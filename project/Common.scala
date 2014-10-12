@@ -21,7 +21,7 @@ object Common {
 	def moduleSettings (module: String) = settings(module) ++: Seq(
 		javaOptions in Test += s"-Dconfig.resource=application.conf"
 	)
-	// Settings for every service, i.e. for admin and web subprojects
+	// Settings for every service, i.e. for manager and web subprojects
 	def serviceSettings (module: String) = moduleSettings(module) ++: Seq(
 	)
 	

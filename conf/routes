@@ -6,6 +6,6 @@
 
 ->  / common.Routes
 
-->  / admin.Routes
+->  / manager.Routes
 
 ->  / web.Routes
