@@ -8,8 +8,7 @@ import play.api.Play.current
 object Application extends Controller {
 
 	def index = Action { implicit request =>
-		val computers = Computer.list
-		Ok(views.html.admin.index("Hello! I'm the ADMIN!", computers))
+		Ok(views.html.admin.index("Hello! I'm the ADMIN!"))
 	}
 
 }
