@@ -1,0 +1,31 @@
+import sbt._
+import Keys._
+import play.PlayImport._
+import com.typesafe.sbt.web.SbtWeb.autoImport.{Assets}
+
+object Common {
+	def appName = "altitude"
+	
+	// Common settings for every project
+	def settings (theName: String) = Seq(
+		name := theName,
+		organization := "altitude",
+		version := "1.0-SNAPSHOT",
+		scalaVersion := "2.11.1",
+		doc in Compile <<= target.map(_ / "none"),
+		scalacOptions ++= Seq("-feature", "-deprecation", "-unchecked", "-language:reflectiveCalls")
+	)
+	// Settings for the app, i.e. the root project
+	val appSettings = settings(appName)
+	// Settings for every module, i.e. for every subproject
+	def moduleSettings (module: String) = settings(module) ++: Seq(
+		javaOptions in Test += s"-Dconfig.resource=application.conf"
+	)
+	// Settings for every service, i.e. for admin and web subprojects
+	def serviceSettings (module: String) = moduleSettings(module) ++: Seq(
+	)
+	
+	val commonDependencies = Seq(
+		cache
+	)
+}
