@@ -1,4 +1,4 @@
-Common.serviceSettings("web")
+Common.serviceSettings("client")
 
 // Add here the specific settings for this module
 

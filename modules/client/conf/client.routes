@@ -1,0 +1,14 @@
+# CLIENT Routes
+# This file defines CLIENT application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /							controllers.client.Application.index
+
+
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.client.Assets.versioned(path="/public", file: Asset)
+
+
+->  / common.Routes

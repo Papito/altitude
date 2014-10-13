@@ -8,4 +8,4 @@
 
 ->  / manager.Routes
 
-->  / web.Routes
+->  / client.Routes
