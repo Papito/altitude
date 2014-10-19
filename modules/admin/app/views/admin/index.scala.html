@@ -1,9 +1,0 @@
-@(message: String)
-
-@import controllers.admin.routes
-
-@views.html.admin.main(title = message) {
-	
-	<h1>ADMIN template</h1>
-	<h3>@message <a href="@routes.Application.index">reload</a></h3>
-}
