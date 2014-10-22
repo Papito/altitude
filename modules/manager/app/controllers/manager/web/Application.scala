@@ -1,4 +1,4 @@
-package controllers.manager
+package controllers.manager.web
 
 import models._
 import play.api._
