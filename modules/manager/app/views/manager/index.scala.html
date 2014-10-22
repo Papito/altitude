@@ -1,9 +1,7 @@
-@(message: String)
-
 @import controllers.manager.web.routes
 
-@views.html.manager.base(title = message) {
+@views.html.manager.base() {
 	
 	<h1>MANAGER template</h1>
-	<h3>@message <a href="@routes.Application.index">reload</a></h3>
+	<h3><a href="@routes.Application.index">reload</a></h3>
 }

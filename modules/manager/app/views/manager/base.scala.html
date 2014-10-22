@@ -1,4 +1,4 @@
-@(title: String, styles: Html = Html(""), scripts: Html = Html(""))(content: Html)
+@(styles: Html = Html(""), scripts: Html = Html(""))(content: Html)
 
 @import controllers.manager.web.routes
 
@@ -7,7 +7,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>@title</title>
+		<title>@appName</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("css/lib/bootstrap.min.css")">

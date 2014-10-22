@@ -1,6 +1,6 @@
 @(request: RequestHeader)
 
-@views.html.manager.base("MANAGER Handler Not Found") {
+@views.html.manager.base => {
 
   <h1>MANAGER Handler Not Found</h1>	
   <p>You requested: @request.path</p>
