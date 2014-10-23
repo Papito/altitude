@@ -9,7 +9,6 @@ bin
 db
 eclipse
 .eclipse
-lib
 log
 logs
 precompiled
