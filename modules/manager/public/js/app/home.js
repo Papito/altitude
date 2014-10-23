@@ -21,7 +21,7 @@ HomeViewModel = BaseViewModel.extend({
         var self = this;
 
         opts = {};
-        opts.url = "/api/home"
+        opts.url = "/api"
         opts.successCallback = function(data, textStatus, jqXHR) {
             var assets = $.map(data.assets, function(asset) { return new Asset(asset) });
             self.assets(assets);
