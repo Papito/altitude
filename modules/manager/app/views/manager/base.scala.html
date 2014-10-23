@@ -6,30 +6,31 @@
 
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>@appName</title>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("css/lib/bootstrap.min.css")">
-        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("css/lib/select2.css")">
-        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("css/app.css")">
+  <head>
+	<title>@appName</title>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("css/lib/bootstrap.min.css")">
+      <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("css/lib/select2.css")">
+      <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("css/app.css")">
 
-        <script src="@routes.Assets.versioned("js/lib/jquery-2.1.1.min.js")"></script>
-        <script src="@routes.Assets.versioned("js/lib/jquery-ui-1.11.2.custom/jquery-ui.min.js")"></script>
+      <script src="@routes.Assets.versioned("js/lib/jquery-2.1.1.min.js")"></script>
+      <script src="@routes.Assets.versioned("js/lib/jquery-ui-1.11.2.custom/jquery-ui.min.js")"></script>
 
-        <script src="@routes.Assets.versioned("js/lib/knockout-3.2.0.js")"></script>
-        <script src="@routes.Assets.versioned("js/lib/knockout-custom-bindings.js")"></script>
-        <script src="@routes.Assets.versioned("js/lib/knockout-jqueryui.min.js")"></script>
+      <script src="@routes.Assets.versioned("js/lib/knockout-3.2.0.js")"></script>
+      <script src="@routes.Assets.versioned("js/lib/knockout-custom-bindings.js")"></script>
+      <script src="@routes.Assets.versioned("js/lib/knockout-jqueryui.min.js")"></script>
 
-        <script src="@routes.Assets.versioned("js/lib/bootstrap.js")"></script>
-        <script src="@routes.Assets.versioned("js/lib/modernizr.custom.js")"></script>
-        <script src="@routes.Assets.versioned("js/lib/select2.min.js")"></script>
+      <script src="@routes.Assets.versioned("js/lib/bootstrap.js")"></script>
+      <script src="@routes.Assets.versioned("js/lib/modernizr.custom.js")"></script>
+      <script src="@routes.Assets.versioned("js/lib/select2.min.js")"></script>
 
-        <script src="@routes.Assets.versioned("js/lib/Base.js")"></script>
-        <script src="@routes.Assets.versioned("js/app/core.js")"></script>
+      <script src="@routes.Assets.versioned("js/lib/Base.js")"></script>
+      <script src="@routes.Assets.versioned("js/app/core.js")"></script>
 
-		@styles
+      @styles
 	</head>
+
 	<body>
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container-fluid">
@@ -52,9 +53,10 @@
         </div>
       </div>
     </div>
-		<div class="container-fluid">
-			@content
-		</div>
-		@scripts
+	<div class="container-fluid">
+      @content
+	</div>
+
+	@scripts
 	</body>
 </html>

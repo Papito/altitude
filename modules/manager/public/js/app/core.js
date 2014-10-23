@@ -60,14 +60,9 @@ BaseViewModel = Base.extend({
     restRequest : function(method, opts) {
         var self = this;
 
-        // Loading ...
-        self.loading.show();
-
         method = method.toUpperCase();
         
         data = opts.data || {};            
-        // add _xsrf protection paramatere to all requests
-        data['_xsrf'] = self.getCookie('_xsrf');
 
         if (method == 'DELETE' && !opts.successCallback) {
             alert('Cannot call "DELETE" method without successCallback defined');
@@ -83,8 +78,6 @@ BaseViewModel = Base.extend({
             data : data,
             cache : false,
             error : function(jqXHR, textStatus, errorThrown) {
-                // Not Loading ...
-                self.loading.hide();
                 $('.has-error').removeClass('has-error');
                 /*
                     Nasty error
