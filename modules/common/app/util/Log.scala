@@ -1,0 +1,4 @@
+package util 
+
+object log {
+}
