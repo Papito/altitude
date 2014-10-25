@@ -9,6 +9,3 @@ lazy val client = (project in file("modules/client")).enablePlugins(PlayScala).d
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala).aggregate(common, manager, client).dependsOn(common,
 manager, client)
-
-
-libraryDependencies ++= Common.commonDependencies

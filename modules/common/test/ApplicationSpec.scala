@@ -1,36 +1,21 @@
-import org.specs2.mutable._
-import org.specs2.runner._
-import org.junit.runner._
+import org.scalatest._
 
-import play.api.test._
-import play.api.test.Helpers._
-import java.io.File
+import collection.mutable.Stack
 
-/**
-* Add your spec here.
-* You can mock out a whole application including requests, plugins etc.
-* For more information, consult the wiki.
-*/
-@RunWith(classOf[JUnitRunner])
-class ApplicationSpec extends Specification {
+class ExampleSpec extends FlatSpec with Matchers {
 
-	val modulePath = new File("./modules/common/")
-	
-	"Common Module" should {
+  "A Stack" should "pop values in last-in-first-out order" in {
+    val stack = new Stack[Int]
+    stack.push(1)
+    stack.push(2)
+    stack.pop() should be (2)
+    stack.pop() should be (1)
+  }
 
-		"send 404 on a bad request" in {
-			running(FakeApplication(path = modulePath)) {
-				route(FakeRequest(GET, "/boum")) must beNone        
-			}
-		}
-    
-		"render the status page" in {
-			running(FakeApplication(path = modulePath)) {
-				val home = route(FakeRequest(GET, "/status")).get
-        
-				status(home) must equalTo(OK)
-				contentAsString(home) must contain ("Everything is great")
-			}
-		}
-	}
+  it should "throw NoSuchElementException if an empty stack is popped" in {
+    val emptyStack = new Stack[Int]
+    a [NoSuchElementException] should be thrownBy {
+      emptyStack.pop()
+    }
+  }
 }

@@ -1,6 +1,5 @@
 Common.moduleSettings("common")
 
-// Add here the specific settings for this module
-
-
-libraryDependencies ++= Common.commonDependencies
+libraryDependencies ++= Seq(
+  "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test"
+)
