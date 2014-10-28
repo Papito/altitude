@@ -22,9 +22,9 @@ object log {
   def getLogStmt(level: Level, msg: String, v: Map[String, String] = Map[String, String](), t: Seq[String] = Seq[String]()) = {
     val values = v map { case (key, value) => (key, JsString(value))}
     val json = Json.obj(
-      "msg" -> msg,
+      "msg"   -> msg,
       "level" -> level.toString,
-      "tags" -> t
+      "tags"  -> t
     ) ++ JsObject(values.toSeq)
 
     Json.stringify(json)
