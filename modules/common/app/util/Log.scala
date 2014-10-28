@@ -16,7 +16,6 @@ object log {
 
   private def log(level: Level, msg: String, v: Map[String, String] = Map[String, String](), t: Seq[String] = Seq[String]()): Unit = {
     val stm = this.getLogStmt(level = level, msg = msg, v = v, t = t)
-    println(stm)
   }
 
   def getLogStmt(level: Level, msg: String, v: Map[String, String] = Map[String, String](), t: Seq[String] = Seq[String]()) = {
