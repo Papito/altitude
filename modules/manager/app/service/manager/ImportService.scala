@@ -6,11 +6,10 @@ import util.log
 
 class ImportService {
 
-  private val DAO: ImportDao = new ImportDao
+  private val DAO = new ImportDao
 
-  def getImportAssets(): List[ImportAsset] = {
+  def getImportAssets: List[ImportAsset] = {
     log.info("In import service")
-    val assets = this.DAO.getImportAssets()
-    return assets
+    this.DAO.getImportAssets
   }
 }

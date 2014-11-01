@@ -14,6 +14,6 @@ object ImportController extends Controller {
 
       val assets = this.importService.getImportAssets
 
-      Ok( Json.obj() )
+      Ok( Json.obj("ok" -> JsBoolean(true)) )
     }
 }
