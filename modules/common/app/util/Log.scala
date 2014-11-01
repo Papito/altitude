@@ -20,11 +20,16 @@ object log {
     this.log(Level.INFO, msg = msg, t = t)
   }
 
-  private def log(level: Level, msg: String, v: Map[String, String] = Map[String, String](), t: Seq[String] = Seq[String]()): Unit = {
+  private def log(level: Level, msg: String,
+                  v: Map[String, String] = Map[String, String](),
+                  t: Seq[String] = Seq[String]()): Unit = {
     val stm = this.getLogStmt(level = level, msg = msg, v = v, t = t)
+    println(stm)
   }
 
-  def getLogStmt(level: Level, msg: String, v: Map[String, String] = Map[String, String](), t: Seq[String] = Seq[String]()) = {
+  def getLogStmt(level: Level, msg: String,
+                 v: Map[String, String] = Map[String, String](),
+                 t: Seq[String] = Seq[String]()) = {
     val values = v map { case (key, value) => (key, JsString(value))}
     val json = Json.obj(
       "msg"   -> msg,
