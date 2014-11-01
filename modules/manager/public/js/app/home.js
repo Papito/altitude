@@ -1,5 +1,4 @@
 function Asset(data) {
-    var self = this;
     this.id = data ? data.id : null;
     this.fileName = data ? data.fileName : null;
     this.createdAt = data ? data.createdAt : null;
@@ -8,7 +7,6 @@ function Asset(data) {
 
 HomeViewModel = BaseViewModel.extend({
     constructor : function() {
-        var self = this;
         this.base();
         console.log('Initializing home view model');
 
@@ -20,11 +18,11 @@ HomeViewModel = BaseViewModel.extend({
     loadAssets: function() {
         var self = this;
 
-        opts = {};
+        var opts = {};
         opts.url = "/api"
         opts.successCallback = function(data, textStatus, jqXHR) {
-            var assets = $.map(data.assets, function(asset) { return new Asset(asset) });
-            self.assets(assets);
+            //var assets = $.map(data.assets, function(asset) { return new Asset(asset) });
+            //self.assets(assets);
         };
 
         self.get(opts);

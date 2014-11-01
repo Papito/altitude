@@ -12,6 +12,14 @@ object log {
   var STORAGE = "tag.STORAGE"
   var AUTH = "tag.AUTH"
 
+  def debug(msg: String, v: Map[String, String], t: String*): Unit = {
+    this.log(Level.FINE, msg = msg, v = v, t = t)
+  }
+
+  def debug(msg: String, t: String*): Unit = {
+    this.log(Level.FINE, msg = msg, t = t)
+  }
+
   def info(msg: String, v: Map[String, String], t: String*): Unit = {
     this.log(Level.INFO, msg = msg, v = v, t = t)
   }
