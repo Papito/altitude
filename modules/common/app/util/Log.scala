@@ -5,7 +5,6 @@ import play.api.libs.json.Json
 import java.util.logging.Level
 
 object log {
-
   var APP = "tag.APP"
   var API = "tag.API"
   var WEB = "tag.WEB"
