@@ -4,12 +4,12 @@
 
 # API
 GET     /api                        controllers.manager.api.RootController.index
+GET     /api/import                     controllers.manager.api.ImportController.index
 
 GET     /							controllers.manager.web.IndexController.index
 GET     /import						controllers.manager.web.ImportController.index
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.manager.web.Assets.versioned(path="/public", file: Asset)
-
 
 ->  / common.Routes
