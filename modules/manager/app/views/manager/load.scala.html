@@ -1,0 +1,14 @@
+@import controllers.manager.web.routes
+
+@scriptsArg = {
+      <script src="@routes.Assets.versioned("js/app/home.js")"></script>
+}
+
+@views.html.manager.base(scripts = scriptsArg) {
+  <script>
+    $(document).ready(function() {
+      homeViewModel = new HomeViewModel();
+      ko.applyBindings(homeViewModel);
+    });
+  </script>
+}

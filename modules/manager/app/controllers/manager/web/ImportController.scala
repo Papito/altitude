@@ -3,11 +3,11 @@ package controllers.manager.web
 import play.api.mvc._
 import util.log
 
-object IndexController extends Controller {
+object ImportController extends Controller {
 
 	def index = Action { implicit request =>
-    log.info("Index controller", log.WEB)
-		Ok(views.html.manager.index())
+    log.info("Import controller", log.WEB)
+		Ok(views.html.manager.load())
 	}
 
 }
