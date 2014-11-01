@@ -6,6 +6,12 @@ import java.util.logging.Level
 
 object log {
 
+  var APP = "tag.APP"
+  var API = "tag.API"
+  var WEB = "tag.WEB"
+  var STORAGE = "tag.STORAGE"
+  var AUTH = "tag.AUTH"
+
   def info(msg: String, v: Map[String, String], t: String*): Unit = {
     this.log(Level.INFO, msg = msg, v = v, t = t)
   }
