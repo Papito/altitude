@@ -7,7 +7,6 @@ import org.json4s.DefaultFormats
 import play.api.mvc._
 
 object ImportController extends Controller {
-
     private val importService = new ImportService
     implicit val formats = DefaultFormats
 
