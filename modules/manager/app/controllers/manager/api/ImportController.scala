@@ -1,5 +1,6 @@
 package controllers.manager.api
 
+import play.api.Play
 import util.log
 import service.manager.ImportService
 import org.json4s.native.Serialization.write
@@ -13,7 +14,8 @@ object ImportController extends Controller {
     def index = Action { implicit request =>
       log.debug("Import API controller", log.API)
 
-      val assets = this.importService.getImportAssets
+      val importPath = Play.current.configuration.getString("import.path").getOrElse("")
+      val assets = this.importService.getImportAssets(path = importPath)
       val out = assets map {_.toDict}
 
       Ok( write( "assets" -> out) )

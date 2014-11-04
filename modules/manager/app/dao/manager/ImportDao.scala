@@ -1,6 +1,5 @@
 package dao.manager
 
-import play.api.Play
 import org.apache.commons.io.FileUtils
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
@@ -12,11 +11,10 @@ import util.log
 class ImportDao {
   val imageSuffixes = List("jpg", "jpeg")
 
-  def getImportAssets: List[ImportAsset] = {
-    val importPath = Play.current.configuration.getString("import.path").getOrElse("")
-    log.info("Importing from '$importPath'", Map("importPath" -> importPath), log.STORAGE)
+  def getImportAssets(path: String): List[ImportAsset] = {
+    log.info("Importing from 'path'", Map("importPath" -> path), log.STORAGE)
 
-    val fileIterator = FileUtils.iterateFiles(new File(importPath), imageSuffixes.toArray, true)
+    val fileIterator = FileUtils.iterateFiles(new File(path), imageSuffixes.toArray, true)
     val assets = new ListBuffer[ImportAsset]
 
     for(file <- fileIterator) {

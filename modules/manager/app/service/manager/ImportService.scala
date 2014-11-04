@@ -8,8 +8,8 @@ class ImportService {
 
   private val DAO = new ImportDao
 
-  def getImportAssets: List[ImportAsset] = {
+  def getImportAssets(path: String): List[ImportAsset] = {
     log.info("In import service")
-    this.DAO.getImportAssets
+    this.DAO.getImportAssets(path = path)
   }
 }
