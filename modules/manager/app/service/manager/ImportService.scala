@@ -9,7 +9,9 @@ class ImportService {
   private val DAO = new ImportDao
 
   def getImportAssets(path: String): List[ImportAsset] = {
-    log.info("In import service")
+    require(path.nonEmpty)
+    log.info("In import service to import from $path", Map("path" -> path), log.SERVICE)
+
     this.DAO.getImportAssets(path = path)
   }
 }

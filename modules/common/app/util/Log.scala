@@ -5,11 +5,12 @@ import play.api.libs.json.Json
 import java.util.logging.Level
 
 object log {
-  var APP = "tag.APP"
-  var API = "tag.API"
-  var WEB = "tag.WEB"
+  var APP     = "tag.APP"
+  var API     = "tag.API"
+  var WEB     = "tag.WEB"
+  var SERVICE = "tag.SERVICE"
   var STORAGE = "tag.STORAGE"
-  var AUTH = "tag.AUTH"
+  var AUTH    = "tag.AUTH"
 
   def debug(msg: String, v: Map[String, String], t: String*): Unit = {
     this.log(Level.FINE, msg = msg, v = v, t = t)
