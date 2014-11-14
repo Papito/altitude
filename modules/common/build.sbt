@@ -1,7 +1,7 @@
 Common.moduleSettings("common")
 
 libraryDependencies ++= Seq(
-  "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test",
+  "org.scalatest" % "scalatest_2.11" % "2.2.1",
   "org.json4s" %% "json4s-native" % "3.2.11",
   "org.apache.commons" % "commons-io" % "1.3.2"
 )
