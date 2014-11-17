@@ -4,4 +4,5 @@ Common.serviceSettings("manager")
 
 
 libraryDependencies ++= Common.commonDependencies ++: Seq(
+  "org.scalatestplus" %% "play" % "1.2.0" % "test"
 )
