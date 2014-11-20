@@ -1,10 +1,21 @@
-import play.api._
-import play.api.mvc._
-import play.api.mvc.Results._
+ package global
+
 import scala.concurrent.Future
+import play.api._
+import play.api.mvc.Results._
+import play.api.mvc._
+import util.log
+
+import service.manager.ImportService
 
 object ManagerGlobal extends GlobalSettings {	
-	
+
+	def importService: ImportService = new ImportService
+
+	override def onStart(app: Application) {
+		log.info("Application starting", log.APP)
+	}
+
 	// 404 - page not found error
 	override def onHandlerNotFound (request: RequestHeader) = Future.successful(
 		NotFound(views.html.manager.errors.onHandlerNotFound(request))
