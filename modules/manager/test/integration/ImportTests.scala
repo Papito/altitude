@@ -2,10 +2,6 @@ package integration
 
 import org.scalatest._
 import org.scalatestplus.play._
-import play.api.Play
-import util.log
-
-import scala.io.Source
 
 class ImportTests extends FunSuite with OneAppPerSuite {
 

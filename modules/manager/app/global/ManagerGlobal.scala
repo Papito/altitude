@@ -5,6 +5,7 @@ import play.api._
 import play.api.mvc.Results._
 import play.api.mvc._
 import util.log
+import constants.{const => C}
 
 import service.manager.ImportService
 
@@ -13,7 +14,7 @@ object ManagerGlobal extends GlobalSettings {
 	def importService: ImportService = new ImportService
 
 	override def onStart(app: Application) {
-		log.info("Application starting", log.APP)
+		log.info("Application starting", C.tag.APP)
 	}
 
 	// 404 - page not found error
