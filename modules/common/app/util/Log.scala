@@ -26,6 +26,10 @@ object log {
                   v: Map[String, String] = Map[String, String](),
                   t: Seq[String] = Seq[String]()): Unit = {
     val stm = this.getLogStmt(level = level, msg = msg, v = v, t = t)
+    this.output(stm)
+  }
+
+  protected def output(stm: String): Unit = {
     println(stm)
   }
 
@@ -33,8 +37,14 @@ object log {
                  v: Map[String, String] = Map[String, String](),
                  t: Seq[String] = Seq[String]()) = {
     val values = v map { case (key, value) => (key, JsString(value))}
+
+    // replace all occurrences of variables in the message (start with '$')
+    val interpolatedMsg = v.foldLeft(msg){
+      case (out, (k, v)) => out.replaceAll("\\$"+k, v)
+    }
+
     val json = Json.obj(
-      "msg"   -> msg,
+      "msg"   -> interpolatedMsg,
       "level" -> level.toString,
       "tags"  -> t
     ) ++ JsObject(values.toSeq)

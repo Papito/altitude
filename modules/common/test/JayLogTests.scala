@@ -55,4 +55,17 @@ class JayLogTests extends FunSuite {
     json \ "v2" should not be Nil
     (json \ "v2").as[String] should equal ("value 2")
   }
+
+  test("variable substitution") {
+    val jsonText: String = log.getLogStmt(Level.INFO, "$v1, $v2", V)
+    jsonText should not be Nil
+    val json: JsValue = Json.parse(jsonText)
+
+    json \ "v1" should not be Nil
+    (json \ "v1").as[String] should equal ("value 1")
+    json \ "v2" should not be Nil
+    (json \ "v2").as[String] should equal ("value 2")
+
+    (json \ "msg").as[String] should equal ("value 1, value 2")
+  }
 }
