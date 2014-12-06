@@ -5,6 +5,7 @@ import play.api.libs.json.Json
 import java.util.logging.Level
 
 object log {
+
   def debug(msg: String, v: Map[String, String], t: String*): Unit = {
     this.log(Level.FINE, msg = msg, v = v, t = t)
   }
