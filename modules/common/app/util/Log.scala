@@ -19,6 +19,12 @@ object log {
     constants += (name -> JsString(value.toString))
   }
 
+  def trace(msg: String, v: Map[String, String], t: String*) =
+    log(Level.FINER, msg = msg, v = v, t = t)
+
+  def trace(msg: String, t: String*) =
+    log(Level.FINER, msg = msg, t = t)
+
   def debug(msg: String, v: Map[String, String], t: String*) =
     log(Level.FINE, msg = msg, v = v, t = t)
 
@@ -57,7 +63,7 @@ object log {
   def getLogStmt(level: Level, msg: String,
                  v: Map[String, String] = Map(),
                  t: Seq[String] = Seq()) = {
-    val values = (v map { case (key, value) => (key, JsString(value))})
+    val values = v map { case (key, value) => (key, JsString(value))}
 
     // check if arbitrary value keys collide with reserved ones
     for (reservedKey: String <- List(MSG, LEVEL, TAGS)) {
