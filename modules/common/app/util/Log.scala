@@ -73,7 +73,7 @@ object log {
     val values = v map { case (key, value) => (key, JsString(value))}
 
     // check if arbitrary value keys collide with reserved ones
-    for (reservedKey: String <- List(MSG, LEVEL, TAGS)) {
+    for (reservedKey: String <- List(MSG, LEVEL, TAGS, LOC, TIME)) {
       if (v.contains(reservedKey)) {
         warn(
           "Logger reserved key collision for '$key'. Lost value: '$value'",

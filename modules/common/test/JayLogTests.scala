@@ -87,7 +87,7 @@ class JayLogTests extends FunSuite {
     val jsonText: String = log.getLogStmt(
       Level.INFO, "constants test"
     )
-    println(jsonText)
+
     val json: JsValue = Json.parse(jsonText)
 
     json \ "module" should not be Nil
