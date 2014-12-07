@@ -68,4 +68,15 @@ class JayLogTests extends FunSuite {
 
     (json \ "msg").as[String] should equal ("value 1, value 2")
   }
-}
+
+  test("name collision") {
+    val jsonText: String = log.getLogStmt(
+      Level.INFO,
+      "message",
+      Map("msg" -> "Success message")
+    )
+
+    val json: JsValue = Json.parse(jsonText)
+
+    (json \ "msg").as[String] should equal ("Success message")
+  }}
