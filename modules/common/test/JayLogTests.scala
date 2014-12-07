@@ -72,12 +72,27 @@ class JayLogTests extends FunSuite {
 
   test("name collision") {
     val jsonText: String = log.getLogStmt(
-      Level.INFO,
-      "message",
-      Map("msg" -> "Success message")
+      Level.INFO, "message", Map("msg" -> "Success message")
     )
 
     val json: JsValue = Json.parse(jsonText)
 
     (json \ "msg").as[String] should equal ("Success message")
-  }}
+  }
+
+  test("log constants") {
+    log.addConstant("module", "JayLog")
+    log.addConstant("threads", 4)
+
+    val jsonText: String = log.getLogStmt(
+      Level.INFO, "constants test"
+    )
+    println(jsonText)
+    val json: JsValue = Json.parse(jsonText)
+
+    json \ "module" should not be Nil
+    (json \ "module").as[String] should equal ("JayLog")
+    json \ "threads" should not be Nil
+    (json \ "threads").as[String] should equal ("4")
+  }
+}
