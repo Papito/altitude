@@ -11,37 +11,31 @@ object log {
 
   private val LOGGER_TAG = "LOGGER"
 
-  def debug(msg: String, v: Map[String, String], t: String*): Unit = {
-    this.log(Level.FINE, msg = msg, v = v, t = t)
-  }
+  def debug(msg: String, v: Map[String, String], t: String*) =
+    log(Level.FINE, msg = msg, v = v, t = t)
 
-  def debug(msg: String, t: String*): Unit = {
-    this.log(Level.FINE, msg = msg, t = t)
-  }
+  def debug(msg: String, t: String*) =
+    log(Level.FINE, msg = msg, t = t)
 
-  def info(msg: String, v: Map[String, String], t: String*): Unit = {
-    this.log(Level.INFO, msg = msg, v = v, t = t)
-  }
 
-  def info(msg: String, t: String*): Unit = {
-    this.log(Level.INFO, msg = msg, t = t)
-  }
+  def info(msg: String, v: Map[String, String], t: String*) =
+    log(Level.INFO, msg = msg, v = v, t = t)
 
-  def warn(msg: String, v: Map[String, String], t: String*): Unit = {
-    this.log(Level.WARNING, msg = msg, v = v, t = t)
-  }
+  def info(msg: String, t: String*) =
+    log(Level.INFO, msg = msg, t = t)
 
-  def warn(msg: String, t: String*): Unit = {
-    this.log(Level.WARNING, msg = msg, t = t)
-  }
 
-  def error(msg: String, v: Map[String, String], t: String*): Unit = {
-    this.log(Level.SEVERE, msg = msg, v = v, t = t)
-  }
+  def warn(msg: String, v: Map[String, String], t: String*) =
+    log(Level.WARNING, msg = msg, v = v, t = t)
 
-  def error(msg: String, t: String*): Unit = {
-    this.log(Level.SEVERE, msg = msg, t = t)
-  }
+  def warn(msg: String, t: String*) =
+    log(Level.WARNING, msg = msg, t = t)
+
+
+  def error(msg: String, v: Map[String, String], t: String*) =
+    log(Level.SEVERE, msg = msg, v = v, t = t)
+
+  def error(msg: String, t: String*) = log(Level.SEVERE, msg = msg, t = t)
 
   private def log(level: Level, msg: String,
                   v: Map[String, String] = Map(),
