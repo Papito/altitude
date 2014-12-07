@@ -1,6 +1,7 @@
 package dao.manager
 
 import org.apache.commons.io.FileUtils
+import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
 import java.io.File
@@ -10,12 +11,12 @@ import util.log
 import constants.{const => C}
 
 class ImportDao {
-  val imageSuffixes = List("jpg", "jpeg")
+  private val ANY_FILE_FILTER: IOFileFilter = TrueFileFilter.INSTANCE
 
   def getImportAssets(path: String): List[ImportAsset] = {
-    log.info("Importing from 'path'", Map("importPath" -> path), C.tag.STORAGE)
+    log.info("Importing from 'importPath'", Map("importPath" -> path), C.tag.STORAGE)
 
-    val fileIterator = FileUtils.iterateFiles(new File(path), imageSuffixes.toArray, true)
+    val fileIterator = FileUtils.iterateFiles(new File(path), ANY_FILE_FILTER, ANY_FILE_FILTER)
     val assets = new ListBuffer[ImportAsset]
 
     for(file <- fileIterator) {
