@@ -12,6 +12,7 @@ class JayLogTests extends FunSuite {
 
   test("with message") {
     val jsonText: String = log.getLogStmt(Level.INFO, "message")
+    println(jsonText)
     jsonText should not be Nil
     val json: JsValue = Json.parse(jsonText)
 
