@@ -1,12 +1,20 @@
 package models
 
-class ImportAsset(pathArg: String) {
-  require(pathArg != Nil)
+import java.io.File
 
-  def path = pathArg
+class ImportAsset(argFile: File) {
+  require(argFile != null)
+
+  val absolutePath = file.getAbsolutePath
+  val name = file.getName
+  var mediaType: AssetMediaType = null
+
+  def file = argFile
 
   def toDict = Map(
-    "path" -> this.path
+    "path" -> absolutePath
   )
+
+  override def toString = this.absolutePath
 }
 

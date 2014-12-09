@@ -5,8 +5,8 @@ import org.scalatestplus.play._
 
 class ImportTests extends FunSuite with OneAppPerSuite {
 
-  test("List files") {
+  test("Import files") {
     val incomingPath = getClass.getResource("../files/incoming").getPath
-    global.ManagerGlobal.importService.getImportAssets(path = incomingPath)
+    global.ManagerGlobal.importService.importAssets(path = incomingPath)
   }
 }

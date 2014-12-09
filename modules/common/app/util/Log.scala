@@ -83,7 +83,7 @@ object log {
       }
     }
 
-    // replace all occurrences of variables in the message
+    // replace all occurrences of $variables in the message
     val interpolatedMsg = v.foldLeft(msg){
       case (out, (k, v)) => out.replaceAll("\\$"+k, v.toString)
     }
