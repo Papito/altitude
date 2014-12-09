@@ -1,5 +1,6 @@
 package dao.manager
 
+import org.apache.tika._
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
 import scala.collection.mutable.ListBuffer
@@ -15,6 +16,7 @@ class ImportDao {
 
   def getImportAssets(path: String): List[ImportAsset] = {
     log.info("Importing from 'importPath'", Map("importPath" -> path), C.tag.STORAGE)
+    require(path != Nil)
 
     val fileIterator = FileUtils.iterateFiles(new File(path), ANY_FILE_FILTER, ANY_FILE_FILTER)
     val assets = new ListBuffer[ImportAsset]

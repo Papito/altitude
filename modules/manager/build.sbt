@@ -4,5 +4,6 @@ Common.serviceSettings("manager")
 
 
 libraryDependencies ++= Common.commonDependencies ++: Seq(
-  "org.scalatestplus" %% "play" % "1.2.0" % "test"
+  "org.scalatestplus" %% "play" % "1.2.0" % "test",
+  "org.apache.tika" % "tika-parsers" % "1.4"
 )

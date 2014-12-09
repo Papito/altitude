@@ -1,5 +1,6 @@
-Common.appSettings
+import play.PlayScala
 
+Common.appSettings
 
 lazy val common = (project in file("modules/common")).enablePlugins(PlayScala)
 
