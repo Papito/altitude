@@ -24,6 +24,6 @@ ImportViewModel = BaseViewModel.extend({
             //self.assets(assets);
         };
 
-        self.get(opts);
+        //self.get(opts);
     }
 });

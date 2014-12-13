@@ -5,7 +5,13 @@
 }
 
 @views.html.manager.base(scripts = scriptsArg) {
-  <script>
+    <div class="row">
+        <div class="col-md-2 col-md-offset-5">
+            <button type="button" class="btn btn-default">Start Import</button>
+        </div>
+    </div>
+
+    <script>
     $(document).ready(function() {
       var importViewModel = new ImportViewModel();
       ko.applyBindings(importViewModel);
