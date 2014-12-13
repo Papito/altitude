@@ -10,7 +10,7 @@ import play.api.mvc._
 import constants.{const => C}
 
 object ImportController extends Controller {
-    implicit val formats = DefaultFormats
+   implicit val formats = DefaultFormats
 
     def index = Action { implicit request =>
       log.debug("Import API controller", C.tag.API)
@@ -21,24 +21,27 @@ object ImportController extends Controller {
       Ok( write( "assets" -> out) )
     }
 
-  object ImportWebSocketActor{
+  object ImportWebSocketActor {
     def props(out: ActorRef) = Props(new ImportWebSocketActor(out))
   }
 
   class ImportWebSocketActor(out: ActorRef) extends Actor {
     def receive = {
-      case msg: String =>
-        out ! ("I received your message: " + msg)
+      case msg: String => cycle(out)
     }
   }
+
   def socket = WebSocket.acceptWithActor[String, String] { request => out =>
     ImportWebSocketActor.props(out)
   }
 
-  /*
-  def index() = WebSocket.tryAccept[JsValue] { request  =>
-    //log.debug("Import API controller", C.tag.API)
-    //val importPath = Play.current.configuration.getString("import.path").getOrElse("")
+  private def cycle(out: ActorRef): Unit = {
+    log.debug("Import API controller", C.tag.API)
+    val importPath = Play.current.configuration.getString("import.path").getOrElse("")
+    val assets = global.ManagerGlobal.importService.getImportAssets(path = importPath)
+    val data = assets map {_.toDict}
+    assets.foreach(asset => out ! (asset.toDict.toString()))
   }
-  */
+
+
 }
