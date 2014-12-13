@@ -7,7 +7,7 @@
 @views.html.manager.base(scripts = scriptsArg) {
   <script>
     $(document).ready(function() {
-      homeViewModel = new HomeViewModel();
+      var homeViewModel = new HomeViewModel();
       ko.applyBindings(homeViewModel);
     });
   </script>

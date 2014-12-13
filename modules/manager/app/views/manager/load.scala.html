@@ -7,7 +7,7 @@
 @views.html.manager.base(scripts = scriptsArg) {
   <script>
     $(document).ready(function() {
-      importViewModel = new ImportViewModel();
+      var importViewModel = new ImportViewModel();
       ko.applyBindings(importViewModel);
     });
   </script>
