@@ -62,7 +62,7 @@ object log {
     println(stm)
   }
 
-  protected def getTimestamp(): String = {
+  protected def getTimestamp: String = {
     val format = new java.text.SimpleDateFormat(TIME_FORMAT)
     format.format(new java.util.Date())
   }
