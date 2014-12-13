@@ -9,7 +9,6 @@ import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.Metadata
 import org.apache.tika.mime.MediaType
 import util.log
-import constants.{const => C}
 
 class ImportService {
   private val DAO = new ImportDao
