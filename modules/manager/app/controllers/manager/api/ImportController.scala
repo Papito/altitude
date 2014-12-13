@@ -1,6 +1,8 @@
 package controllers.manager.api
 
+import akka.actor.{Props, ActorRef, Actor}
 import play.api.Play
+import play.api.Play.current
 import util.log
 import org.json4s.native.Serialization.write
 import org.json4s.DefaultFormats
@@ -18,4 +20,25 @@ object ImportController extends Controller {
 
       Ok( write( "assets" -> out) )
     }
+
+  object ImportWebSocketActor{
+    def props(out: ActorRef) = Props(new ImportWebSocketActor(out))
+  }
+
+  class ImportWebSocketActor(out: ActorRef) extends Actor {
+    def receive = {
+      case msg: String =>
+        out ! ("I received your message: " + msg)
+    }
+  }
+  def socket = WebSocket.acceptWithActor[String, String] { request => out =>
+    ImportWebSocketActor.props(out)
+  }
+
+  /*
+  def index() = WebSocket.tryAccept[JsValue] { request  =>
+    //log.debug("Import API controller", C.tag.API)
+    //val importPath = Play.current.configuration.getString("import.path").getOrElse("")
+  }
+  */
 }

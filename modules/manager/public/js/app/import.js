@@ -11,19 +11,28 @@ ImportViewModel = BaseViewModel.extend({
         console.log('Initializing import view model');
 
         this.assets = ko.observableArray([]);
-        this.loadAssets();
+        this.import();
     },
 
-    loadAssets: function() {
-        var self = this;
+    import: function() {
+        var ws = new WebSocket('ws://localhost:9000/ws/import');
 
-        var opts = {};
-        opts.url = "/api/import"
-        opts.successCallback = function(data, textStatus, jqXHR) {
-            //var assets = $.map(data.assets, function(asset) { return new Asset(asset) });
-            //self.assets(assets);
+        // When the connection is open, send some data to the server
+        ws.onopen = function () {
+            ws.send('');
+            console.log('Socket connected')
         };
 
-        //self.get(opts);
+        // Log errors
+        ws.onerror = function (error) {
+            console.log('WebSocket Error ');
+            console.log(error);
+        };
+
+        ws.onmessage = function (e) {
+            var out = '<tr><td>' + e.data + '</td></tr>'
+            $('#out').prepend(out);
+        };
+
     }
 });

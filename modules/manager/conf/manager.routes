@@ -4,7 +4,7 @@
 
 # API
 GET     /api                        controllers.manager.api.RootController.index
-GET     /api/import                     controllers.manager.api.ImportController.index
+GET     /ws/import                  controllers.manager.api.ImportController.socket
 
 GET     /							controllers.manager.web.IndexController.index
 GET     /import						controllers.manager.web.ImportController.index
