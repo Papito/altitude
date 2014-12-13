@@ -43,13 +43,13 @@ class JayLogTests extends FunSuite {
   }
 
   test("with message, tags, and values") {
-    val jsonText: String = log.getLogStmt(Level.WARNING, "message", V, Seq[String](C.tag.WEB, C.tag.STORAGE))
+    val jsonText: String = log.getLogStmt(Level.WARNING, "message", V, Seq[String](C.tag.WEB, C.tag.DB))
     jsonText should not be Nil
     val json: JsValue = Json.parse(jsonText)
     (json \ "level").as[String] should equal (Level.WARNING.toString)
     (json \ "tags").as[List[String]] should have size 2
     (json \ "tags").as[List[String]] should contain (C.tag.WEB)
-    (json \ "tags").as[List[String]] should contain (C.tag.STORAGE)
+    (json \ "tags").as[List[String]] should contain (C.tag.DB)
 
     json \ "v1" should not be Nil
     (json \ "v1").as[String] should equal ("value 1")

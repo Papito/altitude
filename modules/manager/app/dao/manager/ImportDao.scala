@@ -14,14 +14,14 @@ class ImportDao {
   private val ANY_FILE_FILTER: IOFileFilter = TrueFileFilter.INSTANCE
 
   def getImportAssets(path: String): List[ImportAsset] = {
-    log.info("Importing from 'importPath'", Map("importPath" -> path), C.tag.STORAGE)
+    log.info("Importing from 'importPath'", Map("importPath" -> path), C.tag.DB)
     require(path != null)
 
     val files = FileUtils.iterateFiles(new File(path), ANY_FILE_FILTER, ANY_FILE_FILTER)
     val assets = new ListBuffer[ImportAsset]
 
     for(fileIt <- files) {
-      log.info("Processing '$file'", Map("file" -> fileIt), C.tag.STORAGE)
+      log.info("Processing '$file'", Map("file" -> fileIt), C.tag.DB)
       val file: File = new File(fileIt.toString)
       val importAsset = new ImportAsset(file)
       assets += importAsset
