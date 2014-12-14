@@ -4,44 +4,31 @@ import akka.actor.{Props, ActorRef, Actor}
 import play.api.Play
 import play.api.Play.current
 import util.log
-import org.json4s.native.Serialization.write
-import org.json4s.DefaultFormats
 import play.api.mvc._
 import constants.{const => C}
 
 object ImportController extends Controller {
-   implicit val formats = DefaultFormats
-
-    def index = Action { implicit request =>
-      log.debug("Import API controller", C.tag.API)
-      val importPath = Play.current.configuration.getString("import.path").getOrElse("")
-
-      val assets = global.ManagerGlobal.importService.getImportAssets(path=importPath)
-      val out = assets map {_.toDict}
-
-      Ok( write( "assets" -> out) )
-    }
-
-  object ImportWebSocketActor {
-    def props(out: ActorRef) = Props(new ImportWebSocketActor(out))
-  }
-
-  class ImportWebSocketActor(out: ActorRef) extends Actor {
-    def receive = {
-      case msg: String => cycle(out)
-    }
-  }
 
   def socket = WebSocket.acceptWithActor[String, String] { request => out =>
+    log.info("Import websocket endpoint", C.tag.WEB)
     ImportWebSocketActor.props(out)
   }
 
-  private def cycle(out: ActorRef): Unit = {
-    log.debug("Import API controller", C.tag.API)
-    val importPath = Play.current.configuration.getString("import.path").getOrElse("")
-    val assets = global.ManagerGlobal.importService.iterateAssets(path = importPath)
-    assets.foreach(asset => out ! asset.toDict.toString())
+  private object ImportWebSocketActor {
+    def props(out: ActorRef) = Props(new ImportWebSocketActor(out))
   }
 
+  private class ImportWebSocketActor(out: ActorRef) extends Actor {
+    val importPath = Play.current.configuration.getString("import.path").getOrElse("")
+    val assets = global.ManagerGlobal.importService.iterateAssets(path=importPath)
+
+    def receive = {
+      case msg: String => {
+        if (assets.hasNext)
+          out ! assets.next().toDict.toString
+        else out ! ""
+      }
+    }
+  }
 
 }

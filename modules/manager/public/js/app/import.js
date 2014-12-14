@@ -30,8 +30,14 @@ ImportViewModel = BaseViewModel.extend({
         };
 
         ws.onmessage = function (e) {
-            var out = '<tr><td>' + e.data + '</td></tr>'
-            $('#out').prepend(out);
+            if (e.data) {
+                var out = '<tr><td>' + e.data + '</td></tr>'
+                $('#out').prepend(out);
+                ws.send('');
+            }
+            else {
+                ws.close();
+            }
         };
 
     }
