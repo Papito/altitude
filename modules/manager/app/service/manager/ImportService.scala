@@ -22,7 +22,7 @@ class ImportService {
     DAO.iterateAssets(path = path).to[List]
   }
 
-  def importAssets(path: String): Iterator[ImportAsset] = {
+  def iterateAssets(path: String): Iterator[ImportAsset] = {
     require(path.nonEmpty)
     log.info("Importing assets in '$path'", Map("path" -> path))
 
@@ -31,7 +31,6 @@ class ImportService {
     new Iterable[ImportAsset] {
       def iterator = new Iterator[ImportAsset] {
         def hasNext = assets.hasNext
-
         def next() = assets.next()
       }
     }.toIterator
