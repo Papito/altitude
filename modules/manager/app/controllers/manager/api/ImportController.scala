@@ -6,8 +6,11 @@ import play.api.Play.current
 import util.log
 import play.api.mvc._
 import constants.{const => C}
+import org.json4s.native.Serialization._
+import org.json4s.DefaultFormats
 
 object ImportController extends Controller {
+  implicit val formats = DefaultFormats
 
   def socket = WebSocket.acceptWithActor[String, String] { request => out =>
     log.info("Import websocket endpoint", C.tag.WEB)
@@ -25,7 +28,7 @@ object ImportController extends Controller {
     def receive = {
       case msg: String => {
         if (assets.hasNext)
-          out ! assets.next().toDict.toString
+          out ! write("asset" -> assets.next().toDict)
         else out ! ""
       }
     }

@@ -32,6 +32,7 @@ ImportViewModel = BaseViewModel.extend({
         this.socket.onopen = function () {
             self.isImporting(true);
             self.socket.send('');
+            //console.log('Getting total import progress')
             console.log('Socket connected')
         };
 
@@ -45,14 +46,18 @@ ImportViewModel = BaseViewModel.extend({
         this.socket.onmessage = function (e) {
             if (e.data) {
                 console.log('ws > ' + e.data);
-                var out = '<tr><td>' + e.data + '</td></tr>'
-                $('#out').prepend(out);
-                self.socket.send('');
+                self.handleResponse(e.data);
             }
             else {
                 self.cancelImportAssets();
             }
         };
 
+    },
+
+    handleResponse: function (data) {
+        var out = '<tr><td>' + data + '</td></tr>';
+        $('#out').prepend(out);
+        this.socket.send('');
     }
 });
