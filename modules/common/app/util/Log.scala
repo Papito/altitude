@@ -99,6 +99,7 @@ object log {
       LOC   -> location.mkString(":")
     ) ++ JsObject(values.toSeq) ++ JsObject(constants.toSeq)
 
+    //FIXME: use org.json4s.native.Serialization._?
     Json.stringify(json)
   }
 }

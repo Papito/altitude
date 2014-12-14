@@ -55,9 +55,16 @@ ImportViewModel = BaseViewModel.extend({
 
     },
 
-    handleResponse: function (data) {
-        var out = '<tr><td>' + data + '</td></tr>';
-        $('#out').prepend(out);
-        this.socket.send('');
+    handleResponse: function (payload) {
+        var data = JSON.parse(payload);
+
+        if (data.total) {
+
+        }
+        else if (data.asset) {
+            var out = '<tr><td>' + data.asset.path + '</td></tr>';
+            $('#out').prepend(out);
+            this.socket.send('');
+        }
     }
 });
