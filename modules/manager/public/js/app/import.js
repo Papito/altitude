@@ -44,6 +44,7 @@ ImportViewModel = BaseViewModel.extend({
 
         this.socket.onmessage = function (e) {
             if (e.data) {
+                console.log('ws > ' + e.data);
                 var out = '<tr><td>' + e.data + '</td></tr>'
                 $('#out').prepend(out);
                 self.socket.send('');
