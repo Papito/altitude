@@ -13,21 +13,22 @@ import constants.{const => C}
 class ImportDao {
   private val ANY_FILE_FILTER: IOFileFilter = TrueFileFilter.INSTANCE
 
-  def getImportAssets(path: String): List[ImportAsset] = {
-    log.info("Importing from 'importPath'", Map("importPath" -> path), C.tag.DB)
+  def iterateAssets(path: String): Iterator[ImportAsset] = {
     require(path != null)
+    log.info("Importing from 'importPath'", Map("importPath" -> path), C.tag.DB)
 
     val files = FileUtils.iterateFiles(new File(path), ANY_FILE_FILTER, ANY_FILE_FILTER)
-    val assets = new ListBuffer[ImportAsset]
 
-    for(fileIt <- files) {
-      log.info("Processing '$file'", Map("file" -> fileIt), C.tag.DB)
-      val file: File = new File(fileIt.toString)
-      val importAsset = new ImportAsset(file)
-      assets += importAsset
-    }
+    new Iterable[ImportAsset] {
+      def iterator = new Iterator[ImportAsset] {
+        def hasNext = files.hasNext
 
-    assets.toList
+        def next() = {
+          val file: File = new File(files.next().toString)
+          log.info("Processing '$file'", Map("file" -> file), C.tag.DB)
+          new ImportAsset(file)
+        }
+      }
+    }.toIterator
   }
-
 }

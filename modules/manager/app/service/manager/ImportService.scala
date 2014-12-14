@@ -1,7 +1,8 @@
 package service.manager
 
-import java.io.InputStream
+import java.io.{File, InputStream}
 
+import constants.const
 import dao.manager.ImportDao
 import models.{AssetMediaType, ImportAsset}
 import org.apache.tika.detect.{DefaultDetector, Detector}
@@ -10,25 +11,30 @@ import org.apache.tika.metadata.Metadata
 import org.apache.tika.mime.MediaType
 import util.log
 
+import scala.collection.mutable.ListBuffer
+
 class ImportService {
   private val DAO = new ImportDao
 
   def getImportAssets(path: String): List[ImportAsset] = {
     require(path.nonEmpty)
     log.info("Getting assets to import in '$path'", Map("path" -> path))
-
-    this.DAO.getImportAssets(path = path)
+    DAO.iterateAssets(path = path).to[List]
   }
 
-  def importAssets(path: String): Unit = {
+  def importAssets(path: String): Iterator[ImportAsset] = {
     require(path.nonEmpty)
     log.info("Importing assets in '$path'", Map("path" -> path))
 
-    val importAssets = getImportAssets(path)
+    val assets = DAO.iterateAssets(path = path)
 
-    for (assetToImport <- importAssets) {
-      importAsset(assetToImport)
-    }
+    new Iterable[ImportAsset] {
+      def iterator = new Iterator[ImportAsset] {
+        def hasNext = assets.hasNext
+
+        def next() = assets.next()
+      }
+    }.toIterator
   }
 
   def importAsset(importAsset: ImportAsset): Unit = {

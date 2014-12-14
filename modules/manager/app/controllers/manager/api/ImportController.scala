@@ -15,6 +15,7 @@ object ImportController extends Controller {
     def index = Action { implicit request =>
       log.debug("Import API controller", C.tag.API)
       val importPath = Play.current.configuration.getString("import.path").getOrElse("")
+
       val assets = global.ManagerGlobal.importService.getImportAssets(path = importPath)
       val out = assets map {_.toDict}
 
@@ -38,9 +39,8 @@ object ImportController extends Controller {
   private def cycle(out: ActorRef): Unit = {
     log.debug("Import API controller", C.tag.API)
     val importPath = Play.current.configuration.getString("import.path").getOrElse("")
-    val assets = global.ManagerGlobal.importService.getImportAssets(path = importPath)
-    val data = assets map {_.toDict}
-    assets.foreach(asset => out ! (asset.toDict.toString()))
+    val assets = global.ManagerGlobal.importService.importAssets(path = importPath)
+    assets.foreach(asset => out ! asset.toDict.toString())
   }
 
 
