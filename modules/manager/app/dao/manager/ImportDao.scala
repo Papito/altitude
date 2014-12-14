@@ -1,14 +1,12 @@
 package dao.manager
 
 import java.io.File
+
+import constants.{const => C}
+import models.ImportAsset
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
-import scala.collection.mutable.ListBuffer
-import scala.collection.JavaConversions._
-
-import models.ImportAsset
 import util.log
-import constants.{const => C}
 
 class ImportDao {
   private val ANY_FILE_FILTER: IOFileFilter = TrueFileFilter.INSTANCE
