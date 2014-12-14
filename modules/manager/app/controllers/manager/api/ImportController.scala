@@ -29,6 +29,11 @@ object ImportController extends Controller {
         else out ! ""
       }
     }
+
+    override def postStop() = {
+      log.info("Socket closed", C.tag.WEB)
+
+    }
   }
 
 }

@@ -7,7 +7,8 @@
 @views.html.manager.base(scripts = scriptsArg) {
     <div class="row">
         <div class="col-md-2 col-md-offset-5">
-            <button type="button" class="btn btn-default">Start Import</button>
+            <button type="button" data-bind="click: importAssets, visible: !isImporting()" class="btn btn-default">Start Import</button>
+            <button type="button" data-bind="click: cancelImportAssets, visible: isImporting()" class="btn btn-danger">STOP</button>
         </div>
     </div>
 

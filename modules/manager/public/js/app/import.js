@@ -10,33 +10,46 @@ ImportViewModel = BaseViewModel.extend({
         this.base();
         console.log('Initializing import view model');
 
+        this.socket = null;
+        this.isImporting = ko.observable(false);
         this.assets = ko.observableArray([]);
-        this.import();
     },
 
-    import: function() {
-        var ws = new WebSocket('ws://localhost:9000/ws/import');
+    cancelImportAssets: function() {
+        console.log('Closing websocket');
+        this.isImporting(false);
+        this.socket.close();
+        this.socket = null;
+        $('#out').html("");
+    },
+
+    importAssets: function() {
+        var self = this;
+        // FIXME: http://stackoverflow.com/questions/10406930/how-to-construct-a-websocket-uri-relative-to-the-page-uri
+        this.socket = new WebSocket('ws://localhost:9000/ws/import');
 
         // When the connection is open, send some data to the server
-        ws.onopen = function () {
-            ws.send('');
+        this.socket.onopen = function () {
+            self.isImporting(true);
+            self.socket.send('');
             console.log('Socket connected')
         };
 
         // Log errors
-        ws.onerror = function (error) {
-            console.log('WebSocket Error ');
+        this.socket.onerror = function (error) {
+            self.isImporting(false);
+            console.log('!!! WebSocket Error !!!');
             console.log(error);
         };
 
-        ws.onmessage = function (e) {
+        this.socket.onmessage = function (e) {
             if (e.data) {
                 var out = '<tr><td>' + e.data + '</td></tr>'
                 $('#out').prepend(out);
-                ws.send('');
+                self.socket.send('');
             }
             else {
-                ws.close();
+                self.cancelImportAssets();
             }
         };
 
