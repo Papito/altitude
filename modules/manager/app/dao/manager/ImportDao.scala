@@ -23,7 +23,7 @@ class ImportDao {
 
         def next() = {
           val file: File = new File(files.next().toString)
-          log.info("Found file '$file'", Map("file" -> file), C.tag.DB)
+          //log.info("Found file '$file'", Map("file" -> file), C.tag.DB)
           new ImportAsset(file)
         }
       }

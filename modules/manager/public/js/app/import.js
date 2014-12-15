@@ -33,10 +33,8 @@ ImportViewModel = BaseViewModel.extend({
         this.socket.onopen = function () {
             self.isImporting(true);
 
-            self.responseHandler = self.handleTotal;
-            self.sendCommand('start');
-
             console.log('Socket connected')
+            self.sendCommand('total', self.handleTotal);
         };
 
         // Log errors
@@ -47,6 +45,7 @@ ImportViewModel = BaseViewModel.extend({
         };
 
         this.socket.onmessage = function (e) {
+            console.log(e.data);
             if (!e.data) {
                 self.cancelImportAssets();
                 return;
@@ -57,23 +56,21 @@ ImportViewModel = BaseViewModel.extend({
             self.responseHandler(jsonData);
 
         };
-
     },
 
-    sendCommand: function(cmd) {
+    sendCommand: function(cmd, handler) {
         console.log('ws < ' + cmd);
+        this.responseHandler = handler;
         this.socket.send(cmd);
     },
 
     handleAsset: function (json) {
         var out = '<tr><td>' + json.asset.path + '</td></tr>';
-        $('#out').prepend(out);
-        self.responseHandler = self.handleAsset;
-        this.sendCommand('next');
+        $('#imported-assets').prepend(out);
+        this.sendCommand('next', this.handleAsset);
     },
 
     handleTotal: function (json) {
-        self.responseHandler = self.handleAsset;
-        this.sendCommand('next');
+        this.sendCommand('next', this.handleAsset);
     }
 });
