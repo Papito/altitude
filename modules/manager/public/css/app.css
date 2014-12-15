@@ -3,5 +3,9 @@ body {
 }
 
 #import-controls .progress {
-    margin-top: .6em;
+    height: 2.8em;
+}
+
+#import-controls .progress h4 {
+    padding-top: .05em;
 }

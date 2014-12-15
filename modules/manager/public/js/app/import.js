@@ -12,8 +12,17 @@ ImportViewModel = BaseViewModel.extend({
 
         this.socket = null;
         this.isImporting = ko.observable(false);
-        this.assets = ko.observableArray([]);
+        this.totalAssetsCnt = ko.observable(0);
+        this.assetsImportedCnt = ko.observable(0);
         this.responseHandler = null;
+
+        this.percentComplete = ko.computed(function() {
+            var percent = 0;
+            if (this.assetsImportedCnt() > 0) {
+                percent = Math.floor((this.assetsImportedCnt()/ this.totalAssetsCnt()) * 100);
+            }
+            return percent;
+        }, this);
     },
 
     cancelImportAssets: function() {
@@ -21,7 +30,9 @@ ImportViewModel = BaseViewModel.extend({
         this.isImporting(false);
         this.socket.close();
         this.socket = null;
-        $('#out').html("");
+        this.totalAssetsCnt(0);
+        this.assetsImportedCnt(0);
+        $('#imported-assets').html("");
     },
 
     importAssets: function() {
@@ -29,7 +40,6 @@ ImportViewModel = BaseViewModel.extend({
         // FIXME: http://stackoverflow.com/questions/10406930/how-to-construct-a-websocket-uri-relative-to-the-page-uri
         this.socket = new WebSocket('ws://localhost:9000/ws/import');
 
-        // When the connection is open, send some data to the server
         this.socket.onopen = function () {
             self.isImporting(true);
 
@@ -37,7 +47,6 @@ ImportViewModel = BaseViewModel.extend({
             self.sendCommand('total', self.handleTotal);
         };
 
-        // Log errors
         this.socket.onerror = function (error) {
             self.isImporting(false);
             console.log('!!! WebSocket Error !!!');
@@ -45,32 +54,32 @@ ImportViewModel = BaseViewModel.extend({
         };
 
         this.socket.onmessage = function (e) {
-            console.log(e.data);
             if (!e.data) {
                 self.cancelImportAssets();
                 return;
             }
 
             var jsonData = JSON.parse(e.data);
-            console.log('ws > ' + e.data);
+            //console.log('ws > ' + e.data);
             self.responseHandler(jsonData);
 
         };
     },
 
     sendCommand: function(cmd, handler) {
-        console.log('ws < ' + cmd);
+        //console.log('ws < ' + cmd);
         this.responseHandler = handler;
         this.socket.send(cmd);
     },
 
     handleAsset: function (json) {
-        var out = '<tr><td>' + json.asset.path + '</td></tr>';
-        $('#imported-assets').prepend(out);
+        $('#imported-assets').html(json.asset.path);
+        this.assetsImportedCnt(this.assetsImportedCnt() + 1);
         this.sendCommand('next', this.handleAsset);
     },
 
     handleTotal: function (json) {
+        this.totalAssetsCnt(json.total);
         this.sendCommand('next', this.handleAsset);
     }
 });

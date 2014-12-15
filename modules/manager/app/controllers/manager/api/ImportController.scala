@@ -23,18 +23,18 @@ object ImportController extends Controller {
 
   private class ImportWebSocketActor(out: ActorRef) extends Actor {
     val importPath = Play.current.configuration.getString("import.path").getOrElse("")
-    val assetsIt = global.ManagerGlobal.importService.iterateAssets(path=importPath)
-    val assetsTotalIt = global.ManagerGlobal.importService.iterateAssets(path=importPath)
+    val assets = global.ManagerGlobal.importService.iterateAssets(path=importPath).toList
+    val assetsIt = assets.toIterator
 
     def receive = {
       case "next" => {
         if (assetsIt.hasNext)
           out ! write("asset" -> assetsIt.next().toDict)
         else
-          out ! {"status" -> "done"}
+          out ! ""
       }
       case "total" => {
-        out ! write("total" -> assetsTotalIt.size)
+        out ! write("total" -> assets.size)
       }
     }
 
