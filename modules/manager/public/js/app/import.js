@@ -42,7 +42,6 @@ ImportViewModel = BaseViewModel.extend({
 
         this.socket.onopen = function () {
             self.isImporting(true);
-
             console.log('Socket connected')
             self.sendCommand('total', self.handleTotal);
         };

@@ -2,10 +2,33 @@ body {
     padding-top: 70px;
 }
 
+#import-controls {
+    border-bottom: 1px solid #1c1e22;
+    padding-bottom: 0.8em;
+    margin-bottom: 0.8em;
+}
 #import-controls .progress {
     height: 2.8em;
+    margin-bottom: 0;
 }
 
 #import-controls .progress h4 {
+    height: 2.8em;
     padding-top: .05em;
+}
+
+#import-controls .alert {
+    height: 2.8em;
+    background-color: #1c1e22;
+    border: none;
+    margin-bottom: 0;
+}
+
+#import-controls .alert h4 {
+    margin-top: -0.2em;
+}
+
+#import-controls #asset-count-text {
+    padding-right: 0.5em;
+    padding-top: .5em;
 }

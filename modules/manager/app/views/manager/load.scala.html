@@ -7,10 +7,16 @@
 @views.html.manager.base(scripts = scriptsArg) {
     <div class="row" id="import-controls">
         <div class="col-md-10">
-            <div class="progress" data-bind="visible: assetsImportedCnt() > 0">
+            <div class="progress" data-bind="visible: isImporting() && assetsImportedCnt() > 0">
                 <div data-bind="attr: {'aria-valuenow': percentComplete}, style: {width: percentComplete() + '%'}" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
                     <h4><span data-bind="text: percentComplete"></span>%</h4>
                 </div>
+            </div>
+            <div id="collecting-data-text" data-bind="visible: isImporting() && assetsImportedCnt() == 0">
+                <div class="alert alert-success" role="alert"><h4>Collecting asset info ...</h4></div>
+            </div>
+            <div id="asset-count-text" data-bind="visible: isImporting() && totalAssetsCnt()">
+                <strong>Importing asset <span data-bind="text: assetsImportedCnt()"></span> of <span data-bind="text: totalAssetsCnt()"></span></strong>
             </div>
         </div>
         <div class="col-md-2">
