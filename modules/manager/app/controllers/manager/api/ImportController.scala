@@ -27,20 +27,12 @@ object ImportController extends Controller {
     val assetsIt = assets.toIterator
 
     def receive = {
-      case "next" => {
-        if (assetsIt.hasNext)
-          out ! write("asset" -> assetsIt.next().toDict)
-        else
-          out ! ""
-      }
-      case "total" => {
-        out ! write("total" -> assets.size)
-      }
+      case "next" => out ! (if (assetsIt.hasNext) write("asset" -> assetsIt.next().toDict) else "")
+      case "total" => out ! write("total" -> assets.size)
     }
 
     override def postStop() = {
       log.info("Socket closed", C.tag.WEB)
-
     }
   }
 
