@@ -6,9 +6,11 @@
 
 @views.html.manager.base(scripts = scriptsArg) {
     <div class="row" id="import-controls">
-        <div class="progress col-md-9 col-md-offset-1">
-            <div data-bind="attr: {'aria-valuenow': percentComplete}, style: {width: percentComplete() + '%'}" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-                <h4><span data-bind="text: percentComplete"></span>%</h4>
+        <div class="col-md-10">
+            <div class="progress" data-bind="visible: assetsImportedCnt() > 0">
+                <div data-bind="attr: {'aria-valuenow': percentComplete}, style: {width: percentComplete() + '%'}" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                    <h4><span data-bind="text: percentComplete"></span>%</h4>
+                </div>
             </div>
         </div>
         <div class="col-md-2">
