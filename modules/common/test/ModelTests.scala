@@ -1,6 +1,6 @@
 import java.io.File
 
-import models.{ImportAsset, BaseModel}
+import models.{AssetMediaType, ImportAsset, BaseModel}
 import org.scalatest._
 import org.scalatest.Matchers._
 
@@ -14,8 +14,15 @@ class ModelTests extends FunSuite {
   }
 
   test("import asset model") {
-    val model = new ImportAsset(new File("/"))
+    val mediaType = new AssetMediaType("mediaType", "mediaSubtype", "fileMime")
+    val model = new ImportAsset(new File("/"), mediaType)
     model.id shouldBe null
     model.isClean shouldEqual false
+
+    val d: Map[String, Any] = model.toDict
+    d should contain key "id"
+    d should contain key "mediaType"
+
+    val modelNoType = new ImportAsset(new File("/"))
   }
 }

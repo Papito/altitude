@@ -52,10 +52,12 @@ class ImportService {
       val detector: Detector = new DefaultDetector
       val mediaType: MediaType = detector.detect(inputStream, metadata)
 
+/*
       importAsset.mediaType = new AssetMediaType(
         mediaType = mediaType.getType,
         mediaSubtype = mediaType.getSubtype,
         mime = mediaType.getBaseType.toString)
+*/
 
       log.info("Media type for '$asset' is $mediaType",
         Map("asset" -> importAsset, "mediaType" -> importAsset.mediaType))
