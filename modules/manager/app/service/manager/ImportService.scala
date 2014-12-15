@@ -36,6 +36,7 @@ class ImportService {
     }.toIterator
   }
 
+  // FIXME: should not mutate assets
   def importAsset(importAsset: ImportAsset): Unit = {
     log.info("Importing asset: '$asset'", Map("asset" -> importAsset))
     log.debug("Discovering media type for: '$asset'", Map("asset" -> importAsset))
