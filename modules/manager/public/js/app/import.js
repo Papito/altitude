@@ -13,6 +13,7 @@ ImportViewModel = BaseViewModel.extend({
         this.socket = null;
         this.isImporting = ko.observable(false);
         this.assets = ko.observableArray([]);
+        this.responseHandler = null;
     },
 
     cancelImportAssets: function() {
@@ -31,8 +32,10 @@ ImportViewModel = BaseViewModel.extend({
         // When the connection is open, send some data to the server
         this.socket.onopen = function () {
             self.isImporting(true);
-            self.socket.send('');
-            //console.log('Getting total import progress')
+
+            self.responseHandler = self.handleTotal;
+            self.sendCommand('start');
+
             console.log('Socket connected')
         };
 
@@ -44,27 +47,33 @@ ImportViewModel = BaseViewModel.extend({
         };
 
         this.socket.onmessage = function (e) {
-            if (e.data) {
-                console.log('ws > ' + e.data);
-                self.handleResponse(e.data);
-            }
-            else {
+            if (!e.data) {
                 self.cancelImportAssets();
+                return;
             }
+
+            var jsonData = JSON.parse(e.data);
+            console.log('ws > ' + e.data);
+            self.responseHandler(jsonData);
+
         };
 
     },
 
-    handleResponse: function (payload) {
-        var data = JSON.parse(payload);
+    sendCommand: function(cmd) {
+        console.log('ws < ' + cmd);
+        this.socket.send(cmd);
+    },
 
-        if (data.total) {
+    handleAsset: function (json) {
+        var out = '<tr><td>' + json.asset.path + '</td></tr>';
+        $('#out').prepend(out);
+        self.responseHandler = self.handleAsset;
+        this.sendCommand('next');
+    },
 
-        }
-        else if (data.asset) {
-            var out = '<tr><td>' + data.asset.path + '</td></tr>';
-            $('#out').prepend(out);
-            this.socket.send('');
-        }
+    handleTotal: function (json) {
+        self.responseHandler = self.handleAsset;
+        this.sendCommand('next');
     }
 });
