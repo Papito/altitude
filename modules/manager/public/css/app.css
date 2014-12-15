@@ -36,3 +36,7 @@ body {
 #import-controls #import-button{
     text-align: center;
 }
+
+#import-button button {
+    width: 90%;
+}
