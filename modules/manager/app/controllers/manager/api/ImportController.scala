@@ -27,7 +27,7 @@ object ImportController extends Controller {
     val assetsIt = assets.toIterator
 
     def receive = {
-      case "next" => out ! (if (assetsIt.hasNext) write("asset" -> assetsIt.next().toDict) else "")
+      case "next" => out ! (if (assetsIt.hasNext) write("asset" -> assetsIt.next().toMap) else "")
       case "total" => out ! write("total" -> assets.size)
     }
 

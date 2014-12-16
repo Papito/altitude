@@ -19,7 +19,7 @@ class ModelTests extends FunSuite {
     model.id shouldBe null
     model.isClean shouldEqual false
 
-    val d: Map[String, Any] = model.toDict
+    val d: Map[String, Any] = model.toMap
     d should contain key "id"
     d should contain key "mediaType"
 

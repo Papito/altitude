@@ -20,9 +20,9 @@ class ImportTests extends FunSuite with OneAppPerSuite {
     val path = getClass.getResource("../files/incoming/images/1.jpg").getPath
     val importAsset = new ImportAsset(new File(path))
     val knownTypeImportAsset = global.ManagerGlobal.importService.getAssetWithType(importAsset)
-    
+
     // to map
-    val d = knownTypeImportAsset.mediaType.toDict
+    val d = knownTypeImportAsset.mediaType.toMap
     d.valueAt("type") should equal("image")
     d.valueAt("subtype") should equal("jpeg")
     d.valueAt("mime") should equal("image/jpeg")

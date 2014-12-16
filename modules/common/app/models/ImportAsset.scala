@@ -10,10 +10,10 @@ class ImportAsset(val file: File, val mediaType: AssetMediaType) extends BaseMod
   val absolutePath = file.getAbsolutePath
   val name = file.getName
 
-  override def toDict = Map(
+  override def toMap = Map(
     "id" -> id,
     "path" -> absolutePath,
-    "mediaType" -> (if (mediaType != null) mediaType.toDict else null)
+    "mediaType" -> (if (mediaType != null) mediaType.toMap else null)
   )
 
   override def toString = this.absolutePath
