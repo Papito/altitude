@@ -25,6 +25,7 @@ class ImportTests extends FunSuite with OneAppPerSuite {
     d.valueAt("subtype") should equal("jpeg")
     d.valueAt("mime") should equal("image/jpeg")
   }
+
   test("audio media type (MP3)") {
     val path = getClass.getResource("../files/incoming/audio/all.mp3").getPath
     val importAsset = new ImportAsset(new File(path))

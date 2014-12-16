@@ -49,6 +49,9 @@ class ImportService {
         mediaSubtype = mediaType.getSubtype,
         mime = mediaType.getBaseType.toString)
 
+      log.info("Media type for $asset is: $mediaType",
+        Map("asset" -> importAsset, "mediaType" -> assetMediaType))
+
       new ImportAsset(
         file=importAsset.file,
         mediaType=assetMediaType)

@@ -6,6 +6,5 @@ class AssetMediaType(mediaType: String, mediaSubtype: String, mime: String) exte
   override def toMap = Map(
     "type" -> mediaType,
     "subtype" -> mediaSubtype,
-    "mime" -> mime
-  )
+    "mime" -> mime)
 }
