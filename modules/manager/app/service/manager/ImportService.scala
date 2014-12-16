@@ -22,23 +22,15 @@ class ImportService {
     DAO.iterateAssets(path = path).to[List]
   }
 
-  def iterateAssets(path: String): Iterator[ImportAsset] = {
+  def getAssetsToImport(path: String): List[ImportAsset] = {
     require(path.nonEmpty)
-    log.info("Importing assets in '$path'", Map("path" -> path))
-
-    val assets = DAO.iterateAssets(path = path)
-
-    new Iterable[ImportAsset] {
-      def iterator = new Iterator[ImportAsset] {
-        def hasNext = assets.hasNext
-        def next() = assets.next()
-      }
-    }.toIterator
+    log.info("Finding assets to import @ '$path'", Map("path" -> path))
+    val assets = DAO.iterateAssets(path = path).toList
+    log.info("Found $num", Map("num" -> assets.size))
+    assets
   }
 
-  // FIXME: should not mutate assets
-  def importAsset(importAsset: ImportAsset): Unit = {
-    log.info("Importing asset: '$asset'", Map("asset" -> importAsset))
+  def getAssetWithType(importAsset: ImportAsset): ImportAsset = {
     log.debug("Discovering media type for: '$asset'", Map("asset" -> importAsset))
 
     var inputStream: InputStream = null
@@ -52,15 +44,14 @@ class ImportService {
       val detector: Detector = new DefaultDetector
       val mediaType: MediaType = detector.detect(inputStream, metadata)
 
-/*
-      importAsset.mediaType = new AssetMediaType(
+      val assetMediaType = new AssetMediaType(
         mediaType = mediaType.getType,
         mediaSubtype = mediaType.getSubtype,
         mime = mediaType.getBaseType.toString)
-*/
 
-      log.info("Media type for '$asset' is $mediaType",
-        Map("asset" -> importAsset, "mediaType" -> importAsset.mediaType))
+      new ImportAsset(
+        file=importAsset.file,
+        mediaType=assetMediaType)
     }
     finally {
       log.info("Closing stream for '$asset'", Map("asset" -> importAsset))
