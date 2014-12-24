@@ -1,6 +1,6 @@
 import java.io.File
 
-import models.{AssetMediaType, FileImportAsset, BaseModel}
+import models.{MediaType, FileImportAsset, BaseModel}
 import org.scalatest._
 import org.scalatest.Matchers._
 

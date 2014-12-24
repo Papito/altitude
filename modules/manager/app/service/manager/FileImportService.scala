@@ -4,10 +4,10 @@ import java.io.InputStream
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.Metadata
-import org.apache.tika.mime.MediaType
+import org.apache.tika.mime.{MediaType => TikaMediaType}
 
 import dao.manager.ImportDao
-import models.{AssetMediaType, FileImportAsset}
+import models.{MediaType, FileImportAsset}
 import util.log
 
 class FileImportService {
@@ -21,7 +21,7 @@ class FileImportService {
     assets
   }
 
-  def detectAssetType(importAsset: FileImportAsset): AssetMediaType = {
+  def detectAssetType(importAsset: FileImportAsset): MediaType = {
     log.debug("Discovering media type for: '$asset'", Map("asset" -> importAsset))
 
     var inputStream: InputStream = null
@@ -33,12 +33,12 @@ class FileImportService {
       inputStream = TikaInputStream.get(url, metadata)
 
       val detector: Detector = new DefaultDetector
-      val mediaType: MediaType = detector.detect(inputStream, metadata)
+      val tikaMediaType: TikaMediaType = detector.detect(inputStream, metadata)
 
-      val assetMediaType = new AssetMediaType(
-        mediaType = mediaType.getType,
-        mediaSubtype = mediaType.getSubtype,
-        mime = mediaType.getBaseType.toString)
+      val assetMediaType = new MediaType(
+        mediaType = tikaMediaType.getType,
+        mediaSubtype = tikaMediaType.getSubtype,
+        mime = tikaMediaType.getBaseType.toString)
 
       log.info("Media type for $asset is: $mediaType",
         Map("asset" -> importAsset, "mediaType" -> assetMediaType))
