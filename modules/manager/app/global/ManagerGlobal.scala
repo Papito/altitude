@@ -7,11 +7,11 @@ import play.api.mvc._
 import util.log
 import constants.{const => C}
 
-import service.manager.ImportService
+import service.manager.FileImportService
 
 object ManagerGlobal extends GlobalSettings {	
 
-	def importService: ImportService = new ImportService
+	def importService: FileImportService = new FileImportService
 
 	override def onStart(app: Application) {
 		log.info("Application starting", C.tag.APP)

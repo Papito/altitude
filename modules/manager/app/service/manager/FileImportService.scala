@@ -1,28 +1,19 @@
 package service.manager
 
-import java.io.{File, InputStream}
-
-import constants.const
-import dao.manager.ImportDao
-import models.{AssetMediaType, ImportAsset}
+import java.io.InputStream
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.Metadata
 import org.apache.tika.mime.MediaType
+
+import dao.manager.ImportDao
+import models.{AssetMediaType, FileImportAsset}
 import util.log
 
-import scala.collection.mutable.ListBuffer
-
-class ImportService {
+class FileImportService {
   private val DAO = new ImportDao
 
-  def getImportAssets(path: String): List[ImportAsset] = {
-    require(path.nonEmpty)
-    log.info("Getting assets to import in '$path'", Map("path" -> path))
-    DAO.iterateAssets(path = path).to[List]
-  }
-
-  def getAssetsToImport(path: String): List[ImportAsset] = {
+  def getFilesToImport(path: String): List[FileImportAsset] = {
     require(path.nonEmpty)
     log.info("Finding assets to import @ '$path'", Map("path" -> path))
     val assets = DAO.iterateAssets(path = path).toList
@@ -30,7 +21,7 @@ class ImportService {
     assets
   }
 
-  def getAssetWithType(importAsset: ImportAsset): ImportAsset = {
+  def getAssetType(importAsset: FileImportAsset): AssetMediaType = {
     log.debug("Discovering media type for: '$asset'", Map("asset" -> importAsset))
 
     var inputStream: InputStream = null
@@ -52,9 +43,7 @@ class ImportService {
       log.info("Media type for $asset is: $mediaType",
         Map("asset" -> importAsset, "mediaType" -> assetMediaType))
 
-      new ImportAsset(
-        file=importAsset.file,
-        mediaType=assetMediaType)
+      assetMediaType
     }
     finally {
       log.info("Closing stream for '$asset'", Map("asset" -> importAsset))
