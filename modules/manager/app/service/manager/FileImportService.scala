@@ -3,11 +3,11 @@ package service.manager
 import java.io.InputStream
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
-import org.apache.tika.metadata.Metadata
+import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
 
 import dao.manager.ImportDao
-import models.{MediaType, FileImportAsset}
+import models.{Metadata, Asset, MediaType, FileImportAsset}
 import util.log
 
 class FileImportService {
@@ -28,7 +28,7 @@ class FileImportService {
 
     try {
       val url: java.net.URL = importAsset.file.toURI.toURL
-      val metadata: Metadata = new Metadata
+      val metadata: TikaMetadata = new TikaMetadata
       log.info("Opening stream for '$asset'", Map("asset" -> importAsset))
       inputStream = TikaInputStream.get(url, metadata)
 
@@ -49,5 +49,12 @@ class FileImportService {
       log.info("Closing stream for '$asset'", Map("asset" -> importAsset))
       inputStream.close()
     }
+  }
+
+  def importAsset(fileAsset: FileImportAsset): Asset = {
+    log.info("Importing file asset '$asset'", Map("asset" -> fileAsset))
+    val mediaType = detectAssetType(fileAsset)
+    val metadata = new Metadata
+    new Asset(mediaType = mediaType, metadata = metadata)
   }
 }
