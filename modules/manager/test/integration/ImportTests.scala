@@ -18,7 +18,7 @@ class ImportTests extends FunSuite with OneAppPerSuite {
   test("image media type (JPEG)") {
     val path = getClass.getResource("../files/incoming/images/1.jpg").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
-    val assetType = global.ManagerGlobal.importService.getAssetType(fileImportAsset)
+    val assetType = global.ManagerGlobal.importService.detectAssetType(fileImportAsset)
 
     val d = assetType.toMap
     d.valueAt("type") should equal("image")
@@ -29,7 +29,7 @@ class ImportTests extends FunSuite with OneAppPerSuite {
   test("audio media type (MP3)") {
     val path = getClass.getResource("../files/incoming/audio/all.mp3").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
-    val assetType = global.ManagerGlobal.importService.getAssetType(fileImportAsset)
+    val assetType = global.ManagerGlobal.importService.detectAssetType(fileImportAsset)
 
     val d = assetType.toMap
     d.valueAt("type") should equal("audio")

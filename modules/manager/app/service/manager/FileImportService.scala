@@ -21,7 +21,7 @@ class FileImportService {
     assets
   }
 
-  def getAssetType(importAsset: FileImportAsset): AssetMediaType = {
+  def detectAssetType(importAsset: FileImportAsset): AssetMediaType = {
     log.debug("Discovering media type for: '$asset'", Map("asset" -> importAsset))
 
     var inputStream: InputStream = null
