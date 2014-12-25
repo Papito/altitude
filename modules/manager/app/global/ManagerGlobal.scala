@@ -7,13 +7,13 @@ import play.api.mvc._
 import util.log
 import constants.{const => C}
 
-import service.manager.{MetadataService, FileImportService}
+import service.manager.{TikaMetadataService, MetadataService, FileImportService}
 
 object ManagerGlobal extends GlobalSettings {	
 
   object service {
-    val importService = new FileImportService
-    val metadatService = new MetadataService
+    val importService: FileImportService = new FileImportService
+    val metadata: MetadataService = new TikaMetadataService
   }
 
 	override def onStart(app: Application) {
@@ -34,5 +34,4 @@ object ManagerGlobal extends GlobalSettings {
 	override def onBadRequest (request: RequestHeader, error: String) = Future.successful(
 		BadRequest("Bad Request: " + error)
 	)
-
 }

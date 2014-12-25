@@ -1,2 +1,1 @@
 Factor out common code in the metadata service.
-Create metadata service interface and Tika implementation.

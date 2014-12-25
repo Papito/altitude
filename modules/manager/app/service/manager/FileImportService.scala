@@ -54,7 +54,7 @@ class FileImportService extends BaseService {
   def importAsset(fileAsset: FileImportAsset): Asset = {
     log.info("Importing file asset '$asset'", Map("asset" -> fileAsset))
     val mediaType = detectAssetType(fileAsset)
-    val metadata = app.service.metadatService.extract(fileAsset, mediaType)
+    val metadata = app.service.metadata.extract(fileAsset, mediaType)
     new Asset(mediaType = mediaType, metadata = metadata)
   }
 }
