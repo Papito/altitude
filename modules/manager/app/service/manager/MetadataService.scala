@@ -6,6 +6,7 @@ import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.parser.audio.AudioParser
 import org.apache.tika.parser.image.ImageParser
+import org.apache.tika.parser.mp3.Mp3Parser
 import org.xml.sax.helpers.DefaultHandler
 
 import models.{MediaType, Metadata}
@@ -16,7 +17,8 @@ import util.log
 class MetadataService extends BaseService {
   private object PARSERS {
     val IMAGE = new ImageParser
-    val AUDIO = new AudioParser
+    val MPEG_AUDIO = new Mp3Parser
+    val SIMPLE_AUDIO = new AudioParser
   }
   private val TIKA_HANDLER = new DefaultHandler
 
@@ -25,7 +27,10 @@ class MetadataService extends BaseService {
 
     mediaType match {
       case mt: MediaType if mt.mediaType == "image" => extractImageMetadata(importAsset)
-      case mt: MediaType if mt.mediaType == "audio" => extractAudioMetadata(importAsset)
+      case mt: MediaType if mt.mediaType == "audio" && mt.mediaSubtype == "mpeg"
+        => extractMpegAudioMetadata(importAsset)
+      case mt: MediaType if mt.mediaType == "audio"
+        => extractSimpleAudioMetadata(importAsset)
       case _ => {
         log.warn(
           "No metadata extractor found for $asset of type '$mediaType'",
@@ -37,7 +42,7 @@ class MetadataService extends BaseService {
   }
 
   private def extractImageMetadata(importAsset: FileImportAsset): Metadata = {
-    log.info("Extracting IMAGE medadata for $asset", Map("asset" -> importAsset), C.tag.SERVICE)
+    log.info("Extracting IMAGE metadata for $asset", Map("asset" -> importAsset), C.tag.SERVICE)
 
     var inputStream: InputStream = null
 
@@ -61,8 +66,8 @@ class MetadataService extends BaseService {
     }
   }
 
-  private def extractAudioMetadata(importAsset: FileImportAsset): Metadata = {
-    log.info("Extracting AUDIO medadata for $asset", Map("asset" -> importAsset), C.tag.SERVICE)
+  private def extractMpegAudioMetadata(importAsset: FileImportAsset): Metadata = {
+    log.info("Extracting MPEG AUDIO metadata for $asset", Map("asset" -> importAsset), C.tag.SERVICE)
     var inputStream: InputStream = null
 
     try {
@@ -71,7 +76,31 @@ class MetadataService extends BaseService {
       log.debug("Opening stream for '$asset'", Map("asset" -> importAsset))
       inputStream = TikaInputStream.get(url, metadata)
 
-      PARSERS.AUDIO.parse(inputStream, TIKA_HANDLER, metadata, null)
+      PARSERS.MPEG_AUDIO.parse(inputStream, TIKA_HANDLER, metadata, null)
+      for (key <- metadata.names()) {
+        println(key + ": " + metadata.get(key))
+      }
+
+      new Metadata
+    }
+    finally {
+      log.debug("Closing stream for '$asset'", Map("asset" -> importAsset))
+      if (inputStream != null)
+        inputStream.close()
+    }
+  }
+
+  private def extractSimpleAudioMetadata(importAsset: FileImportAsset): Metadata = {
+    log.info("Extracting SIMPLE AUDIO metadata for $asset", Map("asset" -> importAsset), C.tag.SERVICE)
+    var inputStream: InputStream = null
+
+    try {
+      val url: java.net.URL = importAsset.file.toURI.toURL
+      val metadata: TikaMetadata = new TikaMetadata
+      log.debug("Opening stream for '$asset'", Map("asset" -> importAsset))
+      inputStream = TikaInputStream.get(url, metadata)
+
+      PARSERS.SIMPLE_AUDIO.parse(inputStream, TIKA_HANDLER, metadata, null)
       for (key <- metadata.names()) {
         println(key + ": " + metadata.get(key))
       }
