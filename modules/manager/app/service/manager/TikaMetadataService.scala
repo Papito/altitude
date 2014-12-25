@@ -2,20 +2,20 @@ package service.manager
 
 import java.io.InputStream
 
-import org.apache.tika.metadata.{Metadata => TikaMetadata}
+import constants.{const => C}
+import models.manager.FileImportAsset
+import models.{MediaType, Metadata}
 import org.apache.tika.io.TikaInputStream
+import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.parser.AbstractParser
 import org.apache.tika.parser.audio.AudioParser
 import org.apache.tika.parser.image.ImageParser
 import org.apache.tika.parser.mp3.Mp3Parser
 import org.xml.sax.helpers.DefaultHandler
-
-import models.{MediaType, Metadata}
-import models.manager.FileImportAsset
-import constants.{const => C}
 import util.log
 
 class TikaMetadataService extends MetadataService {
+
   private object PARSERS {
     final val IMAGE = new ImageParser
     final val MPEG_AUDIO = new Mp3Parser
@@ -24,25 +24,22 @@ class TikaMetadataService extends MetadataService {
 
   final private val TIKA_HANDLER = new DefaultHandler
 
-  def extract(importAsset: FileImportAsset, mediaType: MediaType): Metadata = {
-    log.info("Extracting metadata for $asset", Map("asset" -> importAsset), C.tag.SERVICE)
-
-    mediaType match {
-      case mt: MediaType if mt.mediaType == "image" =>
-        extractMetadata(importAsset, PARSERS.IMAGE)
-      case mt: MediaType if mt.mediaType == "audio" && mt.mediaSubtype == "mpeg" =>
-        extractMetadata(importAsset, PARSERS.MPEG_AUDIO)
-      case mt: MediaType if mt.mediaType == "audio"
-        => extractMetadata(importAsset, PARSERS.SIMPLE_AUDIO)
-      case _ => {
-        log.warn(
-          "No metadata extractor found for $asset of type '$mediaType'",
-          Map("asset" -> importAsset, "mediaType" -> mediaType.mediaType),
-          C.tag.SERVICE)
-        null
-      }
+  override def extract(importAsset: FileImportAsset, mediaType: MediaType): Metadata = mediaType match {
+    case mt: MediaType if mt.mediaType == "image" =>
+      extractMetadata(importAsset, PARSERS.IMAGE)
+    case mt: MediaType if mt.mediaType == "audio" && mt.mediaSubtype == "mpeg" =>
+      extractMetadata(importAsset, PARSERS.MPEG_AUDIO)
+    case mt: MediaType if mt.mediaType == "audio"
+    => extractMetadata(importAsset, PARSERS.SIMPLE_AUDIO)
+    case _ => {
+      log.warn(
+        "No metadata extractor found for $asset of type '$mediaType'",
+        Map("asset" -> importAsset, "mediaType" -> mediaType.mediaType),
+        C.tag.SERVICE)
+      null
     }
   }
+
 
   private def extractMetadata(importAsset: FileImportAsset, parser: AbstractParser): Metadata = {
     log.info(

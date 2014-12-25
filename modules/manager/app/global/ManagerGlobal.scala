@@ -1,13 +1,13 @@
  package global
 
-import scala.concurrent.Future
+import constants.{const => C}
 import play.api._
 import play.api.mvc.Results._
 import play.api.mvc._
+import service.manager.{FileImportService, MetadataService, TikaMetadataService}
 import util.log
-import constants.{const => C}
 
-import service.manager.{TikaMetadataService, MetadataService, FileImportService}
+import scala.concurrent.Future
 
 object ManagerGlobal extends GlobalSettings {	
 

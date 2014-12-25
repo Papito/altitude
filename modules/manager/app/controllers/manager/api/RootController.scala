@@ -1,9 +1,9 @@
 package controllers.manager.api
 
+import constants.{const => C}
 import util.log
 import play.api.libs.json._
 import play.api.mvc._
-import constants.{const => C}
 
 object RootController extends Controller {
 

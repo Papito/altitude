@@ -1,11 +1,10 @@
 package integration
 
 import java.io.File
+
 import models.manager.FileImportAsset
 import org.scalatest._
 import org.scalatestplus.play._
-import org.scalatest.Matchers._
-import org.scalatest.PartialFunctionValues._
 
 class ImportTests extends FunSuite with OneAppPerSuite {
 /*

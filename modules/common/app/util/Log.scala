@@ -1,8 +1,8 @@
 package util
 
-import play.api.libs.json.{JsObject, JsString}
-import play.api.libs.json.Json
 import java.util.logging.Level
+
+import play.api.libs.json.{JsObject, JsString, Json}
 
 object log {
   var TIME_FORMAT = "yyyy-MM-dd HH:mm:ss:S"

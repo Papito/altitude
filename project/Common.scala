@@ -1,7 +1,6 @@
-import sbt._
-import Keys._
 import play.PlayImport._
-import com.typesafe.sbt.web.SbtWeb.autoImport.{Assets}
+import sbt.Keys._
+import sbt._
 
 object Common {
 	def appName = "altitude"

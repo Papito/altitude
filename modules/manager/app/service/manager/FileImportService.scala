@@ -1,14 +1,14 @@
 package service.manager
 
 import java.io.InputStream
+
+import dao.manager.ImportDao
 import models.manager.FileImportAsset
+import models.{Asset, MediaType}
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
-
-import dao.manager.ImportDao
-import models.{Asset, MediaType}
 import util.log
 
 class FileImportService extends BaseService {
