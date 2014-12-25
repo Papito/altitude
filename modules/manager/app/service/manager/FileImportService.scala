@@ -11,7 +11,7 @@ import dao.manager.ImportDao
 import models.{Metadata, Asset, MediaType}
 import util.log
 
-class FileImportService {
+class FileImportService extends BaseService {
   private val DAO = new ImportDao
 
   def getFilesToImport(path: String): List[FileImportAsset] = {
@@ -22,7 +22,7 @@ class FileImportService {
   }
 
   def detectAssetType(importAsset: FileImportAsset): MediaType = {
-    log.debug("Discovering media type for: '$asset'", Map("asset" -> importAsset))
+    log.debug("Detecting media type for: '$asset'", Map("asset" -> importAsset))
 
     var inputStream: InputStream = null
 
@@ -54,10 +54,7 @@ class FileImportService {
   def importAsset(fileAsset: FileImportAsset): Asset = {
     log.info("Importing file asset '$asset'", Map("asset" -> fileAsset))
     val mediaType = detectAssetType(fileAsset)
-
-
-
-    val metadata = new Metadata
+    val metadata = app.service.metadatService.extract(fileAsset, mediaType)
     new Asset(mediaType = mediaType, metadata = metadata)
   }
 }

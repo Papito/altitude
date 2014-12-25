@@ -1,5 +1,5 @@
 package service.manager
 
-class BaseService {
-
+abstract class BaseService {
+  val app = global.ManagerGlobal
 }

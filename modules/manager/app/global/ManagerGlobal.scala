@@ -7,11 +7,14 @@ import play.api.mvc._
 import util.log
 import constants.{const => C}
 
-import service.manager.FileImportService
+import service.manager.{MetadataService, FileImportService}
 
 object ManagerGlobal extends GlobalSettings {	
 
-	def importService: FileImportService = new FileImportService
+  object service {
+    val importService = new FileImportService
+    val metadatService = new MetadataService
+  }
 
 	override def onStart(app: Application) {
 		log.info("Application starting", C.tag.APP)
