@@ -46,8 +46,8 @@ class TikaMetadataService extends MetadataService {
 
   private def extractMetadata(importAsset: FileImportAsset, parser: AbstractParser): Metadata = {
     log.info(
-      "Extracting $parserType metadata for $asset",
-      Map("asset" -> importAsset),
+      "Extracting metadata for '$asset' with $parserType",
+      Map("asset" -> importAsset, "parserType" -> parser.getClass.getSimpleName),
       C.tag.SERVICE)
 
     var inputStream: InputStream = null
