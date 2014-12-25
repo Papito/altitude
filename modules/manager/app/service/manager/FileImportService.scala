@@ -1,20 +1,20 @@
 package service.manager
 
 import java.io.InputStream
+import models.manager.FileImportAsset
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
 
 import dao.manager.ImportDao
-import models.{Metadata, Asset, MediaType, FileImportAsset}
+import models.{Metadata, Asset, MediaType}
 import util.log
 
 class FileImportService {
   private val DAO = new ImportDao
 
   def getFilesToImport(path: String): List[FileImportAsset] = {
-    require(path.nonEmpty)
     log.info("Finding assets to import @ '$path'", Map("path" -> path))
     val assets = DAO.iterateAssets(path = path).toList
     log.info("Found $num", Map("num" -> assets.size))
@@ -54,6 +54,9 @@ class FileImportService {
   def importAsset(fileAsset: FileImportAsset): Asset = {
     log.info("Importing file asset '$asset'", Map("asset" -> fileAsset))
     val mediaType = detectAssetType(fileAsset)
+
+
+
     val metadata = new Metadata
     new Asset(mediaType = mediaType, metadata = metadata)
   }

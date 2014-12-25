@@ -1,9 +1,12 @@
+package unit
+
 import java.util.logging.Level
+
+import constants.{const => C}
+import org.scalatest.Matchers._
 import org.scalatest._
 import util.log
 import play.api.libs.json._
-import org.scalatest.Matchers._
-import constants.{const => C}
 
 class JayLogTests extends FunSuite {
   val V = Map(

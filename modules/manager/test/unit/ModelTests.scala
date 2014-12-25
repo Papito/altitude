@@ -1,18 +1,11 @@
-import java.io.File
+package unit
 
-import models.{MediaType, FileImportAsset, BaseModel}
-import org.scalatest._
+import java.io.File
+import models.manager.FileImportAsset
 import org.scalatest.Matchers._
+import org.scalatest._
 
 class ModelTests extends FunSuite {
-  test("model fields") {
-    class TestModel extends BaseModel(id = "1")
-
-    val model = new TestModel
-    model.id shouldEqual "1"
-    model.isClean shouldEqual false
-  }
-
   test("import asset model") {
     val model = new FileImportAsset(new File("/"))
     model.id shouldBe null

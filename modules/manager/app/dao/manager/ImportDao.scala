@@ -3,7 +3,7 @@ package dao.manager
 import java.io.File
 
 import constants.{const => C}
-import models.FileImportAsset
+import models.manager.FileImportAsset
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
 import util.log
