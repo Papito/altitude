@@ -1,12 +1,12 @@
 package unit
 
 import org.scalatest._
-import models.{StringMetaField, MetaValue}
+import models.{StringMetaValue, StringMetaField, MetaValue}
 
 class MetaFieldTests extends FunSuite {
+  final val stringField = new StringMetaField("String Field")
+
   test("string field") {
-    val strVal = new MetaValue[String]("a test value")
-    val strMetaField = new StringMetaField("field_name")
-    strMetaField.check(strVal)
+    new StringMetaValue("a test value", stringField)
   }
 }
