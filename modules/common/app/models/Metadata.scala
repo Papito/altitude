@@ -1,5 +1,4 @@
 package models
 
-class Metadata extends BaseModel {
-
+class Metadata(val values: List[MetaValue]) {
 }

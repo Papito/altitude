@@ -4,7 +4,7 @@ import constants.{const => C}
 import play.api._
 import play.api.mvc.Results._
 import play.api.mvc._
-import service.manager.{FileImportService, MetadataService, TikaMetadataService}
+import service.manager.{FileImportService, AbstractMetadataService, TikaMetadataService}
 import util.log
 
 import scala.concurrent.Future
@@ -13,7 +13,7 @@ object ManagerGlobal extends GlobalSettings {
 
   object service {
     val importService: FileImportService = new FileImportService
-    val metadata: MetadataService = new TikaMetadataService
+    val metadata: AbstractMetadataService = new TikaMetadataService
   }
 
 	override def onStart(app: Application) {

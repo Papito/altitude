@@ -14,7 +14,7 @@ import org.apache.tika.parser.mp3.Mp3Parser
 import org.xml.sax.helpers.DefaultHandler
 import util.log
 
-class TikaMetadataService extends MetadataService {
+class TikaMetadataService extends AbstractMetadataService {
 
   private object PARSERS {
     final val IMAGE = new ImageParser
@@ -28,7 +28,8 @@ class TikaMetadataService extends MetadataService {
     case mt: MediaType if mt.mediaType == "image" =>
       extractMetadata(importAsset, PARSERS.IMAGE)
     case mt: MediaType if mt.mediaType == "audio" && mt.mediaSubtype == "mpeg" =>
-      extractMetadata(importAsset, PARSERS.MPEG_AUDIO)
+      val metadata = extractMetadata(importAsset, PARSERS.MPEG_AUDIO)
+      postProcessAudo(metadata)
     case mt: MediaType if mt.mediaType == "audio"
     => extractMetadata(importAsset, PARSERS.SIMPLE_AUDIO)
     case _ => {
@@ -38,6 +39,10 @@ class TikaMetadataService extends MetadataService {
         C.tag.SERVICE)
       null
     }
+  }
+
+  private def postProcessAudo(metadata: Metadata): Metadata = {
+    metadata
   }
 
   private def extractMetadata(importAsset: FileImportAsset, parser: AbstractParser): Metadata = {
