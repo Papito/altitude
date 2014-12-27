@@ -1,3 +1,3 @@
 package models
 
-class TrueFalseMetaField(name: String) extends AbstractMetaField[Boolean](name, isMulti=false)
+class TrueFalseMetaField(name: String) extends MetaField[Boolean](name, isMulti=false)
