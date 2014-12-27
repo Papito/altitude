@@ -88,6 +88,7 @@ object log {
       case (out, (k, v)) => out.replaceAll("\\$"+k, v.toString)
     }
 
+    // FIXME: this is wrong. Needs to intelligently find the closest call to logger
     val ctx: StackTraceElement = Thread.currentThread().getStackTrace()(4)
     val location = List(ctx.getFileName, ctx.getLineNumber)
 
