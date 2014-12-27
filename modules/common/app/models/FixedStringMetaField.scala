@@ -4,7 +4,7 @@ import exceptions.FieldValueException
 
 class FixedStringMetaField(name: String, isMulti: Boolean=false, val allowed: Set[String]=null)
   extends StringMetaField(name, isMulti=isMulti)
-  with FixedField[String] {
+  with FixedMetaField[String] {
   require(allowed.nonEmpty)
 
   override def checkValue(value: String): Unit = {
