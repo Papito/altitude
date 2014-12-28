@@ -1,24 +1,19 @@
 package dao.mongo
 
+import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api._
-import util.log
-
+import reactivemongo.api.DefaultDB
 import scala.concurrent.ExecutionContext.Implicits.global
+
+import util.log
 
 abstract class BaseDao extends dao.BaseDao {
   private val driver = new MongoDriver
-  protected var mongoConn: MongoConnection = null
 
   protected val COLLECTION_NAME: String
-  protected val collection: Collection = db(COLLECTION_NAME)
+  protected def collection: JSONCollection  = db.collection[JSONCollection](COLLECTION_NAME)
 
-  protected def conn: MongoConnection = {
-    if (mongoConn == null) {
-      log.info("Connecting to Mongo DB")
-      mongoConn = driver.connection(List("localhost"))
-    }
-    mongoConn
-  }
+  protected def conn: MongoConnection = driver.connection(List("localhost"))
 
-  protected def db: DefaultDB = conn("altitide")
+  protected def db: DefaultDB = conn("altitude")
 }
