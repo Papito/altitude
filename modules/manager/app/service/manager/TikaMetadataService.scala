@@ -14,6 +14,8 @@ import org.apache.tika.parser.mp3.Mp3Parser
 import org.xml.sax.helpers.DefaultHandler
 import util.log
 
+import scala.collection.immutable.HashMap
+
 class TikaMetadataService extends AbstractMetadataService {
 
   private object PARSERS {
@@ -55,11 +57,17 @@ class TikaMetadataService extends AbstractMetadataService {
       inputStream = TikaInputStream.get(url, metadata)
 
       parser.parse(inputStream, TIKA_HANDLER, metadata, null)
-      for (key <- metadata.names()) {
-        println(key + ": " + metadata.get(key))
+
+      // accumulate metadata into a map
+      val data = metadata.names().foldLeft(new HashMap[String, String])(
+        (col, key) => col + (key -> metadata.get(key))
+      )
+
+      for (key <- data.keys) {
+        println(key + ": " + data.get(key))
       }
 
-      new Metadata
+      new Metadata(data)
     }
     finally {
       log.debug("Closing stream for '$asset'", Map("asset" -> importAsset))
