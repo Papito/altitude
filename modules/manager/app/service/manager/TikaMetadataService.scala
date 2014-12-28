@@ -28,10 +28,9 @@ class TikaMetadataService extends AbstractMetadataService {
     case mt: MediaType if mt.mediaType == "image" =>
       extractMetadata(importAsset, PARSERS.IMAGE)
     case mt: MediaType if mt.mediaType == "audio" && mt.mediaSubtype == "mpeg" =>
-      val metadata = extractMetadata(importAsset, PARSERS.MPEG_AUDIO)
-      postProcessAudo(metadata)
-    case mt: MediaType if mt.mediaType == "audio"
-    => extractMetadata(importAsset, PARSERS.SIMPLE_AUDIO)
+      extractMetadata(importAsset, PARSERS.MPEG_AUDIO)
+    case mt: MediaType if mt.mediaType == "audio" =>
+      extractMetadata(importAsset, PARSERS.SIMPLE_AUDIO)
     case _ => {
       log.warn(
         "No metadata extractor found for $asset of type '$mediaType'",
@@ -39,10 +38,6 @@ class TikaMetadataService extends AbstractMetadataService {
         C.tag.SERVICE)
       null
     }
-  }
-
-  private def postProcessAudo(metadata: Metadata): Metadata = {
-    metadata
   }
 
   private def extractMetadata(importAsset: FileImportAsset, parser: AbstractParser): Metadata = {
