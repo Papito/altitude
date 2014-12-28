@@ -40,12 +40,12 @@ class ImportTests extends FunSuite with OneAppPerSuite {
   test("import image (JPEG)") {
     val path = getClass.getResource("../files/incoming/images/1.jpg").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
-    val asset = global.ManagerGlobal.service.importService.importAsset(fileImportAsset)
+    val asset = global.ManagerGlobal.service.fileImport.importAsset(fileImportAsset)
   }
 
   test("import audio (MP3)") {
     val path = getClass.getResource("../files/incoming/audio/all.mp3").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
-    val asset = global.ManagerGlobal.service.importService.importAsset(fileImportAsset)
+    val asset = global.ManagerGlobal.service.fileImport.importAsset(fileImportAsset)
   }
 }

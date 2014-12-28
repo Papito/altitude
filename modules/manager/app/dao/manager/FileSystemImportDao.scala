@@ -8,7 +8,7 @@ import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
 import util.log
 
-class ImportDao {
+class FileSystemImportDao {
   private val ANY_FILE_FILTER: IOFileFilter = TrueFileFilter.INSTANCE
 
   def iterateAssets(path: String): Iterator[FileImportAsset] = {
