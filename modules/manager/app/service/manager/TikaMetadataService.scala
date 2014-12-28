@@ -63,10 +63,6 @@ class TikaMetadataService extends AbstractMetadataService {
         (col, key) => col + (key -> metadata.get(key))
       )
 
-      for (key <- data.keys) {
-        println(key + ": " + data.get(key))
-      }
-
       new Metadata(data)
     }
     finally {
