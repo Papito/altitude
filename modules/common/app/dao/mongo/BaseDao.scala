@@ -1,21 +1,15 @@
 package dao.mongo
 
-import play.modules.reactivemongo.json.collection.JSONCollection
+import constants.{const => C}
 import reactivemongo.api._
-import reactivemongo.api.DefaultDB
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
+import util.log
 
-//import util.log
-
-abstract class BaseDao extends dao.BaseDao {
+object BaseDao {
+  log.info("Initializing mongo connection", C.tag.DB, C.tag.APP)
   private val driver = new MongoDriver
-  final protected val TIMEOUT: Duration = 5.seconds
-
-  protected val COLLECTION_NAME: String
-  protected def collection: JSONCollection  = db.collection[JSONCollection](COLLECTION_NAME)
-
-  protected def conn: MongoConnection = driver.connection(List("localhost"))
-
-  protected def db: DefaultDB = conn("altitude")
+  private val connection = driver.connection(List("localhost"))
+  def db: DB = connection("altitude")
 }
+
+//abstract class BaseDao[T](collectionName: String) extends JsonDao[T, BSONObjectID](BaseDao.db, collectionName)

@@ -4,9 +4,14 @@ import java.io.File
 
 import models.manager.FileImportAsset
 import org.scalatest._
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play._
+import reactivemongo.core.commands.LastError
 
-class ImportTests extends FunSuite with OneAppPerSuite {
+import scala.concurrent.Await
+import scala.concurrent.duration._
+
+class ImportTests extends FunSuite with OneAppPerSuite with ScalaFutures {
 /*
   test("import file list") {
     val incomingPath = getClass.getResource("../files/incoming").getPath
@@ -41,11 +46,13 @@ class ImportTests extends FunSuite with OneAppPerSuite {
     val path = getClass.getResource("../files/incoming/images/1.jpg").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
     val asset = global.ManagerGlobal.service.fileImport.importAsset(fileImportAsset)
+    Await.result(asset, 1.second)
   }
 
   test("import audio (MP3)") {
     val path = getClass.getResource("../files/incoming/audio/all.mp3").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
     val asset = global.ManagerGlobal.service.fileImport.importAsset(fileImportAsset)
+    Await.result(asset, 1.second)
   }
 }

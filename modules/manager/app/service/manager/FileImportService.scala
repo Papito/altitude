@@ -1,6 +1,9 @@
 package service.manager
 
 import java.io.InputStream
+import reactivemongo.core.commands.LastError
+
+import scala.concurrent.Future
 
 import dao.manager.FileSystemImportDao
 import models.manager.FileImportAsset
@@ -51,7 +54,7 @@ class FileImportService extends BaseService {
     }
   }
 
-  def importAsset(fileAsset: FileImportAsset): Asset = {
+  def importAsset(fileAsset: FileImportAsset): Future[LastError]  = {
     log.info("Importing file asset '$asset'", Map("asset" -> fileAsset))
     val mediaType = detectAssetType(fileAsset)
     val metadata = app.service.metadata.extract(fileAsset, mediaType)
