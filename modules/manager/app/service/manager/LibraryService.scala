@@ -7,11 +7,6 @@ import util.log
 
 import scala.concurrent.Future
 
-class LibraryService extends BaseService {
-  val DAO: dao.manager.LibraryDao = new dao.manager.mongo.LibraryDao
-
-  def addAsset(asset: Asset): Future[LastError]  = {
-    //log.info("Adding asset", Map("asset" -> asset), C.tag.SERVICE)
-    DAO.addAsset(asset)
-  }
+class LibraryService extends BaseService[Asset] {
+  override val DAO = new dao.manager.mongo.LibraryDao
 }

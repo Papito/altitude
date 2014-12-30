@@ -14,8 +14,9 @@ import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
 import util.log
 
-class FileImportService extends BaseService {
+class FileImportService {
   private val DAO = new FileSystemImportDao
+  private val app = global.ManagerGlobal
 
   def getFilesToImport(path: String): List[FileImportAsset] = {
     log.info("Finding assets to import @ '$path'", Map("path" -> path))
@@ -59,6 +60,6 @@ class FileImportService extends BaseService {
     val mediaType = detectAssetType(fileAsset)
     val metadata = app.service.metadata.extract(fileAsset, mediaType)
     val asset = new Asset(mediaType = mediaType, metadata = metadata)
-    app.service.library.addAsset(asset)
+    app.service.library.add(asset)
   }
 }

@@ -6,5 +6,5 @@ import reactivemongo.core.commands.LastError
 import scala.concurrent.Future
 
 trait LibraryDao {
-  def addAsset(asset: Asset): Future[LastError]
+  def add(asset: Asset): Future[LastError]
 }

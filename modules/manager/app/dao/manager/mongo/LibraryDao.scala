@@ -13,10 +13,4 @@ import play.modules.reactivemongo.json.BSONFormats._
 
 import scala.concurrent.Future
 
-class LibraryDao extends JsonDao[Asset, BSONObjectID](BaseDao.db, "asset") with dao.manager.LibraryDao {
-  def addAsset(asset: Asset): Future[LastError] = {
-    log.info("Adding asset", Map("asset" -> asset), C.tag.DB)
-    collection.insert(Json.toJson(asset.toMap))
-  }
-
-}
+class LibraryDao extends BaseDao[Asset]("assets") with dao.manager.LibraryDao
