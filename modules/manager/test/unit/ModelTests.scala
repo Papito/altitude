@@ -5,6 +5,7 @@ import java.io.File
 import models.manager.FileImportAsset
 import org.scalatest.Matchers._
 import org.scalatest._
+import play.api.libs.json.JsObject
 
 class ModelTests extends FunSuite {
   test("import asset model") {
@@ -12,7 +13,6 @@ class ModelTests extends FunSuite {
     model.id shouldBe null
     model.isClean shouldEqual false
 
-    val d: Map[String, Any] = model.toMap
-    d should contain key "id"
+    val j: JsObject = model.toJson
   }
 }

@@ -1,7 +1,7 @@
 package models
 
+import play.api.libs.json.{Json, JsObject}
+
 abstract class BaseModel(val id: String = null, val isClean: Boolean = false) {
-  def toMap: Map[String, Any] = throw new NotImplementedError
-  def fromMap(d: Map[String, Any]): BaseModel = throw new NotImplementedError
-  override def toString = toMap.toString()
+  def toJson: JsObject = Json.obj()
 }
