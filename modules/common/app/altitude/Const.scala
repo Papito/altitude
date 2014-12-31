@@ -1,6 +1,6 @@
-package constants
+package altitude
 
-object const {
+object Const {
   object tag {
     val APP     = "APP"
     val API     = "API"

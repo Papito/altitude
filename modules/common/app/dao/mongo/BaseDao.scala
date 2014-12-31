@@ -1,6 +1,6 @@
 package dao.mongo
 
-import constants.{const => C}
+import altitude.{Const => C}
 import models.BaseModel
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.core.commands.LastError

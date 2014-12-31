@@ -1,8 +1,6 @@
 package unit
 
 import java.util.logging.Level
-
-import constants.{const => C}
 import org.scalatest.Matchers._
 import org.scalatest._
 import util.log

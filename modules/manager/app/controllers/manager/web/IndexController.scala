@@ -1,8 +1,8 @@
 package controllers.manager.web
 
-import constants.{const => C}
 import play.api.mvc._
 import util.log
+import altitude.{Const => C}
 
 object IndexController extends Controller {
 

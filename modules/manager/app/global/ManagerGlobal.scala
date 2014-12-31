@@ -1,13 +1,14 @@
  package global
 
-import constants.{const => C}
-import play.api._
+ import play.api._
 import play.api.mvc.Results._
 import play.api.mvc._
 import service.manager.{LibraryService, FileImportService, AbstractMetadataService, TikaMetadataService}
 import util.log
+import altitude.{Const => C}
 
-import scala.concurrent.Future
+
+ import scala.concurrent.Future
 
 object ManagerGlobal extends GlobalSettings {	
 
