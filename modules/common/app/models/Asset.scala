@@ -1,3 +1,5 @@
 package models
 
-case class Asset(mediaType: MediaType, metadata: Metadata) extends BaseModel
+import reactivemongo.bson.BSONObjectID
+
+case class Asset(mediaType: MediaType, metadata: Metadata) extends BaseModel[BSONObjectID]

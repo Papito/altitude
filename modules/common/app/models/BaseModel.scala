@@ -2,6 +2,6 @@ package models
 
 import play.api.libs.json.{Json, JsObject}
 
-abstract class BaseModel(val id: Option[String] = None, val isClean: Boolean = false) {
+abstract class BaseModel[ID](val id: Option[ID] = None, val isClean: Boolean = false) {
   def toJson: JsObject = Json.obj()
 }

@@ -18,10 +18,10 @@ object BaseDao {
   def db: DB = connection("altitude")
 }
 
-abstract class BaseDao[T <: BaseModel](private val collectionName: String) {
+abstract class BaseDao[Model <: BaseModel[ID], ID](private val collectionName: String) {
   protected def collection = BaseDao.db.collection[JSONCollection](collectionName)
 
-  def add(model: T): Future[LastError] = {
+  def add(model: Model): Future[LastError] = {
     collection.insert(model.toJson)
   }
 }
