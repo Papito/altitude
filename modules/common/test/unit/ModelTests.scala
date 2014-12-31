@@ -6,10 +6,10 @@ import org.scalatest._
 
 class ModelTests extends FunSuite {
   test("model fields") {
-    class TestModel extends BaseModel(id = "1")
+    class TestModel extends BaseModel
 
     val model = new TestModel
-    model.id shouldEqual "1"
+    model.id shouldEqual None
     model.isClean shouldEqual false
   }
 }

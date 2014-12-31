@@ -5,6 +5,7 @@ import org.scalatest.Matchers._
 import org.scalatest._
 import util.log
 import play.api.libs.json._
+import altitude.{Const => C}
 
 class JayLogTests extends FunSuite {
   val V = Map(
