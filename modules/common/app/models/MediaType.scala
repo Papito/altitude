@@ -16,6 +16,10 @@ case class MediaType(mediaType: String, mediaSubtype: String, mime: String) exte
 
   override def hashCode: Int = (mediaType + mediaSubtype + mime).hashCode
 
-  override def toJson: JsObject = Json.obj()
+  override def toJson: JsObject = Json.obj(
+    "mime" -> mime,
+    "type" ->  mediaType,
+    "subtype" -> mediaSubtype
+  )
   override protected def genId: String = BSONObjectID.generate.toString()
 }
