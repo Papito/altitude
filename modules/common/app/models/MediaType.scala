@@ -1,6 +1,9 @@
 package models
 
-case class MediaType(mediaType: String, mediaSubtype: String, mime: String) extends BaseModel {
+import play.api.libs.json.{Json, JsObject}
+import reactivemongo.bson.BSONObjectID
+
+case class MediaType(mediaType: String, mediaSubtype: String, mime: String) extends BaseModel[String] {
   override def toString = List(mediaType, mediaSubtype, mime).mkString(":")
 
   override def equals(other: Any) = other match {
@@ -12,4 +15,7 @@ case class MediaType(mediaType: String, mediaSubtype: String, mime: String) exte
   }
 
   override def hashCode: Int = (mediaType + mediaSubtype + mime).hashCode
+
+  override def toJson: JsObject = Json.obj()
+  override protected def genId: String = BSONObjectID.generate.toString()
 }

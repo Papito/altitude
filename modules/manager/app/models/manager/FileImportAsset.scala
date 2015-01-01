@@ -3,12 +3,19 @@ package models.manager
 import java.io.File
 
 import models.BaseModel
+import play.api.libs.json.{Json, JsObject}
+import reactivemongo.bson.BSONObjectID
 
-class FileImportAsset(val file: File) extends BaseModel {
+class FileImportAsset(val file: File) extends BaseModel[String] {
   require(file != null)
 
   val absolutePath = file.getAbsolutePath
   val name = file.getName
 
   override def toString = this.absolutePath
+  override def toJson: JsObject = Json.obj(
+    "absolutePath" -> absolutePath,
+    "name" -> name
+  )
+  override protected def genId: String = BSONObjectID.generate.toString()
 }
