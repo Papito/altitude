@@ -23,10 +23,9 @@ class ImportTests extends FunSuite with OneAppPerSuite with ScalaFutures {
     val fileImportAsset = new FileImportAsset(new File(path))
     val assetType = global.ManagerGlobal.service.fileImport.detectAssetType(fileImportAsset)
 
-    val json = assetType.toJson
-    (json \ "type").as[String] should equal ("image")
-    (json \ "subtype").as[String] should equal ("jpeg")
-    (json \ "mime").as[String] should equal ("image/jpeg")
+    assetType.mediaType should equal ("image")
+    assetType.mediaSubtype should equal ("jpeg")
+    assetType.mime should equal ("image/jpeg")
   }
 
   test("detect audio media type (MP3)") {
@@ -34,10 +33,9 @@ class ImportTests extends FunSuite with OneAppPerSuite with ScalaFutures {
     val fileImportAsset = new FileImportAsset(new File(path))
     val assetType = global.ManagerGlobal.service.fileImport.detectAssetType(fileImportAsset)
 
-    val json = assetType.toJson
-    (json \ "type").as[String] should equal ("audio")
-    (json \ "subtype").as[String] should equal ("mpeg")
-    (json \ "mime").as[String] should equal ("audio/mpeg")
+    assetType.mediaType should equal ("audio")
+    assetType.mediaSubtype should equal ("mpeg")
+    assetType.mime should equal ("audio/mpeg")
   }
 
   test("import image (JPEG)") {
