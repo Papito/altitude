@@ -4,13 +4,13 @@ import java.io.File
 
 import models.manager.FileImportAsset
 import org.scalatest.concurrent.{ScalaFutures, Futures}
-import org.scalatest.time.{Seconds, Span, Millis}
+import org.scalatest.time.{Second, Span, Millis}
 import org.scalatestplus.play._
 import org.scalatest.Matchers._
 import org.scalatest._
 
 class ImportTests extends FunSuite with OneAppPerSuite with ScalaFutures {
-  implicit val defaultPatience = PatienceConfig(timeout = Span(2, Seconds), interval = Span(5, Millis))
+  implicit val defaultPatience = PatienceConfig(timeout = Span(1, Second), interval = Span(5, Millis))
 
   test("import file list") {
     val incomingPath = getClass.getResource("../files/incoming").getPath
