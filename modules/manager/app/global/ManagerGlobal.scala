@@ -1,7 +1,7 @@
  package global
 
 import altitude.{Const => C}
-import com.google.inject.{AbstractModule, Guice}
+import com.google.inject.{Injector, AbstractModule, Guice}
 import dao.manager.LibraryDao
 import net.codingwell.scalaguice.ScalaModule
 import play.api._
@@ -13,17 +13,16 @@ import util.log
 import scala.concurrent.Future
 
 object ManagerGlobal extends GlobalSettings {
-  lazy val injector = Guice.createInjector(new InjectionModule)
+  var injector: Injector = null
 
   class InjectionModule extends AbstractModule with ScalaModule  {
-    val dataSourceType = Play.current.configuration.getString("db.dataSource").getOrElse("mongo")
-    log.info("Datasource type: $source", Map("source" -> dataSourceType), C.tag.APP)
-
     override def configure(): Unit = {
+      val dataSourceType = Play.current.configuration.getString("db.dataSource").getOrElse("")
+      log.info("Datasource type: $source", Map("source" -> dataSourceType), C.tag.APP)
       log.info("Application configure", C.tag.APP)
       dataSourceType match {
         case "mongo" => bind[LibraryDao].toInstance(new dao.manager.mongo.LibraryDao)
-        case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
+        case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType); sys.exit()
       }
     }
   }
@@ -35,6 +34,7 @@ object ManagerGlobal extends GlobalSettings {
   }
 
 	override def onStart(app: Application) {
+    injector = Guice.createInjector(new InjectionModule)
 		log.info("Application starting", C.tag.APP)
 	}
 

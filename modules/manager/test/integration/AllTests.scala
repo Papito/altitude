@@ -15,6 +15,13 @@ class MongoSuite extends Suites(
     additionalConfiguration = Map("db.dataSource" -> "mongo")
   )
 }
+class PostgresSuite extends Suites(
+  new ImportTests
+) with OneAppPerSuite {
+  implicit override lazy val app = FakeApplication(
+    additionalConfiguration = Map("db.dataSource" -> "postgres")
+  )
+}
 
 //class PostgresTests extends AllTests(Map("db.dataSource" -> "postgres"))
 
