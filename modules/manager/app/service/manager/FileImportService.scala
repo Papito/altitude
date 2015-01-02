@@ -33,7 +33,7 @@ class FileImportService {
     try {
       val url: java.net.URL = importAsset.file.toURI.toURL
       val metadata: TikaMetadata = new TikaMetadata
-      log.debug("Opening stream for '$asset'", Map("asset" -> importAsset))
+      //log.debug("Opening stream for '$asset'", Map("asset" -> importAsset))
       inputStream = TikaInputStream.get(url, metadata)
 
       val detector: Detector = new DefaultDetector
@@ -50,7 +50,7 @@ class FileImportService {
       assetMediaType
     }
     finally {
-      log.debug("Closing stream for '$asset'", Map("asset" -> importAsset))
+      //log.debug("Closing stream for '$asset'", Map("asset" -> importAsset))
       inputStream.close()
     }
   }

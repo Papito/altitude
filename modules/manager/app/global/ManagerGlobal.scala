@@ -1,16 +1,29 @@
  package global
 
+import com.google.inject.{AbstractModule, Guice}
+import dao.manager.LibraryDao
+ import net.codingwell.scalaguice.ScalaModule
  import play.api._
 import play.api.mvc.Results._
 import play.api.mvc._
-import service.manager.{LibraryService, FileImportService, AbstractMetadataService, TikaMetadataService}
+ import service.manager.FileImportService
+ import service.manager._
 import util.log
 import altitude.{Const => C}
 
+import scala.concurrent.Future
 
- import scala.concurrent.Future
+object ManagerGlobal extends GlobalSettings {
+  lazy val injector = Guice.createInjector(new InjectionModule)
 
-object ManagerGlobal extends GlobalSettings {	
+  class InjectionModule extends AbstractModule with ScalaModule  {
+    val dataSourceType = Play.current.configuration.getString("db.dataSource").getOrElse("mongo")
+    log.info("Datasource type: $source", Map("source" -> dataSourceType), C.tag.APP)
+
+    def configure(): Unit = {
+      bind[LibraryDao].toInstance(new dao.manager.mongo.LibraryDao)
+    }
+  }
 
   object service {
     val fileImport: FileImportService = new FileImportService
