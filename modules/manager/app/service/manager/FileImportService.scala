@@ -55,7 +55,7 @@ class FileImportService {
     }
   }
 
-  def importAsset(fileAsset: FileImportAsset): Future[LastError]  = {
+  def importAsset(fileAsset: FileImportAsset): Future[Asset]  = {
     log.info("Importing file asset '$asset'", Map("asset" -> fileAsset))
     val mediaType = detectAssetType(fileAsset)
     val metadata = app.service.metadata.extract(fileAsset, mediaType)

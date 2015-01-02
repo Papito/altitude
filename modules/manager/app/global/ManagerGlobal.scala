@@ -13,7 +13,7 @@ import util.log
 import scala.concurrent.Future
 
 object ManagerGlobal extends GlobalSettings {
-  var injector: Injector = null
+  implicit var injector: Injector = null
 
   class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
@@ -22,7 +22,8 @@ object ManagerGlobal extends GlobalSettings {
       log.info("Application configure", C.tag.APP)
       dataSourceType match {
         case "mongo" => bind[LibraryDao].toInstance(new dao.manager.mongo.LibraryDao)
-        case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType); sys.exit()
+        case "postgres" => bind[LibraryDao].toInstance(new dao.manager.postgres.LibraryDao)
+        case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType);
       }
     }
   }

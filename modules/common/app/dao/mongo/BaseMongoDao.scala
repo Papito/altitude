@@ -1,10 +1,11 @@
 package dao.mongo
 
 import altitude.{Const => C}
+import dao.BaseDao
 import models.BaseModel
 import play.api.{Configuration, Play}
 import play.modules.reactivemongo.json.collection.JSONCollection
-import reactivemongo.core.commands.LastError
+import scala.concurrent.ExecutionContext.Implicits.global
 import util.log
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -12,7 +13,7 @@ import scala.concurrent.Future
 
 import reactivemongo.api._
 
-object BaseDao {
+object BaseMongoDao {
   private val host = Play.current.configuration.getString("db.mongo.host").getOrElse("")
   require(host.nonEmpty)
   private val dbName = Play.current.configuration.getString("db.name").getOrElse("")
@@ -27,10 +28,11 @@ object BaseDao {
   final def db: DB = connection(dbName)
 }
 
-abstract class BaseDao[Model <: BaseModel[ID], ID](private val collectionName: String) {
-  protected def collection = BaseDao.db.collection[JSONCollection](collectionName)
+abstract class BaseMongoDao[Model <: BaseModel[ID], ID](private val collectionName: String) extends BaseDao[Model] {
+  protected def collection = BaseMongoDao.db.collection[JSONCollection](collectionName)
 
-  def add(model: Model): Future[LastError] = {
+  override def add(model: Model): Future[Model] = {
     collection.insert(model.toJson)
+    Future[Model] {model}
   }
 }

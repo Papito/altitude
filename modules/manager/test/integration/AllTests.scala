@@ -4,24 +4,19 @@ import org.scalatest.{DoNotDiscover, Suites, FunSuite}
 import org.scalatestplus.play.{ConfiguredApp, OneAppPerSuite}
 import play.api.test.FakeApplication
 
-class AllTests extends Suites(
-  new MongoSuite
+@DoNotDiscover class AllTests extends Suites(
+  new ImportTests
 )
 
-class MongoSuite extends Suites(
-  new ImportTests
-) with OneAppPerSuite {
+class MongoSuite extends AllTests with OneAppPerSuite {
   implicit override lazy val app = FakeApplication(
     additionalConfiguration = Map("db.dataSource" -> "mongo")
   )
 }
-class PostgresSuite extends Suites(
-  new ImportTests
-) with OneAppPerSuite {
+
+class PostgresSuite extends AllTests with OneAppPerSuite {
   implicit override lazy val app = FakeApplication(
     additionalConfiguration = Map("db.dataSource" -> "postgres")
   )
 }
-
-//class PostgresTests extends AllTests(Map("db.dataSource" -> "postgres"))
 
