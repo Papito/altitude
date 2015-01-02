@@ -3,56 +3,58 @@ package integration
 import java.io.File
 
 import models.manager.FileImportAsset
-import org.scalatest._
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{ScalaFutures, Futures}
+import org.scalatest.time.{Seconds, Span, Millis}
 import org.scalatestplus.play._
-import reactivemongo.core.commands.LastError
-
-import scala.concurrent.Await
-import scala.concurrent.duration._
+import org.scalatest.Matchers._
+import org.scalatest._
 
 class ImportTests extends FunSuite with OneAppPerSuite with ScalaFutures {
-/*
+  implicit val defaultPatience = PatienceConfig(timeout = Span(2, Seconds), interval = Span(5, Millis))
+
   test("import file list") {
     val incomingPath = getClass.getResource("../files/incoming").getPath
-    val assets = global.ManagerGlobal.importService.getFilesToImport(path=incomingPath)
+    val assets = global.ManagerGlobal.service.fileImport.getFilesToImport(path=incomingPath)
     assets should not be empty
   }
 
   test("detect image media type (JPEG)") {
     val path = getClass.getResource("../files/incoming/images/1.jpg").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
-    val assetType = global.ManagerGlobal.importService.detectAssetType(fileImportAsset)
+    val assetType = global.ManagerGlobal.service.fileImport.detectAssetType(fileImportAsset)
 
-    val d = assetType.toMap
-    d.valueAt("type") should equal("image")
-    d.valueAt("subtype") should equal("jpeg")
-    d.valueAt("mime") should equal("image/jpeg")
+    val json = assetType.toJson
+    (json \ "type").as[String] should equal ("image")
+    (json \ "subtype").as[String] should equal ("jpeg")
+    (json \ "mime").as[String] should equal ("image/jpeg")
   }
 
   test("detect audio media type (MP3)") {
     val path = getClass.getResource("../files/incoming/audio/all.mp3").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
-    val assetType = global.ManagerGlobal.importService.detectAssetType(fileImportAsset)
+    val assetType = global.ManagerGlobal.service.fileImport.detectAssetType(fileImportAsset)
 
-    val d = assetType.toMap
-    d.valueAt("type") should equal("audio")
-    d.valueAt("subtype") should equal("mpeg")
-    d.valueAt("mime") should equal("audio/mpeg")
+    val json = assetType.toJson
+    (json \ "type").as[String] should equal ("audio")
+    (json \ "subtype").as[String] should equal ("mpeg")
+    (json \ "mime").as[String] should equal ("audio/mpeg")
   }
-*/
 
   test("import image (JPEG)") {
     val path = getClass.getResource("../files/incoming/images/1.jpg").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
     val asset = global.ManagerGlobal.service.fileImport.importAsset(fileImportAsset)
-    Await.result(asset, 1.second)
+    whenReady(asset) {asset =>
+      asset.getMessage() should equal("DatabaseException['empty lastError message']")
+    }
   }
 
   test("import audio (MP3)") {
     val path = getClass.getResource("../files/incoming/audio/all.mp3").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
     val asset = global.ManagerGlobal.service.fileImport.importAsset(fileImportAsset)
-    Await.result(asset, 1.second)
+    whenReady(asset) {asset =>
+      asset.getMessage() should equal("DatabaseException['empty lastError message']")
+    }
   }
 }
