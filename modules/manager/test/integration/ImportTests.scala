@@ -3,15 +3,9 @@ package integration
 import java.io.File
 
 import models.manager.FileImportAsset
-import org.scalatest.concurrent.{ScalaFutures, Futures}
-import org.scalatest.time.{Second, Span, Millis}
-import org.scalatestplus.play._
 import org.scalatest.Matchers._
-import org.scalatest._
 
-class ImportTests extends FunSuite with OneAppPerSuite with ScalaFutures {
-  implicit val defaultPatience = PatienceConfig(timeout = Span(1, Second), interval = Span(5, Millis))
-
+class ImportTests extends IntegrationTests {
   test("import file list") {
     val incomingPath = getClass.getResource("../files/incoming").getPath
     val assets = global.ManagerGlobal.service.fileImport.getFilesToImport(path=incomingPath)
