@@ -1,5 +1,7 @@
 package integration
 
+import com.google.inject.Guice
+import global.ManagerGlobal
 import org.scalatest.{DoNotDiscover, Suites, FunSuite}
 import org.scalatestplus.play.{ConfiguredApp, OneAppPerSuite}
 import play.api.test.FakeApplication
