@@ -3,9 +3,11 @@ package integration
 import java.io.File
 
 import models.manager.FileImportAsset
+import org.scalatest.{DoNotDiscover, FunSuite}
 import org.scalatest.Matchers._
+import org.scalatestplus.play.ConfiguredApp
 
-class ImportTests extends IntegrationTests {
+@DoNotDiscover class ImportTests extends FunSuite with AsyncTestable with ConfiguredApp {
   test("import file list") {
     val incomingPath = getClass.getResource("../files/incoming").getPath
     val assets = global.ManagerGlobal.service.fileImport.getFilesToImport(path=incomingPath)

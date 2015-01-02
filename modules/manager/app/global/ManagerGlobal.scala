@@ -19,9 +19,11 @@ object ManagerGlobal extends GlobalSettings {
     val dataSourceType = Play.current.configuration.getString("db.dataSource").getOrElse("mongo")
     log.info("Datasource type: $source", Map("source" -> dataSourceType), C.tag.APP)
 
-    def configure(): Unit = {
+    override def configure(): Unit = {
+      log.info("Application configure", C.tag.APP)
       dataSourceType match {
         case "mongo" => bind[LibraryDao].toInstance(new dao.manager.mongo.LibraryDao)
+        case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
       }
     }
   }
