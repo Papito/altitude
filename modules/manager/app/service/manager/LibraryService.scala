@@ -7,7 +7,5 @@ import dao.manager.mongo.LibraryDao
 import models.Asset
 
 class LibraryService extends BaseService[Asset, String] {
-  val LibraryDao: LibraryDao = app.injector.instance[LibraryDao]
-
-  override def DAO = LibraryDao
+  override protected val DAO = app.injector.instance[LibraryDao]
 }

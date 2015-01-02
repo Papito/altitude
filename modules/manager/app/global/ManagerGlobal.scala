@@ -1,15 +1,14 @@
  package global
 
+import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
 import dao.manager.LibraryDao
- import net.codingwell.scalaguice.ScalaModule
- import play.api._
+import net.codingwell.scalaguice.ScalaModule
+import play.api._
 import play.api.mvc.Results._
 import play.api.mvc._
- import service.manager.FileImportService
- import service.manager._
+import service.manager.{FileImportService, _}
 import util.log
-import altitude.{Const => C}
 
 import scala.concurrent.Future
 
@@ -21,7 +20,9 @@ object ManagerGlobal extends GlobalSettings {
     log.info("Datasource type: $source", Map("source" -> dataSourceType), C.tag.APP)
 
     def configure(): Unit = {
-      bind[LibraryDao].toInstance(new dao.manager.mongo.LibraryDao)
+      dataSourceType match {
+        case "mongo" => bind[LibraryDao].toInstance(new dao.manager.mongo.LibraryDao)
+      }
     }
   }
 
