@@ -1,7 +1,7 @@
 package integration
 
-import org.scalatest.{DoNotDiscover, Suites}
+import org.scalatest.Suites
 
-@DoNotDiscover class AllTests extends Suites(
-  new ImportTests
+abstract class AllTests(config: Map[String, _]) extends Suites(
+  new ImportTests(config)
 )

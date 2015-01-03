@@ -10,7 +10,7 @@ import org.scalatestplus.play.ConfiguredApp
 import play.api.Play
 import util.log
 
-@DoNotDiscover class ImportTests extends AltitudeApp {
+@DoNotDiscover class ImportTests(config: Map[String, _]) extends AltitudeApp(config) {
 
   test("import image (JPEG)") {
     log.info("Running test with play app " + this.app.hashCode())
@@ -23,7 +23,6 @@ import util.log
     }
   }
 
-/*
   test("import audio (MP3)") {
     val path = getClass.getResource("../files/incoming/audio/all.mp3").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
@@ -57,5 +56,5 @@ import util.log
     assetType.mediaSubtype should equal ("mpeg")
     assetType.mime should equal ("audio/mpeg")
   }
-*/
+
 }
