@@ -9,8 +9,8 @@ import reactivemongo.api._
 import util.log
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
 object BaseMongoDao {
   private val host = Play.current.configuration.getString("mongo.host").getOrElse("")
   require(host.nonEmpty)
@@ -30,7 +30,9 @@ abstract class BaseMongoDao[Model <: BaseModel[ID], ID](private val collectionNa
   protected def collection = BaseMongoDao.db.collection[JSONCollection](collectionName)
 
   override def add(model: Model): Future[Model] = {
-    collection.insert(model.toJson)
+    log.info("MONGO INSERT")
+    val f = collection.insert(model.toJson)
+    Await.result(f, 1.second)
     Future[Model] {model}
   }
 }

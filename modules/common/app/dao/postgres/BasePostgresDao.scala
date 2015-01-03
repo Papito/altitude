@@ -21,6 +21,7 @@ abstract class BasePostgresDao[Model <: BaseModel[ID], ID](private val tableName
   }
 
   override def add(model: Model): Future[Model] = {
+    log.info("POSTGRES INSERT")
     Future[Model] {model}
   }
 }
