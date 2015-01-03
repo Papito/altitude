@@ -14,7 +14,7 @@ abstract class IntegrationTestCore extends FunSuite with OneAppPerSuite with Sca
     additionalConfiguration = config
   )
 
-  protected def altitude: Altitude = Altitude.getInstance(this.app)
+  protected lazy val altitude: Altitude = Altitude.getInstance(this.app)
 
   // async setup
   implicit val defaultPatience = PatienceConfig(timeout = Span(1, Second), interval = Span(5, Millis))
