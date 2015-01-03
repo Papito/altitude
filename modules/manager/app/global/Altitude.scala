@@ -14,7 +14,7 @@ import altitude.{Const => C}
   Bridge between a Play! app instance and our app, which is our communication hub
   between all the different services.
 
-  The Play! global object is a bad candidate since it has to follow the GlobalSetting trait.
+  The Play! global object is a bad candidate since it has to follow the GlobalSettings trait.
  */
 object Altitude {
   // our Altitude instances - multiple ones can exist at once (parallel test suites)
@@ -26,7 +26,13 @@ object Altitude {
     val app: Altitude = new Altitude(playApp)
     instances += (id -> app)
     log.info("Registering app $app with Play! id: $id", Map("id" -> id, "app" -> app), C.tag.APP)
+    log.info("We have $n applications running", Map("n" -> instances.size), C.tag.APP)
+  }
 
+  def deregister(playApp: Application): Unit = {
+    val id: Int = playApp.hashCode()
+    log.info("De-registering app $app with Play! id: $id", Map("app" -> instances.get(id), "id" -> id), C.tag.APP)
+    instances.remove(playApp.hashCode())
     log.info("We have $n applications running", Map("n" -> instances.size), C.tag.APP)
   }
 

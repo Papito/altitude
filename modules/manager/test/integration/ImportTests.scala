@@ -7,10 +7,14 @@ import models.manager.FileImportAsset
 import org.scalatest.Matchers._
 import org.scalatest.{DoNotDiscover, FunSuite}
 import org.scalatestplus.play.ConfiguredApp
+import play.api.Play
 import util.log
 
 @DoNotDiscover class ImportTests extends AltitudeApp {
+
   test("import image (JPEG)") {
+    log.info("Running test with play app " + this.app.hashCode())
+    altitude
     val path = getClass.getResource("../files/incoming/images/1.jpg").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
     val asset = altitude.service.fileImport.importAsset(fileImportAsset)
@@ -19,6 +23,7 @@ import util.log
     }
   }
 
+/*
   test("import audio (MP3)") {
     val path = getClass.getResource("../files/incoming/audio/all.mp3").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
@@ -52,4 +57,5 @@ import util.log
     assetType.mediaSubtype should equal ("mpeg")
     assetType.mime should equal ("audio/mpeg")
   }
+*/
 }

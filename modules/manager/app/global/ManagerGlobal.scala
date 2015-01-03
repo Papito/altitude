@@ -8,7 +8,7 @@ import util.log
 
 import scala.concurrent.Future
 
-class BaseManagerGlobal extends GlobalSettings {
+object ManagerGlobal extends GlobalSettings {
 
   override def onStart(app: Application) {
     log.info("Application $app starting", Map("app" -> app.hashCode()), C.tag.APP)
@@ -17,6 +17,7 @@ class BaseManagerGlobal extends GlobalSettings {
 
   override def onStop(app: Application) {
     log.info("Application $app stopping", Map("app" -> app.hashCode()), C.tag.APP)
+    Altitude.deregister(app)
   }
 
   // 404 - page not found error
@@ -34,5 +35,3 @@ class BaseManagerGlobal extends GlobalSettings {
     BadRequest("Bad Request: " + error)
   )
 }
-
-object ManagerGlobal extends BaseManagerGlobal
