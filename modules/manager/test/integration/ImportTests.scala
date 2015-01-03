@@ -5,7 +5,6 @@ import java.io.File
 import models.manager.FileImportAsset
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
-import util.log
 
 @DoNotDiscover class ImportTests(config: Map[String, _]) extends AltitudeApp(config) {
   test("import image (JPEG)") {
