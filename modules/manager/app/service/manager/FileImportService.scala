@@ -3,19 +3,21 @@ package service.manager
 import java.io.InputStream
 
 import dao.manager.FileSystemImportDao
+import global.App
 import models.manager.FileImportAsset
 import models.{Asset, MediaType}
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
+import play.api.Play
 import util.log
 
 import scala.concurrent.Future
 
 class FileImportService {
-  private val DAO = new FileSystemImportDao
-  private val app = global.ManagerGlobal
+  protected val DAO = new FileSystemImportDao
+  protected val app = App.getInstance()
 
   def getFilesToImport(path: String): List[FileImportAsset] = {
     log.info("Finding assets to import @ '$path'", Map("path" -> path))
