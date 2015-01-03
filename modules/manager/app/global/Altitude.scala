@@ -10,32 +10,37 @@ import util.log
 import scala.collection.mutable
 import altitude.{Const => C}
 
-object App {
-  val instances = mutable.HashMap.empty[Int, App]
+/*
+  Bridge between a Play! app instance and our app, which is our communication hub
+  between all the different services.
 
+  The Play! global object is a bad candidate since it has to follow the GlobalSetting trait.
+ */
+object Altitude {
+  // our Altitude instances - multiple ones can exist at once (parallel test suites)
+  val instances = mutable.HashMap.empty[Int, Altitude]
+
+  // listen to Play! app init and register our own app instance with it
   def register(playApp: Application): Unit = {
     val id: Int = playApp.hashCode()
-    val app: App = new App(playApp)
+    val app: Altitude = new Altitude(playApp)
     instances += (id -> app)
-    log.info("Registering app $app with Play! id: $id", Map("id" -> id, "app" -> app.hashCode()), C.tag.APP)
+    log.info("Registering app $app with Play! id: $id", Map("id" -> id, "app" -> app), C.tag.APP)
 
-    log.info("$n APPS", Map("n" -> instances.size), C.tag.APP)
-    for (app <- instances.values) {
-      log.info("$app: fileImport -> $fileImport", Map("app" -> app.hashCode(), "fileImport" -> app.service.fileImport), C.tag.APP)
-    }
+    log.info("We have $n applications running", Map("n" -> instances.size), C.tag.APP)
   }
 
-  def getInstance(playApp: Application = Play.current): App = {
+  def getInstance(playApp: Application = Play.current): Altitude = {
     val id: Int = playApp.hashCode()
-    val appInstance: Option[App] = instances.get(id)
+    val appInstance: Option[Altitude] = instances.get(id)
     require(appInstance != None)
     appInstance.get
   }
 }
 
-class App(val playApp: Application) {
+class Altitude(val playApp: Application) {
   val id = playApp.hashCode()
-  log.info("Initializing app for play id: $id", Map("id" -> id), C.tag.APP)
+  log.info("Initializing app for Play! id: $id", Map("id" -> id), C.tag.APP)
 
   val injector = Guice.createInjector(new InjectionModule)
 

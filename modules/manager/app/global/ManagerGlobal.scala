@@ -12,7 +12,7 @@ class BaseManagerGlobal extends GlobalSettings {
 
   override def onStart(app: Application) {
     log.info("Application $app starting", Map("app" -> app.hashCode()), C.tag.APP)
-    App.register(app)
+    Altitude.register(app)
   }
 
   override def onStop(app: Application) {

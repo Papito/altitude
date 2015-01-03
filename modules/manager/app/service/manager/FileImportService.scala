@@ -3,7 +3,7 @@ package service.manager
 import java.io.InputStream
 
 import dao.manager.FileSystemImportDao
-import global.App
+import global.Altitude
 import models.manager.FileImportAsset
 import models.{Asset, MediaType}
 import org.apache.tika.detect.{DefaultDetector, Detector}
@@ -17,7 +17,7 @@ import scala.concurrent.Future
 
 class FileImportService {
   protected val DAO = new FileSystemImportDao
-  protected val app = App.getInstance()
+  protected val app = Altitude.getInstance()
 
   def getFilesToImport(path: String): List[FileImportAsset] = {
     log.info("Finding assets to import @ '$path'", Map("path" -> path))

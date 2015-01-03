@@ -2,7 +2,7 @@ package controllers.manager.api
 
 import akka.actor.{Actor, ActorRef, Props}
 import altitude.{Const => C}
-import global.App
+import global.Altitude
 import org.json4s.DefaultFormats
 import org.json4s.native.Serialization._
 import play.api.Play
@@ -24,7 +24,7 @@ object ImportController extends Controller {
 
   private class ImportWebSocketActor(out: ActorRef) extends Actor {
     val importPath = Play.current.configuration.getString("import.path").getOrElse("")
-    val assets = App.getInstance().service.fileImport.getFilesToImport(path=importPath).toList
+    val assets = Altitude.getInstance().service.fileImport.getFilesToImport(path=importPath).toList
     val assetsIt = assets.toIterator
 
     def receive = {
