@@ -3,7 +3,7 @@ package models.manager
 import java.io.File
 
 import models.BaseModel
-import play.api.libs.json.{Json, JsObject}
+import play.api.libs.json.{JsObject, Json}
 import reactivemongo.bson.BSONObjectID
 
 class FileImportAsset(val file: File) extends BaseModel[String] {

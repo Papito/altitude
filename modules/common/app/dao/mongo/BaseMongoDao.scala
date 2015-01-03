@@ -3,15 +3,13 @@ package dao.mongo
 import altitude.{Const => C}
 import dao.BaseDao
 import models.BaseModel
-import play.api.{Configuration, Play}
+import play.api.Play
 import play.modules.reactivemongo.json.collection.JSONCollection
-import scala.concurrent.ExecutionContext.Implicits.global
-import util.log
-import scala.concurrent.ExecutionContext.Implicits.global
-
-import scala.concurrent.Future
-
 import reactivemongo.api._
+import util.log
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 object BaseMongoDao {
   private val host = Play.current.configuration.getString("db.mongo.host").getOrElse("")

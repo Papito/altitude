@@ -1,7 +1,7 @@
  package global
 
 import altitude.{Const => C}
-import com.google.inject.{Injector, AbstractModule, Guice}
+import com.google.inject.{AbstractModule, Guice, Injector}
 import dao.manager.LibraryDao
 import net.codingwell.scalaguice.ScalaModule
 import play.api._

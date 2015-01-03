@@ -1,9 +1,6 @@
 package service.manager
 
 import java.io.InputStream
-import reactivemongo.core.commands.LastError
-
-import scala.concurrent.Future
 
 import dao.manager.FileSystemImportDao
 import models.manager.FileImportAsset
@@ -13,6 +10,8 @@ import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
 import util.log
+
+import scala.concurrent.Future
 
 class FileImportService {
   private val DAO = new FileSystemImportDao

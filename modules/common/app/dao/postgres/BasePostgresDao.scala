@@ -4,8 +4,8 @@ import altitude.{Const => C}
 import dao.BaseDao
 import models.BaseModel
 import util.log
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 object BasePostgresDao {
   log.info(

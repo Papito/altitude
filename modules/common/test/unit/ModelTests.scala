@@ -3,7 +3,7 @@ package unit
 import models.BaseModel
 import org.scalatest.Matchers._
 import org.scalatest._
-import play.api.libs.json.{Json, JsObject}
+import play.api.libs.json.{JsObject, Json}
 import reactivemongo.bson.BSONObjectID
 
 class ModelTests extends FunSuite {

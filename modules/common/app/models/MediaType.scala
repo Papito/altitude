@@ -1,6 +1,6 @@
 package models
 
-import play.api.libs.json.{Json, JsObject}
+import play.api.libs.json.{JsObject, Json}
 import reactivemongo.bson.BSONObjectID
 
 case class MediaType(mediaType: String, mediaSubtype: String, mime: String) extends BaseModel[String] {

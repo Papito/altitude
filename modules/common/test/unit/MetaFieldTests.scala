@@ -1,8 +1,8 @@
 package unit
 
 import _root_.exceptions.FieldValueException
-import org.scalatest._
 import models._
+import org.scalatest._
 
 import scala.collection.immutable.HashSet
 

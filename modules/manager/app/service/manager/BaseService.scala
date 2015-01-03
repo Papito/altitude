@@ -1,10 +1,11 @@
 package service.manager
 
 import dao.BaseDao
-import models.BaseModel
-import scala.concurrent.Future
 import global.ManagerGlobal
+import models.BaseModel
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 abstract class BaseService[Model <: BaseModel[ID], ID] {
   protected val DAO: BaseDao[Model]

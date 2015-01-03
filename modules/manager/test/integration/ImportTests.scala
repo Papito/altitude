@@ -3,8 +3,8 @@ package integration
 import java.io.File
 
 import models.manager.FileImportAsset
-import org.scalatest.{DoNotDiscover, FunSuite}
 import org.scalatest.Matchers._
+import org.scalatest.{DoNotDiscover, FunSuite}
 import org.scalatestplus.play.ConfiguredApp
 
 @DoNotDiscover class ImportTests extends FunSuite with AsyncTestable with ConfiguredApp {

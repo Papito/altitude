@@ -1,6 +1,8 @@
 package service.manager
 
 import java.io.InputStream
+
+import altitude.{Const => C}
 import models.manager.FileImportAsset
 import models.{MediaType, Metadata}
 import org.apache.tika.io.TikaInputStream
@@ -11,8 +13,6 @@ import org.apache.tika.parser.image.ImageParser
 import org.apache.tika.parser.mp3.Mp3Parser
 import org.xml.sax.helpers.DefaultHandler
 import util.log
-import altitude.{Const => C}
-
 
 import scala.collection.immutable.HashMap
 

@@ -1,9 +1,7 @@
 package integration
 
-import com.google.inject.Guice
-import global.ManagerGlobal
-import org.scalatest.{DoNotDiscover, Suites, FunSuite}
-import org.scalatestplus.play.{ConfiguredApp, OneAppPerSuite}
+import org.scalatest.{DoNotDiscover, Suites}
+import org.scalatestplus.play.OneAppPerSuite
 import play.api.test.FakeApplication
 
 @DoNotDiscover class AllTests extends Suites(
