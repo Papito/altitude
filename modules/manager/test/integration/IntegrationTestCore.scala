@@ -7,7 +7,9 @@ import org.scalatest.time.{Millis, Second, Span}
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.test.FakeApplication
 
-abstract class AltitudeApp(val config: Map[String, _]) extends FunSuite with OneAppPerSuite with ScalaFutures {
+abstract class IntegrationTestCore extends FunSuite with OneAppPerSuite with ScalaFutures {
+  val config: Map[String, _]
+
   override lazy val app = FakeApplication(
     additionalConfiguration = config
   )

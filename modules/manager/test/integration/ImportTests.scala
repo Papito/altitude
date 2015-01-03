@@ -6,7 +6,7 @@ import models.manager.FileImportAsset
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
-@DoNotDiscover class ImportTests(config: Map[String, _]) extends AltitudeApp(config) {
+@DoNotDiscover class ImportTests(val config: Map[String, _]) extends IntegrationTestCore {
   test("import image (JPEG)") {
     val path = getClass.getResource("../files/incoming/images/1.jpg").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
