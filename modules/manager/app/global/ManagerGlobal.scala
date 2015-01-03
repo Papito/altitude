@@ -17,7 +17,7 @@ object ManagerGlobal extends GlobalSettings {
 
   class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
-      val dataSourceType = Play.current.configuration.getString("db.dataSource").getOrElse("")
+      val dataSourceType = Play.current.configuration.getString("datasource").getOrElse("")
       log.info("Datasource type: $source", Map("source" -> dataSourceType), C.tag.APP)
       log.info("Application configure", C.tag.APP)
       dataSourceType match {

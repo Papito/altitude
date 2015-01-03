@@ -12,9 +12,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 object BaseMongoDao {
-  private val host = Play.current.configuration.getString("db.mongo.host").getOrElse("")
+  private val host = Play.current.configuration.getString("mongo.host").getOrElse("")
   require(host.nonEmpty)
-  private val dbName = Play.current.configuration.getString("db.name").getOrElse("")
+  private val dbName = Play.current.configuration.getString("mongo.name").getOrElse("")
   require(dbName.nonEmpty)
 
   log.info(

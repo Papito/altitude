@@ -10,13 +10,13 @@ import play.api.test.FakeApplication
 
 class MongoSuite extends AllTests with OneAppPerSuite {
   implicit override lazy val app = FakeApplication(
-    additionalConfiguration = Map("db.dataSource" -> "mongo")
+    additionalConfiguration = Map("datasource" -> "mongo")
   )
 }
 
 class PostgresSuite extends AllTests with OneAppPerSuite {
   implicit override lazy val app = FakeApplication(
-    additionalConfiguration = Map("db.dataSource" -> "postgres")
+    additionalConfiguration = Map("datasource" -> "postgres")
   )
 }
 
