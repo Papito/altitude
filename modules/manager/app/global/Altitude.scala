@@ -1,14 +1,14 @@
 package global
 
+import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
 import dao.manager.LibraryDao
 import net.codingwell.scalaguice.ScalaModule
-import play.api.Application
-import play.api.Play
-import service.manager.{LibraryService, TikaMetadataService, AbstractMetadataService, FileImportService}
+import play.api.{Application, Play}
+import service.manager.{AbstractMetadataService, FileImportService, LibraryService, TikaMetadataService}
 import util.log
+
 import scala.collection.mutable
-import altitude.{Const => C}
 
 /*
   Bridge between a Play! app instance and our app, which is our communication hub

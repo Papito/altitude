@@ -9,8 +9,8 @@ import reactivemongo.api._
 import util.log
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 object BaseMongoDao {
   private val host = Play.current.configuration.getString("mongo.host").getOrElse("")
   require(host.nonEmpty)
