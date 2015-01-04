@@ -12,13 +12,20 @@ import util.log
 import scala.collection.mutable
 
 /*
-  Bridge between a Play! app instance and our app, which is our communication hub
-  between all the different services.
+Bridge between a Play! app instance and our app, which is our communication hub
+between all the different services.
 
-  The Play! global object is a bad candidate since it has to follow the GlobalSettings trait.
+The Play! global object is a bad candidate since it has to follow the GlobalSettings trait.
  */
+
 object Altitude {
-  // our Altitude instances - multiple ones can exist at once (parallel test suites)
+  /*
+  Our Altitude instances - multiple ones can exist at once
+  (parallel test suites)
+
+  NOTE: parallel suite execution did not work at the time (Jan 2015) - the test
+  system seemed to shut down one test app cold before tests could finish.
+  */
   val instances = mutable.HashMap.empty[Int, Altitude]
 
   // listen to Play! app init and register our own app instance with it
@@ -47,10 +54,13 @@ object Altitude {
 
 class Altitude(val playApp: Application) {
   val id = playApp.hashCode()
-  log.info("Initializing app for Play! id: $id", Map("id" -> id), C.tag.APP)
+  log.trace("Initializing app for Play! id: $id", Map("id" -> id), C.tag.APP)
 
   val injector = Guice.createInjector(new InjectionModule)
 
+  /*
+  Inject dependencies
+   */
   class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
       val dataSourceType = playApp.configuration.getString("datasource").getOrElse("")
