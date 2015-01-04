@@ -1,6 +1,6 @@
 package service.manager
 
-import dao.BaseDao
+import dao.common.BaseDao
 import global.Altitude
 import models.BaseModel
 

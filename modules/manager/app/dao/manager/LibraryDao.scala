@@ -1,6 +1,6 @@
 package dao.manager
 
-import dao.BaseDao
+import dao.common.BaseDao
 import models.Asset
 
 import scala.concurrent.Future

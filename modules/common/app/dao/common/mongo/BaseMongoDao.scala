@@ -1,7 +1,7 @@
-package dao.mongo
+package dao.common.mongo
 
 import altitude.{Const => C}
-import dao.BaseDao
+import dao.common.BaseDao
 import models.BaseModel
 import play.api.Play
 import play.modules.reactivemongo.json.collection.JSONCollection

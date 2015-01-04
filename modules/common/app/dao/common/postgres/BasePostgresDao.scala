@@ -1,7 +1,7 @@
-package dao.postgres
+package dao.common.postgres
 
 import altitude.{Const => C}
-import dao.BaseDao
+import dao.common.BaseDao
 import models.BaseModel
 import play.api.Play
 import play.api.Play.current

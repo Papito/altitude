@@ -1,6 +1,6 @@
 package service.manager
 
-import dao.UtilitiesDao
+import dao.common.UtilitiesDao
 import net.codingwell.scalaguice.InjectorExtensions._
 
 class DbUtilitiesService extends BaseService[Nothing, Nothing] {

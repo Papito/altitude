@@ -1,4 +1,4 @@
-package dao
+package dao.common
 
 import scala.concurrent.Future
 
