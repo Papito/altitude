@@ -2,7 +2,7 @@ package controllers.manager.api
 
 import akka.actor.{Actor, ActorRef, Props}
 import altitude.{Const => C}
-import global.Altitude
+import global.manager.Altitude
 import org.json4s.DefaultFormats
 import org.json4s.native.Serialization._
 import play.api.Play

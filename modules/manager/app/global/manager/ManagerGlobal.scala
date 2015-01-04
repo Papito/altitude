@@ -1,4 +1,4 @@
-package global
+package global.manager
 
 import altitude.{Const => C}
 import play.api._

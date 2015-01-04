@@ -3,7 +3,7 @@ package service.manager
 import java.io.InputStream
 
 import dao.manager.FileSystemImportDao
-import global.Altitude
+import global.manager.Altitude
 import models.common.{MediaType, Asset}
 import models.manager.FileImportAsset
 import org.apache.tika.detect.{DefaultDetector, Detector}

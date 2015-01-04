@@ -1,6 +1,6 @@
 package integration
 
-import global.Altitude
+import global.manager.Altitude
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Seconds, Millis, Second, Span}

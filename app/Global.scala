@@ -1,4 +1,5 @@
-import global.ManagerGlobal
+import global.common.ClientGlobal
+import global.manager.ManagerGlobal
 import play.api._
 import play.api.mvc._
 

@@ -1,4 +1,4 @@
-package global
+package global.manager
 
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}

@@ -1,3 +1,5 @@
+package global.common
+
 import play.api._
 import play.api.mvc.Results._
 import play.api.mvc._
