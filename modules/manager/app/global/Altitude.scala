@@ -2,10 +2,11 @@ package global
 
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
+import dao.UtilitiesDao
 import dao.manager.LibraryDao
 import net.codingwell.scalaguice.ScalaModule
 import play.api.{Application, Play}
-import service.manager.{AbstractMetadataService, FileImportService, LibraryService, TikaMetadataService}
+import service.manager._
 import util.log
 
 import scala.collection.mutable
@@ -55,8 +56,14 @@ class Altitude(val playApp: Application) {
       val dataSourceType = playApp.configuration.getString("datasource").getOrElse("")
       log.info("Datasource type: $source", Map("source" -> dataSourceType), C.tag.APP)
       dataSourceType match {
-        case "mongo" => bind[LibraryDao].toInstance(new dao.manager.mongo.LibraryDao)
-        case "postgres" => bind[LibraryDao].toInstance(new dao.manager.postgres.LibraryDao)
+        case "mongo" => {
+          bind[LibraryDao].toInstance(new dao.manager.mongo.LibraryDao)
+          bind[UtilitiesDao].toInstance(new dao.mongo.UtilitiesDao)
+        }
+        case "postgres" => {
+          bind[LibraryDao].toInstance(new dao.manager.postgres.LibraryDao)
+          bind[UtilitiesDao].toInstance(new dao.postgres.UtilitiesDao)
+        }
         case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType);
       }
     }
@@ -66,5 +73,6 @@ class Altitude(val playApp: Application) {
     val fileImport: FileImportService = new FileImportService
     val metadata: AbstractMetadataService = new TikaMetadataService
     val library: LibraryService = new LibraryService
+    val dbUtilities: DbUtilitiesService = new DbUtilitiesService
   }
 }

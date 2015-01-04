@@ -8,5 +8,5 @@ case class Asset(mediaType: MediaType, metadata: Metadata) extends BaseModel[Str
     "id" -> id,
     "mediaType" -> mediaType.toJson
   )
-  override protected def genId: String = BSONObjectID.generate.toString()
+  override protected def genId: String = BSONObjectID.generate.stringify
 }

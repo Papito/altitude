@@ -22,6 +22,7 @@ object log {
     constants += (name -> JsString(value.toString))
   }
 
+  // TODO: respect the actual level
   def trace(msg: String, v: Map[String, Any], t: String*) =
     log(Level.FINER, msg = msg, v = v, t = t)
 

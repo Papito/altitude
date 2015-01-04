@@ -11,10 +11,11 @@ import util.log
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
+
 object BaseMongoDao {
-  private val host = Play.current.configuration.getString("mongo.host").getOrElse("")
+  lazy val host = Play.current.configuration.getString("mongo.host").getOrElse("")
   require(host.nonEmpty)
-  private val dbName = Play.current.configuration.getString("mongo.name").getOrElse("")
+  lazy val dbName = Play.current.configuration.getString("mongo.name").getOrElse("")
   require(dbName.nonEmpty)
 
   log.info(

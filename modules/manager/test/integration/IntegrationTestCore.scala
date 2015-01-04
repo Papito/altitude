@@ -1,14 +1,24 @@
 package integration
 
 import global.Altitude
-import org.scalatest.FunSuite
+import org.scalatest.{BeforeAndAfter, FunSuite}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Second, Span}
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.test.FakeApplication
 
-abstract class IntegrationTestCore extends FunSuite with OneAppPerSuite with ScalaFutures {
+abstract class IntegrationTestCore extends FunSuite
+  with OneAppPerSuite with ScalaFutures with BeforeAndAfter {
+  /* Stores test app config overrides, since we run same tests with different app setup.
+   */
   val config: Map[String, _]
+
+  before {
+    altitude.service.dbUtilities.dropDatabase()
+  }
+
+  after {
+  }
 
   override lazy val app = FakeApplication(
     additionalConfiguration = config
