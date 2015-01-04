@@ -74,7 +74,7 @@ class Altitude(val playApp: Application) {
           bind[LibraryDao].toInstance(new dao.manager.postgres.LibraryDao)
           bind[UtilitiesDao].toInstance(new dao.postgres.UtilitiesDao)
         }
-        case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType);
+        case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
       }
     }
   }

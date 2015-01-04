@@ -7,7 +7,7 @@ import org.scalatest.Matchers._
 import org.scalatest._
 import play.api.libs.json.JsObject
 
-@DoNotDiscover class ModelTests extends FunSuite {
+class ModelTests extends FunSuite {
   test("import asset model") {
     val model = new FileImportAsset(new File("/"))
     model.isClean shouldEqual false
