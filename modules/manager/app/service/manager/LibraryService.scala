@@ -3,7 +3,7 @@ package service.manager
 //import constants.{const => C}
 
 import dao.manager.LibraryDao
-import models.Asset
+import models.common.Asset
 import net.codingwell.scalaguice.InjectorExtensions._
 
 class LibraryService extends BaseService[Asset, String] {

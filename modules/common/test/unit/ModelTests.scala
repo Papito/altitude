@@ -1,6 +1,6 @@
 package unit
 
-import models.BaseModel
+import models.common.BaseModel
 import org.scalatest.Matchers._
 import org.scalatest._
 import play.api.libs.json.{JsObject, Json}

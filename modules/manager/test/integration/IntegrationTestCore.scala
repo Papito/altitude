@@ -3,7 +3,7 @@ package integration
 import global.Altitude
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.time.{Millis, Second, Span}
+import org.scalatest.time.{Seconds, Millis, Second, Span}
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.test.FakeApplication
 
@@ -27,5 +27,5 @@ abstract class IntegrationTestCore extends FunSuite
   protected lazy val altitude: Altitude = Altitude.getInstance(this.app)
 
   // async setup
-  implicit val defaultPatience = PatienceConfig(timeout = Span(1, Second), interval = Span(5, Millis))
+  implicit val defaultPatience = PatienceConfig(timeout = Span(2, Seconds), interval = Span(5, Millis))
 }

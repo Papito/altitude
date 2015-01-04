@@ -4,8 +4,8 @@ import java.io.InputStream
 
 import dao.manager.FileSystemImportDao
 import global.Altitude
+import models.common.{MediaType, Asset}
 import models.manager.FileImportAsset
-import models.{Asset, MediaType}
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}

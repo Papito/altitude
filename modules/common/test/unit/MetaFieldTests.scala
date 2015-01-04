@@ -1,7 +1,8 @@
 package unit
 
-import _root_.exceptions.FieldValueException
+import _root_.exceptions.common.FieldValueException
 import models._
+import models.common.{MetaValue, MetaField, FixedMetaField}
 import org.scalatest._
 
 import scala.collection.immutable.HashSet

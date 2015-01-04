@@ -1,4 +1,4 @@
-package models
+package models.common
 
 object ValueDataType extends Enumeration {
   val INTEGER = Value

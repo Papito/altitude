@@ -3,8 +3,8 @@ package service.manager
 import java.io.InputStream
 
 import altitude.{Const => C}
+import models.common.{Metadata, MediaType}
 import models.manager.FileImportAsset
-import models.{MediaType, Metadata}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.parser.AbstractParser

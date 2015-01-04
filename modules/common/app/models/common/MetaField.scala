@@ -1,4 +1,4 @@
-package models
+package models.common
 
 class MetaField[T](val name: String, val isMulti: Boolean=false) {
   require(name != null)

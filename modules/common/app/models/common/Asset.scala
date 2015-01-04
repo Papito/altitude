@@ -1,4 +1,4 @@
-package models
+package models.common
 
 import play.api.libs.json.{JsObject, Json}
 import reactivemongo.bson.BSONObjectID

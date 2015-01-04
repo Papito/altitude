@@ -1,8 +1,7 @@
 package models.manager
 
 import java.io.File
-
-import models.BaseModel
+import models.common.BaseModel
 import play.api.libs.json.{JsObject, Json}
 import reactivemongo.bson.BSONObjectID
 

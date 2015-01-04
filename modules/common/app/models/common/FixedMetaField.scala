@@ -1,6 +1,6 @@
-package models
+package models.common
 
-import exceptions.FieldValueException
+import exceptions.common.FieldValueException
 
 class FixedMetaField[T](name: String, isMulti: Boolean=false, val allowed: Set[T]=null)
   extends MetaField[T](name, isMulti=isMulti) {

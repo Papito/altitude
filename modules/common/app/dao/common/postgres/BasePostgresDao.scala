@@ -2,7 +2,7 @@ package dao.common.postgres
 
 import altitude.{Const => C}
 import dao.common.BaseDao
-import models.BaseModel
+import models.common.BaseModel
 import play.api.Play
 import play.api.Play.current
 import play.api.db._

@@ -2,7 +2,7 @@ package service.manager
 
 import dao.common.BaseDao
 import global.Altitude
-import models.BaseModel
+import models.common.BaseModel
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

@@ -1,4 +1,4 @@
-package models
+package models.common
 
 object FieldType extends Enumeration {
   val SINGLE = Value
