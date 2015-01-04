@@ -8,7 +8,7 @@ import util.log
 
 import scala.concurrent.Future
 
-object ManagerGlobal extends GlobalSettings {
+object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
     log.info("Application $app starting", Map("app" -> app.hashCode()), C.tag.APP)

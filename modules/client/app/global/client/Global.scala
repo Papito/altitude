@@ -1,4 +1,4 @@
-package global.common
+package global.client
 
 import play.api._
 import play.api.mvc.Results._
@@ -6,7 +6,7 @@ import play.api.mvc._
 
 import scala.concurrent.Future
 
-object ClientGlobal extends GlobalSettings {	
+object Global extends GlobalSettings {
 	
 	// 404 - page not found error
 	override def onHandlerNotFound (request: RequestHeader) = Future.successful(

@@ -1,5 +1,3 @@
-import global.common.ClientGlobal
-import global.manager.ManagerGlobal
 import play.api._
 import play.api.mvc._
 
@@ -14,20 +12,20 @@ object Global extends GlobalSettings {
 	
 	// 404 - page not found error
 	override def onHandlerNotFound (request: RequestHeader) = getSubdomain(request) match {
-		case "web" => ClientGlobal.onHandlerNotFound(request)
-		case _ => ManagerGlobal.onHandlerNotFound(request)
+		case "web" => global.client.Global.onHandlerNotFound(request)
+		case _ => global.manager.Global.onHandlerNotFound(request)
 	}
 	
 	// 500 - internal server error
 	override def onError (request: RequestHeader, throwable: Throwable) = getSubdomain(request) match {
-		case "web" => ClientGlobal.onError(request, throwable)
-		case _ => ManagerGlobal.onError(request, throwable)
+		case "web" => global.client.Global.onError(request, throwable)
+		case _ => global.manager.Global.onError(request, throwable)
 	}
 	
 	// called when a route is found, but it was not possible to bind the request parameters
 	override def onBadRequest (request: RequestHeader, error: String) = getSubdomain(request) match {
-		case "web" => ClientGlobal.onBadRequest(request, error)
-		case _ => ManagerGlobal.onBadRequest(request, error)
+		case "web" => global.client.Global.onBadRequest(request, error)
+		case _ => global.manager.Global.onBadRequest(request, error)
 	}
 
 }
