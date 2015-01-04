@@ -13,6 +13,5 @@ abstract class BaseService[Model <: BaseModel[ID], ID] {
 
   def add(model: Model): Future[Model] = {
     DAO.add(model)
-    Future[Model] {model}
   }
 }

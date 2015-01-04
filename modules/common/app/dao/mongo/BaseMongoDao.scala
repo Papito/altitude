@@ -6,11 +6,12 @@ import models.BaseModel
 import play.api.Play
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api._
+import reactivemongo.core.commands.LastError
 import util.log
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
+import scala.util.{Success, Failure}
 
 object BaseMongoDao {
   lazy val host = Play.current.configuration.getString("mongo.host").getOrElse("")
@@ -31,9 +32,19 @@ abstract class BaseMongoDao[Model <: BaseModel[ID], ID](private val collectionNa
   protected def collection = BaseMongoDao.db.collection[JSONCollection](collectionName)
 
   override def add(model: Model): Future[Model] = {
-    log.info("MONGO INSERT")
-    val f = collection.insert(model.toJson)
-    Await.result(f, 1.second)
-    Future[Model] {model}
+    log.debug("Starting database INSERT for: $o", Map("o" -> model.toJson))
+
+    val f: Future[LastError] = collection.insert(model.toJson)
+
+    f map {res =>
+      if (res.ok) {
+        log.debug("Database INSERT result '$res'", Map("res" -> res.stringify))
+        model
+      }
+      else {
+        log.error("Database INSERT ERROR", Map("res" -> res.errMsg))
+        throw res.getCause
+      }
+    }
   }
 }

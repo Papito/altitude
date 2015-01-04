@@ -24,11 +24,6 @@ import org.scalatest.Matchers._
       println(asset)
     }
   }
-  test("import file list") {
-    val incomingPath = getClass.getResource("../files/incoming").getPath
-    val assets = altitude.service.fileImport.getFilesToImport(path=incomingPath)
-    assets should not be empty
-  }
 
   test("detect image media type (JPEG)") {
     val path = getClass.getResource("../files/incoming/images/1.jpg").getPath
@@ -50,4 +45,9 @@ import org.scalatest.Matchers._
     assetType.mime should equal ("audio/mpeg")
   }
 
+  test("import file list") {
+    val incomingPath = getClass.getResource("../files/incoming").getPath
+    val assets = altitude.service.fileImport.getFilesToImport(path=incomingPath)
+    assets should not be empty
+  }
 }

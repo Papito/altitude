@@ -1,3 +1,5 @@
 package integration
 
-class PostgresSuite extends AllTests(Map("datasource" -> "postgres"))
+import org.scalatest.DoNotDiscover
+
+@DoNotDiscover class PostgresSuite extends AllTests(Map("datasource" -> "postgres"))
