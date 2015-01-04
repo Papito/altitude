@@ -15,10 +15,8 @@ abstract class BasePostgresDao[Model <: BaseModel[ID], ID](private val tableName
   private val url = Play.current.configuration.getString("db.postgres.url").getOrElse("")
   require(url.nonEmpty)
 
-  private def conn: java.sql.Connection = {
-    log.info("Getting postgres connection @ $host", Map("host" -> url), C.tag.DB, C.tag.APP)
-    DB.getConnection("postgres")
-  }
+  protected lazy val ds: javax.sql.DataSource = DB.getDataSource("postgres")
+  private def conn: java.sql.Connection = ds.getConnection
 
   override def add(model: Model): Future[Model] = {
     log.info("POSTGRES INSERT")
