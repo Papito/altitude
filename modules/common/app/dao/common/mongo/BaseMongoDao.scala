@@ -10,8 +10,7 @@ import reactivemongo.core.commands.LastError
 import util.log
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Await, Future}
-import scala.util.{Success, Failure}
+import scala.concurrent.Future
 
 object BaseMongoDao {
   lazy val host = Play.current.configuration.getString("mongo.host").getOrElse("")
@@ -19,8 +18,7 @@ object BaseMongoDao {
   lazy val dbName = Play.current.configuration.getString("mongo.name").getOrElse("")
   require(dbName.nonEmpty)
 
-  log.info(
-    "Initializing mongo connection",
+  log.info("Initializing mongo connection",
     Map("host" -> host, "dbName" -> dbName), C.tag.DB, C.tag.APP)
 
   final private val driver = new MongoDriver
@@ -33,18 +31,7 @@ abstract class BaseMongoDao[Model <: BaseModel[ID], ID](private val collectionNa
 
   override def add(model: Model): Future[Model] = {
     log.debug("Starting database INSERT for: $o", Map("o" -> model.toJson))
-
     val f: Future[LastError] = collection.insert(model.toJson)
-
-    f map {res =>
-      if (res.ok) {
-        log.debug("Database INSERT result '$res'", Map("res" -> res.stringify))
-        model
-      }
-      else {
-        log.error("Database INSERT ERROR", Map("res" -> res.errMsg))
-        throw res.getCause
-      }
-    }
+    f map {res => if (res.ok) model else throw res.getCause}
   }
 }

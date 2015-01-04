@@ -1,10 +1,10 @@
 package dao.common.mongo
 
 import reactivemongo.core.commands.DropDatabase
-import scala.concurrent.duration._
-import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 class UtilitiesDao extends BaseMongoDao[Nothing, Nothing]("") with dao.common.UtilitiesDao {
   override def dropDatabase(): Unit = {

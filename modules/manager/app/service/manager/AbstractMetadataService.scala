@@ -1,6 +1,6 @@
 package service.manager
 
-import models.common.{Metadata, MediaType}
+import models.common.{MediaType, Metadata}
 import models.manager.FileImportAsset
 
 abstract class AbstractMetadataService {

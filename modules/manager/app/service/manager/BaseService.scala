@@ -4,7 +4,6 @@ import dao.common.BaseDao
 import global.manager.Altitude
 import models.common.BaseModel
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 abstract class BaseService[Model <: BaseModel[ID], ID] {

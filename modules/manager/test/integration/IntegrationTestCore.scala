@@ -1,9 +1,9 @@
 package integration
 
 import global.manager.Altitude
-import org.scalatest.{BeforeAndAfter, FunSuite}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.time.{Seconds, Millis, Second, Span}
+import org.scalatest.time.{Millis, Seconds, Span}
+import org.scalatest.{BeforeAndAfter, FunSuite}
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.test.FakeApplication
 
