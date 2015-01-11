@@ -8,5 +8,6 @@ libraryDependencies ++= Seq(
   "org.apache.commons" % "commons-io" % "1.3.2",
   "net.codingwell" %% "scala-guice" % "4.0.0-beta5",
   "com.typesafe.slick" % "slick_2.11" % "2.1.0",
+  "org.slf4j" % "slf4j-nop" % "1.6.4",
   jdbc
 )
