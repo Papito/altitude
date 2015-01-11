@@ -1,9 +1,0 @@
-@(message: String)
-
-@import controllers.client.routes
-
-@views.html.client.main(title = message) {
-	
-	<h1>CLIENT template</h1>
-	<h3>@message <a href="@routes.Application.index">reload</a></h3>
-}

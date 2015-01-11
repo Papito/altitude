@@ -1,0 +1,3 @@
+package altitude.exceptions
+
+class FieldValueException extends IllegalArgumentException

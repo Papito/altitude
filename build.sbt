@@ -1,12 +1,29 @@
+import play.PlayImport._
 import play.PlayScala
 
-Common.appSettings
+name := "altitude"
 
-lazy val common = (project in file("modules/common")).enablePlugins(PlayScala)
+version := "1.0-SNAPSHOT"
 
-lazy val manager = (project in file("modules/manager")).enablePlugins(PlayScala).dependsOn(common)
+scalaVersion := "2.11.1"
 
-lazy val client = (project in file("modules/client")).enablePlugins(PlayScala).dependsOn(common)
+doc in Compile <<= target.map(_ / "none")
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala).aggregate(common, manager, client).dependsOn(common,
-manager, client)
+scalacOptions ++= Seq("-feature", "-deprecation", "-unchecked", "-language:reflectiveCalls")
+
+javaOptions in Test += s"-Dconfig.resource=application.test.conf"
+
+lazy val root = (project in file(".")).enablePlugins(PlayScala)
+
+// Add here the specific settings for this module
+libraryDependencies ++= Seq(
+  "org.scalatestplus" % "play_2.11" % "1.2.0",
+  "org.apache.tika" % "tika-parsers" % "1.4",
+  "org.reactivemongo" % "play2-reactivemongo_2.11" % "0.10.5.0.akka23",
+  "org.json4s" %% "json4s-native" % "3.2.11",
+  "org.apache.commons" % "commons-io" % "1.3.2",
+  "net.codingwell" %% "scala-guice" % "4.0.0-beta5",
+  "com.typesafe.slick" % "slick_2.11" % "2.1.0",
+  cache,
+  jdbc
+)
