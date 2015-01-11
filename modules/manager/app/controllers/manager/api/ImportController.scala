@@ -8,7 +8,7 @@ import org.json4s.native.Serialization._
 import play.api.Play
 import play.api.Play.current
 import play.api.mvc._
-import util.log
+import altitude.util.log
 
 object ImportController extends Controller {
   implicit val formats = DefaultFormats

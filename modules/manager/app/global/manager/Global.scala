@@ -4,7 +4,7 @@ import altitude.{Const => C}
 import play.api._
 import play.api.mvc.Results._
 import play.api.mvc._
-import util.log
+import altitude.util.log
 
 import scala.concurrent.Future
 

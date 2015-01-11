@@ -2,7 +2,7 @@ package controllers.manager.web
 
 import altitude.{Const => C}
 import play.api.mvc._
-import util.log
+import altitude.util.log
 
 object ImportController extends Controller {
 

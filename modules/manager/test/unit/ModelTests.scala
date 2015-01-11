@@ -1,8 +1,7 @@
 package unit
 
 import java.io.File
-
-import models.manager.FileImportAsset
+import altitude.manager.models.FileImportAsset
 import org.scalatest.Matchers._
 import org.scalatest._
 import play.api.libs.json.JsObject

@@ -5,7 +5,7 @@ import java.util.logging.Level
 import altitude.{Const => C}
 import org.scalatest.Matchers._
 import org.scalatest._
-import util.log
+import altitude.util.log
 import play.api.libs.json._
 
 class JayLogTests extends FunSuite {

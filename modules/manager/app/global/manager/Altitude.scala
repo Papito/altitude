@@ -1,13 +1,13 @@
 package global.manager
 
+import altitude.common.dao.UtilitiesDao
+import altitude.manager.dao.LibraryDao
+import altitude.manager.services._
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
-import dao.common.UtilitiesDao
-import dao.manager.LibraryDao
 import net.codingwell.scalaguice.ScalaModule
 import play.api.{Application, Play}
-import service.manager._
-import util.log
+import altitude.util.log
 
 import scala.collection.mutable
 
@@ -67,12 +67,12 @@ class Altitude(val playApp: Application) {
       log.info("Datasource type: $source", Map("source" -> dataSourceType), C.tag.APP)
       dataSourceType match {
         case "mongo" => {
-          bind[LibraryDao].toInstance(new dao.manager.mongo.LibraryDao)
-          bind[UtilitiesDao].toInstance(new dao.common.mongo.UtilitiesDao)
+          bind[LibraryDao].toInstance(new altitude.manager.dao.mongo.LibraryDao)
+          bind[UtilitiesDao].toInstance(new altitude.common.dao.mongo.UtilitiesDao)
         }
         case "postgres" => {
-          bind[LibraryDao].toInstance(new dao.manager.postgres.LibraryDao)
-          bind[UtilitiesDao].toInstance(new dao.common.postgres.UtilitiesDao)
+          bind[LibraryDao].toInstance(new altitude.manager.dao.postgres.LibraryDao)
+          bind[UtilitiesDao].toInstance(new altitude.common.dao.postgres.UtilitiesDao)
         }
         case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
       }

@@ -1,3 +1,0 @@
-package exceptions.common
-
-class FieldValueException extends IllegalArgumentException
