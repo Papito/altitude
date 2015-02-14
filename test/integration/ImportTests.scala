@@ -12,6 +12,7 @@ import org.scalatest.Matchers._
     val asset = altitude.service.fileImport.importAsset(fileImportAsset)
     whenReady(asset) {asset =>
       println(asset)
+      asset.id shouldNot be(null)
     }
   }
 
@@ -21,6 +22,7 @@ import org.scalatest.Matchers._
     val asset = altitude.service.fileImport.importAsset(fileImportAsset)
     whenReady(asset) {asset =>
       println(asset)
+      asset.id shouldNot be(null)
     }
   }
 

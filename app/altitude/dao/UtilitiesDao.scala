@@ -1,5 +1,5 @@
 package altitude.dao
 
-trait UtilitiesDao extends BaseDao[Nothing] {
+trait UtilitiesDao extends BaseDao {
   def dropDatabase(): Unit
 }

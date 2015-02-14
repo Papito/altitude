@@ -4,8 +4,10 @@ import altitude.dao.BaseDao
 import altitude.models.BaseModel
 import altitude.util.log
 import play.api.Play
+import play.api.libs.json.{JsValue, JsObject, Json}
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api._
+import reactivemongo.bson.BSONDocument
 import reactivemongo.core.commands.LastError
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -26,12 +28,28 @@ object BaseMongoDao {
   final def db: DB = connection(dbName)
 }
 
-abstract class BaseMongoDao[Model <: BaseModel[ID], ID](private val collectionName: String) extends BaseDao[Model] {
+abstract class BaseMongoDao(private val collectionName: String) extends BaseDao {
   protected def collection = BaseMongoDao.db.collection[JSONCollection](collectionName)
 
-  override def add(model: Model): Future[Model] = {
-    log.debug("Starting database INSERT for: $o", Map("o" -> model.toJson))
-    val f: Future[LastError] = collection.insert(model.toJson)
-    f map {res => if (res.ok) model else throw res.getCause}
+  override def add(json: JsValue): Future[JsValue] = {
+    log.debug("Starting database INSERT for: $o", Map("o" -> json))
+    val f: Future[LastError] = collection.insert(json)
+    f map {res => if (res.ok) json else throw res.getCause}
+  }
+
+  override def getById(id: String): Future[JsValue] = {
+    log.debug("Getting by ID '$id'", Map("id" -> id))
+
+    val query = Json.obj("id" -> id)
+    val cursor: Cursor[JsObject] = collection.find(query).cursor[JsObject]
+    val f: Future[List[JsObject]] = cursor.collect[List](upTo = 2)
+
+    f map {results =>
+      if (results.length == 1) {
+       results.head
+      }
+      else {
+        throw new Exception("getById should return only a single result")}
+      }
   }
 }

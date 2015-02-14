@@ -4,20 +4,29 @@ import altitude.dao.BaseDao
 import altitude.models.BaseModel
 import altitude.util.log
 import play.api.Play
+import play.api.libs.json.{Json, JsString, JsObject, JsValue}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.slick.driver.H2Driver.simple._
 
-abstract class BasePostgresDao[Model <: BaseModel[ID], ID](private val tableName: String) extends BaseDao[Model] {
+abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
   private val url = Play.current.configuration.getString("db.postgres.url").getOrElse("")
   require(url.nonEmpty)
   private val driver = Play.current.configuration.getString("db.postgres.driver").getOrElse("")
 
   def db = Database.forURL(url, driver = driver)
 
-  override def add(model: Model): Future[Model] = {
+  override def add(json: JsValue): Future[JsValue] = {
     log.info("POSTGRES INSERT")
-    Future[Model] {model}
+    Future[JsValue] {
+      json
+    }
+  }
+
+  override def getById(id: String): Future[JsValue] = {
+    Future[JsValue] {
+      Json.obj()
+    }
   }
 }
