@@ -5,12 +5,9 @@ import altitude.models.BaseModel
 import altitude.services.BaseService
 import org.scalatest.DoNotDiscover
 import play.api.libs.json.{Json, JsObject}
-import reactivemongo.bson.BSONObjectID
 
 @DoNotDiscover class BaseMongoDaoTests(val config: Map[String, _]) extends IntegrationTestCore {
-  class TestModel extends BaseModel[String] {
-    override protected def genId: String = BSONObjectID.generate.stringify
-
+  class TestModel extends BaseModel {
     override def toJson: JsObject = Json.obj(
       "id" -> id
     )
@@ -18,7 +15,7 @@ import reactivemongo.bson.BSONObjectID
 
   class TestPostgresDao extends BaseMongoDao("test")
 
-  class TestService extends BaseService[TestModel, String] {
+  class TestService extends BaseService[TestModel] {
     override protected val DAO = new TestPostgresDao
   }
 

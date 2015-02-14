@@ -9,7 +9,7 @@ import scala.concurrent.Future
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-abstract class BaseService[Model <: BaseModel[ID], ID] {
+abstract class BaseService[Model <: BaseModel] {
   protected val DAO: BaseDao
   protected val app = Altitude.getInstance()
 

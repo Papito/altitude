@@ -4,7 +4,7 @@ import java.io.File
 import play.api.libs.json.{JsObject, Json}
 import reactivemongo.bson.BSONObjectID
 
-class FileImportAsset(val file: File) extends BaseModel[String] {
+class FileImportAsset(val file: File) extends BaseModel {
   require(file != null)
 
   val absolutePath = file.getAbsolutePath
@@ -15,5 +15,4 @@ class FileImportAsset(val file: File) extends BaseModel[String] {
     "absolutePath" -> absolutePath,
     "name" -> name
   )
-  override protected def genId: String = BSONObjectID.generate.toString()
 }

@@ -13,9 +13,7 @@ import reactivemongo.bson.BSONObjectID
 import scala.concurrent.Future
 
 @DoNotDiscover class BasePostgresDaoTests(val config: Map[String, _]) extends IntegrationTestCore {
-  class TestModel extends BaseModel[String] {
-    override protected def genId: String = BSONObjectID.generate.stringify
-
+  class TestModel extends BaseModel {
     override def toJson: JsObject = Json.obj(
       "id" -> id
     )
@@ -23,7 +21,7 @@ import scala.concurrent.Future
 
   class TestPostgresDao extends BasePostgresDao("test")
 
-  class TestService extends BaseService[TestModel, String] {
+  class TestService extends BaseService[TestModel] {
     override protected val DAO = new TestPostgresDao
   }
 

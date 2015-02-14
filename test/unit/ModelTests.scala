@@ -9,9 +9,8 @@ import reactivemongo.bson.BSONObjectID
 
 class ModelTests extends FunSuite {
   test("model fields") {
-    class TestModel extends BaseModel[String] {
+    class TestModel extends BaseModel {
       override def toJson: JsObject = Json.obj()
-      override protected def genId: String = BSONObjectID.generate.toString()
     }
 
     val model = new TestModel

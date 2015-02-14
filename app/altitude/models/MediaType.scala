@@ -3,7 +3,7 @@ package altitude.models
 import play.api.libs.json.{JsObject, Json}
 import reactivemongo.bson.BSONObjectID
 
-case class MediaType(mediaType: String, mediaSubtype: String, mime: String) extends BaseModel[String] {
+case class MediaType(mediaType: String, mediaSubtype: String, mime: String) extends BaseModel {
   override def toString = List(mediaType, mediaSubtype, mime).mkString(":")
 
   override def equals(other: Any) = other match {
@@ -21,5 +21,4 @@ case class MediaType(mediaType: String, mediaSubtype: String, mime: String) exte
     "type" ->  mediaType,
     "subtype" -> mediaSubtype
   )
-  override protected def genId: String = BSONObjectID.generate.toString()
 }
