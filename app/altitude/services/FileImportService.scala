@@ -3,7 +3,7 @@ package altitude.services
 import java.io.InputStream
 
 import altitude.dao.FileSystemImportDao
-import altitude.models.{MediaType, Asset, FileImportAsset}
+import altitude.models.{Asset, FileImportAsset, MediaType}
 import altitude.util.log
 import global.Altitude
 import org.apache.tika.detect.{DefaultDetector, Detector}

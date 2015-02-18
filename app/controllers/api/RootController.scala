@@ -1,9 +1,9 @@
 package controllers.api
 
 import altitude.util.log
+import altitude.{Const => C}
 import play.api.libs.json._
 import play.api.mvc._
-import altitude.{Const => C}
 
 object RootController extends Controller {
 

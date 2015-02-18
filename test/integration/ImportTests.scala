@@ -1,6 +1,7 @@
 package integration
 
 import java.io.File
+
 import altitude.models.FileImportAsset
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._

@@ -1,14 +1,14 @@
 package controllers.api
 
 import akka.actor.{Actor, ActorRef, Props}
+import altitude.util.log
+import altitude.{Const => C}
 import global.Altitude
 import org.json4s.DefaultFormats
 import org.json4s.native.Serialization._
 import play.api.Play
 import play.api.Play.current
 import play.api.mvc._
-import altitude.util.log
-import altitude.{Const => C}
 
 object ImportController extends Controller {
   implicit val formats = DefaultFormats

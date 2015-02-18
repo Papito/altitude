@@ -1,7 +1,6 @@
 package altitude.models
 
 import play.api.libs.json.{JsObject, Json}
-import reactivemongo.bson.BSONObjectID
 
 case class MediaType(mediaType: String, mediaSubtype: String, mime: String) extends BaseModel {
   override def toString = List(mediaType, mediaSubtype, mime).mkString(":")

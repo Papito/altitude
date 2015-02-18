@@ -1,10 +1,9 @@
 package altitude.dao.postgres
 
 import altitude.dao.BaseDao
-import altitude.models.BaseModel
 import altitude.util.log
 import play.api.Play
-import play.api.libs.json.{Json, JsString, JsObject, JsValue}
+import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

@@ -1,9 +1,10 @@
 package altitude.dao
 
 import java.io.File
-import altitude.{Const => C}
+
 import altitude.models.FileImportAsset
 import altitude.util.log
+import altitude.{Const => C}
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
 

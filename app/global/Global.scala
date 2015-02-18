@@ -1,12 +1,12 @@
 package global
 
 import altitude.util.log
+import altitude.{Const => C}
 import play.api._
 import play.api.mvc.Results._
 import play.api.mvc._
 
 import scala.concurrent.Future
-import altitude.{Const => C}
 
 object Global extends GlobalSettings {
 

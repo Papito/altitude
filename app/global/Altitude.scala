@@ -3,12 +3,12 @@ package global
 import altitude.dao.{LibraryDao, UtilitiesDao, mongo, postgres}
 import altitude.services._
 import altitude.util.log
+import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
 import net.codingwell.scalaguice.ScalaModule
 import play.api.{Application, Play}
 
 import scala.collection.mutable
-import altitude.{Const => C}
 
 /*
 Bridge between a Play! app instance and our app, which is our communication hub

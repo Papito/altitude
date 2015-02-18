@@ -1,8 +1,8 @@
 package altitude.models
 
 import java.io.File
+
 import play.api.libs.json.{JsObject, Json}
-import reactivemongo.bson.BSONObjectID
 
 class FileImportAsset(val file: File) extends BaseModel {
   require(file != null)

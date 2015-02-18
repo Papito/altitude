@@ -2,9 +2,9 @@ package altitude.services
 
 import java.io.InputStream
 
-import altitude.models.{Metadata, MediaType, FileImportAsset}
-import altitude.{Const => C}
+import altitude.models.{FileImportAsset, MediaType, Metadata}
 import altitude.util.log
+import altitude.{Const => C}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.parser.AbstractParser

@@ -1,18 +1,16 @@
 package altitude.dao.mongo
 
 import altitude.dao.BaseDao
-import altitude.models.BaseModel
 import altitude.util.log
+import altitude.{Const => C}
 import play.api.Play
-import play.api.libs.json.{JsValue, JsObject, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api._
-import reactivemongo.bson.BSONDocument
 import reactivemongo.core.commands.LastError
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import altitude.{Const => C}
 
 object BaseMongoDao {
   lazy val host = Play.current.configuration.getString("mongo.host").getOrElse("")

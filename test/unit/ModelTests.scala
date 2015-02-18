@@ -1,11 +1,11 @@
 package unit
 
 import java.io.File
+
 import altitude.models.{BaseModel, FileImportAsset}
 import org.scalatest.Matchers._
 import org.scalatest._
-import play.api.libs.json.{Json, JsObject}
-import reactivemongo.bson.BSONObjectID
+import play.api.libs.json.{JsObject, Json}
 
 class ModelTests extends FunSuite {
   test("model fields") {

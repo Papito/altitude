@@ -2,8 +2,8 @@ package integration
 
 import altitude.models.BaseModel
 import altitude.services.BaseService
-import org.scalatest.{FunSuite, DoNotDiscover}
-import play.api.libs.json.{Json, JsObject}
+import org.scalatest.FunSuite
+import play.api.libs.json.{JsObject, Json}
 
 class TestModel extends BaseModel {
   override def toJson: JsObject = Json.obj(

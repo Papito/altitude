@@ -5,9 +5,8 @@ import altitude.models.BaseModel
 import global.Altitude
 import play.api.libs.json.JsValue
 
-import scala.concurrent.Future
-
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 abstract class BaseService[Model <: BaseModel] {
   protected val DAO: BaseDao
