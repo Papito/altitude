@@ -8,6 +8,7 @@ import org.json4s.DefaultFormats
 import org.json4s.native.Serialization._
 import play.api.Play
 import play.api.Play.current
+import play.api.libs.json.JsValue
 import play.api.mvc._
 
 object ImportController extends Controller {
@@ -28,7 +29,7 @@ object ImportController extends Controller {
     val assetsIt = assets.toIterator
 
     def receive = {
-      case "next" => out ! (if (assetsIt.hasNext) write("asset" -> assetsIt.next().toJson) else "")
+      case "next" => out ! (if (assetsIt.hasNext) write("asset" -> (assetsIt.next(): JsValue)) else "")
       case "total" => out ! write("total" -> assets.size)
     }
 

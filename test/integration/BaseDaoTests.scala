@@ -3,13 +3,17 @@ package integration
 import altitude.models.BaseModel
 import altitude.services.BaseService
 import org.scalatest.FunSuite
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsValue, JsObject, Json}
 
-class TestModel extends BaseModel {
-  override def toJson: JsObject = Json.obj(
-    "id" -> id
+import scala.language.implicitConversions
+
+object TestModel {
+  implicit def toJson(obj: TestModel): JsValue = Json.obj(
+    "id" -> obj.id
   )
 }
+
+class TestModel extends BaseModel
 
 trait BaseDaoTests extends FunSuite {
   def service: BaseService[TestModel]

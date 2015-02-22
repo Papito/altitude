@@ -11,12 +11,10 @@ import scala.concurrent.Future
 object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
-    log.info("Application $app starting", Map("app" -> app.hashCode()), C.tag.APP)
     Altitude.register(app)
   }
 
   override def onStop(app: Application) {
-    log.info("Application $app stopping", Map("app" -> app.hashCode()), C.tag.APP)
     Altitude.deregister(app)
   }
 

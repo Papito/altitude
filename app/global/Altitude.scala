@@ -32,15 +32,11 @@ object Altitude {
     val id: Int = playApp.hashCode()
     val app: Altitude = new Altitude(playApp)
     instances += (id -> app)
-    log.info("Registering app $app with Play! id: $id", Map("id" -> id, "app" -> app), C.tag.APP)
-    log.info("We have $n applications running", Map("n" -> instances.size), C.tag.APP)
   }
 
   def deregister(playApp: Application): Unit = {
     val id: Int = playApp.hashCode()
-    log.info("De-registering app $app with Play! id: $id", Map("app" -> instances.get(id), "id" -> id), C.tag.APP)
     instances.remove(playApp.hashCode())
-    log.info("We have $n applications running", Map("n" -> instances.size), C.tag.APP)
   }
 
   def getInstance(playApp: Application = Play.current): Altitude = {
@@ -53,8 +49,6 @@ object Altitude {
 
 class Altitude(val playApp: Application) {
   val id = playApp.hashCode()
-  log.trace("Initializing app for Play! id: $id", Map("id" -> id), C.tag.APP)
-
   val injector = Guice.createInjector(new InjectionModule)
 
   /*

@@ -1,6 +1,15 @@
 package altitude.models
 
 import play.api.libs.json.{JsObject, Json}
+import scala.language.implicitConversions
+
+object MediaType {
+  implicit def toJson(obj: MediaType) = Json.obj(
+    "mime" -> obj.mime,
+    "type" ->  obj.mediaType,
+    "subtype" -> obj.mediaSubtype)
+
+}
 
 case class MediaType(mediaType: String, mediaSubtype: String, mime: String) extends BaseModel {
   override def toString = List(mediaType, mediaSubtype, mime).mkString(":")
@@ -14,10 +23,4 @@ case class MediaType(mediaType: String, mediaSubtype: String, mime: String) exte
   }
 
   override def hashCode: Int = (mediaType + mediaSubtype + mime).hashCode
-
-  override def toJson: JsObject = Json.obj(
-    "mime" -> mime,
-    "type" ->  mediaType,
-    "subtype" -> mediaSubtype
-  )
 }
