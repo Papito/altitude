@@ -1,6 +1,6 @@
 package altitude.models
 
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsValue, Json}
 import scala.language.implicitConversions
 
 object MediaType {
@@ -9,6 +9,10 @@ object MediaType {
     "type" ->  obj.mediaType,
     "subtype" -> obj.mediaSubtype)
 
+  implicit def fromJson(json: JsValue): MediaType = new MediaType(
+      mediaType = (json \ "type").as[String],
+      mediaSubtype = (json \ "subtype").as[String],
+      mime = (json \ "mime").as[String])
 }
 
 case class MediaType(mediaType: String, mediaSubtype: String, mime: String) extends BaseModel {

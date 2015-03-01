@@ -12,6 +12,8 @@ import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class FileImportService {
   protected val DAO = new FileSystemImportDao
@@ -59,6 +61,7 @@ class FileImportService {
     val mediaType = detectAssetType(fileAsset)
     val metadata = app.service.metadata.extract(fileAsset, mediaType)
     val asset = new Asset(mediaType = mediaType, metadata = metadata)
-    app.service.library.add(asset)
+    val f = app.service.library.add(asset)
+    f map{res => res}
   }
 }
