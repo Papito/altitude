@@ -6,12 +6,12 @@ import scala.language.implicitConversions
 object Asset {
   implicit def toJson(obj: Asset): JsValue = Json.obj(
     "id" -> obj.id,
-    "mediaType" -> (obj.mediaType: JsValue)
+    "mediaType" -> obj.mediaType.toJson
   )
 
   implicit def fromJson(json: JsValue): Asset = new Asset(
-    mediaType = json \ "mediaType": MediaType,
-    metadata = json \ "mediaType": Metadata
+    mediaType = json \ "mediaType",
+    metadata = json \ "mediaType"
   )
 }
 
