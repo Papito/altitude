@@ -1,19 +1,12 @@
 package integration
 
-import altitude.models.{Asset, BaseModel}
+import altitude.models.BaseModel
 import altitude.services.BaseService
 import org.scalatest.Matchers._
-import play.api.libs.json.{JsValue, JsObject, Json}
-
+import play.api.libs.json.JsValue
 
 import scala.concurrent.Future
 import scala.language.implicitConversions
-
-object TestModel {
-  implicit def toJson(obj: TestModel): JsValue = Json.obj(
-    "id" -> obj.id
-  )
-}
 
 class TestModel extends BaseModel
 
@@ -23,8 +16,18 @@ trait BaseDaoTests extends IntegrationTestCore {
 
   test("add record") {
     val f: Future[JsValue] = service.add(model)
+
     whenReady(f) {json =>
-      (json \ "id").as[String] should be(model.id)
+      val id = (json \ "id").asOpt[String].getOrElse("")
+      id should equal(model.id)
+
+      // retrieve the object
+      val f = service.getById(model.id)
+
+      whenReady(f) {json =>
+        val id = (json \ "id").asOpt[String].getOrElse("")
+        id should be(model.id)
+      }
     }
   }
 }
