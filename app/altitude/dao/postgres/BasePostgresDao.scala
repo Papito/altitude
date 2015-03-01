@@ -7,14 +7,13 @@ import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.slick.driver.H2Driver.simple._
 
 abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
   private val url = Play.current.configuration.getString("db.postgres.url").getOrElse("")
   require(url.nonEmpty)
   private val driver = Play.current.configuration.getString("db.postgres.driver").getOrElse("")
 
-  def db = Database.forURL(url, driver = driver)
+  //def db = Database.forURL(url, driver = driver)
 
   override def add(json: JsValue): Future[JsValue] = {
     log.info("POSTGRES INSERT")
