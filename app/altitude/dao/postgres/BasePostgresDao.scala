@@ -1,19 +1,18 @@
 package altitude.dao.postgres
 
-import java.sql.{SQLException, Connection}
-
-import org.apache.commons.dbutils.handlers.MapListHandler
-import play.api.db._
+import java.sql.Connection
 
 import altitude.dao.BaseDao
 import altitude.util.log
 import altitude.{Const => C}
-
+import org.apache.commons.dbutils.QueryRunner
+import org.apache.commons.dbutils.handlers.MapListHandler
+import play.api.Play.current
+import play.api.db._
 import play.api.libs.json.{JsValue, Json}
-import org.apache.commons.dbutils.{ResultSetHandler, QueryRunner, DbUtils}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import play.api.Play.current
 
 abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
   def ds = DB.getDataSource("postgres")

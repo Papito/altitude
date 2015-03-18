@@ -1,6 +1,5 @@
 package global
 
-import altitude.util.log
 import altitude.{Const => C}
 import play.api._
 import play.api.mvc.Results._

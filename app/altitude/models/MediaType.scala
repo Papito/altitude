@@ -1,6 +1,7 @@
 package altitude.models
 
 import play.api.libs.json.{JsValue, Json}
+
 import scala.language.implicitConversions
 
 object MediaType {

@@ -11,8 +11,8 @@ import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 
 class FileImportService {

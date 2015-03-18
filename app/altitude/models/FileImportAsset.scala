@@ -2,7 +2,8 @@ package altitude.models
 
 import java.io.File
 
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.Json
+
 import scala.language.implicitConversions
 
 object FileImportAsset {

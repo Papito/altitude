@@ -3,7 +3,7 @@ package integration
 import altitude.dao.mongo.BaseMongoDao
 import altitude.dao.postgres.BasePostgresDao
 import altitude.services.BaseService
-import org.scalatest.{Suites, DoNotDiscover}
+import org.scalatest.Suites
 
 /*
   Define base dao tests for each type of DB.

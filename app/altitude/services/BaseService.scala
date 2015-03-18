@@ -1,14 +1,13 @@
 package altitude.services
 
 import altitude.dao.BaseDao
-import altitude.models.{Asset, BaseModel}
+import altitude.models.BaseModel
 import global.Altitude
 import play.api.libs.json.JsValue
-import scala.language.implicitConversions
-
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.language.implicitConversions
 
 abstract class BaseService[Model <: BaseModel] {
   protected val DAO: BaseDao

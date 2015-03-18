@@ -1,7 +1,8 @@
 package altitude.models
 
-import play.api.libs.json.{Json, JsValue, JsObject}
+import play.api.libs.json.{JsValue, Json}
 import reactivemongo.bson.BSONObjectID
+
 import scala.language.implicitConversions
 
 object BaseModel {
