@@ -8,4 +8,8 @@ object Const {
      val SERVICE = "SERVICE"
      val DB = "DB"
    }
+
+   object Common {
+     val ID = "id"
+   }
  }

@@ -36,9 +36,9 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
   }
 
   override def getById(id: String): Future[JsValue] = {
-    log.debug("Getting by ID '$id'", Map("id" -> id))
+    log.debug("Getting by ID '$id'", Map(C.Common.ID -> id))
 
-    val query = Json.obj("id" -> id)
+    val query = Json.obj(C.Common.ID -> id)
     val cursor: Cursor[JsObject] = collection.find(query).cursor[JsObject]
     val f: Future[List[JsObject]] = cursor.collect[List](upTo = 2)
 

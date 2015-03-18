@@ -23,7 +23,7 @@ libraryDependencies ++= Seq(
   "org.json4s" %% "json4s-native" % "3.2.11",
   "org.apache.commons" % "commons-io" % "1.3.2",
   "net.codingwell" %% "scala-guice" % "4.0.0-beta5",
-  "net.noerd" % "prequel_2.9.2" % "0.3.8",
+  "commons-dbutils" % "commons-dbutils" % "1.6",
   cache,
   jdbc
 )
