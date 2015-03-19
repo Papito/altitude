@@ -24,6 +24,7 @@ libraryDependencies ++= Seq(
   "org.apache.commons" % "commons-io" % "1.3.2",
   "net.codingwell" %% "scala-guice" % "4.0.0-beta5",
   "commons-dbutils" % "commons-dbutils" % "1.6",
+  "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
   cache,
   jdbc
 )
