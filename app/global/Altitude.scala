@@ -20,10 +20,8 @@ The Play! global object is a bad candidate since it has to follow the GlobalSett
 object Altitude {
   /*
   Our Altitude instances - multiple ones can exist at once
-  (parallel test suites)
-
-  NOTE: parallel suite execution did not work at the time (Jan 2015) - the test
-  system seemed to shut down one test app cold before tests could finish.
+  (parallel test suites). Ideally, but this probably won't work until
+  version 3, where global state will be removed.
   */
   val instances = mutable.HashMap.empty[Int, Altitude]
 
@@ -59,19 +57,21 @@ class Altitude(val playApp: Application) {
       val dataSourceType = playApp.configuration.getString("datasource").getOrElse("")
       log.info("Datasource type: $source", Map("source" -> dataSourceType), C.tag.APP)
       dataSourceType match {
-        case "mongo" => {
+        case "mongo" =>
+          bind[AbstractTransactionManager].toInstance(new altitude.services.VoidTransactionManager)
           bind[LibraryDao].toInstance(new altitude.dao.mongo.LibraryDao)
           bind[UtilitiesDao].toInstance(new mongo.UtilitiesDao)
-        }
-        case "postgres" => {
+        case "postgres" =>
+          bind[AbstractTransactionManager].toInstance(new altitude.services.JdbcTransactionManager)
           bind[LibraryDao].toInstance(new altitude.dao.postgres.LibraryDao)
           bind[UtilitiesDao].toInstance(new postgres.UtilitiesDao)
-        }
+
         case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
       }
     }
   }
 
+  // declare singleton services
   object service {
     val fileImport: FileImportService = new FileImportService
     val metadata: AbstractMetadataService = new TikaMetadataService

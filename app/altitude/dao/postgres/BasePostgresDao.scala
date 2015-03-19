@@ -40,7 +40,10 @@ abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
 
     val q: String = "SELECT id FROM asset WHERE id = ?"
     val res = run.query(q, new MapListHandler(), id)
-    require(res.size() == 1)
+
+    if (res.size() > 1)
+      throw new Exception("getById should return only a single result")
+
     val rec = res.get(0)
 
     Future[JsValue] {
