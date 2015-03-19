@@ -15,13 +15,11 @@ class VoidTransactionManager extends AbstractTransactionManager {
     f
   }
 
-  def rollback[A](f: => A) = {
+  def rollback() = {
     log.info("ROLLBACK")
-    f
   }
 
-  def commit[A](f: => A)  = {
+  def commit() = {
     log.info("COMMIT")
-    f
   }
 }

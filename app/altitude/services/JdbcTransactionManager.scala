@@ -16,11 +16,11 @@ class JdbcTransactionManager extends AbstractTransactionManager {
     f
   }
 
-  def rollback[A](f: => A) = {
+  def rollback() = {
     log.info("ROLLBACK")
   }
 
-  def commit = {
+  def commit() = {
     log.info("COMMIT")
   }
 }
