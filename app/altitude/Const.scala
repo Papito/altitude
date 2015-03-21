@@ -1,5 +1,7 @@
 package altitude
 
+import play.api.libs.json.Json
+
 object Const {
    object tag {
      val APP     = "APP"
@@ -12,4 +14,9 @@ object Const {
    object Common {
      val ID = "id"
    }
+
+  object Db {
+    val EMPTY: Int = Json.obj().hashCode()
+
+  }
  }

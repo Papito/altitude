@@ -22,12 +22,9 @@ abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
     val run: QueryRunner = new QueryRunner
 
     val conn: Connection = ds.getConnection
-    conn.setReadOnly(false)
     conn.setAutoCommit(false)
-
     val q: String = "INSERT INTO asset (id) VALUES(?)"
     run.update(conn, q, (json \ "id").as[String])
-    conn.commit()
 
     Future[JsValue] {
       json
@@ -41,11 +38,13 @@ abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
     val q: String = "SELECT id FROM asset WHERE id = ?"
     val res = run.query(q, new MapListHandler(), id)
 
+    if (res.size() == 0)
+      return Future[JsValue](Json.obj())
+
     if (res.size() > 1)
       throw new Exception("getById should return only a single result")
 
     val rec = res.get(0)
-
     Future[JsValue] {
       Json.obj(
         C.Common.ID -> rec.get("id").toString

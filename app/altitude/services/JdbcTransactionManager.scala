@@ -5,6 +5,8 @@ import altitude.util.log
 class JdbcTransactionManager extends AbstractTransactionManager {
   def transaction[A](f: => A) = {
     log.info("TRANSACTION START")
+    //conn.setReadOnly(false)
+    //conn.setAutoCommit(false)
     val res: A = f
     this.commit()
     log.info("TRANSACTION END")
