@@ -17,7 +17,7 @@ abstract class BaseService[Model <: BaseModel] {
   protected def app = Altitude.getInstance()
   protected val txManager = app.injector.instance[AbstractTransactionManager]
   def add(obj: Model)(implicit txArg: Option[Transaction]): Future[JsValue] = {
-    log.info("Transaction defined?: " + tx.isDefined)
+    log.info("Transaction defined?: " + txArg.isDefined)
     txManager.withTransaction[Future[JsValue]] {
       val f: Future[JsValue] = DAO.add(obj.toJson)
       f map {res => res}
