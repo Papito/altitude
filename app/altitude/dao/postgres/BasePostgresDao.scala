@@ -38,6 +38,7 @@ abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
     val q: String = "SELECT id FROM asset WHERE id = ?"
     val res = run.query(q, new MapListHandler(), id)
 
+    log.debug(s"Found ${res.size()} records")
     if (res.size() == 0)
       return Future[JsValue](Json.obj())
 
