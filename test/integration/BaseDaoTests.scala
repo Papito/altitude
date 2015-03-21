@@ -15,6 +15,7 @@ trait BaseDaoTests extends IntegrationTestCore {
   val model = new TestModel
 
   test("add record") {
+    implicit val tx = None
     val f: Future[JsValue] = service.add(model)
 
     whenReady(f) {json =>

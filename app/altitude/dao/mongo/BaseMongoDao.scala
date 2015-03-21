@@ -1,6 +1,6 @@
 package altitude.dao.mongo
 
-import altitude.dao.BaseDao
+import altitude.dao.{Transaction, BaseDao}
 import altitude.util.log
 import altitude.{Const => C}
 import play.api.Play
@@ -29,13 +29,13 @@ object BaseMongoDao {
 abstract class BaseMongoDao(private val collectionName: String) extends BaseDao {
   protected def collection = BaseMongoDao.db.collection[JSONCollection](collectionName)
 
-  override def add(json: JsValue): Future[JsValue] = {
+  override def add(json: JsValue)(implicit tx: Option[Transaction]): Future[JsValue] = {
     log.debug("Starting database INSERT for: $o", Map("o" -> json))
     val f: Future[LastError] = collection.insert(json)
     f map {res => if (res.ok) json else throw res.getCause}
   }
 
-  override def getById(id: String): Future[JsValue] = {
+  override def getById(id: String)(implicit tx: Option[Transaction]): Future[JsValue] = {
     log.debug("Getting by ID '$id'", Map(C.Common.ID -> id))
 
     val query = Json.obj(C.Common.ID -> id)

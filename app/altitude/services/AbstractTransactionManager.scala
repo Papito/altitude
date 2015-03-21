@@ -1,8 +1,10 @@
 package altitude.services
 
+import altitude.dao.Transaction
+
 abstract class AbstractTransactionManager {
-  def transaction[A](f: => A): A
-  def readOnly[A](f: => A): A
+  def withTransaction[A](f: => A)(implicit tx: Option[Transaction] = None): A
+  def asReadOnly[A](f: => A): A
   def commit()
   def rollback()
 }

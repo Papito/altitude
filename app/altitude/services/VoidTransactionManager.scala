@@ -1,9 +1,11 @@
 package altitude.services
 
-class VoidTransactionManager extends AbstractTransactionManager {
-  def transaction[A](f: => A) = f
+import altitude.dao.Transaction
 
-  def readOnly[A](f: => A) = f
+class VoidTransactionManager extends AbstractTransactionManager {
+  def withTransaction[A](f: => A)(implicit tx: Option[Transaction]) = f
+
+  def asReadOnly[A](f: => A) = f
 
   def rollback() = Unit
 
