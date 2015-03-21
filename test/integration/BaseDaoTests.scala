@@ -1,5 +1,6 @@
 package integration
 
+import altitude.dao.Transaction
 import altitude.models.BaseModel
 import altitude.services.BaseService
 import org.scalatest.Matchers._
@@ -15,7 +16,7 @@ trait BaseDaoTests extends IntegrationTestCore {
   val model = new TestModel
 
   test("add record") {
-    implicit val tx = None
+    implicit val tx = Some(new Transaction)
     val f: Future[JsValue] = service.add(model)
 
     whenReady(f) {json =>
