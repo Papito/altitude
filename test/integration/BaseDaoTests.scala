@@ -29,6 +29,8 @@ trait BaseDaoTests extends IntegrationTestCore {
       whenReady(f) {json =>
         val id = (json \ "id").asOpt[String].getOrElse("")
         id should be(model.id)
+
+        tx.get.close()
       }
     }
   }

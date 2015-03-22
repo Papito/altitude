@@ -20,7 +20,7 @@ abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
     val run: QueryRunner = new QueryRunner
 
     val q: String = "INSERT INTO asset (id) VALUES(?)"
-    run.update(tx.get.conn, q, (json \ "id").as[String])
+    run.update(tx.get.getConnection, q, (json \ "id").as[String])
 
     Future[JsValue] {
       json
@@ -32,7 +32,7 @@ abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
     val run: QueryRunner = new QueryRunner()
 
     val q: String = "SELECT id FROM asset WHERE id = ?"
-    val res = run.query(tx.get.conn, q, new MapListHandler(), id)
+    val res = run.query(tx.get.getConnection, q, new MapListHandler(), id)
 
     log.debug(s"Found ${res.size()} records")
     if (res.size() == 0)

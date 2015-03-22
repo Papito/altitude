@@ -11,7 +11,7 @@ import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
-import play.api.libs.json.JsValue
+import altitude.dao.Transaction
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -22,6 +22,7 @@ class FileImportService {
   protected val DAO = new FileSystemImportDao
   protected val app = Altitude.getInstance()
   protected val txManager = app.injector.instance[AbstractTransactionManager]
+  implicit val tx: Option[Transaction] = None
 
   def getFilesToImport(path: String): List[FileImportAsset] = {
     log.info("Finding assets to import @ '$path'", Map("path" -> path))
@@ -66,7 +67,6 @@ class FileImportService {
     val metadata = app.service.metadata.extract(fileAsset, mediaType)
     val asset = new Asset(mediaType = mediaType, metadata = metadata)
 
-    implicit val tx = None
     txManager.withTransaction[Future[Asset]] {
       val f = app.service.library.add(asset)
       f map {res => res}
