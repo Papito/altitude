@@ -10,7 +10,7 @@ import play.api.Play.current
 class Transaction {
   private val ds: DataSource = DB.getDataSource("postgres")
   private val conn: Connection = ds.getConnection
-  val id = scala.util.Random.nextInt()
+  val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
 
   def getConnection: Connection = conn
 
