@@ -23,7 +23,10 @@ class JdbcTransactionManager extends AbstractTransactionManager {
         tx.get.setAutoCommit(false)
       }
       val res: A = f
-      commit()
+
+      // commit if this is not an existing transaction
+      if (!isNestedTx) tx.get.commit()
+
       log.debug("TRANSACTION END: " + tx.get.id)
       res
     } finally {
@@ -57,13 +60,5 @@ class JdbcTransactionManager extends AbstractTransactionManager {
         tx.get.close()
       }
     }
-  }
-
-  def rollback() = {
-    log.info("ROLLBACK")
-  }
-
-  def commit() = {
-    log.info("COMMIT")
   }
 }
