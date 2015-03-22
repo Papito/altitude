@@ -15,17 +15,17 @@ class Transaction {
   def getConnection: Connection = conn
 
   def close() = {
-    log.debug("Closing connection for transaction: " + id)
+    log.debug(s"Closing connection for transaction $id")
     conn.close()
   }
 
   def commit() {
-    log.debug("Committing transaction: " + id)
+    log.debug(s"Committing transaction $id")
     conn.commit()
   }
 
   def rollback() {
-    log.debug("ROLLBACK for transaction: " + id)
+    log.debug(s"ROLLBACK for transaction $id")
     conn.rollback()
   }
 
