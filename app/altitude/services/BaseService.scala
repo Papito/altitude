@@ -16,6 +16,7 @@ abstract class BaseService[Model <: BaseModel] {
   protected val DAO: BaseDao
   protected def app = Altitude.getInstance()
   protected val txManager = app.injector.instance[AbstractTransactionManager]
+
   def add(obj: Model)(implicit txArg: Option[Transaction]): Future[JsValue] = {
     log.info("Transaction defined?: " + txArg.isDefined)
     txManager.withTransaction[Future[JsValue]] {
