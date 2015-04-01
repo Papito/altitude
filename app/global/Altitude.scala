@@ -2,7 +2,7 @@ package global
 
 import java.sql.Connection
 
-import altitude.dao.{LibraryDao, UtilitiesDao, mongo, postgres}
+import altitude.dao._
 import altitude.services._
 import altitude.util.log
 import altitude.{Const => C}

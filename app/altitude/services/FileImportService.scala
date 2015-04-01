@@ -1,7 +1,6 @@
 package altitude.services
 
 import java.io.InputStream
-import java.sql.Connection
 
 import altitude.dao.FileSystemImportDao
 import altitude.models.{Asset, FileImportAsset, MediaType}

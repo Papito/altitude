@@ -1,7 +1,7 @@
 package altitude.dao.postgres
 
 
-import altitude.dao.{Transaction, BaseDao}
+import altitude.dao.{JdbcTransaction, BaseDao}
 import altitude.util.log
 import altitude.{Const => C}
 import org.apache.commons.dbutils.QueryRunner
@@ -13,7 +13,7 @@ import scala.concurrent.Future
 
 abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
 
-  override def add(json: JsValue)(implicit tx: Option[Transaction]): Future[JsValue] = {
+  override def add(json: JsValue)(implicit tx: Option[JdbcTransaction]): Future[JsValue] = {
     log.info("POSTGRES INSERT")
 
     val run: QueryRunner = new QueryRunner
@@ -26,7 +26,7 @@ abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
      }
   }
 
-  override def getById(id: String)(implicit tx: Option[Transaction]): Future[JsValue] = {
+  override def getById(id: String)(implicit tx: Option[JdbcTransaction]): Future[JsValue] = {
     log.info("POSTGRES SELECT")
     val run: QueryRunner = new QueryRunner()
 
