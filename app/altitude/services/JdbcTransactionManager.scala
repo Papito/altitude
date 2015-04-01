@@ -5,7 +5,7 @@ import altitude.util.log
 
 class JdbcTransactionManager extends AbstractTransactionManager {
 
-  def withTransaction[A](f: => A)(implicit txArg: Option[Transaction]) = {
+  def withTransaction[A](f: => A)(implicit txArg: Option[Transaction] = Some(new Transaction)) = {
     log.debug("TRANSACTION START")
 
     val isNestedTx: Boolean = txArg.isDefined
@@ -37,7 +37,7 @@ class JdbcTransactionManager extends AbstractTransactionManager {
     }
   }
 
-  def asReadOnly[A](f: => A)(implicit txArg: Option[Transaction]) = {
+  def asReadOnly[A](f: => A)(implicit txArg: Option[Transaction] = Some(new Transaction)) = {
     log.debug("READONLY TRANSACTION START")
 
     val isNestedTx: Boolean = txArg.isDefined
