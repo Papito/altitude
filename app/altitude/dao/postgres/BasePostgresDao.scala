@@ -15,7 +15,6 @@ abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
 
   override def add(json: JsValue)(implicit tx: Option[Transaction]): Future[JsValue] = {
     log.info("POSTGRES INSERT")
-    log.info("Transaction defined?: " + tx.isDefined)
 
     val run: QueryRunner = new QueryRunner
 

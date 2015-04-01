@@ -2,7 +2,6 @@ package altitude.services
 
 import altitude.dao.{Transaction, BaseDao}
 import altitude.models.BaseModel
-import altitude.util.log
 import global.Altitude
 import play.api.libs.json.JsValue
 
@@ -18,7 +17,6 @@ abstract class BaseService[Model <: BaseModel] {
   protected val txManager = app.injector.instance[AbstractTransactionManager]
 
   def add(obj: Model)(implicit tx: Option[Transaction] = Some(new Transaction)): Future[JsValue] = {
-    log.info("Transaction defined?: " + tx.isDefined)
     txManager.withTransaction[Future[JsValue]] {
       val f: Future[JsValue] = DAO.add(obj.toJson)
       f map {res => res}
