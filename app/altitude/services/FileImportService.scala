@@ -21,7 +21,7 @@ class FileImportService {
   protected val DAO = new FileSystemImportDao
   protected val app = Altitude.getInstance()
   protected val txManager = app.injector.instance[AbstractTransactionManager]
-  implicit val tx: Option[Transaction] = None
+  implicit val txId: Int = 0
 
   def getFilesToImport(path: String): List[FileImportAsset] = {
     log.info("Finding assets to import @ '$path'", Map("path" -> path))

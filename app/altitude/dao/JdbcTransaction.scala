@@ -15,9 +15,9 @@ object JdbcTransaction {
 }
 
 class JdbcTransaction extends Transaction {
-  private val conn: Connection = JdbcTransaction.ds.getConnection
+  val conn: Connection = JdbcTransaction.ds.getConnection
 
-  log.debug(s"New transaction $id")
+  log.debug(s"New JDBC transaction $id")
   def getConnection: Connection = conn
 
   override def close() = {
@@ -41,6 +41,6 @@ class JdbcTransaction extends Transaction {
     }
   }
 
-  override def setReadOnly(flag: Boolean) = conn.setReadOnly(flag)
-  override def setAutoCommit(flag: Boolean) = conn.setAutoCommit(flag)
+  def setReadOnly(flag: Boolean) = conn.setReadOnly(flag)
+  def setAutoCommit(flag: Boolean) = conn.setAutoCommit(flag)
 }

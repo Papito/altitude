@@ -2,6 +2,7 @@ package altitude.dao.postgres
 
 
 import altitude.dao.{JdbcTransaction, BaseDao}
+import altitude.services.JdbcTransactionManager
 import altitude.util.log
 import altitude.{Const => C}
 import org.apache.commons.dbutils.QueryRunner
@@ -10,28 +11,29 @@ import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import java.sql.Connection
 
 abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
+  private def conn(implicit txId: Int): Connection = JdbcTransactionManager.transaction.conn
 
-  override def add(json: JsValue)(implicit tx: Option[JdbcTransaction]): Future[JsValue] = {
+  override def add(json: JsValue)(implicit txId: Int = 0): Future[JsValue] = {
     log.info("POSTGRES INSERT")
-
     val run: QueryRunner = new QueryRunner
 
     val q: String = "INSERT INTO asset (id) VALUES(?)"
-    run.update(tx.get.getConnection, q, (json \ "id").as[String])
+    run.update(conn, q, (json \ "id").as[String])
 
     Future[JsValue] {
       json
      }
   }
 
-  override def getById(id: String)(implicit tx: Option[JdbcTransaction]): Future[JsValue] = {
+  override def getById(id: String)(implicit txId: Int = 0): Future[JsValue] = {
     log.info("POSTGRES SELECT")
     val run: QueryRunner = new QueryRunner()
 
     val q: String = "SELECT id FROM asset WHERE id = ?"
-    val res = run.query(tx.get.getConnection, q, new MapListHandler(), id)
+    val res = run.query(conn, q, new MapListHandler(), id)
 
     log.debug(s"Found ${res.size()} records")
     if (res.size() == 0)
