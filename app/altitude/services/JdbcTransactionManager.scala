@@ -1,24 +1,25 @@
 package altitude.services
 
-import altitude.dao.JdbcTransaction
+import altitude.dao.{TransactionId, JdbcTransaction}
 import altitude.util.log
 
 object JdbcTransactionManager {
   private val TRANSACTIONS = scala.collection.mutable.Map[Int, JdbcTransaction]()
 
-  def transaction(implicit txId: Int = 0): JdbcTransaction = {
-    if (TRANSACTIONS.contains(txId)) {
-      return TRANSACTIONS.get(txId).get
+  def transaction(implicit txId: TransactionId): JdbcTransaction = {
+    if (TRANSACTIONS.contains(txId.id)) {
+      return TRANSACTIONS.get(txId.id).get
     }
     val tx: JdbcTransaction = new JdbcTransaction
     TRANSACTIONS += (tx.id -> tx)
+    txId.id = tx.id
     tx
   }
 }
 
 class JdbcTransactionManager extends AbstractTransactionManager {
 
-  def withTransaction[A](f: => A)(implicit txId: Int = 0) = {
+  def withTransaction[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
     log.debug("TRANSACTION START")
 
     val tx = JdbcTransactionManager.transaction
@@ -44,12 +45,12 @@ class JdbcTransactionManager extends AbstractTransactionManager {
     } finally {
       if (!tx.isNested) {
         tx.close()
-        JdbcTransactionManager.TRANSACTIONS.remove(txId)
+        JdbcTransactionManager.TRANSACTIONS.remove(txId.id)
       }
     }
   }
 
-  def asReadOnly[A](f: => A)(implicit txId: Int = 0) = {
+  def asReadOnly[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
     log.debug("READONLY TRANSACTION START")
 
     val tx = JdbcTransactionManager.transaction
@@ -74,7 +75,7 @@ class JdbcTransactionManager extends AbstractTransactionManager {
     } finally {
       if (!tx.isNested) {
         tx.close()
-        JdbcTransactionManager.TRANSACTIONS.remove(txId)
+        JdbcTransactionManager.TRANSACTIONS.remove(txId.id)
       }
     }
   }
