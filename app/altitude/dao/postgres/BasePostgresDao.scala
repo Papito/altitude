@@ -14,7 +14,9 @@ import scala.concurrent.Future
 import java.sql.Connection
 
 abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
-  private def conn(implicit txId: TransactionId): Connection = JdbcTransactionManager.transaction.conn
+
+  private def conn(implicit txId: TransactionId): Connection =
+    JdbcTransactionManager.transaction.conn
 
   override def add(json: JsValue)(implicit txId: TransactionId): Future[JsValue] = {
     log.info("POSTGRES INSERT")

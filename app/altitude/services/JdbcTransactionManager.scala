@@ -24,9 +24,6 @@ class JdbcTransactionManager extends AbstractTransactionManager {
 
     val tx = JdbcTransactionManager.transaction
 
-    if (tx.isNested)
-      log.debug("Nested transaction: " + tx.id)
-
     try {
       if (!tx.isNested) {
         tx.setReadOnly(flag=false)
@@ -54,11 +51,6 @@ class JdbcTransactionManager extends AbstractTransactionManager {
     log.debug("READONLY TRANSACTION START")
 
     val tx = JdbcTransactionManager.transaction
-
-    if (tx.isNested)
-      log.debug("Nested transaction: " + tx.id)
-    else
-      log.debug("New transaction: " + tx.id)
 
     try {
       if (!tx.isNested){
