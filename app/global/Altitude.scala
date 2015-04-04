@@ -78,6 +78,5 @@ class Altitude(val playApp: Application) {
     val fileImport: FileImportService = new FileImportService
     val metadata: AbstractMetadataService = new TikaMetadataService
     val library: LibraryService = new LibraryService
-    val dbUtilities: DbUtilitiesService = new DbUtilitiesService
   }
 }
