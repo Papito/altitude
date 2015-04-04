@@ -1,10 +1,12 @@
 package integration
 
 import altitude.{Const => C}
-import altitude.dao.{LibraryDao, postgres, mongo, UtilitiesDao}
+import altitude.dao.{LibraryDao, postgres, mongo}
 import altitude.util.log
 import com.google.inject.{Guice, AbstractModule}
 import global.Altitude
+import integration.util.dao
+import integration.util.dao.UtilitiesDao
 import net.codingwell.scalaguice.ScalaModule
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -41,9 +43,9 @@ abstract class IntegrationTestCore extends FunSuite
 
       dataSourceType match {
         case "mongo" =>
-          bind[UtilitiesDao].toInstance(new mongo.UtilitiesDao)
+          bind[UtilitiesDao].toInstance(new dao.mongo.UtilitiesDao)
         case "postgres" =>
-          bind[UtilitiesDao].toInstance(new postgres.UtilitiesDao)
+          bind[UtilitiesDao].toInstance(new dao.postgres.UtilitiesDao)
 
         case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
       }

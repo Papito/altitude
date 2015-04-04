@@ -62,12 +62,9 @@ class Altitude(val playApp: Application) {
         case "mongo" =>
           bind[AbstractTransactionManager].toInstance(new altitude.services.VoidTransactionManager)
           bind[LibraryDao].toInstance(new altitude.dao.mongo.LibraryDao)
-          bind[UtilitiesDao].toInstance(new mongo.UtilitiesDao)
         case "postgres" =>
           bind[AbstractTransactionManager].toInstance(new altitude.services.JdbcTransactionManager)
           bind[LibraryDao].toInstance(new altitude.dao.postgres.LibraryDao)
-          bind[UtilitiesDao].toInstance(new postgres.UtilitiesDao)
-
         case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
       }
     }
