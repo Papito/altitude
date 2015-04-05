@@ -8,14 +8,12 @@ import play.api.Play
 import play.api.db.DB
 import play.api.Play.current
 
-object JdbcTransaction {
-  lazy val dsName = Play.current.configuration.getString("datasource").getOrElse("")
-  require(!dsName.isEmpty)
-  lazy val ds: DataSource = DB.getDataSource(dsName)
-}
-
 class JdbcTransaction extends Transaction {
-  val conn: Connection = JdbcTransaction.ds.getConnection
+  private val dsName = Play.current.configuration.getString("datasource").getOrElse("")
+  require(!dsName.isEmpty)
+  private val ds: DataSource = DB.getDataSource(dsName)
+
+  val conn: Connection = ds.getConnection
 
   log.debug(s"New JDBC transaction $id")
   def getConnection: Connection = conn
