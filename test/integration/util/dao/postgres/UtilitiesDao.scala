@@ -21,6 +21,11 @@ class UtilitiesDao extends BasePostgresDao("") with integration.util.dao.Utiliti
       tx._2.close()
     })
 
+  }
+
+  override def cleanup() = {
+    rollback()
+    close()
     JdbcTransactionManager.TRANSACTIONS.clear()
   }
 

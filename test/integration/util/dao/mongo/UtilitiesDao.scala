@@ -16,5 +16,6 @@ class UtilitiesDao extends BaseMongoDao("") with integration.util.dao.UtilitiesD
 
   override def close() = Unit
   override def rollback() = Unit
+  override def cleanup() = Unit
   override def createTransaction(tx: TransactionId) = Unit
 }

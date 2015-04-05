@@ -40,8 +40,7 @@ abstract class IntegrationTestCore extends FunSuite
   }
 
   override def afterEach() {
-    dbUtilities.rollback()
-    dbUtilities.close()
+    dbUtilities.cleanup()
   }
 
   class InjectionModule extends AbstractModule with ScalaModule  {

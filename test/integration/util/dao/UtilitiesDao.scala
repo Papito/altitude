@@ -4,7 +4,8 @@ import altitude.dao.{TransactionId, BaseDao}
 
 trait UtilitiesDao extends BaseDao {
   def dropDatabase(): Unit
-  def rollback(): Unit
-  def close(): Unit
+  protected def rollback(): Unit
+  protected def close(): Unit
+  def cleanup(): Unit
   def createTransaction(tx: TransactionId): Unit
 }
