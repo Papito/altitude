@@ -5,22 +5,16 @@ import java.io.InputStream
 import altitude.dao.{TransactionId, FileSystemImportDao, Transaction}
 import altitude.models.{Asset, FileImportAsset, MediaType}
 import altitude.util.log
-import global.Altitude
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import net.codingwell.scalaguice.InjectorExtensions._
+import scala.concurrent.ExecutionContext.Implicits.global
 
-
-class FileImportService {
+class FileImportService extends BaseService {
   protected val DAO = new FileSystemImportDao
-  protected val app = Altitude.getInstance()
-  protected val txManager = app.injector.instance[AbstractTransactionManager]
-  implicit val txId = new TransactionId
 
   def getFilesToImport(path: String): List[FileImportAsset] = {
     log.info("Finding assets to import @ '$path'", Map("path" -> path))
@@ -65,9 +59,7 @@ class FileImportService {
     val metadata = app.service.metadata.extract(fileAsset, mediaType)
     val asset = new Asset(mediaType = mediaType, metadata = metadata)
 
-    txManager.withTransaction[Future[Asset]] {
-      val f = app.service.library.add(asset)
-      f map {res => res}
-    }
+    val f = app.service.library.add(asset)
+    f map {res => res}
   }
 }

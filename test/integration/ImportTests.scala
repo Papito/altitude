@@ -7,6 +7,7 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
 @DoNotDiscover class ImportTests(val config: Map[String, _]) extends IntegrationTestCore {
+/*
   test("import image (JPEG)") {
     val path = getClass.getResource("../files/incoming/images/1.jpg").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
@@ -26,6 +27,7 @@ import org.scalatest.Matchers._
       asset.id shouldNot be(null)
     }
   }
+*/
 
   test("detect image media type (JPEG)") {
     val path = getClass.getResource("../files/incoming/images/1.jpg").getPath
