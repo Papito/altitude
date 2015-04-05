@@ -7,10 +7,9 @@ import altitude.util.log
 import altitude.{Const => C}
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
-import play.api.libs.json.JsValue
-import play.api.libs.json.Json
-import scala.concurrent.ExecutionContext.Implicits.global
+import play.api.libs.json.{JsValue, Json}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class FileSystemImportDao extends BaseDao {

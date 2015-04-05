@@ -2,7 +2,7 @@ package altitude.services
 
 import java.io.InputStream
 
-import altitude.dao.{TransactionId, FileSystemImportDao, Transaction}
+import altitude.dao.FileSystemImportDao
 import altitude.models.{Asset, FileImportAsset, MediaType}
 import altitude.util.log
 import org.apache.tika.detect.{DefaultDetector, Detector}
@@ -10,8 +10,8 @@ import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class FileImportService extends BaseService {
   protected val DAO = new FileSystemImportDao

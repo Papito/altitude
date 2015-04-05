@@ -1,6 +1,6 @@
 package altitude.services
 
-import altitude.dao.{TransactionId, JdbcTransaction}
+import altitude.dao.{JdbcTransaction, TransactionId}
 import altitude.util.log
 
 object JdbcTransactionManager {

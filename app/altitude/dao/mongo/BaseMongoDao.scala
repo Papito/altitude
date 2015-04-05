@@ -1,6 +1,6 @@
 package altitude.dao.mongo
 
-import altitude.dao.{TransactionId, MongoTransaction, BaseDao}
+import altitude.dao.{BaseDao, TransactionId}
 import altitude.util.log
 import altitude.{Const => C}
 import play.api.Play

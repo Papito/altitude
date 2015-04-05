@@ -1,9 +1,8 @@
 package integration.util.dao.postgres
 
-import altitude.dao.{Transaction, TransactionId}
+import altitude.dao.TransactionId
 import altitude.dao.postgres.BasePostgresDao
 import altitude.services.JdbcTransactionManager
-import altitude.util.log
 
 class UtilitiesDao extends BasePostgresDao("") with integration.util.dao.UtilitiesDao {
   override def dropDatabase() = Unit

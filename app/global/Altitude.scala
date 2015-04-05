@@ -1,7 +1,5 @@
 package global
 
-import java.sql.Connection
-
 import altitude.dao._
 import altitude.services._
 import altitude.util.log

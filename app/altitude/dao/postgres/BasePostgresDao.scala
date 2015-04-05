@@ -1,7 +1,9 @@
 package altitude.dao.postgres
 
 
-import altitude.dao.{TransactionId, JdbcTransaction, BaseDao}
+import java.sql.Connection
+
+import altitude.dao.{BaseDao, TransactionId}
 import altitude.services.JdbcTransactionManager
 import altitude.util.log
 import altitude.{Const => C}
@@ -11,7 +13,6 @@ import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import java.sql.Connection
 
 abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
 

@@ -1,7 +1,5 @@
 package altitude.dao
 
-import altitude.util.log
-
 trait Transaction {
   val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
   var _level: Int  = 0

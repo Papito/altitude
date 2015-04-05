@@ -1,6 +1,6 @@
 package integration.util.dao
 
-import altitude.dao.{TransactionId, BaseDao}
+import altitude.dao.{BaseDao, TransactionId}
 
 trait UtilitiesDao extends BaseDao {
   def dropDatabase(): Unit

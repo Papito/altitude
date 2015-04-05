@@ -5,8 +5,8 @@ import javax.sql.DataSource
 
 import altitude.util.log
 import play.api.Play
-import play.api.db.DB
 import play.api.Play.current
+import play.api.db.DB
 
 class JdbcTransaction extends Transaction {
   private val dsName = Play.current.configuration.getString("datasource").getOrElse("")
