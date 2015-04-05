@@ -1,5 +1,5 @@
 package altitude.dao
 
-class TransactionId {
-  var id = 0
+class TransactionId(val _id: Int = 0) {
+  var id: Int = _id
 }

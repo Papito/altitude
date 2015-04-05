@@ -1,7 +1,7 @@
 package integration
 
+import altitude.dao.TransactionId
 import altitude.{Const => C}
-import altitude.dao.{LibraryDao, postgres, mongo}
 import altitude.util.log
 import com.google.inject.{Guice, AbstractModule}
 import global.Altitude
@@ -10,13 +10,13 @@ import integration.util.dao.UtilitiesDao
 import net.codingwell.scalaguice.ScalaModule
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.{BeforeAndAfterEach, BeforeAndAfter, FunSuite}
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.test.FakeApplication
 import net.codingwell.scalaguice.InjectorExtensions._
 
 abstract class IntegrationTestCore extends FunSuite
-  with OneAppPerSuite with ScalaFutures with BeforeAndAfter {
+  with OneAppPerSuite with ScalaFutures with BeforeAndAfter with BeforeAndAfterEach {
   /* Stores test app config overrides, since we run same tests with different app setup.
    */
   val config: Map[String, _]
@@ -29,11 +29,19 @@ abstract class IntegrationTestCore extends FunSuite
   // async setup
   implicit val defaultPatience = PatienceConfig(timeout = Span(2, Seconds), interval = Span(5, Millis))
 
+  implicit val txId: TransactionId = new TransactionId
+
   before {
     dbUtilities.dropDatabase()
   }
 
-  after {
+  override def beforeEach() = {
+    dbUtilities.createTransaction(txId)
+  }
+
+  override def afterEach() {
+    dbUtilities.rollback()
+    dbUtilities.close()
   }
 
   class InjectionModule extends AbstractModule with ScalaModule  {

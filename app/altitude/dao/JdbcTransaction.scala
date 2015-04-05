@@ -35,7 +35,7 @@ class JdbcTransaction extends Transaction {
   }
 
   override def rollback() {
-    if (level == 0) {
+    if (level == 0 && !conn.isReadOnly) {
       log.debug(s"ROLLBACK for transaction $id")
       conn.rollback()
     }

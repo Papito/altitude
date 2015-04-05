@@ -4,7 +4,7 @@ import altitude.dao.{TransactionId, JdbcTransaction}
 import altitude.util.log
 
 object JdbcTransactionManager {
-  private val TRANSACTIONS = scala.collection.mutable.Map[Int, JdbcTransaction]()
+  val TRANSACTIONS = scala.collection.mutable.Map[Int, JdbcTransaction]()
 
   def transaction(implicit txId: TransactionId): JdbcTransaction = {
     if (TRANSACTIONS.contains(txId.id)) {
@@ -35,11 +35,14 @@ class JdbcTransactionManager extends AbstractTransactionManager {
       tx.down()
 
       // commit if this is not an existing transaction
-      if (!tx.isNested) tx.commit()
-      log.debug("TRANSACTION END: " + tx.id)
+      if (!tx.isNested) {
+        log.debug("TRANSACTION END: " + tx.id)
+        tx.commit()
+      }
 
       res
-    } finally {
+    }
+    finally {
       if (!tx.isNested) {
         tx.close()
         JdbcTransactionManager.TRANSACTIONS.remove(txId.id)
@@ -64,7 +67,8 @@ class JdbcTransactionManager extends AbstractTransactionManager {
       log.debug("READONLY TRANSACTION END: " + tx.id)
 
       res
-    } finally {
+    }
+    finally {
       if (!tx.isNested) {
         tx.close()
         JdbcTransactionManager.TRANSACTIONS.remove(txId.id)
