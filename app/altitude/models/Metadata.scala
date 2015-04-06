@@ -1,6 +1,7 @@
 package altitude.models
 
-import play.api.libs.json.{JsValue, Json}
+import altitude.exceptions.FormatException
+import play.api.libs.json.{JsResultException, JsValue, Json}
 
 import scala.collection.immutable.HashMap
 import scala.language.implicitConversions
@@ -10,9 +11,12 @@ object Metadata {
     "id" -> obj.id
   )
 
-  implicit def fromJson(json: JsValue): Metadata = new Metadata(
-    raw = new HashMap[String, String]()
-  )
+  implicit def fromJson(json: JsValue): Metadata = try {
+    new Metadata(
+      raw = new HashMap[String, String]()
+    )} catch {
+    case e: JsResultException => throw new FormatException(s"Cannot convert to Asset from $json")
+  }
 
 }
 
