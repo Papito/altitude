@@ -23,7 +23,7 @@ abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
     log.info("POSTGRES INSERT")
     val run: QueryRunner = new QueryRunner
 
-    val q: String = "INSERT INTO asset (id) VALUES(?)"
+    val q: String = s"INSERT INTO $tableName (id) VALUES(?)"
     run.update(conn, q, (json \ "id").as[String])
 
     Future[JsValue] {
