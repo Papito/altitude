@@ -2,7 +2,7 @@ package altitude.services
 
 import java.io.InputStream
 
-import altitude.dao.FileSystemImportDao
+import altitude.dao.{TransactionId, FileSystemImportDao}
 import altitude.models.{Asset, FileImportAsset, MediaType}
 import altitude.util.log
 import org.apache.tika.detect.{DefaultDetector, Detector}
@@ -53,12 +53,11 @@ class FileImportService extends BaseService {
     }
   }
 
-  def importAsset(fileAsset: FileImportAsset): Future[Asset]  = {
+  def importAsset(fileAsset: FileImportAsset)(implicit txId: TransactionId) : Future[Asset]  = {
     log.info("Importing file asset '$asset'", Map("asset" -> fileAsset))
     val mediaType = detectAssetType(fileAsset)
     val metadata = app.service.metadata.extract(fileAsset, mediaType)
     val asset = new Asset(mediaType = mediaType, metadata = metadata)
-
     val f = app.service.library.add(asset)
     f map {res => res}
   }

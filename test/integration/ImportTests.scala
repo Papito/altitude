@@ -2,6 +2,7 @@ package integration
 
 import java.io.File
 
+import altitude.dao.TransactionId
 import altitude.models.FileImportAsset
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
@@ -10,13 +11,13 @@ import org.scalatest.Matchers._
   test("import image (JPEG)") {
     val path = getClass.getResource("../files/incoming/images/1.jpg").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
+
     val asset = altitude.service.fileImport.importAsset(fileImportAsset)
     whenReady(asset) {asset =>
       println(asset)
       asset.id shouldNot be(null)
     }
   }
-
 
   test("import audio (MP3)") {
     val path = getClass.getResource("../files/incoming/audio/all.mp3").getPath
