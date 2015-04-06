@@ -1,6 +1,6 @@
 package integration
 
-import altitude.dao.TransactionId
+import altitude.dao.{Transaction, TransactionId}
 import altitude.util.log
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
@@ -41,6 +41,8 @@ abstract class IntegrationTestCore extends FunSuite
 
   override def afterEach() {
     dbUtilities.cleanup()
+    // should not have committed anything, else implicit transaction id is not being propagated somewhere
+    require(Transaction.COMMITTED == 0)
   }
 
   class InjectionModule extends AbstractModule with ScalaModule  {
