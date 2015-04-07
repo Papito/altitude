@@ -14,9 +14,9 @@ import play.api.libs.json.{JsValue, Json}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
+abstract class BasePostgresDao(protected val tableName: String) extends BaseDao {
 
-  private def conn(implicit txId: TransactionId): Connection =
+  protected def conn(implicit txId: TransactionId): Connection =
     JdbcTransactionManager.transaction.conn
 
   override def add(json: JsValue)(implicit txId: TransactionId): Future[JsValue] = {

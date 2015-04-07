@@ -14,15 +14,17 @@ import scala.concurrent.Future
     val path = getClass.getResource("../files/incoming/images/1.jpg").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
 
-    val importedAsset = altitude.service.fileImport.importAsset(fileImportAsset)
-    val futureAsset = altitude.service.library.getById(importedAsset.futureValue.id)
+    val importedAsset = altitude.service.fileImport.importAsset(fileImportAsset).futureValue
+    val asset = altitude.service.library.getById(importedAsset.id).futureValue: Asset
+    asset.mediaType should equal(importedAsset.mediaType)
   }
 
   test("import audio (MP3)") {
     val path = getClass.getResource("../files/incoming/audio/all.mp3").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
-    val importedAsset = altitude.service.fileImport.importAsset(fileImportAsset)
-    val futureAsset = altitude.service.library.getById(importedAsset.futureValue.id)
+    val importedAsset = altitude.service.fileImport.importAsset(fileImportAsset).futureValue
+    val asset = altitude.service.library.getById(importedAsset.id).futureValue: Asset
+    asset.mediaType should equal(importedAsset.mediaType)
   }
 
   test("detect image media type (JPEG)") {

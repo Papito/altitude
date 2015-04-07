@@ -15,6 +15,11 @@ object Const {
      val ID = "id"
    }
 
+  object Asset {
+    val MEDIA_TYPE = "mediaType"
+    val MEDIA_SUBTYPE = "mediaSubtype"
+  }
+
   object Db {
     val EMPTY: Int = Json.obj().hashCode()
 
