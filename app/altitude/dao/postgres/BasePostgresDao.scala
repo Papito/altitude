@@ -35,7 +35,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     log.debug(s"Getting by ID '$id'", C.tag.DB)
     val run: QueryRunner = new QueryRunner()
 
-    val q: String = "SELECT id FROM asset WHERE id = ?"
+    val q: String = s"SELECT id FROM $tableName WHERE id = ?"
     val res = run.query(conn, q, new MapListHandler(), id)
 
     log.debug(s"Found ${res.size()} records", C.tag.DB)

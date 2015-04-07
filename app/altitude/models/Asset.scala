@@ -13,7 +13,7 @@ object Asset {
       metadata = json \ "metadata"
     )
   } catch {
-    case e: JsResultException => throw new FormatException(s"Cannot convert to Asset from $json: ${e.getMessage}")
+    case e: JsResultException => throw new FormatException(s"Cannot convert to from $json: ${e.getMessage}")
   }
 }
 

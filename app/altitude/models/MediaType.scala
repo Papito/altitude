@@ -12,7 +12,7 @@ object MediaType {
       mediaSubtype = (json \ "subtype").as[String],
       mime = (json \ "mime").as[String])
   } catch {
-    case e: JsResultException => throw new FormatException(s"Cannot convert to Asset from $json: ${e.getMessage}")
+    case e: JsResultException => throw new FormatException(s"Cannot convert from $json: ${e.getMessage}")
   }
 }
 
