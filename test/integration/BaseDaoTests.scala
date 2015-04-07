@@ -15,19 +15,15 @@ trait BaseDaoTests extends IntegrationTestCore {
   val model = new TestModel
 
   test("add record") {
-    val f: Future[JsValue] = service.add(model)
+    val future = service.add(model)
+    val js: JsValue = future.futureValue
+    val id = (js \ "id").asOpt[String].getOrElse("")
+    id should equal(model.id)
 
-    whenReady(f) {json =>
-      val id = (json \ "id").asOpt[String].getOrElse("")
-      id should equal(model.id)
-
-      // retrieve the object
-      val f = service.getById(model.id)
-
-      whenReady(f) {json =>
-        val id = (json \ "id").asOpt[String].getOrElse("")
-        id should be(model.id)
-      }
-    }
+    // retrieve the object
+    val future2 = service.getById(model.id)
+    val js2: JsValue = future2.futureValue
+    val id2 = (js2 \ "id").asOpt[String].getOrElse("")
+    id2 should equal(model.id)
   }
 }

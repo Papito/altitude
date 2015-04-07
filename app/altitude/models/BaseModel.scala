@@ -9,9 +9,10 @@ object BaseModel {
   implicit def toJson(obj: Asset): JsValue = obj.toJson
 }
 
-abstract class BaseModel(objId: Option[String] = None, val isClean: Boolean = false) {
-  val id: String = objId.getOrElse( this.genId )
-  protected final def genId: String = BSONObjectID.generate.stringify
+abstract class BaseModel(objId: Option[String] = None) {
+  final val id: String = objId.getOrElse( this.genId )
+
+  private final def genId: String = BSONObjectID.generate.stringify
   def toJson: JsValue = Json.obj(
     "id" -> id
   )

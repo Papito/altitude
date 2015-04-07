@@ -12,11 +12,9 @@ class ModelTests extends FunSuite {
 
     val model = new TestModel
     model.id should not be None
-    model.isClean shouldEqual false
   }
 
   test("import asset model") {
     val model = new FileImportAsset(new File("/"))
-    model.isClean shouldEqual false
   }
 }
