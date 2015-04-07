@@ -7,6 +7,7 @@ import play.api.libs.json.JsValue
 
 import scala.concurrent.Future
 import scala.language.implicitConversions
+import altitude.{Const => C}
 
 class TestModel extends BaseModel
 
@@ -17,13 +18,13 @@ trait BaseDaoTests extends IntegrationTestCore {
   test("add record") {
     val future = service.add(model)
     val js: JsValue = future.futureValue
-    val id = (js \ "id").asOpt[String].getOrElse("")
+    val id = (js \ C.Base.ID).asOpt[String].getOrElse("")
     id should equal(model.id)
 
     // retrieve the object
     val future2 = service.getById(model.id)
     val js2: JsValue = future2.futureValue
-    val id2 = (js2 \ "id").asOpt[String].getOrElse("")
+    val id2 = (js2 \ C.Base.ID).asOpt[String].getOrElse("")
     id2 should equal(model.id)
   }
 }

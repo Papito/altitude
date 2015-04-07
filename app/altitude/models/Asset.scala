@@ -2,15 +2,16 @@ package altitude.models
 
 import altitude.exceptions.FormatException
 import play.api.libs.json.{JsResultException, JsValue, Json}
+import altitude.{Const => C}
 
 import scala.language.implicitConversions
 
 object Asset {
   implicit def fromJson(json: JsValue): Asset = try {
     new Asset(
-      id = (json \ "id").as[String],
-      mediaType = json \ "mediaType",
-      metadata = json \ "metadata"
+      id = (json \ C.Asset.ID).as[String],
+      mediaType = json \ C.Asset.MEDIA_TYPE,
+      metadata = json \ C.Asset.MEDIA_SUBTYPE
     )
   } catch {
     case e: JsResultException => throw new FormatException(s"Cannot convert to from $json: ${e.getMessage}")
@@ -21,8 +22,8 @@ case class Asset(override final val id: String = BaseModel.genId, mediaType: Med
   extends BaseModel(id) {
 
   override def toJson = Json.obj(
-    "id" -> id,
-    "mediaType" -> mediaType.toJson,
-    "metadata" -> metadata.toJson
+    C.Asset.ID -> id,
+    C.Asset.MEDIA_TYPE -> mediaType.toJson,
+    C.Asset.MEDIA_SUBTYPE -> metadata.toJson
   )
 }

@@ -33,10 +33,7 @@ class TikaMetadataService extends AbstractMetadataService {
     case mt: MediaType if mt.mediaType == "audio" =>
       extractMetadata(importAsset, PARSERS.SIMPLE_AUDIO)
     case _ => {
-      log.warn(
-        "No metadata extractor found for $asset of type '$mediaType'",
-        Map("asset" -> importAsset, "mediaType" -> mediaType.mediaType),
-        C.tag.SERVICE)
+      log.warn(s"No metadata extractor found for $importAsset of type '$mediaType'", C.tag.SERVICE)
       null
     }
   }

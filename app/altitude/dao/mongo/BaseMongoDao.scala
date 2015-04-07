@@ -38,7 +38,7 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
   override def getById(id: String)(implicit txId: TransactionId): Future[JsValue] = {
     log.debug(s"Getting by ID '$id'", C.tag.DB)
 
-    val query = Json.obj(C.Common.ID -> id)
+    val query = Json.obj(C.Base.ID -> id)
     val cursor: Cursor[JsObject] = collection.find(query).cursor[JsObject]
     val f: Future[List[JsObject]] = cursor.collect[List](upTo = 2)
 

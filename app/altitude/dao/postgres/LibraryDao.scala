@@ -9,6 +9,8 @@ import org.apache.commons.dbutils.handlers.MapListHandler
 import play.api.libs.json.{Json, JsValue}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import altitude.{Const => C}
+
 
 class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
 
@@ -18,7 +20,9 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
     val run: QueryRunner = new QueryRunner
 
     val q: String = s"""
-         INSERT INTO $tableName (id, media_type, media_subtype, mime) VALUES(?, ?, ?, ?)
+        INSERT INTO $tableName (
+             ${C.Asset.ID}, ${C.Asset.MEDIA_TYPE}, ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE})
+            VALUES(?, ?, ?, ?)
     """
 
     run.update(conn, q,
@@ -36,7 +40,12 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
     log.debug(s"Getting by ID '$id'", C.tag.DB)
     val run: QueryRunner = new QueryRunner()
 
-    val q: String = "SELECT id, media_type, media_subtype, mime FROM asset WHERE id = ?"
+    val q: String = s"""
+        SELECT ${C.Asset.ID}, ${C.Asset.MEDIA_TYPE}, ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE}
+          FROM $tableName
+         WHERE id = ?
+    """
+
     val res = run.query(conn, q, new MapListHandler(), id)
 
     log.debug(s"Found ${res.size()} records", C.tag.DB)
@@ -49,9 +58,9 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
     val rec = res.get(0)
 
     val mediaType = new MediaType(
-      mediaType = rec.get("media_type").toString,
-      mediaSubtype = rec.get("media_subtype").toString,
-      mime = rec.get("mime").toString
+      mediaType = rec.get(C.Asset.MEDIA_TYPE).toString,
+      mediaSubtype = rec.get(C.Asset.MEDIA_SUBTYPE).toString,
+      mime = rec.get(C.Asset.MIME_TYPE).toString
     )
 
     Future[JsValue] {

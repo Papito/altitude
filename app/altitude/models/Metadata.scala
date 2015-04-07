@@ -2,6 +2,7 @@ package altitude.models
 
 import altitude.exceptions.FormatException
 import play.api.libs.json.{JsResultException, JsValue, Json}
+import altitude.{Const => C}
 
 import scala.collection.immutable.HashMap
 import scala.language.implicitConversions
@@ -9,7 +10,7 @@ import scala.language.implicitConversions
 object Metadata {
   implicit def fromJson(json: JsValue): Metadata = try {
     new Metadata(
-      id = (json \ "id").as[String]
+      id = (json \ C.Metadata.ID).as[String]
     )} catch {
     case e: JsResultException => throw new FormatException(s"Cannot convert from $json: ${e.getMessage}")
   }
@@ -20,6 +21,6 @@ case class Metadata(
   private val raw: Map[String, String] = new HashMap[String, String]())
   extends BaseModel(id) {
   override def toJson = Json.obj(
-    "id" -> id
+    C.Metadata.ID -> id
   )
 }

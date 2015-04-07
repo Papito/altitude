@@ -11,14 +11,18 @@ object Const {
      val DB = "DB"
    }
 
-   object Common {
+   trait Common {
      val ID = "id"
    }
+  object Base extends Common
 
-  object Asset {
-    val MEDIA_TYPE = "mediaType"
-    val MEDIA_SUBTYPE = "mediaSubtype"
+  object Asset extends Common {
+    val MEDIA_TYPE = "media_type"
+    val MEDIA_SUBTYPE = "media_subtype"
+    val MIME_TYPE = "mime_type"
   }
+
+  object Metadata extends Common
 
   object Db {
     val EMPTY: Int = Json.obj().hashCode()

@@ -23,8 +23,8 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     log.info(s"POSTGRES INSERT: $json", C.tag.DB)
     val run: QueryRunner = new QueryRunner
 
-    val q: String = s"INSERT INTO $tableName (id) VALUES(?)"
-    run.update(conn, q, (json \ "id").as[String])
+    val q: String = s"INSERT INTO $tableName (${C.Base.ID}) VALUES(?)"
+    run.update(conn, q, (json \ C.Base.ID).as[String])
 
     Future[JsValue] {
       json
@@ -35,7 +35,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     log.debug(s"Getting by ID '$id'", C.tag.DB)
     val run: QueryRunner = new QueryRunner()
 
-    val q: String = s"SELECT id FROM $tableName WHERE id = ?"
+    val q: String = s"SELECT ${C.Base.ID} FROM $tableName WHERE ${C.Base.ID} = ?"
     val res = run.query(conn, q, new MapListHandler(), id)
 
     log.debug(s"Found ${res.size()} records", C.tag.DB)
@@ -48,7 +48,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     val rec = res.get(0)
     Future[JsValue] {
       Json.obj(
-        C.Common.ID -> rec.get("id").toString
+        C.Base.ID -> rec.get(C.Base.ID).toString
       )
     }
   }
