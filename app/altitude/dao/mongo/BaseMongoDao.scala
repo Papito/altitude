@@ -30,20 +30,20 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
   protected def collection = BaseMongoDao.db.collection[JSONCollection](collectionName)
 
   override def add(json: JsValue)(implicit txId: TransactionId): Future[JsValue] = {
-    log.debug("Starting database INSERT for: $o", Map("o" -> json))
+    log.debug(s"Starting database INSERT for: $json", C.tag.DB)
     val f: Future[LastError] = collection.insert(json)
     f map {res => if (res.ok) json else throw res.getCause}
   }
 
   override def getById(id: String)(implicit txId: TransactionId): Future[JsValue] = {
-    log.debug("Getting by ID '$id'", Map(C.Common.ID -> id))
+    log.debug(s"Getting by ID '$id'", C.tag.DB)
 
     val query = Json.obj(C.Common.ID -> id)
     val cursor: Cursor[JsObject] = collection.find(query).cursor[JsObject]
     val f: Future[List[JsObject]] = cursor.collect[List](upTo = 2)
 
     f map { results =>
-      log.debug(s"Found ${results.length} records")
+      log.debug(s"Found ${results.length} records", C.tag.DB)
       if (results.length > 1) throw new Exception("getById should return only a single result")
       results.head
     }

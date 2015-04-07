@@ -52,7 +52,6 @@ class TikaMetadataService extends AbstractMetadataService {
     try {
       val url: java.net.URL = importAsset.file.toURI.toURL
       val metadata: TikaMetadata = new TikaMetadata
-      //log.debug("Opening stream for '$asset'", Map("asset" -> importAsset))
       inputStream = TikaInputStream.get(url, metadata)
 
       parser.parse(inputStream, TIKA_HANDLER, metadata, null)
@@ -65,7 +64,6 @@ class TikaMetadataService extends AbstractMetadataService {
       new Metadata(raw = data)
     }
     finally {
-      //log.debug("Closing stream for '$asset'", Map("asset" -> importAsset))
       if (inputStream != null)
         inputStream.close()
     }

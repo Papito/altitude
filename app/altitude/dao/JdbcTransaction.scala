@@ -7,6 +7,7 @@ import altitude.util.log
 import play.api.Play
 import play.api.Play.current
 import play.api.db.DB
+import altitude.{Const => C}
 
 class JdbcTransaction extends Transaction {
   Transaction.CREATED += 1
@@ -15,12 +16,12 @@ class JdbcTransaction extends Transaction {
   private val ds: DataSource = DB.getDataSource(dsName)
   val conn: Connection = ds.getConnection
 
-  log.debug(s"New JDBC transaction $id")
+  log.debug(s"New JDBC transaction $id", C.tag.DB)
   def getConnection: Connection = conn
 
   override def close() = {
     if (level == 0) {
-      log.debug(s"Closing connection for transaction $id")
+      log.debug(s"Closing connection for transaction $id", C.tag.DB)
       Transaction.CLOSED += 1
       conn.close()
     }
@@ -28,7 +29,7 @@ class JdbcTransaction extends Transaction {
 
   override def commit() {
     if (level == 0) {
-      log.debug(s"Committing transaction $id")
+      log.debug(s"Committing transaction $id", C.tag.DB)
       Transaction.COMMITTED += 1
       conn.commit()
     }
@@ -36,7 +37,7 @@ class JdbcTransaction extends Transaction {
 
   override def rollback() {
     if (level == 0 && !conn.isReadOnly) {
-      log.debug(s"ROLLBACK for transaction $id")
+      log.warn(s"ROLLBACK for transaction $id", C.tag.DB)
       Transaction.ROLLED_BACK += 1
       conn.rollback()
     }

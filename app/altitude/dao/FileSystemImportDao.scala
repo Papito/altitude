@@ -17,7 +17,7 @@ class FileSystemImportDao extends BaseDao {
 
   def iterateAssets(path: String): Iterator[FileImportAsset] = {
     require(path != null)
-    log.info("Importing from 'importPath'", Map("importPath" -> path), C.tag.DB)
+    log.info(s"Importing from '$path'", C.tag.DB)
 
     val files = FileUtils.iterateFiles(new File(path), ANY_FILE_FILTER, ANY_FILE_FILTER)
 
@@ -27,7 +27,7 @@ class FileSystemImportDao extends BaseDao {
 
         def next() = {
           val file: File = new File(files.next().toString)
-          //log.info("Found file '$file'", Map("file" -> file), C.tag.DB)
+          //log.info(s"Found file '$file'", C.tag.DB)
           new FileImportAsset(file)
         }
       }

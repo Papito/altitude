@@ -2,6 +2,7 @@ package altitude.services
 
 import altitude.dao.{JdbcTransaction, TransactionId}
 import altitude.util.log
+import altitude.{Const => C}
 
 object JdbcTransactionManager {
   val TRANSACTIONS = scala.collection.mutable.Map[Int, JdbcTransaction]()
@@ -35,7 +36,7 @@ class JdbcTransactionManager extends AbstractTransactionManager {
 
       // commit if this is not an existing transaction
       if (!tx.isNested) {
-        log.debug("TRANSACTION END: " + tx.id)
+        log.debug(s"TRANSACTION END: ${tx.id}", C.tag.DB)
         tx.commit()
       }
 

@@ -55,7 +55,7 @@ class Altitude(val playApp: Application) {
   class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
       val dataSourceType = playApp.configuration.getString("datasource").getOrElse("")
-      log.info("Datasource type: $source", Map("source" -> dataSourceType), C.tag.APP)
+      log.info(s"Datasource type: $dataSourceType", C.tag.APP)
       dataSourceType match {
         case "mongo" =>
           bind[AbstractTransactionManager].toInstance(new altitude.services.VoidTransactionManager)

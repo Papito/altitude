@@ -20,7 +20,7 @@ abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
     JdbcTransactionManager.transaction.conn
 
   override def add(json: JsValue)(implicit txId: TransactionId): Future[JsValue] = {
-    log.info(s"POSTGRES INSERT: ${json}")
+    log.info(s"POSTGRES INSERT: $json", C.tag.DB)
     val run: QueryRunner = new QueryRunner
 
     val q: String = s"INSERT INTO $tableName (id) VALUES(?)"
@@ -32,15 +32,14 @@ abstract class BasePostgresDao(private val tableName: String) extends BaseDao {
   }
 
   override def getById(id: String)(implicit txId: TransactionId): Future[JsValue] = {
-    log.debug("Getting by ID '$id'", Map(C.Common.ID -> id))
+    log.debug(s"Getting by ID '$id'", C.tag.DB)
     val run: QueryRunner = new QueryRunner()
 
     val q: String = "SELECT id FROM asset WHERE id = ?"
     val res = run.query(conn, q, new MapListHandler(), id)
 
-    log.debug(s"Found ${res.size()} records")
+    log.debug(s"Found ${res.size()} records", C.tag.DB)
     if (res.size() == 0)
-      //FIXME: Option?
       return Future[JsValue](Json.obj())
 
     if (res.size() > 1)
