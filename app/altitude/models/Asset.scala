@@ -8,6 +8,7 @@ import scala.language.implicitConversions
 object Asset {
   implicit def fromJson(json: JsValue): Asset = try {
     new Asset(
+      objId = (json \ "id").asOpt[String],
       mediaType = json \ "mediaType",
       metadata = json \ "metadata"
     )
@@ -16,7 +17,8 @@ object Asset {
   }
 }
 
-case class Asset(mediaType: MediaType, metadata: Metadata) extends BaseModel {
+case class Asset(objId: Option[String] = None, mediaType: MediaType, metadata: Metadata) extends BaseModel(objId) {
+
   override def toJson = Json.obj(
     "id" -> id,
     "mediaType" -> mediaType.toJson,

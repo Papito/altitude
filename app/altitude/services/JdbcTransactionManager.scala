@@ -20,7 +20,6 @@ object JdbcTransactionManager {
 class JdbcTransactionManager extends AbstractTransactionManager {
 
   def withTransaction[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
-    log.debug("TRANSACTION START")
 
     val tx = JdbcTransactionManager.transaction
 
@@ -51,8 +50,6 @@ class JdbcTransactionManager extends AbstractTransactionManager {
   }
 
   def asReadOnly[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
-    log.debug("READONLY TRANSACTION START")
-
     val tx = JdbcTransactionManager.transaction
 
     try {
@@ -63,8 +60,6 @@ class JdbcTransactionManager extends AbstractTransactionManager {
       tx.up()
       val res: A = f
       tx.down()
-
-      log.debug("READONLY TRANSACTION END: " + tx.id)
 
       res
     }

@@ -62,7 +62,7 @@ class TikaMetadataService extends AbstractMetadataService {
         (col, key) => col + (key -> metadata.get(key))
       )
 
-      new Metadata(data)
+      new Metadata(raw = data)
     }
     finally {
       //log.debug("Closing stream for '$asset'", Map("asset" -> importAsset))

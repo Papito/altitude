@@ -42,12 +42,10 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
     val cursor: Cursor[JsObject] = collection.find(query).cursor[JsObject]
     val f: Future[List[JsObject]] = cursor.collect[List](upTo = 2)
 
-    f map {results =>
-      if (results.length == 1) {
-       results.head
-      }
-      else {
-        throw new Exception("getById should return only a single result")}
-      }
+    f map { results =>
+      log.debug(s"Found ${results.length} records")
+      if (results.length > 1) throw new Exception("getById should return only a single result")
+      results.head
+    }
   }
 }

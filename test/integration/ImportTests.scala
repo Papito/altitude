@@ -3,9 +3,11 @@ package integration
 import java.io.File
 
 import altitude.dao.TransactionId
-import altitude.models.FileImportAsset
+import altitude.models.{Asset, FileImportAsset}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
+
+import scala.concurrent.Future
 
 @DoNotDiscover class ImportTests(val config: Map[String, _]) extends IntegrationTestCore {
   test("import image (JPEG)") {
@@ -22,10 +24,13 @@ import org.scalatest.Matchers._
   test("import audio (MP3)") {
     val path = getClass.getResource("../files/incoming/audio/all.mp3").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
-    altitude.service.fileImport.importAsset(fileImportAsset)
+    val importedAsset = altitude.service.fileImport.importAsset(fileImportAsset)
+    println(importedAsset.futureValue.id)
+    val futureAsset = altitude.service.library.getById(importedAsset.futureValue.id)
+    println(futureAsset.futureValue)
   }
 
-  test("detect image media tynpe (JPEG)") {
+  test("detect image media type (JPEG)") {
     val path = getClass.getResource("../files/incoming/images/1.jpg").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
     val assetType = altitude.service.fileImport.detectAssetType(fileImportAsset)

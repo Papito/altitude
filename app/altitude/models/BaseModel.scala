@@ -10,7 +10,7 @@ object BaseModel {
 }
 
 abstract class BaseModel(objId: Option[String] = None) {
-  final val id: String = objId.getOrElse( this.genId )
+  final val id: String = objId.getOrElse(genId)
 
   private final def genId: String = BSONObjectID.generate.stringify
   def toJson: JsValue = Json.obj(
