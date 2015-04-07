@@ -25,7 +25,7 @@ class TikaMetadataService extends AbstractMetadataService {
 
   final private val TIKA_HANDLER = new DefaultHandler
 
-  override def extract(importAsset: FileImportAsset, mediaType: MediaType): Metadata = mediaType match {
+  override def extract(importAsset: FileImportAsset, mediaType: MediaType): Option[Metadata] = mediaType match {
     case mt: MediaType if mt.mediaType == "image" =>
       extractMetadata(importAsset, PARSERS.IMAGE)
     case mt: MediaType if mt.mediaType == "audio" && mt.mediaSubtype == "mpeg" =>
@@ -34,11 +34,11 @@ class TikaMetadataService extends AbstractMetadataService {
       extractMetadata(importAsset, PARSERS.SIMPLE_AUDIO)
     case _ => {
       log.warn(s"No metadata extractor found for $importAsset of type '$mediaType'", C.tag.SERVICE)
-      null
+      None
     }
   }
 
-  private def extractMetadata(importAsset: FileImportAsset, parser: AbstractParser): Metadata = {
+  private def extractMetadata(importAsset: FileImportAsset, parser: AbstractParser): Option[Metadata] = {
     log.info(
       "Extracting metadata for '$asset' with $parserType",
       Map("asset" -> importAsset, "parserType" -> parser.getClass.getSimpleName),
@@ -58,7 +58,7 @@ class TikaMetadataService extends AbstractMetadataService {
         (col, key) => col + (key -> metadata.get(key))
       )
 
-      new Metadata(raw = data)
+      Some(new Metadata(raw = data))
     }
     finally {
       if (inputStream != null)

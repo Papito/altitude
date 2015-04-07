@@ -11,19 +11,19 @@ object Asset {
     new Asset(
       id = (json \ C.Asset.ID).as[String],
       mediaType = json \ C.Asset.MEDIA_TYPE,
-      metadata = json \ C.Asset.MEDIA_SUBTYPE
+      metadata = Some(json \ C.Asset.MEDIA_SUBTYPE)
     )
   } catch {
     case e: JsResultException => throw new FormatException(s"Cannot convert to from $json: ${e.getMessage}")
   }
 }
 
-case class Asset(override final val id: String = BaseModel.genId, mediaType: MediaType, metadata: Metadata)
-  extends BaseModel(id) {
+case class Asset(override final val id: String = BaseModel.genId,
+  mediaType: MediaType, metadata: Option[Metadata] = Some(new Metadata())) extends BaseModel(id) {
 
   override def toJson = Json.obj(
     C.Asset.ID -> id,
     C.Asset.MEDIA_TYPE -> mediaType.toJson,
-    C.Asset.MEDIA_SUBTYPE -> metadata.toJson
+    C.Asset.MEDIA_SUBTYPE -> metadata.get.toJson
   )
 }

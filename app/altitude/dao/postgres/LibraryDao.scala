@@ -64,7 +64,7 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
     )
 
     Future[JsValue] {
-      val asset = new Asset(mediaType = mediaType, metadata = new Metadata())
+      val asset = new Asset(mediaType = mediaType, metadata = Some(new Metadata()))
       asset.toJson
     }
   }
