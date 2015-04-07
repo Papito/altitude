@@ -36,6 +36,7 @@ abstract class IntegrationTestCore extends FunSuite
   }
 
   override def beforeEach() = {
+    println("\n")
     dbUtilities.createTransaction(txId)
   }
 

@@ -12,7 +12,7 @@ import org.scalatest.Suites
 private class MongoBaseDaoTests(val config: Map[String, _])
   extends BaseDaoTests {
 
-  class TestMongoDao extends BaseMongoDao("test")
+  class TestMongoDao extends BaseMongoDao("asset")
 
   class TestMongoService extends BaseService[TestModel] {
     override protected val DAO = new TestMongoDao
@@ -24,7 +24,7 @@ private class MongoBaseDaoTests(val config: Map[String, _])
 private class PostgresBaseDaoTests(val config: Map[String, _])
   extends BaseDaoTests {
 
-  class TestPostgresDao extends BasePostgresDao("test")
+  class TestPostgresDao extends BasePostgresDao("asset")
 
   class TestPostgresService extends BaseService[TestModel] {
     override protected val DAO = new TestPostgresDao
