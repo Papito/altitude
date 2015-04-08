@@ -1,12 +1,12 @@
 package altitude.dao.postgres
 
-import altitude.models.{Metadata, MediaType, Asset}
+import altitude.models.{MediaType, Asset}
 import altitude.{Const => C}
 import altitude.dao.TransactionId
 import altitude.util.log
 import org.apache.commons.dbutils.QueryRunner
 import org.apache.commons.dbutils.handlers.MapListHandler
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json.{JsValue, Json}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import altitude.{Const => C}
@@ -70,7 +70,7 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
       val asset = new Asset(
         path = rec.get(C.Asset.PATH).toString,
         mediaType = mediaType,
-        metadata = Some(new Metadata()))
+        metadata = Json.obj())
       asset.toJson
     }
   }

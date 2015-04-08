@@ -2,7 +2,7 @@ package altitude.services
 
 import java.io.InputStream
 
-import altitude.models.{FileImportAsset, MediaType, Metadata}
+import altitude.models.{FileImportAsset, MediaType}
 import altitude.util.log
 import altitude.{Const => C}
 import org.apache.tika.io.TikaInputStream
@@ -12,6 +12,7 @@ import org.apache.tika.parser.audio.AudioParser
 import org.apache.tika.parser.image.ImageParser
 import org.apache.tika.parser.mp3.Mp3Parser
 import org.xml.sax.helpers.DefaultHandler
+import play.api.libs.json.{Json, JsNull, JsValue}
 
 import scala.collection.immutable.HashMap
 
@@ -25,7 +26,7 @@ class TikaMetadataService extends AbstractMetadataService {
 
   final private val TIKA_HANDLER = new DefaultHandler
 
-  override def extract(importAsset: FileImportAsset, mediaType: MediaType): Option[Metadata] = mediaType match {
+  override def extract(importAsset: FileImportAsset, mediaType: MediaType): JsValue = mediaType match {
     case mt: MediaType if mt.mediaType == "image" =>
       extractMetadata(importAsset, PARSERS.IMAGE)
     case mt: MediaType if mt.mediaType == "audio" && mt.mediaSubtype == "mpeg" =>
@@ -34,11 +35,11 @@ class TikaMetadataService extends AbstractMetadataService {
       extractMetadata(importAsset, PARSERS.SIMPLE_AUDIO)
     case _ => {
       log.warn(s"No metadata extractor found for $importAsset of type '$mediaType'", C.tag.SERVICE)
-      None
+      JsNull
     }
   }
 
-  private def extractMetadata(importAsset: FileImportAsset, parser: AbstractParser): Option[Metadata] = {
+  private def extractMetadata(importAsset: FileImportAsset, parser: AbstractParser): JsValue = {
     log.info(
       "Extracting metadata for '$asset' with $parserType",
       Map("asset" -> importAsset, "parserType" -> parser.getClass.getSimpleName),
@@ -58,7 +59,7 @@ class TikaMetadataService extends AbstractMetadataService {
         (col, key) => col + (key -> metadata.get(key))
       )
 
-      Some(new Metadata(raw = data))
+      Json.obj()
     }
     finally {
       if (inputStream != null)

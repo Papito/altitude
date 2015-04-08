@@ -3,12 +3,13 @@ package altitude.services
 import java.io.InputStream
 
 import altitude.dao.{TransactionId, FileSystemImportDao}
-import altitude.models.{Metadata, Asset, FileImportAsset, MediaType}
+import altitude.models.{Asset, FileImportAsset, MediaType}
 import altitude.util.log
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
+import play.api.libs.json.JsValue
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -55,7 +56,7 @@ class FileImportService extends BaseService {
   def importAsset(fileAsset: FileImportAsset)(implicit txId: TransactionId = new TransactionId) : Future[Asset]  = {
     log.info(s"Importing file asset '$fileAsset'", C.tag.SERVICE)
     val mediaType = detectAssetType(fileAsset)
-    val metadata: Option[Metadata] = app.service.metadata.extract(fileAsset, mediaType)
+    val metadata: JsValue = app.service.metadata.extract(fileAsset, mediaType)
     val asset = new Asset(path = fileAsset.absolutePath, mediaType = mediaType, metadata = metadata)
     log.debug(s"New asset: $asset", C.tag.SERVICE)
     val f = app.service.library.add(asset)

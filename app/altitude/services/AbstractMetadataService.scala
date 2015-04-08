@@ -1,7 +1,8 @@
 package altitude.services
 
-import altitude.models.{FileImportAsset, MediaType, Metadata}
+import altitude.models.{FileImportAsset, MediaType}
+import play.api.libs.json.JsValue
 
 abstract class AbstractMetadataService {
-  def extract(importAsset: FileImportAsset, mediaType: MediaType): Option[Metadata]
+  def extract(importAsset: FileImportAsset, mediaType: MediaType): JsValue
 }
