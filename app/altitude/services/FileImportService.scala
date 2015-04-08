@@ -56,7 +56,7 @@ class FileImportService extends BaseService {
     log.info(s"Importing file asset '$fileAsset'", C.tag.SERVICE)
     val mediaType = detectAssetType(fileAsset)
     val metadata: Option[Metadata] = app.service.metadata.extract(fileAsset, mediaType)
-    val asset = new Asset(mediaType = mediaType, metadata = metadata)
+    val asset = new Asset(path = fileAsset.absolutePath, mediaType = mediaType, metadata = metadata)
     log.debug(s"New asset: $asset", C.tag.SERVICE)
     val f = app.service.library.add(asset)
     f map {res =>

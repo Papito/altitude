@@ -21,12 +21,14 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
 
     val q: String = s"""
         INSERT INTO $tableName (
-             ${C.Asset.ID}, ${C.Asset.MEDIA_TYPE}, ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE})
-            VALUES(?, ?, ?, ?)
+             ${C.Asset.ID}, ${C.Asset.PATH}, ${C.Asset.MEDIA_TYPE},
+             ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE})
+            VALUES(?, ?, ?, ?, ?)
     """
 
     run.update(conn, q,
       asset.id,
+      asset.path,
       asset.mediaType.mediaType,
       asset.mediaType.mediaSubtype,
       asset.mediaType.mime)
@@ -41,7 +43,8 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
     val run: QueryRunner = new QueryRunner()
 
     val q: String = s"""
-        SELECT ${C.Asset.ID}, ${C.Asset.MEDIA_TYPE}, ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE}
+        SELECT ${C.Asset.ID}, ${C.Asset.PATH}, ${C.Asset.MEDIA_TYPE},
+               ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE}
           FROM $tableName
          WHERE id = ?
     """
@@ -64,7 +67,10 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
     )
 
     Future[JsValue] {
-      val asset = new Asset(mediaType = mediaType, metadata = Some(new Metadata()))
+      val asset = new Asset(
+        path = rec.get(C.Asset.PATH).toString,
+        mediaType = mediaType,
+        metadata = Some(new Metadata()))
       asset.toJson
     }
   }
