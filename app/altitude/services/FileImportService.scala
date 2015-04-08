@@ -52,7 +52,7 @@ class FileImportService extends BaseService {
     }
   }
 
-  def importAsset(fileAsset: FileImportAsset)(implicit txId: TransactionId) : Future[Asset]  = {
+  def importAsset(fileAsset: FileImportAsset)(implicit txId: TransactionId = new TransactionId) : Future[Asset]  = {
     log.info(s"Importing file asset '$fileAsset'", C.tag.SERVICE)
     val mediaType = detectAssetType(fileAsset)
     val metadata: Option[Metadata] = app.service.metadata.extract(fileAsset, mediaType)
