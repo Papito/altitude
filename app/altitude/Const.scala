@@ -25,9 +25,4 @@ object Const {
   }
 
   object Metadata extends Common
-
-  object Db {
-    val EMPTY: Int = Json.obj().hashCode()
-
-  }
  }
