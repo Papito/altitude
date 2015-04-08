@@ -1,20 +1,15 @@
 package altitude.models
 
-import altitude.exceptions.FormatException
-import play.api.libs.json.{JsResultException, JsValue, Json}
+import play.api.libs.json.{JsValue, Json}
 import altitude.{Const => C}
 
 import scala.language.implicitConversions
 
 object MediaType {
-  implicit def fromJson(json: JsValue): MediaType = try {
-    new MediaType(
+  implicit def fromJson(json: JsValue): MediaType = new MediaType(
       mediaType = (json \ C.Asset.MEDIA_TYPE).as[String],
       mediaSubtype = (json \ C.Asset.MEDIA_SUBTYPE).as[String],
       mime = (json \ C.Asset.MIME_TYPE).as[String])
-  } catch {
-    case e: JsResultException => throw new FormatException(s"Cannot convert from $json: ${e.getMessage}")
-  }
 }
 
 case class MediaType(mediaType: String, mediaSubtype: String, mime: String) extends BaseModel {
