@@ -15,8 +15,6 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import net.codingwell.scalaguice.InjectorExtensions._
 
-import scala.concurrent.Future
-
 object ImportController extends Controller {
   implicit val formats = DefaultFormats
 
@@ -39,9 +37,8 @@ object ImportController extends Controller {
     def receive = {
       case "next" => out ! (if (assetsIt.hasNext) {
         val importAsset: FileImportAsset = assetsIt.next()
-
-        val asset: Future[Asset] = app.service.fileImport.importAsset(importAsset)
-        write("asset" -> importAsset.toJson)
+        val assetF = app.service.fileImport.importAsset(importAsset)
+        write("asset" -> assetF.map{asset => asset})
       } else "")
       case "total" => out ! write("total" -> assets.size)
     }
