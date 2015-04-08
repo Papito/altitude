@@ -1,6 +1,8 @@
 package controllers.api
 
 import akka.actor.{Actor, ActorRef, Props}
+import altitude.models.{FileImportAsset, Asset}
+import altitude.services.AbstractTransactionManager
 import altitude.util.log
 import altitude.{Const => C}
 import global.Altitude
@@ -8,8 +10,12 @@ import org.json4s.DefaultFormats
 import org.json4s.native.Serialization._
 import play.api.Play
 import play.api.Play.current
-import play.api.libs.json.JsValue
 import play.api.mvc._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+
+import net.codingwell.scalaguice.InjectorExtensions._
+
+import scala.concurrent.Future
 
 object ImportController extends Controller {
   implicit val formats = DefaultFormats
@@ -24,12 +30,19 @@ object ImportController extends Controller {
   }
 
   private class ImportWebSocketActor(out: ActorRef) extends Actor {
+    lazy val app: Altitude = Altitude.getInstance()
+    val txManager = app.injector.instance[AbstractTransactionManager]
     val importPath = Play.current.configuration.getString("import.path").getOrElse("")
-    val assets = Altitude.getInstance().service.fileImport.getFilesToImport(path=importPath).toList
+    val assets = app.service.fileImport.getFilesToImport(path=importPath).toList
     val assetsIt = assets.toIterator
 
     def receive = {
-      case "next" => out ! (if (assetsIt.hasNext) write("asset" -> (assetsIt.next(): JsValue)) else "")
+      case "next" => out ! (if (assetsIt.hasNext) {
+        val importAsset: FileImportAsset = assetsIt.next()
+
+        val asset: Future[Asset] = app.service.fileImport.importAsset(importAsset)
+        write("asset" -> importAsset.toJson)
+      } else "")
       case "total" => out ! write("total" -> assets.size)
     }
 

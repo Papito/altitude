@@ -16,7 +16,7 @@ class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres")) w
     val tx = new JdbcTransaction
     try {
       val stmt = tx.conn.createStatement()
-      stmt.executeUpdate("DROP SCHEMA PUBLIC CASCADE; CREATE SCHEMA PUBLIC")
+      stmt.executeUpdate("DROP SCHEMA PUBLIC CASCADE; CREATE SCHEMA PUBLIC;")
     } finally {
       tx.close()
       play.api.Play.stop()

@@ -23,23 +23,23 @@ object Altitude {
   (parallel test suites). Ideally, but this probably won't work until
   version 3, where global state will be removed.
   */
-  val instances = mutable.HashMap.empty[Int, Altitude]
+  final val INSTANCES = mutable.HashMap.empty[Int, Altitude]
 
   // listen to Play! app init and register our own app instance with it
   def register(playApp: Application): Unit = {
     val id: Int = playApp.hashCode()
     val app: Altitude = new Altitude(playApp)
-    instances += (id -> app)
+    INSTANCES += (id -> app)
   }
 
   def deregister(playApp: Application): Unit = {
     val id: Int = playApp.hashCode()
-    instances.remove(playApp.hashCode())
+    INSTANCES.remove(playApp.hashCode())
   }
 
   def getInstance(playApp: Application = Play.current): Altitude = {
     val id: Int = playApp.hashCode()
-    val appInstance: Option[Altitude] = instances.get(id)
+    val appInstance: Option[Altitude] = INSTANCES.get(id)
     require(appInstance != None)
     appInstance.get
   }

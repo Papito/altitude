@@ -21,6 +21,7 @@ object Const {
     val PATH = "path"
     val MEDIA_SUBTYPE = "media_subtype"
     val MIME_TYPE = "mime_type"
+    val METADATA = "metadata"
   }
 
   object Metadata extends Common

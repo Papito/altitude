@@ -53,20 +53,21 @@ ImportViewModel = BaseViewModel.extend({
         };
 
         this.socket.onmessage = function (e) {
+            console.log(e);
             if (!e.data) {
                 self.cancelImportAssets();
                 return;
             }
 
             var jsonData = JSON.parse(e.data);
-            //console.log('ws > ' + e.data);
+            console.log('ws > ' + e.data);
             self.responseHandler(jsonData);
 
         };
     },
 
     sendCommand: function(cmd, handler) {
-        //console.log('ws < ' + cmd);
+        console.log('ws < ' + cmd);
         this.responseHandler = handler;
         this.socket.send(cmd);
     },
