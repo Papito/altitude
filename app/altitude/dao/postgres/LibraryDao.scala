@@ -19,11 +19,14 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
     log.info(s"POSTGRES ASSET INSERT: $asset", C.tag.DB)
     val run: QueryRunner = new QueryRunner
 
+    // Postgres will reject this sequence
+    val metadata: String = asset.metadata.toString().replaceAll("\\\\u0000", "")
+
     val q: String = s"""
         INSERT INTO $tableName (
              ${C.Asset.ID}, ${C.Asset.PATH}, ${C.Asset.MEDIA_TYPE},
-             ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE})
-            VALUES(?, ?, ?, ?, ?)
+             ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE}, ${C.Asset.METADATA})
+            VALUES(?, ?, ?, ?, ?, CAST(? AS jsonb))
     """
 
     run.update(conn, q,
@@ -31,7 +34,8 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
       asset.path,
       asset.mediaType.mediaType,
       asset.mediaType.mediaSubtype,
-      asset.mediaType.mime)
+      asset.mediaType.mime,
+      metadata)
 
     Future[JsValue] {
       json
@@ -44,7 +48,7 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
 
     val q: String = s"""
         SELECT ${C.Asset.ID}, ${C.Asset.PATH}, ${C.Asset.MEDIA_TYPE},
-               ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE}
+               ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE}, ${C.Asset.METADATA}
           FROM $tableName
          WHERE id = ?
     """
@@ -67,11 +71,9 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
     )
 
     Future[JsValue] {
-      val asset = new Asset(
-        path = rec.get(C.Asset.PATH).toString,
-        mediaType = mediaType,
-        metadata = Json.obj())
-      asset.toJson
+      Asset(path = rec.get(C.Asset.PATH).toString,
+            mediaType = mediaType,
+            metadata = Json.parse(rec.get(C.Asset.METADATA).toString))
     }
   }
 }

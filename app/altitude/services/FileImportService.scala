@@ -39,7 +39,7 @@ class FileImportService extends BaseService {
       val detector: Detector = new DefaultDetector
       val tikaMediaType: TikaMediaType = detector.detect(inputStream, metadata)
 
-      val assetMediaType = new MediaType(
+      val assetMediaType = MediaType(
         mediaType = tikaMediaType.getType,
         mediaSubtype = tikaMediaType.getSubtype,
         mime = tikaMediaType.getBaseType.toString)
@@ -57,7 +57,7 @@ class FileImportService extends BaseService {
     log.info(s"Importing file asset '$fileAsset'", C.tag.SERVICE)
     val mediaType = detectAssetType(fileAsset)
     val metadata: JsValue = app.service.metadata.extract(fileAsset, mediaType)
-    val asset = new Asset(path = fileAsset.absolutePath, mediaType = mediaType, metadata = metadata)
+    val asset = Asset(path = fileAsset.absolutePath, mediaType = mediaType, metadata = metadata)
     log.debug(s"New asset: $asset", C.tag.SERVICE)
     val f = app.service.library.add(asset)
     f map {res =>
