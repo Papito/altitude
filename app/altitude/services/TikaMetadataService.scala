@@ -1,6 +1,6 @@
 package altitude.services
 
-import java.io.InputStream
+import java.io.{StringWriter, InputStream}
 
 import altitude.models.{FileImportAsset, MediaType}
 import altitude.util.log
@@ -11,10 +11,9 @@ import org.apache.tika.parser.AbstractParser
 import org.apache.tika.parser.audio.AudioParser
 import org.apache.tika.parser.image.ImageParser
 import org.apache.tika.parser.mp3.Mp3Parser
+import org.apache.tika.metadata.serialization.JsonMetadata
 import org.xml.sax.helpers.DefaultHandler
 import play.api.libs.json.{Json, JsNull, JsValue}
-
-import scala.collection.immutable.HashMap
 
 class TikaMetadataService extends AbstractMetadataService {
 
@@ -46,6 +45,7 @@ class TikaMetadataService extends AbstractMetadataService {
       C.tag.SERVICE)
 
     var inputStream: InputStream = null
+    val writer: StringWriter = new StringWriter()
 
     try {
       val url: java.net.URL = importAsset.file.toURI.toURL
@@ -54,14 +54,14 @@ class TikaMetadataService extends AbstractMetadataService {
 
       parser.parse(inputStream, TIKA_HANDLER, metadata, null)
 
-      // accumulate metadata into a map
-      val data = metadata.names().foldLeft(new HashMap[String, String])(
-        (col, key) => col + (key -> metadata.get(key))
-      )
-
-      Json.obj()
+      JsonMetadata.toJson(metadata, writer) // raises org.apache.tika.exception.TikaException
+      val jsonData = writer.toString
+      val json = Json.parse(jsonData)
+      println(Json.prettyPrint(json))
+      json
     }
     finally {
+      writer.close()
       if (inputStream != null)
         inputStream.close()
     }

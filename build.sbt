@@ -18,7 +18,8 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 // Add here the specific settings for this module
 libraryDependencies ++= Seq(
   "org.scalatestplus" % "play_2.11" % "1.2.0",
-  "org.apache.tika" % "tika-parsers" % "1.4",
+  "org.apache.tika" % "tika-parsers" % "1.7",
+  "org.apache.tika" % "tika-serialization" % "1.7",
   "org.reactivemongo" % "play2-reactivemongo_2.11" % "0.10.5.0.akka23",
   "org.json4s" %% "json4s-native" % "3.2.11",
   "org.apache.commons" % "commons-io" % "1.3.2",
