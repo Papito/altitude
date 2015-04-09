@@ -6,6 +6,7 @@ CREATE TABLE asset (
     media_type varchar(64) NOT NULL,
     media_subtype varchar(64) NOT NULL,
     mime_type varchar(64) NOT NULL,
+    metadata jsonb,
     PRIMARY KEY (id)
 );
  

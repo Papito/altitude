@@ -25,6 +25,7 @@ import scala.concurrent.Future
     val importedAsset = altitude.service.fileImport.importAsset(fileImportAsset).futureValue
     val asset = altitude.service.library.getById(importedAsset.id).futureValue: Asset
     asset.mediaType should equal(importedAsset.mediaType)
+    (asset.metadata \ "Author").as[String] should equal("Whitney Houston")
   }
 
   test("detect image media type (JPEG)") {

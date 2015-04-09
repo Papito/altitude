@@ -32,10 +32,9 @@ class TikaMetadataService extends AbstractMetadataService {
       extractMetadata(importAsset, PARSERS.MPEG_AUDIO)
     case mt: MediaType if mt.mediaType == "audio" =>
       extractMetadata(importAsset, PARSERS.SIMPLE_AUDIO)
-    case _ => {
+    case _ =>
       log.warn(s"No metadata extractor found for $importAsset of type '$mediaType'", C.tag.SERVICE)
       JsNull
-    }
   }
 
   private def extractMetadata(importAsset: FileImportAsset, parser: AbstractParser): JsValue = {
