@@ -45,6 +45,7 @@ private class PostgresBaseDaoTests(val config: Map[String, _])
     try {
       val stmt = tx.conn.createStatement()
       stmt.executeUpdate("DROP SCHEMA \"altitude-test\" CASCADE; CREATE SCHEMA \"altitude-test\";")
+      // we need this for the set of DAO tests
       stmt.executeUpdate("CREATE TABLE test (id varchar(24) NOT NULL);")
     } finally {
       tx.close()
