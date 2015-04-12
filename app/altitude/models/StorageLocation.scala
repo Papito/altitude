@@ -6,7 +6,7 @@ import scala.language.implicitConversions
 
 object StorageLocation {
   implicit def fromJson(json: JsValue): StorageLocation = StorageLocation(
-    storageId = (json \ C.StorageLocation.ID).as[String],
+    storageId = (json \ C.StorageLocation.STORAGE_ID).as[String],
     path = (json \ C.StorageLocation.PATH).as[String]
   )
 }

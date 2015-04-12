@@ -7,12 +7,10 @@ import scala.language.implicitConversions
 
 object Asset {
   implicit def fromJson(json: JsValue): Asset = {
-    val locationsJs: JsArray = (json \ C.Asset.LOCATIONS).as[JsArray]
-
     new Asset(
       id = (json \ C.Asset.ID).as[String],
       mediaType = json \ C.Asset.MEDIA_TYPE,
-      locations = locationsJs.value.map(StorageLocation.fromJson).toList,
+      locations = (json \ C.Asset.LOCATIONS).as[List[JsValue]].map(StorageLocation.fromJson),
       metadata = json \ C.Asset.METADATA
     )
   }
@@ -23,10 +21,12 @@ case class Asset(override final val id: String = BaseModel.genId,
                  locations: List[StorageLocation],
                  metadata: JsValue = JsNull) extends BaseModel {
 
-  override def toJson = Json.obj(
+  override def toJson = {
+    Json.obj(
       C.Asset.ID -> id,
-      C.Asset.LOCATIONS -> Json.arr(  ),
+      C.Asset.LOCATIONS -> locations.map(_.toJson),
       C.Asset.MEDIA_TYPE -> (mediaType: JsValue),
       C.Asset.METADATA -> metadata
     )
+  }
 }
