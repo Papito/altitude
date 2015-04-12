@@ -14,10 +14,10 @@ object Storage {
   )
 }
 
-case class Storage(override val id: String,
+case class Storage(override final val id: String,
                    name: String,
                    storageType: StorageType,
-                   description: String = "") extends BaseModel(id) {
+                   description: String = "") extends BaseModel {
 
   override def toJson = Json.obj(
     C.Storage.ID -> id,

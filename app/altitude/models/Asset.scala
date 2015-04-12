@@ -17,7 +17,7 @@ object Asset {
 case class Asset(override final val id: String = BaseModel.genId,
                  mediaType: MediaType,
                  path: String,
-                 metadata: JsValue = JsNull) extends BaseModel(id) {
+                 metadata: JsValue = JsNull) extends BaseModel {
 
   override def toJson = Json.obj(
     C.Asset.ID -> id,
