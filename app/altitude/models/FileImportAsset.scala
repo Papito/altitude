@@ -6,10 +6,6 @@ import play.api.libs.json.Json
 
 import scala.language.implicitConversions
 
-object FileImportAsset {
-  implicit def toJson(obj: FileImportAsset) = obj.toJson
-}
-
 class FileImportAsset(val file: File) extends BaseModel {
   require(file != null)
 

@@ -8,7 +8,7 @@ import org.scalatest._
 
 class ModelTests extends FunSuite {
   test("model fields") {
-    class TestModel extends BaseModel
+    case class TestModel(id: String = BaseModel.genId) extends BaseModel(id = id)
 
     val model = new TestModel
     model.id should not be None

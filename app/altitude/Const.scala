@@ -12,6 +12,8 @@ object Const {
 
    trait Common {
      val ID = "id"
+     val CREATED_AT = "created_at"
+     val UPDATED_AT = "updated_at"
    }
   object Base extends Common
 

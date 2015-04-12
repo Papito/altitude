@@ -5,7 +5,7 @@
 --
 
 CREATE TABLE _core (
-    created_at timestamp without time zone NOT NULL default (now() at time zone 'utc'),
+    created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
 

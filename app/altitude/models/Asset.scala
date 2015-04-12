@@ -1,5 +1,6 @@
 package altitude.models
 
+import org.joda.time.{DateTime}
 import play.api.libs.json._
 import altitude.{Const => C}
 
@@ -16,7 +17,7 @@ object Asset {
   }
 }
 
-case class Asset(override final val id: String = BaseModel.genId,
+case class Asset(id: String = BaseModel.genId,
                  mediaType: MediaType,
                  locations: List[StoreLocation],
                  metadata: JsValue = JsNull) extends BaseModel {
@@ -26,7 +27,9 @@ case class Asset(override final val id: String = BaseModel.genId,
       C.Asset.ID -> id,
       C.Asset.LOCATIONS -> locations.map(_.toJson),
       C.Asset.MEDIA_TYPE -> (mediaType: JsValue),
-      C.Asset.METADATA -> metadata
+      C.Asset.METADATA -> metadata,
+      C.Asset.CREATED_AT -> isoCreatedAt,
+      C.Asset.UPDATED_AT -> isoUpdatedAt
     )
   }
 }

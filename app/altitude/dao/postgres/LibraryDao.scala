@@ -6,7 +6,8 @@ import altitude.dao.TransactionId
 import altitude.util.log
 import org.apache.commons.dbutils.QueryRunner
 import org.apache.commons.dbutils.handlers.MapListHandler
-import play.api.libs.json.{JsValue, Json}
+import org.joda.time.{DateTime, DateTimeZone}
+import play.api.libs.json.{JsNull, JsValue, Json}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import altitude.{Const => C}
@@ -16,6 +17,7 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
 
   override def add(json: JsValue)(implicit txId: TransactionId): Future[JsValue] = {
     val asset = json: Asset
+
     log.info(s"POSTGRES ASSET INSERT: $asset", C.tag.DB)
     val run: QueryRunner = new QueryRunner
 
@@ -74,7 +76,8 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
     )
 
     Future[JsValue] {
-      Asset(locations = locations,
+      Asset(id = rec.get(C.Asset.ID).toString,
+            locations = locations,
             mediaType = mediaType,
             metadata = Json.parse(rec.get(C.Asset.METADATA).toString))
     }

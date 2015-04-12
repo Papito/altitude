@@ -9,7 +9,7 @@ import scala.concurrent.Future
 import scala.language.implicitConversions
 import altitude.{Const => C}
 
-class TestModel extends BaseModel
+case class TestModel(id: String = BaseModel.genId) extends BaseModel(id)
 
 trait BaseDaoTests extends IntegrationTestCore {
   def service: BaseService[TestModel]

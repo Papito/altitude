@@ -2,6 +2,7 @@ package altitude.models
 
 import altitude.models.StorageType.StorageType
 import altitude.{Const => C}
+import org.joda.time.DateTime
 import play.api.libs.json.{Json, JsValue}
 import scala.language.implicitConversions
 
@@ -14,10 +15,10 @@ object Storage {
   )
 }
 
-case class Storage(override final val id: String,
+case class Storage(id: String,
                    name: String,
                    storageType: StorageType,
-                   description: String = "") extends BaseModel {
+                   description: String = "") extends BaseModel(id) {
 
   override def toJson = Json.obj(
     C.Storage.ID -> id,
