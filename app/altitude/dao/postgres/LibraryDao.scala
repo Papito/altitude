@@ -1,6 +1,6 @@
 package altitude.dao.postgres
 
-import altitude.models.{MediaType, Asset}
+import altitude.models.{StorageLocation, MediaType, Asset}
 import altitude.{Const => C}
 import altitude.dao.TransactionId
 import altitude.util.log
@@ -69,8 +69,12 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
       mime = rec.get(C.Asset.MIME_TYPE).toString
     )
 
+    val locations = List[StorageLocation](
+      StorageLocation(storageId = "1", path =  "")
+    )
+
     Future[JsValue] {
-      Asset(path = "",
+      Asset(locations = locations,
             mediaType = mediaType,
             metadata = Json.parse(rec.get(C.Asset.METADATA).toString))
     }

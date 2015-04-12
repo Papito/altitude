@@ -17,10 +17,10 @@ object Const {
 
   object Asset extends Common {
     val MEDIA_TYPE = "media_type"
+    val LOCATIONS = "locations"
     val MEDIA_SUBTYPE = "media_subtype"
     val MIME_TYPE = "mime_type"
     val METADATA = "metadata"
-    val PATH = "path"
   }
 
   object Storage extends Common {

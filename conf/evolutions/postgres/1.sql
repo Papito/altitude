@@ -11,7 +11,7 @@ CREATE TABLE _core (
 
 CREATE TABLE asset (
     id varchar(24) NOT NULL,
-    storage jsonb,
+    locations jsonb,
     media_type varchar(64) NOT NULL,
     media_subtype varchar(64) NOT NULL,
     mime_type varchar(64) NOT NULL,
