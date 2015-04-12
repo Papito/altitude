@@ -29,7 +29,7 @@ object Const {
     val TYPE = "type"
   }
 
-  object StorageLocation extends Common {
+  object StoreLocation extends Common {
     val STORAGE_ID = "storage_id"
     val PATH = "path"
   }

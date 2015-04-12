@@ -10,7 +10,7 @@ object Asset {
     new Asset(
       id = (json \ C.Asset.ID).as[String],
       mediaType = json \ C.Asset.MEDIA_TYPE,
-      locations = (json \ C.Asset.LOCATIONS).as[List[JsValue]].map(StorageLocation.fromJson),
+      locations = (json \ C.Asset.LOCATIONS).as[List[JsValue]].map(StoreLocation.fromJson),
       metadata = json \ C.Asset.METADATA
     )
   }
@@ -18,7 +18,7 @@ object Asset {
 
 case class Asset(override final val id: String = BaseModel.genId,
                  mediaType: MediaType,
-                 locations: List[StorageLocation],
+                 locations: List[StoreLocation],
                  metadata: JsValue = JsNull) extends BaseModel {
 
   override def toJson = {
