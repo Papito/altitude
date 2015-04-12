@@ -22,9 +22,7 @@ case class Asset(override final val id: String = BaseModel.genId,
   override def toJson = Json.obj(
     C.Asset.ID -> id,
     C.Asset.PATH -> path,
-    C.Asset.MEDIA_TYPE -> mediaType.toJson,
-    C.Asset.MEDIA_SUBTYPE -> mediaType.mediaSubtype,
-    C.Asset.MIME_TYPE -> mediaType.mime,
+    C.Asset.MEDIA_TYPE -> (mediaType: JsValue),
     C.Asset.METADATA -> metadata
   )
 }
