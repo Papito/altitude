@@ -18,15 +18,21 @@ abstract class BaseService[Model <: BaseModel] {
 
   def add(obj: Model)(implicit txId: TransactionId = new TransactionId): Future[JsValue] = {
     txManager.withTransaction[Future[JsValue]] {
-      val f: Future[JsValue] = DAO.add(obj.toJson)
+      val f = DAO.add(obj.toJson)
       f map {res => res}
     }
   }
 
   def getById(id: String)(implicit txId: TransactionId = new TransactionId): Future[JsValue] = {
     txManager.asReadOnly[Future[JsValue]] {
-      val f: Future[JsValue] = DAO.getById(id)
+      val f = DAO.getById(id)
       f map {res => res}
     }
   }
+
+  def getAll()(implicit txId: TransactionId = new TransactionId): Future[List[JsValue]] =
+    txManager.asReadOnly[Future[List[JsValue]]] {
+      val f = DAO.getAll
+      f map {res => res}
+    }
 }
