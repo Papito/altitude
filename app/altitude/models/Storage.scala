@@ -21,9 +21,8 @@ case class Storage(id: String,
                    description: String = "") extends BaseModel(id) {
 
   override def toJson = Json.obj(
-    C.Storage.ID -> id,
     C.Storage.NAME -> name,
     C.Storage.TYPE -> storageType.toString,
     C.Storage.DESCRIPTION -> description
-  )
+  ) ++ coreAttrs
 }

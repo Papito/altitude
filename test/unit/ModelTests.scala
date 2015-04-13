@@ -12,7 +12,7 @@ import altitude.{Const => C}
 class ModelTests extends FunSuite {
   test("model fields") {
     case class TestModel(id: String = BaseModel.genId) extends BaseModel(id = id) {
-      def toJson: JsValue = Json.obj(C.Base.ID -> id)
+      def toJson: JsValue = coreAttrs
     }
 
     val model = new TestModel

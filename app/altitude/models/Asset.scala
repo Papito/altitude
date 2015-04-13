@@ -24,12 +24,9 @@ case class Asset(id: String = BaseModel.genId,
 
   override def toJson = {
     Json.obj(
-      C.Asset.ID -> id,
       C.Asset.LOCATIONS -> locations.map(_.toJson),
       C.Asset.MEDIA_TYPE -> (mediaType: JsValue),
-      C.Asset.METADATA -> metadata,
-      C.Asset.CREATED_AT -> isoCreatedAt,
-      C.Asset.UPDATED_AT -> isoUpdatedAt
-    )
+      C.Asset.METADATA -> metadata
+    ) ++ coreAttrs
   }
 }

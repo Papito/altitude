@@ -5,12 +5,11 @@ import altitude.services.BaseService
 import org.scalatest.Matchers._
 import play.api.libs.json.{Json, JsValue}
 
-import scala.concurrent.Future
 import scala.language.implicitConversions
 import altitude.{Const => C}
 
 case class TestModel(id: String = BaseModel.genId) extends BaseModel(id) {
-  def toJson: JsValue = Json.obj(C.Base.ID -> id)
+  override def toJson: JsValue = coreAttrs
 }
 
 trait BaseDaoTests extends IntegrationTestCore {
