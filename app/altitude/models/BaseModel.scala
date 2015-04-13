@@ -17,8 +17,8 @@ abstract class BaseModel(id: String = BaseModel.genId) {
 
   private val DATETIME_FORMAT: DateTimeFormatter = ISODateTimeFormat.dateTime()
 
-  val createdAt: DateTime = altitude.util.utcNow
-  val updatedAt: DateTime = altitude.util.utcNow
+  val createdAt: DateTime = altitude.Util.utcNow
+  val updatedAt: DateTime = altitude.Util.utcNow
 
   final def isoCreatedAt: String = DATETIME_FORMAT.print(createdAt)
   final def isoUpdatedAt: String = DATETIME_FORMAT.print(updatedAt)
