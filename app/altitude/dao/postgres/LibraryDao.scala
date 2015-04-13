@@ -1,13 +1,13 @@
 package altitude.dao.postgres
 
-import altitude.models.{StoreLocation, MediaType, Asset}
+import altitude.models.{BaseModel, StoreLocation, MediaType, Asset}
 import altitude.{Const => C}
 import altitude.dao.TransactionId
 import altitude.util.log
 import org.apache.commons.dbutils.QueryRunner
 import org.apache.commons.dbutils.handlers.MapListHandler
 import org.joda.time.{DateTime, DateTimeZone}
-import play.api.libs.json.{JsNull, JsValue, Json}
+import play.api.libs.json._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import altitude.{Const => C}
@@ -31,8 +31,10 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
             VALUES(?, ?, ?, ?, CAST(? AS jsonb))
     """
 
+    val id = BaseModel.genId
+
     run.update(conn, q,
-      asset.id,
+      id,
       asset.mediaType.mediaType,
       asset.mediaType.mediaSubtype,
       asset.mediaType.mime,
@@ -76,7 +78,7 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
     )
 
     Future[JsValue] {
-      Asset(id = rec.get(C.Asset.ID).toString,
+      Asset(id = Some(rec.get(C.Asset.ID).toString),
             locations = locations,
             mediaType = mediaType,
             metadata = Json.parse(rec.get(C.Asset.METADATA).toString))

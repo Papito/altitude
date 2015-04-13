@@ -9,7 +9,7 @@ import scala.language.implicitConversions
 object Asset {
   implicit def fromJson(json: JsValue): Asset = {
     new Asset(
-      id = (json \ C.Asset.ID).as[String],
+      id = Some((json \ C.Asset.ID).as[String]),
       mediaType = json \ C.Asset.MEDIA_TYPE,
       locations = (json \ C.Asset.LOCATIONS).as[List[JsValue]].map(StoreLocation.fromJson),
       metadata = json \ C.Asset.METADATA
@@ -17,10 +17,10 @@ object Asset {
   }
 }
 
-case class Asset(id: String = BaseModel.genId,
+case class Asset(override val id: Option[String] = None,
                  mediaType: MediaType,
                  locations: List[StoreLocation],
-                 metadata: JsValue = JsNull) extends BaseModel {
+                 metadata: JsValue = JsNull) extends BaseModel(id) {
 
   override def toJson = {
     Json.obj(

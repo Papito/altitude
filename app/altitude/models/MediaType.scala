@@ -12,7 +12,7 @@ object MediaType {
       mime = (json \ C.Asset.MIME_TYPE).as[String])
 }
 
-case class MediaType(mediaType: String, mediaSubtype: String, mime: String) extends BaseModel {
+case class MediaType(mediaType: String, mediaSubtype: String, mime: String) extends BaseModel(id = None) {
   override def toString = List(mediaType, mediaSubtype, mime).mkString(":")
 
   override def toJson =  Json.obj(

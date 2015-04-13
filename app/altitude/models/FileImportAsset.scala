@@ -6,7 +6,7 @@ import play.api.libs.json.Json
 
 import scala.language.implicitConversions
 
-class FileImportAsset(val file: File) extends BaseModel {
+class FileImportAsset(val file: File) extends BaseModel(id = None) {
   require(file != null)
 
   val absolutePath = file.getAbsolutePath

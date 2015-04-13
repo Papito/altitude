@@ -11,12 +11,11 @@ import altitude.{Const => C}
 
 class ModelTests extends FunSuite {
   test("model fields") {
-    case class TestModel(id: String = BaseModel.genId) extends BaseModel(id = id) {
+    case class TestModel(override val id: Option[String] = None) extends BaseModel(id = None) {
       def toJson: JsValue = coreAttrs
     }
 
-    val model = new TestModel
-    model.id should not be None
+    val model = TestModel(Some("1"))
   }
 
   test("import asset model") {
