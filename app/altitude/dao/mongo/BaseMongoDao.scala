@@ -30,12 +30,12 @@ object BaseMongoDao {
 abstract class BaseMongoDao(private val collectionName: String) extends BaseDao {
   protected def collection = BaseMongoDao.db.collection[JSONCollection](collectionName)
 
-  override def add(json: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
-    log.debug(s"Starting database INSERT for: $json", C.tag.DB)
+  override def add(jsonIn: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
+    log.debug(s"Starting database INSERT for: $jsonIn", C.tag.DB)
 
     // append the id
+    val json: JsObject = jsonIn ++ JsObject(Seq(C.Base.ID -> JsString(BaseModel.genId)))
 
-    require((json \ C.Base.ID).asOpt[String].isDefined)
     val f: Future[LastError] = collection.insert(json)
     f map {res => if (res.ok) json else throw res.getCause}
   }

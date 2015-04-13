@@ -19,13 +19,12 @@ trait BaseDaoTests extends IntegrationTestCore {
   test("add record") {
     val future = service.add(model)
     val js: JsObject = future.futureValue
-    val id = (js \ C.Base.ID).asOpt[String].getOrElse("")
-    id should equal(model.id)
+
+    js \ C.Base.ID should not be Nil
+    val id = (js \ C.Base.ID).as[String]
 
     // retrieve the object
-    val future2 = service.getById(model.id.get)
+    val future2 = service.getById(id)
     val js2: JsObject = future2.futureValue
-    val id2 = (js2 \ C.Base.ID).asOpt[String].getOrElse("")
-    id2 should equal(model.id)
   }
 }

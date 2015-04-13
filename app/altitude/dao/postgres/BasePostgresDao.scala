@@ -10,7 +10,7 @@ import altitude.util.log
 import altitude.{Const => C}
 import org.apache.commons.dbutils.QueryRunner
 import org.apache.commons.dbutils.handlers.MapListHandler
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsString, JsObject, JsValue, Json}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -20,11 +20,13 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
   protected def conn(implicit txId: TransactionId): Connection =
     JdbcTransactionManager.transaction.conn
 
-  override def add(json: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
-    log.info(s"POSTGRES INSERT: $json", C.tag.DB)
+  override def add(jsonIn: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
+    log.info(s"POSTGRES INSERT: $jsonIn", C.tag.DB)
     val run: QueryRunner = new QueryRunner
 
+    // append the id
     val id = BaseModel.genId
+    val json: JsObject = jsonIn ++ JsObject(Seq(C.Base.ID -> JsString(id)))
 
     val q: String = s"INSERT INTO $tableName (${C.Base.ID}) VALUES(?)"
     run.update(conn, q, id)

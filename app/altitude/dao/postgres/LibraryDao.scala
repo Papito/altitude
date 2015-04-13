@@ -15,8 +15,8 @@ import altitude.{Const => C}
 
 class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
 
-  override def add(json: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
-    val asset = json: Asset
+  override def add(jsonIn: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
+    val asset = jsonIn: Asset
 
     log.info(s"POSTGRES ASSET INSERT: $asset", C.tag.DB)
     val run: QueryRunner = new QueryRunner
@@ -24,14 +24,16 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
     // Postgres will reject this sequence with jsonb
     val metadata: String = asset.metadata.toString().replaceAll("\\\\u0000", "")
 
+    // append the id
+    val id = BaseModel.genId
+    val json: JsObject = jsonIn ++ JsObject(Seq(C.Base.ID -> JsString(id)))
+
     val q: String = s"""
         INSERT INTO $tableName (
              ${C.Asset.ID}, ${C.Asset.MEDIA_TYPE},
              ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE}, ${C.Asset.METADATA})
             VALUES(?, ?, ?, ?, CAST(? AS jsonb))
     """
-
-    val id = BaseModel.genId
 
     run.update(conn, q,
       id,
