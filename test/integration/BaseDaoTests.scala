@@ -3,13 +3,15 @@ package integration
 import altitude.models.BaseModel
 import altitude.services.BaseService
 import org.scalatest.Matchers._
-import play.api.libs.json.JsValue
+import play.api.libs.json.{Json, JsValue}
 
 import scala.concurrent.Future
 import scala.language.implicitConversions
 import altitude.{Const => C}
 
-case class TestModel(id: String = BaseModel.genId) extends BaseModel(id)
+case class TestModel(id: String = BaseModel.genId) extends BaseModel(id) {
+  def toJson: JsValue = Json.obj(C.Base.ID -> id)
+}
 
 trait BaseDaoTests extends IntegrationTestCore {
   def service: BaseService[TestModel]
