@@ -3,12 +3,12 @@ package altitude.models
 import altitude.models.StorageType.StorageType
 import altitude.{Const => C}
 import org.joda.time.DateTime
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json.{JsObject, Json, JsValue}
 import scala.language.implicitConversions
 
 object Storage {
   implicit def fromJson(json: JsValue): Storage = new Storage(
-    id = Some((json \ C.Storage.ID).as[String]),
+    id = (json \ C.Storage.ID).asOpt[String],
     name = (json \ C.Storage.NAME).as[String],
     description = (json \ C.Storage.DESCRIPTION).as[String],
     storageType = json \ C.Storage.TYPE

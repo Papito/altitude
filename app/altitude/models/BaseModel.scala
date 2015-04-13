@@ -8,7 +8,7 @@ import altitude.{Const => C}
 import scala.language.implicitConversions
 
 object BaseModel {
-  implicit def toJson(obj: BaseModel): JsValue = obj.toJson
+  implicit def toJson(obj: BaseModel): JsObject = obj.toJson
 
   final def genId: String = BSONObjectID.generate.stringify
 
@@ -26,16 +26,16 @@ abstract class BaseModel(val id: Option[String]) {
     C.Base.CREATED_AT -> {
       altitude.Util.isoDateTime(createdAt) match {
         case "" => JsNull
-        case _ => JsString("")
+        case _ => JsString(altitude.Util.isoDateTime(createdAt))
       }
     },
     C.Base.UPDATED_AT -> {
       altitude.Util.isoDateTime(updatedAt) match {
         case "" => JsNull
-        case _ => JsString("")
+        case _ => JsString(altitude.Util.isoDateTime(updatedAt))
       }
     }
   ).toSeq)
 
-  def toJson: JsValue
+  def toJson: JsObject
 }

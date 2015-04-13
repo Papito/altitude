@@ -9,7 +9,7 @@ import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsObject, JsValue}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

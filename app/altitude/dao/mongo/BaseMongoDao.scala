@@ -1,10 +1,11 @@
 package altitude.dao.mongo
 
 import altitude.dao.{BaseDao, TransactionId}
+import altitude.models.BaseModel
 import altitude.util.log
 import altitude.{Const => C}
 import play.api.Play
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsString, JsObject, JsValue, Json}
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api._
 import reactivemongo.core.commands.LastError
@@ -29,13 +30,17 @@ object BaseMongoDao {
 abstract class BaseMongoDao(private val collectionName: String) extends BaseDao {
   protected def collection = BaseMongoDao.db.collection[JSONCollection](collectionName)
 
-  override def add(json: JsValue)(implicit txId: TransactionId): Future[JsValue] = {
+  override def add(json: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
     log.debug(s"Starting database INSERT for: $json", C.tag.DB)
+
+    // append the id
+
+    require((json \ C.Base.ID).asOpt[String].isDefined)
     val f: Future[LastError] = collection.insert(json)
     f map {res => if (res.ok) json else throw res.getCause}
   }
 
-  override def getById(id: String)(implicit txId: TransactionId): Future[JsValue] = {
+  override def getById(id: String)(implicit txId: TransactionId): Future[JsObject] = {
     log.debug(s"Getting by ID '$id'", C.tag.DB)
 
     val query = Json.obj(C.Base.ID -> id)

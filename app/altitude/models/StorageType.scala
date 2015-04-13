@@ -1,6 +1,6 @@
 package altitude.models
 
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsObject, JsValue}
 import scala.language.implicitConversions
 
 object StorageType extends Enumeration {

@@ -7,7 +7,7 @@ import altitude.util.log
 import altitude.{Const => C}
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -34,9 +34,9 @@ class FileSystemImportDao extends BaseDao {
     }.toIterator
   }
 
-  override def add(json: JsValue)(implicit txId: TransactionId): Future[JsValue] =
+  override def add(json: JsObject)(implicit txId: TransactionId): Future[JsObject] =
     Future{ Json.obj() }
 
-  override def getById(id: String)(implicit txId: TransactionId): Future[JsValue] =
+  override def getById(id: String)(implicit txId: TransactionId): Future[JsObject] =
     Future{ Json.obj() }
 }

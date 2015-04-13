@@ -15,7 +15,7 @@ import altitude.{Const => C}
 
 class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
 
-  override def add(json: JsValue)(implicit txId: TransactionId): Future[JsValue] = {
+  override def add(json: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
     val asset = json: Asset
 
     log.info(s"POSTGRES ASSET INSERT: $asset", C.tag.DB)
@@ -40,12 +40,12 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
       asset.mediaType.mime,
       metadata)
 
-    Future[JsValue] {
+    Future[JsObject] {
       json
     }
   }
 
-  override def getById(id: String)(implicit txId: TransactionId): Future[JsValue] = {
+  override def getById(id: String)(implicit txId: TransactionId): Future[JsObject] = {
     log.debug(s"Getting by ID '$id'", C.tag.DB)
     val run: QueryRunner = new QueryRunner()
 
@@ -60,7 +60,7 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
 
     log.debug(s"Found ${res.size()} records", C.tag.DB)
     if (res.size() == 0)
-      return Future[JsValue](Json.obj())
+      return Future[JsObject](Json.obj())
 
     if (res.size() > 1)
       throw new Exception("getById should return only a single result")
@@ -77,7 +77,7 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
       StoreLocation(storageId = "1", path =  "")
     )
 
-    Future[JsValue] {
+    Future[JsObject] {
       Asset(id = Some(rec.get(C.Asset.ID).toString),
             locations = locations,
             mediaType = mediaType,
