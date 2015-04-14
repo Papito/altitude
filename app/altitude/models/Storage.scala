@@ -15,10 +15,10 @@ object Storage {
   )
 }
 
-case class Storage(override val id: Option[String] = None,
+case class Storage(id: Option[String] = None,
                    name: String,
                    storageType: StorageType,
-                   description: String = "") extends BaseModel(id) {
+                   description: String = "") extends BaseModel {
 
   override def toJson = Json.obj(
     C.Storage.NAME -> name,

@@ -8,7 +8,7 @@ import play.api.libs.json.{JsObject, Json, JsValue}
 import scala.language.implicitConversions
 import altitude.{Const => C}
 
-case class TestModel(override val id: Option[String] = None) extends BaseModel(id) {
+case class TestModel(id: Option[String] = None) extends BaseModel {
   override def toJson: JsObject = coreAttrs
 }
 
@@ -17,6 +17,7 @@ trait BaseDaoTests extends IntegrationTestCore {
   val model = new TestModel
 
   test("add record") {
+    model.id should be(None)
     val future = service.add(model)
     val js: JsObject = future.futureValue
 

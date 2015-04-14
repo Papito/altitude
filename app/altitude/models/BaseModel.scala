@@ -17,7 +17,9 @@ object BaseModel {
   def setUpdatedAt(dt: DateTime, m: BaseModel): Unit = m.updatedAt = Some(dt)
 }
 
-abstract class BaseModel(val id: Option[String]) {
+abstract class BaseModel {
+  val id: Option[String]
+
   protected var createdAt: Option[DateTime]  = None
   protected var updatedAt: Option[DateTime]  = None
 

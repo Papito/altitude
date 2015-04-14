@@ -11,7 +11,7 @@ object StoreLocation {
   )
 }
 
-case class StoreLocation(storageId: String, path: String) extends BaseModel(id = None) {
+case class StoreLocation(storageId: String, path: String) extends BaseModel with NoId {
   override def toJson = Json.obj(
     C.StoreLocation.STORAGE_ID -> storageId,
     C.StoreLocation.PATH -> path)

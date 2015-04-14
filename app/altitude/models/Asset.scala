@@ -17,10 +17,10 @@ object Asset {
   }
 }
 
-case class Asset(override val id: Option[String] = None,
+case class Asset(id: Option[String] = None,
                  mediaType: MediaType,
                  locations: List[StoreLocation],
-                 metadata: JsValue = JsNull) extends BaseModel(id) {
+                 metadata: JsValue = JsNull) extends BaseModel {
 
   override def toJson = {
     Json.obj(
