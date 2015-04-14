@@ -1,7 +1,7 @@
 package altitude.dao.postgres
 
 import altitude.models.{BaseModel, StoreLocation, MediaType, Asset}
-import altitude.{Const => C}
+import altitude.{Const => C, Util}
 import altitude.dao.TransactionId
 import altitude.util.log
 import org.apache.commons.dbutils.QueryRunner
@@ -10,7 +10,6 @@ import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import altitude.{Const => C}
 
 
 class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
@@ -26,13 +25,18 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
 
     // append the id
     val id = BaseModel.genId
-    val json: JsObject = jsonIn ++ JsObject(Seq(C.Base.ID -> JsString(id)))
+    val createdAt: String = Util.isoDateTime(Some(Util.utcNow))
+
+    val json: JsObject = jsonIn ++ JsObject(Seq(
+      C.Base.ID -> JsString(BaseModel.genId),
+      C.Base.CREATED_AT -> JsString(createdAt)
+    ))
 
     val q: String = s"""
         INSERT INTO $tableName (
-             ${C.Asset.ID}, ${C.Asset.MEDIA_TYPE},
+             ${C.Asset.ID}, ${C.Asset.CREATED_AT},  ${C.Asset.MEDIA_TYPE},
              ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE}, ${C.Asset.METADATA})
-            VALUES(?, ?, ?, ?, CAST(? AS jsonb))
+            VALUES(?, ? ?, ?, ?, CAST(? AS jsonb))
     """
 
     run.update(conn, q,

@@ -7,14 +7,12 @@ import altitude.{Const => C}
 import scala.language.implicitConversions
 
 object Asset {
-  implicit def fromJson(json: JsValue): Asset = {
-    new Asset(
-      id = (json \ C.Asset.ID).asOpt[String],
-      mediaType = json \ C.Asset.MEDIA_TYPE,
-      locations = (json \ C.Asset.LOCATIONS).as[List[JsObject]].map(StoreLocation.fromJson),
-      metadata = json \ C.Asset.METADATA
-    )
-  }
+  implicit def fromJson(json: JsValue): Asset = Asset(
+    id = (json \ C.Asset.ID).asOpt[String],
+    mediaType = json \ C.Asset.MEDIA_TYPE,
+    locations = (json \ C.Asset.LOCATIONS).as[List[JsObject]].map(StoreLocation.fromJson),
+    metadata = json \ C.Asset.METADATA
+  )
 }
 
 case class Asset(id: Option[String] = None,

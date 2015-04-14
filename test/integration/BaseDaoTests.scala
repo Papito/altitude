@@ -8,6 +8,12 @@ import play.api.libs.json.{JsObject, Json, JsValue}
 import scala.language.implicitConversions
 import altitude.{Const => C}
 
+object TestModel {
+  implicit def fromJson(json: JsValue): TestModel = TestModel(
+    id = (json \ C.Base.ID).asOpt[String]
+  ).withCoreAttrs(json)
+
+}
 case class TestModel(id: Option[String] = None) extends BaseModel {
   override def toJson: JsObject = coreAttrs
 }
@@ -30,6 +36,12 @@ trait BaseDaoTests extends IntegrationTestCore {
     // retrieve the object
     val persisted = service.getById(id.get)
     val persistedJs: JsObject = persisted.futureValue
+    println(persistedJs)
     persistedJs \ C.Base.ID should not be Nil
+    (persistedJs \ C.Base.CREATED_AT).asOpt[String] should not be None
+    (persistedJs \ C.Base.UPDATED_AT).asOpt[String] should be(None)
+
+    val persistedModel = TestModel.fromJson(persistedJs)
+    persistedModel.id should equal(id)
   }
 }

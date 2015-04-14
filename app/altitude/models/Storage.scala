@@ -7,11 +7,12 @@ import play.api.libs.json.{JsObject, Json, JsValue}
 import scala.language.implicitConversions
 
 object Storage {
-  implicit def fromJson(json: JsValue): Storage = new Storage(
-    id = (json \ C.Storage.ID).asOpt[String],
-    name = (json \ C.Storage.NAME).as[String],
-    description = (json \ C.Storage.DESCRIPTION).as[String],
-    storageType = json \ C.Storage.TYPE
+  implicit def fromJson(json: JsValue): Storage =
+    Storage(
+      id = (json \ C.Storage.ID).asOpt[String],
+      name = (json \ C.Storage.NAME).as[String],
+      description = (json \ C.Storage.DESCRIPTION).as[String],
+      storageType = json \ C.Storage.TYPE
   )
 }
 

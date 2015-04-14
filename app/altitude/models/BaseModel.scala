@@ -55,4 +55,10 @@ abstract class BaseModel {
       }
     }
   ).toSeq)
+
+  // return this model with core attributes set from JSON
+  def withCoreAttrs(json: JsValue): this.type = {
+    val updatedAtStr = (json \ C.Base.UPDATED_AT).asOpt[String]
+    this
+  }
 }
