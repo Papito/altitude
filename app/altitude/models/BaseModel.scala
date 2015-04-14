@@ -15,21 +15,24 @@ object BaseModel {
 
 abstract class BaseModel {
   val id: Option[String]
+  def toJson: JsObject
 
-  protected var createdAt: Option[DateTime]  = None
+  private var _createdAt: Option[DateTime]  = None
+  def createdAt = _createdAt
 
   def createdAt_= (arg: DateTime): Unit = {
-    if (createdAt.isDefined)
+    if (_createdAt.isDefined)
       throw new RuntimeException("Cannot set 'created_at' twice")
-    createdAt = Some(arg)
+    _createdAt = Some(arg)
   }
 
-  protected var updatedAt: Option[DateTime]  = None
+  private var _updatedAt: Option[DateTime]  = None
+  def updatedAt = _updatedAt
 
   def updatedAt_= (arg: DateTime): Unit = {
-    if (updatedAt.isDefined)
+    if (_updatedAt.isDefined)
       throw new RuntimeException("Cannot set 'updated_at' twice")
-    updatedAt = Some(arg)
+    _updatedAt = Some(arg)
   }
 
   /*
@@ -38,20 +41,18 @@ abstract class BaseModel {
   protected def coreAttrs = JsObject(Map(
     C.Base.ID -> {if (id.isDefined) JsString(id.get) else JsNull},
     C.Base.CREATED_AT -> {
-      val isoDateTimeStr: String = altitude.Util.isoDateTime(createdAt)
+      val isoDateTimeStr: String = altitude.Util.isoDateTime(_createdAt)
       isoDateTimeStr match {
         case "" => JsNull
         case _ => JsString(isoDateTimeStr)
       }
     },
     C.Base.UPDATED_AT -> {
-      val isoDateTimeStr: String = altitude.Util.isoDateTime(updatedAt)
+      val isoDateTimeStr: String = altitude.Util.isoDateTime(_updatedAt)
       isoDateTimeStr match {
         case "" => JsNull
         case _ => JsString(isoDateTimeStr)
       }
     }
   ).toSeq)
-
-  def toJson: JsObject
 }

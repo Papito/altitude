@@ -18,14 +18,18 @@ trait BaseDaoTests extends IntegrationTestCore {
 
   test("add record") {
     model.id should be(None)
+    model.createdAt should be(None)
+    model.updatedAt should be(None)
     val future = service.add(model)
     val js: JsObject = future.futureValue
 
     js \ C.Base.ID should not be Nil
-    val id = (js \ C.Base.ID).as[String]
+    val id = (js \ C.Base.ID).asOpt[String]
+    id should not be None
 
     // retrieve the object
-    val future2 = service.getById(id)
-    val js2: JsObject = future2.futureValue
+    val persisted = service.getById(id.get)
+    val persistedJs: JsObject = persisted.futureValue
+    persistedJs \ C.Base.ID should not be Nil
   }
 }
