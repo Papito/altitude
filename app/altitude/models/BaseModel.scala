@@ -11,54 +11,33 @@ object BaseModel {
   implicit def toJson(obj: BaseModel): JsObject = obj.toJson
 
   final def genId: String = BSONObjectID.generate.stringify
+
+  // the run-around, to make changing these values less trivial
+  def setCreatedAt(dt: DateTime, m: BaseModel): Unit = m.createdAt = Some(dt)
+  def setUpdatedAt(dt: DateTime, m: BaseModel): Unit = m.updatedAt = Some(dt)
 }
 
 abstract class BaseModel {
   val id: Option[String]
-  def toJson: JsObject
 
-  private var _createdAt: Option[DateTime]  = None
-  def createdAt = _createdAt
+  protected var createdAt: Option[DateTime]  = None
+  protected var updatedAt: Option[DateTime]  = None
 
-  def createdAt_= (arg: DateTime): Unit = {
-    if (_createdAt.isDefined)
-      throw new RuntimeException("Cannot set 'created_at' twice")
-    _createdAt = Some(arg)
-  }
-
-  private var _updatedAt: Option[DateTime]  = None
-  def updatedAt = _updatedAt
-
-  def updatedAt_= (arg: DateTime): Unit = {
-    if (_updatedAt.isDefined)
-      throw new RuntimeException("Cannot set 'updated_at' twice")
-    _updatedAt = Some(arg)
-  }
-
-  /*
-  Every model must have these (but not necessarily with values)
-   */
   protected def coreAttrs = JsObject(Map(
     C.Base.ID -> {if (id.isDefined) JsString(id.get) else JsNull},
     C.Base.CREATED_AT -> {
-      val isoDateTimeStr: String = altitude.Util.isoDateTime(_createdAt)
-      isoDateTimeStr match {
+      altitude.Util.isoDateTime(createdAt) match {
         case "" => JsNull
-        case _ => JsString(isoDateTimeStr)
+        case _ => JsString(altitude.Util.isoDateTime(createdAt))
       }
     },
     C.Base.UPDATED_AT -> {
-      val isoDateTimeStr: String = altitude.Util.isoDateTime(_updatedAt)
-      isoDateTimeStr match {
+      altitude.Util.isoDateTime(updatedAt) match {
         case "" => JsNull
-        case _ => JsString(isoDateTimeStr)
+        case _ => JsString(altitude.Util.isoDateTime(updatedAt))
       }
     }
   ).toSeq)
 
-  // return this model with core attributes set from JSON
-  def withCoreAttrs(json: JsValue): this.type = {
-    val updatedAtStr = (json \ C.Base.UPDATED_AT).asOpt[String]
-    this
-  }
+  def toJson: JsObject
 }

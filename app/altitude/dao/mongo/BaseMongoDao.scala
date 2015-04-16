@@ -3,7 +3,6 @@ package altitude.dao.mongo
 import altitude.dao.{BaseDao, TransactionId}
 import altitude.models.BaseModel
 import altitude.util.log
-import altitude.Util
 import altitude.{Const => C}
 import play.api.Play
 import play.api.libs.json.{JsString, JsObject, JsValue, Json}
@@ -34,12 +33,8 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
     log.debug(s"Starting database INSERT for: $jsonIn", C.tag.DB)
 
-    // append core attributes
-    val createdAt: String = Util.isoDateTime(Some(Util.utcNow))
-    val json: JsObject = jsonIn ++ JsObject(Seq(
-      C.Base.ID -> JsString(BaseModel.genId),
-      C.Base.CREATED_AT -> JsString(createdAt)
-    ))
+    // append the id
+    val json: JsObject = jsonIn ++ JsObject(Seq(C.Base.ID -> JsString(BaseModel.genId)))
 
     val f: Future[LastError] = collection.insert(json)
     f map {res => if (res.ok) json else throw res.getCause}

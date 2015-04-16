@@ -7,7 +7,7 @@ import altitude.dao.{BaseDao, TransactionId}
 import altitude.models.BaseModel
 import altitude.services.JdbcTransactionManager
 import altitude.util.log
-import altitude.{Const => C, Util}
+import altitude.{Const => C}
 import org.apache.commons.dbutils.QueryRunner
 import org.apache.commons.dbutils.handlers.MapListHandler
 import play.api.libs.json.{JsString, JsObject, JsValue, Json}
@@ -26,16 +26,10 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
 
     // append the id
     val id = BaseModel.genId
+    val json: JsObject = jsonIn ++ JsObject(Seq(C.Base.ID -> JsString(id)))
 
-    val createdAt: String = Util.isoDateTime(Some(Util.utcNow))
-
-    val q: String = s"INSERT INTO $tableName (${C.Base.ID}, ${C.Base.CREATED_AT}) VALUES(?, ?)"
-    run.update(conn, q, id, createdAt)
-
-    val json: JsObject = jsonIn ++ JsObject(Seq(
-      C.Base.ID -> JsString(BaseModel.genId),
-      C.Base.CREATED_AT -> JsString(createdAt)
-    ))
+    val q: String = s"INSERT INTO $tableName (${C.Base.ID}) VALUES(?)"
+    run.update(conn, q, id)
 
     Future[JsObject] {
       json

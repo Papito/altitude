@@ -46,9 +46,7 @@ private class PostgresBaseDaoTests(val config: Map[String, _])
       val stmt = tx.conn.createStatement()
       stmt.executeUpdate("DROP SCHEMA IF EXISTS \"altitude-test\" CASCADE; CREATE SCHEMA \"altitude-test\";")
       // we need this for the set of DAO tests
-      stmt.executeUpdate(
-        "DROP TABLE IF EXISTS test;" +
-        "CREATE TABLE test (id varchar(24) NOT NULL, created_at timestamp without time zone, updated_at timestamp without time zone);")
+      stmt.executeUpdate("DROP TABLE IF EXISTS test; CREATE TABLE test (id varchar(24) NOT NULL);")
     } finally {
       tx.close()
       play.api.Play.stop()
