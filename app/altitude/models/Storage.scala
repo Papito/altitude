@@ -24,5 +24,5 @@ case class Storage(id: Option[String] = None,
     C.Storage.NAME -> name,
     C.Storage.TYPE -> storageType.toString,
     C.Storage.DESCRIPTION -> description
-  ) ++ coreAttrs
+  )
 }

@@ -3,13 +3,27 @@ package integration
 import altitude.models.BaseModel
 import altitude.services.BaseService
 import org.scalatest.Matchers._
-import play.api.libs.json.{JsObject, Json, JsValue}
+import play.api.libs.json._
 
 import scala.language.implicitConversions
 import altitude.{Const => C}
 
+object TestModel {
+  implicit val writes = new Writes[TestModel] {
+    def writes(o: TestModel) = Json.obj(
+      C.Asset.ID -> o.id
+    )
+  }
+
+  implicit val reads = new Reads[TestModel] {
+    def reads(json: JsValue): JsResult[TestModel] = JsSuccess {
+      TestModel(
+        id = (json \ C.Base.ID).asOpt[String]
+      )}}
+}
+
 case class TestModel(id: Option[String] = None) extends BaseModel {
-  override def toJson: JsObject = coreAttrs
+  def toJson = Json.toJson(this).as[JsObject]
 }
 
 trait BaseDaoTests extends IntegrationTestCore {
