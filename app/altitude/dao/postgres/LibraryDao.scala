@@ -16,7 +16,7 @@ import altitude.{Const => C}
 class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
-    val asset = jsonIn.as[Asset]
+    val asset = jsonIn: Asset
 
     log.info(s"POSTGRES ASSET INSERT: $asset", C.tag.DB)
     val run: QueryRunner = new QueryRunner
@@ -68,8 +68,6 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
       throw new Exception("getById should return only a single result")
 
     val rec = res.get(0)
-    println("!!!!!!!!!!!!!!")
-    println(rec)
 
     val mediaType = new MediaType(
       mediaType = rec.get(C.Asset.MEDIA_TYPE).toString,

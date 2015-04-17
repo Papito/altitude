@@ -8,27 +8,14 @@ import play.api.libs.json._
 import scala.language.implicitConversions
 import altitude.{Const => C}
 
-object TestModel {
-  implicit val writes = new Writes[TestModel] {
-    def writes(o: TestModel) = Json.obj(
-      C.Asset.ID -> o.id
-    )
-  }
-
-  implicit val reads = new Reads[TestModel] {
-    def reads(json: JsValue): JsResult[TestModel] = JsSuccess {
-      TestModel(
-        id = (json \ C.Base.ID).asOpt[String]
-      )}}
-}
-
-case class TestModel(id: Option[String] = None) extends BaseModel {
-  def toJson = Json.toJson(this).as[JsObject]
-}
 
 trait BaseDaoTests extends IntegrationTestCore {
   def service: BaseService[TestModel]
   val model = new TestModel
+
+  case class TestModel(id: Option[String] = None) extends BaseModel {
+    def toJson: JsObject = coreJsonAttrs
+  }
 
   test("add record") {
     model.id should be(None)

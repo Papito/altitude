@@ -8,29 +8,13 @@ import org.scalatest._
 import altitude.{Const => C}
 import play.api.libs.json._
 
-object TestModel {
-  implicit val writes = new Writes[TestModel] {
-    def writes(o: TestModel) = Json.obj(
-      C.Asset.ID -> o.id
-    )
+class ModelTests extends FunSuite {
+  case class TestModel(id: Option[String] = None) extends BaseModel {
+    def toJson: JsObject = coreJsonAttrs
   }
 
-  implicit val reads = new Reads[TestModel] {
-    def reads(json: JsValue): JsResult[TestModel] = JsSuccess {
-      TestModel(
-        id = (json \ C.Base.ID).asOpt[String]
-      )}}
-}
-
-case class TestModel(id: Option[String] = None) extends BaseModel {
-  def toJson = Json.toJson(this).as[JsObject]
-}
-
-class ModelTests extends FunSuite {
   test("create a model") {
-
-
-    val model = TestModel(id = Some("1"))
+    val model = TestModel()
   }
 
   test("import asset model") {

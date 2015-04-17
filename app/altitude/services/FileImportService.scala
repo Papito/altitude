@@ -61,8 +61,7 @@ class FileImportService extends BaseService {
       StoreLocation(storageId = "1", path =  fileAsset.absolutePath)
     )
     val asset = Asset(locations = locations, mediaType = mediaType, metadata = metadata)
-    log.debug(s"New asset: $asset", C.tag.SERVICE)
     val f = app.service.library.add(asset)
-    f map { res => res.as[Asset] }
+    f map { res => res }
   }
 }
