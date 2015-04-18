@@ -55,6 +55,6 @@ private class PostgresBaseDaoTests(val config: Map[String, _])
 }
 
 class BaseDaoTestSuite extends Suites(
-  new MongoBaseDaoTests(Map("datasource" -> "mongo")),
-  new PostgresBaseDaoTests(Map("datasource" -> "postgres"))
+  new MongoBaseDaoTests(Map("datasource" -> "mongo"))
+  //new PostgresBaseDaoTests(Map("datasource" -> "postgres"))
 )

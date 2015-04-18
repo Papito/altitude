@@ -3,19 +3,16 @@ package altitude.dao.mongo
 import altitude.dao.{BaseDao, TransactionId}
 import altitude.models.BaseModel
 import altitude.util.log
-import altitude.{Const => C}
+import altitude.{Const => C, Util}
 import org.joda.time.DateTime
 import play.api.Play
 import play.api.libs.json._
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api._
-import reactivemongo.bson.BSONDateTime
 import reactivemongo.core.commands.LastError
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import altitude.Util
-import play.modules.reactivemongo.json.BSONFormats._
 
 object BaseMongoDao {
   lazy val host = Play.current.configuration.getString("mongo.host").getOrElse("")
@@ -39,14 +36,18 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
 
     // append core attributes
     val id = BaseModel.genId
+    val createdAt = Util.utcNow
     val json: JsObject = jsonIn ++ JsObject(Seq(
-      C.Base.ID -> JsString(id),
       "_id" -> Json.obj("$oid" -> id),
-      C.Base.CREATED_AT -> Json.obj("$date" -> Util.utcNow)
+      C.Base.CREATED_AT -> Json.obj("$date" -> createdAt)
     ))
 
     val f: Future[LastError] = collection.insert(json)
-    f map {res => if (res.ok) json else throw res.getCause}
+    f map {res =>
+      if (res.ok) {
+        fixMongoFields(json)
+      }
+      else throw res.getCause}
   }
 
   override def getById(id: String)(implicit txId: TransactionId): Future[JsObject] = {
@@ -61,7 +62,32 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
     f map { results =>
       log.debug(s"Found ${results.length} records", C.tag.DB)
       if (results.length > 1) throw new Exception("getById should return only a single result")
-      results.head
+
+      fixMongoFields(results.head)
     }
+  }
+
+  protected def fixMongoFields(json: JsObject): JsObject = {
+    val createdAtMillis: Option[Long] =  (json \ C.Base.CREATED_AT \ "$date").asOpt[Long]
+    val createdAt: Option[DateTime] = {
+      if (createdAtMillis.isDefined) Some(new DateTime(createdAtMillis.get)) else None
+    }
+
+    val updatedAtMillis: Option[Long] =  (json \ C.Base.UPDATED_AT \ "$date").asOpt[Long]
+    val updatedAt: Option[DateTime] = {
+      if (updatedAtMillis.isDefined) Some(new DateTime(updatedAtMillis.get)) else None
+    }
+
+    json ++ Json.obj(
+      C.Base.ID -> (json \ "_id" \ "$oid").as[String],
+      C.Base.CREATED_AT -> {createdAt match {
+        case None => JsNull
+        case _ => Util.isoDateTime(createdAt)
+      }},
+      C.Base.UPDATED_AT -> {updatedAt match {
+        case None => JsNull
+        case _ => Util.isoDateTime(updatedAt)
+      }}
+    )
   }
 }
