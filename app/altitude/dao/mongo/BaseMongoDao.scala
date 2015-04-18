@@ -38,13 +38,13 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
     log.debug(s"Starting database INSERT for: $jsonIn", C.tag.DB)
 
     // append core attributes
+    val id = BaseModel.genId
     val json: JsObject = jsonIn ++ JsObject(Seq(
-      C.Base.ID -> JsString(BaseModel.genId),
-      C.Base.CREATED_AT ->  Json.obj("$date" -> Util.utcNow)
+      C.Base.ID -> JsString(id),
+      "_id" -> Json.obj("$oid" -> id),
+      C.Base.CREATED_AT -> Json.obj("$date" -> Util.utcNow)
     ))
 
-    println("!!!!!")
-    println(json)
     val f: Future[LastError] = collection.insert(json)
     f map {res => if (res.ok) json else throw res.getCause}
   }
@@ -52,7 +52,9 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
   override def getById(id: String)(implicit txId: TransactionId): Future[JsObject] = {
     log.debug(s"Getting by ID '$id'", C.tag.DB)
 
-    val query = Json.obj(C.Base.ID -> id)
+    val query = JsObject(Seq(
+      "_id" -> Json.obj("$oid" -> id)))
+
     val cursor: Cursor[JsObject] = collection.find(query).cursor[JsObject]
     val f: Future[List[JsObject]] = cursor.collect[List](upTo = 2)
 
