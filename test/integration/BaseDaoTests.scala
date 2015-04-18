@@ -14,7 +14,7 @@ trait BaseDaoTests extends IntegrationTestCore {
   object TestModel {
     implicit def fromJson(json: JsValue): TestModel = TestModel(
       id = (json \ C.Asset.ID).asOpt[String]
-    )
+    ).withCoreAttr(json)
   }
 
   case class TestModel(id: Option[String] = None) extends BaseModel {
@@ -44,5 +44,7 @@ trait BaseDaoTests extends IntegrationTestCore {
 
     val model2 = js2: TestModel
     model2.id.get should be(id)
+    model2.createdAt should not be None
+    println(model2)
   }
 }
