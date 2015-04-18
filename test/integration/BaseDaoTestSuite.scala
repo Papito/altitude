@@ -8,9 +8,10 @@ import org.scalatest.{BeforeAndAfterAll, Suites}
 import play.api.test.FakeApplication
 
 /*
-  Define base dao tests for each type of DB.
-  The suite at the bottom runs all
+  Define base dao tests for each type of DB
  */
+
+// MONGO
 private class MongoBaseDaoTests(val config: Map[String, _])
   extends BaseDaoTests {
 
@@ -22,7 +23,11 @@ private class MongoBaseDaoTests(val config: Map[String, _])
 
   override def service = new TestMongoService
 }
+class MongoBaseDaoTestSuite extends Suites(
+  new MongoBaseDaoTests(Map("datasource" -> "mongo"))
+)
 
+// POSTGRES
 private class PostgresBaseDaoTests(val config: Map[String, _])
   extends BaseDaoTests with BeforeAndAfterAll {
 
@@ -53,8 +58,6 @@ private class PostgresBaseDaoTests(val config: Map[String, _])
     }
   }
 }
-
-class BaseDaoTestSuite extends Suites(
-  new MongoBaseDaoTests(Map("datasource" -> "mongo"))
-  //new PostgresBaseDaoTests(Map("datasource" -> "postgres"))
+class PostgresBaseDaoTestSuite extends Suites(
+  new PostgresBaseDaoTests(Map("datasource" -> "postgres"))
 )
