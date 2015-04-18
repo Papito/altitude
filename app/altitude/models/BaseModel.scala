@@ -67,7 +67,7 @@ abstract class BaseModel {
     if (isoCreatedAt != None) {
       createdAt = ISODateTimeFormat.dateTime().parseDateTime(isoCreatedAt.get)
     }
-    val isoUpdatedAt = (json \ C.Base.CREATED_AT).asOpt[String]
+    val isoUpdatedAt = (json \ C.Base.UPDATED_AT).asOpt[String]
 
     if (isoUpdatedAt != None) {
       updatedAt = ISODateTimeFormat.dateTime().parseDateTime(isoUpdatedAt.get)

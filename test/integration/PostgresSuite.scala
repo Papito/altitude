@@ -17,6 +17,13 @@ class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres")) w
     try {
       val stmt = tx.conn.createStatement()
       stmt.executeUpdate("DROP SCHEMA IF EXISTS \"altitude-test\" CASCADE; CREATE SCHEMA \"altitude-test\";")
+      stmt.executeUpdate("""
+                           |DROP TABLE IF EXISTS test;
+                           |CREATE TABLE test (
+                           | id varchar(24) NOT NULL,
+                           | created_at TIMESTAMP,
+                           | updated_at TIMESTAMP)
+                         """.stripMargin)
     } finally {
       tx.close()
       play.api.Play.stop()

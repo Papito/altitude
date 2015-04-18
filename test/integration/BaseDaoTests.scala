@@ -45,6 +45,6 @@ trait BaseDaoTests extends IntegrationTestCore {
     val model2 = js2: TestModel
     model2.id.get should be(id)
     model2.createdAt should not be None
-    println(model2)
+    model2.updatedAt should be(None)
   }
 }
