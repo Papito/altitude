@@ -12,7 +12,7 @@ object Asset {
       mediaType = json \ C.Asset.MEDIA_TYPE,
       locations = (json \ C.Asset.LOCATIONS).as[List[JsValue]].map(StoreLocation.fromJson),
       metadata = json \ C.Asset.METADATA
-    )
+    ).withCoreAttr(json)
   }
 
 case class Asset(id: Option[String] = None,

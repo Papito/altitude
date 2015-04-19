@@ -31,7 +31,7 @@ class MongoBaseDaoTestSuite extends Suites(
 private class PostgresBaseDaoTests(val config: Map[String, _])
   extends BaseDaoTests with BeforeAndAfterAll {
 
-  class TestPostgresDao extends BasePostgresDao("test")
+  class TestPostgresDao extends BasePostgresDao("test1")
 
   class TestPostgresService extends BaseService[TestModel] {
     override protected val DAO = new TestPostgresDao
@@ -49,15 +49,26 @@ private class PostgresBaseDaoTests(val config: Map[String, _])
     val tx = new JdbcTransaction
     try {
       val stmt = tx.conn.createStatement()
-      stmt.executeUpdate("DROP SCHEMA IF EXISTS \"altitude-test\" CASCADE; CREATE SCHEMA \"altitude-test\";")
       // we need this for the set of DAO tests
       stmt.executeUpdate("""
-          |DROP TABLE IF EXISTS test;
-          |CREATE TABLE test (
-          | id varchar(24) NOT NULL,
-          | created_at TIMESTAMP,
-          | updated_at TIMESTAMP DEFAULT NULL)
-        """.stripMargin)
+          |DROP SCHEMA IF EXISTS "altitude-test" CASCADE; CREATE SCHEMA "altitude-test";
+          |DROP TABLE IF EXISTS test2;
+          |DROP TABLE IF EXISTS test1;
+          |DROP TABLE IF EXISTS _test_core;
+          |
+          |CREATE TABLE _test_core (
+          | id VARCHAR(24) NOT NULL,
+          | created_at timestamp WITHOUT TIME ZONE,
+          | updated_at timestamp WITHOUT TIME ZONE DEFAULT NULL);
+          |
+          |CREATE TABLE test1 (
+          | field1_1 INTEGER,
+          | field1_2 VARCHAR(255)) INHERITS (_test_core);
+          |
+          |CREATE TABLE test2 (
+          | field2_1 INTEGER,
+          | field2_2 VARCHAR(255)) INHERITS (_test_core);
+       """.stripMargin)
     } finally {
       tx.close()
       play.api.Play.stop()

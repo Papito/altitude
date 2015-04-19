@@ -5,8 +5,8 @@
 --
 
 CREATE TABLE _core (
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp WITHOUT TIME ZONE, -- FIXME: NOT NULL
+    updated_at timestamp WITHOUT TIME ZONE DEFAULT NULL
 );
 
 CREATE TABLE asset (
@@ -21,5 +21,5 @@ CREATE TABLE asset (
 
 # --- !Downs
 
-DROP TABLE asset;
-DROP TABLE _core;
+DROP TABLE IF EXISTS asset;
+DROP TABLE IF EXISTS _core;
