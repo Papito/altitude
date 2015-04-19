@@ -26,6 +26,8 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
 
   protected def utcNow = Util.utcNow
 
+  protected def dtAsJsString(dt: DateTime) = JsString(Util.isoDateTime(Some(dt)))
+
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
     log.info(s"POSTGRES INSERT: $jsonIn", C.tag.DB)
     val run: QueryRunner = new QueryRunner()
@@ -48,8 +50,8 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     Future[JsObject] {
       jsonIn ++ JsObject(Seq(
         C.Base.ID -> JsString(id),
-        C.Base.CREATED_AT -> JsString(Util.isoDateTime(Some(createdAt)))
-      ))
+        C.Base.CREATED_AT -> dtAsJsString{createdAt})
+      )
      }
   }
 
