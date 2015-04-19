@@ -21,23 +21,29 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
   protected def conn(implicit txId: TransactionId): Connection =
     JdbcTransactionManager.transaction.conn
 
+  protected val coreSqlColsForInsert = s"${C.Base.ID}, ${C.Base.CREATED_AT}"
+  protected val coreSqlValuesForInsert = "?, TO_TIMESTAMP(?)"
+
+  protected def utcNow = Util.utcNow
+
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
     log.info(s"POSTGRES INSERT: $jsonIn", C.tag.DB)
     val run: QueryRunner = new QueryRunner()
 
     // append the id
     val id = BaseModel.genId
-    val createdAt = Util.utcNow
+    val createdAt = utcNow
 
     val q: String =
       s"""
-         |INSERT INTO $tableName (${C.Base.ID}, ${C.Base.CREATED_AT})
-         |     VALUES (?, TO_TIMESTAMP(?))
+         |INSERT INTO $tableName ($coreSqlColsForInsert)
+         |     VALUES ($coreSqlValuesForInsert)
          |""".stripMargin
 
-    run.update(conn, q,
-      id.asInstanceOf[Object],
-      createdAt.toDateTime.getMillis.asInstanceOf[Object])
+    val values: List[Object] = id :: createdAt.getMillis.asInstanceOf[Object] :: Nil
+
+    log.debug(s"SQL: $q. ARGS: ${values.toString()}")
+    run.update(conn, q, values:_*)
 
     Future[JsObject] {
       jsonIn ++ JsObject(Seq(

@@ -5,7 +5,7 @@
 --
 
 CREATE TABLE _core (
-    created_at timestamp WITHOUT TIME ZONE, -- FIXME: NOT NULL
+    created_at timestamp WITHOUT TIME ZONE NOT NULL,
     updated_at timestamp WITHOUT TIME ZONE DEFAULT NULL
 );
 
