@@ -22,26 +22,31 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
     // Postgres will reject this sequence with jsonb
     val metadata: String = asset.metadata.toString().replaceAll("\\\\u0000", "")
 
-    // append the id
     val id = BaseModel.genId
-    val json: JsObject = jsonIn ++ JsObject(Seq(C.Base.ID -> JsString(id)))
+    val createdAt = utcNow
 
     val q: String = s"""
         INSERT INTO $tableName (
-             ${C.Asset.ID}, ${C.Asset.MEDIA_TYPE},
+             $coreSqlColsForInsert, ${C.Asset.MEDIA_TYPE},
              ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE}, ${C.Asset.METADATA})
-            VALUES(?, ?, ?, ?, CAST(? AS jsonb))
+            VALUES($coreSqlValuesForInsert, ?, ?, ?, CAST(? AS jsonb))
     """
 
-    run.update(conn, q,
-      id,
-      asset.mediaType.mediaType,
-      asset.mediaType.mediaSubtype,
-      asset.mediaType.mime,
-      metadata)
+    val values: List[Object] =
+      id ::
+      createdAt.getMillis.asInstanceOf[Object] ::
+      asset.mediaType.mediaType ::
+      asset.mediaType.mediaSubtype ::
+      asset.mediaType.mime ::
+      metadata :: Nil
+
+    log.debug(s"SQL: $q. ARGS: ${values.toString()}")
+    run.update(conn, q, values:_*)
 
     Future[JsObject] {
-      json
+      jsonIn ++ JsObject(Seq(
+        C.Base.ID -> JsString(id),
+        C.Base.CREATED_AT -> dtAsJsString{createdAt}))
     }
   }
 

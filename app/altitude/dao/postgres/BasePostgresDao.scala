@@ -32,7 +32,6 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     log.info(s"POSTGRES INSERT: $jsonIn", C.tag.DB)
     val run: QueryRunner = new QueryRunner()
 
-    // append the id
     val id = BaseModel.genId
     val createdAt = utcNow
 
@@ -50,8 +49,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     Future[JsObject] {
       jsonIn ++ JsObject(Seq(
         C.Base.ID -> JsString(id),
-        C.Base.CREATED_AT -> dtAsJsString{createdAt})
-      )
+        C.Base.CREATED_AT -> dtAsJsString{createdAt}))
      }
   }
 
