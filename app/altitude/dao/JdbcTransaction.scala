@@ -3,7 +3,7 @@ package altitude.dao
 import java.sql.Connection
 import javax.sql.DataSource
 
-import altitude.util.log
+import altitude.Util.log
 import play.api.Play
 import play.api.Play.current
 import play.api.db.DB

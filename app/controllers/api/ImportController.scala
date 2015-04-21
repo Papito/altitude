@@ -3,7 +3,7 @@ package controllers.api
 import akka.actor.{Actor, ActorRef, Props}
 import altitude.models.{FileImportAsset, Asset}
 import altitude.services.AbstractTransactionManager
-import altitude.util.log
+import altitude.Util.log
 import altitude.{Const => C}
 import global.Altitude
 import org.json4s.DefaultFormats

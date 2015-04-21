@@ -2,7 +2,7 @@ package unit
 
 import java.util.logging.Level
 
-import altitude.util.log
+import altitude.Util.log
 import altitude.{Const => C}
 import org.scalatest.Matchers._
 import org.scalatest._

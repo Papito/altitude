@@ -1,6 +1,6 @@
 package controllers.web
 
-import altitude.util.log
+import altitude.Util.log
 import altitude.{Const => C}
 import play.api.mvc._
 

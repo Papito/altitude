@@ -3,7 +3,7 @@ package altitude.services
 import java.io.{StringWriter, InputStream}
 
 import altitude.models.{FileImportAsset, MediaType}
-import altitude.util.log
+import altitude.Util.log
 import altitude.{Const => C}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}

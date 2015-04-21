@@ -1,12 +1,10 @@
 package altitude.dao.postgres
 
 import altitude.models.{BaseModel, StoreLocation, MediaType, Asset}
-import altitude.{Const => C}
 import altitude.dao.TransactionId
-import altitude.util.log
+import altitude.Util.log
 import org.apache.commons.dbutils.QueryRunner
 import org.apache.commons.dbutils.handlers.MapListHandler
-import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

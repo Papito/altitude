@@ -4,7 +4,7 @@ import java.io.InputStream
 
 import altitude.dao.{TransactionId, FileSystemImportDao}
 import altitude.models.{StoreLocation, Asset, FileImportAsset, MediaType}
-import altitude.util.log
+import altitude.Util.log
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}

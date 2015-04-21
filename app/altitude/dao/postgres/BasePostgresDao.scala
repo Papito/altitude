@@ -6,7 +6,7 @@ import java.sql.Connection
 import altitude.dao.{BaseDao, TransactionId}
 import altitude.models.BaseModel
 import altitude.services.JdbcTransactionManager
-import altitude.util.log
+import altitude.Util.log
 import altitude.{Const => C, Util}
 import org.apache.commons.dbutils.QueryRunner
 import org.apache.commons.dbutils.handlers.MapListHandler

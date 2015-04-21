@@ -2,7 +2,7 @@ package altitude.dao.mongo
 
 import altitude.dao.{BaseDao, TransactionId}
 import altitude.models.BaseModel
-import altitude.util.log
+import altitude.Util.log
 import altitude.{Const => C, Util}
 import org.joda.time.DateTime
 import play.api.Play

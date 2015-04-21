@@ -2,7 +2,7 @@ package global
 
 import altitude.dao._
 import altitude.services._
-import altitude.util.log
+import altitude.Util.log
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
 import net.codingwell.scalaguice.ScalaModule

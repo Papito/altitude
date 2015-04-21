@@ -1,7 +1,7 @@
 package integration
 
 import altitude.dao.{Transaction, TransactionId}
-import altitude.util.log
+import altitude.Util.log
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
 import global.Altitude
