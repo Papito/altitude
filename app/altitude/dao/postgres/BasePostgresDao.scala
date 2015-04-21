@@ -29,19 +29,23 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
   protected def dtAsJsString(dt: DateTime) = JsString(Util.isoDateTime(Some(dt)))
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
-    log.info(s"POSTGRES INSERT: $jsonIn", C.tag.DB)
-    val run: QueryRunner = new QueryRunner()
-
-    val id = BaseModel.genId
-    val createdAt = utcNow
-
     val q: String =
       s"""
          |INSERT INTO $tableName ($coreSqlColsForInsert)
          |     VALUES ($coreSqlValuesForInsert)
          |""".stripMargin
 
-    val values: List[Object] = id :: createdAt.getMillis.asInstanceOf[Object] :: Nil
+    _add(jsonIn, q, List[Object]())
+  }
+
+  protected def _add(jsonIn: JsObject, q: String, vals: List[Object])(implicit txId: TransactionId): Future[JsObject] = {
+    log.info(s"POSTGRES INSERT: $jsonIn", C.tag.DB)
+    val run: QueryRunner = new QueryRunner()
+
+    val id = BaseModel.genId
+    val createdAt = utcNow
+
+    val values: List[Object] = id :: createdAt.getMillis.asInstanceOf[Object] :: vals
 
     log.debug(s"SQL: $q. ARGS: ${values.toString()}")
     run.update(conn, q, values:_*)
@@ -50,7 +54,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
       jsonIn ++ JsObject(Seq(
         C.Base.ID -> JsString(id),
         C.Base.CREATED_AT -> dtAsJsString{createdAt}))
-     }
+    }
   }
 
   override def getById(id: String)(implicit txId: TransactionId): Future[JsObject] = {
