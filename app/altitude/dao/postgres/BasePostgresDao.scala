@@ -22,6 +22,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     JdbcTransactionManager.transaction.conn
 
   protected val coreSqlColsForInsert = s"${C.Base.ID}, ${C.Base.CREATED_AT}"
+  protected val coreSqlColsForSelect = s"${C.Base.ID}, ${C.Base.CREATED_AT}, ${C.Base.UPDATED_AT}"
   protected val coreSqlValuesForInsert = "?, TO_TIMESTAMP(?)"
 
   protected def utcNow = Util.utcNow
@@ -63,23 +64,25 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
 
     val q: String =
       s"""
-         |SELECT ${C.Base.ID},
-         |       EXTRACT(EPOCH FROM created_at) AS created_at,
-         |       EXTRACT(EPOCH FROM updated_at) AS updated_at
-         |  FROM $tableName
-         | WHERE ${C.Base.ID} = ?
-         |""".stripMargin
+         |SELECT ${C.Base.ID}, *,
+         |EXTRACT(EPOCH FROM created_at) AS created_at,
+         |EXTRACT(EPOCH FROM updated_at) AS updated_at
+         | FROM $tableName
+         |WHERE ${C.Base.ID} = ?
+      |""".stripMargin
 
+    log.debug(s"SQL: $q")
     val res = run.query(conn, q, new MapListHandler(), id)
 
     log.debug(s"Found ${res.size()} records", C.tag.DB)
     if (res.size() == 0)
-      return Future[JsObject](Json.obj())
+      return Future[JsObject](Json.obj()) //FIXME: empty object semantics
 
     if (res.size() > 1)
       throw new Exception("getById should return only a single result")
     val rec = res.get(0)
 
+    log.debug(s"Record: $rec")
     val createdAtMilis = rec.get(C.Base.CREATED_AT).asInstanceOf[Double].toLong
     val createdAt: DateTime = new DateTime(createdAtMilis)
 
