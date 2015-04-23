@@ -97,13 +97,16 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     val updatedAt: DateTime = new DateTime(updatedAtMilis)
 
     Json.obj(
-      C.Base.ID -> rec.getOrElse(C.Base.ID, "").toString,
+      C.Base.ID -> {rec.get(C.Base.ID).isDefined match {
+        case false => JsNull
+        case _ => rec.get(C.Base.ID).get.toString
+      }},
       C.Base.CREATED_AT -> {createdAtMilis match {
-        case 0L => JsNull
+        case 0d => JsNull
         case _ => Util.isoDateTime(Some(createdAt))
       }},
       C.Base.UPDATED_AT -> {updatedAtMilis match {
-        case 0L => JsNull
+        case 0d => JsNull
         case _ => Util.isoDateTime(Some(updatedAt))
       }}
     )
