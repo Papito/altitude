@@ -13,6 +13,7 @@ import org.apache.commons.dbutils.handlers.MapListHandler
 import org.joda.time.DateTime
 import play.api.libs.json._
 
+import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -36,10 +37,10 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
          |     VALUES ($coreSqlValuesForInsert)
          |""".stripMargin
 
-    _add(jsonIn, q, List[Object]())
+    addRecord(jsonIn, q, List[Object]())
   }
 
-  protected def _add(jsonIn: JsObject, q: String, vals: List[Object])(implicit txId: TransactionId): Future[JsObject] = {
+  protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object])(implicit txId: TransactionId): Future[JsObject] = {
     log.info(s"POSTGRES INSERT: $jsonIn", C.tag.DB)
     val run: QueryRunner = new QueryRunner()
 
@@ -58,49 +59,58 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     }
   }
 
-  override def getById(id: String)(implicit txId: TransactionId): Future[JsObject] = {
+  protected def getRecordById(id: String)(implicit txId: TransactionId): Option[Map[String, AnyRef]] = {
     log.debug(s"Getting by ID '$id'", C.tag.DB)
     val run: QueryRunner = new QueryRunner()
 
     val q: String =
       s"""
          |SELECT ${C.Base.ID}, *,
-         |EXTRACT(EPOCH FROM created_at) AS created_at,
-         |EXTRACT(EPOCH FROM updated_at) AS updated_at
-         | FROM $tableName
-         |WHERE ${C.Base.ID} = ?
-      |""".stripMargin
+         |       EXTRACT(EPOCH FROM created_at) AS created_at,
+         |       EXTRACT(EPOCH FROM updated_at) AS updated_at
+         |  FROM $tableName
+         | WHERE ${C.Base.ID} = ?
+      """.stripMargin
 
     log.debug(s"SQL: $q")
     val res = run.query(conn, q, new MapListHandler(), id)
 
     log.debug(s"Found ${res.size()} records", C.tag.DB)
+
     if (res.size() == 0)
-      return Future[JsObject](Json.obj()) //FIXME: empty object semantics
+      return None
 
     if (res.size() > 1)
       throw new Exception("getById should return only a single result")
+
     val rec = res.get(0)
 
     log.debug(s"Record: $rec")
-    val createdAtMilis = rec.get(C.Base.CREATED_AT).asInstanceOf[Double].toLong
+    Some(rec.toMap[String, AnyRef])
+  }
+
+  protected def getCoreJson(rec: Map[String, AnyRef]): JsObject = {
+    val createdAtMilis = rec.getOrElse(C.Base.CREATED_AT, 0d).asInstanceOf[Double].toLong
     val createdAt: DateTime = new DateTime(createdAtMilis)
 
-    val updatedAtMilis = rec.get(C.Base.UPDATED_AT).asInstanceOf[Double].toLong
+    val updatedAtMilis = rec.getOrElse(C.Base.UPDATED_AT, 0d).asInstanceOf[Double].toLong
     val updatedAt: DateTime = new DateTime(updatedAtMilis)
 
-    Future[JsObject] {
-      Json.obj(
-        C.Base.ID -> rec.get(C.Base.ID).toString,
-        C.Base.CREATED_AT -> {createdAtMilis match {
-          case 0L => JsNull
-          case _ => Util.isoDateTime(Some(createdAt))
-        }},
-        C.Base.UPDATED_AT -> {updatedAtMilis match {
-          case 0L => JsNull
-          case _ => Util.isoDateTime(Some(updatedAt))
-        }}
-      )
-    }
+    Json.obj(
+      C.Base.ID -> rec.getOrElse(C.Base.ID, "").toString,
+      C.Base.CREATED_AT -> {createdAtMilis match {
+        case 0L => JsNull
+        case _ => Util.isoDateTime(Some(createdAt))
+      }},
+      C.Base.UPDATED_AT -> {updatedAtMilis match {
+        case 0L => JsNull
+        case _ => Util.isoDateTime(Some(updatedAt))
+      }}
+    )
+  }
+
+  override def getById(id: String)(implicit txId: TransactionId): Future[JsObject] = {
+    val rec = getRecordById(id).get // FIXME: does not handle no results!
+    Future[JsObject] {getCoreJson(rec)}
   }
 }

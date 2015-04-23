@@ -62,7 +62,7 @@ abstract class BaseModel {
   ).toSeq)
 
   // pull in core model attributes from JSON
-  protected def withCoreAttr(json: JsValue): this.type  = {
+  def withCoreAttr(json: JsValue): this.type  = {
     val isoCreatedAt = (json \ C.Base.CREATED_AT).asOpt[String]
     if (isoCreatedAt != None) {
       createdAt = ISODateTimeFormat.dateTime().parseDateTime(isoCreatedAt.get)

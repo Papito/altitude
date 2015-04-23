@@ -1,10 +1,8 @@
 package altitude.dao.postgres
 
-import altitude.models.{BaseModel, StoreLocation, MediaType, Asset}
+import altitude.models.{StoreLocation, MediaType, Asset}
 import altitude.dao.TransactionId
 import altitude.Util.log
-import org.apache.commons.dbutils.QueryRunner
-import org.apache.commons.dbutils.handlers.MapListHandler
 import play.api.libs.json._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -32,46 +30,27 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
       asset.mediaType.mime ::
       metadata :: Nil
 
-    _add(jsonIn, q, values)
+    addRecord(jsonIn, q, values)
   }
 
   override def getById(id: String)(implicit txId: TransactionId): Future[JsObject] = {
-    log.debug(s"Getting by ID '$id'", C.tag.DB)
-    val run: QueryRunner = new QueryRunner()
-
-    val q: String = s"""
-        SELECT ${C.Asset.ID}, ${C.Asset.MEDIA_TYPE},
-               ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE}, ${C.Asset.METADATA}
-          FROM $tableName
-         WHERE id = ?
-    """
-
-    val res = run.query(conn, q, new MapListHandler(), id)
-
-    log.debug(s"Found ${res.size()} records", C.tag.DB)
-    if (res.size() == 0)
-      return Future[JsObject](Json.obj())
-
-    if (res.size() > 1)
-      throw new Exception("getById should return only a single result")
-
-    val rec = res.get(0)
+    val rec = getRecordById(id).get
+    val coreJson = getCoreJson(rec)
 
     val mediaType = new MediaType(
-      mediaType = rec.get(C.Asset.MEDIA_TYPE).toString,
-      mediaSubtype = rec.get(C.Asset.MEDIA_SUBTYPE).toString,
-      mime = rec.get(C.Asset.MIME_TYPE).toString
-    )
+      mediaType = rec.get(C.Asset.MEDIA_TYPE).get.toString,
+      mediaSubtype = rec.get(C.Asset.MEDIA_SUBTYPE).get.toString,
+      mime = rec.get(C.Asset.MIME_TYPE).get.toString)
 
     val locations = List[StoreLocation](
-      StoreLocation(storageId = "1", path =  "")
-    )
+      StoreLocation(storageId = "1", path =  ""))
 
     Future[JsObject] {
-      Asset(id = Some(rec.get(C.Asset.ID).toString),
+      Asset(id = Some(rec.get(C.Asset.ID).get.toString),
             locations = locations,
             mediaType = mediaType,
-            metadata = Json.parse(rec.get(C.Asset.METADATA).toString)): JsObject
+            metadata = Json.parse(rec.get(C.Asset.METADATA).get.toString)
+      ).withCoreAttr(coreJson)
     }
   }
 }
