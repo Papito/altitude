@@ -17,7 +17,7 @@
 package altitude.dao
 
 import altitude.models.{StorageType, Storage}
-import play.api.libs.json.{JsObject, JsValue}
+import play.api.libs.json.JsObject
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future

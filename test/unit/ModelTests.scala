@@ -2,7 +2,7 @@ package unit
 
 import java.io.File
 
-import altitude.models.{StoreLocation, Asset, BaseModel, FileImportAsset}
+import altitude.models.{AssetLocation, Asset, BaseModel, FileImportAsset}
 import org.scalatest.Matchers._
 import org.scalatest._
 import altitude.{Const => C}

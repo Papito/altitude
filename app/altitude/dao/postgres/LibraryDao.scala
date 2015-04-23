@@ -1,6 +1,6 @@
 package altitude.dao.postgres
 
-import altitude.models.{StoreLocation, MediaType, Asset}
+import altitude.models.{AssetLocation, MediaType, Asset}
 import altitude.dao.TransactionId
 import altitude.Util.log
 import play.api.libs.json._
@@ -47,8 +47,8 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
       mediaSubtype = rec.get(C.Asset.MEDIA_SUBTYPE).get.toString,
       mime = rec.get(C.Asset.MIME_TYPE).get.toString)
 
-    val locations = List[StoreLocation](
-      StoreLocation(storageId = "1", path =  ""))
+    val locations = List[AssetLocation](
+      AssetLocation(locId = "1", path =  ""))
 
     Future[Option[JsObject]] {
       val model = Asset(id = Some(rec.get(C.Asset.ID).get.toString),

@@ -10,14 +10,14 @@ object Asset {
   implicit def fromJson(json: JsValue): Asset = Asset(
       id = (json \ C.Asset.ID).asOpt[String],
       mediaType = json \ C.Asset.MEDIA_TYPE,
-      locations = (json \ C.Asset.LOCATIONS).as[List[JsValue]].map(StoreLocation.fromJson),
+      locations = (json \ C.Asset.LOCATIONS).as[List[JsValue]].map(AssetLocation.fromJson),
       metadata = json \ C.Asset.METADATA
     ).withCoreAttr(json)
   }
 
 case class Asset(id: Option[String] = None,
                  mediaType: MediaType,
-                 locations: List[StoreLocation],
+                 locations: List[AssetLocation],
                  metadata: JsValue = JsNull) extends BaseModel {
 
   override def toJson = Json.obj(
