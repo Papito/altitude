@@ -112,6 +112,15 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     )
   }
 
+  def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit = {
+    val createdAtMilis = rec.getOrElse(C.Base.CREATED_AT, 0d).asInstanceOf[Double].toLong
+    model.createdAt = new DateTime(createdAtMilis)
+
+    val updatedAtMilis = rec.getOrElse(C.Base.UPDATED_AT, 0d).asInstanceOf[Double].toLong
+    model.updatedAt = new DateTime(updatedAtMilis)
+
+  }
+
   override def getById(id: String)(implicit txId: TransactionId): Future[JsObject] = {
     val rec = getRecordById(id).get // FIXME: does not handle no results!
     Future[JsObject] {getCoreJson(rec)}

@@ -35,7 +35,6 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
 
   override def getById(id: String)(implicit txId: TransactionId): Future[JsObject] = {
     val rec = getRecordById(id).get
-    val coreJson = getCoreJson(rec)
 
     val mediaType = new MediaType(
       mediaType = rec.get(C.Asset.MEDIA_TYPE).get.toString,
@@ -46,11 +45,13 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
       StoreLocation(storageId = "1", path =  ""))
 
     Future[JsObject] {
-      Asset(id = Some(rec.get(C.Asset.ID).get.toString),
+      val model = Asset(id = Some(rec.get(C.Asset.ID).get.toString),
             locations = locations,
             mediaType = mediaType,
-            metadata = Json.parse(rec.get(C.Asset.METADATA).get.toString)
-      ).withCoreAttr(coreJson)
+            metadata = Json.parse(rec.get(C.Asset.METADATA).get.toString))
+
+      addCoreAttrs(model, rec)
+      model
     }
   }
 }
