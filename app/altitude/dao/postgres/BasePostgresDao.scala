@@ -89,14 +89,27 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     Some(rec.toMap[String, AnyRef])
   }
 
-  protected def getCoreJson(rec: Map[String, AnyRef]): JsObject = {
+  def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit = {
+    val createdAtMilis = rec.getOrElse(C.Base.CREATED_AT, 0d).asInstanceOf[Double].toLong
+    if (createdAtMilis != 0d) {
+      model.createdAt = new DateTime(createdAtMilis)
+    }
+
+    val updatedAtMilis = rec.getOrElse(C.Base.UPDATED_AT, 0d).asInstanceOf[Double].toLong
+    if (updatedAtMilis != 0d) {
+      model.createdAt = new DateTime(createdAtMilis)
+    }
+  }
+
+  override def getById(id: String)(implicit txId: TransactionId): Future[JsObject] = {
+    val rec = getRecordById(id).get // FIXME: does not handle no results!
     val createdAtMilis = rec.getOrElse(C.Base.CREATED_AT, 0d).asInstanceOf[Double].toLong
     val createdAt: DateTime = new DateTime(createdAtMilis)
 
     val updatedAtMilis = rec.getOrElse(C.Base.UPDATED_AT, 0d).asInstanceOf[Double].toLong
     val updatedAt: DateTime = new DateTime(updatedAtMilis)
 
-    Json.obj(
+    val res = Json.obj(
       C.Base.ID -> {rec.get(C.Base.ID).isDefined match {
         case false => JsNull
         case _ => rec.get(C.Base.ID).get.toString
@@ -110,19 +123,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
         case _ => Util.isoDateTime(Some(updatedAt))
       }}
     )
-  }
 
-  def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit = {
-    val createdAtMilis = rec.getOrElse(C.Base.CREATED_AT, 0d).asInstanceOf[Double].toLong
-    model.createdAt = new DateTime(createdAtMilis)
-
-    val updatedAtMilis = rec.getOrElse(C.Base.UPDATED_AT, 0d).asInstanceOf[Double].toLong
-    model.updatedAt = new DateTime(updatedAtMilis)
-
-  }
-
-  override def getById(id: String)(implicit txId: TransactionId): Future[JsObject] = {
-    val rec = getRecordById(id).get // FIXME: does not handle no results!
-    Future[JsObject] {getCoreJson(rec)}
+    Future[JsObject] {res}
   }
 }
