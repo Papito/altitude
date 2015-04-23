@@ -15,7 +15,7 @@ import scala.concurrent.Future
     val fileImportAsset = new FileImportAsset(new File(path))
 
     val importedAsset = altitude.service.fileImport.importAsset(fileImportAsset).futureValue
-    val asset = altitude.service.library.getById(importedAsset.id.get).futureValue: Asset
+    val asset = altitude.service.library.getById(importedAsset.id.get).futureValue.get: Asset
     asset.mediaType should equal(importedAsset.mediaType)
   }
 
@@ -23,7 +23,7 @@ import scala.concurrent.Future
     val path = getClass.getResource("../files/incoming/audio/all.mp3").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
     val importedAsset = altitude.service.fileImport.importAsset(fileImportAsset).futureValue
-    val asset = altitude.service.library.getById(importedAsset.id.get).futureValue: Asset
+    val asset = altitude.service.library.getById(importedAsset.id.get).futureValue.get: Asset
     asset.mediaType should equal(importedAsset.mediaType)
     (asset.metadata \ "Author").as[String] should equal("Whitney Houston")
   }

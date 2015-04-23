@@ -38,9 +38,12 @@ trait BaseDaoTests extends IntegrationTestCore {
 
     // retrieve the object
     val future2 = service.getById(id)
-    val js2: JsObject = future2.futureValue
-    js \ C.Base.CREATED_AT should be (an[JsString])
-    js \ C.Base.UPDATED_AT should be(JsNull)
+    val js2Opt: Option[JsObject] = future2.futureValue
+    js2Opt should not be None
+
+    val js2 = js2Opt.get
+    js2 \ C.Base.CREATED_AT should be (an[JsString])
+    js2 \ C.Base.UPDATED_AT should be(JsNull)
 
     val model2 = js2: TestModel
     model2.id.get should be(id)

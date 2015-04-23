@@ -50,20 +50,25 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
       else throw res.getCause}
   }
 
-  override def getById(id: String)(implicit txId: TransactionId): Future[JsObject] = {
+  override def getById(id: String)(implicit txId: TransactionId): Future[Option[JsObject]] = {
     log.debug(s"Getting by ID '$id'", C.tag.DB)
 
-    val query = JsObject(Seq(
-      "_id" -> Json.obj("$oid" -> id)))
+    val query = JsObject(Seq("_id" -> Json.obj("$oid" -> id)))
 
     val cursor: Cursor[JsObject] = collection.find(query).cursor[JsObject]
     val f: Future[List[JsObject]] = cursor.collect[List](upTo = 2)
 
     f map { results =>
       log.debug(s"Found ${results.length} records", C.tag.DB)
+
       if (results.length > 1) throw new Exception("getById should return only a single result")
 
-      fixMongoFields(results.head)
+      if (results.length == 0) {
+        return Future{None}
+      }
+
+      val res = fixMongoFields(results.head)
+      Some(res)
     }
   }
 

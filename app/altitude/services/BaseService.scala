@@ -23,8 +23,8 @@ abstract class BaseService[Model <: BaseModel] {
     }
   }
 
-  def getById(id: String)(implicit txId: TransactionId = new TransactionId): Future[JsObject] = {
-    txManager.asReadOnly[Future[JsObject]] {
+  def getById(id: String)(implicit txId: TransactionId = new TransactionId): Future[Option[JsObject]] = {
+    txManager.asReadOnly[Future[Option[JsObject]]] {
       val f = DAO.getById(id)
       f map {res => res}
     }

@@ -101,8 +101,15 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     }
   }
 
-  override def getById(id: String)(implicit txId: TransactionId): Future[JsObject] = {
-    val rec = getRecordById(id).get // FIXME: does not handle no results!
+  override def getById(id: String)(implicit txId: TransactionId): Future[Option[JsObject]] = {
+    val recOpt = getRecordById(id)
+
+    if (recOpt == None) {
+      return Future[Option[JsObject]] {None}
+    }
+
+    val rec = recOpt.get
+
     val createdAtMilis = rec.getOrElse(C.Base.CREATED_AT, 0d).asInstanceOf[Double].toLong
     val createdAt: DateTime = new DateTime(createdAtMilis)
 
@@ -124,6 +131,6 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
       }}
     )
 
-    Future[JsObject] {res}
+    Future[Option[JsObject]] {Some(res)}
   }
 }
