@@ -1,6 +1,5 @@
 package altitude.models
 
-import org.joda.time.{DateTime}
 import play.api.libs.json._
 import altitude.{Const => C}
 

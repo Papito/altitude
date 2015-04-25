@@ -31,11 +31,9 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
   protected def dtAsJsString(dt: DateTime) = JsString(Util.isoDateTime(Some(dt)))
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
-    val q: String =
-      s"""
-         |INSERT INTO $tableName ($coreSqlColsForInsert)
-         |     VALUES ($coreSqlValuesForInsert)
-         |""".stripMargin
+    val q: String =s"""
+      INSERT INTO $tableName ($coreSqlColsForInsert)
+           VALUES ($coreSqlValuesForInsert)"""
 
     addRecord(jsonIn, q, List[Object]())
   }
@@ -63,14 +61,12 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     log.debug(s"Getting by ID '$id'", C.tag.DB)
     val run: QueryRunner = new QueryRunner()
 
-    val q: String =
-      s"""
-         |SELECT ${C.Base.ID}, *,
-         |       EXTRACT(EPOCH FROM created_at) AS created_at,
-         |       EXTRACT(EPOCH FROM updated_at) AS updated_at
-         |  FROM $tableName
-         | WHERE ${C.Base.ID} = ?
-      """.stripMargin
+    val q =s"""
+      SELECT ${C.Base.ID}, *,
+             EXTRACT(EPOCH FROM created_at) AS created_at,
+             EXTRACT(EPOCH FROM updated_at) AS updated_at
+        FROM $tableName
+       WHERE ${C.Base.ID} = ?"""
 
     log.debug(s"SQL: $q")
     val res = run.query(conn, q, new MapListHandler(), id)
