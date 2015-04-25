@@ -9,18 +9,18 @@ object Asset {
   implicit def fromJson(json: JsValue): Asset = Asset(
       id = (json \ C.Asset.ID).asOpt[String],
       mediaType = json \ C.Asset.MEDIA_TYPE,
-      locations = (json \ C.Asset.LOCATIONS).as[List[JsValue]].map(AssetLocation.fromJson),
+      path = (json \ C.Asset.PATH).as[String],
       metadata = json \ C.Asset.METADATA
     ).withCoreAttr(json)
   }
 
 case class Asset(id: Option[String] = None,
                  mediaType: MediaType,
-                 locations: List[AssetLocation],
+                 path: String,
                  metadata: JsValue = JsNull) extends BaseModel {
 
   override def toJson = Json.obj(
-      C.Asset.LOCATIONS -> locations.map(_.toJson),
+      C.Asset.PATH -> path,
       C.Asset.MEDIA_TYPE -> (mediaType: JsValue),
       C.Asset.METADATA -> metadata
     ) ++ coreJsonAttrs

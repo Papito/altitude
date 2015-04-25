@@ -25,9 +25,7 @@ import scala.concurrent.Future
     val importedAsset = altitude.service.fileImport.importAsset(fileImportAsset).futureValue
     val asset = altitude.service.library.getById(importedAsset.id.get).futureValue.get: Asset
     asset.mediaType should equal(importedAsset.mediaType)
-    asset.locations.length should be > 0
-    val loc = asset.locations.head
-    loc.path should not be empty
+    asset.path should not be empty
     asset
   }
 
