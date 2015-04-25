@@ -48,7 +48,7 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
         """
 
       val location_query_values: List[Object] = asset.locations.foldLeft(List[Object]()) {
-        (res, el) => (record \ C.Asset.ID).as[String] :: el.locId.toInt.asInstanceOf[Object] :: el.path :: res
+        (res, el) => (record \ C.Asset.ID).as[String] :: el.locId.asInstanceOf[Object] :: el.path :: res
       }
 
       val run: QueryRunner = new QueryRunner()
@@ -75,7 +75,7 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
       mime = rec.get(C.Asset.MIME_TYPE).get.toString)
 
     val locations = List[AssetLocation](
-      AssetLocation(locId = "1", path =  ""))
+      AssetLocation(locId = 1, path =  ""))
 
     Future[Option[JsObject]] {
       val model = Asset(id = Some(rec.get(C.Asset.ID).get.toString),

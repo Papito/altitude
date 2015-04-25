@@ -6,12 +6,12 @@ import scala.language.implicitConversions
 
 object AssetLocation {
   implicit def fromJson(json: JsValue): AssetLocation = AssetLocation(
-    locId = (json \ C.AssetLocation.LOC_ID).as[String],
+    locId = (json \ C.AssetLocation.LOC_ID).as[Int],
     path = (json \ C.AssetLocation.PATH).as[String]
   )
 }
 
-case class AssetLocation(locId: String, path: String) extends BaseModel with NoId {
+case class AssetLocation(locId: Int, path: String) extends BaseModel with NoId {
   override def toJson = Json.obj(
     C.AssetLocation.LOC_ID -> locId,
     C.AssetLocation.PATH -> path)

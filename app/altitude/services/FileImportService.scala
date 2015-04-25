@@ -58,7 +58,7 @@ class FileImportService extends BaseService {
     val mediaType = detectAssetType(fileAsset)
     val metadata: JsValue = app.service.metadata.extract(fileAsset, mediaType)
     val locations = List[AssetLocation](
-      AssetLocation(locId = "1", path =  fileAsset.absolutePath)
+      AssetLocation(locId = 1, path =  fileAsset.absolutePath)
     )
     val asset = Asset(locations = locations, mediaType = mediaType, metadata = metadata)
     val f = app.service.library.add(asset)
