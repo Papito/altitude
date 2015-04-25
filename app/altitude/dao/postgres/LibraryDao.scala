@@ -4,7 +4,6 @@ import altitude.models.{AssetLocation, MediaType, Asset}
 import altitude.dao.TransactionId
 import altitude.Util.log
 import org.apache.commons.dbutils.QueryRunner
-import play.api.libs.json._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import altitude.{Const => C}
@@ -61,30 +60,43 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
   }
 
   override def getById(id: String)(implicit txId: TransactionId): Future[Option[JsObject]] = {
-    val recOpt = getRecordById(id)
+    log.debug(s"Getting by ID '$id'", C.tag.DB)
+    val run: QueryRunner = new QueryRunner()
 
-    if (recOpt == None) {
-      return Future[Option[JsObject]] {None}
-    }
+    // FIXME: this only assumes one supported storage for now
+    val q =s"""
+      SELECT ${C.Base.ID}, *,
+             EXTRACT(EPOCH FROM a.created_at) AS created_at,
+             EXTRACT(EPOCH FROM a.updated_at) AS updated_at
+        FROM $tableName as a, asset_location al
+       WHERE ${C.Base.ID} = ? AND a.id = al.asset_id"""
 
-    val rec = recOpt.get
+    val optRec = oneBySqlQuery(q, List(id))
 
-    val mediaType = new MediaType(
-      mediaType = rec.get(C.Asset.MEDIA_TYPE).get.toString,
-      mediaSubtype = rec.get(C.Asset.MEDIA_SUBTYPE).get.toString,
-      mime = rec.get(C.Asset.MIME_TYPE).get.toString)
+    optRec match {
+      case None => Future {None}
+      case _ =>
+        val rec = optRec.get
 
-    val locations = List[AssetLocation](
-      AssetLocation(locId = 1, path =  ""))
+        val mediaType = new MediaType(
+          mediaType = rec.get(C.Asset.MEDIA_TYPE).get.toString,
+          mediaSubtype = rec.get(C.Asset.MEDIA_SUBTYPE).get.toString,
+          mime = rec.get(C.Asset.MIME_TYPE).get.toString)
 
-    Future[Option[JsObject]] {
-      val model = Asset(id = Some(rec.get(C.Asset.ID).get.toString),
+        val locations = List[AssetLocation](
+          AssetLocation(
+            locId = rec.get(C.AssetLocation.STORAGE_ID).get.asInstanceOf[Int],
+            path =  rec.get(C.AssetLocation.PATH).get.toString))
+
+        Future {
+          val model = Asset(id = Some(rec.get(C.Asset.ID).get.toString),
             locations = locations,
             mediaType = mediaType,
             metadata = Json.parse(rec.get(C.Asset.METADATA).get.toString))
 
-      addCoreAttrs(model, rec)
-      Some(model)
+          addCoreAttrs(model, rec)
+          Some(model)
+        }
     }
   }
 }

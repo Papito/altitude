@@ -32,7 +32,7 @@ object Const {
   }
 
   object AssetLocation extends Common {
-    val LOC_ID = "loc_id"
+    val STORAGE_ID = "storage_id"
     val PATH = "path"
   }
   object Metadata extends Common
