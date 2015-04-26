@@ -23,13 +23,14 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
      */
     val asset_query = s"""
         INSERT INTO $tableName (
-             $coreSqlColsForInsert, ${C.Asset.PATH}, ${C.Asset.MEDIA_TYPE},
+             $coreSqlColsForInsert, ${C.Asset.PATH}, ${C.Asset.MD5}, ${C.Asset.MEDIA_TYPE},
              ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE}, ${C.Asset.METADATA})
-            VALUES($coreSqlValuesForInsert, ?, ?, ?, ?, CAST(? AS jsonb))
+            VALUES($coreSqlValuesForInsert, ?, ?, ?, ?, ?, CAST(? AS jsonb))
     """
 
     val asset_query_values: List[Object] =
       asset.path ::
+      asset.md5 ::
       asset.mediaType.mediaType ::
       asset.mediaType.mediaSubtype ::
       asset.mediaType.mime ::
@@ -64,6 +65,7 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
         Future {
           val model = Asset(id = Some(rec.get(C.Asset.ID).get.toString),
             path = rec.get(C.Asset.PATH).get.toString,
+            md5 = rec.get(C.Asset.MD5).get.toString,
             mediaType = mediaType,
             metadata = Json.parse(rec.get(C.Asset.METADATA).get.toString))
 

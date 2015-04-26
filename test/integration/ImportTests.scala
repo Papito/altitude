@@ -26,6 +26,7 @@ import scala.concurrent.Future
     val asset = altitude.service.library.getById(importedAsset.id.get).futureValue.get: Asset
     asset.mediaType should equal(importedAsset.mediaType)
     asset.path should not be empty
+    asset.md5 should not be empty
     asset
   }
 

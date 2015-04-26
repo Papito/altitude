@@ -20,6 +20,7 @@ object Const {
   object Asset extends Common {
     val MEDIA_TYPE = "media_type"
     val PATH = "path"
+    val MD5 = "md5"
     val MEDIA_SUBTYPE = "media_subtype"
     val MIME_TYPE = "mime_type"
     val METADATA = "metadata"

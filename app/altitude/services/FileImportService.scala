@@ -5,6 +5,7 @@ import java.io.InputStream
 import altitude.dao.{TransactionId, FileSystemImportDao}
 import altitude.models.{Asset, FileImportAsset, MediaType}
 import altitude.Util.log
+import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
@@ -14,7 +15,10 @@ import play.api.libs.json.{JsObject, JsValue}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import altitude.{Const => C}
-
+import java.io.File
+import java.io.FileInputStream
+import java.io.IOException
+import java.io.InputStream
 
 class FileImportService extends BaseService {
   protected val DAO = new FileSystemImportDao
@@ -57,8 +61,28 @@ class FileImportService extends BaseService {
     log.info(s"Importing file asset '$fileAsset'", C.tag.SERVICE)
     val mediaType = detectAssetType(fileAsset)
     val metadata: JsValue = app.service.metadata.extract(fileAsset, mediaType)
-    val asset = Asset(path = fileAsset.absolutePath, mediaType = mediaType, metadata = metadata)
+
+    val asset = Asset(
+      path = fileAsset.absolutePath,
+      md5 = getChecksum(fileAsset.absolutePath),
+      mediaType = mediaType,
+      metadata = metadata)
+
     val f = app.service.library.add(asset)
     f map { res => res }
   }
+
+  protected def getChecksum(file: File): String = {
+    var inputStream: InputStream = null
+
+    try {
+      inputStream = new FileInputStream(file)
+      DigestUtils.md5Hex(inputStream)
+    }
+    finally  {
+      inputStream.close()
+    }
+  }
+
+  protected def getChecksum(path: String): String = getChecksum(new File(path))
 }

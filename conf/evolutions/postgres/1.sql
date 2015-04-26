@@ -11,6 +11,7 @@ CREATE TABLE _core (
 
 CREATE TABLE asset (
     id varchar(24) PRIMARY KEY,
+    md5 varchar(32) NOT NULL,
     media_type varchar(64) NOT NULL,
     media_subtype varchar(64) NOT NULL,
     mime_type varchar(64) NOT NULL,
@@ -18,6 +19,7 @@ CREATE TABLE asset (
     path TEXT NOT NULL
 ) INHERITS (_core);
 
+CREATE UNIQUE INDEX asset_md5 ON asset(md5);
 
 # --- !Downs
 
