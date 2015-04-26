@@ -4,10 +4,10 @@ import java.sql.Connection
 import javax.sql.DataSource
 
 import altitude.Util.log
+import altitude.{Const => C}
 import play.api.Play
 import play.api.Play.current
 import play.api.db.DB
-import altitude.{Const => C}
 
 class JdbcTransaction extends Transaction {
   Transaction.CREATED += 1

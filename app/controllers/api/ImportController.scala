@@ -1,19 +1,18 @@
 package controllers.api
 
 import akka.actor.{Actor, ActorRef, Props}
-import altitude.models.{FileImportAsset, Asset}
-import altitude.services.AbstractTransactionManager
 import altitude.Util.log
+import altitude.models.FileImportAsset
+import altitude.services.AbstractTransactionManager
 import altitude.{Const => C}
 import global.Altitude
+import net.codingwell.scalaguice.InjectorExtensions._
 import org.json4s.DefaultFormats
 import org.json4s.native.Serialization._
 import play.api.Play
 import play.api.Play.current
-import play.api.mvc._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-
-import net.codingwell.scalaguice.InjectorExtensions._
+import play.api.mvc._
 
 object ImportController extends Controller {
   implicit val formats = DefaultFormats

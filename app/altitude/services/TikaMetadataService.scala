@@ -1,19 +1,19 @@
 package altitude.services
 
-import java.io.{StringWriter, InputStream}
+import java.io.{InputStream, StringWriter}
 
-import altitude.models.{FileImportAsset, MediaType}
 import altitude.Util.log
+import altitude.models.{FileImportAsset, MediaType}
 import altitude.{Const => C}
 import org.apache.tika.io.TikaInputStream
+import org.apache.tika.metadata.serialization.JsonMetadata
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.parser.AbstractParser
 import org.apache.tika.parser.audio.AudioParser
 import org.apache.tika.parser.image.ImageParser
 import org.apache.tika.parser.mp3.Mp3Parser
-import org.apache.tika.metadata.serialization.JsonMetadata
 import org.xml.sax.helpers.DefaultHandler
-import play.api.libs.json.{Json, JsNull, JsValue}
+import play.api.libs.json.{JsNull, JsValue, Json}
 
 class TikaMetadataService extends AbstractMetadataService {
 

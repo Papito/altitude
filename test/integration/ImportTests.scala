@@ -2,12 +2,9 @@ package integration
 
 import java.io.File
 
-import altitude.dao.TransactionId
 import altitude.models.{Asset, FileImportAsset}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
-
-import scala.concurrent.Future
 
 @DoNotDiscover class ImportTests(val config: Map[String, _]) extends IntegrationTestCore {
   test("import image (JPEG)") {

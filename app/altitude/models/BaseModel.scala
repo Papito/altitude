@@ -1,11 +1,10 @@
 package altitude.models
 
+import altitude.{Const => C, Util}
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json._
 import reactivemongo.bson.BSONObjectID
-import altitude.{Const => C}
-import altitude.Util
 
 import scala.language.implicitConversions
 

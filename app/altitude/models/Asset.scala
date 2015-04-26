@@ -1,7 +1,7 @@
 package altitude.models
 
-import play.api.libs.json._
 import altitude.{Const => C}
+import play.api.libs.json._
 
 import scala.language.implicitConversions
 

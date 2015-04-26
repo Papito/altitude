@@ -1,13 +1,14 @@
 package altitude.dao.postgres
 
-import altitude.models.{MediaType, Asset}
-import altitude.dao.TransactionId
 import altitude.Util.log
+import altitude.dao.TransactionId
+import altitude.models.{Asset, MediaType}
+import altitude.{Const => C}
 import org.apache.commons.dbutils.QueryRunner
+import play.api.libs.json._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import altitude.{Const => C}
-import play.api.libs.json._
 
 
 class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {

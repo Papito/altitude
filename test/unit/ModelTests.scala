@@ -2,10 +2,9 @@ package unit
 
 import java.io.File
 
-import altitude.models.{AssetLocation, Asset, BaseModel, FileImportAsset}
-import org.scalatest.Matchers._
-import org.scalatest._
+import altitude.models.{BaseModel, FileImportAsset}
 import altitude.{Const => C}
+import org.scalatest._
 import play.api.libs.json._
 
 class ModelTests extends FunSuite {

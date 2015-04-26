@@ -4,7 +4,7 @@ import altitude.dao.{BaseDao, TransactionId}
 import altitude.models.BaseModel
 import global.Altitude
 import net.codingwell.scalaguice.InjectorExtensions._
-import play.api.libs.json.{JsObject, JsValue}
+import play.api.libs.json.JsObject
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

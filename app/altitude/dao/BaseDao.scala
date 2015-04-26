@@ -1,7 +1,7 @@
 package altitude.dao
 
 import global.Altitude
-import play.api.libs.json.{JsObject, JsValue}
+import play.api.libs.json.JsObject
 
 import scala.concurrent.Future
 

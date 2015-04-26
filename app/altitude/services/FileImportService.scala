@@ -1,24 +1,20 @@
 package altitude.services
 
-import java.io.InputStream
+import java.io.{File, FileInputStream, InputStream}
 
-import altitude.dao.{TransactionId, FileSystemImportDao}
-import altitude.models.{Asset, FileImportAsset, MediaType}
 import altitude.Util.log
+import altitude.dao.{FileSystemImportDao, TransactionId}
+import altitude.models.{Asset, FileImportAsset, MediaType}
+import altitude.{Const => C}
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
-import play.api.libs.json.{JsObject, JsValue}
+import play.api.libs.json.JsValue
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import altitude.{Const => C}
-import java.io.File
-import java.io.FileInputStream
-import java.io.IOException
-import java.io.InputStream
 
 class FileImportService extends BaseService {
   protected val DAO = new FileSystemImportDao

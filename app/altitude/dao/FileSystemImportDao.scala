@@ -2,14 +2,13 @@ package altitude.dao
 
 import java.io.File
 
-import altitude.models.FileImportAsset
 import altitude.Util.log
+import altitude.models.FileImportAsset
 import altitude.{Const => C}
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.JsObject
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class FileSystemImportDao extends BaseDao {
