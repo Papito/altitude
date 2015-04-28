@@ -4,6 +4,7 @@ import java.util.NoSuchElementException
 
 import altitude.Util.log
 import altitude.dao.{TransactionId, LibraryDao}
+import altitude.exceptions.DuplicateException
 import altitude.models.Asset
 import altitude.models.search.Query
 import net.codingwell.scalaguice.InjectorExtensions._
@@ -28,7 +29,7 @@ class LibraryService extends BaseService[Asset] {
 
       f recover {
         // if filter fails and there IS a duplicate
-        case ex: NoSuchElementException => asset
+        case ex: NoSuchElementException => throw new DuplicateException(s"Duplicate for ${asset.path}")
       }
     }
   }

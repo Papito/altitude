@@ -1,12 +1,14 @@
 package integration
-
+import scala.util.{Success, Failure}
 import java.io.File
 
+import altitude.exceptions.DuplicateException
 import altitude.models.search.Query
 import altitude.models.{Asset, FileImportAsset}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 import play.api.libs.json.JsObject
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
@@ -28,13 +30,14 @@ import scala.concurrent.Future
 
   test("import duplicate") {
     importFile("images/1.jpg")
-
-    // again
     val path = getClass.getResource(s"../files/incoming/images/1.jpg").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
-    val importedAsset = altitude.service.fileImport.importAsset(fileImportAsset).futureValue
-    importedAsset.id should be(None)
-    importedAsset.createdAt should be(None)
+    val importedAsset: Future[Asset] = altitude.service.fileImport.importAsset(fileImportAsset)
+
+    importedAsset onComplete  {
+      case Success(res) => fail("Should throw a duplicate exception")
+      case Failure(ex) => ex shouldBe a [DuplicateException]
+    }
   }
 
   protected def importFile(p: String): Asset = {
