@@ -6,6 +6,7 @@ import java.sql.Connection
 import altitude.Util.log
 import altitude.dao.{BaseDao, TransactionId}
 import altitude.models.BaseModel
+import altitude.models.search.Query
 import altitude.services.JdbcTransactionManager
 import altitude.{Const => C, Util}
 import org.apache.commons.dbutils.QueryRunner
@@ -69,6 +70,10 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     )
 
     Future[Option[JsObject]] {Some(res)}
+  }
+
+  override def query(q: Query)(implicit txId: TransactionId): Future[List[JsObject]] = {
+    throw new NotImplementedError()
   }
 
   protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object])(implicit txId: TransactionId): Future[JsObject] = {

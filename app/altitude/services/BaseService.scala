@@ -2,11 +2,11 @@ package altitude.services
 
 import altitude.dao.{BaseDao, TransactionId}
 import altitude.models.BaseModel
+import altitude.models.search.Query
 import global.Altitude
 import net.codingwell.scalaguice.InjectorExtensions._
 import play.api.libs.json.JsObject
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.language.implicitConversions
 
@@ -18,21 +18,25 @@ abstract class BaseService[Model <: BaseModel] {
 
   def add(obj: Model)(implicit txId: TransactionId = new TransactionId): Future[JsObject] = {
     txManager.withTransaction[Future[JsObject]] {
-      val f = DAO.add(obj.toJson)
-      f map {res => res}
+      DAO.add(obj.toJson)
     }
   }
 
   def getById(id: String)(implicit txId: TransactionId = new TransactionId): Future[Option[JsObject]] = {
     txManager.asReadOnly[Future[Option[JsObject]]] {
-      val f = DAO.getById(id)
-      f map {res => res}
+      DAO.getById(id)
     }
   }
 
-  def getAll()(implicit txId: TransactionId = new TransactionId): Future[List[JsObject]] =
+  def getAll()(implicit txId: TransactionId = new TransactionId): Future[List[JsObject]] = {
     txManager.asReadOnly[Future[List[JsObject]]] {
-      val f = DAO.getAll
-      f map {res => res}
+      DAO.getAll
     }
+  }
+
+  def query(query: Query)(implicit txId: TransactionId = new TransactionId): Future[List[JsObject]] = {
+    txManager.asReadOnly[Future[List[JsObject]]] {
+      DAO.query(query)
+    }
+  }
 }

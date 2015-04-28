@@ -4,6 +4,7 @@ import java.io.File
 
 import altitude.Util.log
 import altitude.models.FileImportAsset
+import altitude.models.search.Query
 import altitude.{Const => C}
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
@@ -35,4 +36,5 @@ class FileSystemImportDao extends BaseDao {
 
   override def add(json: JsObject)(implicit txId: TransactionId): Future[JsObject] = throw new NotImplementedError
   override def getById(id: String)(implicit txId: TransactionId): Future[Option[JsObject]] = throw new NotImplementedError
+  override def query(q: Query)(implicit txId: TransactionId): Future[List[JsObject]] = throw new NotImplementedError
 }

@@ -2,9 +2,13 @@ package integration
 
 import java.io.File
 
+import altitude.models.search.Query
 import altitude.models.{Asset, FileImportAsset}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
+import play.api.libs.json.JsObject
+
+import scala.concurrent.Future
 
 @DoNotDiscover class ImportTests(val config: Map[String, _]) extends IntegrationTestCore {
   test("import image (JPEG)") {
@@ -16,6 +20,21 @@ import org.scalatest.Matchers._
     (asset.metadata \ "Author").as[String] should equal("Whitney Houston")
   }
 
+  test("import file list") {
+    val incomingPath = getClass.getResource("../files/incoming").getPath
+    val assets = altitude.service.fileImport.getFilesToImport(path=incomingPath)
+    assets should not be empty
+  }
+
+  test("import duplicate") {
+    importFile("images/1.jpg")
+    importFile("images/1.jpg")
+
+    // there should be only one file like this in the system
+    val assets = altitude.service.library.query(Query()).futureValue
+    assets.length should be(1)
+  }
+
   protected def importFile(p: String): Asset = {
     val path = getClass.getResource(s"../files/incoming/$p").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
@@ -24,7 +43,7 @@ import org.scalatest.Matchers._
     importedAsset.path should not be empty
     importedAsset.md5 should not be empty
     importedAsset.createdAt should not be None
-    
+
     val asset = altitude.service.library.getById(importedAsset.id.get).futureValue.get: Asset
     asset.mediaType should equal(importedAsset.mediaType)
     asset.path should not be empty
@@ -33,9 +52,4 @@ import org.scalatest.Matchers._
     asset
   }
 
-  test("import file list") {
-    val incomingPath = getClass.getResource("../files/incoming").getPath
-    val assets = altitude.service.fileImport.getFilesToImport(path=incomingPath)
-    assets should not be empty
-  }
 }

@@ -3,6 +3,7 @@ package altitude.dao.mongo
 import altitude.Util.log
 import altitude.dao.{BaseDao, TransactionId}
 import altitude.models.BaseModel
+import altitude.models.search.Query
 import altitude.{Const => C, Util}
 import org.joda.time.DateTime
 import play.api.Play
@@ -53,9 +54,9 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
   override def getById(id: String)(implicit txId: TransactionId): Future[Option[JsObject]] = {
     log.debug(s"Getting by ID '$id'", C.tag.DB)
 
-    val query = JsObject(Seq("_id" -> Json.obj("$oid" -> id)))
+    val mongoQuery = JsObject(Seq("_id" -> Json.obj("$oid" -> id)))
 
-    val cursor: Cursor[JsObject] = collection.find(query).cursor[JsObject]
+    val cursor: Cursor[JsObject] = collection.find(mongoQuery).cursor[JsObject]
     val f: Future[List[JsObject]] = cursor.collect[List](upTo = 2)
 
     f map { results =>
@@ -64,7 +65,7 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
       if (results.length > 1) throw new Exception("getById should return only a single result")
 
       if (results.length == 0) {
-        return Future{None}
+        Future{None}
       }
 
       val res = fixMongoFields(results.head)
@@ -72,6 +73,21 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
     }
   }
 
+  override def query(q: Query)(implicit txId: TransactionId): Future[List[JsObject]] = {
+    val mongoQuery = q.params map { case (key, value) => (key, JsString(value.toString))}
+
+    val cursor: Cursor[JsObject] = collection.find(mongoQuery).cursor[JsObject]
+    val f: Future[List[JsObject]] = cursor.collect[List](upTo = 1000)
+
+    f map { results =>
+      log.debug(s"Found ${results.length} records", C.tag.DB)
+      results.map(fixMongoFields)
+    }
+  }
+
+  /*
+  Return a JSON record with timestamp and ID fields translated from Mongo's "extended" format
+   */
   protected def fixMongoFields(json: JsObject): JsObject = {
     val createdAtMillis: Option[Long] =  (json \ C.Base.CREATED_AT \ "$date").asOpt[Long]
     val createdAt: Option[DateTime] = {
