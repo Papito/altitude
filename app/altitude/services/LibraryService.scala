@@ -22,8 +22,11 @@ class LibraryService extends BaseService[Asset] {
       val existing = DAO.query(Query(Map(C.Asset.MD5 -> asset.md5)))
 
       val f = for {
+        // fine duplicate
         duplicates <- existing
+        // and add asset
         res <- super.add(asset)
+        // IF there is no duplicate
         if duplicates.length == 0
       } yield res
 
