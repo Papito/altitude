@@ -29,7 +29,10 @@ class LibraryService extends BaseService[Asset] {
 
       f recover {
         // if filter fails and there IS a duplicate
-        case ex: NoSuchElementException => throw new DuplicateException(s"Duplicate for ${asset.path}")
+        case ex: NoSuchElementException => {
+          log.warn(s"Asset already exists for ${asset.path}")
+          throw new DuplicateException(s"Duplicate for ${asset.path}")
+        }
       }
     }
   }
