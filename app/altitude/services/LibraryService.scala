@@ -1,5 +1,7 @@
 package altitude.services
 
+import java.util.NoSuchElementException
+
 import altitude.Util.log
 import altitude.dao.{TransactionId, LibraryDao}
 import altitude.models.Asset
@@ -16,20 +18,18 @@ class LibraryService extends BaseService[Asset] {
 
   override def add(asset: Asset)(implicit txId: TransactionId = new TransactionId): Future[JsObject] = {
     txManager.withTransaction[Future[JsObject]] {
-      // is there a duplicate
-      val fDuplicate = DAO.query(Query(Map(C.Asset.MD5 -> asset.md5)))
+      val existing = DAO.query(Query(Map(C.Asset.MD5 -> asset.md5)))
 
-      val f: Future[JsObject] = fDuplicate map {res =>
+      val f = for {
+        duplicates <- existing
+        res <- super.add(asset)
+        if duplicates.length == 0
+      } yield res
 
-        if (res.length > 0) {
-          log.warn(s"Asset already exists for ${asset.path}")
-          asset
-        } else {
-          super.add(asset)
-        }
+      f recover {
+        // if filter fails and there IS a duplicate
+        case ex: NoSuchElementException => asset
       }
-
-      f
     }
   }
 }

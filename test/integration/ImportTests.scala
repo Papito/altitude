@@ -28,11 +28,13 @@ import scala.concurrent.Future
 
   test("import duplicate") {
     importFile("images/1.jpg")
-    importFile("images/1.jpg")
 
-    // there should be only one file like this in the system
-    val assets = altitude.service.library.query(Query()).futureValue
-    assets.length should be(1)
+    // again
+    val path = getClass.getResource(s"../files/incoming/images/1.jpg").getPath
+    val fileImportAsset = new FileImportAsset(new File(path))
+    val importedAsset = altitude.service.fileImport.importAsset(fileImportAsset).futureValue
+    importedAsset.id should be(None)
+    importedAsset.createdAt should be(None)
   }
 
   protected def importFile(p: String): Asset = {
