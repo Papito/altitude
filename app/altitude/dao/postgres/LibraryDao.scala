@@ -13,21 +13,25 @@ import scala.concurrent.Future
 
 class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
 
-  override protected def makeModel(rec: Map[String, AnyRef]): Future[Option[JsObject]] = {
+  override protected def makeModel(rec: Option[Map[String, AnyRef]]): Future[Option[JsObject]] = {
     Future {
-      val mediaType = new MediaType(
-        mediaType = rec.get(C.Asset.MEDIA_TYPE).get.toString,
-        mediaSubtype = rec.get(C.Asset.MEDIA_SUBTYPE).get.toString,
-        mime = rec.get(C.Asset.MIME_TYPE).get.toString)
+      rec match {
+        case None => None
+        case _ =>
+          val mediaType = new MediaType(
+            mediaType = rec.get(C.Asset.MEDIA_TYPE).toString,
+            mediaSubtype = rec.get(C.Asset.MEDIA_SUBTYPE).toString,
+            mime = rec.get(C.Asset.MIME_TYPE).toString)
 
-      val model = Asset(id = Some(rec.get(C.Asset.ID).get.toString),
-        path = rec.get(C.Asset.PATH).get.toString,
-        md5 = rec.get(C.Asset.MD5).get.toString,
-        mediaType = mediaType,
-        metadata = Json.parse(rec.get(C.Asset.METADATA).get.toString))
+          val model = Asset(id = Some(rec.get(C.Asset.ID).toString),
+            path = rec.get(C.Asset.PATH).toString,
+            md5 = rec.get(C.Asset.MD5).toString,
+            mediaType = mediaType,
+            metadata = Json.parse(rec.get(C.Asset.METADATA).toString))
 
-      addCoreAttrs(model, rec)
-      Some(model)
+          addCoreAttrs(model, rec.get)
+          Some(model)
+      }
     }
   }
 
@@ -60,13 +64,7 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
 
   override def getById(id: String)(implicit txId: TransactionId): Future[Option[JsObject]] = {
     log.debug(s"Getting by ID '$id'", C.tag.DB)
-    val run: QueryRunner = new QueryRunner()
-
     val optRec = oneBySqlQuery(oneSql, List(id))
-
-    optRec match {
-      case None => Future {None}
-      case _ => makeModel(optRec.get)
-    }
+    makeModel(optRec)
   }
 }

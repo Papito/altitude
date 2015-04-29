@@ -138,12 +138,12 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
   }
 
   /*
-    Implementations must define this method, which returns an optional
-    JSON object which is quaranteed to cerialize into a valid model of interest.
+    Implementations should define this method, which returns an optional
+    JSON object which is guaranteed to serialize into a valid model of interest.
     JSON can be constructed directly, but best to create a model instance first
-    and return it, trigerring implicit conversion.
+    and return it, trigering implicit conversion.
    */
-  protected def makeModel(rec: Map[String, AnyRef]): Future[Option[JsObject]]
+  protected def makeModel(rec: Option[Map[String, AnyRef]]): Future[Option[JsObject]] = throw new NotImplementedError
 
   /* Given a model and an SQL record, "decipher" and set certain core properties
    */

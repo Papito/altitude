@@ -34,9 +34,7 @@ class MongoBaseDaoTestSuite extends Suites(
 private class PostgresBaseDaoTests(val config: Map[String, _])
   extends BaseDaoTests with BeforeAndAfterAll {
 
-  class TestPostgresDao extends BasePostgresDao("test1") {
-    override protected def makeModel(rec: Map[String, AnyRef]): Future[Option[JsObject]] = throw new NotImplementedError
-  }
+  class TestPostgresDao extends BasePostgresDao("test1")
 
   class TestPostgresService extends BaseService[TestModel] {
     override protected val DAO = new TestPostgresDao

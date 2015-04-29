@@ -38,6 +38,4 @@ class UtilitiesDao extends BasePostgresDao("") with integration.util.dao.Utiliti
     // up one level so it does not get committed or closed
     tx.up()
   }
-
-  override protected def makeModel(rec: Map[String, AnyRef]): Future[Option[JsObject]] = throw new NotImplementedError
 }
