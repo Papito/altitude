@@ -20,8 +20,10 @@ import scala.concurrent.Future
 
 abstract class BasePostgresDao(protected val tableName: String) extends BaseDao {
 
-  protected def conn(implicit txId: TransactionId): Connection =
+  protected def conn(implicit txId: TransactionId): Connection = {
+    // get transaction from the global lookup
     JdbcTransactionManager.transaction.conn
+  }
 
   protected val coreSqlColsForInsert = s"${C.Base.ID}, ${C.Base.CREATED_AT}"
   protected val coreSqlValuesForInsert = "?, TO_TIMESTAMP(?)"
@@ -38,7 +40,6 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
         FROM $tableName
        WHERE ${C.Base.ID} = ?"""
 
-
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
     val sql: String =s"""
       INSERT INTO $tableName ($coreSqlColsForInsert)
@@ -49,12 +50,32 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
 
   override def getById(id: String)(implicit txId: TransactionId): Future[Option[JsObject]] = {
     log.debug(s"Getting by ID '$id' from '$tableName'", C.tag.DB)
-    val optRec = oneBySqlQuery(oneSql, List(id))
-    makeModel(optRec)
+    val optRec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneSql, List(id))
+
+    Future {
+      optRec match {
+        case None => None
+        case _ => Some(makeModel(optRec.get))
+      }
+    }
   }
 
   override def query(query: Query)(implicit txId: TransactionId): Future[List[JsObject]] = {
-    throw new NotImplementedError()
+    val (sqlColumns, sqlValues) = query.params.unzip
+
+    // create pairs of column names and value placeholders, to be joined in the final clause
+    val whereClauses: List[String] = sqlColumns.foldLeft(List[String]())((out, el) => s"$el = ?" :: out)
+
+    val sql = s"""
+      SELECT ${C.Base.ID}, *,
+             EXTRACT(EPOCH FROM created_at) AS created_at,
+             EXTRACT(EPOCH FROM updated_at) AS updated_at
+        FROM $tableName
+       WHERE ${whereClauses.mkString("AND")}"""
+
+    val recs = manyBySqlQuery(sql, sqlValues.toList)
+
+    Future {recs.map{makeModel}}
   }
 
   protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object])(implicit txId: TransactionId): Future[JsObject] = {
@@ -74,6 +95,14 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
         C.Base.ID -> JsString(id),
         C.Base.CREATED_AT -> dtAsJsString{createdAt}))
     }
+  }
+
+  protected def manyBySqlQuery(sql: String, vals: List[Object])(implicit txId: TransactionId): List[Map[String, AnyRef]] = {
+    log.debug(s"SQL: $sql")
+    val run: QueryRunner = new QueryRunner()
+    val res = run.query(conn, sql, new MapListHandler(), vals:_*)
+    log.debug(s"Found ${res.size()} records", C.tag.DB)
+    res.map{_.toMap[String, AnyRef]}.toList
   }
 
   protected def oneBySqlQuery(sql: String, vals: List[Object])(implicit txId: TransactionId): Option[Map[String, AnyRef]] = {
@@ -102,7 +131,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     JSON can be constructed directly, but best to create a model instance first
     and return it, trigering implicit conversion.
    */
-  protected def makeModel(rec: Option[Map[String, AnyRef]]): Future[Option[JsObject]] = throw new NotImplementedError
+  protected def makeModel(rec: Map[String, AnyRef]): JsObject = throw new NotImplementedError
 
   /* Given a model and an SQL record, "decipher" and set certain core properties
    */

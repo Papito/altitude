@@ -25,10 +25,10 @@ class LibraryService extends BaseService[Asset] {
       val f = for {
         // fine duplicate
         duplicates <- existing
+        // IF there is no duplicate
+        if duplicates.size == 0
         // and add asset
         res <- super.add(asset)
-        // IF there is no duplicate
-        if duplicates.length == 0
       } yield res
 
       f recover {

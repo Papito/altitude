@@ -13,26 +13,21 @@ import scala.concurrent.Future
 
 class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
 
-  override protected def makeModel(rec: Option[Map[String, AnyRef]]): Future[Option[JsObject]] = {
-    Future {
-      rec match {
-        case None => None
-        case _ =>
-          val mediaType = new MediaType(
-            mediaType = rec.get(C.Asset.MEDIA_TYPE).toString,
-            mediaSubtype = rec.get(C.Asset.MEDIA_SUBTYPE).toString,
-            mime = rec.get(C.Asset.MIME_TYPE).toString)
+  override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
+    val mediaType = new MediaType(
+      mediaType = rec.get(C.Asset.MEDIA_TYPE).get.asInstanceOf[String],
+      mediaSubtype = rec.get(C.Asset.MEDIA_SUBTYPE).get.asInstanceOf[String],
+      mime = rec.get(C.Asset.MIME_TYPE).get.asInstanceOf[String])
 
-          val model = Asset(id = Some(rec.get(C.Asset.ID).toString),
-            path = rec.get(C.Asset.PATH).toString,
-            md5 = rec.get(C.Asset.MD5).toString,
-            mediaType = mediaType,
-            metadata = Json.parse(rec.get(C.Asset.METADATA).toString))
+    val model = Asset(id = Some(rec.get(C.Asset.ID).get.asInstanceOf[String]),
+      path = rec.get(C.Asset.PATH).get.asInstanceOf[String],
+      md5 = rec.get(C.Asset.MD5).get.asInstanceOf[String],
+      mediaType = mediaType,
+      metadata = Json.parse(rec.get(C.Asset.METADATA).get.toString))
 
-          addCoreAttrs(model, rec.get)
-          Some(model)
-      }
-    }
+    addCoreAttrs(model, rec)
+    log.debug(model.toJson.toString())
+    model
   }
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
@@ -60,11 +55,5 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
       metadata :: Nil
 
     addRecord(jsonIn, asset_sql, asset_sql_vals)
-  }
-
-  override def getById(id: String)(implicit txId: TransactionId): Future[Option[JsObject]] = {
-    log.debug(s"Getting by ID '$id'", C.tag.DB)
-    val optRec = oneBySqlQuery(oneSql, List(id))
-    makeModel(optRec)
   }
 }

@@ -108,7 +108,7 @@ package object Util {
 
       val json = Json.obj(
         TIME  -> JsString(getTimestamp),
-        THREAD ->  java.lang.Thread.currentThread().getId(),
+        THREAD ->  java.lang.Thread.currentThread().getId,
         MSG   -> interpolatedMsg,
         LEVEL -> level.toString,
         TAGS  -> t,
