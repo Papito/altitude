@@ -48,36 +48,9 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
   }
 
   override def getById(id: String)(implicit txId: TransactionId): Future[Option[JsObject]] = {
-    val recOpt = getRecordById(id)
-
-    if (recOpt == None) {
-      return Future[Option[JsObject]] {None}
-    }
-
-    val rec = recOpt.get
-
-    val createdAtMilis = rec.getOrElse(C.Base.CREATED_AT, 0d).asInstanceOf[Double].toLong
-    val createdAt: DateTime = new DateTime(createdAtMilis)
-
-    val updatedAtMilis = rec.getOrElse(C.Base.UPDATED_AT, 0d).asInstanceOf[Double].toLong
-    val updatedAt: DateTime = new DateTime(updatedAtMilis)
-
-    val res = Json.obj(
-      C.Base.ID -> {rec.get(C.Base.ID).isDefined match {
-        case false => JsNull
-        case _ => rec.get(C.Base.ID).get.toString
-      }},
-      C.Base.CREATED_AT -> {createdAtMilis match {
-        case 0d => JsNull
-        case _ => Util.isoDateTime(Some(createdAt))
-      }},
-      C.Base.UPDATED_AT -> {updatedAtMilis match {
-        case 0d => JsNull
-        case _ => Util.isoDateTime(Some(updatedAt))
-      }}
-    )
-
-    Future[Option[JsObject]] {Some(res)}
+    log.debug(s"Getting by ID '$id' from '$tableName'", C.tag.DB)
+    val optRec = oneBySqlQuery(oneSql, List(id))
+    makeModel(optRec)
   }
 
   override def query(query: Query)(implicit txId: TransactionId): Future[List[JsObject]] = {
@@ -101,20 +74,6 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
         C.Base.ID -> JsString(id),
         C.Base.CREATED_AT -> dtAsJsString{createdAt}))
     }
-  }
-
-  protected def getRecordById(id: String)(implicit txId: TransactionId): Option[Map[String, AnyRef]] = {
-    log.debug(s"Getting by ID '$id'", C.tag.DB)
-    val run: QueryRunner = new QueryRunner()
-
-    val q =s"""
-      SELECT ${C.Base.ID}, *,
-             EXTRACT(EPOCH FROM created_at) AS created_at,
-             EXTRACT(EPOCH FROM updated_at) AS updated_at
-        FROM $tableName
-       WHERE ${C.Base.ID} = ?"""
-
-    oneBySqlQuery(q, List(id))
   }
 
   protected def oneBySqlQuery(sql: String, vals: List[Object])(implicit txId: TransactionId): Option[Map[String, AnyRef]] = {
