@@ -3,6 +3,9 @@ package integration.util.dao.postgres
 import altitude.dao.TransactionId
 import altitude.dao.postgres.BasePostgresDao
 import altitude.services.JdbcTransactionManager
+import play.api.libs.json.JsObject
+
+import scala.concurrent.Future
 
 class UtilitiesDao extends BasePostgresDao("") with integration.util.dao.UtilitiesDao {
   override def dropDatabase() = Unit
@@ -35,4 +38,6 @@ class UtilitiesDao extends BasePostgresDao("") with integration.util.dao.Utiliti
     // up one level so it does not get committed or closed
     tx.up()
   }
+
+  override protected def makeModel(rec: Map[String, AnyRef]): Future[Option[JsObject]] = throw new NotImplementedError
 }

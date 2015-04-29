@@ -24,12 +24,20 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     JdbcTransactionManager.transaction.conn
 
   protected val coreSqlColsForInsert = s"${C.Base.ID}, ${C.Base.CREATED_AT}"
-  protected val coreSqlColsForSelect = s"${C.Base.ID}, ${C.Base.CREATED_AT}, ${C.Base.UPDATED_AT}"
   protected val coreSqlValuesForInsert = "?, TO_TIMESTAMP(?)"
 
   protected def utcNow = Util.utcNow
 
   protected def dtAsJsString(dt: DateTime) = JsString(Util.isoDateTime(Some(dt)))
+
+  // SQL to select the whole record, in very simple cases
+  protected val oneSql = s"""
+      SELECT ${C.Base.ID}, *,
+             EXTRACT(EPOCH FROM created_at) AS created_at,
+             EXTRACT(EPOCH FROM updated_at) AS updated_at
+        FROM $tableName
+       WHERE ${C.Base.ID} = ?"""
+
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
     val sql: String =s"""
@@ -129,7 +137,17 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     Some(rec.toMap[String, AnyRef])
   }
 
-  def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit = {
+  /*
+    Implementations must define this method, which returns an optional
+    JSON object which is quaranteed to cerialize into a valid model of interest.
+    JSON can be constructed directly, but best to create a model instance first
+    and return it, trigerring implicit conversion.
+   */
+  protected def makeModel(rec: Map[String, AnyRef]): Future[Option[JsObject]]
+
+  /* Given a model and an SQL record, "decipher" and set certain core properties
+   */
+  protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit = {
     val createdAtMilis = rec.getOrElse(C.Base.CREATED_AT, 0d).asInstanceOf[Double].toLong
     if (createdAtMilis != 0d) {
       model.createdAt = new DateTime(createdAtMilis)

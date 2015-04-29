@@ -13,6 +13,24 @@ import scala.concurrent.Future
 
 class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
 
+  override protected def makeModel(rec: Map[String, AnyRef]): Future[Option[JsObject]] = {
+    Future {
+      val mediaType = new MediaType(
+        mediaType = rec.get(C.Asset.MEDIA_TYPE).get.toString,
+        mediaSubtype = rec.get(C.Asset.MEDIA_SUBTYPE).get.toString,
+        mime = rec.get(C.Asset.MIME_TYPE).get.toString)
+
+      val model = Asset(id = Some(rec.get(C.Asset.ID).get.toString),
+        path = rec.get(C.Asset.PATH).get.toString,
+        md5 = rec.get(C.Asset.MD5).get.toString,
+        mediaType = mediaType,
+        metadata = Json.parse(rec.get(C.Asset.METADATA).get.toString))
+
+      addCoreAttrs(model, rec)
+      Some(model)
+    }
+  }
+
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
     val asset = jsonIn: Asset
 
@@ -44,35 +62,11 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
     log.debug(s"Getting by ID '$id'", C.tag.DB)
     val run: QueryRunner = new QueryRunner()
 
-    val sql =s"""
-      SELECT ${C.Base.ID}, *,
-             EXTRACT(EPOCH FROM created_at) AS created_at,
-             EXTRACT(EPOCH FROM updated_at) AS updated_at
-        FROM $tableName
-       WHERE ${C.Base.ID} = ?"""
-
-    val optRec = oneBySqlQuery(sql, List(id))
+    val optRec = oneBySqlQuery(oneSql, List(id))
 
     optRec match {
       case None => Future {None}
-      case _ =>
-        val rec = optRec.get
-
-        val mediaType = new MediaType(
-          mediaType = rec.get(C.Asset.MEDIA_TYPE).get.toString,
-          mediaSubtype = rec.get(C.Asset.MEDIA_SUBTYPE).get.toString,
-          mime = rec.get(C.Asset.MIME_TYPE).get.toString)
-
-        Future {
-          val model = Asset(id = Some(rec.get(C.Asset.ID).get.toString),
-            path = rec.get(C.Asset.PATH).get.toString,
-            md5 = rec.get(C.Asset.MD5).get.toString,
-            mediaType = mediaType,
-            metadata = Json.parse(rec.get(C.Asset.METADATA).get.toString))
-
-          addCoreAttrs(model, rec)
-          Some(model)
-        }
+      case _ => makeModel(optRec.get)
     }
   }
 }

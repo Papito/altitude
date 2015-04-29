@@ -5,7 +5,10 @@ import altitude.dao.mongo.BaseMongoDao
 import altitude.dao.postgres.BasePostgresDao
 import altitude.services.BaseService
 import org.scalatest.{BeforeAndAfterAll, Suites}
+import play.api.libs.json.JsObject
 import play.api.test.FakeApplication
+
+import scala.concurrent.Future
 
 /*
   Define base dao tests for each type of DB
@@ -31,7 +34,9 @@ class MongoBaseDaoTestSuite extends Suites(
 private class PostgresBaseDaoTests(val config: Map[String, _])
   extends BaseDaoTests with BeforeAndAfterAll {
 
-  class TestPostgresDao extends BasePostgresDao("test1")
+  class TestPostgresDao extends BasePostgresDao("test1") {
+    override protected def makeModel(rec: Map[String, AnyRef]): Future[Option[JsObject]] = throw new NotImplementedError
+  }
 
   class TestPostgresService extends BaseService[TestModel] {
     override protected val DAO = new TestPostgresDao
