@@ -19,7 +19,8 @@ class LibraryService extends BaseService[Asset] {
 
   override def add(asset: Asset)(implicit txId: TransactionId = new TransactionId): Future[JsObject] = {
     txManager.withTransaction[Future[JsObject]] {
-      val existing = DAO.query(Query(Map(C.Asset.MD5 -> asset.md5)))
+      val query = Query(Map(C.Asset.MD5 -> asset.md5))
+      val existing = DAO.query(query)
 
       val f = for {
         // fine duplicate

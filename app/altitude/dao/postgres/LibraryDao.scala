@@ -22,14 +22,14 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
     /*
     Add the asset
      */
-    val asset_query = s"""
+    val asset_sql = s"""
         INSERT INTO $tableName (
              $coreSqlColsForInsert, ${C.Asset.PATH}, ${C.Asset.MD5}, ${C.Asset.MEDIA_TYPE},
              ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE}, ${C.Asset.METADATA})
             VALUES($coreSqlValuesForInsert, ?, ?, ?, ?, ?, CAST(? AS jsonb))
     """
 
-    val asset_query_values: List[Object] =
+    val asset_sql_vals: List[Object] =
       asset.path ::
       asset.md5 ::
       asset.mediaType.mediaType ::
@@ -37,21 +37,21 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
       asset.mediaType.mime ::
       metadata :: Nil
 
-    addRecord(jsonIn, asset_query, asset_query_values)
+    addRecord(jsonIn, asset_sql, asset_sql_vals)
   }
 
   override def getById(id: String)(implicit txId: TransactionId): Future[Option[JsObject]] = {
     log.debug(s"Getting by ID '$id'", C.tag.DB)
     val run: QueryRunner = new QueryRunner()
 
-    val q =s"""
+    val sql =s"""
       SELECT ${C.Base.ID}, *,
              EXTRACT(EPOCH FROM created_at) AS created_at,
              EXTRACT(EPOCH FROM updated_at) AS updated_at
         FROM $tableName
        WHERE ${C.Base.ID} = ?"""
 
-    val optRec = oneBySqlQuery(q, List(id))
+    val optRec = oneBySqlQuery(sql, List(id))
 
     optRec match {
       case None => Future {None}

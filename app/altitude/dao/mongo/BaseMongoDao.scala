@@ -73,11 +73,11 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
     }
   }
 
-  override def query(q: Query)(implicit txId: TransactionId): Future[List[JsObject]] = {
-    val mongoQuery = q.params map { case (key, value) => (key, JsString(value.toString))}
+  override def query(query: Query)(implicit txId: TransactionId): Future[List[JsObject]] = {
+    val mongoQuery = query.params map { case (key, value) => (key, JsString(value.toString))}
 
     val cursor: Cursor[JsObject] = collection.find(mongoQuery).cursor[JsObject]
-    val f: Future[List[JsObject]] = cursor.collect[List](upTo = 1000)
+    val f: Future[List[JsObject]] = cursor.collect[List](upTo = 1000) //FIXME: setting
 
     f map { results =>
       log.debug(s"Found ${results.length} records", C.tag.DB)

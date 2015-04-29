@@ -32,11 +32,11 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
   protected def dtAsJsString(dt: DateTime) = JsString(Util.isoDateTime(Some(dt)))
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
-    val q: String =s"""
+    val sql: String =s"""
       INSERT INTO $tableName ($coreSqlColsForInsert)
            VALUES ($coreSqlValuesForInsert)"""
 
-    addRecord(jsonIn, q, List[Object]())
+    addRecord(jsonIn, sql, List[Object]())
   }
 
   override def getById(id: String)(implicit txId: TransactionId): Future[Option[JsObject]] = {
@@ -72,7 +72,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     Future[Option[JsObject]] {Some(res)}
   }
 
-  override def query(q: Query)(implicit txId: TransactionId): Future[List[JsObject]] = {
+  override def query(query: Query)(implicit txId: TransactionId): Future[List[JsObject]] = {
     throw new NotImplementedError()
   }
 
@@ -109,11 +109,11 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     oneBySqlQuery(q, List(id))
   }
 
-  protected def oneBySqlQuery(q: String, vals: List[Object])(implicit txId: TransactionId): Option[Map[String, AnyRef]] = {
+  protected def oneBySqlQuery(sql: String, vals: List[Object])(implicit txId: TransactionId): Option[Map[String, AnyRef]] = {
     val run: QueryRunner = new QueryRunner()
 
-    log.debug(s"SQL: $q")
-    val res = run.query(conn, q, new MapListHandler(), vals:_*)
+    log.debug(s"SQL: $sql")
+    val res = run.query(conn, sql, new MapListHandler(), vals:_*)
 
     log.debug(s"Found ${res.size()} records", C.tag.DB)
 
