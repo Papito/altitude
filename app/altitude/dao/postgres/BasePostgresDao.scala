@@ -64,7 +64,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     val (sqlColumns, sqlValues) = query.params.unzip
 
     // create pairs of column names and value placeholders, to be joined in the final clause
-    val whereClauses: List[String] = sqlColumns.foldLeft(List[String]())((out, el) => s"$el = ?" :: out)
+    val whereClauses: List[String] = for (column <- sqlColumns.toList) yield  s"$column = ?"
 
     val sql = s"""
       SELECT ${C.Base.ID}, *,
