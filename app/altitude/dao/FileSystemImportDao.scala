@@ -19,6 +19,7 @@ class FileSystemImportDao extends BaseDao {
     require(path != null)
     log.info(s"Importing from '$path'", C.tag.DB)
 
+    // FIXME: use a future and a separate executor context
     val files = FileUtils.iterateFiles(new File(path), ANY_FILE_FILTER, ANY_FILE_FILTER)
     new Iterable[FileImportAsset] {
       def iterator = new Iterator[FileImportAsset] {

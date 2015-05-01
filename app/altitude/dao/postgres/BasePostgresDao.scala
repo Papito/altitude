@@ -20,6 +20,9 @@ import scala.concurrent.Future
 
 abstract class BasePostgresDao(protected val tableName: String) extends BaseDao {
 
+  protected val RUNNER: QueryRunner = new QueryRunner()
+
+
   protected def conn(implicit txId: TransactionId): Connection = {
     // get transaction from the global lookup
     JdbcTransactionManager.transaction.conn
@@ -80,7 +83,6 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
 
   protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object])(implicit txId: TransactionId): Future[JsObject] = {
     log.info(s"POSTGRES INSERT: $jsonIn", C.tag.DB)
-    val run: QueryRunner = new QueryRunner()
 
     val id = BaseModel.genId
     val createdAt = utcNow
@@ -88,7 +90,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     val values: List[Object] = id :: createdAt.getMillis.asInstanceOf[Object] :: vals
 
     log.debug(s"SQL: $q. ARGS: ${values.toString()}")
-    run.update(conn, q, values:_*)
+    RUNNER.update(conn, q, values:_*)
 
     Future[JsObject] {
       jsonIn ++ JsObject(Seq(
@@ -99,8 +101,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
 
   protected def manyBySqlQuery(sql: String, vals: List[Object])(implicit txId: TransactionId): List[Map[String, AnyRef]] = {
     log.debug(s"SQL: $sql")
-    val run: QueryRunner = new QueryRunner()
-    val res = run.query(conn, sql, new MapListHandler(), vals:_*)
+    val res = RUNNER.query(conn, sql, new MapListHandler(), vals:_*)
     log.debug(s"Found ${res.size()} records", C.tag.DB)
     res.map{_.toMap[String, AnyRef]}.toList
   }
@@ -129,7 +130,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     Implementations should define this method, which returns an optional
     JSON object which is guaranteed to serialize into a valid model of interest.
     JSON can be constructed directly, but best to create a model instance first
-    and return it, trigering implicit conversion.
+    and return it, triggering implicit conversion.
    */
   protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val createdAtMilis = rec.getOrElse(C.Base.CREATED_AT, 0d).asInstanceOf[Double].toLong
