@@ -20,7 +20,7 @@ object JdbcTransactionManager {
 
 class JdbcTransactionManager extends AbstractTransactionManager {
 
-  def withTransaction[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
+  override def withTransaction[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
 
     val tx = JdbcTransactionManager.transaction
 
@@ -45,7 +45,7 @@ class JdbcTransactionManager extends AbstractTransactionManager {
     }
   }
 
-  def asReadOnly[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
+  override def asReadOnly[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
     val tx = JdbcTransactionManager.transaction
 
     try {
