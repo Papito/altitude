@@ -131,7 +131,28 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     JSON can be constructed directly, but best to create a model instance first
     and return it, trigering implicit conversion.
    */
-  protected def makeModel(rec: Map[String, AnyRef]): JsObject = throw new NotImplementedError
+  protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
+    val createdAtMilis = rec.getOrElse(C.Base.CREATED_AT, 0d).asInstanceOf[Double].toLong
+    val createdAt: DateTime = new DateTime(createdAtMilis)
+
+    val updatedAtMilis = rec.getOrElse(C.Base.UPDATED_AT, 0d).asInstanceOf[Double].toLong
+    val updatedAt: DateTime = new DateTime(updatedAtMilis)
+
+    Json.obj(
+      C.Base.ID -> {rec.get(C.Base.ID).isDefined match {
+        case false => JsNull
+        case _ => rec.get(C.Base.ID).get.toString
+      }},
+      C.Base.CREATED_AT -> {createdAtMilis match {
+        case 0d => JsNull
+        case _ => Util.isoDateTime(Some(createdAt))
+      }},
+      C.Base.UPDATED_AT -> {updatedAtMilis match {
+        case 0d => JsNull
+        case _ => Util.isoDateTime(Some(updatedAt))
+      }}
+    )
+  }
 
   /* Given a model and an SQL record, "decipher" and set certain core properties
    */
