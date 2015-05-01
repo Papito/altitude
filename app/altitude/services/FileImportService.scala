@@ -7,6 +7,7 @@ import altitude.dao.{FileSystemImportDao, TransactionId}
 import altitude.models.{Asset, FileImportAsset, MediaType}
 import altitude.{Const => C}
 import org.apache.commons.codec.digest.DigestUtils
+import org.apache.commons.io.FileUtils
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
@@ -58,10 +59,13 @@ class FileImportService extends BaseService {
     val mediaType = detectAssetType(fileAsset)
     val metadata: JsValue = app.service.metadata.extract(fileAsset, mediaType)
 
+    val fileSizeInBytes: Long = FileUtils.sizeOf(new File(fileAsset.absolutePath))
+
     val asset = Asset(
       path = fileAsset.absolutePath,
       md5 = getChecksum(fileAsset.absolutePath),
       mediaType = mediaType,
+      sizeBytes = fileSizeInBytes,
       metadata = metadata)
 
     val f = app.service.library.add(asset)

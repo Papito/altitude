@@ -6,7 +6,7 @@ import altitude.Util.log
 import altitude.models.FileImportAsset
 import altitude.models.search.Query
 import altitude.{Const => C}
-import org.apache.commons.io.FileUtils
+import org.apache.commons.io.{FilenameUtils, FileUtils}
 import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
 import play.api.libs.json.JsObject
 
@@ -20,7 +20,6 @@ class FileSystemImportDao extends BaseDao {
     log.info(s"Importing from '$path'", C.tag.DB)
 
     val files = FileUtils.iterateFiles(new File(path), ANY_FILE_FILTER, ANY_FILE_FILTER)
-
     new Iterable[FileImportAsset] {
       def iterator = new Iterator[FileImportAsset] {
         def hasNext = files.hasNext

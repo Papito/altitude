@@ -16,7 +16,9 @@ CREATE TABLE asset (
     media_subtype varchar(64) NOT NULL,
     mime_type varchar(64) NOT NULL,
     metadata jsonb,
-    path TEXT NOT NULL
+    path TEXT NOT NULL,
+    filename TEXT NOT NULL,
+    size_bytes BIGINT NOT NULL
 ) INHERITS (_core);
 
 CREATE UNIQUE INDEX asset_md5 ON asset(md5);

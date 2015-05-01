@@ -15,12 +15,15 @@ object Const {
      val CREATED_AT = "created_at"
      val UPDATED_AT = "updated_at"
    }
+
   object Base extends Common
 
   object Asset extends Common {
     val MEDIA_TYPE = "media_type"
     val PATH = "path"
     val MD5 = "md5"
+    val SIZE_BYTES = "size_bytes"
+    val FILENAME = "filename"
     val MEDIA_SUBTYPE = "media_subtype"
     val MIME_TYPE = "mime_type"
     val METADATA = "metadata"
