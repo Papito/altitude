@@ -20,7 +20,7 @@ class JdbcTransaction extends Transaction {
   def getConnection: Connection = conn
 
   override def close() = {
-    if (level == 0) {
+    if (!isNested) {
       log.debug(s"Closing connection for transaction $id", C.tag.DB)
       Transaction.CLOSED += 1
       conn.close()
@@ -28,7 +28,7 @@ class JdbcTransaction extends Transaction {
   }
 
   override def commit() {
-    if (level == 0) {
+    if (!isNested) {
       log.debug(s"Committing transaction $id", C.tag.DB)
       Transaction.COMMITTED += 1
       conn.commit()
@@ -36,13 +36,13 @@ class JdbcTransaction extends Transaction {
   }
 
   override def rollback() {
-    if (level == 0 && !conn.isReadOnly) {
+    if (!isNested && !conn.isReadOnly) {
       log.warn(s"ROLLBACK for transaction $id", C.tag.DB)
       Transaction.ROLLED_BACK += 1
       conn.rollback()
     }
   }
 
-  def setReadOnly(flag: Boolean) = conn.setReadOnly(flag)
-  def setAutoCommit(flag: Boolean) = conn.setAutoCommit(flag)
+  def setReadOnly(flag: Boolean) = if (!isNested) conn.setReadOnly(flag)
+  def setAutoCommit(flag: Boolean) =if (!isNested) conn.setAutoCommit(flag)
 }

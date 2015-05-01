@@ -25,20 +25,15 @@ class JdbcTransactionManager extends AbstractTransactionManager {
     val tx = JdbcTransactionManager.transaction
 
     try {
-      if (!tx.isNested) {
-        tx.setReadOnly(flag=false)
-        tx.setAutoCommit(flag=false)
-      }
+      tx.setReadOnly(flag=false)
+      tx.setAutoCommit(flag=false)
 
       tx.up()
       val res: A = f
       tx.down()
 
-      // commit if this is not an existing transaction
-      if (!tx.isNested) {
-        log.debug(s"TRANSACTION END: ${tx.id}", C.tag.DB)
-        tx.commit()
-      }
+      log.debug(s"TRANSACTION END: ${tx.id}", C.tag.DB)
+      tx.commit()
 
       res
     }
@@ -54,9 +49,7 @@ class JdbcTransactionManager extends AbstractTransactionManager {
     val tx = JdbcTransactionManager.transaction
 
     try {
-      if (!tx.isNested){
-        tx.setReadOnly(flag=true)
-      }
+      tx.setReadOnly(flag=true)
 
       tx.up()
       val res: A = f
