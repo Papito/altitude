@@ -20,6 +20,8 @@ import scala.concurrent.Future
 class FileImportService extends BaseService {
   protected val DAO = new FileSystemImportDao
 
+  protected val SUPPORTED_MEDIA_TYPES = List("audio", "image")
+
   def getFilesToImport(path: String): List[FileImportAsset] = {
     log.info(s"Finding assets to import @ '$path'", C.tag.SERVICE)
     val assets = DAO.iterateAssets(path = path).toList
@@ -54,9 +56,15 @@ class FileImportService extends BaseService {
     }
   }
 
-  def importAsset(fileAsset: FileImportAsset)(implicit txId: TransactionId = new TransactionId) : Future[Asset]  = {
+  def importAsset(fileAsset: FileImportAsset)(implicit txId: TransactionId = new TransactionId) : Future[Option[Asset]]  = {
     log.info(s"Importing file asset '$fileAsset'", C.tag.SERVICE)
     val mediaType = detectAssetType(fileAsset)
+
+    if (!SUPPORTED_MEDIA_TYPES.contains(mediaType.mediaType)) {
+      log.warn(s"Ignoring ${fileAsset.absolutePath} of type ${mediaType.mediaType}")
+      return Future{None}
+    }
+
     val metadata: JsValue = app.service.metadata.extract(fileAsset, mediaType)
 
     val fileSizeInBytes: Long = FileUtils.sizeOf(new File(fileAsset.absolutePath))
@@ -69,7 +77,7 @@ class FileImportService extends BaseService {
       metadata = metadata)
 
     val f = app.service.library.add(asset)
-    f map { res => res }
+    f map { res => Some(res) }
   }
 
   protected def getChecksum(file: File): String = {

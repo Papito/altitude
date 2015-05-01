@@ -32,7 +32,7 @@ import scala.concurrent.Future
     importFile("images/1.jpg")
     val path = getClass.getResource(s"../files/incoming/images/1.jpg").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
-    val importedAsset: Future[Asset] = altitude.service.fileImport.importAsset(fileImportAsset)
+    val importedAsset: Future[Option[Asset]] = altitude.service.fileImport.importAsset(fileImportAsset)
 
     importedAsset onComplete  {
       case Success(res) => fail("Should throw a duplicate exception")
@@ -43,7 +43,7 @@ import scala.concurrent.Future
   protected def importFile(p: String): Asset = {
     val path = getClass.getResource(s"../files/incoming/$p").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
-    val importedAsset = altitude.service.fileImport.importAsset(fileImportAsset).futureValue
+    val importedAsset = altitude.service.fileImport.importAsset(fileImportAsset).futureValue.get
     importedAsset.mediaType should equal(importedAsset.mediaType)
     importedAsset.path should not be empty
     importedAsset.md5 should not be empty

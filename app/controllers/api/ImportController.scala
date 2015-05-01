@@ -2,7 +2,7 @@ package controllers.api
 
 import akka.actor.{Actor, ActorRef, Props}
 import altitude.Util.log
-import altitude.models.FileImportAsset
+import altitude.models.{Asset, FileImportAsset}
 import altitude.services.AbstractTransactionManager
 import altitude.{Const => C}
 import global.Altitude
@@ -13,6 +13,8 @@ import play.api.Play
 import play.api.Play.current
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc._
+
+import scala.concurrent.Future
 
 object ImportController extends Controller {
   implicit val formats = DefaultFormats
@@ -36,8 +38,13 @@ object ImportController extends Controller {
     def receive = {
       case "next" => out ! (if (assetsIt.hasNext) {
         val importAsset: FileImportAsset = assetsIt.next()
-        val assetF = app.service.fileImport.importAsset(importAsset)
-        write("asset" -> assetF.map{asset => asset})
+        val fAsset: Future[Option[Asset]] = app.service.fileImport.importAsset(importAsset)
+        val fRes = fAsset map{asset => asset match {
+          case None => "ignored"
+          case _ => asset.get.toJson
+        }}
+
+        write("asset" -> fRes)
       } else "")
       case "total" => out ! write("total" -> assets.size)
     }
