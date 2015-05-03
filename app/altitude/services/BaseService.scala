@@ -17,25 +17,25 @@ abstract class BaseService[Model <: BaseModel] {
   protected val txManager = app.injector.instance[AbstractTransactionManager]
 
   def add(obj: Model)(implicit txId: TransactionId = new TransactionId): Future[JsObject] = {
-    txManager.withTransaction[Future[JsObject]] {
+    txManager.withTransaction[JsObject] {
       DAO.add(obj.toJson)
     }
   }
 
   def getById(id: String)(implicit txId: TransactionId = new TransactionId): Future[Option[JsObject]] = {
-    txManager.asReadOnly[Future[Option[JsObject]]] {
+    txManager.asReadOnly[Option[JsObject]] {
       DAO.getById(id)
     }
   }
 
   def getAll()(implicit txId: TransactionId = new TransactionId): Future[List[JsObject]] = {
-    txManager.asReadOnly[Future[List[JsObject]]] {
+    txManager.asReadOnly[List[JsObject]] {
       DAO.getAll
     }
   }
 
   def query(query: Query)(implicit txId: TransactionId = new TransactionId): Future[List[JsObject]] = {
-    txManager.asReadOnly[Future[List[JsObject]]] {
+    txManager.asReadOnly[List[JsObject]] {
       DAO.query(query)
     }
   }

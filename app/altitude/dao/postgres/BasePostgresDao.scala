@@ -20,9 +20,6 @@ import scala.concurrent.Future
 
 abstract class BasePostgresDao(protected val tableName: String) extends BaseDao {
 
-  protected val RUNNER: QueryRunner = new QueryRunner()
-
-
   protected def conn(implicit txId: TransactionId): Connection = {
     // get transaction from the global lookup
     JdbcTransactionManager.transaction.conn
@@ -82,16 +79,15 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
 
   protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object])(implicit txId: TransactionId): Future[JsObject] = {
     log.info(s"POSTGRES INSERT: $jsonIn", C.tag.DB)
-
     val id = BaseModel.genId
     val createdAt = utcNow
 
     val values: List[Object] = id :: createdAt.getMillis.asInstanceOf[Object] :: vals
 
-    log.debug(s"SQL: $q. ARGS: ${values.toString()}")
-
     val fRes = Future {
-      RUNNER.update(conn, q, values:_*)
+      log.debug(s"SQL: $q. ARGS: ${values.toString()}")
+      val runner: QueryRunner = new QueryRunner()
+      runner.update(conn, q, values:_*)
     }
 
     fRes map  {_ =>
@@ -102,10 +98,11 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
   }
 
   protected def manyBySqlQuery(sql: String, vals: List[Object])(implicit txId: TransactionId): Future[List[Map[String, AnyRef]]] = {
-    log.debug(s"SQL: $sql")
 
     val fRes = Future {
-       RUNNER.query(conn, sql, new MapListHandler(), vals: _*)
+      log.debug(s"SQL: $sql")
+      val runner: QueryRunner = new QueryRunner()
+      runner.query(conn, sql, new MapListHandler(), vals: _*)
     }
 
     fRes map { res =>
@@ -118,7 +115,8 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     log.debug(s"SQL: $sql")
 
     val fRes = Future {
-      RUNNER.query(conn, sql, new MapListHandler(), vals:_*)
+      val runner: QueryRunner = new QueryRunner()
+      runner.query(conn, sql, new MapListHandler(), vals:_*)
     }
 
     fRes map {res =>

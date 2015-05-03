@@ -3,6 +3,10 @@ package altitude.services
 import altitude.Util.log
 import altitude.dao.{JdbcTransaction, TransactionId}
 import altitude.{Const => C}
+import org.apache.commons.lang3.exception.ExceptionUtils
+import scala.concurrent.ExecutionContext.Implicits.global
+
+import scala.concurrent.Future
 
 object JdbcTransactionManager {
   val TRANSACTIONS = scala.collection.mutable.Map[Int, JdbcTransaction]()
@@ -20,48 +24,72 @@ object JdbcTransactionManager {
 
 class JdbcTransactionManager extends AbstractTransactionManager {
 
-  override def withTransaction[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
-
+  override def withTransaction[A](f: => Future[A])(implicit txId: TransactionId = new TransactionId) = {
     val tx = JdbcTransactionManager.transaction
+    tx.setReadOnly(flag=false) //FIXME: can throw
+    tx.setAutoCommit(flag=false) //FIXME: can throw
 
-    try {
-      tx.setReadOnly(flag=false)
-      tx.setAutoCommit(flag=false)
+    tx.up()
+    val res: Future[A] = f
 
-      tx.up()
-      val res: A = f
-      tx.down()
-
-      log.debug(s"TRANSACTION END: ${tx.id}", C.tag.DB)
-      tx.commit()
-
-      res
-    }
-    finally {
-      if (!tx.isNested) {
+    res.onSuccess { case result =>
+      try {
+        tx.down()
+        tx.commit()
+      } finally {
+        if (!tx.isNested) {
+          log.debug(s"TRANSACTION END: ${tx.id}", C.tag.DB)
+          JdbcTransactionManager.TRANSACTIONS.remove(txId.id)
+        }
         tx.close()
-        JdbcTransactionManager.TRANSACTIONS.remove(txId.id)
       }
     }
+
+    res.onFailure { case ex =>
+      try {
+        log.debug(s"TRANSACTION EXIT: ${tx.id}, ${ex.getMessage}", C.tag.DB)
+        //ExceptionUtils.printRootCauseStackTrace(ex)
+        tx.down()
+        tx.rollback()
+      } finally {
+        if (!tx.isNested) {
+          JdbcTransactionManager.TRANSACTIONS.remove(txId.id)
+        }
+        tx.close()
+      }
+    }
+
+    res
   }
 
-  override def asReadOnly[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
+  override def asReadOnly[A](f: => Future[A])(implicit txId: TransactionId = new TransactionId) = {
     val tx = JdbcTransactionManager.transaction
 
-    try {
-      tx.setReadOnly(flag=true)
+    tx.setReadOnly(flag=true) //FIXME: can throw
 
-      tx.up()
-      val res: A = f
-      tx.down()
+    tx.up()
+    val res: Future[A] = f
 
-      res
-    }
-    finally {
-      if (!tx.isNested) {
-        tx.close()
-        JdbcTransactionManager.TRANSACTIONS.remove(txId.id)
+    if (tx.level == 0) {
+      f.onSuccess { case result =>
+        log.debug(s"TRANSACTION END: ${tx.id}", C.tag.DB)
+        tx.down()
+        if (!tx.isNested) {
+          JdbcTransactionManager.TRANSACTIONS.remove(txId.id)
+          tx.close()
+        }
+      }
+
+      f.onFailure { case ex =>
+        log.debug(s"TRANSACTION EXIT: ${tx.id}, ${ex.getMessage}", C.tag.DB)
+        //ExceptionUtils.printRootCauseStackTrace(ex)
+        tx.down()
+        if (!tx.isNested) {
+          JdbcTransactionManager.TRANSACTIONS.remove(txId.id)
+          tx.close()
+        }
       }
     }
+    res
   }
 }

@@ -18,7 +18,7 @@ class LibraryService extends BaseService[Asset] {
   override protected val DAO = app.injector.instance[LibraryDao]
 
   override def add(asset: Asset)(implicit txId: TransactionId = new TransactionId): Future[JsObject] = {
-    txManager.withTransaction[Future[JsObject]] {
+    txManager.withTransaction[JsObject] {
       val query = Query(Map(C.Asset.MD5 -> asset.md5))
       val existing = DAO.query(query)
 

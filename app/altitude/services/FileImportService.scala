@@ -14,8 +14,8 @@ import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
 import play.api.libs.json.JsValue
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class FileImportService extends BaseService {
   protected val DAO = new FileSystemImportDao

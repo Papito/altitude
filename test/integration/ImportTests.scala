@@ -1,4 +1,7 @@
 package integration
+
+import org.apache.commons.lang3.exception.ExceptionUtils
+
 import scala.util.{Success, Failure}
 import java.io.File
 
