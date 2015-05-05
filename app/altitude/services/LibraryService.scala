@@ -33,7 +33,7 @@ class LibraryService extends BaseService[Asset] {
         duplicates <- existing
         // IF there is no duplicate
         if duplicates.size == 0
-        // get asset with image representation, if possible
+        // get asset with image preview, if any
         assetWithImage <- withImagePreview(asset)
         // and add asset
         res <- super.add(assetWithImage)
@@ -50,7 +50,7 @@ class LibraryService extends BaseService[Asset] {
   }
 
   private def withImagePreview(asset: Asset): Future[Asset] = {
-    log.info("Getting asset image")
+    log.info(s"Getting asset image for ${asset.path}")
 
     asset.mediaType.mediaType match {
       // IMAGES

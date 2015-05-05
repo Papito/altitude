@@ -24,6 +24,7 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
       md5 = rec.get(C.Asset.MD5).get.asInstanceOf[String],
       mediaType = mediaType,
       sizeBytes = rec.get(C.Asset.SIZE_BYTES).get.asInstanceOf[Long],
+      imageData = rec.get(C.Asset.IMAGE_DATA).get.asInstanceOf[Array[Byte]],
       metadata = Json.parse(rec.get(C.Asset.METADATA).get.toString))
 
     addCoreAttrs(model, rec)
@@ -45,8 +46,8 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
              $coreSqlColsForInsert, ${C.Asset.PATH}, ${C.Asset.MD5},
              ${C.Asset.FILENAME}, ${C.Asset.SIZE_BYTES},
              ${C.Asset.MEDIA_TYPE}, ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE},
-             ${C.Asset.METADATA})
-            VALUES($coreSqlValuesForInsert, ?, ?, ?, ?, ?, ?, ?, CAST(? AS jsonb))
+             ${C.Asset.METADATA}, ${C.Asset.IMAGE_DATA})
+            VALUES($coreSqlValuesForInsert, ?, ?, ?, ?, ?, ?, ?, CAST(? AS jsonb), ?)
     """
 
     val asset_sql_vals: List[Object] = List(
@@ -57,7 +58,8 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
       asset.mediaType.mediaType,
       asset.mediaType.mediaSubtype,
       asset.mediaType.mime,
-      metadata)
+      metadata,
+      asset.imageData)
 
     addRecord(jsonIn, asset_sql, asset_sql_vals)
   }

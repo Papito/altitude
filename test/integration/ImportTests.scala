@@ -18,6 +18,7 @@ import scala.concurrent.Future
 @DoNotDiscover class ImportTests(val config: Map[String, _]) extends IntegrationTestCore {
   test("import image (JPEG)") {
     val asset = importFile("images/1.jpg")
+    asset.imageData.length should not be(0)
   }
 
   test("import audio (MP3)") {

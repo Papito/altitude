@@ -18,6 +18,7 @@ CREATE TABLE asset (
     metadata jsonb,
     path TEXT NOT NULL,
     filename TEXT NOT NULL,
+    image_data BYTEA,
     size_bytes BIGINT NOT NULL
 ) INHERITS (_core);
 
