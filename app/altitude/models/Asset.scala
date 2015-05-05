@@ -15,13 +15,14 @@ object Asset {
       sizeBytes = (json \ C.Asset.SIZE_BYTES).as[Long],
       metadata = json \ C.Asset.METADATA
     ).withCoreAttr(json)
-  }
+}
 
 case class Asset(id: Option[String] = None,
                  mediaType: MediaType,
                  path: String,
                  md5: String,
                  sizeBytes: Long,
+                 imageData: Array[Byte] = new Array[Byte](0),
                  metadata: JsValue = JsNull) extends BaseModel {
 
   val fileName: String = FilenameUtils.getName(path)

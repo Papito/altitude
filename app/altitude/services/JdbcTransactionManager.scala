@@ -3,7 +3,6 @@ package altitude.services
 import altitude.Util.log
 import altitude.dao.{JdbcTransaction, TransactionId}
 import altitude.{Const => C}
-import org.apache.commons.lang3.exception.ExceptionUtils
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future

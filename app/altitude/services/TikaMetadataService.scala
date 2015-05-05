@@ -20,7 +20,7 @@ class TikaMetadataService extends AbstractMetadataService {
   private object PARSERS {
     final val IMAGE = new ImageParser
     final val MPEG_AUDIO = new Mp3Parser
-    final val SIMPLE_AUDIO = new AudioParser
+    final val ANY_AUDIO = new AudioParser
   }
 
   final private val TIKA_HANDLER = new DefaultHandler
@@ -31,7 +31,7 @@ class TikaMetadataService extends AbstractMetadataService {
     case mt: MediaType if mt.mediaType == "audio" && mt.mediaSubtype == "mpeg" =>
       extractMetadata(importAsset, PARSERS.MPEG_AUDIO)
     case mt: MediaType if mt.mediaType == "audio" =>
-      extractMetadata(importAsset, PARSERS.SIMPLE_AUDIO)
+      extractMetadata(importAsset, PARSERS.ANY_AUDIO)
     case _ =>
       log.warn(s"No metadata extractor found for $importAsset of type '$mediaType'", C.tag.SERVICE)
       JsNull
