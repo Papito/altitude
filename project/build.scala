@@ -27,6 +27,18 @@ object AltitudeBuild extends Build {
         "org.scalatra" %% "scalatra-scalate" % ScalatraVersion,
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
         "ch.qos.logback" % "logback-classic" % "1.1.2" % "runtime",
+
+        "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test",
+        "org.scalatra" %% "scalatra-scalatest" % "2.4.0.RC1" % "test",
+        "org.apache.tika" % "tika-parsers" % "1.7",
+        "org.apache.tika" % "tika-serialization" % "1.7",
+        "org.json4s" %% "json4s-native" % "3.2.11",
+        "org.apache.commons" % "commons-io" % "1.3.2",
+        "net.codingwell" %% "scala-guice" % "4.0.0-beta5",
+        "commons-dbutils" % "commons-dbutils" % "1.6",
+        "org.imgscalr" % "imgscalr-lib" % "4.2",
+        "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
+
         "org.eclipse.jetty" % "jetty-webapp" % "9.1.5.v20140505" % "container",
         "org.eclipse.jetty" % "jetty-plus" % "9.1.5.v20140505" % "container",
         "javax.servlet" % "javax.servlet-api" % "3.1.0"
