@@ -5,7 +5,7 @@ import java.io.{File, FileInputStream, InputStream}
 import altitude.Util.log
 import altitude.dao.{FileSystemImportDao, TransactionId}
 import altitude.models.{Asset, FileImportAsset, MediaType}
-import altitude.{Const => C}
+import altitude.{Const => C, Altitude}
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.apache.tika.detect.{DefaultDetector, Detector}
@@ -17,7 +17,7 @@ import play.api.libs.json.JsValue
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class FileImportService extends BaseService {
+class FileImportService(app: Altitude)  extends BaseService(app) {
   protected val DAO = new FileSystemImportDao
 
   protected val SUPPORTED_MEDIA_TYPES = List("audio", "image")
@@ -66,8 +66,7 @@ class FileImportService extends BaseService {
     }
 
     val metadata: JsValue = app.service.metadata.extract(fileAsset, mediaType)
-
-    val fileSizeInBytes: Long = FileUtils.sizeOf(new File(fileAsset.absolutePath))
+    val fileSizeInBytes: Long = 0L //FIXME: FileUtils.sizeOf(new File(fileAsset.absolutePath))
 
     val asset = Asset(
       path = fileAsset.absolutePath,

@@ -6,7 +6,6 @@ import altitude.models.BaseModel
 import altitude.models.search.Query
 import altitude.{Const => C, Util}
 import org.joda.time.DateTime
-import play.api.Play
 import play.api.libs.json._
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api._
@@ -16,9 +15,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 object BaseMongoDao {
-  lazy val host = Play.current.configuration.getString("mongo.host").getOrElse("")
+  lazy val host = "" //FIXME Play.current.configuration.getString("mongo.host").getOrElse("")
   require(host.nonEmpty)
-  lazy val dbName = Play.current.configuration.getString("mongo.name").getOrElse("")
+  lazy val dbName = "" //FIXME  Play.current.configuration.getString("mongo.name").getOrElse("")
   require(dbName.nonEmpty)
 
   log.info("Initializing mongo connection",

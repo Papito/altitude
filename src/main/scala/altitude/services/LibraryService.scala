@@ -14,12 +14,12 @@ import altitude.models.search.Query
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.imgscalr.Scalr
 import play.api.libs.json.JsObject
-import altitude.{Const => C}
+import altitude.{Const => C, Altitude}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class LibraryService extends BaseService[Asset] {
+class LibraryService(app: Altitude) extends BaseService[Asset](app) {
   override protected val DAO = app.injector.instance[LibraryDao]
   val PREVIEW_BOX_SIZE = 175 //FIXME: to settings
 

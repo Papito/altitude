@@ -5,15 +5,12 @@ import javax.sql.DataSource
 
 import altitude.Util.log
 import altitude.{Const => C}
-import play.api.Play
-import play.api.Play.current
-import play.api.db.DB
 
 class JdbcTransaction extends Transaction {
   Transaction.CREATED += 1
-  private val dsName = Play.current.configuration.getString("datasource").getOrElse("")
+  private val dsName = "" //FIXME Play.current.configuration.getString("datasource").getOrElse("")
   require(!dsName.isEmpty)
-  private val ds: DataSource = DB.getDataSource(dsName)
+  private val ds: DataSource = null //FIXME
   val conn: Connection = ds.getConnection
 
   log.debug(s"New JDBC transaction $id", C.tag.DB)
