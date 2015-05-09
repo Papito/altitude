@@ -38,8 +38,10 @@ object AltitudeBuild extends Build {
         "commons-dbutils" % "commons-dbutils" % "1.6",
         "org.imgscalr" % "imgscalr-lib" % "4.2",
         "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
-        "org.reactivemongo" % "reactivemongo_2.11" % "0.10.5.0.akka23",
         "com.typesafe.play" %% "play-json" % "2.3.4",
+        "org.mongodb" %% "casbah" % "2.7.2",
+        "org.json4s" %% "json4s-jackson" % "3.2.10",
+        "org.json4s" %% "json4s-mongo" % "3.2.10",
 
         "org.eclipse.jetty" % "jetty-webapp" % "9.1.5.v20140505" % "container",
         "org.eclipse.jetty" % "jetty-plus" % "9.1.5.v20140505" % "container",
