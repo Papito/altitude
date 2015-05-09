@@ -34,7 +34,7 @@ class FileSystemImportDao extends BaseDao {
     }.toIterator
   }
 
-  override def add(json: JsObject)(implicit txId: TransactionId): Future[JsObject] = throw new NotImplementedError
-  override def getById(id: String)(implicit txId: TransactionId): Future[Option[JsObject]] = throw new NotImplementedError
-  override def query(q: Query)(implicit txId: TransactionId): Future[List[JsObject]] = throw new NotImplementedError
+  override def add(json: JsObject)(implicit txId: TransactionId): JsObject = throw new NotImplementedError
+  override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = throw new NotImplementedError
+  override def query(q: Query)(implicit txId: TransactionId): List[JsObject] = throw new NotImplementedError
 }

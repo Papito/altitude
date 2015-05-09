@@ -56,13 +56,13 @@ class FileImportService(app: Altitude)  extends BaseService(app) {
     }
   }
 
-  def importAsset(fileAsset: FileImportAsset)(implicit txId: TransactionId = new TransactionId) : Future[Option[Asset]]  = {
+  def importAsset(fileAsset: FileImportAsset)(implicit txId: TransactionId = new TransactionId) : Option[Asset]  = {
     log.info(s"Importing file asset '$fileAsset'", C.tag.SERVICE)
     val mediaType = detectAssetType(fileAsset)
 
     if (!SUPPORTED_MEDIA_TYPES.contains(mediaType.mediaType)) {
       log.warn(s"Ignoring ${fileAsset.absolutePath} of type ${mediaType.mediaType}")
-      return Future{None}
+      return None
     }
 
     val metadata: JsValue = app.service.metadata.extract(fileAsset, mediaType)
@@ -75,8 +75,8 @@ class FileImportService(app: Altitude)  extends BaseService(app) {
       sizeBytes = fileSizeInBytes,
       metadata = metadata)
 
-    val f = app.service.library.add(asset)
-    f map { res => Some(res) }
+    val res = app.service.library.add(asset)
+    Some(res)
   }
 
   protected def getChecksum(file: File): String = {

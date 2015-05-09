@@ -15,15 +15,15 @@ object BaseMongoDao {
 }
 
 abstract class BaseMongoDao(private val collectionName: String) extends BaseDao {
-  override def add(jsonIn: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
+  override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     throw new NotImplementedError()
   }
 
-  override def getById(id: String)(implicit txId: TransactionId): Future[Option[JsObject]] = {
+  override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = {
     throw new NotImplementedError()
   }
 
-  override def query(query: Query)(implicit txId: TransactionId): Future[List[JsObject]] = {
+  override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {
     throw new NotImplementedError()
   }
 

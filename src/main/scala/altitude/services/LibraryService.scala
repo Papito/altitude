@@ -23,45 +23,34 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
   override protected val DAO = app.injector.instance[LibraryDao]
   val PREVIEW_BOX_SIZE = 175 //FIXME: to settings
 
-  override def add(asset: Asset)(implicit txId: TransactionId = new TransactionId): Future[JsObject] = {
+  override def add(asset: Asset)(implicit txId: TransactionId = new TransactionId): JsObject = {
     txManager.withTransaction[JsObject] {
       val query = Query(Map(C.Asset.MD5 -> asset.md5))
       val existing = DAO.query(query)
 
-      val f = for {
-        // find duplicate
-        duplicates <- existing
-        // IF there is no duplicate
-        if duplicates.size == 0
-        // get asset with image preview, if any
-        assetWithImage <- withImagePreview(asset)
-        // and add asset
-        res <- super.add(assetWithImage)
-      } yield res
-
-      f recover {
-        // if filter fails and there IS a duplicate
-        case ex: NoSuchElementException => {
-          log.warn(s"Asset already exists for ${asset.path}")
-          throw new DuplicateException(s"Duplicate for ${asset.path}")
-        }
+      if (existing.nonEmpty) {
+        log.warn(s"Asset already exists for ${asset.path}")
+        throw new DuplicateException(s"Duplicate for ${asset.path}")
       }
+
+      val assetWithImage = withImagePreview(asset)
+      super.add(assetWithImage)
     }
   }
 
-  private def withImagePreview(asset: Asset): Future[Asset] = {
+  private def withImagePreview(asset: Asset): Asset = {
     log.info(s"Getting asset image for ${asset.path}")
 
     asset.mediaType.mediaType match {
       // IMAGES
-      case "image" => Future {
+      case "image" => {
         val imageData = makeImageThumbnail(asset)
         log.debug(s"Asset image size ${imageData.length}")
         Asset(id=asset.id, mediaType=asset.mediaType, path=asset.path, md5=asset.md5,
           imageData=imageData, sizeBytes=asset.sizeBytes, metadata=asset.metadata)
       }
       // FILES WITH NO IMAGE
-      case _ => Future {asset}
+      case _ => asset
     }
   }
 

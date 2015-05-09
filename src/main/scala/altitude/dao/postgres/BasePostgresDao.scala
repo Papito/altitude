@@ -40,7 +40,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
         FROM $tableName
        WHERE ${C.Base.ID} = ?"""
 
-  override def add(jsonIn: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
+  override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     val sql: String =s"""
       INSERT INTO $tableName ($coreSqlColsForInsert)
            VALUES ($coreSqlValuesForInsert)"""
@@ -48,18 +48,17 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     addRecord(jsonIn, sql, List[Object]())
   }
 
-  override def getById(id: String)(implicit txId: TransactionId): Future[Option[JsObject]] = {
+  override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'", C.tag.DB)
-    val fRec: Future[Option[Map[String, AnyRef]]] = oneBySqlQuery(oneSql, List(id))
+    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneSql, List(id))
 
-    fRec map {rec => rec match {
+    rec match {
         case None => None
         case _ => Some(makeModel(rec.get))
       }
-    }
   }
 
-  override def query(query: Query)(implicit txId: TransactionId): Future[List[JsObject]] = {
+  override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {
     val (sqlColumns, sqlValues) = query.params.unzip
 
     // create pairs of column names and value placeholders, to be joined in the final clause
@@ -72,67 +71,54 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
         FROM $tableName
        WHERE ${whereClauses.mkString("AND")}"""
 
-    val fRecs = manyBySqlQuery(sql, sqlValues.toList)
+    val recs = manyBySqlQuery(sql, sqlValues.toList)
 
-    fRecs map {_.map{makeModel}}
+    recs.map{makeModel}
   }
 
-  protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object])(implicit txId: TransactionId): Future[JsObject] = {
+  protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object])(implicit txId: TransactionId): JsObject = {
     log.info(s"POSTGRES INSERT: $jsonIn", C.tag.DB)
     val id = BaseModel.genId
     val createdAt = utcNow
 
     val values: List[Object] = id :: createdAt.getMillis.asInstanceOf[Object] :: vals
 
-    val fRes = Future {
-      log.debug(s"SQL: $q. ARGS: ${values.toString()}")
-      val runner: QueryRunner = new QueryRunner()
-      runner.update(conn, q, values:_*)
-    }
+    log.debug(s"SQL: $q. ARGS: ${values.toString()}")
+    val runner: QueryRunner = new QueryRunner()
+    runner.update(conn, q, values:_*)
 
-    fRes map  {_ =>
-      jsonIn ++ JsObject(Seq(
-        C.Base.ID -> JsString(id),
-        C.Base.CREATED_AT -> dtAsJsString{createdAt}))
-    }
+    jsonIn ++ JsObject(Seq(
+      C.Base.ID -> JsString(id),
+      C.Base.CREATED_AT -> dtAsJsString{createdAt}))
   }
 
-  protected def manyBySqlQuery(sql: String, vals: List[Object])(implicit txId: TransactionId): Future[List[Map[String, AnyRef]]] = {
+  protected def manyBySqlQuery(sql: String, vals: List[Object])(implicit txId: TransactionId): List[Map[String, AnyRef]] = {
 
-    val fRes = Future {
-      log.debug(s"SQL: $sql")
-      val runner: QueryRunner = new QueryRunner()
-      runner.query(conn, sql, new MapListHandler(), vals: _*)
-    }
-
-    fRes map { res =>
-      log.debug(s"Found ${res.size()} records", C.tag.DB)
-      res.map{_.toMap[String, AnyRef]}.toList
-    }
+    log.debug(s"SQL: $sql")
+    val runner: QueryRunner = new QueryRunner()
+    val res = runner.query(conn, sql, new MapListHandler(), vals: _*)
+    log.debug(s"Found ${res.size()} records", C.tag.DB)
+    res.map{_.toMap[String, AnyRef]}.toList
   }
 
-  protected def oneBySqlQuery(sql: String, vals: List[Object])(implicit txId: TransactionId): Future[Option[Map[String, AnyRef]]] = {
+  protected def oneBySqlQuery(sql: String, vals: List[Object])(implicit txId: TransactionId): Option[Map[String, AnyRef]] = {
     log.debug(s"SQL: $sql")
 
-    val fRes = Future {
-      val runner: QueryRunner = new QueryRunner()
-      runner.query(conn, sql, new MapListHandler(), vals:_*)
-    }
+    val runner: QueryRunner = new QueryRunner()
+    val res = runner.query(conn, sql, new MapListHandler(), vals:_*)
 
-    fRes map {res =>
-      log.debug(s"Found ${res.size()} records", C.tag.DB)
+    log.debug(s"Found ${res.size()} records", C.tag.DB)
 
-      if (res.size() == 0)
-        return Future{None}
+    if (res.size() == 0)
+      return None
 
-      if (res.size() > 1)
-        throw new Exception("getById should return only a single result")
+    if (res.size() > 1)
+      throw new Exception("getById should return only a single result")
 
-      val rec = res.get(0)
+    val rec = res.get(0)
 
-      log.debug(s"Record: $rec")
-      Some(rec.toMap[String, AnyRef])
-    }
+    log.debug(s"Record: $rec")
+    Some(rec.toMap[String, AnyRef])
   }
 
   /*

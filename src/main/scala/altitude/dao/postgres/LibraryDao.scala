@@ -32,7 +32,7 @@ class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
     model
   }
 
-  override def add(jsonIn: JsObject)(implicit txId: TransactionId): Future[JsObject] = {
+  override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     val asset = jsonIn: Asset
 
     // Postgres will reject this sequence with jsonb
