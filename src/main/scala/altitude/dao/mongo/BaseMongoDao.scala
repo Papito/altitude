@@ -1,15 +1,10 @@
 package altitude.dao.mongo
 
-import altitude.Util.log
 import altitude.dao.{BaseDao, TransactionId}
-import altitude.models.BaseModel
 import altitude.models.search.Query
 import altitude.{Const => C, Util}
 import org.joda.time.DateTime
 import play.api.libs.json._
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 object BaseMongoDao {
 }

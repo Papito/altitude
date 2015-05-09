@@ -1,4 +1,4 @@
-package altitude.integration
+package integration
 
 import altitude.AltitudeServlet
 import org.scalatest.FunSuiteLike

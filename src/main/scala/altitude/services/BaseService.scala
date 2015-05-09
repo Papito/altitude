@@ -1,13 +1,12 @@
 package altitude.services
 
+import altitude.Altitude
 import altitude.dao.{BaseDao, TransactionId}
 import altitude.models.BaseModel
 import altitude.models.search.Query
-import altitude.Altitude
 import net.codingwell.scalaguice.InjectorExtensions._
 import play.api.libs.json.JsObject
 
-import scala.concurrent.Future
 import scala.language.implicitConversions
 
 abstract class BaseService[Model <: BaseModel](app: Altitude) {

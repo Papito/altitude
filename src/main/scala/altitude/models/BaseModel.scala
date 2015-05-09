@@ -4,12 +4,11 @@ import altitude.{Const => C, Util}
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json._
-import reactivemongo.bson.BSONObjectID
 
 import scala.language.implicitConversions
 
 object BaseModel {
-  final def genId: String = BSONObjectID.generate.stringify
+  final def genId: String = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE).toString
   implicit def toJson(obj: BaseModel): JsObject = obj.toJson
 }
 

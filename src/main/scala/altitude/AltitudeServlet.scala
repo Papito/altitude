@@ -1,8 +1,5 @@
 package altitude
 
-import org.scalatra._
-import scalate.ScalateSupport
-
 class AltitudeServlet extends AltitudeStack {
 
   get("/") {

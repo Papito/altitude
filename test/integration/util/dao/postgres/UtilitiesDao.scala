@@ -3,9 +3,6 @@ package integration.util.dao.postgres
 import altitude.dao.TransactionId
 import altitude.dao.postgres.BasePostgresDao
 import altitude.services.JdbcTransactionManager
-import play.api.libs.json.JsObject
-
-import scala.concurrent.Future
 
 class UtilitiesDao extends BasePostgresDao("") with integration.util.dao.UtilitiesDao {
   override def dropDatabase() = Unit

@@ -8,7 +8,7 @@ object Transaction {
 }
 
 trait Transaction {
-  val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
+  val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE) // FIXME: must be alphanumeric 24-char
   var _level: Int  = 0
   def level = _level
   def isNested: Boolean = level > 0

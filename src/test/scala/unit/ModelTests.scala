@@ -4,6 +4,7 @@ import java.io.File
 
 import altitude.models.{BaseModel, FileImportAsset}
 import altitude.{Const => C}
+import org.scalatest._
 import play.api.libs.json._
 
 class ModelTests extends FunSuite {

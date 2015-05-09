@@ -2,10 +2,8 @@ package integration.util.dao.mongo
 
 import altitude.dao.TransactionId
 import altitude.dao.mongo.BaseMongoDao
-import reactivemongo.core.commands.DropDatabase
 
 import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 class UtilitiesDao extends BaseMongoDao("") with integration.util.dao.UtilitiesDao {

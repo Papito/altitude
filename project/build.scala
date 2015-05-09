@@ -1,9 +1,8 @@
-import sbt._
-import Keys._
-import org.scalatra.sbt._
-import org.scalatra.sbt.PluginKeys._
+import com.mojolly.scalate.ScalatePlugin.ScalateKeys._
 import com.mojolly.scalate.ScalatePlugin._
-import ScalateKeys._
+import org.scalatra.sbt._
+import sbt.Keys._
+import sbt._
 
 object AltitudeBuild extends Build {
   val Organization = "altitude"

@@ -5,17 +5,13 @@ import java.io.{File, FileInputStream, InputStream}
 import altitude.Util.log
 import altitude.dao.{FileSystemImportDao, TransactionId}
 import altitude.models.{Asset, FileImportAsset, MediaType}
-import altitude.{Const => C, Altitude}
+import altitude.{Altitude, Const => C}
 import org.apache.commons.codec.digest.DigestUtils
-import org.apache.commons.io.FileUtils
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
 import play.api.libs.json.JsValue
-
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class FileImportService(app: Altitude)  extends BaseService(app) {
   protected val DAO = new FileSystemImportDao

@@ -4,16 +4,9 @@ import altitude.Util.log
 import altitude.dao.{Transaction, TransactionId}
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
-import global.Altitude
 import integration.util.dao
-import integration.util.dao.UtilitiesDao
 import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.time.{Millis, Seconds, Span}
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach, FunSuite}
-import org.scalatestplus.play.OneAppPerSuite
-import play.api.test.FakeApplication
 
 abstract class IntegrationTestCore extends FunSuite
   with OneAppPerSuite with ScalaFutures with BeforeAndAfter with BeforeAndAfterEach {

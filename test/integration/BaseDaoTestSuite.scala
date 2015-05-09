@@ -4,11 +4,6 @@ import altitude.dao.JdbcTransaction
 import altitude.dao.mongo.BaseMongoDao
 import altitude.dao.postgres.BasePostgresDao
 import altitude.services.BaseService
-import org.scalatest.{BeforeAndAfterAll, Suites}
-import play.api.libs.json.JsObject
-import play.api.test.FakeApplication
-
-import scala.concurrent.Future
 
 /*
   Define base dao tests for each type of DB

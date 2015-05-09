@@ -3,7 +3,6 @@ package integration
 import altitude.models.BaseModel
 import altitude.services.BaseService
 import altitude.{Const => C}
-import org.scalatest.Matchers._
 import play.api.libs.json._
 
 import scala.language.implicitConversions

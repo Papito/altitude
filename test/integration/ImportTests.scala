@@ -1,19 +1,13 @@
 package integration
 
-import org.apache.commons.lang3.exception.ExceptionUtils
-
-import scala.util.{Success, Failure}
 import java.io.File
 
 import altitude.exceptions.DuplicateException
-import altitude.models.search.Query
 import altitude.models.{Asset, FileImportAsset}
-import org.scalatest.DoNotDiscover
-import org.scalatest.Matchers._
-import play.api.libs.json.JsObject
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 @DoNotDiscover class ImportTests(val config: Map[String, _]) extends IntegrationTestCore {
   test("import image (JPEG)") {

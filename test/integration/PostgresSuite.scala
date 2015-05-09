@@ -1,8 +1,6 @@
 package integration
 
 import altitude.dao.JdbcTransaction
-import org.scalatest.BeforeAndAfterAll
-import play.api.test.FakeApplication
 
 class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres")) with BeforeAndAfterAll {
 

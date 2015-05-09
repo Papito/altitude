@@ -6,11 +6,9 @@ import altitude.Util.log
 import altitude.models.FileImportAsset
 import altitude.models.search.Query
 import altitude.{Const => C}
-import org.apache.commons.io.{FilenameUtils, FileUtils}
+import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
 import play.api.libs.json.JsObject
-
-import scala.concurrent.Future
 
 class FileSystemImportDao extends BaseDao {
   private val ANY_FILE_FILTER: IOFileFilter = TrueFileFilter.INSTANCE

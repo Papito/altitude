@@ -15,8 +15,6 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 
 import scala.collection.JavaConversions._
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 abstract class BasePostgresDao(protected val tableName: String) extends BaseDao {
 
