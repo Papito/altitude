@@ -1,10 +1,10 @@
 package altitude
 
-class AltitudeServlet extends AltitudeStack {
+class ImportServlet extends AltitudeStack {
 
   get("/") {
     contentType="text/html"
-    jade("/index")
+    jade("/import")
   }
 
 }
