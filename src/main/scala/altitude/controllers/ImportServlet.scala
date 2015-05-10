@@ -6,5 +6,4 @@ class ImportServlet extends AltitudeStack {
     contentType="text/html"
     jade("/import")
   }
-
 }

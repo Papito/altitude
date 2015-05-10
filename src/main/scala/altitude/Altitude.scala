@@ -1,13 +1,28 @@
 package altitude
 
-import altitude.Util.log
+import org.slf4j.LoggerFactory
+
 //import altitude.dao._
 //import altitude.services._
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
 import net.codingwell.scalaguice.ScalaModule
 
-class Altitude(config: Configuration) {
+class Altitude(additionalConfiguration: Map[String, String] = Map(),
+               val isTest: Boolean = false,
+               val isProd: Boolean = false) {
+  val log =  LoggerFactory.getLogger(getClass)
+
+  log.info("Initializing Altitude application instance")
+  log.info(s"Test? $isTest, Prod? $isProd")
+
+  // at least one ENV should be chosen
+  require(isTest || isProd)
+  // but not two or more at the same time
+  require(List(isTest, isProd).count(_ == true) == 1)
+
+  val config = new Configuration(additionalConfiguration = additionalConfiguration)
+
   val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
   //val injector = Guice.createInjector(new InjectionModule)
 
