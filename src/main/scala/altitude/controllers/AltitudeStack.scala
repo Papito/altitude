@@ -1,4 +1,4 @@
-package altitude
+package altitude.controllers
 
 import javax.servlet.http.HttpServletRequest
 

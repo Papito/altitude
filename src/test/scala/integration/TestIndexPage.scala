@@ -1,6 +1,6 @@
 package integration
 
-import altitude.AltitudeServlet
+import altitude.controllers.AltitudeServlet
 import org.scalatest.FunSuiteLike
 import org.scalatra.test.scalatest._
 

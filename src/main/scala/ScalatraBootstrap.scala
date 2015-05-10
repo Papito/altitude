@@ -1,6 +1,7 @@
 import javax.servlet.ServletContext
 
 import altitude._
+import altitude.controllers.{ImportServlet, AltitudeServlet}
 import org.scalatra._
 
 class ScalatraBootstrap extends LifeCycle {

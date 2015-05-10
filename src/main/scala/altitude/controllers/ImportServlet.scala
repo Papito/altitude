@@ -1,4 +1,4 @@
-package altitude
+package altitude.controllers
 
 class ImportServlet extends AltitudeStack {
 
