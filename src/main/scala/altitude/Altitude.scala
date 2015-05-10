@@ -1,19 +1,20 @@
 package altitude
 
 import altitude.Util.log
-import altitude.dao._
-import altitude.services._
+//import altitude.dao._
+//import altitude.services._
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
 import net.codingwell.scalaguice.ScalaModule
 
 class Altitude(config: Configuration) {
   val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
-  val injector = Guice.createInjector(new InjectionModule)
+  //val injector = Guice.createInjector(new InjectionModule)
 
   /*
   Inject dependencies
    */
+/*
   class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
       val dataSourceType = config.get("datasource")
@@ -38,4 +39,5 @@ class Altitude(config: Configuration) {
     val metadata: AbstractMetadataService = new TikaMetadataService
     val library: LibraryService = new LibraryService(app)
   }
+*/
 }
