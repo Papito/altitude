@@ -1,5 +1,7 @@
 package altitude
 
+import java.sql.DriverManager
+
 import altitude.transactions.{JdbcTransaction, AbstractTransactionManager}
 import org.slf4j.LoggerFactory
 
@@ -44,7 +46,9 @@ class Altitude(additionalConfiguration: Map[String, String] = Map(),
           //bind[LibraryDao].toInstance(new altitude.dao.mongo.LibraryDao)
         case "postgres" =>
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
-          //bind[LibraryDao].toInstance(new altitude.dao.postgres.LibraryDao)
+          DriverManager.registerDriver(new org.postgresql.Driver)
+
+        //bind[LibraryDao].toInstance(new altitude.dao.postgres.LibraryDao)
         case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
       }
     }

@@ -10,11 +10,14 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
   val log =  LoggerFactory.getLogger(getClass)
 
   def transaction(implicit txId: TransactionId): JdbcTransaction = {
+    // see if we already have a transaction id defined
     if (app.JDBC_TRANSACTIONS.contains(txId.id)) {
+      // we do, eh
       return app.JDBC_TRANSACTIONS.get(txId.id).get
     }
 
-    // get a connection
+    // create a connection and a transaction
+
     val props = new Properties
     val user = app.config.get("db.postgres.user")
     props.setProperty("user", user)
@@ -41,8 +44,10 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
       val res: A = f
       tx.down()
 
-      log.debug(s"TRANSACTION END: ${tx.id}", C.tag.DB)
-      tx.commit()
+      if (!tx.isNested) {
+        log.debug(s"TRANSACTION END: ${tx.id}", C.tag.DB)
+        tx.commit()
+      }
 
       res
     }
