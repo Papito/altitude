@@ -15,15 +15,15 @@ class Configuration(additionalConfiguration: Map[String, String] = new HashMap()
 
   val default = HashMap(
     "datasource" -> "postgres", // mongo
-    "db.user" -> "altitude",
-    "db.password" -> "dba",
-    "db.url" -> "jdbc:postgresql://localhost/altitude"
+    "db.postgres.user" -> "altitude",
+    "db.postgres.password" -> "dba",
+    "db.postgres.url" -> "jdbc:postgresql://localhost/altitude"
   )
 
   val test = default ++ HashMap(
-    "db.password" -> "dba",
-    "db.url" -> "jdbc:postgresql://localhost/altitude-test",
-    "db.user" -> "altitude-test"
+    "db.postgres.password" -> "dba",
+    "db.postgres.url" -> "jdbc:postgresql://localhost/altitude-test",
+    "db.postgres.user" -> "altitude-test"
   ) ++ additionalConfiguration
 
   val prod = default ++ HashMap() ++ additionalConfiguration

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
 import net.codingwell.scalaguice.ScalaModule
+import net.codingwell.scalaguice.InjectorExtensions._
 
 class Altitude(additionalConfiguration: Map[String, String] = Map(),
                val isTest: Boolean,
@@ -50,7 +51,7 @@ class Altitude(additionalConfiguration: Map[String, String] = Map(),
   }
 
   val injector = Guice.createInjector(new InjectionModule)
-
+  val txManager = app.injector.instance[AbstractTransactionManager]
 
   // declare singleton services
 /*

@@ -1,19 +1,14 @@
 package altitude.transactions
 
 import java.sql.Connection
-import javax.sql.DataSource
 
 import altitude.{Const => C}
 import org.slf4j.LoggerFactory
 
-class JdbcTransaction extends Transaction {
+class JdbcTransaction(val conn: Connection) extends Transaction {
   val log =  LoggerFactory.getLogger(getClass)
 
   Transaction.CREATED += 1
-  private val dsName = "" //FIXME Play.current.configuration.getString("datasource").getOrElse("")
-  require(!dsName.isEmpty)
-  private val ds: DataSource = null //FIXME
-  val conn: Connection = ds.getConnection
 
   log.debug(s"New JDBC transaction $id", C.tag.DB)
   def getConnection: Connection = conn

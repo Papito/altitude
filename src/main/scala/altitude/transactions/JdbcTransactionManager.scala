@@ -1,5 +1,8 @@
 package altitude.transactions
 
+import java.sql.{DriverManager, Connection}
+import java.util.Properties
+
 import altitude.{Const => C, Altitude}
 import org.slf4j.LoggerFactory
 
@@ -10,7 +13,17 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     if (app.JDBC_TRANSACTIONS.contains(txId.id)) {
       return app.JDBC_TRANSACTIONS.get(txId.id).get
     }
-    val tx: JdbcTransaction = new JdbcTransaction
+
+    // get a connection
+    val props = new Properties
+    val user = app.config.get("db.postgres.user")
+    props.setProperty("user", user)
+    val password = app.config.get("db.postgres.password")
+    props.setProperty("password", password)
+    val url = app.config.get("db.postgres.url")
+    val conn: Connection = DriverManager.getConnection(url, props)
+
+    val tx: JdbcTransaction = new JdbcTransaction(conn)
     app.JDBC_TRANSACTIONS. += (tx.id -> tx)
     // assign the integer transaction to the mutable transaction id "carrier" object
     txId.id = tx.id
