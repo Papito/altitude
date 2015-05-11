@@ -11,7 +11,7 @@ class ScalatraBootstrap extends LifeCycle {
 
   override def init(context: ServletContext) {
     log.info("Initializing ... ")
-    app = new Some(new Altitude(isProd = true))
+    app = new Some(new Altitude(isProd = true, isTest = false))
     context.mount(new AltitudeServlet, "/*")
     context.mount(new ImportServlet, "/import/*")
   }

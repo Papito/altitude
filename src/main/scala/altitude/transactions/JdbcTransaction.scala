@@ -42,6 +42,6 @@ class JdbcTransaction extends Transaction {
     }
   }
 
-  def setReadOnly(flag: Boolean) = if (!isNested) conn.setReadOnly(flag)
-  def setAutoCommit(flag: Boolean) =if (!isNested) conn.setAutoCommit(flag)
+  override def setReadOnly(flag: Boolean): Unit = if (!isNested) conn.setReadOnly(flag)
+  override def setAutoCommit(flag: Boolean): Unit = if (!isNested) conn.setAutoCommit(flag)
 }

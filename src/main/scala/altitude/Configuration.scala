@@ -1,24 +1,31 @@
 package altitude
+import collection.immutable.HashMap
 
-class Configuration(additionalConfiguration: Map[String, String] = new scala.collection.immutable.HashMap()) {
-  private val config = new scala.collection.mutable.HashMap[String, String]()
+class Configuration(additionalConfiguration: Map[String, String] = new HashMap(),
+                    val isTest: Boolean,
+                    val isProd: Boolean) {
+  // at least one ENV should be chosen
+  require(isTest || isProd)
+  // but not two or more at the same time
+  require(List(isTest, isProd).count(_ == true) == 1)
+
   def get(key: String) = config.getOrElse(key, "")
 
   // FIXME: must come from files
 
-  val default = collection.immutable.HashMap(
+  val default = HashMap(
     "datasource" -> "postgres", // mongo
     "db.user" -> "altitude",
     "db.password" -> "dba",
     "db.url" -> "jdbc:postgresql://localhost/altitude"
   )
 
-  val test = default ++ collection.immutable.HashMap(
+  val test = default ++ HashMap(
     "db.url" -> "jdbc:postgresql://localhost/altitude-test",
     "db.user" -> "altitude-test"
   ) ++ additionalConfiguration
 
-  val dev = default ++ collection.immutable.HashMap() ++ additionalConfiguration
+  val prod = default ++ HashMap() ++ additionalConfiguration
 
-  val live = default ++ collection.immutable.HashMap() ++ additionalConfiguration
+  private val config: Map[String, String] = if (isTest) test else prod
 }

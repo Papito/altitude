@@ -3,15 +3,13 @@ package altitude
 import altitude.transactions.AbstractTransactionManager
 import org.slf4j.LoggerFactory
 
-//import altitude.dao._
-//import altitude.services._
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
 import net.codingwell.scalaguice.ScalaModule
 
 class Altitude(additionalConfiguration: Map[String, String] = Map(),
-               val isTest: Boolean = false,
-               val isProd: Boolean = false) {
+               val isTest: Boolean,
+               val isProd: Boolean) {
   val log =  LoggerFactory.getLogger(getClass)
 
   log.info("Initializing Altitude application instance")
@@ -22,7 +20,10 @@ class Altitude(additionalConfiguration: Map[String, String] = Map(),
   // but not two or more at the same time
   require(List(isTest, isProd).count(_ == true) == 1)
 
-  val config = new Configuration(additionalConfiguration = additionalConfiguration)
+  val config = new Configuration(
+    additionalConfiguration = additionalConfiguration,
+    isTest = isTest,
+    isProd = isProd)
 
   val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
   val app: Altitude = this
