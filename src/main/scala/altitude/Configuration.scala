@@ -21,6 +21,7 @@ class Configuration(additionalConfiguration: Map[String, String] = new HashMap()
   )
 
   val test = default ++ HashMap(
+    "db.password" -> "dba",
     "db.url" -> "jdbc:postgresql://localhost/altitude-test",
     "db.user" -> "altitude-test"
   ) ++ additionalConfiguration

@@ -1,6 +1,6 @@
 package altitude
 
-import altitude.transactions.AbstractTransactionManager
+import altitude.transactions.{JdbcTransaction, AbstractTransactionManager}
 import org.slf4j.LoggerFactory
 
 import altitude.{Const => C}
@@ -14,6 +14,8 @@ class Altitude(additionalConfiguration: Map[String, String] = Map(),
 
   log.info("Initializing Altitude application instance")
   log.info(s"Test? $isTest, Prod? $isProd")
+
+  val JDBC_TRANSACTIONS = scala.collection.mutable.Map[Int, JdbcTransaction]()
 
   // at least one ENV should be chosen
   require(isTest || isProd)
