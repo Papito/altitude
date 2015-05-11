@@ -1,5 +1,6 @@
 package altitude
 
+import altitude.transactions.AbstractTransactionManager
 import org.slf4j.LoggerFactory
 
 //import altitude.dao._
@@ -24,31 +25,32 @@ class Altitude(additionalConfiguration: Map[String, String] = Map(),
   val config = new Configuration(additionalConfiguration = additionalConfiguration)
 
   val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
-  //val injector = Guice.createInjector(new InjectionModule)
+  val app: Altitude = this
 
   /*
   Inject dependencies
    */
-/*
   class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
       val dataSourceType = config.get("datasource")
       log.info(s"Datasource type: $dataSourceType", C.tag.APP)
       dataSourceType match {
         case "mongo" =>
-          bind[AbstractTransactionManager].toInstance(new altitude.services.VoidTransactionManager)
-          bind[LibraryDao].toInstance(new altitude.dao.mongo.LibraryDao)
+          bind[AbstractTransactionManager].toInstance(new altitude.transactions.VoidTransactionManager(app))
+          //bind[LibraryDao].toInstance(new altitude.dao.mongo.LibraryDao)
         case "postgres" =>
-          bind[AbstractTransactionManager].toInstance(new altitude.services.JdbcTransactionManager)
-          bind[LibraryDao].toInstance(new altitude.dao.postgres.LibraryDao)
+          bind[AbstractTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
+          //bind[LibraryDao].toInstance(new altitude.dao.postgres.LibraryDao)
         case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
       }
     }
   }
 
-  // declare singleton services
-  val app: Altitude = this
+  val injector = Guice.createInjector(new InjectionModule)
 
+
+  // declare singleton services
+/*
   object service {
     val fileImport: FileImportService = new FileImportService(app)
     val metadata: AbstractMetadataService = new TikaMetadataService
