@@ -1,10 +1,10 @@
 package integration.util.dao.postgres
 
-import altitude.dao.TransactionId
+import altitude.Altitude
 import altitude.dao.postgres.BasePostgresDao
-import altitude.services.JdbcTransactionManager
+import altitude.transactions.{TransactionId, JdbcTransactionManager}
 
-class UtilitiesDao extends BasePostgresDao("") with integration.util.dao.UtilitiesDao {
+class UtilitiesDao(val app: Altitude) extends BasePostgresDao("") with integration.util.dao.UtilitiesDao {
   override def dropDatabase() = Unit
 
   override def rollback() = {
@@ -19,7 +19,6 @@ class UtilitiesDao extends BasePostgresDao("") with integration.util.dao.Utiliti
       tx._2.down()
       tx._2.close()
     })
-
   }
 
   override def cleanup() = {
@@ -29,7 +28,7 @@ class UtilitiesDao extends BasePostgresDao("") with integration.util.dao.Utiliti
   }
 
   override def createTransaction(txId: TransactionId): Unit = {
-    val tx = JdbcTransactionManager.transaction(txId)
+    val tx = jdbcTxManager.transaction(txId)
     tx.setReadOnly(flag = false)
     tx.setAutoCommit(flag = false)
     // up one level so it does not get committed or closed

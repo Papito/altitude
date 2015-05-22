@@ -6,14 +6,18 @@ import java.util.Properties
 import altitude.{Const => C, Altitude}
 import org.slf4j.LoggerFactory
 
+object JdbcTransactionManager {
+  val TRANSACTIONS = scala.collection.mutable.Map[Int, JdbcTransaction]()
+}
+
 class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManager {
   val log =  LoggerFactory.getLogger(getClass)
 
   def transaction(implicit txId: TransactionId): JdbcTransaction = {
     // see if we already have a transaction id defined
-    if (app.JDBC_TRANSACTIONS.contains(txId.id)) {
+    if (JdbcTransactionManager.TRANSACTIONS.contains(txId.id)) {
       // we do, eh
-      return app.JDBC_TRANSACTIONS.get(txId.id).get
+      return JdbcTransactionManager.TRANSACTIONS.get(txId.id).get
     }
 
     // create a connection and a transaction
@@ -27,7 +31,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     val conn: Connection = DriverManager.getConnection(url, props)
 
     val tx: JdbcTransaction = new JdbcTransaction(conn)
-    app.JDBC_TRANSACTIONS. += (tx.id -> tx)
+    JdbcTransactionManager.TRANSACTIONS. += (tx.id -> tx)
     // assign the integer transaction to the mutable transaction id "carrier" object
     txId.id = tx.id
     tx
@@ -54,7 +58,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     finally {
       if (!tx.isNested) {
         tx.close()
-        app.JDBC_TRANSACTIONS.remove(txId.id)
+        JdbcTransactionManager.TRANSACTIONS.remove(txId.id)
       }
     }
   }
@@ -74,7 +78,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     finally {
       if (!tx.isNested) {
         tx.close()
-        app.JDBC_TRANSACTIONS.remove(txId.id)
+        JdbcTransactionManager.TRANSACTIONS.remove(txId.id)
       }
     }
   }

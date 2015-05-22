@@ -1,26 +1,27 @@
 package altitude.dao.postgres
 
-
 import java.sql.Connection
 
-import altitude.Util.log
-import altitude.dao.{BaseDao, TransactionId}
+import altitude.dao.BaseDao
 import altitude.models.BaseModel
 import altitude.models.search.Query
-import altitude.services.JdbcTransactionManager
+import altitude.transactions.{JdbcTransactionManager, TransactionId}
 import altitude.{Const => C, Util}
 import org.apache.commons.dbutils.QueryRunner
 import org.apache.commons.dbutils.handlers.MapListHandler
 import org.joda.time.DateTime
+import org.slf4j.LoggerFactory
 import play.api.libs.json._
 
 import scala.collection.JavaConversions._
 
 abstract class BasePostgresDao(protected val tableName: String) extends BaseDao {
+  val log =  LoggerFactory.getLogger(getClass)
+  protected val jdbcTxManager = new JdbcTransactionManager(app)
 
   protected def conn(implicit txId: TransactionId): Connection = {
     // get transaction from the global lookup
-    JdbcTransactionManager.transaction.conn
+    jdbcTxManager.transaction.conn
   }
 
   protected val coreSqlColsForInsert = s"${C.Base.ID}, ${C.Base.CREATED_AT}"

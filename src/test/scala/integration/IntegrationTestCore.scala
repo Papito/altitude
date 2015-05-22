@@ -1,28 +1,27 @@
 package integration
 
-import altitude.Util.log
-import altitude.dao.{Transaction, TransactionId}
-import altitude.{Const => C}
+import altitude.transactions.{Transaction, TransactionId}
+import altitude.{Const => C, Altitude, SingleApplication}
 import com.google.inject.{AbstractModule, Guice}
 import integration.util.dao
+import integration.util.dao.UtilitiesDao
 import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
+import org.scalatest.{BeforeAndAfterEach, BeforeAndAfter, FunSuite}
+import org.scalatest.concurrent.ScalaFutures
+import org.slf4j.LoggerFactory
 
 abstract class IntegrationTestCore extends FunSuite
-  with OneAppPerSuite with ScalaFutures with BeforeAndAfter with BeforeAndAfterEach {
+  with SingleApplication with ScalaFutures with BeforeAndAfter with BeforeAndAfterEach {
+  val log =  LoggerFactory.getLogger(getClass)
+
   /* Stores test app config overrides, since we run same tests with different app setup.
    */
   val config: Map[String, _]
 
   val injector = Guice.createInjector(new InjectionModule)
   protected val dbUtilities = injector.instance[UtilitiesDao]
-  override lazy val app = FakeApplication(additionalConfiguration = config)
-  protected lazy val altitude: Altitude = Altitude.getInstance(this.app)
-
-  // async setup
-  implicit val defaultPatience = PatienceConfig(timeout = Span(2, Seconds), interval = Span(5, Millis))
-
-  implicit val txId: TransactionId = new TransactionId
+  protected lazy val altitude: Altitude = new Altitude(isTest = true, isProd = false)
 
   before {
     dbUtilities.dropDatabase()
@@ -41,14 +40,14 @@ abstract class IntegrationTestCore extends FunSuite
 
   class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
-      val dataSourceType = app.configuration.getString("datasource").getOrElse("")
+      val dataSourceType = altitude.config.get("datasource")
       log.info(s"Datasource type: $dataSourceType", C.tag.APP)
 
       dataSourceType match {
         case "mongo" =>
-          bind[UtilitiesDao].toInstance(new dao.mongo.UtilitiesDao)
+          //bind[UtilitiesDao].toInstance(new dao.mongo.UtilitiesDao)
         case "postgres" =>
-          bind[UtilitiesDao].toInstance(new dao.postgres.UtilitiesDao)
+          bind[UtilitiesDao].toInstance(new dao.postgres.UtilitiesDao(app))
 
         case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
       }
