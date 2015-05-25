@@ -1,12 +1,11 @@
 package integration
 
 import altitude.models.BaseModel
-import altitude.services.BaseService
+import altitude.service.BaseService
 import altitude.{Const => C}
 import play.api.libs.json._
-
+import org.scalatest.Matchers._
 import scala.language.implicitConversions
-
 
 trait BaseDaoTests extends IntegrationTestCore {
 
@@ -25,8 +24,7 @@ trait BaseDaoTests extends IntegrationTestCore {
 
   test("add record") {
     model.id should be(None)
-    val future = service.add(model)
-    val js: JsObject = future.futureValue
+    val js = service.add(model)
 
     js \ C.Base.ID should not be Nil
     //js \ "_id" should be Nil FIXME
@@ -36,8 +34,7 @@ trait BaseDaoTests extends IntegrationTestCore {
     js \ C.Base.UPDATED_AT should be(JsNull)
 
     // retrieve the object
-    val future2 = service.getById(id)
-    val js2Opt: Option[JsObject] = future2.futureValue
+    val js2Opt: Option[JsObject] = service.getById(id)
     js2Opt should not be None
 
     val js2 = js2Opt.get
