@@ -4,8 +4,6 @@ import collection.immutable.HashMap
 class Configuration(additionalConfiguration: Map[String, String] = new HashMap()) {
   def get(key: String) = config.getOrElse(key, "")
 
-  // FIXME: must come from files
-
   val default = HashMap(
     "datasource" -> "postgres", // mongo
     "db.postgres.user" -> "altitude",
@@ -21,5 +19,9 @@ class Configuration(additionalConfiguration: Map[String, String] = new HashMap()
 
   val prod = default ++ HashMap() ++ additionalConfiguration
 
-  private val config: Map[String, String] = if (isTest) test else prod
+  private val config: Map[String, String] =  Environment.ENV match {
+    case Environment.TEST => test
+    case Environment.DEV => default
+    case Environment.PROD => prod
+  }
 }

@@ -32,9 +32,9 @@ class MongoBaseDaoTestSuite extends Suites(
 private class PostgresBaseDaoTests(val config: Map[String, _])
   extends BaseDaoTests with BeforeAndAfterAll {
 
-  class TestPostgresDao(val app: Altitude = app) extends BasePostgresDao("test1")
+  class TestPostgresDao(val app: Altitude = altitude) extends BasePostgresDao("test1")
 
-  class TestPostgresService extends BaseService[TestModel](app) {
+  class TestPostgresService extends BaseService[TestModel](altitude) {
     override protected val DAO = new TestPostgresDao
   }
 
@@ -44,7 +44,7 @@ private class PostgresBaseDaoTests(val config: Map[String, _])
     /*
     Reset the database schema once
      */
-    val txManager = new JdbcTransactionManager(app)
+    val txManager = new JdbcTransactionManager(altitude)
 
     txManager.withTransaction {
       val stmt = txManager.transaction.conn.createStatement()

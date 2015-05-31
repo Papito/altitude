@@ -1,7 +1,7 @@
 package integration
 
 import altitude.transactions.{Transaction, TransactionId}
-import altitude.{Const => C, Altitude, SingleApplication}
+import altitude.{Const => C, Environment, Altitude, SingleApplication}
 import com.google.inject.{AbstractModule, Guice}
 import integration.util.dao
 import integration.util.dao.UtilitiesDao
@@ -12,16 +12,19 @@ import org.scalatest.concurrent.ScalaFutures
 import org.slf4j.LoggerFactory
 
 abstract class IntegrationTestCore extends FunSuite
-  with SingleApplication with ScalaFutures with BeforeAndAfter with BeforeAndAfterEach {
+with ScalaFutures with BeforeAndAfter with BeforeAndAfterEach {
   val log =  LoggerFactory.getLogger(getClass)
 
   /* Stores test app config overrides, since we run same tests with different app setup.
    */
   val config: Map[String, _]
 
+  // force environment to always be TEST
+  Environment.ENV = Environment.TEST
+  protected lazy val altitude: Altitude = new Altitude
   val injector = Guice.createInjector(new InjectionModule)
   protected val dbUtilities = injector.instance[UtilitiesDao]
-  protected lazy val altitude: Altitude = new Altitude(isTest = true, isProd = false)
+  implicit val txId: TransactionId = new TransactionId
 
   before {
     dbUtilities.dropDatabase()
@@ -47,7 +50,7 @@ abstract class IntegrationTestCore extends FunSuite
         case "mongo" =>
           //bind[UtilitiesDao].toInstance(new dao.mongo.UtilitiesDao)
         case "postgres" =>
-          bind[UtilitiesDao].toInstance(new dao.postgres.UtilitiesDao(app))
+          bind[UtilitiesDao].toInstance(new dao.postgres.UtilitiesDao(altitude))
 
         case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
       }

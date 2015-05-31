@@ -10,7 +10,7 @@ import com.google.inject.{AbstractModule, Guice}
 import net.codingwell.scalaguice.ScalaModule
 import net.codingwell.scalaguice.InjectorExtensions._
 
-class Altitude(additionalConfiguration: Map[String, String]) {
+class Altitude(additionalConfiguration: Map[String, String] = Map()) {
   val log =  LoggerFactory.getLogger(getClass)
 
   log.info("Initializing Altitude application instance")
