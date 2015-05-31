@@ -16,7 +16,6 @@ class ScalatraBootstrap extends LifeCycle {
       case Environment.DEV => "development"
       case Environment.PROD => "production"
     }
-    log.info(s"Environment is: $environment")
 
     context.initParameters("org.scalatra.environment") = environment
 

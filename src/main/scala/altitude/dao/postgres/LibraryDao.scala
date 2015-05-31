@@ -1,13 +1,12 @@
 package altitude.dao.postgres
 
-import altitude.Util.log
-import altitude.dao.TransactionId
 import altitude.models.{Asset, MediaType}
-import altitude.{Const => C}
+import altitude.transactions.TransactionId
+import altitude.{Const => C, Altitude}
 import play.api.libs.json._
 
 
-class LibraryDao extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
+class LibraryDao(val app: Altitude) extends BasePostgresDao("asset") with altitude.dao.LibraryDao {
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val mediaType = new MediaType(

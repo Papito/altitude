@@ -1,8 +1,7 @@
-package altitude.services
+package altitude.service
 
 import java.io.{InputStream, StringWriter}
 
-import altitude.Util.log
 import altitude.models.{FileImportAsset, MediaType}
 import altitude.{Const => C}
 import org.apache.tika.io.TikaInputStream
@@ -12,10 +11,12 @@ import org.apache.tika.parser.AbstractParser
 import org.apache.tika.parser.audio.AudioParser
 import org.apache.tika.parser.image.ImageParser
 import org.apache.tika.parser.mp3.Mp3Parser
+import org.slf4j.LoggerFactory
 import org.xml.sax.helpers.DefaultHandler
 import play.api.libs.json.{JsNull, JsValue, Json}
 
 class TikaMetadataService extends AbstractMetadataService {
+  val log =  LoggerFactory.getLogger(getClass)
 
   private object PARSERS {
     final val IMAGE = new ImageParser
@@ -38,11 +39,9 @@ class TikaMetadataService extends AbstractMetadataService {
   }
 
   private def extractMetadata(importAsset: FileImportAsset, parser: AbstractParser): JsValue = {
-    log.info(
-      "Extracting metadata for '$asset' with $parserType",
-      Map("asset" -> importAsset, "parserType" -> parser.getClass.getSimpleName),
-      C.tag.SERVICE)
+    log.info(s"Extracting metadata for '$importAsset' with ${parser.getClass.getSimpleName}")
 
+    //FIXME: Use Option
     var inputStream: InputStream = null
     val writer: StringWriter = new StringWriter()
 

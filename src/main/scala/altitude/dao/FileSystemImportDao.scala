@@ -2,15 +2,18 @@ package altitude.dao
 
 import java.io.File
 
-import altitude.Util.log
 import altitude.models.FileImportAsset
 import altitude.models.search.Query
-import altitude.{Const => C}
+import altitude.transactions.TransactionId
+import altitude.{Const => C, Altitude}
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
+import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
-class FileSystemImportDao extends BaseDao {
+class FileSystemImportDao(val app: Altitude) extends BaseDao {
+  val log =  LoggerFactory.getLogger(getClass)
+
   private val ANY_FILE_FILTER: IOFileFilter = TrueFileFilter.INSTANCE
 
   def iterateAssets(path: String): Iterator[FileImportAsset] = {

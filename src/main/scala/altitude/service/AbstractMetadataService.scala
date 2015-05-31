@@ -1,4 +1,4 @@
-package altitude.services
+package altitude.service
 
 import altitude.models.{FileImportAsset, MediaType}
 import play.api.libs.json.JsValue

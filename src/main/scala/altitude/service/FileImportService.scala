@@ -1,20 +1,23 @@
-package altitude.services
+package altitude.service
 
 import java.io.{File, FileInputStream, InputStream}
 
-import altitude.Util.log
-import altitude.dao.{FileSystemImportDao, TransactionId}
+import altitude.dao.FileSystemImportDao
 import altitude.models.{Asset, FileImportAsset, MediaType}
+import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
+import org.slf4j.LoggerFactory
 import play.api.libs.json.JsValue
 
-class FileImportService(app: Altitude)  extends BaseService(app) {
-  protected val DAO = new FileSystemImportDao
+class FileImportService(app: Altitude) extends BaseService(app) {
+  val log =  LoggerFactory.getLogger(getClass)
+
+  protected val DAO = new FileSystemImportDao(app)
 
   protected val SUPPORTED_MEDIA_TYPES = List("audio", "image")
 
@@ -28,6 +31,7 @@ class FileImportService(app: Altitude)  extends BaseService(app) {
   def detectAssetType(importAsset: FileImportAsset): MediaType = {
     log.debug(s"Detecting media type for: '$importAsset'", C.tag.SERVICE)
 
+    //FIXME: Use Option
     var inputStream: InputStream = null
 
     try {

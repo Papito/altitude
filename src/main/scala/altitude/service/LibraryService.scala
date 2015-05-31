@@ -1,21 +1,23 @@
-package altitude.services
+package altitude.service
 
 import java.awt.image.BufferedImage
 import java.awt.{Color, Graphics2D}
 import java.io._
 import javax.imageio.ImageIO
 
-import altitude.Util.log
-import altitude.dao.{LibraryDao, TransactionId}
+import altitude.dao.LibraryDao
 import altitude.exceptions.DuplicateException
 import altitude.models.Asset
 import altitude.models.search.Query
+import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.imgscalr.Scalr
+import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
 class LibraryService(app: Altitude) extends BaseService[Asset](app) {
+  val log =  LoggerFactory.getLogger(getClass)
   override protected val DAO = app.injector.instance[LibraryDao]
   val PREVIEW_BOX_SIZE = 175 //FIXME: to settings
 

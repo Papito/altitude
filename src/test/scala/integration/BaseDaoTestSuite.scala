@@ -3,8 +3,9 @@ package integration
 import altitude.Altitude
 import altitude.dao.postgres.BasePostgresDao
 import altitude.service.BaseService
-import altitude.transactions.{Transaction, JdbcTransactionManager, JdbcTransaction}
+import altitude.transactions.{TransactionId, Transaction, JdbcTransactionManager, JdbcTransaction}
 import org.scalatest.{Suites, BeforeAndAfterAll}
+import org.slf4j.LoggerFactory
 
 /*
   Define base dao tests for each type of DB
@@ -47,6 +48,7 @@ private class PostgresBaseDaoTests(val config: Map[String, _])
     val txManager = new JdbcTransactionManager(altitude)
 
     txManager.withTransaction {
+      log.info("SETUP")
       val stmt = txManager.transaction.conn.createStatement()
       // we need this for the set of DAO tests
       stmt.executeUpdate("""
@@ -69,6 +71,11 @@ private class PostgresBaseDaoTests(val config: Map[String, _])
                            | field2_2 VARCHAR(255)) INHERITS (_test_core);
                          """.stripMargin)
     }
+    /*
+      We have to commit this, however, later we make sure everything is rolled back.
+      The committed count must be kept at zero
+    */
+    log.info("END SETUP")
     Transaction.COMMITTED = 0
   }
 }

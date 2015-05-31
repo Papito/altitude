@@ -1,7 +1,8 @@
 package altitude.dao.mongo
 
-import altitude.dao.{BaseDao, TransactionId}
+import altitude.dao.BaseDao
 import altitude.models.search.Query
+import altitude.transactions.TransactionId
 import altitude.{Const => C, Util}
 import org.joda.time.DateTime
 import play.api.libs.json._

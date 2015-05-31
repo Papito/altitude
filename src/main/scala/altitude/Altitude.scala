@@ -2,7 +2,9 @@ package altitude
 
 import java.sql.DriverManager
 
-import altitude.transactions.{JdbcTransaction, AbstractTransactionManager}
+import altitude.dao.{LibraryDao}
+import altitude.service.{AbstractMetadataService, LibraryService, TikaMetadataService, FileImportService}
+import altitude.transactions.{AbstractTransactionManager}
 import org.slf4j.LoggerFactory
 
 import altitude.{Const => C}
@@ -14,6 +16,14 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
   val log =  LoggerFactory.getLogger(getClass)
 
   log.info("Initializing Altitude application instance")
+
+  val environment = Environment.ENV match {
+    case Environment.DEV => "development"
+    case Environment.PROD => "production"
+    case Environment.TEST => "test"
+  }
+
+  log.info(s"Environment is: $environment")
 
   val config = new Configuration(
     additionalConfiguration = additionalConfiguration)
@@ -33,10 +43,9 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.VoidTransactionManager(app))
           //bind[LibraryDao].toInstance(new altitude.dao.mongo.LibraryDao)
         case "postgres" =>
-          bind[AbstractTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
           DriverManager.registerDriver(new org.postgresql.Driver)
-
-        //bind[LibraryDao].toInstance(new altitude.dao.postgres.LibraryDao)
+          bind[AbstractTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
+          bind[LibraryDao].toInstance(new altitude.dao.postgres.LibraryDao(app))
         case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
       }
     }
@@ -46,11 +55,9 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
   val txManager = app.injector.instance[AbstractTransactionManager]
 
   // declare singleton services
-/*
   object service {
     val fileImport: FileImportService = new FileImportService(app)
     val metadata: AbstractMetadataService = new TikaMetadataService
     val library: LibraryService = new LibraryService(app)
   }
-*/
 }
