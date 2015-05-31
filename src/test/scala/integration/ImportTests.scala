@@ -25,19 +25,16 @@ import org.scalatest.Matchers._
     assets should not be empty
   }
 
-/*
+
   test("import duplicate") {
     importFile("images/1.jpg")
     val path = getClass.getResource(s"../files/incoming/images/1.jpg").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
-    val importedAsset: Option[Asset] = altitude.service.fileImport.importAsset(fileImportAsset)
 
-    importedAsset onComplete  {
-      case Success(res) => fail("Should throw a duplicate exception")
-      case Failure(ex) => ex shouldBe a [DuplicateException]
-    }
+    intercept[DuplicateException] {
+      altitude.service.fileImport.importAsset(fileImportAsset)    }
   }
-*/
+
 
   protected def importFile(p: String): Asset = {
     val path = getClass.getResource(s"../files/incoming/$p").getPath
