@@ -6,10 +6,10 @@ import scala.io.Source._
 import altitude.{Altitude, Environment}
 import altitude.transactions.{TransactionId, Transaction, JdbcTransactionManager, JdbcTransaction}
 import org.apache.commons.io.FileUtils
-import org.scalatest.BeforeAndAfterAll
+import org.scalatest.{DoNotDiscover, BeforeAndAfterAll}
 import org.slf4j.LoggerFactory
 
-class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres"))
+@DoNotDiscover class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres"))
   with BeforeAndAfterAll {
   Environment.ENV = Environment.TEST
   val log =  LoggerFactory.getLogger(getClass)

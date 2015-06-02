@@ -5,16 +5,22 @@ class Configuration(additionalConfiguration: Map[String, String] = new HashMap()
   def get(key: String) = config.getOrElse(key, "")
 
   val default = HashMap(
-    "datasource" -> "postgres", // mongo
+    "datasource" -> "mongo",
+
     "db.postgres.user" -> "altitude",
     "db.postgres.password" -> "dba",
-    "db.postgres.url" -> "jdbc:postgresql://localhost/altitude"
+    "db.postgres.url" -> "jdbc:postgresql://localhost/altitude",
+
+    "db.mongo.host" -> "localhost",
+    "db.mongo.db" -> "altitude",
+    "db.mongo.port" -> "27017"
   )
 
   val test = default ++ HashMap(
-    "db.postgres.password" -> "dba",
     "db.postgres.url" -> "jdbc:postgresql://localhost/altitude-test",
-    "db.postgres.user" -> "altitude-test"
+    "db.postgres.user" -> "altitude-test",
+
+    "db.mongo.db" -> "altitude-test"
   ) ++ additionalConfiguration
 
   val prod = default ++ HashMap() ++ additionalConfiguration

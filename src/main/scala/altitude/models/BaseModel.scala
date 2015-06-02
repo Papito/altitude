@@ -8,6 +8,7 @@ import play.api.libs.json._
 import scala.language.implicitConversions
 
 object BaseModel {
+  //FIXME: alphanumeric
   final def genId: String = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE).toString
   implicit def toJson(obj: BaseModel): JsObject = obj.toJson
 }
@@ -23,7 +24,7 @@ abstract class BaseModel {
   def createdAt: Option[DateTime] = _createdAt
 
   def createdAt_= (arg: DateTime): Unit = {
-    if (_createdAt != None)
+    if (!_createdAt.isDefined)
       throw new RuntimeException("Cannot set 'created_at' twice")
     _createdAt = Some(arg)
   }
@@ -34,7 +35,7 @@ abstract class BaseModel {
   def updatedAt: Option[DateTime] = _updatedAt
 
   def updatedAt_= (arg: DateTime): Unit = {
-    if (_updatedAt != None)
+    if (!_updatedAt.isDefined)
       throw new RuntimeException("Cannot set 'updated_at' twice")
     _updatedAt = Some(arg)
   }

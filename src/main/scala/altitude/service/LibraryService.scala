@@ -53,7 +53,7 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
   }
 
   private def makeImageThumbnail(asset: Asset): Array[Byte] = {
-    //FIXME: use options and try/catch
+    //FIXME: use Option and try/catch
     val inFile = new File(asset.path)
     val srcImage: BufferedImage = ImageIO.read(inFile)
     val scaledImage: BufferedImage = Scalr.resize(srcImage, Scalr.Method.QUALITY, PREVIEW_BOX_SIZE)

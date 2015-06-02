@@ -4,7 +4,7 @@ import java.sql.DriverManager
 
 import altitude.dao.{LibraryDao}
 import altitude.service.{AbstractMetadataService, LibraryService, TikaMetadataService, FileImportService}
-import altitude.transactions.{AbstractTransactionManager}
+import altitude.transactions.{VoidTransactionManager, AbstractTransactionManager}
 import org.slf4j.LoggerFactory
 
 import altitude.{Const => C}
@@ -40,11 +40,16 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
       log.info(s"Datasource type: $dataSourceType", C.tag.APP)
       dataSourceType match {
         case "mongo" =>
+          // transaction manager
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.VoidTransactionManager(app))
-          //bind[LibraryDao].toInstance(new altitude.dao.mongo.LibraryDao)
+          // DAOs
+          bind[LibraryDao].toInstance(new altitude.dao.mongo.LibraryDao(app))
         case "postgres" =>
+          // register the JDBC driver
           DriverManager.registerDriver(new org.postgresql.Driver)
+          // transaction manager
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
+          // DAOs
           bind[LibraryDao].toInstance(new altitude.dao.postgres.LibraryDao(app))
         case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
       }

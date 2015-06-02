@@ -38,7 +38,7 @@ object AltitudeBuild extends Build {
         "org.imgscalr" % "imgscalr-lib" % "4.2",
         "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
         "com.typesafe.play" %% "play-json" % "2.3.4",
-        "org.mongodb" %% "casbah" % "2.7.2",
+        "org.mongodb" % "casbah_2.11" % "2.8.1",
         "org.json4s" %% "json4s-jackson" % "3.2.10",
         "org.json4s" %% "json4s-mongo" % "3.2.10",
 

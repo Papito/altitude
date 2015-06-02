@@ -1,26 +1,65 @@
 package altitude.dao.mongo
 
 import altitude.dao.BaseDao
+import altitude.models.BaseModel
 import altitude.models.search.Query
 import altitude.transactions.TransactionId
 import altitude.{Const => C, Util}
+import com.mongodb.casbah.Imports._
+import com.mongodb.casbah.commons.ValidBSONType.ObjectId
 import org.joda.time.DateTime
+import org.slf4j.LoggerFactory
 import play.api.libs.json._
 
-object BaseMongoDao {
-}
 
 abstract class BaseMongoDao(private val collectionName: String) extends BaseDao {
+  val log =  LoggerFactory.getLogger(getClass)
+  private val host: String = app.config.get("db.mongo.host")
+  private val dbPort: Int = Integer.parseInt(app.config.get("db.mongo.port"))
+  private val client = MongoClient(host, dbPort)
+
+  private val dbName: String = app.config.get("db.mongo.db")
+  protected val db = client(dbName)
+  protected val collection: MongoCollection = db(collectionName)
+
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
-    throw new NotImplementedError()
+    log.debug(s"Starting database INSERT for: $jsonIn")
+
+    // append core attributes
+    val id = BaseModel.genId
+    val createdAt = Util.utcNow
+    val json: JsObject = jsonIn ++ JsObject(Seq(
+      "_id" -> Json.obj("$oid" -> id),
+      C.Base.CREATED_AT -> Json.obj("$date" -> createdAt)
+    ))
+
+    val obj: MongoDBObject =  com.mongodb.util.JSON.parse(json.toString()).asInstanceOf[MongoDBObject]
+    collection.insert(obj)
+    json
   }
 
   override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = {
-    throw new NotImplementedError()
+    log.debug(s"Getting by ID '$id'", C.tag.DB)
+
+    val o: Option[DBObject] = collection findOneByID new ObjectId(id)
+
+    o.isDefined match {
+      case false => None
+      case true =>
+        val json: JsObject = Json.parse(o.toString).as[JsObject]
+        Some(fixMongoFields(json))
+    }
   }
 
   override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {
-    throw new NotImplementedError()
+    val mongoQuery: DBObject = query.params
+    val cursor: MongoCursor = collection.find(mongoQuery).limit(1000) //FIXME: setting
+    log.debug(s"Found ${cursor.length} records")
+
+    cursor.map(o => {
+      val json: JsObject = Json.parse(o.toString).as[JsObject]
+      fixMongoFields(json)
+    }).toList
   }
 
   /*
