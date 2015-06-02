@@ -6,7 +6,7 @@ import altitude.transactions.TransactionId
 
 class UtilitiesDao(val app: Altitude) extends BaseMongoDao("") with integration.util.dao.UtilitiesDao {
   override def dropDatabase(): Unit = {
-    //val f = BaseMongoDao.db.command[Boolean](new DropDatabase)
+    db.dropDatabase()
   }
 
   override def close() = Unit
