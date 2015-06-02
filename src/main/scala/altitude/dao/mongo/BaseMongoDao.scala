@@ -6,13 +6,15 @@ import altitude.models.search.Query
 import altitude.transactions.TransactionId
 import altitude.{Const => C, Util}
 import com.mongodb.casbah.Imports._
-import com.mongodb.casbah.commons.ValidBSONType.ObjectId
 import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
 
 
 abstract class BaseMongoDao(private val collectionName: String) extends BaseDao {
+  import com.mongodb.casbah.commons.conversions.scala._
+  RegisterJodaTimeConversionHelpers()
+
   val log =  LoggerFactory.getLogger(getClass)
   private val host: String = app.config.get("db.mongo.host")
   private val dbPort: Int = Integer.parseInt(app.config.get("db.mongo.port"))
@@ -26,15 +28,18 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
     log.debug(s"Starting database INSERT for: $jsonIn")
 
     // append core attributes
-    val id = BaseModel.genId
+    val id: String = BaseModel.genId
     val createdAt = Util.utcNow
-    val json: JsObject = jsonIn ++ JsObject(Seq(
-      "_id" -> Json.obj("$oid" -> id),
-      C.Base.CREATED_AT -> Json.obj("$date" -> createdAt)
-    ))
 
-    val obj: MongoDBObject =  com.mongodb.util.JSON.parse(json.toString()).asInstanceOf[MongoDBObject]
+    val obj: DBObject =  com.mongodb.util.JSON.parse(jsonIn.toString()).asInstanceOf[DBObject] ++
+      MongoDBObject("id" -> id, "_id" -> id, C.Base.CREATED_AT -> createdAt)
+
     collection.insert(obj)
+
+    val json: JsObject = jsonIn ++ JsObject(Seq(
+      "id" -> JsString(id),
+      C.Base.CREATED_AT -> JsString(createdAt.toString)
+    ))
     json
   }
 

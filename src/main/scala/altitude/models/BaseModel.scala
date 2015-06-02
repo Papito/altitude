@@ -4,12 +4,10 @@ import altitude.{Const => C, Util}
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json._
-
 import scala.language.implicitConversions
 
 object BaseModel {
-  //FIXME: alphanumeric
-  final def genId: String = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE).toString
+  final def genId: String = scala.util.Random.alphanumeric.take(24).mkString.toLowerCase
   implicit def toJson(obj: BaseModel): JsObject = obj.toJson
 }
 
@@ -24,7 +22,7 @@ abstract class BaseModel {
   def createdAt: Option[DateTime] = _createdAt
 
   def createdAt_= (arg: DateTime): Unit = {
-    if (!_createdAt.isDefined)
+    if (_createdAt.isEmpty)
       throw new RuntimeException("Cannot set 'created_at' twice")
     _createdAt = Some(arg)
   }
@@ -35,7 +33,7 @@ abstract class BaseModel {
   def updatedAt: Option[DateTime] = _updatedAt
 
   def updatedAt_= (arg: DateTime): Unit = {
-    if (!_updatedAt.isDefined)
+    if (_updatedAt.isEmpty)
       throw new RuntimeException("Cannot set 'updated_at' twice")
     _updatedAt = Some(arg)
   }
@@ -63,12 +61,12 @@ abstract class BaseModel {
   // pull in core model attributes from JSON
   protected def withCoreAttr(json: JsValue): this.type  = {
     val isoCreatedAt = (json \ C.Base.CREATED_AT).asOpt[String]
-    if (isoCreatedAt != None) {
+    if (isoCreatedAt.isEmpty) {
       createdAt = ISODateTimeFormat.dateTime().parseDateTime(isoCreatedAt.get)
     }
     val isoUpdatedAt = (json \ C.Base.UPDATED_AT).asOpt[String]
 
-    if (isoUpdatedAt != None) {
+    if (isoUpdatedAt.isEmpty) {
       updatedAt = ISODateTimeFormat.dateTime().parseDateTime(isoUpdatedAt.get)
     }
 
