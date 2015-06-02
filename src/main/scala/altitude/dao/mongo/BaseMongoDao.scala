@@ -36,22 +36,21 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
 
     collection.insert(obj)
 
-    val json: JsObject = jsonIn ++ JsObject(Seq(
-      "id" -> JsString(id),
-      C.Base.CREATED_AT -> JsString(createdAt.toString)
-    ))
-    json
+    jsonIn ++ Json.obj(
+      C.Base.ID -> JsString(id),
+      C.Base.CREATED_AT -> Util.isoDateTime(Some(Util.utcNow))
+    )
   }
 
   override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting by ID '$id'", C.tag.DB)
 
-    val o: Option[DBObject] = collection findOneByID new ObjectId(id)
+    val o: Option[DBObject] = collection.findOneByID(id)
 
     o.isDefined match {
       case false => None
       case true =>
-        val json: JsObject = Json.parse(o.toString).as[JsObject]
+        val json = Json.parse(o.get.toString).as[JsObject]
         Some(fixMongoFields(json))
     }
   }
@@ -71,26 +70,10 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
   Return a JSON record with timestamp and ID fields translated from Mongo's "extended" format
    */
   protected def fixMongoFields(json: JsObject): JsObject = {
-    val createdAtMillis: Option[Long] =  (json \ C.Base.CREATED_AT \ "$date").asOpt[Long]
-    val createdAt: Option[DateTime] = {
-      if (createdAtMillis.isDefined) Some(new DateTime(createdAtMillis.get)) else None
-    }
-
-    val updatedAtMillis: Option[Long] =  (json \ C.Base.UPDATED_AT \ "$date").asOpt[Long]
-    val updatedAt: Option[DateTime] = {
-      if (updatedAtMillis.isDefined) Some(new DateTime(updatedAtMillis.get)) else None
-    }
-
     json ++ Json.obj(
-      C.Base.ID -> (json \ "_id" \ "$oid").as[String],
-      C.Base.CREATED_AT -> {createdAt match {
-        case None => JsNull
-        case _ => Util.isoDateTime(createdAt)
-      }},
-      C.Base.UPDATED_AT -> {updatedAt match {
-        case None => JsNull
-        case _ => Util.isoDateTime(updatedAt)
-      }}
+      C.Base.ID -> (json \ "_id").as[String],
+      C.Base.CREATED_AT ->  (json \ C.Base.CREATED_AT \ "$date").asOpt[String],
+      C.Base.UPDATED_AT -> (json \ C.Base.UPDATED_AT \ "$date").asOpt[String]
     )
   }
 }
