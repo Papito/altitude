@@ -27,6 +27,8 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
 
   val config = new Configuration(
     additionalConfiguration = additionalConfiguration)
+  protected val dataSourceType = config.get("datasource")
+  log.info(s"Datasource type: $dataSourceType", C.tag.APP)
 
   val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
   val app: Altitude = this
@@ -36,8 +38,6 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
    */
   class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
-      val dataSourceType = config.get("datasource")
-      log.info(s"Datasource type: $dataSourceType", C.tag.APP)
       dataSourceType match {
         case "mongo" =>
           // transaction manager

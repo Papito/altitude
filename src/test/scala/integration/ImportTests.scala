@@ -8,7 +8,7 @@ import org.scalatest.DoNotDiscover
 
 import org.scalatest.Matchers._
 
-@DoNotDiscover class ImportTests(val config: Map[String, _]) extends IntegrationTestCore {
+@DoNotDiscover class ImportTests(val config: Map[String, String]) extends IntegrationTestCore {
   test("import image (JPEG)") {
     val asset = importFile("images/1.jpg")
     asset.imageData.length should not be 0

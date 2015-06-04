@@ -9,7 +9,7 @@ import org.apache.commons.io.FileUtils
 import org.scalatest.{DoNotDiscover, BeforeAndAfterAll}
 import org.slf4j.LoggerFactory
 
-@DoNotDiscover class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres"))
+class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres"))
   with BeforeAndAfterAll {
   Environment.ENV = Environment.TEST
   val log =  LoggerFactory.getLogger(getClass)

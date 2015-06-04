@@ -21,13 +21,13 @@ class Configuration(additionalConfiguration: Map[String, String] = new HashMap()
     "db.postgres.user" -> "altitude-test",
 
     "db.mongo.db" -> "altitude-test"
-  ) ++ additionalConfiguration
+  )
 
-  val prod = default ++ HashMap() ++ additionalConfiguration
+  val prod = default ++ HashMap()
 
   private val config: Map[String, String] =  Environment.ENV match {
-    case Environment.TEST => test
-    case Environment.DEV => default
-    case Environment.PROD => prod
+    case Environment.TEST => test ++ additionalConfiguration
+    case Environment.DEV => default ++ additionalConfiguration
+    case Environment.PROD => prod ++ additionalConfiguration
   }
 }
