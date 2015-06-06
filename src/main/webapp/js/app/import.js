@@ -38,11 +38,11 @@ ImportViewModel = BaseViewModel.extend({
     importAssets: function() {
         var self = this;
         // FIXME: http://stackoverflow.com/questions/10406930/how-to-construct-a-websocket-uri-relative-to-the-page-uri
-        this.socket = new WebSocket('ws://localhost:9000/ws/import');
+        this.socket = new WebSocket('ws://localhost:8080/ws/import');
 
         this.socket.onopen = function () {
             self.isImporting(true);
-            console.log('Socket connected')
+            console.log('Socket connected');
             self.sendCommand('total', self.handleTotal);
         };
 
