@@ -38,7 +38,7 @@ ImportViewModel = BaseViewModel.extend({
     importAssets: function() {
         var self = this;
         // FIXME: http://stackoverflow.com/questions/10406930/how-to-construct-a-websocket-uri-relative-to-the-page-uri
-        this.socket = new WebSocket('ws://localhost:8080/ws/import');
+        this.socket = new WebSocket('ws://localhost:8080/import/ws');
 
         this.socket.onopen = function () {
             self.isImporting(true);
@@ -58,15 +58,16 @@ ImportViewModel = BaseViewModel.extend({
                 return;
             }
 
+            console.log('ws > ' + e.data);
+
             var jsonData = JSON.parse(e.data);
-            //console.log('ws > ' + e.data);
             self.responseHandler(jsonData);
 
         };
     },
 
     sendCommand: function(cmd, handler) {
-        //console.log('ws < ' + cmd);
+        console.log('ws < ' + cmd);
         this.responseHandler = handler;
         this.socket.send(cmd);
     },
