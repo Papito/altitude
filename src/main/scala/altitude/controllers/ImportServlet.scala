@@ -8,6 +8,7 @@ import org.json4s._
 import org.scalatra._
 import org.scalatra.atmosphere._
 import org.scalatra.json.{JValueResult, JacksonJsonSupport}
+import play.api.libs.json.{JsValue, JsObject}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ImportServlet extends AltitudeStack  with JValueResult
@@ -30,8 +31,9 @@ with AtmosphereSupport  with SingleApplication {
   }
 
   atmosphere("/ws") {
-    val assets = app.service.fileImport.getFilesToImport(path="/mnt/hgfs/import/").toList
+    val assets = app.service.fileImport.getFilesToImport(path="/mnt/hgfs/import/")
     val assetsIt = assets.toIterator
+    var stop: Boolean = false
 
     new AtmosphereClient {
       def receive = {
@@ -41,21 +43,28 @@ with AtmosphereSupport  with SingleApplication {
           log.info("Client disconnected")
         case Error(Some(error)) =>
         case TextMessage(text) =>
-          log.info(s"Recevied text: $text")
-          val out = text match {
+          log.info(s"Received text: $text")
+          text match {
             case "total" =>
-              assets.size.toString
-            case "next" =>
-              val importAsset: FileImportAsset = assetsIt.next()
-              val asset: Option[Asset] = app.service.fileImport.importAsset(importAsset)
-              if (asset.isDefined) {
-                asset.get.toJson.toString()
+              val out = assets.size.toString
+              log.info(out)
+              this.send(out)
+            case "import" =>
+              stop = false
+              while(assetsIt.hasNext && !stop) {
+                val importAsset: FileImportAsset = assetsIt.next()
+                val asset: Option[Asset] = app.service.fileImport.importAsset(importAsset)
+                if (asset.isDefined) {
+                  val json = JsObject(Seq("asset" -> asset.get.toJson))
+                  val out = json.toString()
+                  log.info(out)
+                  this.send(out)
+                }
               }
-              else {
-                ""
-              }
+            case "stop" =>
+              log.info("Stopping")
+              stop = true
           }
-          this.send(out)
       }
     }
   }
