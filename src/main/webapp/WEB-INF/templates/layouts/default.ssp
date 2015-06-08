@@ -1,0 +1,26 @@
+<%@ var body: String %>
+<%@ var title: String = "Altitude" %>
+
+<html>
+    <head>
+        <title>${title}</title>
+        <link rel="stylesheet" type="text/css" href="/css/app.css">
+        <link rel="stylesheet" type="text/css" href="/css/lib/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="/css/lib/select2.css">
+        <link rel="stylesheet" type="text/css" href="/css/lib/select2.png">
+        <link rel="stylesheet" type="text/css" href="/css/lib/select2-spinner.gif">
+        <link rel="stylesheet" type="text/css" href="/css/lib/select2x2.png">
+
+        <script src="/js/lib/jquery-2.1.1.min.js"></script>
+        <script src="/js/lib/bootstrap.js"></script>
+        <script src="/js/lib/knockout-3.2.0.js"></script>
+        <script src="/js/lib/knockout-custom-bindings.js"></script>
+        <script src="/js/lib/modernizr.custom.js"></script>
+        <script src="/js/lib/select2.min.js"></script>
+        <script src="/js/lib/Base.js"></script>
+        <script src="/js/app/core.js"></script>
+    </head>
+    <body>
+        ${unescape(body)}
+    </body>
+</html>

@@ -4,7 +4,7 @@ class AltitudeServlet extends AltitudeStack {
 
   get("/") {
     contentType="text/html"
-    jade("/index")
+    ssp("/index")
   }
 
 }

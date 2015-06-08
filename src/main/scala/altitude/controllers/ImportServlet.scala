@@ -27,7 +27,7 @@ with AtmosphereSupport  with SingleApplication {
     }
 
     contentType="text/html"
-    jade("/import")
+    ssp("/import")
   }
 
   atmosphere("/ws") {
