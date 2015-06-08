@@ -1,2 +1,3 @@
-<h3>Home</h3>
-<script src="/js/app/home.js"></script>
+#set (head)
+    <script src="/js/app/home.js"></script>
+#end
