@@ -1,6 +1,5 @@
 package altitude.controllers
 
-import altitude.SingleApplication
 import altitude.models.{Asset, FileImportAsset}
 import org.slf4j.LoggerFactory
 
@@ -11,9 +10,8 @@ import org.scalatra.json.{JValueResult, JacksonJsonSupport}
 import play.api.libs.json.{JsValue, JsObject}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ImportServlet extends AltitudeStack  with JValueResult
-with JacksonJsonSupport with SessionSupport
-with AtmosphereSupport  with SingleApplication {
+class ImportServlet extends BaseController  with JValueResult
+with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
   val log = LoggerFactory.getLogger(getClass)
   implicit protected val jsonFormats: Formats = DefaultFormats
 

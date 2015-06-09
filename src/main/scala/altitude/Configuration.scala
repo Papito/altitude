@@ -5,6 +5,7 @@ class Configuration(additionalConfiguration: Map[String, String] = new HashMap()
   def get(key: String) = config.getOrElse(key, "")
 
   val default = HashMap(
+    "app.name" -> "Altitude",
     "datasource" -> "mongo",
 
     "db.postgres.user" -> "altitude",
