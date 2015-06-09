@@ -1,29 +1,52 @@
 <%@ var body: String %>
 <%@ var title: String = "Altitude" %>
-<%@ var head: String = "" %>
+<%@ var assets: String = "" %>
 
 <html>
-    <head>
-        <title>${title}</title>
-        <link rel="stylesheet" type="text/css" href="/css/app.css">
-        <link rel="stylesheet" type="text/css" href="/css/lib/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="/css/lib/select2.css">
-        <link rel="stylesheet" type="text/css" href="/css/lib/select2.png">
-        <link rel="stylesheet" type="text/css" href="/css/lib/select2-spinner.gif">
-        <link rel="stylesheet" type="text/css" href="/css/lib/select2x2.png">
+<head>
+<title>${title}</title>
+<link rel="stylesheet" type="text/css" href="/css/app.css">
+<link rel="stylesheet" type="text/css" href="/css/lib/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="/css/lib/select2.css">
+<link rel="stylesheet" type="text/css" href="/css/lib/select2.png">
+<link rel="stylesheet" type="text/css" href="/css/lib/select2-spinner.gif">
+<link rel="stylesheet" type="text/css" href="/css/lib/select2x2.png">
 
-        <script src="/js/lib/jquery-2.1.1.min.js"></script>
-        <script src="/js/lib/bootstrap.js"></script>
-        <script src="/js/lib/knockout-3.2.0.js"></script>
-        <script src="/js/lib/knockout-custom-bindings.js"></script>
-        <script src="/js/lib/modernizr.custom.js"></script>
-        <script src="/js/lib/select2.min.js"></script>
-        <script src="/js/lib/Base.js"></script>
-        <script src="/js/app/core.js"></script>
+<script src="/js/lib/jquery-2.1.1.min.js"></script>
+<script src="/js/lib/bootstrap.js"></script>
+<script src="/js/lib/knockout-3.2.0.js"></script>
+<script src="/js/lib/knockout-custom-bindings.js"></script>
+<script src="/js/lib/modernizr.custom.js"></script>
+<script src="/js/lib/select2.min.js"></script>
+<script src="/js/lib/Base.js"></script>
+<script src="/js/app/core.js"></script>
 
-        ${unescape(head)}
-    </head>
-    <body>
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="@routes.IndexController.index">${title}</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="@routes.ImportController.index">Import</a></li>
+            </ul>
+            <form class="navbar-form navbar-right">
+                <input type="text" class="form-control" placeholder="Search...">
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
         ${unescape(body)}
+    </div>
+    ${unescape(assets)}
     </body>
 </html>

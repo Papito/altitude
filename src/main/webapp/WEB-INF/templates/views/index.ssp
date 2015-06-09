@@ -1,3 +1,3 @@
-#set (head)
+#set (assets)
     <script src="/js/app/home.js"></script>
 #end
