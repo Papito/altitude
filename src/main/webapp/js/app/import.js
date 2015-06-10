@@ -27,7 +27,6 @@ ImportViewModel = BaseViewModel.extend({
 
     cancelImportAssets: function() {
         console.log('Closing websocket');
-        this.socket.send("stop");
         this.isImporting(false);
         this.socket.close();
         this.socket = null;
@@ -43,7 +42,7 @@ ImportViewModel = BaseViewModel.extend({
 
         this.socket.onopen = function () {
             self.isImporting(true);
-            console.log('Socket connected');
+            console.log('Socket connected')
             self.sendCommand('total', self.handleTotal);
         };
 
@@ -58,7 +57,6 @@ ImportViewModel = BaseViewModel.extend({
                 self.cancelImportAssets();
                 return;
             }
-
             console.log('ws > ' + e.data);
 
             var jsonData = JSON.parse(e.data);
@@ -73,13 +71,16 @@ ImportViewModel = BaseViewModel.extend({
         this.socket.send(cmd);
     },
 
-    handleImport: function (json) {
-        $('#imported-assets').html(json.asset.path);
+    handleAsset: function (json) {
+        if (json.asset) {
+            $('#imported-assets').html(json.asset.path);
+        }
         this.assetsImportedCnt(this.assetsImportedCnt() + 1);
+        this.sendCommand('next', this.handleAsset);
     },
 
     handleTotal: function (json) {
         this.totalAssetsCnt(json.total);
-        this.sendCommand('import', this.handleImport);
+        this.sendCommand('next', this.handleAsset);
     }
 });

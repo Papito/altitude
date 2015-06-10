@@ -7,7 +7,7 @@ import org.json4s._
 import org.scalatra._
 import org.scalatra.atmosphere._
 import org.scalatra.json.{JValueResult, JacksonJsonSupport}
-import play.api.libs.json.{JsValue, JsObject}
+import play.api.libs.json.{JsString, JsValue, JsObject}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ImportServlet extends BaseController  with JValueResult
@@ -31,7 +31,6 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
   atmosphere("/ws") {
     val assets = app.service.fileImport.getFilesToImport(path="/mnt/hgfs/import/")
     val assetsIt = assets.toIterator
-    var stop: Boolean = false
 
     new AtmosphereClient {
       def receive = {
@@ -47,21 +46,17 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
               val out = assets.size.toString
               log.info(out)
               this.send(out)
-            case "import" =>
-              stop = false
-              while(assetsIt.hasNext && !stop) {
-                val importAsset: FileImportAsset = assetsIt.next()
-                val asset: Option[Asset] = app.service.fileImport.importAsset(importAsset)
-                if (asset.isDefined) {
-                  val json = JsObject(Seq("asset" -> asset.get.toJson))
-                  val out = json.toString()
-                  log.info(out)
-                  this.send(out)
-                }
+            case "next" =>
+              val importAsset: FileImportAsset = assetsIt.next()
+              val asset: Option[Asset] = app.service.fileImport.importAsset(importAsset)
+
+              val jsonOut = asset.isDefined match {
+                case true => JsObject(Seq("asset" -> asset.get.toJson))
+                case false => JsObject(Seq("warning" -> JsString("Skipping")))
               }
-            case "stop" =>
-              log.info("Stopping")
-              stop = true
+              val dataOut = jsonOut.toString()
+              log.info(dataOut)
+              this.send(dataOut)
           }
       }
     }
