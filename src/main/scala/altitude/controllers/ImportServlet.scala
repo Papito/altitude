@@ -1,5 +1,6 @@
 package altitude.controllers
 
+import altitude.exceptions.DuplicateException
 import altitude.models.{Asset, FileImportAsset}
 import org.slf4j.LoggerFactory
 
@@ -48,8 +49,25 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
               log.info(dataOut)
               this.send(dataOut)
             case "next" =>
+
               val importAsset: FileImportAsset = assetsIt.next()
-              val asset: Option[Asset] = app.service.fileImport.importAsset(importAsset)
+
+              var asset: Option[Asset] = None
+
+              try {
+                asset = app.service.fileImport.importAsset(importAsset)
+              }
+              catch {
+                case ex: DuplicateException =>
+                  val dataOut = JsObject(Seq("warning" -> JsString("Duplicate"))).toString()
+                  log.info(dataOut)
+                  this.send(dataOut)
+                case ex: Throwable =>
+                  ex.printStackTrace()
+                  val dataOut = JsObject(Seq("error" -> JsString(ex.getMessage))).toString()
+                  log.info(dataOut)
+                  this.send(dataOut)
+              }
 
               val jsonOut = asset.isDefined match {
                 case true => JsObject(Seq("asset" -> asset.get.toJson))
@@ -62,19 +80,4 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
       }
     }
   }
-
-  error {
-    case t: Throwable => t.printStackTrace()
-  }
-
-  notFound {
-    // remove content type in case it was set through an action
-    contentType = null
-    // Try to render a ScalateTemplate if no route matched
-    findTemplate(requestPath) map { path =>
-      contentType = "text/html"
-      layoutTemplate(path)
-    } orElse serveStaticResource() getOrElse resourceNotFound()
-  }
-
 }
