@@ -10,24 +10,39 @@ ImportViewModel = BaseViewModel.extend({
         this.base();
         console.log('Initializing import view model');
 
+        var self = this;
         this.socket = null;
         this.isImporting = ko.observable(false);
         this.totalAssetsCnt = ko.observable(0);
         this.assetsImportedCnt = ko.observable(0);
+        this.currentAsset = ko.observable();
         this.responseHandler = null;
 
         this.percentComplete = ko.computed(function() {
             var percent = 0;
-            if (this.assetsImportedCnt() > 0) {
-                percent = Math.floor((this.assetsImportedCnt()/ this.totalAssetsCnt()) * 100);
+            if (self.assetsImportedCnt() > 0) {
+                percent = Math.floor((self.assetsImportedCnt()/ self.totalAssetsCnt()) * 100);
             }
             return percent;
+        }, this);
+
+        this.currentImage = ko.computed(function() {
+            if (!self.currentAsset())
+                return "";
+
+            var image_data = self.currentAsset().image_data ? self.currentAsset().image_data : null;
+            return image_data ? "data:" + self.currentAsset().media_type.mime_type + ";base64," + image_data : "";
+        }, this);
+
+        this.currentPath = ko.computed(function() {
+            return self.currentAsset() ? self.currentAsset().path : "";
         }, this);
     },
 
     cancelImportAssets: function() {
         console.log('Closing websocket');
         this.isImporting(false);
+        this.currentAsset(null);
         this.socket.close();
         this.socket = null;
         this.totalAssetsCnt(0);
@@ -57,7 +72,7 @@ ImportViewModel = BaseViewModel.extend({
                 self.cancelImportAssets();
                 return;
             }
-            console.log('ws > ' + e.data);
+            //console.log('ws > ' + e.data);
 
             var jsonData = JSON.parse(e.data);
             self.responseHandler(jsonData);
@@ -73,9 +88,9 @@ ImportViewModel = BaseViewModel.extend({
 
     handleAsset: function (json) {
         if (json.asset) {
-            $('#imported-assets').html(json.asset.path);
+            this.currentAsset(json.asset);
+            this.assetsImportedCnt(this.assetsImportedCnt() + 1);
         }
-        this.assetsImportedCnt(this.assetsImportedCnt() + 1);
         this.sendCommand('next', this.handleAsset);
     },
 
