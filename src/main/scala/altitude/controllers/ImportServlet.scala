@@ -7,7 +7,7 @@ import org.json4s._
 import org.scalatra._
 import org.scalatra.atmosphere._
 import org.scalatra.json.{JValueResult, JacksonJsonSupport}
-import play.api.libs.json.{JsString, JsValue, JsObject}
+import play.api.libs.json.{JsNumber, JsString, JsValue, JsObject}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ImportServlet extends BaseController  with JValueResult
@@ -43,9 +43,10 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
           log.info(s"Received text: $text")
           text match {
             case "total" =>
-              val out = assets.size.toString
-              log.info(out)
-              this.send(out)
+              val jsonOut = JsObject(Seq("total" -> JsNumber(assets.size)))
+              val dataOut = jsonOut.toString()
+              log.info(dataOut)
+              this.send(dataOut)
             case "next" =>
               val importAsset: FileImportAsset = assetsIt.next()
               val asset: Option[Asset] = app.service.fileImport.importAsset(importAsset)
