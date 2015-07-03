@@ -32,7 +32,7 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
       }
 
       val assetWithImage = withImagePreview(asset)
-      super.add(assetWithImage)
+      DAO.add(assetWithImage)
     }
   }
 

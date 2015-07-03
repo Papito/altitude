@@ -6,7 +6,6 @@ import altitude.models.search.Query
 import altitude.transactions.TransactionId
 import altitude.{Const => C, Util}
 import com.mongodb.casbah.Imports._
-import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
 

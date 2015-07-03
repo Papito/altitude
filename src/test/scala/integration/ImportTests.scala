@@ -14,6 +14,7 @@ import org.scalatest.Matchers._
     asset.imageData.length should not be 0
   }
 
+/*
   test("import audio (MP3)") {
     val asset = importFile("audio/all.mp3")
     (asset.metadata \ "Author").as[String] should equal("Whitney Houston")
@@ -34,6 +35,7 @@ import org.scalatest.Matchers._
     intercept[DuplicateException] {
       altitude.service.fileImport.importAsset(fileImportAsset)    }
   }
+*/
 
 
   protected def importFile(p: String): Asset = {
