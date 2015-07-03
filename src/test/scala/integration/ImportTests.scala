@@ -11,7 +11,8 @@ import org.scalatest.Matchers._
 @DoNotDiscover class ImportTests(val config: Map[String, String]) extends IntegrationTestCore {
   test("import image (JPEG)") {
     val asset = importFile("images/1.jpg")
-    asset.imageData.length should not be 0
+    //asset.imagePreview should not be None
+    //asset.imagePreview.get.length should not be 0
   }
 
 /*
@@ -42,10 +43,11 @@ import org.scalatest.Matchers._
     val path = getClass.getResource(s"../files/incoming/$p").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
     val importedAsset = altitude.service.fileImport.importAsset(fileImportAsset).get
+    importedAsset.createdAt should not be None
     importedAsset.mediaType should equal(importedAsset.mediaType)
     importedAsset.path should not be empty
+    importedAsset.imagePreview should not be None
     importedAsset.md5 should not be empty
-    importedAsset.createdAt should not be None
 
     val asset = altitude.service.library.getById(importedAsset.id.get).get: Asset
     asset.mediaType should equal(importedAsset.mediaType)

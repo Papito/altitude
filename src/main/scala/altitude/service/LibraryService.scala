@@ -21,7 +21,11 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
   override protected val DAO = app.injector.instance[LibraryDao]
   val PREVIEW_BOX_SIZE = 200 //FIXME: to settings
 
-  override def add(asset: Asset)(implicit txId: TransactionId = new TransactionId): JsObject = {
+  override def add(obj: Asset)(implicit txId: TransactionId = new TransactionId): JsObject = {
+    throw new NotImplementedError
+  }
+
+  def addAsset(asset: Asset)(implicit txId: TransactionId = new TransactionId): Asset = {
     txManager.withTransaction[JsObject] {
       val query = Query(Map(C.Asset.MD5 -> asset.md5))
       val existing = DAO.query(query)
@@ -31,23 +35,20 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
         throw new DuplicateException(s"Duplicate for ${asset.path}")
       }
 
-      val assetWithImage = withImagePreview(asset)
-      DAO.add(assetWithImage)
+      DAO.add(asset)
+      addImagePreview(asset)
     }
   }
 
-  private def withImagePreview(asset: Asset): Asset = {
-    log.info(s"Getting asset image for ${asset.path}")
-
+  private def addImagePreview(asset: Asset): Asset = {
     asset.mediaType.mediaType match {
-      // IMAGES
-      case "image" => {
+      case "image" =>
         val imageData = makeImageThumbnail(asset)
         log.debug(s"Asset image size ${imageData.length}")
-        Asset(id=asset.id, mediaType=asset.mediaType, path=asset.path, md5=asset.md5,
-          imageData=imageData, sizeBytes=asset.sizeBytes, metadata=asset.metadata)
-      }
-      // FILES WITH NO IMAGE
+
+        DAO.addImagePreview(asset, imageData)
+
+      // Return as is
       case _ => asset
     }
   }

@@ -19,9 +19,9 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
   private val dbPort: Int = Integer.parseInt(app.config.get("db.mongo.port"))
   private val client = MongoClient(host, dbPort)
 
-  private val dbName: String = app.config.get("db.mongo.db")
-  protected val db = client(dbName)
-  protected val collection: MongoCollection = db(collectionName)
+  private val DB_NAME: String = app.config.get("db.mongo.db")
+  protected val DB = client(DB_NAME)
+  protected val COLLECTION: MongoCollection = DB(collectionName)
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     log.debug(s"Starting database INSERT for: $jsonIn")
@@ -33,7 +33,7 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
     val obj: DBObject =  com.mongodb.util.JSON.parse(jsonIn.toString()).asInstanceOf[DBObject] ++
       MongoDBObject("id" -> id, "_id" -> id, C.Base.CREATED_AT -> createdAt)
 
-    collection.insert(obj)
+    COLLECTION.insert(obj)
 
     jsonIn ++ Json.obj(
       C.Base.ID -> JsString(id),
@@ -44,7 +44,7 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
   override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting by ID '$id'", C.tag.DB)
 
-    val o: Option[DBObject] = collection.findOneByID(id)
+    val o: Option[DBObject] = COLLECTION.findOneByID(id)
 
     o.isDefined match {
       case false => None
@@ -56,7 +56,7 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
 
   override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {
     val mongoQuery: DBObject = query.params
-    val cursor: MongoCursor = collection.find(mongoQuery).limit(1000) //FIXME: setting
+    val cursor: MongoCursor = COLLECTION.find(mongoQuery).limit(1000) //FIXME: setting
     log.debug(s"Found ${cursor.length} records")
 
     cursor.map(o => {

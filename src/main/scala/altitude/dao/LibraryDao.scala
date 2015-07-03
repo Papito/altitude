@@ -1,3 +1,7 @@
 package altitude.dao
 
-trait LibraryDao extends BaseDao
+import altitude.models.Asset
+
+trait LibraryDao extends BaseDao {
+  def addImagePreview(asset: Asset, bytes: Array[Byte]): Asset
+}

@@ -27,7 +27,7 @@ object Const {
     val MEDIA_SUBTYPE = "media_subtype"
     val MIME_TYPE = "mime_type"
     val METADATA = "metadata"
-    val IMAGE_DATA = "image_data"
+    val IMAGE_PREVIEW = "image_preview"
   }
 
   object Metadata extends Common

@@ -75,7 +75,7 @@ class FileImportService(app: Altitude) extends BaseService(app) {
       sizeBytes = fileSizeInBytes,
       metadata = metadata)
 
-    val res = app.service.library.add(asset)
+    val res = app.service.library.addAsset(asset)
     Some(res)
   }
 

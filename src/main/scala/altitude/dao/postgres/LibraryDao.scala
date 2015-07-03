@@ -19,7 +19,7 @@ class LibraryDao(val app: Altitude) extends BasePostgresDao("asset") with altitu
       md5 = rec.get(C.Asset.MD5).get.asInstanceOf[String],
       mediaType = mediaType,
       sizeBytes = rec.get(C.Asset.SIZE_BYTES).get.asInstanceOf[Long],
-      imageData = rec.get(C.Asset.IMAGE_DATA).get.asInstanceOf[Array[Byte]],
+      //imageData = rec.get(C.Asset.IMAGE_PREVIEW).get.asInstanceOf[Array[Byte]],
       metadata = Json.parse(rec.get(C.Asset.METADATA).get.toString))
 
     addCoreAttrs(model, rec)
@@ -41,7 +41,7 @@ class LibraryDao(val app: Altitude) extends BasePostgresDao("asset") with altitu
              $coreSqlColsForInsert, ${C.Asset.PATH}, ${C.Asset.MD5},
              ${C.Asset.FILENAME}, ${C.Asset.SIZE_BYTES},
              ${C.Asset.MEDIA_TYPE}, ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE},
-             ${C.Asset.METADATA}, ${C.Asset.IMAGE_DATA})
+             ${C.Asset.METADATA}, ${C.Asset.IMAGE_PREVIEW})
             VALUES($coreSqlValuesForInsert, ?, ?, ?, ?, ?, ?, ?, CAST(? AS jsonb), ?)
     """
 
@@ -54,8 +54,10 @@ class LibraryDao(val app: Altitude) extends BasePostgresDao("asset") with altitu
       asset.mediaType.mediaSubtype,
       asset.mediaType.mime,
       metadata,
-      asset.imageData)
+      asset.imagePreview)
 
     addRecord(jsonIn, asset_sql, asset_sql_vals)
   }
+
+  override def addImagePreview(asset: Asset, bytes: Array[Byte]): Asset = throw new NotImplementedError
 }
