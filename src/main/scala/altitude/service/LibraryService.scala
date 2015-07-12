@@ -33,7 +33,7 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
       }
 
       val assetJson: JsObject = DAO.add(obj)
-      addImagePreview(assetJson)
+      addPreview(assetJson)
       assetJson
     }
   }
@@ -44,13 +44,13 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
     }
   }
 
-  private def addImagePreview(asset: Asset): Option[String] = {
+  private def addPreview(asset: Asset): Option[String] = {
     asset.mediaType.mediaType match {
       case "image" =>
         val imageData = makeImageThumbnail(asset)
         log.debug(s"Asset image size ${imageData.length}")
 
-        DAO.addImagePreview(asset, imageData)
+        DAO.addPreview(asset, imageData)
       case _ => None
     }
   }
