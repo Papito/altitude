@@ -59,5 +59,5 @@ class LibraryDao(val app: Altitude) extends BasePostgresDao("asset") with altitu
     addRecord(jsonIn, asset_sql, asset_sql_vals)
   }
 
-  override def addImagePreview(asset: Asset, bytes: Array[Byte]): Asset = throw new NotImplementedError
+  override def addImagePreview(asset: Asset, bytes: Array[Byte]): Option[String] = throw new NotImplementedError
 }

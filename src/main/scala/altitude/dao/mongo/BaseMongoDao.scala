@@ -17,11 +17,11 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
   val log =  LoggerFactory.getLogger(getClass)
   private val host: String = app.config.get("db.mongo.host")
   private val dbPort: Int = Integer.parseInt(app.config.get("db.mongo.port"))
-  private val client = MongoClient(host, dbPort)
+  private def client = MongoClient(host, dbPort)
 
   private val DB_NAME: String = app.config.get("db.mongo.db")
-  protected val DB = client(DB_NAME)
-  protected val COLLECTION: MongoCollection = DB(collectionName)
+  protected def DB = client(DB_NAME)
+  protected def COLLECTION: MongoCollection = DB(collectionName)
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     log.debug(s"Starting database INSERT for: $jsonIn")

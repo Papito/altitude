@@ -1,18 +1,19 @@
 package altitude.dao.mongo
 
-import java.io.{InputStream, ByteArrayInputStream, FileInputStream}
+import java.io.{InputStream, ByteArrayInputStream}
 
 import altitude.Altitude
 import altitude.models.Asset
 import com.mongodb.casbah.gridfs.Imports._
+import org.apache.commons.codec.binary.Base64
 
 
 class LibraryDao(val app: Altitude) extends BaseMongoDao("assets") with altitude.dao.LibraryDao {
   protected def GRID_FS = GridFS(DB, "preview")
 
-  def addImagePreview(asset: Asset, bytes: Array[Byte]): Asset = {
+  override def addImagePreview(asset: Asset, bytes: Array[Byte]): Option[String] = {
     bytes.length > 0 match {
-      case false => asset
+      case false => None
       case true =>
         log.info(s"Saving image preview for ${asset.path}")
         val is: InputStream = new ByteArrayInputStream(bytes)
@@ -22,10 +23,8 @@ class LibraryDao(val app: Altitude) extends BaseMongoDao("assets") with altitude
         }
 
         //FIXME: Option in a try/catch
-        is.close()
 
-        Asset(id=asset.id, mediaType=asset.mediaType, path=asset.path, md5=asset.md5,
-          imagePreview=Some(bytes), sizeBytes=asset.sizeBytes, metadata=asset.metadata)
+        Some(Base64.encodeBase64String(bytes))
     }
   }
 }

@@ -14,7 +14,7 @@ import altitude.{Altitude, Const => C}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.imgscalr.Scalr
 import org.slf4j.LoggerFactory
-import play.api.libs.json.JsObject
+import play.api.libs.json.{Json, JsString, JsObject}
 
 class LibraryService(app: Altitude) extends BaseService[Asset](app) {
   val log =  LoggerFactory.getLogger(getClass)
@@ -22,34 +22,30 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
   val PREVIEW_BOX_SIZE = 200 //FIXME: to settings
 
   override def add(obj: Asset)(implicit txId: TransactionId = new TransactionId): JsObject = {
-    throw new NotImplementedError
-  }
-
-  def addAsset(asset: Asset)(implicit txId: TransactionId = new TransactionId): Asset = {
     txManager.withTransaction[JsObject] {
-      val query = Query(Map(C.Asset.MD5 -> asset.md5))
+      log.info(s"\nAdding asset with MD5: ${obj.md5}\n")
+      val query = Query(Map(C.Asset.MD5 -> obj.md5))
       val existing = DAO.query(query)
 
       if (existing.nonEmpty) {
-        log.warn(s"Asset already exists for ${asset.path}")
-        throw new DuplicateException(s"Duplicate for ${asset.path}")
+        log.warn(s"Asset already exists for ${obj.path}")
+        throw new DuplicateException(s"Duplicate for ${obj.path}")
       }
 
-      DAO.add(asset)
-      addImagePreview(asset)
+      val assetJson: JsObject = DAO.add(obj)
+      addImagePreview(assetJson)
+      assetJson
     }
   }
 
-  private def addImagePreview(asset: Asset): Asset = {
+  private def addImagePreview(asset: Asset): Option[String] = {
     asset.mediaType.mediaType match {
       case "image" =>
         val imageData = makeImageThumbnail(asset)
         log.debug(s"Asset image size ${imageData.length}")
 
         DAO.addImagePreview(asset, imageData)
-
-      // Return as is
-      case _ => asset
+      case _ => None
     }
   }
 
