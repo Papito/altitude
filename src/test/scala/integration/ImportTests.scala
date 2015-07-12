@@ -3,9 +3,8 @@ package integration
 import java.io.File
 
 import altitude.exceptions.DuplicateException
-import altitude.models.{Preview, Asset, FileImportAsset}
+import altitude.models.{Asset, FileImportAsset, Preview}
 import org.scalatest.DoNotDiscover
-
 import org.scalatest.Matchers._
 
 @DoNotDiscover class ImportTests(val config: Map[String, String]) extends IntegrationTestCore {

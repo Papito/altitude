@@ -3,8 +3,10 @@ package altitude.controllers
 import altitude.models.Preview
 
 class AssetServlet extends BaseController {
-  get("/") {
-    val preview: Option[Preview] = this.app.service.library.getPreview("")
-    this.contentType = preview.get.mime
+  get("/:id/preview") {
+    val id = params("id")
+    val preview: Preview = this.app.service.library.getPreview(id).get
+    this.contentType = preview.mime
+    preview.data
   }
 }

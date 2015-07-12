@@ -2,7 +2,7 @@ package integration.util.dao.postgres
 
 import altitude.Altitude
 import altitude.dao.postgres.BasePostgresDao
-import altitude.transactions.{TransactionId, JdbcTransactionManager}
+import altitude.transactions.{JdbcTransactionManager, TransactionId}
 
 class UtilitiesDao(val app: Altitude) extends BasePostgresDao("") with integration.util.dao.UtilitiesDao {
   override def dropDatabase() = Unit

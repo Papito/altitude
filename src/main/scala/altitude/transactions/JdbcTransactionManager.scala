@@ -1,9 +1,9 @@
 package altitude.transactions
 
-import java.sql.{DriverManager, Connection}
+import java.sql.{Connection, DriverManager}
 import java.util.Properties
 
-import altitude.{Const => C, Altitude}
+import altitude.{Altitude, Const => C}
 import org.slf4j.LoggerFactory
 
 object JdbcTransactionManager {

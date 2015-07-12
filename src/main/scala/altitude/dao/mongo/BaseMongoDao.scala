@@ -20,7 +20,7 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
   private def client = MongoClient(host, dbPort)
 
   private val DB_NAME: String = app.config.get("db.mongo.db")
-  protected def DB = client(DB_NAME)
+  protected val DB = client(DB_NAME)
   protected def COLLECTION: MongoCollection = DB(collectionName)
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
@@ -34,7 +34,7 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
       MongoDBObject("id" -> id, "_id" -> id, C.Base.CREATED_AT -> createdAt)
 
     COLLECTION.insert(obj)
-
+    
     jsonIn ++ Json.obj(
       C.Base.ID -> JsString(id),
       C.Base.CREATED_AT -> Util.isoDateTime(Some(Util.utcNow))

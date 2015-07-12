@@ -3,7 +3,6 @@ package altitude.dao
 import java.sql.Connection
 import javax.sql.DataSource
 
-import altitude.Util.log
 import altitude.{Const => C}
 
 class JdbcTransaction extends Transaction {

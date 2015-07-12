@@ -4,7 +4,7 @@ import altitude.Altitude
 import altitude.dao.BaseDao
 import altitude.models.BaseModel
 import altitude.models.search.Query
-import altitude.transactions.{TransactionId, AbstractTransactionManager}
+import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import net.codingwell.scalaguice.InjectorExtensions._
 import play.api.libs.json.JsObject
 

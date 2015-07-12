@@ -2,7 +2,6 @@ package unit
 
 import java.util.logging.Level
 
-import altitude.Util.log
 import altitude.{Const => C}
 import play.api.libs.json._
 

@@ -1,12 +1,8 @@
 package integration
 
-import java.io.File
-import scala.io.Source._
-
+import altitude.transactions.{JdbcTransactionManager, Transaction, TransactionId}
 import altitude.{Altitude, Environment}
-import altitude.transactions.{TransactionId, Transaction, JdbcTransactionManager, JdbcTransaction}
-import org.apache.commons.io.FileUtils
-import org.scalatest.{DoNotDiscover, BeforeAndAfterAll}
+import org.scalatest.BeforeAndAfterAll
 import org.slf4j.LoggerFactory
 
 class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres"))

@@ -26,12 +26,11 @@ ImportViewModel = BaseViewModel.extend({
             return percent;
         }, this);
 
-        this.currentImage = ko.computed(function() {
+        this.previewUrl = ko.computed(function() {
             if (!self.currentAsset())
-                return "";
+                return null;
 
-            var image_data = self.currentAsset().image_data ? self.currentAsset().image_data : null;
-            return image_data ? "data:" + self.currentAsset().media_type.mime_type + ";base64," + image_data : "";
+            return "/assets/" + self.currentAsset().id + "/preview";
         }, this);
 
         this.currentPath = ko.computed(function() {

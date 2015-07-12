@@ -1,10 +1,7 @@
 package altitude
 
-import java.util.logging.Level
-
 import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.{DateTime, DateTimeZone}
-import play.api.libs.json.{JsObject, JsString, Json}
 
 package object Util {
 

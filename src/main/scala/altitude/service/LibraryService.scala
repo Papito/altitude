@@ -7,14 +7,14 @@ import javax.imageio.ImageIO
 
 import altitude.dao.LibraryDao
 import altitude.exceptions.DuplicateException
-import altitude.models.{Preview, Asset}
 import altitude.models.search.Query
+import altitude.models.{Asset, Preview}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.imgscalr.Scalr
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{Json, JsString, JsObject}
+import play.api.libs.json.JsObject
 
 class LibraryService(app: Altitude) extends BaseService[Asset](app) {
   val log =  LoggerFactory.getLogger(getClass)
@@ -39,6 +39,8 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
   }
 
   def getPreview(id: String)(implicit txId: TransactionId = new TransactionId): Option[Preview] = {
+    require(id.nonEmpty)
+
     txManager.asReadOnly[Option[Preview]] {
       DAO.getPreview(id)
     }

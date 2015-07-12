@@ -1,13 +1,13 @@
 package integration
 
 import altitude.transactions.{Transaction, TransactionId}
-import altitude.{Const => C, Environment, Altitude}
+import altitude.{Altitude, Const => C, Environment}
 import com.google.inject.{AbstractModule, Guice}
 import integration.util.dao
 import integration.util.dao.UtilitiesDao
 import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
-import org.scalatest.{BeforeAndAfterEach, BeforeAndAfter, FunSuite}
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach, FunSuite}
 import org.slf4j.LoggerFactory
 
 abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with BeforeAndAfterEach {
