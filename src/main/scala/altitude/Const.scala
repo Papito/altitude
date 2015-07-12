@@ -27,7 +27,13 @@ object Const {
     val MEDIA_SUBTYPE = "media_subtype"
     val MIME_TYPE = "mime_type"
     val METADATA = "metadata"
+    // FIXME: remove
     val IMAGE_PREVIEW = "image_preview"
+  }
+
+  object Preview extends Common {
+    val DATA = "data"
+    val MIME = "mime"
   }
 
   object Metadata extends Common

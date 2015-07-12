@@ -7,7 +7,7 @@ import javax.imageio.ImageIO
 
 import altitude.dao.LibraryDao
 import altitude.exceptions.DuplicateException
-import altitude.models.Asset
+import altitude.models.{Preview, Asset}
 import altitude.models.search.Query
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
@@ -35,6 +35,12 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
       val assetJson: JsObject = DAO.add(obj)
       addImagePreview(assetJson)
       assetJson
+    }
+  }
+
+  def getPreview(id: String)(implicit txId: TransactionId = new TransactionId): Option[Preview] = {
+    txManager.asReadOnly[Option[Preview]] {
+      DAO.getPreview(id)
     }
   }
 

@@ -1,6 +1,6 @@
 package altitude.dao.postgres
 
-import altitude.models.{Asset, MediaType}
+import altitude.models.{Preview, Asset, MediaType}
 import altitude.transactions.TransactionId
 import altitude.{Const => C, Altitude}
 import play.api.libs.json._
@@ -60,4 +60,5 @@ class LibraryDao(val app: Altitude) extends BasePostgresDao("asset") with altitu
   }
 
   override def addImagePreview(asset: Asset, bytes: Array[Byte]): Option[String] = throw new NotImplementedError
+  override def getPreview(id: String)(implicit txId: TransactionId = new TransactionId): Option[Preview]= throw new NotImplementedError
 }

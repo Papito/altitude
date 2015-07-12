@@ -49,7 +49,7 @@ case class Asset(id: Option[String] = None,
     imagePreview.isDefined match {
       // return with image preview if there is one
       case true => coreJsonData ++ Json.obj(
-        C.Asset.IMAGE_PREVIEW -> JsString(Base64.encodeBase64String(imagePreview.get))
+        C.Asset.IMAGE_PREVIEW -> Base64.encodeBase64String(imagePreview.get)
       )
       case false => coreJsonData
     }

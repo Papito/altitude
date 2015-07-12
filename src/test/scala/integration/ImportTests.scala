@@ -3,13 +3,14 @@ package integration
 import java.io.File
 
 import altitude.exceptions.DuplicateException
-import altitude.models.{Asset, FileImportAsset}
+import altitude.models.{Preview, Asset, FileImportAsset}
 import org.scalatest.DoNotDiscover
 
 import org.scalatest.Matchers._
 
 @DoNotDiscover class ImportTests(val config: Map[String, String]) extends IntegrationTestCore {
 
+/*
   test("import audio (MP3)") {
     val asset = importFile("audio/all.mp3")
     (asset.metadata \ "Author").as[String] should equal("Whitney Houston")
@@ -20,11 +21,17 @@ import org.scalatest.Matchers._
     val assets = altitude.service.fileImport.getFilesToImport(path=incomingPath)
     assets should not be empty
   }
+*/
 
   test("import image (JPEG)") {
     val asset = importFile("images/1.jpg")
+    val preview: Option[Preview] = altitude.service.library.getPreview(asset.id.get)
+    preview should not be None
+    preview.get.mime should equal("image/jpeg")
+    preview.get.data.length should not be 0
   }
 
+/*
   test("import duplicate") {
     importFile("images/1.jpg")
     val path = getClass.getResource(s"../files/incoming/images/1.jpg").getPath
@@ -33,6 +40,7 @@ import org.scalatest.Matchers._
     intercept[DuplicateException] {
       altitude.service.fileImport.importAsset(fileImportAsset)    }
   }
+*/
 
   protected def importFile(p: String): Asset = {
     val path = getClass.getResource(s"../files/incoming/$p").getPath
