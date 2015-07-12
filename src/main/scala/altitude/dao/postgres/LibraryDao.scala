@@ -1,8 +1,8 @@
 package altitude.dao.postgres
 
-import altitude.models.{Preview, Asset, MediaType}
+import altitude.models.{Asset, MediaType, Preview}
 import altitude.transactions.TransactionId
-import altitude.{Const => C, Altitude}
+import altitude.{Altitude, Const => C}
 import play.api.libs.json._
 
 

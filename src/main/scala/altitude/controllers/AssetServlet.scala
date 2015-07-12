@@ -1,6 +1,6 @@
 package altitude.controllers
 
-import altitude.models.{Preview, Asset}
+import altitude.models.Preview
 
 class AssetServlet extends BaseController {
   get("/") {

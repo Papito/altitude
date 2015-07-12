@@ -1,9 +1,9 @@
 package altitude.dao.mongo
 
-import java.io.{StringWriter, InputStream, ByteArrayInputStream}
+import java.io.{ByteArrayInputStream, InputStream}
 
 import altitude.Altitude
-import altitude.models.{Preview, Asset}
+import altitude.models.{Asset, Preview}
 import altitude.transactions.TransactionId
 import com.mongodb.casbah.gridfs.Imports._
 import org.apache.commons.codec.binary.Base64

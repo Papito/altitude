@@ -5,7 +5,7 @@ import java.io.File
 import altitude.models.FileImportAsset
 import altitude.models.search.Query
 import altitude.transactions.TransactionId
-import altitude.{Const => C, Altitude}
+import altitude.{Altitude, Const => C}
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
 import org.slf4j.LoggerFactory

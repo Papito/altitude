@@ -1,6 +1,6 @@
 package altitude.dao
 
-import altitude.models.{Preview, Asset}
+import altitude.models.{Asset, Preview}
 import altitude.transactions.TransactionId
 
 trait LibraryDao extends BaseDao {

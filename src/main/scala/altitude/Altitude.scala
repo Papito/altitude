@@ -2,15 +2,14 @@ package altitude
 
 import java.sql.DriverManager
 
-import altitude.dao.{LibraryDao}
-import altitude.service.{AbstractMetadataService, LibraryService, TikaMetadataService, FileImportService}
-import altitude.transactions.{VoidTransactionManager, AbstractTransactionManager}
-import org.slf4j.LoggerFactory
-
+import altitude.dao.LibraryDao
+import altitude.service.{AbstractMetadataService, FileImportService, LibraryService, TikaMetadataService}
+import altitude.transactions.AbstractTransactionManager
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
-import net.codingwell.scalaguice.ScalaModule
 import net.codingwell.scalaguice.InjectorExtensions._
+import net.codingwell.scalaguice.ScalaModule
+import org.slf4j.LoggerFactory
 
 class Altitude(additionalConfiguration: Map[String, String] = Map()) {
   val log =  LoggerFactory.getLogger(getClass)

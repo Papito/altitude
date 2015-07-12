@@ -2,13 +2,13 @@ package altitude.controllers
 
 import altitude.exceptions.DuplicateException
 import altitude.models.{Asset, FileImportAsset}
-import org.slf4j.LoggerFactory
-
 import org.json4s._
 import org.scalatra._
 import org.scalatra.atmosphere._
 import org.scalatra.json.{JValueResult, JacksonJsonSupport}
-import play.api.libs.json.{JsNumber, JsString, JsValue, JsObject}
+import org.slf4j.LoggerFactory
+import play.api.libs.json.{JsNumber, JsObject, JsString}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ImportServlet extends BaseController  with JValueResult

@@ -1,8 +1,9 @@
 package altitude.models
 
-import org.apache.commons.codec.binary.Base64
-import play.api.libs.json.{Json, JsValue}
 import altitude.{Const => C}
+import org.apache.commons.codec.binary.Base64
+import play.api.libs.json.{JsValue, Json}
+
 import scala.language.implicitConversions
 
 object Preview {

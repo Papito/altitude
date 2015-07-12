@@ -1,5 +1,5 @@
 package altitude
-import collection.immutable.HashMap
+import scala.collection.immutable.HashMap
 
 class Configuration(additionalConfiguration: Map[String, String] = new HashMap()) {
   def get(key: String) = config.getOrElse(key, "")
