@@ -41,8 +41,8 @@ class LibraryDao(val app: Altitude) extends BasePostgresDao("asset") with altitu
              $coreSqlColsForInsert, ${C.Asset.PATH}, ${C.Asset.MD5},
              ${C.Asset.FILENAME}, ${C.Asset.SIZE_BYTES},
              ${C.Asset.MEDIA_TYPE}, ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE},
-             ${C.Asset.METADATA}, ${C.Asset.IMAGE_PREVIEW})
-            VALUES($coreSqlValuesForInsert, ?, ?, ?, ?, ?, ?, ?, CAST(? AS jsonb), ?)
+             ${C.Asset.METADATA})
+            VALUES($coreSqlValuesForInsert, ?, ?, ?, ?, ?, ?, ?, CAST(? AS jsonb))
     """
 
     val asset_sql_vals: List[Object] = List(
@@ -53,8 +53,7 @@ class LibraryDao(val app: Altitude) extends BasePostgresDao("asset") with altitu
       asset.mediaType.mediaType,
       asset.mediaType.mediaSubtype,
       asset.mediaType.mime,
-      metadata,
-      asset.imagePreview)
+      metadata)
 
     addRecord(jsonIn, asset_sql, asset_sql_vals)
   }
