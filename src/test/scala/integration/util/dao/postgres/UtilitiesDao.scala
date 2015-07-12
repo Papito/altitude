@@ -8,6 +8,7 @@ class UtilitiesDao(val app: Altitude) extends BasePostgresDao("") with integrati
   override def dropDatabase() = Unit
 
   override def rollback() = {
+    //FIXME: This would probably blow away connections for a parallel JDBC test - need to namespace by app id
     JdbcTransactionManager.TRANSACTIONS.foreach(tx => {
       tx._2.down()
       tx._2.rollback()
@@ -15,6 +16,7 @@ class UtilitiesDao(val app: Altitude) extends BasePostgresDao("") with integrati
   }
 
   override def close() = {
+    //FIXME: This would probably blow away connections for a parallel JDBC test - need to namespace by app id
     JdbcTransactionManager.TRANSACTIONS.foreach(tx => {
       tx._2.down()
       tx._2.close()

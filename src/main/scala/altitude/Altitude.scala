@@ -14,7 +14,8 @@ import org.slf4j.LoggerFactory
 class Altitude(additionalConfiguration: Map[String, String] = Map()) {
   val log =  LoggerFactory.getLogger(getClass)
 
-  log.info("Initializing Altitude application instance")
+  val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
+  log.info(s"Initializing Altitude application instance with ID $id")
 
   val environment = Environment.ENV match {
     case Environment.DEV => "development"
@@ -29,7 +30,6 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
   protected val dataSourceType = config.get("datasource")
   log.info(s"Datasource type: $dataSourceType", C.tag.APP)
 
-  val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
   val app: Altitude = this
 
   /*

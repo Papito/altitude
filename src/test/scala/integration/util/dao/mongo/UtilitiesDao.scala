@@ -9,7 +9,12 @@ class UtilitiesDao(val app: Altitude) extends BaseMongoDao("") with integration.
     DB.dropDatabase()
   }
 
-  override def close() = Unit
+  override def close() = {
+    val client = BaseMongoDao.CLIENTS.get(app.id)
+    if (client.isDefined) {
+      client.get.close()
+    }
+  }
   override def rollback() = Unit
   override def cleanup() = Unit
   override def createTransaction(tx: TransactionId) = Unit

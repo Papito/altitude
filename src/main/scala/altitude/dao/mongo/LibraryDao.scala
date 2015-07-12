@@ -14,7 +14,7 @@ import play.api.libs.json.JsObject
 class LibraryDao(val app: Altitude) extends BaseMongoDao("assets") with altitude.dao.LibraryDao {
   protected def GRID_FS = GridFS(DB, "preview")
 
-  override def addPreview(asset: Asset, bytes: Array[Byte]): Option[String] = {
+  override def addPreview(asset: Asset, bytes: Array[Byte])(implicit txId: TransactionId = new TransactionId): Option[String] = {
     bytes.length > 0 match {
       case false => None
       case true =>

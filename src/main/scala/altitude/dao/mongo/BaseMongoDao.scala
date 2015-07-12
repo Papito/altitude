@@ -4,23 +4,37 @@ import altitude.dao.BaseDao
 import altitude.models.BaseModel
 import altitude.models.search.Query
 import altitude.transactions.TransactionId
-import altitude.{Const => C, Util}
+import altitude.{Const => C, Altitude, Util}
 import com.mongodb.casbah.Imports._
+import com.mongodb.casbah.MongoClient
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
 
+object BaseMongoDao {
+  // let each application in the JVM have its own client
+  var CLIENTS = scala.collection.mutable.Map[Int, MongoClient]()
+  protected def client(app: Altitude): MongoClient = {
+    if (BaseMongoDao.CLIENTS.contains(app.id)) {
+      return BaseMongoDao.CLIENTS.get(app.id).get
+    }
+
+    // create the client (and connection pool for this app once)
+    val host: String = app.config.get("db.mongo.host")
+    val dbPort: Int = Integer.parseInt(app.config.get("db.mongo.port"))
+    def client = MongoClient(host, dbPort)
+    // save the client for this app once
+    BaseMongoDao.CLIENTS += (app.id -> client)
+    client
+  }
+}
 
 abstract class BaseMongoDao(private val collectionName: String) extends BaseDao {
   import com.mongodb.casbah.commons.conversions.scala._
   RegisterJodaTimeConversionHelpers()
 
   val log =  LoggerFactory.getLogger(getClass)
-  private val host: String = app.config.get("db.mongo.host")
-  private val dbPort: Int = Integer.parseInt(app.config.get("db.mongo.port"))
-  private def client = MongoClient(host, dbPort)
-
   private val DB_NAME: String = app.config.get("db.mongo.db")
-  protected val DB = client(DB_NAME)
+  protected def DB = BaseMongoDao.client(app)(DB_NAME)
   protected def COLLECTION: MongoCollection = DB(collectionName)
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
