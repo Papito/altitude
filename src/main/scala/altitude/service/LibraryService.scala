@@ -3,7 +3,7 @@ package altitude.service
 import java.awt.image.BufferedImage
 import java.awt.{Color, Graphics2D}
 import java.io._
-import javax.imageio.ImageIO
+import javax.imageio.{ImageWriter, ImageWriteParam, IIOImage, ImageIO}
 
 import altitude.dao.LibraryDao
 import altitude.exceptions.DuplicateException
@@ -58,7 +58,6 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
   }
 
   private def makeImageThumbnail(asset: Asset): Array[Byte] = {
-    //FIXME: use Option and try/catch
     val inFile = new File(asset.path)
     val srcImage: BufferedImage = ImageIO.read(inFile)
     val scaledImage: BufferedImage = Scalr.resize(srcImage, Scalr.Method.QUALITY, PREVIEW_BOX_SIZE)
@@ -81,6 +80,29 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
     g.dispose()
     val byteArray: ByteArrayOutputStream = new ByteArrayOutputStream
     ImageIO.write(large, "jpg", byteArray)
+
+
+    val jpgWriter: ImageWriter = ImageIO.getImageWritersByFormatName("jpg").next()
+    val jpgWriteParam: ImageWriteParam = jpgWriter.getDefaultWriteParam()
+    jpgWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT)
+    jpgWriteParam.setCompressionQuality(0.9f)
+
+    /*
+     For those of you who don't want to write in disk:
+     ByteArrayOutputStream baos = new ByteArrayOutputStream();
+     writer.setOutput(new MemoryCacheImageOutputStream(baos));
+     ... baos.flush();
+     byte[] returnImage = baos.toByteArray();
+     baos.close();
+     */
+
+    val outputStream: OutputStream = createOutputStream() //For example, FileImageOutputStream
+    jpgWriter.setOutput(outputStream)
+    val outputImage: IIOImage  = new IIOImage(scaledImage, null, null)
+    jpgWriter.write(null, outputImage, jpgWriteParam)
+    jpgWriter.dispose()
+
+    //FIXME: use finally(), see if any of this is thread-safe to initialize once
     byteArray.toByteArray
   }
 }
