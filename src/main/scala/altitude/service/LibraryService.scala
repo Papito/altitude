@@ -1,7 +1,7 @@
 package altitude.service
 
 import java.awt.image.BufferedImage
-import java.awt.{Color, Graphics2D}
+import java.awt.{AlphaComposite, Color, Graphics2D}
 import java.io._
 import javax.imageio.stream.MemoryCacheImageOutputStream
 import javax.imageio.{ImageWriter, ImageWriteParam, IIOImage, ImageIO}
@@ -62,9 +62,9 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
     val inFile = new File(asset.path)
     val srcImage: BufferedImage = ImageIO.read(inFile)
     val scaledImage: BufferedImage = Scalr.resize(srcImage, Scalr.Method.QUALITY, PREVIEW_BOX_SIZE)
-    val large: BufferedImage = new BufferedImage(PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE, BufferedImage.TYPE_INT_RGB)
+    val large: BufferedImage = new BufferedImage(PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE, BufferedImage.TYPE_INT_ARGB)
     val g: Graphics2D = large.createGraphics
-    g.setBackground(Color.WHITE)
+    g.setComposite(AlphaComposite.Clear);
     g.fillRect(0, 0, PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE)
     var x: Int = 0
     var y: Int = 0
@@ -77,23 +77,11 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
       y = (PREVIEW_BOX_SIZE - height) / 2
     }
     g.drawImage(large, 0, 0, null)
+    g.setComposite(AlphaComposite.Src);
     g.drawImage(scaledImage, x, y, null)
     g.dispose()
-
-    val jpgWriter: ImageWriter = ImageIO.getImageWritersByFormatName("jpg").next()
-    val jpgWriteParam: ImageWriteParam = jpgWriter.getDefaultWriteParam
-    jpgWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT)
-    jpgWriteParam.setCompressionQuality(0.88f)
-
-    val outputStream: ByteArrayOutputStream = new ByteArrayOutputStream()
-    jpgWriter.setOutput(new MemoryCacheImageOutputStream(outputStream));
-    val outputImage: IIOImage = new IIOImage(scaledImage, null, null)
-    jpgWriter.write(null, outputImage, jpgWriteParam)
-    jpgWriter.dispose()
-    outputStream.flush()
-    val byteArray = outputStream.toByteArray
-    outputStream.close()
-    //FIXME: use finally(), see if any of this is thread-safe to initialize once
-    byteArray
+    val byteArray: ByteArrayOutputStream = new ByteArrayOutputStream
+    ImageIO.write(large, "png", byteArray)
+    byteArray.toByteArray
   }
 }
