@@ -20,7 +20,7 @@ import play.api.libs.json.JsObject
 class LibraryService(app: Altitude) extends BaseService[Asset](app) {
   val log =  LoggerFactory.getLogger(getClass)
   override protected val DAO = app.injector.instance[LibraryDao]
-  val PREVIEW_BOX_SIZE = 400 //FIXME: to settings
+  val PREVIEW_BOX_SIZE = 200 //FIXME: to settings
 
   override def add(obj: Asset)(implicit txId: TransactionId = new TransactionId): JsObject = {
     txManager.withTransaction[JsObject] {
