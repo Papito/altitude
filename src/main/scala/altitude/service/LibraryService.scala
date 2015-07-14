@@ -21,6 +21,8 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
   val log =  LoggerFactory.getLogger(getClass)
   override protected val DAO = app.injector.instance[LibraryDao]
   val PREVIEW_BOX_SIZE = 200 //FIXME: to settings
+  val COMPOSITE_IMAGE: BufferedImage = new BufferedImage(PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE, BufferedImage.TYPE_INT_ARGB)
+  val G2D: Graphics2D = COMPOSITE_IMAGE.createGraphics
 
   override def add(obj: Asset)(implicit txId: TransactionId = new TransactionId): JsObject = {
     txManager.withTransaction[JsObject] {
@@ -59,36 +61,29 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
   }
 
   private def makeImageThumbnail(asset: Asset): Array[Byte] = {
-    var g: Option[Graphics2D] = None
 
-    try {
-      val inFile = new File(asset.path)
-      val srcImage: BufferedImage = ImageIO.read(inFile)
-      val scaledImage: BufferedImage = Scalr.resize(srcImage, Scalr.Method.QUALITY, PREVIEW_BOX_SIZE)
-      val compositeImage: BufferedImage = new BufferedImage(PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE, BufferedImage.TYPE_INT_ARGB)
-      g = Some(compositeImage.createGraphics)
-      g.get.setComposite(AlphaComposite.Clear)
-      g.get.fillRect(0, 0, PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE)
-      var x: Int = 0
-      var y: Int = 0
-      val height: Int = scaledImage.getHeight
-      val width: Int = scaledImage.getWidth
-      if (height > width) {
-        x = (PREVIEW_BOX_SIZE - width) / 2
-      }
-      if (height < width) {
-        y = (PREVIEW_BOX_SIZE - height) / 2
-      }
-      g.get.drawImage(compositeImage, 0, 0, null)
-      g.get.setComposite(AlphaComposite.Src)
-      g.get.drawImage(scaledImage, x, y, null)
-      val byteArray: ByteArrayOutputStream = new ByteArrayOutputStream
-      ImageIO.write(compositeImage, "png", byteArray)
+    val inFile = new File(asset.path)
+    val srcImage: BufferedImage = ImageIO.read(inFile)
+    val scaledImage: BufferedImage = Scalr.resize(srcImage, Scalr.Method.QUALITY, PREVIEW_BOX_SIZE)
+    var x: Int = 0
+    var y: Int = 0
+    val height: Int = scaledImage.getHeight
+    val width: Int = scaledImage.getWidth
+    if (height > width) {
+      x = (PREVIEW_BOX_SIZE - width) / 2
+    }
+    if (height < width) {
+      y = (PREVIEW_BOX_SIZE - height) / 2
+    }
 
-      byteArray.toByteArray
-    }
-    finally  {
-      if (g.isDefined) g.get.dispose()
-    }
+    G2D.setComposite(AlphaComposite.Clear)
+    G2D.fillRect(0, 0, PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE)
+    G2D.drawImage(COMPOSITE_IMAGE, 0, 0, null)
+    G2D.setComposite(AlphaComposite.Src)
+    G2D.drawImage(scaledImage, x, y, null)
+    val byteArray: ByteArrayOutputStream = new ByteArrayOutputStream
+    ImageIO.write(COMPOSITE_IMAGE, "png", byteArray)
+
+    byteArray.toByteArray
   }
 }
