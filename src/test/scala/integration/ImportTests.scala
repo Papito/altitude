@@ -11,8 +11,16 @@ import org.scalatest.Matchers._
 
   test("import audio (MP3)") {
     val asset = importFile("audio/all.mp3")
-    (asset.metadata \ "Author").as[String] should equal("Whitney Houston")
+    val optAuthor = (asset.metadata \ "Author").asOpt[String]
+    optAuthor should not be None
+    optAuthor should equal("Whitney Houston")
   }
+
+/*
+  test("import audio images (MP3)") {
+    val asset = importFile("audio/images.mp3")
+  }
+
 
   test("import file list") {
     val incomingPath = getClass.getResource("../files/incoming").getPath
@@ -36,6 +44,7 @@ import org.scalatest.Matchers._
     intercept[DuplicateException] {
       altitude.service.fileImport.importAsset(fileImportAsset)    }
   }
+*/
 
   protected def importFile(p: String): Asset = {
     val path = getClass.getResource(s"../files/incoming/$p").getPath

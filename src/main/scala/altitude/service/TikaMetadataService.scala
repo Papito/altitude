@@ -50,9 +50,7 @@ class TikaMetadataService extends AbstractMetadataService {
       val metadata: TikaMetadata = new TikaMetadata
       inputStream = TikaInputStream.get(url, metadata)
 
-      parser.parse(inputStream, TIKA_HANDLER, metadata, null)
-
-      JsonMetadata.toJson(metadata, writer) // raises org.apache.tika.exception.TikaException
+      JsonMetadata.toJson(metadata, writer) // FIXME: handle org.apache.tika.exception.TikaException
       val jsonData = writer.toString
       val json = Json.parse(jsonData)
       println(Json.prettyPrint(json))
