@@ -3,6 +3,7 @@ package altitude.service
 import java.awt.image.BufferedImage
 import java.awt.{Color, Graphics2D}
 import java.io._
+import javax.imageio.stream.MemoryCacheImageOutputStream
 import javax.imageio.{ImageWriter, ImageWriteParam, IIOImage, ImageIO}
 
 import altitude.dao.LibraryDao
@@ -19,7 +20,7 @@ import play.api.libs.json.JsObject
 class LibraryService(app: Altitude) extends BaseService[Asset](app) {
   val log =  LoggerFactory.getLogger(getClass)
   override protected val DAO = app.injector.instance[LibraryDao]
-  val PREVIEW_BOX_SIZE = 200 //FIXME: to settings
+  val PREVIEW_BOX_SIZE = 400 //FIXME: to settings
 
   override def add(obj: Asset)(implicit txId: TransactionId = new TransactionId): JsObject = {
     txManager.withTransaction[JsObject] {
@@ -78,31 +79,21 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
     g.drawImage(large, 0, 0, null)
     g.drawImage(scaledImage, x, y, null)
     g.dispose()
-    val byteArray: ByteArrayOutputStream = new ByteArrayOutputStream
-    ImageIO.write(large, "jpg", byteArray)
-
 
     val jpgWriter: ImageWriter = ImageIO.getImageWritersByFormatName("jpg").next()
-    val jpgWriteParam: ImageWriteParam = jpgWriter.getDefaultWriteParam()
+    val jpgWriteParam: ImageWriteParam = jpgWriter.getDefaultWriteParam
     jpgWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT)
-    jpgWriteParam.setCompressionQuality(0.9f)
+    jpgWriteParam.setCompressionQuality(0.88f)
 
-    /*
-     For those of you who don't want to write in disk:
-     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-     writer.setOutput(new MemoryCacheImageOutputStream(baos));
-     ... baos.flush();
-     byte[] returnImage = baos.toByteArray();
-     baos.close();
-     */
-
-    val outputStream: OutputStream = createOutputStream() //For example, FileImageOutputStream
-    jpgWriter.setOutput(outputStream)
-    val outputImage: IIOImage  = new IIOImage(scaledImage, null, null)
+    val outputStream: ByteArrayOutputStream = new ByteArrayOutputStream()
+    jpgWriter.setOutput(new MemoryCacheImageOutputStream(outputStream));
+    val outputImage: IIOImage = new IIOImage(scaledImage, null, null)
     jpgWriter.write(null, outputImage, jpgWriteParam)
     jpgWriter.dispose()
-
+    outputStream.flush()
+    val byteArray = outputStream.toByteArray
+    outputStream.close()
     //FIXME: use finally(), see if any of this is thread-safe to initialize once
-    byteArray.toByteArray
+    byteArray
   }
 }
