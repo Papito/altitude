@@ -36,7 +36,7 @@
                 <span class="icon-bar"></span>
             </button>
 
-            <a class="navbar-brand" href="/">${config.get("app.name")}</a>
+            <a class="navbar-brand" href="/">${config.getString("app.name")}</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">

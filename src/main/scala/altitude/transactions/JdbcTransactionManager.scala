@@ -23,11 +23,11 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     // create a connection and a transaction
 
     val props = new Properties
-    val user = app.config.get("db.postgres.user")
+    val user = app.config.getString("db.postgres.user")
     props.setProperty("user", user)
-    val password = app.config.get("db.postgres.password")
+    val password = app.config.getString("db.postgres.password")
     props.setProperty("password", password)
-    val url = app.config.get("db.postgres.url")
+    val url = app.config.getString("db.postgres.url")
     val conn: Connection = DriverManager.getConnection(url, props)
 
     val tx: JdbcTransaction = new JdbcTransaction(conn)

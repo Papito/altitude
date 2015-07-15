@@ -19,8 +19,8 @@ object BaseMongoDao {
     }
 
     // create the client (and connection pool for this app once)
-    val host: String = app.config.get("db.mongo.host")
-    val dbPort: Int = Integer.parseInt(app.config.get("db.mongo.port"))
+    val host: String = app.config.getString("db.mongo.host")
+    val dbPort: Int = Integer.parseInt(app.config.getString("db.mongo.port"))
     def client = MongoClient(host, dbPort)
     // save the client for this app once
     BaseMongoDao.CLIENTS += (app.id -> client)
@@ -33,9 +33,10 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
   RegisterJodaTimeConversionHelpers()
 
   val log =  LoggerFactory.getLogger(getClass)
-  private val DB_NAME: String = app.config.get("db.mongo.db")
+  private val DB_NAME: String = app.config.getString("db.mongo.db")
   protected def DB = BaseMongoDao.client(app)(DB_NAME)
   protected def COLLECTION: MongoCollection = DB(collectionName)
+  protected val MAX_RECORDS = app.config.getInt("db.max_records")
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     log.debug(s"Starting database INSERT for: $jsonIn")
@@ -70,7 +71,7 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
 
   override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {
     val mongoQuery: DBObject = query.params
-    val cursor: MongoCursor = COLLECTION.find(mongoQuery).limit(1000) //FIXME: setting
+    val cursor: MongoCursor = COLLECTION.find(mongoQuery).limit(MAX_RECORDS)
     log.debug(s"Found ${cursor.length} records")
 
     cursor.map(o => {
