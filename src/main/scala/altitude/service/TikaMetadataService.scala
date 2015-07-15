@@ -41,27 +41,24 @@ class TikaMetadataService extends AbstractMetadataService {
   private def extractMetadata(importAsset: FileImportAsset, parser: AbstractParser): JsValue = {
     log.info(s"Extracting metadata for '$importAsset' with ${parser.getClass.getSimpleName}")
 
-    //FIXME: Use Option
-    var inputStream: InputStream = null
+    var inputStream: Option[InputStream] = None
     val writer: StringWriter = new StringWriter()
 
     try {
       val url: java.net.URL = importAsset.file.toURI.toURL
       val metadata: TikaMetadata = new TikaMetadata
-      inputStream = TikaInputStream.get(url, metadata)
+      inputStream = Some(TikaInputStream.get(url, metadata))
 
-      parser.parse(inputStream, TIKA_HANDLER, metadata, null)
+      parser.parse(inputStream.get, TIKA_HANDLER, metadata, null)
 
       JsonMetadata.toJson(metadata, writer) // FIXME: handle org.apache.tika.exception.TikaException
       val jsonData = writer.toString
-      val json = Json.parse(jsonData)
-      println(Json.prettyPrint(json))
-      json
+      Json.parse(jsonData)
+      //println(Json.prettyPrint(json))
     }
     finally {
-      writer.close()
-      if (inputStream != null)
-        inputStream.close()
+      if (writer != null) writer.close()
+      if (inputStream.isDefined) inputStream.get.close()
     }
   }
 }

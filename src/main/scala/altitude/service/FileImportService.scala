@@ -33,16 +33,15 @@ class FileImportService(app: Altitude) extends BaseService(app) {
   def detectAssetType(importAsset: FileImportAsset): MediaType = {
     log.debug(s"Detecting media type for: '$importAsset'", C.tag.SERVICE)
 
-    //FIXME: Use Option
-    var inputStream: InputStream = null
+    var inputStream: Option[InputStream] = None
 
     try {
       val url: java.net.URL = importAsset.file.toURI.toURL
       val metadata: TikaMetadata = new TikaMetadata
-      inputStream = TikaInputStream.get(url, metadata)
+      inputStream = Some(TikaInputStream.get(url, metadata))
 
       val detector: Detector = new DefaultDetector
-      val tikaMediaType: TikaMediaType = detector.detect(inputStream, metadata)
+      val tikaMediaType: TikaMediaType = detector.detect(inputStream.get, metadata)
 
       val assetMediaType = MediaType(
         mediaType = tikaMediaType.getType,
@@ -54,7 +53,7 @@ class FileImportService(app: Altitude) extends BaseService(app) {
       assetMediaType
     }
     finally {
-      inputStream.close()
+      if (inputStream.isDefined) inputStream.get.close()
     }
   }
 
