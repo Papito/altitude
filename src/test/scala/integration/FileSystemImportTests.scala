@@ -7,7 +7,7 @@ import altitude.models.{Asset, FileImportAsset, Preview}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
-@DoNotDiscover class ImportTests(val config: Map[String, String]) extends IntegrationTestCore {
+@DoNotDiscover class FileSystemImportTests(val config: Map[String, String]) extends IntegrationTestCore {
 
   test("import audio (MP3)") {
     val asset = importFile("audio/all.mp3")
@@ -36,7 +36,8 @@ import org.scalatest.Matchers._
     val fileImportAsset = new FileImportAsset(new File(path))
 
     intercept[DuplicateException] {
-      altitude.service.fileImport.importAsset(fileImportAsset)    }
+      altitude.service.fileImport.importAsset(fileImportAsset)
+    }
   }
 
   protected def importFile(p: String): Asset = {

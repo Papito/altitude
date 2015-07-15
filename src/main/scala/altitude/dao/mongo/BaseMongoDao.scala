@@ -1,6 +1,7 @@
 package altitude.dao.mongo
 
 import altitude.dao.BaseDao
+import altitude.exceptions.NotFoundException
 import altitude.models.BaseModel
 import altitude.models.search.Query
 import altitude.transactions.TransactionId
@@ -61,12 +62,11 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
 
     val o: Option[DBObject] = COLLECTION.findOneByID(id)
 
-    o.isDefined match {
-      case false => None
-      case true =>
-        val json = Json.parse(o.get.toString).as[JsObject]
-        Some(fixMongoFields(json))
-    }
+    if (o.isEmpty)
+      throw new NotFoundException
+
+    val json = Json.parse(o.get.toString).as[JsObject]
+    Some(fixMongoFields(json))
   }
 
   override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {

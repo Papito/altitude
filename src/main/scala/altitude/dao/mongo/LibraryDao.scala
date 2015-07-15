@@ -39,7 +39,6 @@ class LibraryDao(val app: Altitude) extends BaseMongoDao("assets") with altitude
     log.debug(s"Getting preview for '$id'")
     // get the asset
     val assetJson: Option[JsObject] = this.getById(id)
-    //FIXME: assuming the asset exists, but NotFound should be thrown earlier
     val asset: Asset = Asset.fromJson(assetJson.get)
     val gridFsFile: Option[GridFSDBFile] = GRID_FS.findOne(asset.path)
 
