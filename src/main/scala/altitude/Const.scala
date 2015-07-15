@@ -2,19 +2,23 @@ package altitude
 
 
 object Const {
-   object tag {
-     val APP     = "APP"
-     val API     = "API"
-     val WEB     = "WEB"
-     val SERVICE = "SERVICE"
-     val DB = "DB"
-   }
+  object tag {
+    val APP     = "APP"
+    val API     = "API"
+    val WEB     = "WEB"
+    val SERVICE = "SERVICE"
+    val DB = "DB"
+  }
 
-   trait Common {
-     val ID = "id"
-     val CREATED_AT = "created_at"
-     val UPDATED_AT = "updated_at"
-   }
+  object IdType {
+    val ID = "ID"
+  }
+
+  trait Common {
+    val ID = "id"
+    val CREATED_AT = "created_at"
+    val UPDATED_AT = "updated_at"
+  }
 
   object Base extends Common
 
@@ -35,4 +39,4 @@ object Const {
   }
 
   object Metadata extends Common
- }
+}

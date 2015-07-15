@@ -1,6 +1,5 @@
 package altitude.exceptions
 
-class NotFoundException(msg: String) extends Exception(msg) {
-  def this() = this("")
-}
+class NotFoundException(idType: String, id: String)
+  extends Exception(s"Record for $idType:$id not found")
 

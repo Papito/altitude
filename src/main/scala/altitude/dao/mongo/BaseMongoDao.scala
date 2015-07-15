@@ -63,7 +63,7 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
     val o: Option[DBObject] = COLLECTION.findOneByID(id)
 
     if (o.isEmpty)
-      throw new NotFoundException
+      throw new NotFoundException(C.IdType.ID, id)
 
     val json = Json.parse(o.get.toString).as[JsObject]
     Some(fixMongoFields(json))
