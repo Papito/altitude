@@ -37,7 +37,7 @@ object AltitudeBuild extends Build {
 
         "org.apache.tika"              % "tika-parsers"          % "1.7",
         "org.apache.tika"              % "tika-serialization"    % "1.7",
-        "org.apache.commons"           % "commons-io"            % "1.3.2",
+        "org.apache.commons"           % "commons-io"            % "2.4",
         "commons-dbutils"              % "commons-dbutils"       % "1.6",
 
         "ch.qos.logback"               % "logback-classic"       % "1.1.2" % "runtime",

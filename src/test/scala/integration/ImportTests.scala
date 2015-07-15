@@ -16,11 +16,6 @@ import org.scalatest.Matchers._
     optAuthor.get should equal("Whitney Houston")
   }
 
-  test("import audio images (MP3)") {
-    val asset = importFile("audio/images.mp3")
-  }
-
-
   test("import file list") {
     val incomingPath = getClass.getResource("../files/incoming").getPath
     val assets = altitude.service.fileImport.getFilesToImport(path=incomingPath)
@@ -58,6 +53,7 @@ import org.scalatest.Matchers._
     asset.path should not be empty
     asset.md5 should not be empty
     asset.createdAt should not be None
+    asset.sizeBytes should not be 0
     asset
   }
 
