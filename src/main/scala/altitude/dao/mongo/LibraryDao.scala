@@ -16,8 +16,7 @@ class LibraryDao(val app: Altitude) extends BaseMongoDao("assets") with altitude
 
   override def addPreview(asset: Asset, bytes: Array[Byte])(implicit txId: TransactionId = new TransactionId): Option[String] = {
     if (bytes.length < 0) return None
-
-    log.info(s"Saving image preview for ${asset.path}")
+    log.info(s"Saving preview for ${asset.path}")
 
     var is: Option[InputStream] = None
 
@@ -35,10 +34,10 @@ class LibraryDao(val app: Altitude) extends BaseMongoDao("assets") with altitude
     Some(Base64.encodeBase64String(bytes))
   }
 
-  override def getPreview(id: String)(implicit txId: TransactionId = new TransactionId): Option[Preview] = {
-    log.debug(s"Getting preview for '$id'")
+  override def getPreview(asset_id: String)(implicit txId: TransactionId = new TransactionId): Option[Preview] = {
+    log.debug(s"Getting preview for '$asset_id'")
     // get the asset
-    val assetJson: Option[JsObject] = this.getById(id)
+    val assetJson: Option[JsObject] = this.getById(asset_id)
     val asset: Asset = Asset.fromJson(assetJson.get)
     val gridFsFile: Option[GridFSDBFile] = GRID_FS.findOne(asset.path)
 
@@ -52,8 +51,9 @@ class LibraryDao(val app: Altitude) extends BaseMongoDao("assets") with altitude
       val bytes: Array[Byte] = IOUtils.toByteArray(is.get)
       val preview: Preview = Preview(
         id = Some(gridFsFile.get.id.toString),
+        asset_id = asset_id,
         data = bytes,
-        mime = asset.mediaType.mime)
+        mime_type = asset.mediaType.mime)
       Some(preview)
     }
     finally {

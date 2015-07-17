@@ -57,6 +57,7 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
     )
   }
 
+  //FIXME - throws 404 - no Option needed
   override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting by ID '$id'", C.tag.DB)
 

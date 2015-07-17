@@ -11,16 +11,18 @@ object Preview {
     val data: String = (json \ C.Preview.DATA).as[String]
     Preview(
       id = (json \ C.Preview.ID).asOpt[String],
-      mime = (json \ C.Preview.MIME).as[String],
+      asset_id = (json \ C.Preview.ASSET_ID).as[String],
+      mime_type = (json \ C.Preview.MIME_TYPE).as[String],
       data =  Base64.decodeBase64(data)
     ).withCoreAttr(json)
   }
 }
 
-case class Preview(id: Option[String], mime: String, data: Array[Byte]) extends BaseModel {
+case class Preview(id: Option[String]=None, asset_id: String, mime_type: String, data: Array[Byte]) extends BaseModel {
   override def toJson = {
     Json.obj(
-      C.Preview.MIME -> mime,
+      C.Preview.ASSET_ID -> asset_id,
+      C.Preview.MIME_TYPE -> mime_type,
       C.Preview.DATA -> Base64.encodeBase64String(data)
     ) ++ coreJsonAttrs
   }

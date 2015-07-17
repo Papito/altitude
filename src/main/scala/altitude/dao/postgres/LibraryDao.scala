@@ -3,6 +3,7 @@ package altitude.dao.postgres
 import altitude.models.{Asset, MediaType, Preview}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
+import org.apache.commons.codec.binary.Base64
 import play.api.libs.json._
 
 
@@ -19,7 +20,6 @@ class LibraryDao(val app: Altitude) extends BasePostgresDao("asset") with altitu
       md5 = rec.get(C.Asset.MD5).get.asInstanceOf[String],
       mediaType = mediaType,
       sizeBytes = rec.get(C.Asset.SIZE_BYTES).get.asInstanceOf[Long],
-      //imageData = rec.get(C.Asset.IMAGE_PREVIEW).get.asInstanceOf[Array[Byte]],
       metadata = Json.parse(rec.get(C.Asset.METADATA).get.toString))
 
     addCoreAttrs(model, rec)
@@ -58,6 +58,46 @@ class LibraryDao(val app: Altitude) extends BasePostgresDao("asset") with altitu
     addRecord(jsonIn, asset_sql, asset_sql_vals)
   }
 
-  override def addPreview(asset: Asset, bytes: Array[Byte])(implicit txId: TransactionId = new TransactionId): Option[String] = throw new NotImplementedError
-  override def getPreview(id: String)(implicit txId: TransactionId = new TransactionId): Option[Preview]= throw new NotImplementedError
+  override def addPreview(asset: Asset, bytes: Array[Byte])
+                         (implicit txId: TransactionId = new TransactionId): Option[String] = {
+    require(asset.id.nonEmpty)
+    if (bytes.length < 0) return None
+
+    log.info(s"Saving preview for ${asset.path}")
+
+    val preview: Preview = Preview(asset_id=asset.id.get, mime_type=asset.mediaType.mime, data=bytes)
+
+    val preview_sql = s"""
+        INSERT INTO preview (
+             $coreSqlColsForInsert, ${C.Preview.ASSET_ID},
+             ${C.Preview.MIME_TYPE}, ${C.Preview.DATA})
+            VALUES($coreSqlValuesForInsert, ?, ?, ?)
+    """
+
+    val base64EncodedData = Base64.encodeBase64String(bytes)
+    val preview_sql_vals: List[Object] = List(
+      preview.asset_id,
+      preview.mime_type,
+      base64EncodedData)
+
+    addRecord(preview, preview_sql, preview_sql_vals)
+
+    Some(base64EncodedData)
+  }
+
+  override def getPreview(asset_id: String)
+                         (implicit txId: TransactionId = new TransactionId): Option[Preview] = {
+    log.debug(s"Getting preview for '$asset_id'")
+    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneSql("preview"), List(asset_id))
+
+    val data: Array[Byte] = Base64.decodeBase64(rec.get(C.Preview.DATA).asInstanceOf[String])
+    val preview = Preview(
+      id=Some(rec.get(C.Preview.ID).asInstanceOf[String]),
+      asset_id=rec.get(C.Preview.ASSET_ID).asInstanceOf[String],
+      mime_type=rec.get(C.Preview.MIME_TYPE).asInstanceOf[String],
+      data=data
+    )
+    addCoreAttrs(preview, rec.get)
+    Some(preview)
+  }
 }

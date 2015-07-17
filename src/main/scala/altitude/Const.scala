@@ -12,6 +12,7 @@ object Const {
 
   object IdType {
     val ID = "ID"
+    val QUERY = "QUERY"
   }
 
   trait Common {
@@ -34,8 +35,9 @@ object Const {
   }
 
   object Preview extends Common {
+    val ASSET_ID =  "asset_id"
     val DATA = "data"
-    val MIME = "mime"
+    val MIME_TYPE = "mime_type"
   }
 
   object Metadata extends Common

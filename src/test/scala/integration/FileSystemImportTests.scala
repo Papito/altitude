@@ -9,6 +9,15 @@ import org.scalatest.Matchers._
 
 @DoNotDiscover class FileSystemImportTests(val config: Map[String, String]) extends IntegrationTestCore {
 
+  test("import image (JPEG)") {
+    val asset = importFile("images/1.jpg")
+    val preview: Option[Preview] = altitude.service.library.getPreview(asset.id.get)
+    preview should not be None
+    preview.get.mime_type should equal("image/jpeg")
+    preview.get.data.length should not be 0
+  }
+
+/*
   test("import audio (MP3)") {
     val asset = importFile("audio/all.mp3")
     val optAuthor = (asset.metadata \ "Author").asOpt[String]
@@ -22,14 +31,6 @@ import org.scalatest.Matchers._
     assets should not be empty
   }
 
-  test("import image (JPEG)") {
-    val asset = importFile("images/1.jpg")
-    val preview: Option[Preview] = altitude.service.library.getPreview(asset.id.get)
-    preview should not be None
-    preview.get.mime should equal("image/jpeg")
-    preview.get.data.length should not be 0
-  }
-
   test("import duplicate") {
     importFile("images/1.jpg")
     val path = getClass.getResource(s"../files/incoming/images/1.jpg").getPath
@@ -39,6 +40,7 @@ import org.scalatest.Matchers._
       altitude.service.fileImport.importAsset(fileImportAsset)
     }
   }
+*/
 
   protected def importFile(p: String): Asset = {
     val path = getClass.getResource(s"../files/incoming/$p").getPath

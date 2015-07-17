@@ -1,5 +1,7 @@
 DROP SCHEMA IF EXISTS "altitude-test" CASCADE; CREATE SCHEMA "altitude-test";
 
+SET CONSTRAINTS ALL DEFERRED;
+
 CREATE TABLE _core (
   created_at timestamp WITHOUT TIME ZONE NOT NULL DEFAULT now(),
   updated_at timestamp WITHOUT TIME ZONE DEFAULT NULL
@@ -16,6 +18,13 @@ CREATE TABLE asset (
   filename TEXT NOT NULL,
   image_data BYTEA,
   size_bytes BIGINT NOT NULL
+) INHERITS (_core);
+
+CREATE TABLE preview (
+  id varchar(24) PRIMARY KEY,
+  asset_id varchar(24),
+  mime_type varchar(64) NOT NULL,
+  data TEXT NOT NULL
 ) INHERITS (_core);
 
 CREATE UNIQUE INDEX asset_md5 ON asset(md5);
