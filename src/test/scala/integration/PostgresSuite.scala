@@ -24,6 +24,7 @@ class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres"))
     txManager.withTransaction {
       log.info("SETUP")
       val stmt = txManager.transaction.conn.createStatement()
+      println(sql)
       stmt.executeUpdate(sql)
     }
     /*

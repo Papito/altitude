@@ -1,3 +1,5 @@
 package integration
 
-class MongoSuite extends AllTests(Map("datasource" -> "mongo"))
+import org.scalatest.DoNotDiscover
+
+@DoNotDiscover class MongoSuite extends AllTests(Map("datasource" -> "mongo"))

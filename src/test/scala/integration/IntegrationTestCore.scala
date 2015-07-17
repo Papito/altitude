@@ -35,7 +35,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
 
   override def afterEach() {
     dbUtilities.cleanup()
-    // should not have committed anything, else implicit transaction id is not being propagated somewhere
+    // should not have committed anythingf for tests
     require(Transaction.COMMITTED == 0)
   }
 
