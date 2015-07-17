@@ -14,6 +14,7 @@ import play.api.libs.json._
 object BaseMongoDao {
   // let each application in the JVM have its own client
   var CLIENTS = scala.collection.mutable.Map[Int, MongoClient]()
+
   protected def client(app: Altitude): MongoClient = {
     if (BaseMongoDao.CLIENTS.contains(app.id)) {
       return BaseMongoDao.CLIENTS.get(app.id).get
@@ -32,7 +33,6 @@ object BaseMongoDao {
 abstract class BaseMongoDao(private val collectionName: String) extends BaseDao {
   import com.mongodb.casbah.commons.conversions.scala._
   RegisterJodaTimeConversionHelpers()
-
   val log =  LoggerFactory.getLogger(getClass)
   private val DB_NAME: String = app.config.getString("db.mongo.db")
   protected def DB = BaseMongoDao.client(app)(DB_NAME)

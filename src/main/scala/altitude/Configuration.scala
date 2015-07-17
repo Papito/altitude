@@ -10,6 +10,8 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
     "app.name" -> "Altitude",
     "datasource" -> "mongo",
 
+    "preview.box.pixels" -> 200,
+
     "db.max_records" -> 1000,
     "db.postgres.user" -> "altitude",
     "db.postgres.password" -> "dba",

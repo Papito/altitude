@@ -22,7 +22,6 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
 
   def getById(id: String)(implicit txId: TransactionId = new TransactionId): Option[JsObject] = {
     txManager.asReadOnly[Option[JsObject]] {
-      //FIXME: must throw a NOT FOUND
       DAO.getById(id)
     }
   }

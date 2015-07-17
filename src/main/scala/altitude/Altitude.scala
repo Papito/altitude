@@ -4,7 +4,7 @@ import java.sql.DriverManager
 
 import altitude.dao.LibraryDao
 import altitude.service.{AbstractMetadataService, FileImportService, LibraryService, TikaMetadataService}
-import altitude.transactions.AbstractTransactionManager
+import altitude.transactions.{JdbcTransaction, AbstractTransactionManager}
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
 import net.codingwell.scalaguice.InjectorExtensions._
@@ -31,6 +31,7 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
   log.info(s"Datasource type: $dataSourceType", C.tag.APP)
 
   val app: Altitude = this
+  val JDBC_TRANSACTIONS = scala.collection.mutable.Map[Int, JdbcTransaction]()
 
   /*
   Inject dependencies
