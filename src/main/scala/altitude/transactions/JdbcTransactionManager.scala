@@ -63,7 +63,6 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
 
   override def asReadOnly[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
     val tx = transaction
-    println("\n !!!!!!! HERE\n")
 
     try {
       tx.setReadOnly(flag=true)
