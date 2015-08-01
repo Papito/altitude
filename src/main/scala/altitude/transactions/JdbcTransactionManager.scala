@@ -10,6 +10,8 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
   val log =  LoggerFactory.getLogger(getClass)
 
   def transaction(implicit txId: TransactionId): JdbcTransaction = {
+    log.debug(s"TX. Getting transaction for ${txId.id}")
+
     // see if we already have a transaction id defined
     if (app.JDBC_TRANSACTIONS.contains(txId.id)) {
       // we do, eh
@@ -61,6 +63,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
 
   override def asReadOnly[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
     val tx = transaction
+    println("\n !!!!!!! HERE\n")
 
     try {
       tx.setReadOnly(flag=true)

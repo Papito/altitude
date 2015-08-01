@@ -31,11 +31,12 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   override def beforeEach() = {
     println("\n")
     dbUtilities.createTransaction(txId)
+    log.info(s"TX. Test transaction ID is ${txId.id}")
   }
 
   override def afterEach() {
     dbUtilities.cleanup()
-    // should not have committed anythingf for tests
+    // should not have committed anything for tests
     require(Transaction.COMMITTED == 0)
   }
 

@@ -17,7 +17,16 @@ import org.scalatest.Matchers._
     preview.get.data.length should not be 0
   }
 
-  /*
+  test("import duplicate") {
+    importFile("images/1.jpg")
+    val path = getClass.getResource(s"../files/incoming/images/1.jpg").getPath
+    val fileImportAsset = new FileImportAsset(new File(path))
+
+    intercept[DuplicateException] {
+      altitude.service.fileImport.importAsset(fileImportAsset)
+    }
+  }
+
   test("import audio (MP3)") {
     val asset = importFile("audio/all.mp3")
     val optAuthor = (asset.metadata \ "Author").asOpt[String]
@@ -30,18 +39,7 @@ import org.scalatest.Matchers._
       val assets = altitude.service.fileImport.getFilesToImport(path=incomingPath)
       assets should not be empty
     }
-
-    test("import duplicate") {
-      importFile("images/1.jpg")
-      val path = getClass.getResource(s"../files/incoming/images/1.jpg").getPath
-      val fileImportAsset = new FileImportAsset(new File(path))
-
-      intercept[DuplicateException] {
-        altitude.service.fileImport.importAsset(fileImportAsset)
-      }
-    }
-  */
-
+  
   protected def importFile(p: String): Asset = {
     val path = getClass.getResource(s"../files/incoming/$p").getPath
     val fileImportAsset = new FileImportAsset(new File(path))

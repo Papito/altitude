@@ -11,15 +11,16 @@ class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres"))
   val log =  LoggerFactory.getLogger(getClass)
 
   override def beforeAll(): Unit = {
-    //Reset the database schema once
+    log.info("TEST. Resetting DB schema once")
 
-    val altitude: Altitude = new Altitude
-    implicit val txId: TransactionId = new TransactionId
-    val txManager = new JdbcTransactionManager(altitude)
 
     val evolutionPath = new java.io.File( "evolutions/postgres/1.sql" ).getCanonicalPath
     val sql = scala.io.Source.fromFile(evolutionPath).mkString
     log.info(s"Running $sql")
+
+    val altitude: Altitude = new Altitude
+    implicit val txId: TransactionId = new TransactionId
+    val txManager = new JdbcTransactionManager(altitude)
 
     txManager.withTransaction {
       log.info("SETUP")
