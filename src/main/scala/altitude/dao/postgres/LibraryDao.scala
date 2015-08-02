@@ -87,8 +87,16 @@ class LibraryDao(val app: Altitude) extends BasePostgresDao("asset") with altitu
 
   override def getPreview(asset_id: String)
                          (implicit txId: TransactionId = new TransactionId): Option[Preview] = {
-    log.debug(s"Getting preview for '$asset_id'")
-    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneSql("preview"), List(asset_id))
+    log.debug(s"Getting preview for asset id '$asset_id'")
+
+    val sql = s"""
+      SELECT ${C.Preview.ID}, *,
+             EXTRACT(EPOCH FROM created_at) AS created_at,
+             EXTRACT(EPOCH FROM updated_at) AS updated_at
+        FROM preview
+       WHERE ${C.Preview.ASSET_ID} = ?"""
+
+    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(sql, List(asset_id))
 
     val data: Array[Byte] = Base64.decodeBase64(rec.get(C.Preview.DATA).asInstanceOf[String])
     val preview = Preview(

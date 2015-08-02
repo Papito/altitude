@@ -119,7 +119,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
 
     val rec = res.get(0)
 
-    log.debug(s"Record: $rec")
+    //log.debug(s"Record: $rec")
     Some(rec.toMap[String, AnyRef])
   }
 

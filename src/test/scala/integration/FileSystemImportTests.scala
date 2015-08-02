@@ -34,12 +34,12 @@ import org.scalatest.Matchers._
     optAuthor.get should equal("Whitney Houston")
   }
 
-    test("import file list") {
-      val incomingPath = getClass.getResource("../files/incoming").getPath
-      val assets = altitude.service.fileImport.getFilesToImport(path=incomingPath)
-      assets should not be empty
-    }
-  
+  test("import file list") {
+    val incomingPath = getClass.getResource("../files/incoming").getPath
+    val assets = altitude.service.fileImport.getFilesToImport(path=incomingPath)
+    assets should not be empty
+  }
+
   protected def importFile(p: String): Asset = {
     val path = getClass.getResource(s"../files/incoming/$p").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
