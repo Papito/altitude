@@ -38,11 +38,11 @@ class LibraryDao(val app: Altitude) extends BasePostgresDao("asset") with altitu
      */
     val asset_sql = s"""
         INSERT INTO $tableName (
-             $coreSqlColsForInsert, ${C.Asset.PATH}, ${C.Asset.MD5},
+             $CORE_SQL_COLS_FOR_INSERT, ${C.Asset.PATH}, ${C.Asset.MD5},
              ${C.Asset.FILENAME}, ${C.Asset.SIZE_BYTES},
              ${C.Asset.MEDIA_TYPE}, ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE},
              ${C.Asset.METADATA})
-            VALUES($coreSqlValuesForInsert, ?, ?, ?, ?, ?, ?, ?, CAST(? AS jsonb))
+            VALUES($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?, ?, ?, ?, ?, CAST(? AS jsonb))
     """
 
     val asset_sql_vals: List[Object] = List(
@@ -69,9 +69,9 @@ class LibraryDao(val app: Altitude) extends BasePostgresDao("asset") with altitu
 
     val preview_sql = s"""
         INSERT INTO preview (
-             $coreSqlColsForInsert, ${C.Preview.ASSET_ID},
+             $CORE_SQL_COLS_FOR_INSERT, ${C.Preview.ASSET_ID},
              ${C.Preview.MIME_TYPE}, ${C.Preview.DATA})
-            VALUES($coreSqlValuesForInsert, ?, ?, ?)
+            VALUES($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?)
     """
 
     val base64EncodedData = Base64.encodeBase64String(bytes)
@@ -90,9 +90,7 @@ class LibraryDao(val app: Altitude) extends BasePostgresDao("asset") with altitu
     log.debug(s"Getting preview for asset id '$asset_id'")
 
     val sql = s"""
-      SELECT ${C.Preview.ID}, *,
-             EXTRACT(EPOCH FROM created_at) AS created_at,
-             EXTRACT(EPOCH FROM updated_at) AS updated_at
+      SELECT $DEFAULT_SQL_COLS_FOR_SELECT
         FROM preview
        WHERE ${C.Preview.ASSET_ID} = ?"""
 

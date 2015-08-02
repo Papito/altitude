@@ -25,34 +25,37 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     jdbcTxManager.transaction.conn
   }
 
-  protected val coreSqlColsForInsert = s"${C.Base.ID}, ${C.Base.CREATED_AT}"
-  protected val coreSqlValuesForInsert = "?, TO_TIMESTAMP(?)"
+  protected val CORE_SQL_COLS_FOR_INSERT = s"${C.Base.ID}, ${C.Base.CREATED_AT}"
+  protected val CORE_SQL_VALS_FOR_INSERT = "?, TO_TIMESTAMP(?)"
+
+  protected val DEFAULT_SQL_COLS_FOR_SELECT = s"""
+      ${C.Base.ID}, *,
+      EXTRACT(EPOCH FROM created_at) AS created_at,
+      EXTRACT(EPOCH FROM updated_at) AS updated_at
+    """
 
   protected def utcNow = Util.utcNow
 
   protected def dtAsJsString(dt: DateTime) = JsString(Util.isoDateTime(Some(dt)))
 
   // SQL to select the whole record, in very simple cases
-  protected def oneSql(tName: String = tableName) = {
-    s"""
-      SELECT ${C.Base.ID}, *,
-             EXTRACT(EPOCH FROM created_at) AS created_at,
-             EXTRACT(EPOCH FROM updated_at) AS updated_at
-        FROM $tName
+  protected val ONE_SQL = s"""
+      SELECT $DEFAULT_SQL_COLS_FOR_SELECT
+        FROM $tableName
        WHERE ${C.Base.ID} = ?"""
-  }
+
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     val sql: String =s"""
-      INSERT INTO $tableName ($coreSqlColsForInsert)
-           VALUES ($coreSqlValuesForInsert)"""
+      INSERT INTO $tableName ($CORE_SQL_COLS_FOR_INSERT)
+           VALUES ($CORE_SQL_VALS_FOR_INSERT)"""
 
     addRecord(jsonIn, sql, List[Object]())
   }
 
   override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'", C.tag.DB)
-    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneSql(), List(id))
+    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(ONE_SQL, List(id))
 
     rec match {
         case None => None
@@ -67,9 +70,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     val whereClauses: List[String] = for (column <- sqlColumns.toList) yield  s"$column = ?"
 
     val sql = s"""
-      SELECT ${C.Base.ID}, *,
-             EXTRACT(EPOCH FROM created_at) AS created_at,
-             EXTRACT(EPOCH FROM updated_at) AS updated_at
+      SELECT $DEFAULT_SQL_COLS_FOR_SELECT
         FROM $tableName
        WHERE ${whereClauses.mkString("AND")}"""
 
@@ -152,7 +153,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     )
   }
 
-  /* Given a model and an SQL record, "decipher" and set certain core properties
+  /* Given a model and an SQL record, decipher and set certain core properties
    */
   protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit = {
     val createdAtMilis = rec.getOrElse(C.Base.CREATED_AT, 0d).asInstanceOf[Double].toLong
