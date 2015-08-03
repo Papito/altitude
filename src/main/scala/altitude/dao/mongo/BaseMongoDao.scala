@@ -57,16 +57,17 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
     )
   }
 
-  override def getById(id: String)(implicit txId: TransactionId): JsObject = {
+  override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting by ID '$id'", C.tag.DB)
 
     val o: Option[DBObject] = COLLECTION.findOneByID(id)
 
-    if (o.isEmpty)
-      throw new NotFoundException(C.IdType.ID, id)
-
-    val json = Json.parse(o.get.toString).as[JsObject]
-    fixMongoFields(json)
+    o.isDefined match {
+      case false => None
+      case true =>
+        val json = Json.parse(o.get.toString).as[JsObject]
+        Some(fixMongoFields(json))
+    }
   }
 
   override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {

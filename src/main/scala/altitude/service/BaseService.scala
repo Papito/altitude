@@ -1,7 +1,8 @@
 package altitude.service
 
-import altitude.Altitude
+import altitude.{Const => C, Altitude}
 import altitude.dao.BaseDao
+import altitude.exceptions.NotFoundException
 import altitude.models.BaseModel
 import altitude.models.search.Query
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
@@ -22,7 +23,12 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
 
   def getById(id: String)(implicit txId: TransactionId = new TransactionId): JsObject = {
     txManager.asReadOnly[JsObject] {
-      DAO.getById(id)
+      val res: Option[JsObject] = DAO.getById(id)
+
+      res.isDefined match {
+        case false => throw new NotFoundException(C.IdType.ID, id)
+        case true => res.get
+      }
     }
   }
 

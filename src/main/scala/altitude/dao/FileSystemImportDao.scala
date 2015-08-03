@@ -35,6 +35,6 @@ class FileSystemImportDao(val app: Altitude) extends BaseDao {
   }
 
   override def add(json: JsObject)(implicit txId: TransactionId): JsObject = throw new NotImplementedError
-  override def getById(id: String)(implicit txId: TransactionId): JsObject = throw new NotImplementedError
+  override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = throw new NotImplementedError
   override def query(q: Query)(implicit txId: TransactionId): List[JsObject] = throw new NotImplementedError
 }

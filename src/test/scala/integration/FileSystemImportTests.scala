@@ -11,10 +11,9 @@ import org.scalatest.Matchers._
 
   test("import image (JPEG)") {
     val asset = importFile("images/1.jpg")
-    val preview: Option[Preview] = altitude.service.library.getPreview(asset.id.get)
-    preview should not be None
-    preview.get.mime_type should equal("image/jpeg")
-    preview.get.data.length should not be 0
+    val preview: Preview = altitude.service.library.getPreview(asset.id.get)
+    preview.mime_type should equal("image/jpeg")
+    preview.data.length should not be 0
   }
 
   test("import duplicate") {

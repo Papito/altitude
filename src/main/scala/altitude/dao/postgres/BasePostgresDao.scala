@@ -53,13 +53,13 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     addRecord(jsonIn, sql, List[Object]())
   }
 
-  override def getById(id: String)(implicit txId: TransactionId): JsObject = {
+  override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'", C.tag.DB)
     val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(ONE_SQL, List(id))
 
     rec match {
-        case None => throw new NotFoundException(C.IdType.ID, id)
-        case _ => makeModel(rec.get)
+        case None => None
+        case _ => Some(makeModel(rec.get))
       }
   }
 

@@ -7,7 +7,7 @@ import javax.imageio.stream.MemoryCacheImageOutputStream
 import javax.imageio.{ImageWriter, ImageWriteParam, IIOImage, ImageIO}
 
 import altitude.dao.LibraryDao
-import altitude.exceptions.DuplicateException
+import altitude.exceptions.{NotFoundException, DuplicateException}
 import altitude.models.search.Query
 import altitude.models.{Asset, Preview}
 import altitude.transactions.TransactionId
@@ -41,11 +41,15 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
     }
   }
 
-  def getPreview(id: String)(implicit txId: TransactionId = new TransactionId): Option[Preview] = {
+  def getPreview(id: String)(implicit txId: TransactionId = new TransactionId): Preview = {
     require(id.nonEmpty)
+    txManager.asReadOnly[Preview] {
+      val preview: Option[Preview] = DAO.getPreview(id)
 
-    txManager.asReadOnly[Option[Preview]] {
-      DAO.getPreview(id)
+      preview.isDefined match {
+        case false => throw new NotFoundException(C.IdType.ID, id)
+        case true => preview.get
+      }
     }
   }
 
