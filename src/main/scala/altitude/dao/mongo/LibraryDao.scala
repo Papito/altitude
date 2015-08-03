@@ -37,8 +37,8 @@ class LibraryDao(val app: Altitude) extends BaseMongoDao("assets") with altitude
   override def getPreview(asset_id: String)(implicit txId: TransactionId = new TransactionId): Option[Preview] = {
     log.debug(s"Getting preview for '$asset_id'")
     // get the asset
-    val assetJson: Option[JsObject] = this.getById(asset_id)
-    val asset: Asset = Asset.fromJson(assetJson.get)
+    val assetJson: JsObject = this.getById(asset_id)
+    val asset: Asset = Asset.fromJson(assetJson)
     val gridFsFile: Option[GridFSDBFile] = GRID_FS.findOne(asset.path)
 
     if (gridFsFile.isEmpty)

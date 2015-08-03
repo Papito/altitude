@@ -57,8 +57,7 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
     )
   }
 
-  //FIXME - throws 404 - no Option needed
-  override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = {
+  override def getById(id: String)(implicit txId: TransactionId): JsObject = {
     log.debug(s"Getting by ID '$id'", C.tag.DB)
 
     val o: Option[DBObject] = COLLECTION.findOneByID(id)
@@ -67,7 +66,7 @@ abstract class BaseMongoDao(private val collectionName: String) extends BaseDao 
       throw new NotFoundException(C.IdType.ID, id)
 
     val json = Json.parse(o.get.toString).as[JsObject]
-    Some(fixMongoFields(json))
+    fixMongoFields(json)
   }
 
   override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {

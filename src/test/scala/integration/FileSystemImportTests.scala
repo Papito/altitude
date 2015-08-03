@@ -49,7 +49,7 @@ import org.scalatest.Matchers._
     importedAsset.path should not be empty
     importedAsset.md5 should not be empty
 
-    val asset = altitude.service.library.getById(importedAsset.id.get).get: Asset
+    val asset = altitude.service.library.getById(importedAsset.id.get): Asset
     asset.mediaType should equal(importedAsset.mediaType)
     asset.path should not be empty
     asset.md5 should not be empty

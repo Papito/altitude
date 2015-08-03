@@ -20,8 +20,8 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
     }
   }
 
-  def getById(id: String)(implicit txId: TransactionId = new TransactionId): Option[JsObject] = {
-    txManager.asReadOnly[Option[JsObject]] {
+  def getById(id: String)(implicit txId: TransactionId = new TransactionId): JsObject = {
+    txManager.asReadOnly[JsObject] {
       DAO.getById(id)
     }
   }
