@@ -59,13 +59,16 @@ class LibraryDao(val app: Altitude) extends BasePostgresDao("asset") with altitu
   }
 
   override def addPreview(asset: Asset, bytes: Array[Byte])
-                         (implicit txId: TransactionId = new TransactionId): Option[String] = {
+                         (implicit txId: TransactionId = new TransactionId): Option[Preview] = {
     require(asset.id.nonEmpty)
     if (bytes.length < 0) return None
 
     log.info(s"Saving preview for ${asset.path}")
 
-    val preview: Preview = Preview(asset_id=asset.id.get, mime_type=asset.mediaType.mime, data=bytes)
+    val preview: Preview = Preview(
+      asset_id=asset.id.get,
+      mime_type=asset.mediaType.mime,
+      data=bytes)
 
     val preview_sql = s"""
         INSERT INTO preview (
@@ -82,7 +85,7 @@ class LibraryDao(val app: Altitude) extends BasePostgresDao("asset") with altitu
 
     addRecord(preview, preview_sql, preview_sql_vals)
 
-    Some(base64EncodedData)
+    Some(preview)
   }
 
   override def getPreview(asset_id: String)

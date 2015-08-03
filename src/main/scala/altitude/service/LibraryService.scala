@@ -53,7 +53,7 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
     }
   }
 
-  private def addPreview(asset: Asset)(implicit txId: TransactionId = new TransactionId): Option[String] = {
+  private def addPreview(asset: Asset)(implicit txId: TransactionId = new TransactionId): Option[Preview] = {
     asset.mediaType.mediaType match {
       case "image" =>
         val imageData = makeImageThumbnail(asset)

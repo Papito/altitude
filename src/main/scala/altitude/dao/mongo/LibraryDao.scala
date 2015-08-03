@@ -14,7 +14,7 @@ import play.api.libs.json.JsObject
 class LibraryDao(val app: Altitude) extends BaseMongoDao("assets") with altitude.dao.LibraryDao {
   protected def GRID_FS = GridFS(DB, "preview")
 
-  override def addPreview(asset: Asset, bytes: Array[Byte])(implicit txId: TransactionId = new TransactionId): Option[String] = {
+  override def addPreview(asset: Asset, bytes: Array[Byte])(implicit txId: TransactionId = new TransactionId): Option[Preview] = {
     if (bytes.length < 0) return None
     log.info(s"Saving preview for ${asset.path}")
 
@@ -26,12 +26,18 @@ class LibraryDao(val app: Altitude) extends BaseMongoDao("assets") with altitude
         fh.filename = asset.path
         fh.contentType = asset.mediaType.mime
       }
+
+      val preview = Preview(
+        id = Some(asset.path),
+        asset_id = asset.id.get,
+        data = bytes,
+        mime_type = asset.mediaType.mime)
+
+      Some(preview)
     }
     finally {
       if (is.isDefined) is.get.close()
     }
-
-    Some(Base64.encodeBase64String(bytes))
   }
 
   override def getPreview(asset_id: String)(implicit txId: TransactionId = new TransactionId): Option[Preview] = {
