@@ -30,7 +30,7 @@ object BaseMongoDao {
   }
 }
 
-abstract class BaseMongoDao(private val collectionName: String) extends BaseDao {
+abstract class BaseMongoDao(protected val collectionName: String) extends BaseDao {
   import com.mongodb.casbah.commons.conversions.scala._
   RegisterJodaTimeConversionHelpers()
   val log =  LoggerFactory.getLogger(getClass)

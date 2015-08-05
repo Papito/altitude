@@ -2,7 +2,7 @@ package altitude
 
 import java.sql.DriverManager
 
-import altitude.dao.{AssetDao, LibraryDao}
+import altitude.dao.{AssetDao, PreviewDao}
 import altitude.service._
 import altitude.transactions.{JdbcTransaction, AbstractTransactionManager}
 import altitude.{Const => C}
@@ -43,16 +43,16 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
           // transaction manager
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.VoidTransactionManager(app))
           // DAOs
-          bind[LibraryDao].toInstance(new altitude.dao.mongo.LibraryDao(app))
           bind[AssetDao].toInstance(new altitude.dao.mongo.AssetDao(app))
+          bind[PreviewDao].toInstance(new altitude.dao.mongo.PreviewDao(app))
         case "postgres" =>
           // register the JDBC driver
           DriverManager.registerDriver(new org.postgresql.Driver)
           // transaction manager
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
           // DAOs
-          bind[LibraryDao].toInstance(new altitude.dao.postgres.LibraryDao(app))
           bind[AssetDao].toInstance(new altitude.dao.postgres.AssetDao(app))
+          bind[PreviewDao].toInstance(new altitude.dao.postgres.PreviewDao(app))
         case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
       }
     }
@@ -67,5 +67,6 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
     val metadata: AbstractMetadataService = new TikaMetadataService
     val library: LibraryService = new LibraryService(app)
     val asset: AssetService = new AssetService(app)
+    val preview: PreviewService = new PreviewService(app)
   }
 }

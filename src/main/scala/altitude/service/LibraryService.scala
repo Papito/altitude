@@ -6,25 +6,27 @@ import java.io._
 import javax.imageio.stream.MemoryCacheImageOutputStream
 import javax.imageio.{ImageWriter, ImageWriteParam, IIOImage, ImageIO}
 
-import altitude.dao.LibraryDao
 import altitude.exceptions.{NotFoundException, DuplicateException}
 import altitude.models.search.Query
 import altitude.models.{Asset, Preview}
-import altitude.transactions.TransactionId
+import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import altitude.{Altitude, Const => C}
+import com.mongodb.casbah.gridfs.Imports._
 import net.codingwell.scalaguice.InjectorExtensions._
+import org.apache.commons.io.IOUtils
 import org.imgscalr.Scalr
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
-class LibraryService(app: Altitude) extends BaseService[Asset](app) {
+class LibraryService(app: Altitude) {
   val log =  LoggerFactory.getLogger(getClass)
-  override protected val DAO = app.injector.instance[LibraryDao]
+  protected val txManager = app.injector.instance[AbstractTransactionManager]
+
   val PREVIEW_BOX_SIZE = app.config.getInt("preview.box.pixels")
   val COMPOSITE_IMAGE: BufferedImage = new BufferedImage(PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE, BufferedImage.TYPE_INT_ARGB)
   val G2D: Graphics2D = COMPOSITE_IMAGE.createGraphics
 
-  override def add(obj: Asset)(implicit txId: TransactionId = new TransactionId): JsObject = {
+  def add(obj: Asset)(implicit txId: TransactionId = new TransactionId): JsObject = {
     txManager.withTransaction[JsObject] {
       log.info(s"\nAdding asset with MD5: ${obj.md5}\n")
       val query = Query(Map(C.Asset.MD5 -> obj.md5))
@@ -41,26 +43,38 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
     }
   }
 
-  def getPreview(id: String)(implicit txId: TransactionId = new TransactionId): Preview = {
-    require(id.nonEmpty)
-    txManager.asReadOnly[Preview] {
-      val preview: Option[Preview] = DAO.getPreview(id)
+  def getById(id: String)(implicit txId: TransactionId = new TransactionId): JsObject = {
+    app.service.asset.getById(id)
+  }
 
-      preview.isDefined match {
-        case false => throw new NotFoundException(C.IdType.ID, id)
-        case true => preview.get
-      }
-    }
+
+  def getPreview(asset_id: String)(implicit txId: TransactionId = new TransactionId): Preview = {
+    log.debug(s"Getting preview for '$asset_id'")
+    app.service.preview.getById(asset_id)
   }
 
   private def addPreview(asset: Asset)(implicit txId: TransactionId = new TransactionId): Option[Preview] = {
-    asset.mediaType.mediaType match {
+    require(asset.id.nonEmpty)
+    val previewData: Array[Byte] = asset.mediaType.mediaType match {
       case "image" =>
-        val imageData = makeImageThumbnail(asset)
-        log.debug(s"Asset image size ${imageData.length}")
+        makeImageThumbnail(asset)
+      case _ => new Array[Byte](0)
+    }
 
-        DAO.addPreview(asset, imageData)
-      case _ => None
+    previewData.length match {
+      //FIXME: How to make this > 0 condition?
+      case 0 => None
+      case _ =>
+        log.info(s"Saving preview for ${asset.path}")
+
+        val preview: Preview = Preview(
+          asset_id=asset.id.get,
+          mime_type=asset.mediaType.mime,
+          data=previewData)
+
+        app.service.preview.add(preview)
+
+        Some(preview)
     }
   }
 
