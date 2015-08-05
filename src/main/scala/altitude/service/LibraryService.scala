@@ -28,14 +28,14 @@ class LibraryService(app: Altitude) extends BaseService[Asset](app) {
     txManager.withTransaction[JsObject] {
       log.info(s"\nAdding asset with MD5: ${obj.md5}\n")
       val query = Query(Map(C.Asset.MD5 -> obj.md5))
-      val existing = DAO.query(query)
+      val existing = app.service.asset.query(query)
 
       if (existing.nonEmpty) {
         log.warn(s"Asset already exists for ${obj.path}")
         throw new DuplicateException(s"Duplicate for ${obj.path}")
       }
 
-      val assetJson: JsObject = DAO.add(obj)
+      val assetJson: JsObject = app.service.asset.add(obj)
       addPreview(assetJson)
       assetJson
     }

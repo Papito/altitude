@@ -16,7 +16,7 @@ class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres"))
 
     val evolutionPath = new java.io.File( "evolutions/postgres/1.sql" ).getCanonicalPath
     val sql = scala.io.Source.fromFile(evolutionPath).mkString
-    log.info(s"Running $sql")
+    //log.info(s"Running $sql")
 
     val altitude: Altitude = new Altitude
     implicit val txId: TransactionId = new TransactionId
@@ -25,7 +25,6 @@ class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres"))
     txManager.withTransaction {
       log.info("SETUP")
       val stmt = txManager.transaction.conn.createStatement()
-      println(sql)
       stmt.executeUpdate(sql)
     }
     /*
