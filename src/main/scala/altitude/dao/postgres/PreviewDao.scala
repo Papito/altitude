@@ -1,6 +1,6 @@
 package altitude.dao.postgres
 
-import altitude.models.{Preview, Asset, MediaType}
+import altitude.models.Preview
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
 import org.apache.commons.codec.binary.Base64

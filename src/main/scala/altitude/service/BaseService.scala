@@ -1,11 +1,11 @@
 package altitude.service
 
-import altitude.{Const => C, Altitude}
 import altitude.dao.BaseDao
 import altitude.exceptions.NotFoundException
 import altitude.models.BaseModel
 import altitude.models.search.Query
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
+import altitude.{Altitude, Const => C}
 import net.codingwell.scalaguice.InjectorExtensions._
 import play.api.libs.json.JsObject
 

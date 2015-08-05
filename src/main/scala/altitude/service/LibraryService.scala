@@ -1,19 +1,16 @@
 package altitude.service
 
 import java.awt.image.BufferedImage
-import java.awt.{AlphaComposite, Color, Graphics2D}
+import java.awt.{AlphaComposite, Graphics2D}
 import java.io._
-import javax.imageio.stream.MemoryCacheImageOutputStream
-import javax.imageio.{ImageWriter, ImageWriteParam, IIOImage, ImageIO}
+import javax.imageio.ImageIO
 
-import altitude.exceptions.{NotFoundException, DuplicateException}
+import altitude.exceptions.DuplicateException
 import altitude.models.search.Query
 import altitude.models.{Asset, Preview}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import altitude.{Altitude, Const => C}
-import com.mongodb.casbah.gridfs.Imports._
 import net.codingwell.scalaguice.InjectorExtensions._
-import org.apache.commons.io.IOUtils
 import org.imgscalr.Scalr
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject

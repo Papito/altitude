@@ -1,7 +1,7 @@
 import javax.servlet.ServletContext
 
 import altitude.Environment
-import altitude.controllers.{AssetServlet, AltitudeServlet, ImportServlet}
+import altitude.controllers.{AltitudeServlet, AssetServlet, ImportServlet}
 import org.scalatra._
 import org.slf4j.LoggerFactory
 

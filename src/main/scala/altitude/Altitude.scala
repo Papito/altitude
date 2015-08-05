@@ -4,7 +4,7 @@ import java.sql.DriverManager
 
 import altitude.dao.{AssetDao, PreviewDao}
 import altitude.service._
-import altitude.transactions.{JdbcTransaction, AbstractTransactionManager}
+import altitude.transactions.{AbstractTransactionManager, JdbcTransaction}
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
 import net.codingwell.scalaguice.InjectorExtensions._

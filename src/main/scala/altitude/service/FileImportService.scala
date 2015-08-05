@@ -1,14 +1,12 @@
 package altitude.service
 
 import java.io.{File, FileInputStream, InputStream}
-import java.util.zip.Checksum
 
 import altitude.dao.FileSystemImportDao
 import altitude.models.{Asset, FileImportAsset, MediaType}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
 import org.apache.commons.codec.digest.DigestUtils
-import org.apache.commons.io.FileUtils
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
