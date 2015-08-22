@@ -60,8 +60,7 @@ class LibraryService(app: Altitude) {
 
     previewData.length match {
       //FIXME: How to make this > 0 condition?
-      case 0 => None
-      case _ =>
+      case size if size > 0 =>
         log.info(s"Saving preview for ${asset.path}")
 
         val preview: Preview = Preview(
@@ -72,6 +71,7 @@ class LibraryService(app: Altitude) {
         app.service.preview.add(preview)
 
         Some(preview)
+      case size if size == 0 => None
     }
   }
 
