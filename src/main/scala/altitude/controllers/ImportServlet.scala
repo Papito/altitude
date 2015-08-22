@@ -17,14 +17,6 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
   implicit protected val jsonFormats: Formats = DefaultFormats
 
   get("/") {
-    app.txManager.withTransaction {
-      app.txManager.withTransaction {
-        app.txManager.asReadOnly {
-          log.info("I AM IN A TRANSACTION, BITCHES!")
-        }
-      }
-    }
-
     contentType="text/html"
     ssp("/import")
   }
