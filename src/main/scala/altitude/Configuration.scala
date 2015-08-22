@@ -12,6 +12,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
 
     "preview.box.pixels" -> 200,
 
+    // safeguard for maximum records allowed at once without pagination
     "db.max_records" -> 1000,
     "db.postgres.user" -> "altitude",
     "db.postgres.password" -> "dba",

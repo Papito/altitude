@@ -24,6 +24,7 @@
         <div id="import-button" class="col-md-2 col-lg-2">
             <button type="button" data-bind="click: importAssets, visible: !isImporting()" class="btn btn-default">Start Import</button>
             <button type="button" data-bind="click: cancelImportAssets, visible: isImporting()" class="btn btn-danger">STOP</button>
+        </div>
     </div>
 </div>
 
@@ -32,7 +33,7 @@
 
 <script>
     $(document).ready(function() {
-    var importViewModel = new ImportViewModel();
-    ko.applyBindings(importViewModel);
+        var importViewModel = new ImportViewModel();
+        ko.applyBindings(importViewModel);
     });
 </script>
