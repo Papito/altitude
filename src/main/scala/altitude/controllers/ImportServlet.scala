@@ -44,10 +44,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
               var asset: Option[Asset] = None
 
               val assetResponseTxt = try {
-                if (!assetsIt.hasNext) {
-                  throw new EndOfImportAssets
-                }
-
+                if (!assetsIt.hasNext) throw new EndOfImportAssets
                 val importAsset: FileImportAsset = assetsIt.next()
 
                 //FIXME: go until end or valid asset
