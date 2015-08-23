@@ -1,6 +1,6 @@
 package altitude.controllers
 
-import altitude.exceptions.DuplicateException
+import altitude.exceptions.{EndOfImportAssets, DuplicateException}
 import altitude.models.{Asset, FileImportAsset}
 import org.json4s._
 import org.scalatra._
@@ -22,53 +22,51 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
   }
 
   atmosphere("/ws") {
-    val assets = app.service.fileImport.getFilesToImport(path="/mnt/hgfs/import/")
+    val assets = app.service.fileImport.getFilesToImport(path="/mnt/hgfs/import/drivers/hilton")
     val assetsIt = assets.toIterator
 
     new AtmosphereClient {
-      def receive = {
+      def receive: AtmoReceive = {
         case Connected =>
           log.info("Client connected")
         case Disconnected(disconnector, Some(error)) =>
           log.info("Client disconnected")
         case Error(Some(error)) =>
+          error.printStackTrace()
+
         case TextMessage(text) =>
           log.info(s"Received text: $text")
-          text match {
+
+          val responseTxt: String =  text match {
             case "total" =>
-              val jsonOut = JsObject(Seq("total" -> JsNumber(assets.size)))
-              val dataOut = jsonOut.toString()
-              log.info(dataOut)
-              this.send(dataOut)
+              JsObject(Seq("total" -> JsNumber(assets.size))).toString()
             case "next" =>
-
-              val importAsset: FileImportAsset = assetsIt.next()
-
               var asset: Option[Asset] = None
 
-              try {
+              val assetResponseTxt = try {
+                if (!assetsIt.hasNext) {
+                  throw new EndOfImportAssets
+                }
+
+                val importAsset: FileImportAsset = assetsIt.next()
+
+                //FIXME: go until end or valid asset
                 asset = app.service.fileImport.importAsset(importAsset)
+
+                JsObject(Seq("asset" -> asset.get.toJson)).toString()
               }
               catch {
                 case ex: DuplicateException =>
-                  val dataOut = JsObject(Seq("warning" -> JsString("Duplicate"))).toString()
-                  log.info(dataOut)
-                  this.send(dataOut)
+                  JsObject(Seq("warning" -> JsString("Duplicate"))).toString()
+                case ex: EndOfImportAssets => ""
                 case ex: Throwable =>
-                  ex.printStackTrace()
-                  val dataOut = JsObject(Seq("error" -> JsString(ex.getMessage))).toString()
-                  log.info(dataOut)
-                  this.send(dataOut)
+                  JsObject(Seq("error" -> JsString(ex.getMessage))).toString()
               }
 
-              val jsonOut = asset.isDefined match {
-                case true => JsObject(Seq("asset" -> asset.get.toJson))
-                case false => JsObject(Seq("warning" -> JsString("Skipping")))
-              }
-              val dataOut = jsonOut.toString()
-              log.info(dataOut)
-              this.send(dataOut)
+              assetResponseTxt
           }
+          log.info(responseTxt)
+          this.send(responseTxt)
       }
     }
   }

@@ -71,7 +71,7 @@ ImportViewModel = BaseViewModel.extend({
                 self.cancelImportAssets();
                 return;
             }
-            //console.log('ws > ' + e.data);
+            console.log('ws > ' + e.data);
 
             var jsonData = JSON.parse(e.data);
             self.responseHandler(jsonData);
