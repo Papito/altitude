@@ -55,6 +55,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
               catch {
                 case ex: DuplicateException =>
                   JsObject(Seq(
+                    //FIXME: constsants
                     "warning" -> JsString("Duplicate"),
                     "asset" -> ex.asset.toJson)).toString()
                 case ex: EndOfImportAssets => "END"

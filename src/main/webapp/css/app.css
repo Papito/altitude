@@ -1,7 +1,9 @@
+/* GLOBAL */
 body {
     padding-top: 70px;
 }
 
+/* IMPORT */
 #import-controls {
     border-bottom: 1px solid #1c1e22;
     padding-bottom: 0.8em;
@@ -33,10 +35,18 @@ body {
     padding-top: .5em;
 }
 
-#import-controls #import-button{
+#import-controls #startStop{
     text-align: center;
 }
 
-#import-button button {
+#import-controls #startStop button {
     width: 90%;
+}
+
+#import-controls #imagePreview {
+    margin: 1em;
+}
+
+#import-controls #currentPath {
+    font-size: .8em;
 }
