@@ -2,41 +2,49 @@
     <script src="/js/app/import.js"></script>
 #end
 
-<div class="row" id="import-controls">
-
-    <div class="col-md-10 col-lg-10">
-        <div class="progress" data-bind="visible: isImporting() && assetsImportedCnt() > 0">
-            <div data-bind="attr: {'aria-valuenow': percentComplete}, style: {width: percentComplete() + '%'}"
-                 class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-            <h4><span data-bind="text: percentComplete"></span>%</h4>
-        </div>
-        </div>
-        <div id="collecting-data-text" data-bind="visible: isImporting() && assetsImportedCnt() == 0">
-            <div class="alert alert-success" role="alert">
-                <h4>Collecting asset info ...</h4>
+<div class="row" id="importControls">
+    <div class="col-md-12 col-lg-12">
+        <div class="row">
+           <div class="col-md-10 col-lg-10">
+                <div class="progress" data-bind="visible: isImporting() && assetsImportedCnt() > 0">
+                    <div data-bind="attr: {'aria-valuenow': percentComplete}, style: {width: percentComplete() + '%'}"
+                        class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                        <h4><span data-bind="text: percentComplete"></span>%</h4>
+                    </div>
+                </div>
+                <div id="collecting-data-text" data-bind="visible: isImporting() && assetsImportedCnt() == 0">
+                    <div class="alert alert-success" role="alert">
+                        <h4>Collecting asset info ...</h4>
+                    </div>
+                </div>
+                <div id="asset-count-text" data-bind="visible: isImporting() && totalAssetsCnt()">
+                    <strong>
+                        Importing asset
+                        <span data-bind="text: assetsImportedCnt()"></span> of
+                        <span data-bind="text: totalAssetsCnt()"></span>
+                    </strong>
+                    <span id="currentPath" data-bind="text: currentPath"></span>
+                </div>
+                <div class="row">
+                    <div class="col-md-5">
+                        <!-- FIXME: automatic centering based on image width - or app settings -->
+                    </div>
+                    <div class="col-md-7">
+                        <img id="imagePreview" data-bind="visible: previewUrl(), attr: {'src': previewUrl()}"/>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div id="asset-count-text" data-bind="visible: isImporting() && totalAssetsCnt()">
-            <strong>
-                Importing asset
-                <span data-bind="text: assetsImportedCnt()"></span> of
-                <span data-bind="text: totalAssetsCnt()"></span>
-            </strong>
-            <span id="currentPath" data-bind="text: currentPath"></span>
+            <div id="startStop" class="col-md-2 col-lg-2">
+                <button id="start" type="button" data-bind="visible: !isImporting(), click: importAssets" class="btn btn-default">Start Import</button>
+                <button id="stop" type="button" data-bind=" visible: isImporting(), click: cancelImportAssets" class="btn btn-danger">STOP</button>
+            </div>
         </div>
         <div class="row">
-            <div class="col-md-5">
-            <!-- FIXME: automatic centering based on image width - or app settings -->
-            </div>
-            <div class="col-md-7">
-                <img id="imagePreview" data-bind="visible: previewUrl(), attr: {'src': previewUrl()}"/>
+            <div id="importMessages" class="col-md-12">
             </div>
         </div>
-    </div>
-    <div id="startStop" class="col-md-2 col-lg-2">
-        <button id="start" type="button" data-bind="visible: !isImporting(), click: importAssets" class="btn btn-default">Start Import</button>
-        <button id="stop" type="button" data-bind=" visible: isImporting(), click: cancelImportAssets" class="btn btn-danger">STOP</button>
-    </div>
+
+</div>
 </div>
 
 <script>

@@ -38,6 +38,18 @@ ImportViewModel = BaseViewModel.extend({
         }, this);
     },
 
+    addWarning: function(asset, message) {
+        $("#importMessages").prepend(
+            '<div class="message"><button type="button" class="btn btn-warning">' +
+            message + '</button>&nbsp;&nbsp;' + asset.path + '</div>');
+        var messageCount = $("#importMessages .message").length;
+
+        if (messageCount > 20) {
+            var el = $("#importMessages .message").last();
+            $(el).remove();
+        }
+    },
+
     cancelImportAssets: function() {
         console.log('Closing websocket');
         this.isImporting(false);
@@ -47,6 +59,7 @@ ImportViewModel = BaseViewModel.extend({
         this.totalAssetsCnt(0);
         this.assetsImportedCnt(0);
         $('#imported-assets').html("");
+        $("#importMessages").html("");
     },
 
     importAssets: function() {
@@ -71,7 +84,7 @@ ImportViewModel = BaseViewModel.extend({
                 self.cancelImportAssets();
                 return;
             }
-            console.log('ws > ' + e.data);
+            //console.log('ws > ' + e.data);
 
             var jsonData = JSON.parse(e.data);
             self.responseHandler(jsonData);
@@ -90,6 +103,11 @@ ImportViewModel = BaseViewModel.extend({
             this.currentAsset(json.asset);
             this.assetsImportedCnt(this.assetsImportedCnt() + 1);
         }
+
+        if (json.warning) {
+            this.addWarning(json.asset, json.warning);
+        }
+
         this.sendCommand('next', this.handleAsset);
     },
 
