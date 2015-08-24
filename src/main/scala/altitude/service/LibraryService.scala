@@ -31,7 +31,7 @@ class LibraryService(app: Altitude) {
 
       if (existing.nonEmpty) {
         log.warn(s"Asset already exists for ${obj.path}")
-        throw new DuplicateException(s"Duplicate for ${obj.path}")
+        throw new DuplicateException(obj)
       }
 
       val assetJson: JsObject = app.service.asset.add(obj)
@@ -59,7 +59,6 @@ class LibraryService(app: Altitude) {
     }
 
     previewData.length match {
-      //FIXME: How to make this > 0 condition?
       case size if size > 0 =>
         log.info(s"Saving preview for ${asset.path}")
 

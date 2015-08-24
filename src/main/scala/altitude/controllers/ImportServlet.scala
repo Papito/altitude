@@ -22,7 +22,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
   }
 
   atmosphere("/ws") {
-    val assets = app.service.fileImport.getFilesToImport(path="/mnt/hgfs/import/drivers/hilton")
+    val assets = app.service.fileImport.getFilesToImport(path="/mnt/hgfs/import")
     val assetsIt = assets.toIterator
 
     new AtmosphereClient {
@@ -54,8 +54,10 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
               }
               catch {
                 case ex: DuplicateException =>
-                  JsObject(Seq("warning" -> JsString("Duplicate"))).toString()
-                case ex: EndOfImportAssets => ""
+                  JsObject(Seq(
+                    "warning" -> JsString("Duplicate"),
+                    "asset" -> ex.asset.toJson)).toString()
+                case ex: EndOfImportAssets => "END"
                 case ex: Throwable =>
                   JsObject(Seq("error" -> JsString(ex.getMessage))).toString()
               }

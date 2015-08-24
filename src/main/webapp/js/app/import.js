@@ -67,7 +67,7 @@ ImportViewModel = BaseViewModel.extend({
         };
 
         this.socket.onmessage = function (e) {
-            if (!e.data) {
+            if (!e.data || e.data == "END") {
                 self.cancelImportAssets();
                 return;
             }
