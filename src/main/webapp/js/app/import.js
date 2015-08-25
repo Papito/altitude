@@ -48,6 +48,13 @@ ImportViewModel = BaseViewModel.extend({
     addError: function(asset, message) {
         $("#importMessages").prepend(
             '<div class="message"><button type="button" class="btn btn-danger">' +
+            message + '</button>&nbsp;&nbsp;' + asset.absolutePath + '</div>');
+        this.trimMessages();
+    },
+
+    addCritical: function(asset, message) {
+        $("#importMessages").prepend(
+            '<div class="message"><button type="button" class="btn btn-danger">' +
             message + '</button>&nbsp;&nbsp;</div>');
         this.trimMessages();
     },
@@ -79,7 +86,7 @@ ImportViewModel = BaseViewModel.extend({
         this.totalAssetsCnt(0);
         this.assetsImportedCnt(0);
         $('#imported-assets').html("");
-        $("#importMessages").html("");
+        //$("#importMessages").html("");
     },
 
     importAssets: function() {
@@ -119,16 +126,19 @@ ImportViewModel = BaseViewModel.extend({
     },
 
     handleAsset: function (json) {
+        this.assetsImportedCnt(this.assetsImportedCnt() + 1);
         if (json.asset) {
             this.currentAsset(json.asset);
-            this.assetsImportedCnt(this.assetsImportedCnt() + 1);
         }
 
         if (json.warning) {
             this.addWarning(json.asset, json.warning);
         }
         else if (json.error) {
-            this.addError(json.asset, json.error);
+            this.addError(json.importAsset, json.error);
+        }
+        else if (json.critical) {
+            this.addCritical(json.asset, json.critical);
         }
         else {
             this.addSuccess(json.asset);
