@@ -44,18 +44,19 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
               var asset: Option[Asset] = None
 
               val assetResponseTxt = try {
-                if (!assetsIt.hasNext) throw new EndOfImportAssets
-                val importAsset: FileImportAsset = assetsIt.next()
 
-                //FIXME: go until end or valid asset
-                asset = app.service.fileImport.importAsset(importAsset)
+                while (asset.isEmpty) {
+                  if (!assetsIt.hasNext) throw new EndOfImportAssets
+                  val importAsset: FileImportAsset = assetsIt.next()
+                  asset = app.service.fileImport.importAsset(importAsset)
+                }
 
                 JsObject(Seq("asset" -> asset.get.toJson)).toString()
               }
               catch {
                 case ex: DuplicateException =>
                   JsObject(Seq(
-                    //FIXME: constsants
+                    //FIXME: constants
                     "warning" -> JsString("Duplicate"),
                     "asset" -> ex.asset.toJson)).toString()
                 case ex: EndOfImportAssets => "END"

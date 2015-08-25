@@ -42,6 +42,26 @@ ImportViewModel = BaseViewModel.extend({
         $("#importMessages").prepend(
             '<div class="message"><button type="button" class="btn btn-warning">' +
             message + '</button>&nbsp;&nbsp;' + asset.path + '</div>');
+        this.trimMessages();
+    },
+
+    addError: function(asset, message) {
+        $("#importMessages").prepend(
+            '<div class="message"><button type="button" class="btn btn-danger">' +
+            message + '</button>&nbsp;&nbsp;</div>');
+        this.trimMessages();
+    },
+
+    addSuccess: function(asset) {
+        $("#importMessages").prepend(
+            '<div class="message">' +
+                '<button type="button" class="btn btn-success">Imported</button>' +
+                '&nbsp;&nbsp;' + asset.path +
+            '</div>');
+        this.trimMessages();
+    },
+
+    trimMessages: function() {
         var messageCount = $("#importMessages .message").length;
 
         if (messageCount > 20) {
@@ -106,6 +126,12 @@ ImportViewModel = BaseViewModel.extend({
 
         if (json.warning) {
             this.addWarning(json.asset, json.warning);
+        }
+        else if (json.error) {
+            this.addError(json.asset, json.error);
+        }
+        else {
+            this.addSuccess(json.asset);
         }
 
         this.sendCommand('next', this.handleAsset);
