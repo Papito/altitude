@@ -1,4 +1,5 @@
 #set (assets)
+    <script src="/js/lib/jquery-atmosphere.js"></script>
     <script src="/js/app/import.js"></script>
 #end
 
