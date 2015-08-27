@@ -35,7 +35,7 @@
             </div>
             <div id="startStop" class="col-md-2 col-lg-2">
                 <button id="start" type="button" data-bind="visible: !isImporting(), click: importAssets" class="btn btn-default">Start Import</button>
-                <button id="stop" type="button" data-bind=" visible: isImporting(), click: cancelImportAssets" class="btn btn-danger">STOP</button>
+                <button id="stop" type="button" data-bind=" visible: isImporting(), click: cancelImport" class="btn btn-danger">STOP</button>
             </div>
         </div>
         <div class="row">

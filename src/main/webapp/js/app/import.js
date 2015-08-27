@@ -1,3 +1,4 @@
+
 function Asset(data) {
     this.id = data ? data.id : null;
     this.fileName = data ? data.fileName : null;
@@ -7,11 +8,12 @@ function Asset(data) {
 
 ImportViewModel = BaseViewModel.extend({
     constructor : function() {
+        "use strict";
+
         this.base();
         console.log('Initializing import view model');
 
         var self = this;
-        this.socket = null;
         this.isImporting = ko.observable(false);
         this.totalAssetsCnt = ko.observable(0);
         this.assetsImportedCnt = ko.observable(0);
@@ -77,12 +79,11 @@ ImportViewModel = BaseViewModel.extend({
         }
     },
 
-    cancelImportAssets: function() {
+    cancelImport: function() {
         console.log('Closing websocket');
+        this.subSocket.close();
         this.isImporting(false);
         this.currentAsset(null);
-        this.socket.close();
-        this.socket = null;
         this.totalAssetsCnt(0);
         this.assetsImportedCnt(0);
         $('#imported-assets').html("");
@@ -91,38 +92,64 @@ ImportViewModel = BaseViewModel.extend({
 
     importAssets: function() {
         var self = this;
-        // FIXME: http://stackoverflow.com/questions/10406930/how-to-construct-a-websocket-uri-relative-to-the-page-uri
-        this.socket = new WebSocket('ws://localhost:8080/import/ws');
 
-        this.socket.onopen = function () {
+        this.socket = $.atmosphere;
+
+        this.request = {
+            url: "/import/ws",
+            contentType: "text/plain",
+            logLevel: 'debug',
+            transport: 'websocket',
+            fallbackTransport: 'long-polling'
+        };
+        console.log('Initialized Atmosphere');
+
+        this.request.onOpen = function(response) {
+            console.log('Atmosphere connected using ' + response.transport);
             self.isImporting(true);
-            console.log('Socket connected')
             self.sendCommand('total', self.handleTotal);
         };
 
-        this.socket.onerror = function (error) {
-            self.isImporting(false);
-            console.log('!!! WebSocket Error !!!');
-            console.log(error);
+        this.request.onReconnect = function(rq, rs) {
+            self.socket.info("Reconnecting");
         };
 
-        this.socket.onmessage = function (e) {
-            if (!e.data || e.data == "END") {
-                self.cancelImportAssets();
+        this.request.onMessage = function(rs) {
+            console.log(rs);
+            var message = rs.responseBody;
+            console.log('ws > ' + message);
+
+            if (!message || message == "END") {
+                self.cancelImport();
                 return;
             }
-            //console.log('ws > ' + e.data);
 
-            var jsonData = JSON.parse(e.data);
-            self.responseHandler(jsonData);
-
+            try {
+                var json = jQuery.parseJSON(message);
+                self.responseHandler(json);
+            } catch (e) {
+                console.log('This doesn\'t look like a valid JSON object: ', message);
+            }
         };
+
+        this.request.onClose = function(rs) {
+            console.log("Closing connection")
+        };
+
+        this.request.onError = function(rs) {
+            //FIXME: banner error
+            self.cancelImport();
+            console.log("Socket Error");
+            console.log(rs);
+        };
+
+        this.subSocket = self.socket.subscribe(self.request);
     },
 
     sendCommand: function(cmd, handler) {
         console.log('ws < ' + cmd);
         this.responseHandler = handler;
-        this.socket.send(cmd);
+        this.subSocket.push(cmd);
     },
 
     handleAsset: function (json) {
@@ -138,6 +165,7 @@ ImportViewModel = BaseViewModel.extend({
             this.addError(json.importAsset, json.error);
         }
         else if (json.critical) {
+            //FIXME: banner error
             this.addCritical(json.asset, json.critical);
         }
         else {

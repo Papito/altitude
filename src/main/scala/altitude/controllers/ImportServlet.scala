@@ -22,14 +22,16 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
 
   atmosphere("/ws") {
     new AtmosphereClient {
-      val assets = app.service.fileImport.getFilesToImport(path="/mnt/hgfs/import")
-      val assetsIt = assets.toIterator
+      var assets: Option[List[FileImportAsset]] = None
+      var assetsIt: Option[Iterator[FileImportAsset]] = None
       var criticalException: Option[Throwable] = None
 
       def receive: AtmoReceive = {
         case TextMessage("total") =>
           log.info("WS -> total")
-          val responseTxt = JsObject(Seq("total" -> JsNumber(assets.size))).toString()
+          assets = Some(app.service.fileImport.getFilesToImport(path="/mnt/hgfs/import"))
+          assetsIt = Some(assets.get.toIterator)
+          val responseTxt = JsObject(Seq("total" -> JsNumber(assets.get.size))).toString()
           log.info(s"WS <- $responseTxt")
           this.send(responseTxt)
 
@@ -44,8 +46,8 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
               importAsset = None
               asset = None
               while (asset.isEmpty) {
-                if (!assetsIt.hasNext || criticalException.isDefined) throw new StopImport
-                importAsset = Some(assetsIt.next())
+                if (!assetsIt.get.hasNext || criticalException.isDefined) throw new StopImport
+                importAsset = Some(assetsIt.get.next())
                 asset = app.service.fileImport.importAsset(importAsset.get)
               }
 
@@ -73,6 +75,9 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
           log.info(s"WS <- $responseTxt")
           this.send(responseTxt)
         } // end "next"
+
+        case TextMessage(data: String) =>
+          log.info(s"WS -> $data")
 
         case Connected =>
           log.info("Client connected")
