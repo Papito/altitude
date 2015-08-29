@@ -44,7 +44,6 @@ class LibraryService(app: Altitude) {
     app.service.asset.getById(id)
   }
 
-
   def getPreview(asset_id: String)(implicit txId: TransactionId = new TransactionId): Preview = {
     log.debug(s"Getting preview for '$asset_id'")
     app.service.preview.getById(asset_id)
@@ -52,6 +51,7 @@ class LibraryService(app: Altitude) {
 
   private def addPreview(asset: Asset)(implicit txId: TransactionId = new TransactionId): Option[Preview] = {
     require(asset.id.nonEmpty)
+
     val previewData: Array[Byte] = asset.mediaType.mediaType match {
       case "image" =>
         makeImageThumbnail(asset)
@@ -70,29 +70,29 @@ class LibraryService(app: Altitude) {
         app.service.preview.add(preview)
 
         Some(preview)
-      case size if size == 0 => None
+      case _ => None
     }
   }
 
   private def makeImageThumbnail(asset: Asset): Array[Byte] = {
-
     val inFile = new File(asset.path)
     val srcImage: BufferedImage = ImageIO.read(inFile)
-    val scaledImage: BufferedImage = Scalr.resize(srcImage, Scalr.Method.QUALITY, PREVIEW_BOX_SIZE)
-    var x: Int = 0
-    var y: Int = 0
+    val scaledImage: BufferedImage = Scalr.resize(srcImage, Scalr.Method.ULTRA_QUALITY, PREVIEW_BOX_SIZE)
     val height: Int = scaledImage.getHeight
     val width: Int = scaledImage.getWidth
-    if (height > width) {
-      x = (PREVIEW_BOX_SIZE - width) / 2
+
+    val x: Int = height > width match {
+      case true => (PREVIEW_BOX_SIZE - width) / 2
+      case false => 0
     }
-    if (height < width) {
-      y = (PREVIEW_BOX_SIZE - height) / 2
+
+    val y: Int = height < width match {
+      case true => (PREVIEW_BOX_SIZE - height) / 2
+      case false => 0
     }
 
     G2D.setComposite(AlphaComposite.Clear)
     G2D.fillRect(0, 0, PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE)
-    G2D.drawImage(COMPOSITE_IMAGE, 0, 0, null)
     G2D.setComposite(AlphaComposite.Src)
     G2D.drawImage(scaledImage, x, y, null)
     val byteArray: ByteArrayOutputStream = new ByteArrayOutputStream

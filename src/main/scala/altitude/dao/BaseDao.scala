@@ -7,6 +7,8 @@ import play.api.libs.json.JsObject
 
 trait BaseDao {
   val app: Altitude
+  protected val MAX_RECORDS = app.config.getInt("db.max_records")
+
   def add(json: JsObject)(implicit txId: TransactionId): JsObject
   def getById(id: String)(implicit txId: TransactionId): Option[JsObject]
   def getAll()(implicit txId: TransactionId): List[JsObject] = throw new NotImplementedError

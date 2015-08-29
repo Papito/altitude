@@ -9,6 +9,7 @@ import scala.language.implicitConversions
 object Preview {
   implicit def fromJson(json: JsValue): Preview = {
     val data: String = (json \ C.Preview.DATA).as[String]
+
     Preview(
       id = (json \ C.Preview.ID).asOpt[String],
       asset_id = (json \ C.Preview.ASSET_ID).as[String],
@@ -18,7 +19,11 @@ object Preview {
   }
 }
 
-case class Preview(id: Option[String]=None, asset_id: String, mime_type: String, data: Array[Byte]) extends BaseModel {
+case class Preview(id: Option[String]=None,
+                   asset_id: String,
+                   mime_type: String,
+                   data: Array[Byte]) extends BaseModel {
+
   override def toJson = {
     Json.obj(
       C.Preview.ASSET_ID -> asset_id,

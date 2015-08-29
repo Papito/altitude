@@ -27,7 +27,6 @@ class FileSystemImportDao(val app: Altitude) extends BaseDao {
 
         def next() = {
           val file: File = new File(files.next().toString)
-          //log.info(s"Found file '$file'", C.tag.DB)
           new FileImportAsset(file)
         }
       }

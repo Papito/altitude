@@ -54,13 +54,14 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
               JsObject(Seq("asset" -> asset.get.toJson)).toString()
             }
             catch {
-              case ex: DuplicateException =>
+              case ex: StopImport => "END"
+              case ex: DuplicateException => {
                 JsObject(Seq(
                   //FIXME: constants
                   "warning" -> JsString("Duplicate"),
                   "asset" -> ex.asset.toJson)).toString()
-              case ex: StopImport => "END"
-              case ex: Throwable =>
+              }
+              case ex: Throwable => {
                 importAsset.isDefined match {
                   case true => // import asset exists, we send the error and skip the asset
                     JsObject(Seq(
@@ -70,6 +71,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
                     criticalException = Some(ex)
                     JsObject(Seq("critical" -> JsString(ex.getMessage))).toString()
                 }
+              }
             }
           }
           log.info(s"WS <- $responseTxt")

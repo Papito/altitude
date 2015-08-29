@@ -40,7 +40,7 @@ abstract class BaseModel {
   }
 
   /*
-  Create core JSON attributes that every model should have
+  Returns core JSON attributes that every model should have
    */
   protected def coreJsonAttrs = JsObject(Map(
     C.Base.ID -> {id match {
@@ -59,7 +59,11 @@ abstract class BaseModel {
     }}
   ).toSeq)
 
-  // pull in core model attributes from JSON
+  /*
+    Return this type of object, but with core attributes
+    present, parsed from the passed in JSON object
+    (if the values are present)
+   */
   protected def withCoreAttr(json: JsValue): this.type  = {
     val isoCreatedAt = (json \ C.Base.CREATED_AT).asOpt[String]
     if (isoCreatedAt.isDefined) {
@@ -73,4 +77,6 @@ abstract class BaseModel {
 
     this
   }
+
+  override def toString = this.toJson.toString()
 }

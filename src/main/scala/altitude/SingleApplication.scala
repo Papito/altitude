@@ -11,5 +11,4 @@ object SingleApplication {
 
 trait SingleApplication {
   val app = SingleApplication.app
-  implicit val txId: TransactionId = new TransactionId
 }

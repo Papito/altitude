@@ -16,6 +16,4 @@ class FileImportAsset(val file: File) extends BaseModel with NoId {
     "absolutePath" -> absolutePath,
     "name" -> name
   )
-
-  override def toString = this.absolutePath
 }

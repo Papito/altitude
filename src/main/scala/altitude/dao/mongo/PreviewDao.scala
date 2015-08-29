@@ -40,7 +40,6 @@ class PreviewDao(val app: Altitude) extends BaseMongoDao("preview") with altitud
     val asset: Asset = app.service.asset.getById(asset_id)
     val gridFsFile: Option[GridFSDBFile] = GRID_FS.findOne(asset.path)
 
-
     if (gridFsFile.isEmpty)
       return None
 

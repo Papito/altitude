@@ -5,6 +5,7 @@ import play.api.libs.json.{JsValue, Json}
 
 import scala.language.implicitConversions
 
+//FIXME: rename to AssetType
 object MediaType {
   implicit def fromJson(json: JsValue): MediaType = new MediaType(
       mediaType = (json \ C.Asset.MEDIA_TYPE).as[String],

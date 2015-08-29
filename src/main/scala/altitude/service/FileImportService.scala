@@ -18,7 +18,6 @@ class FileImportService(app: Altitude) extends BaseService(app) {
   val log =  LoggerFactory.getLogger(getClass)
 
   protected val DAO = new FileSystemImportDao(app)
-
   protected val SUPPORTED_MEDIA_TYPES = List("audio", "image")
 
   def getFilesToImport(path: String): List[FileImportAsset] = {
@@ -79,14 +78,14 @@ class FileImportService(app: Altitude) extends BaseService(app) {
   }
 
   protected def getChecksum(file: File): String = {
-    var inputStream: InputStream = null
+    var inputStream: Option[InputStream] = None
 
     try {
-      inputStream = new FileInputStream(file)
-      DigestUtils.md5Hex(inputStream)
+      inputStream = Some(new FileInputStream(file))
+      DigestUtils.md5Hex(inputStream.get)
     }
     finally  {
-      inputStream.close()
+      if (inputStream.isDefined) inputStream.get.close()
     }
   }
 

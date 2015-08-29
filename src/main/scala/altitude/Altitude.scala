@@ -39,13 +39,14 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
   class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
       dataSourceType match {
-        case "mongo" =>
+        case "mongo" => {
           // transaction manager
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.VoidTransactionManager(app))
           // DAOs
           bind[AssetDao].toInstance(new altitude.dao.mongo.AssetDao(app))
           bind[PreviewDao].toInstance(new altitude.dao.mongo.PreviewDao(app))
-        case "postgres" =>
+        }
+        case "postgres" => {
           // register the JDBC driver
           DriverManager.registerDriver(new org.postgresql.Driver)
           // transaction manager
@@ -53,7 +54,10 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
           // DAOs
           bind[AssetDao].toInstance(new altitude.dao.postgres.AssetDao(app))
           bind[PreviewDao].toInstance(new altitude.dao.postgres.PreviewDao(app))
-        case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
+        }
+        case _ => {
+          throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
+        }
       }
     }
   }

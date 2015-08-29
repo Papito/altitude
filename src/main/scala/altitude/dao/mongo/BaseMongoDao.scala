@@ -30,23 +30,25 @@ object BaseMongoDao {
 }
 
 abstract class BaseMongoDao(protected val collectionName: String) extends BaseDao {
+  val log =  LoggerFactory.getLogger(getClass)
+
   import com.mongodb.casbah.commons.conversions.scala._
   RegisterJodaTimeConversionHelpers()
-  val log =  LoggerFactory.getLogger(getClass)
+
   private val DB_NAME: String = app.config.getString("db.mongo.db")
   protected def DB = BaseMongoDao.client(app)(DB_NAME)
   protected def COLLECTION: MongoCollection = DB(collectionName)
-  protected val MAX_RECORDS = app.config.getInt("db.max_records")
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     log.debug(s"Starting database INSERT for: $jsonIn")
 
-    // append core attributes
+    // create DBObject for insert with input data  + required core attributes
     val id: String = BaseModel.genId
     val createdAt = Util.utcNow
-
-    val obj: DBObject =  com.mongodb.util.JSON.parse(jsonIn.toString()).asInstanceOf[DBObject] ++
-      MongoDBObject("id" -> id, "_id" -> id, C.Base.CREATED_AT -> createdAt)
+    val origObj: DBObject =  com.mongodb.util.JSON.parse(
+      jsonIn.toString()).asInstanceOf[DBObject]
+    val coreAttrObj = MongoDBObject("id" -> id, "_id" -> id, C.Base.CREATED_AT -> createdAt)
+    val obj: DBObject = origObj ++ coreAttrObj
 
     COLLECTION.insert(obj)
     
@@ -74,6 +76,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     val cursor: MongoCursor = COLLECTION.find(mongoQuery).limit(MAX_RECORDS)
     log.debug(s"Found ${cursor.length} records")
 
+    // iterate through results and "fix" mongo fields
     cursor.map(o => {
       val json: JsObject = Json.parse(o.toString).as[JsObject]
       fixMongoFields(json)

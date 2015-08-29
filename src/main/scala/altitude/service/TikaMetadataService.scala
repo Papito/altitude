@@ -2,7 +2,7 @@ package altitude.service
 
 import java.io.{InputStream, StringWriter}
 
-import altitude.exceptions.MetadataExctractorException
+import altitude.exceptions.MetadataExtractorException
 import altitude.models.{FileImportAsset, MediaType}
 import altitude.{Const => C}
 import org.apache.tika.exception.TikaException
@@ -57,7 +57,7 @@ class TikaMetadataService extends AbstractMetadataService {
         JsonMetadata.toJson(metadata, writer)
       }
       catch {
-        case reason: TikaException => throw new MetadataExctractorException(reason)
+        case reason: TikaException => throw new MetadataExtractorException(reason)
       }
       val jsonData = writer.toString
       Json.parse(jsonData)

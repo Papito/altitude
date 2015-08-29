@@ -22,7 +22,6 @@ class AssetDao(val app: Altitude) extends BasePostgresDao("asset") with altitude
       metadata = Json.parse(rec.get(C.Asset.METADATA).get.toString))
 
     addCoreAttrs(model, rec)
-    log.debug(model.toJson.toString())
     model
   }
 

@@ -9,6 +9,10 @@ import org.slf4j.LoggerFactory
 class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManager {
   val log =  LoggerFactory.getLogger(getClass)
 
+  /*
+  Get an existing transaction if we are already withing a transaction context,
+  else, create a new one
+   */
   def transaction(implicit txId: TransactionId): JdbcTransaction = {
     log.debug(s"TX. Getting transaction for ${txId.id}")
 
@@ -18,7 +22,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
       return app.JDBC_TRANSACTIONS.get(txId.id).get
     }
 
-    // create a connection and a transaction
+    // get a connection and a new transaction
 
     val props = new Properties
     val user = app.config.getString("db.postgres.user")
@@ -30,7 +34,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
 
     val tx: JdbcTransaction = new JdbcTransaction(conn)
     app.JDBC_TRANSACTIONS. += (tx.id -> tx)
-    // assign the integer transaction to the mutable transaction id "carrier" object
+    // assign the integer transaction ID to the mutable transaction id "carrier" object
     txId.id = tx.id
     tx
   }
@@ -42,7 +46,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
       tx.setReadOnly(flag=false)
       tx.setAutoCommit(flag=false)
 
-      tx.up()
+      tx.up() // level up - any new transactions within will be "nested"
       val res: A = f
       tx.down()
 
@@ -54,6 +58,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
       res
     }
     finally {
+      // clean up, if we are done with this transaction
       if (!tx.isNested) {
         tx.close()
         app.JDBC_TRANSACTIONS.remove(txId.id)
