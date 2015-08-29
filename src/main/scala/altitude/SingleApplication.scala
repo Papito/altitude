@@ -1,6 +1,5 @@
 package altitude
 
-import altitude.transactions.TransactionId
 import org.slf4j.LoggerFactory
 
 object SingleApplication {

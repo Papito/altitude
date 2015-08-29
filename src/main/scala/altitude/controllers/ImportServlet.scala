@@ -1,6 +1,6 @@
 package altitude.controllers
 
-import altitude.exceptions.{StopImport, DuplicateException}
+import altitude.exceptions.{DuplicateException, StopImport}
 import altitude.models.{Asset, FileImportAsset}
 import org.json4s._
 import org.scalatra._
@@ -8,6 +8,7 @@ import org.scalatra.atmosphere._
 import org.scalatra.json.{JValueResult, JacksonJsonSupport}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsNumber, JsObject, JsString}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ImportServlet extends BaseController  with JValueResult
