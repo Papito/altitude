@@ -1,7 +1,7 @@
 import javax.servlet.ServletContext
 
 import altitude.Environment
-import altitude.controllers.{IndexController, AssetController, ImportController}
+import altitude.controllers.{SearchController, IndexController, AssetController, ImportController}
 import org.scalatra._
 import org.slf4j.LoggerFactory
 
@@ -12,6 +12,7 @@ class ScalatraBootstrap extends LifeCycle {
     context.mount(new IndexController, "/*")
     context.mount(new ImportController, "/import/*")
     context.mount(new AssetController, "/assets/*")
+    context.mount(new SearchController, "/search/*")
 
     val environment = Environment.ENV match {
       case Environment.DEV => "development"
@@ -19,6 +20,5 @@ class ScalatraBootstrap extends LifeCycle {
     }
 
     context.initParameters("org.scalatra.environment") = environment
-
   }
 }

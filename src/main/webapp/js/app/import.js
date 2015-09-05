@@ -1,4 +1,3 @@
-
 function Asset(data) {
     this.id = data ? data.id : null;
     this.fileName = data ? data.fileName : null;

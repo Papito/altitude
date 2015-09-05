@@ -27,23 +27,23 @@ BaseViewModel = Base.extend({
     },
     // ----------------------------------------------------------------
     
-    post : function(opts) {
-        return this.restRequest('POST', opts);
+    post : function(url, opts) {
+        return this.restRequest(url, 'POST', opts);
     },
     // ----------------------------------------------------------------
 
-    put : function(opts) {
-        return this.restRequest('PUT', opts);
+    put : function(url, opts) {
+        return this.restRequest(url, 'PUT', opts);
     },
     // ----------------------------------------------------------------
 
-    del : function(opts) {
-        return this.restRequest('DELETE', opts);
+    del : function(url, opts) {
+        return this.restRequest(url, 'DELETE', opts);
     },
     // ----------------------------------------------------------------
 
-    get : function(opts) {
-        return this.restRequest('GET', opts);
+    get : function(url, opts) {
+        return this.restRequest(url, 'GET', opts);
     },
     // ----------------------------------------------------------------
     
@@ -57,7 +57,7 @@ BaseViewModel = Base.extend({
         self.successMessage('');
     },
 
-    restRequest : function(method, opts) {
+    restRequest : function(url, method, opts) {
         var self = this;
 
         method = method.toUpperCase();
@@ -73,7 +73,7 @@ BaseViewModel = Base.extend({
 
         $.ajax({
             type : method,
-            url : opts.url,
+            url : url,
             crossDomain : true,
             data : data,
             cache : false,

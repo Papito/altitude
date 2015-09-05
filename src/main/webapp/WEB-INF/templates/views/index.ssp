@@ -1,3 +1,20 @@
 #set (assets)
     <script src="/js/app/home.js?<%= altitude.Util.randomStr(10) %>"></script>
 #end
+
+
+<div class="row" id="home">
+    <div class="col-md-12 col-lg-12">
+        <div class="row" id="searchResults" data-bind="visible: searchResults">
+            <div class="col-md-12 col-lg-12">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        var homeViewModel = new HomeViewModel();
+        ko.applyBindings(homeViewModel);
+    });
+</script>
