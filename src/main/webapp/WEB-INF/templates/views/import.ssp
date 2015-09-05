@@ -1,6 +1,6 @@
 #set (assets)
     <script src="/js/lib/jquery-atmosphere.js"></script>
-    <script src="/js/app/import.js"></script>
+    <script src="/js/app/import.js?<%= altitude.Util.randomStr(10) %>"></script>
 #end
 
 <div class="row" id="importControls">

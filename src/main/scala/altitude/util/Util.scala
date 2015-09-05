@@ -10,4 +10,6 @@ package object Util {
   def isoDateTime (dt: Option[DateTime]): String = {
     if (dt.isDefined) ISODateTimeFormat.dateTime().print(dt.get) else ""
   }
+
+  def randomStr(size: Int = 10) = scala.util.Random.alphanumeric.take(size).mkString.toLowerCase
 }
