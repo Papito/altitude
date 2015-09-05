@@ -11,7 +11,7 @@ import play.api.libs.json.{JsNumber, JsObject, JsString}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ImportServlet extends BaseController  with JValueResult
+class ImportController extends BaseController  with JValueResult
 with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
   val log = LoggerFactory.getLogger(getClass)
   implicit protected val jsonFormats: Formats = DefaultFormats

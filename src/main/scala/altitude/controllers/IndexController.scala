@@ -1,6 +1,6 @@
 package altitude.controllers
 
-class AltitudeServlet extends BaseController {
+class IndexController extends BaseController {
 
   get("/") {
     contentType = "text/html"

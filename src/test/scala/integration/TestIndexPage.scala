@@ -1,13 +1,13 @@
 package integration
 
-import altitude.controllers.AltitudeServlet
+import altitude.controllers.IndexController
 import org.scalatest.FunSuiteLike
 import org.scalatra.test.scalatest._
 
 class TestIndexPage extends ScalatraSuite with FunSuiteLike {
 
   test("Index page") {
-    addServlet(classOf[AltitudeServlet], "/*")
+    addServlet(classOf[IndexController], "/*")
     get("/"){
       status should equal(200)
     }

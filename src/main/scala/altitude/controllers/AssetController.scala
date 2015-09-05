@@ -3,7 +3,7 @@ package altitude.controllers
 import altitude.exceptions.NotFoundException
 import altitude.models.Preview
 
-class AssetServlet extends BaseController {
+class AssetController extends BaseController {
   get("/:id/preview") {
     val id = params("id")
 
