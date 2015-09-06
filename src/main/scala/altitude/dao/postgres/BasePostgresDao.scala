@@ -68,10 +68,15 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     // create pairs of column names and value placeholders, to be joined in the final clause
     val whereClauses: List[String] = for (column <- sqlColumns.toList) yield  s"$column = ?"
 
+    val whereClause = whereClauses.length match {
+      case 0 => ""
+      case _ => s"""WHERE ${whereClauses.mkString("AND")}"""
+    }
+
     val sql = s"""
       SELECT $DEFAULT_SQL_COLS_FOR_SELECT
         FROM $tableName
-       WHERE ${whereClauses.mkString("AND")}
+        $whereClause
        LIMIT ${query.rpp}"""
 
     val recs = manyBySqlQuery(sql, sqlValues.toList)
