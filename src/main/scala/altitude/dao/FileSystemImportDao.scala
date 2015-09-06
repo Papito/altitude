@@ -11,6 +11,7 @@ import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
+
 class FileSystemImportDao(val app: Altitude) extends BaseDao {
   val log =  LoggerFactory.getLogger(getClass)
 

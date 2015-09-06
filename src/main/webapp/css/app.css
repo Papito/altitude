@@ -49,6 +49,10 @@ body {
     font-size: .9em;
 }
 
+#selectFolder select {
+    width: 100%;
+    color: #000000;
+}
 /* SEARCH */
 
 #searchResults img {

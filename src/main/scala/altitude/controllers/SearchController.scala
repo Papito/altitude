@@ -10,7 +10,6 @@ class SearchController extends BaseController {
   get("/") {
     val assets = app.service.library.search(new Query())
     val jsonAssets = for (asset <- assets) yield asset.toJson
-    val jsonSearchResults = Json.toJson(Map("results" -> jsonAssets))
-    Ok(jsonSearchResults)
+    Ok(Json.obj("results" -> jsonAssets)) //FIXME: constants
   }
 }

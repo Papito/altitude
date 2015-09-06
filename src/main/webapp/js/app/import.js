@@ -18,6 +18,9 @@ ImportViewModel = BaseViewModel.extend({
         this.assetsImportedCnt = ko.observable(0);
         this.currentAsset = ko.observable();
         this.importMode = ko.observable();
+        this.directoryNames = ko.observableArray();
+        this.currentPath = ko.observable();
+        this.disableDoubleClick = false;
         this.responseHandler = null;
 
         this.percentComplete = ko.computed(function() {
@@ -35,9 +38,37 @@ ImportViewModel = BaseViewModel.extend({
             return "/assets/" + self.currentAsset().id + "/preview";
         }, this);
 
-        this.currentPath = ko.computed(function() {
+        this.currentAssetPath = ko.computed(function() {
             return self.currentAsset() ? self.currentAsset().path : "";
         }, this);
+    },
+
+    getDirectoryNames: function(path) {
+      var self = this;
+      var opts = {
+            'successCallback': function (json) {
+                self.directoryNames(json.directoryNames);
+                self.currentPath(json.currentPath);
+            },
+            'finally': function() {
+              self.disableDoubleClick = false;
+            }
+        };
+
+        if (path) {
+          opts.data = {'path': path}
+        }
+
+      // some browsers can fire the doubleclick event when populating the list
+      this.disableDoubleClick = true;
+      this.get('/import/source/local/navigate', opts);
+    },
+
+    dropIntoDirectory: function(directoryName) {
+      if (this.disableDoubleClick == true) {
+        return;
+      }
+      this.getDirectoryNames(this.currentPath() + "/" + directoryName);
     },
 
     addWarning: function(asset, message) {

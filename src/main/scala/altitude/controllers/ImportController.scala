@@ -1,15 +1,19 @@
 package altitude.controllers
 
-import altitude.exceptions.{DuplicateException, StopImport}
-import altitude.models.{Asset, FileImportAsset}
+import java.io.File
+
 import org.json4s._
 import org.scalatra._
 import org.scalatra.atmosphere._
 import org.scalatra.json.{JValueResult, JacksonJsonSupport}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsNumber, JsObject, JsString}
+import play.api.libs.json.{Json, JsNumber, JsObject, JsString}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+
+import altitude.exceptions.{DuplicateException, StopImport}
+import altitude.models.{Asset, FileImportAsset}
+
 
 class ImportController extends BaseController  with JValueResult
 with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
@@ -19,6 +23,16 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
   get("/") {
     contentType="text/html"
     ssp("/import")
+  }
+
+  get("/source/local/navigate") {
+    val path: String = this.params.getOrElse("path", "/") //FIXME: const
+    log.debug(s"Getting directory name list for $path")
+    val files: Seq[File] = new File(path).listFiles().toSeq
+    val directoryList: Seq[String] = files.filter(_.isDirectory == true).map(_.getName)
+    Json.obj(
+      "directoryNames" -> directoryList,
+      "currentPath" -> path)
   }
 
   atmosphere("/ws") {
