@@ -8,7 +8,7 @@ class AssetController extends BaseController {
     val id = params("id")
 
     try {
-      val preview: Preview = this.app.service.library.getPreview(id)
+      val preview: Preview = app.service.library.getPreview(id)
       this.contentType = preview.mime_type
       preview.data
     }

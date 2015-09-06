@@ -1,3 +1,11 @@
+function Asset(data) {
+  this.id = data ? data.id : null;
+  this.path = data? data.path: null;
+  this.fileName = data ? data.fileName : null;
+  this.createdAt = data ? data.createdAt : null;
+  this.updatedAt = data ? data.updatedAt : null;
+}
+
 HomeViewModel = BaseViewModel.extend({
     constructor : function() {
         "use strict";
@@ -12,12 +20,16 @@ HomeViewModel = BaseViewModel.extend({
     },
 
     searchLatest: function() {
+      var self = this;
       var opts = {
-        'successCallback': this.populateSearchResults
+        'successCallback': function (json) {
+          var assets = $.map(json.results, function(asset) {
+            return new Asset(asset);
+          });
+          self.searchResults(assets);
+        }
       };
-      this.get('/search', opts);
-    },
 
-    populateSearchResults: function(data, textStatus, jqXHR) {
+      this.get('/search', opts);
     }
 });

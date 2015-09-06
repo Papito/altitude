@@ -1,11 +1,16 @@
 package altitude.controllers
 
 import altitude.exceptions.NotFoundException
-import altitude.models.Preview
+import altitude.models.{Asset, Preview}
+import altitude.models.search.Query
 import org.scalatra.Ok
+import play.api.libs.json.{Json, JsArray, JsObject}
 
 class SearchController extends BaseController {
   get("/") {
-    Ok("{}")
+    val assets = app.service.library.search(new Query())
+    val jsonAssets = for (asset <- assets) yield asset.toJson
+    val jsonSearchResults = Json.toJson(Map("results" -> jsonAssets))
+    Ok(jsonSearchResults)
   }
 }

@@ -121,12 +121,12 @@ BaseViewModel = Base.extend({
                 if (data) {
                     console.log(data);
                 }
+                var json = JSON.parse(data);
 
                 self.setSuccessFlashMessage(method);
 
                 if (opts.successCallback) {
-                    opts.successCallback(data, textStatus, jqXHR);
-                    return;
+                    opts.successCallback(json, textStatus, jqXHR);
                 }
             }
         });

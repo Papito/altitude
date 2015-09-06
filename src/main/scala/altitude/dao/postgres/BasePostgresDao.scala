@@ -72,7 +72,8 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     val sql = s"""
       SELECT $DEFAULT_SQL_COLS_FOR_SELECT
         FROM $tableName
-       WHERE ${whereClauses.mkString("AND")}"""
+       WHERE ${whereClauses.mkString("AND")}
+       LIMIT ${query.rpp}"""
 
     val recs = manyBySqlQuery(sql, sqlValues.toList)
 
