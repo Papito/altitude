@@ -40,11 +40,19 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
       var assets: Option[List[FileImportAsset]] = None
       var assetsIt: Option[Iterator[FileImportAsset]] = None
       var criticalException: Option[Throwable] = None
+      var path: Option[String] = None
 
       def receive: AtmoReceive = {
-        case TextMessage("total") =>
-          log.info("WS -> total")
-          assets = Some(app.service.fileImport.getFilesToImport(path="/mnt/hgfs/import"))
+        case txt: TextMessage if txt.content.startsWith("total") =>
+          log.info(s"WS -> $txt")
+
+          // get the path we will be importing from
+          //FIXME: not defensive
+          val separatorIdx = txt.content.indexOf(' ')
+          path = Some(txt.content.substring(separatorIdx + 1))
+
+
+          assets = Some(app.service.fileImport.getFilesToImport(path=path.get))
           assetsIt = Some(assets.get.toIterator)
           val responseTxt = JsObject(Seq("total" -> JsNumber(assets.get.size))).toString()
           log.info(s"WS <- $responseTxt")

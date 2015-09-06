@@ -95,7 +95,7 @@ ImportViewModel = BaseViewModel.extend({
     selectImportDirectory: function() {
         this.importMode(this.IMPORT_MODE.DIRECTORY);
         var directoryName = $('#directoryList').val();
-        this.importDirectory(this.currentPath() + directoryName);
+        this.importDirectory(this.currentPath() + "/" + directoryName);
         $('#selectImportDirectory').modal('hide');
     },
 
@@ -155,7 +155,7 @@ ImportViewModel = BaseViewModel.extend({
         this.request.onOpen = function(response) {
             console.log('Atmosphere connected using ' + response.transport);
             self.isImporting(true);
-            self.sendCommand('total', self.handleTotal);
+            self.sendCommand('total ' + self.importDirectory(), self.handleTotal);
         };
 
         this.request.onReconnect = function(rq, rs) {
