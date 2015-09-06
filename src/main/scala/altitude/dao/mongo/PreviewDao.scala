@@ -10,7 +10,7 @@ import org.apache.commons.io.IOUtils
 import play.api.libs.json.JsObject
 
 class PreviewDao(val app: Altitude) extends BaseMongoDao("preview") with altitude.dao.PreviewDao {
-  protected def GRID_FS = GridFS(DB, this.collectionName)
+  protected def GRID_FS = BaseMongoDao.gridFS(app, DB, this.collectionName)
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     val preview: Preview = jsonIn
@@ -38,7 +38,8 @@ class PreviewDao(val app: Altitude) extends BaseMongoDao("preview") with altitud
 
   override def getById(asset_id: String)(implicit txId: TransactionId): Option[JsObject] = {
     val asset: Asset = app.service.asset.getById(asset_id)
-    val gridFsFile: Option[GridFSDBFile] = GRID_FS.findOne(asset.path)
+
+    val gridFsFile: Option[JodaGridFSDBFile] = GRID_FS.findOne(asset.path)
 
     if (gridFsFile.isEmpty)
       return None
@@ -49,10 +50,10 @@ class PreviewDao(val app: Altitude) extends BaseMongoDao("preview") with altitud
       is = Some(gridFsFile.get.inputStream)
       val bytes: Array[Byte] = IOUtils.toByteArray(is.get)
       val preview: Preview = Preview(
-      id = Some(gridFsFile.get.id.toString),
-      asset_id = asset.id.get,
-      data = bytes,
-      mime_type = asset.mediaType.mime)
+        id = Some(gridFsFile.get.id.toString),
+        asset_id = asset.id.get,
+        data = bytes,
+        mime_type = asset.mediaType.mime)
 
       Some(preview)
     }

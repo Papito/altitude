@@ -7,14 +7,18 @@ import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Util}
 import com.mongodb.casbah.Imports._
 import com.mongodb.casbah.MongoClient
+import com.mongodb.casbah.gridfs.JodaGridFS
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
 
 object BaseMongoDao {
+  import com.mongodb.casbah.commons.conversions.scala._
+  RegisterJodaTimeConversionHelpers()
+
   // let each application in the JVM have its own client
   var CLIENTS = scala.collection.mutable.Map[Int, MongoClient]()
 
-  protected def client(app: Altitude): MongoClient = {
+  def client(app: Altitude): MongoClient = {
     if (BaseMongoDao.CLIENTS.contains(app.id)) {
       return BaseMongoDao.CLIENTS.get(app.id).get
     }
@@ -27,13 +31,32 @@ object BaseMongoDao {
     BaseMongoDao.CLIENTS += (app.id -> client)
     client
   }
+
+  def removeClient(app: Altitude) = {
+    BaseMongoDao.CLIENTS.remove(app.id)
+  }
+
+  var GRID_FSs = scala.collection.mutable.Map[String, JodaGridFS]()
+
+  def gridFS(app: Altitude, db: MongoDB, colName: String): JodaGridFS = {
+    val gridFsId = s"{app.id}-$colName"
+    if (BaseMongoDao.GRID_FSs.contains(gridFsId)) {
+      return BaseMongoDao.GRID_FSs.get(gridFsId).get
+    }
+
+    val gridFs = JodaGridFS(db, colName)
+    GRID_FSs += (gridFsId -> gridFs)
+    gridFs
+  }
+
+  def removeGridFS(app: Altitude, colName: String): Unit = {
+    val gridFsId = s"{app.id}-$colName"
+    BaseMongoDao.GRID_FSs.remove(gridFsId)
+  }
 }
 
 abstract class BaseMongoDao(protected val collectionName: String) extends BaseDao {
   val log =  LoggerFactory.getLogger(getClass)
-
-  import com.mongodb.casbah.commons.conversions.scala._
-  RegisterJodaTimeConversionHelpers()
 
   private val DB_NAME: String = app.config.getString("db.mongo.db")
   protected def DB = BaseMongoDao.client(app)(DB_NAME)
