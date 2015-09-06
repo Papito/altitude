@@ -9,6 +9,11 @@ ImportViewModel = BaseViewModel.extend({
     constructor : function() {
         "use strict";
 
+        this.IMPORT_MODE = {
+            'DIRECTORY': 'directory',
+            'FILES':  'files'
+        };
+
         this.base();
         console.log('Initializing import view model');
 
@@ -20,6 +25,7 @@ ImportViewModel = BaseViewModel.extend({
         this.importMode = ko.observable();
         this.directoryNames = ko.observableArray();
         this.currentPath = ko.observable();
+        this.importDirectory = ko.observable();
         this.disableDoubleClick = false;
         this.responseHandler = null;
 
@@ -42,6 +48,21 @@ ImportViewModel = BaseViewModel.extend({
             return self.currentAsset() ? self.currentAsset().path : "";
         }, this);
     },
+
+    cancelImport: function() {
+        console.log('Closing websocket');
+        this.isImporting(false);
+        this.subSocket.close();
+        this.currentAsset(null);
+        this.totalAssetsCnt(0);
+        this.assetsImportedCnt(0);
+        this.importMode(null);
+        this.importDirectory(null);
+        this.currentPath(null);
+        $('#imported-assets').html("");
+        $("#importMessages").html("");
+    },
+
 
     getDirectoryNames: function(path) {
       var self = this;
@@ -69,6 +90,13 @@ ImportViewModel = BaseViewModel.extend({
         return;
       }
       this.getDirectoryNames(this.currentPath() + "/" + directoryName);
+    },
+
+    selectImportDirectory: function() {
+        this.importMode(this.IMPORT_MODE.DIRECTORY);
+        var directoryName = $('#directoryList').val();
+        this.importDirectory(this.currentPath() + directoryName);
+        $('#selectImportDirectory').modal('hide');
     },
 
     addWarning: function(asset, message) {
@@ -108,17 +136,6 @@ ImportViewModel = BaseViewModel.extend({
             var el = $("#importMessages .message").last();
             $(el).remove();
         }
-    },
-
-    cancelImport: function() {
-        console.log('Closing websocket');
-        this.subSocket.close();
-        this.isImporting(false);
-        this.currentAsset(null);
-        this.totalAssetsCnt(0);
-        this.assetsImportedCnt(0);
-        $('#imported-assets').html("");
-        //$("#importMessages").html("");
     },
 
     importAssets: function() {

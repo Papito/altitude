@@ -10,9 +10,9 @@
                 <h4 well>Import assets</h4>
             </div>
         </div>
-        <div class="row" id="selectImportMode">
+        <div class="row" id="selectImportMode" data-bind="visible: importMode() == null">
             <div class="col-md-6 col-lg-6">
-                <button class="btn btn-default btn-lg btn-block" data-bind="click: function(){getDirectoryNames(null)}" data-toggle="modal" data-target="#selectFolder">Select a folder</button>
+                <button class="btn btn-default btn-lg btn-block" data-bind="click: function(){getDirectoryNames(null)}" data-toggle="modal" data-target="#selectImportDirectory">Select a folder</button>
             </div>
             <div class="col-md-6 col-lg-6">
                 <button class="btn btn-default btn-lg btn-block">Select files</button>
@@ -29,6 +29,9 @@
                 <div id="collecting-data-text" style="display: none" data-bind="visible: isImporting() && assetsImportedCnt() == 0">
                     <button type="button" class="btn btn-success">Collecting asset info ...</button>
                 </div>
+                <div id="ready-to-import" style="display: none" data-bind="visible: importMode() == $root.IMPORT_MODE.DIRECTORY && isImporting() == false">
+                    <span data-bind="html: 'Ready to import from <strong>' + importDirectory() + '</strong>'"></span>
+                </div>
                 <div id="asset-count-text" style="display: none" data-bind="visible: isImporting() && totalAssetsCnt()">
                     <strong>
                         Importing asset
@@ -39,7 +42,6 @@
                 </div>
                 <div class="row">
                     <div class="col-md-5">
-                        <!-- FIXME: automatic centering based on image width - or app settings -->
                     </div>
                     <div class="col-md-7">
                         <img id="imagePreview" data-bind="visible: previewUrl(), attr: {'src': previewUrl()}"/>
@@ -60,7 +62,7 @@
 
 
 <!-- Modal -->
-<div class="modal fade" id="selectFolder" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="selectImportDirectory" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form>
@@ -69,13 +71,13 @@
                     <h4 class="modal-title" id="myModalLabel">Select a folder (all files will be scanned)</h4>
                 </div>
                 <div class="modal-body">
-                    <select size="40" data-bind="foreach: directoryNames" name="selectedDirectory" multiple="no" >
+                    <select id="directoryList" size="40" data-bind="foreach: directoryNames" name="selectedDirectory" multiple="no" >
                         <option data-bind="attr: {'value': $data}, text: $data, event : { dblclick: $parent.dropIntoDirectory($data) }"></option>
                     </select>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary">Select</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: selectImportDirectory">Select</button>
                 </div>
             </form>
         </div>

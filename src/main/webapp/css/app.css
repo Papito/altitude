@@ -49,7 +49,7 @@ body {
     font-size: .9em;
 }
 
-#selectFolder select {
+#selectImportDirectory select {
     width: 100%;
     color: #000000;
 }
