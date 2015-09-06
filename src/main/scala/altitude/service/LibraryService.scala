@@ -50,9 +50,10 @@ class LibraryService(app: Altitude) {
   }
 
   def search(query: Query)(implicit txId: TransactionId = new TransactionId): List[Asset] = {
-    val searchResultData: List[JsObject] = app.service.asset.query(query)
-    val assets: List[Asset] = for (data <- searchResultData) yield Asset.fromJson(data)
-    assets
+    txManager.asReadOnly[List[Asset] ] {
+      val searchResultData: List[JsObject] = app.service.asset.query(query)
+      for (data <- searchResultData) yield Asset.fromJson(data)
+    }
   }
 
   private def addPreview(asset: Asset)(implicit txId: TransactionId = new TransactionId): Option[Preview] = {

@@ -65,7 +65,6 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
 
   override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {
     val (sqlColumns, sqlValues) = query.params.unzip
-
     // create pairs of column names and value placeholders, to be joined in the final clause
     val whereClauses: List[String] = for (column <- sqlColumns.toList) yield  s"$column = ?"
 
@@ -77,6 +76,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
 
     val recs = manyBySqlQuery(sql, sqlValues.toList)
 
+    log.debug(s"Found: ${recs.length}")
     recs.map{makeModel}
   }
 
@@ -98,7 +98,6 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
   }
 
   protected def manyBySqlQuery(sql: String, vals: List[Object])(implicit txId: TransactionId): List[Map[String, AnyRef]] = {
-    //log.debug(s"SQL: $sql")
     val runner: QueryRunner = new QueryRunner()
     val res = runner.query(conn, sql, new MapListHandler(), vals: _*)
     log.debug(s"Found ${res.size()} records", C.tag.DB)
