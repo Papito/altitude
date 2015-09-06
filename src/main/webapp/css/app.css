@@ -9,6 +9,11 @@ body {
     padding-bottom: 0.8em;
     margin-bottom: 0.8em;
 }
+
+#selectImportMode button {
+    height: 6em;
+}
+
 #importControls .progress {
     height: 2.8em;
     margin-bottom: 0;

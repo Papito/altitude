@@ -17,6 +17,7 @@ ImportViewModel = BaseViewModel.extend({
         this.totalAssetsCnt = ko.observable(0);
         this.assetsImportedCnt = ko.observable(0);
         this.currentAsset = ko.observable();
+        this.importMode = ko.observable();
         this.responseHandler = null;
 
         this.percentComplete = ko.computed(function() {
