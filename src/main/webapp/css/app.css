@@ -43,3 +43,10 @@ body {
 #importMessages .message {
     font-size: .9em;
 }
+
+/* SEARCH */
+
+#searchResults img {
+    float: left;
+    margin: 1em;
+}
