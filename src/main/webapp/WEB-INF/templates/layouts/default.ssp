@@ -4,7 +4,6 @@
 <%@ var config: Configuration = attributes.get("config").asInstanceOf[Configuration] %>
 <%@ var screenTitle: String = "Home" %>
 
-
 <html>
 <head>
 <title>${config.getString("app.name")}</title>

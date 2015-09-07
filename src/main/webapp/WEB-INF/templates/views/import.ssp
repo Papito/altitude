@@ -1,5 +1,5 @@
 #set (assets)
-    <script src="/js/lib/jquery-atmosphere.js"></script>
+    <script src="/js/lib/jquery-atmosphere.js" xmlns="http://www.w3.org/1999/html"></script>
     <script src="/js/app/import.js?<%= altitude.Util.randomStr(10) %>"></script>
 #end
 
@@ -8,11 +8,19 @@
 <div class="row" id="importControls">
     <div class="col-md-12 col-lg-12">
         <div class="row" id="selectImportMode" data-bind="visible: importMode() == null">
-            <div class="col-md-6 col-lg-6">
-                <button class="btn btn-default btn-lg btn-block" data-bind="click: function(){getDirectoryNames(null)}" data-toggle="modal" data-target="#selectImportDirectory">Select a folder</button>
+            <div class="col-md-5 col-lg-5">
+                <button class="large btn btn-default btn-lg btn-block" data-bind="click: function(){getDirectoryNames(null)}" data-toggle="modal" data-target="#selectImportDirectory">Select a folder</button>
             </div>
-            <div class="col-md-6 col-lg-6">
-                <button class="btn btn-default btn-lg btn-block">Select files</button>
+            <div class="col-md-2 col-lg-2">
+                 <button type="button" class="large btn btn-primary btn-lg btn-block">OR</button>
+            </div>
+            <div class="col-md-5 col-lg-5">
+                <form method="post" enctype="multipart/form-data" action="/import/">
+                    <p class="large btn btn-default btn-lg btn-block">
+                        <input class="btn btn-default btn btn-block" type="file" name="files[]" multiple>
+                        <button type="submit" class="btn btn-default btn btn-block">Upload</button>
+                    </p>
+                </form>
             </div>
         </div>
         <div class="row">
@@ -41,7 +49,7 @@
                     <div class="col-md-5">
                     </div>
                     <div class="col-md-7">
-                        <img id="imagePreview" data-bind="visible: previewUrl(), attr: {'src': previewUrl()}"/>
+                        <img src="" id="imagePreview" data-bind="visible: previewUrl(), attr: {'src': previewUrl()}"/>
                     </div>
                 </div>
             </div>

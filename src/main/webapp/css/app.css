@@ -10,7 +10,7 @@ body {
     margin-bottom: 0.8em;
 }
 
-#selectImportMode button {
+#selectImportMode .large {
     height: 6em;
 }
 
