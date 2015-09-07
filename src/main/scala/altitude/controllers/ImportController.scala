@@ -6,6 +6,7 @@ import org.json4s._
 import org.scalatra._
 import org.scalatra.atmosphere._
 import org.scalatra.json.{JValueResult, JacksonJsonSupport}
+import org.scalatra.servlet.{SizeConstraintExceededException, MultipartConfig, FileUploadSupport}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{Json, JsNumber, JsObject, JsString}
 
@@ -16,7 +17,10 @@ import altitude.models.{Asset, FileImportAsset}
 
 
 class ImportController extends BaseController  with JValueResult
-with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
+with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUploadSupport  {
+  val ONE_HUNDRED_MEGABYTES = 1024 * 1024 * 100;
+  configureMultipartHandling(MultipartConfig(maxFileSize = Some(ONE_HUNDRED_MEGABYTES)))
+
   val log = LoggerFactory.getLogger(getClass)
   implicit protected val jsonFormats: Formats = DefaultFormats
 
@@ -116,5 +120,9 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  {
 
       }
     }
+  }
+
+  error {
+    case e: SizeConstraintExceededException => RequestEntityTooLarge(s"sFile is larger than $ONE_HUNDRED_MEGABYTES")
   }
 }
