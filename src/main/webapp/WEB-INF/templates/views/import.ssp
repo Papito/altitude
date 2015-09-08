@@ -53,7 +53,7 @@
                     </div>
                 </div>
             </div>
-            <div id="startStop" class="col-md-2 col-lg-2" data-bind="visible: importMode">
+            <div id="startStop" class="col-md-2 col-lg-2" data-bind="visible: importMode()">
                 <button id="start" style="display: none" type="button" data-bind="visible: !isImporting(), click: importAssets" class="btn btn-success">Start Import</button>
                 <button id="stop" style="display: none" type="button" data-bind=" visible: isImporting(), click: cancelImport" class="btn btn-danger">STOP</button>
             </div>
@@ -65,15 +65,38 @@
     </div>
 </div>
 
+<!-- Import ptofiles -->
+<div class="row well" style="display: none" data-bind="visible: importMode() && !isImporting()">
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-12" style="text-align: center">
+                <h3>Import Profile <button type="button" class="btn btn-default"  data-toggle="modal" data-target="#createImportProfile">Create New</button></h3>
+            </div>
+        </div>
 
-<!-- Modal -->
-<div class="modal fade" id="selectImportDirectory" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="row">
+            <div class="col-md-12">
+                <select size="10" data-bind="foreach: importProfiles, visible: importProfiles.length > 0" name="importProfile" multiple="no" >
+                    <option data-bind="attr: {'value': $data}, text: $data"></option>
+                </select>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- MODALS -->
+
+
+<!-- Directory browser modal -->
+<div class="modal fade" id="selectImportDirectory" tabindex="-1" role="dialog" aria-labelledby="selectImportDirectoryLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form>
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Select a folder (all files will be scanned)</h4>
+                    <h4 class="modal-title" id="selectImportDirectoryModalLabel">Select a folder (all files will be scanned)</h4>
                 </div>
                 <div class="modal-body">
                     <select id="directoryList" size="40" data-bind="foreach: directoryNames" name="selectedDirectory" multiple="no" >
@@ -89,6 +112,39 @@
     </div>
 </div>
 
+<!-- Import profile modal -->
+<div class="modal fade" id="createImportProfile" tabindex="-1" role="dialog" aria-labelledby="createImportProfileLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="createImportProfileLabel">Create a New Import Profile</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="createImportProfileForm" class="form-horizontal">
+                        <div class="form-group">
+                            <label for="name" class="control-label"></label>
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" name="name" placeholder="Profile name">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="keywords" class="control-label"></label>
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" name="keywords" placeholder="keyword keyword, keyword">
+                            </div>
+                         </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: createImportProfile">Select</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 
 

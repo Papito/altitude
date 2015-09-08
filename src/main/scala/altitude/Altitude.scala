@@ -74,5 +74,6 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
     val library: LibraryService = new LibraryService(app)
     val asset: AssetService = new AssetService(app)
     val preview: PreviewService = new PreviewService(app)
+    val importProfile: ImportProfileService = new ImportProfileService(app)
   }
 }

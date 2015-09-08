@@ -1,5 +1,3 @@
 package altitude.dao
 
-class ImportProfileDao {
-
-}
+trait ImportProfileDao extends BaseDao

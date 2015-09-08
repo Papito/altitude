@@ -23,6 +23,7 @@ ImportViewModel = BaseViewModel.extend({
         this.assetsImportedCnt = ko.observable(0);
         this.currentAsset = ko.observable();
         this.importMode = ko.observable();
+        this.importProfiles = ko.observableArray();
         this.directoryNames = ko.observableArray();
         this.currentPath = ko.observable();
         this.importDirectory = ko.observable();
@@ -97,6 +98,27 @@ ImportViewModel = BaseViewModel.extend({
         var directoryName = $('#directoryList').val();
         this.importDirectory(this.currentPath() + "/" + directoryName);
         $('#selectImportDirectory').modal('hide');
+    },
+
+    createImportProfile: function() {
+        var self = this;
+
+        var data = {
+            'name': $("#createImportProfile input:text[name=name]").val(),
+            'keywords': $("#createImportProfile input:text[name=keywords]").val()
+        };
+
+        var opts = {
+            'data': data,
+            'successCallback': function (json) {
+                self.directoryNames(json.directoryNames);
+                self.currentPath(json.currentPath);
+            },
+            'finally': function() {
+                $('#createImportProfile').modal('hide');
+            }
+        };
+        this.post('/api/ip/', opts);
     },
 
     addWarning: function(asset, message) {

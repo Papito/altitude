@@ -42,6 +42,7 @@ object Const {
 
   object ImportProfile extends Common {
     val NAME = "name"
+    val KEYWORDS = "keywords"
   }
 
   object Metadata extends Common
