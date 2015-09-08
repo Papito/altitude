@@ -34,7 +34,7 @@ class AssetDao(val app: Altitude) extends BasePostgresDao("asset") with altitude
     /*
     Add the asset
      */
-    val asset_sql = s"""
+    val sql = s"""
         INSERT INTO $tableName (
              $CORE_SQL_COLS_FOR_INSERT, ${C.Asset.PATH}, ${C.Asset.MD5},
              ${C.Asset.FILENAME}, ${C.Asset.SIZE_BYTES},
@@ -43,7 +43,7 @@ class AssetDao(val app: Altitude) extends BasePostgresDao("asset") with altitude
             VALUES($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?, ?, ?, ?, ?, CAST(? AS jsonb))
     """
 
-    val asset_sql_vals: List[Object] = List(
+    val sqlVals: List[Object] = List(
       asset.path,
       asset.md5,
       asset.fileName,
@@ -53,6 +53,6 @@ class AssetDao(val app: Altitude) extends BasePostgresDao("asset") with altitude
       asset.mediaType.mime,
       metadata)
 
-    addRecord(jsonIn, asset_sql, asset_sql_vals)
+    addRecord(jsonIn, sql, sqlVals)
   }
 }

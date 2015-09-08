@@ -2,7 +2,7 @@ package altitude
 
 import java.sql.DriverManager
 
-import altitude.dao.{AssetDao, PreviewDao}
+import altitude.dao.{ImportProfileDao, AssetDao, PreviewDao}
 import altitude.service._
 import altitude.transactions.{AbstractTransactionManager, JdbcTransaction}
 import altitude.{Const => C}
@@ -45,6 +45,7 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
           // DAOs
           bind[AssetDao].toInstance(new altitude.dao.mongo.AssetDao(app))
           bind[PreviewDao].toInstance(new altitude.dao.mongo.PreviewDao(app))
+          bind[ImportProfileDao].toInstance(new altitude.dao.mongo.ImportProfileDao(app))
         }
         case "postgres" => {
           // register the JDBC driver
@@ -54,6 +55,7 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
           // DAOs
           bind[AssetDao].toInstance(new altitude.dao.postgres.AssetDao(app))
           bind[PreviewDao].toInstance(new altitude.dao.postgres.PreviewDao(app))
+          bind[ImportProfileDao].toInstance(new altitude.dao.postgres.ImportProfileDao(app))
         }
         case _ => {
           throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)

@@ -40,5 +40,9 @@ object Const {
     val MIME_TYPE = "mime_type"
   }
 
+  object ImportProfile extends Common {
+    val NAME = "name"
+  }
+
   object Metadata extends Common
 }
