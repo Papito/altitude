@@ -24,7 +24,7 @@
             </div>
         </div>
         <div class="row">
-           <div class="col-md-10 col-lg-10">
+           <div class="col-md-12 col-lg-12">
                 <div class="progress" style="display: none" data-bind="visible: isImporting() && assetsImportedCnt() > 0">
                     <div data-bind="attr: {'aria-valuenow': percentComplete}, style: {width: percentComplete() + '%'}"
                         class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
@@ -33,9 +33,6 @@
                 </div>
                 <div id="collecting-data-text" style="display: none" data-bind="visible: isImporting() && assetsImportedCnt() == 0">
                     <button type="button" class="btn btn-success">Collecting asset info ...</button>
-                </div>
-                <div id="ready-to-import" style="display: none" data-bind="visible: importMode() == $root.IMPORT_MODE.DIRECTORY && isImporting() == false">
-                    <span data-bind="html: 'Ready to import from <strong>' + importDirectory() + '</strong>'"></span>
                 </div>
                 <div id="asset-count-text" style="display: none" data-bind="visible: isImporting() && totalAssetsCnt()">
                     <strong>
@@ -53,33 +50,40 @@
                     </div>
                 </div>
             </div>
-            <div id="startStop" class="col-md-2 col-lg-2" data-bind="visible: importMode()">
+        </div>
+
+        <!-- Import profiles -->
+        <div class="row well" id="importProfiles" style="display: none" data-bind="visible: importMode() && !isImporting()">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-12" style="text-align: center">
+                        <h3>Import Profile <button type="button" class="btn btn-default"  data-toggle="modal" data-target="#createImportProfile">Create New</button></h3>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12" data-bind="visible: importProfiles">
+                        <select size="10" data-bind="foreach: importProfiles" name="importProfile">
+                            <option data-bind="attr: {'value': $data.id}, text: $data.name"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div id="readyToImport" class="col-md-12" style="display: none" data-bind="visible: importMode() == $root.IMPORT_MODE.DIRECTORY && isImporting() == false">
+                <span data-bind="html: 'Ready to import from <strong>' + importDirectory() + '</strong>'"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div id="startStop" class="col-md-12" data-bind="visible: importMode()">
                 <button id="start" style="display: none" type="button" data-bind="visible: !isImporting(), click: importAssets" class="btn btn-success">Start Import</button>
                 <button id="stop" style="display: none" type="button" data-bind=" visible: isImporting(), click: cancelImport" class="btn btn-danger">STOP</button>
             </div>
         </div>
+
         <div class="row">
             <div id="importMessages" class="col-md-12">
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Import ptofiles -->
-<div class="row well" style="display: none" data-bind="visible: importMode() && !isImporting()">
-    <div class="col-md-12">
-        <div class="row">
-            <div class="col-md-12" style="text-align: center">
-                <h3>Import Profile <button type="button" class="btn btn-default"  data-toggle="modal" data-target="#createImportProfile">Create New</button></h3>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-12">
-                <select size="10" data-bind="foreach: importProfiles, visible: importProfiles.length > 0" name="importProfile" multiple="no" >
-                    <option data-bind="attr: {'value': $data}, text: $data"></option>
-                </select>
-
             </div>
         </div>
     </div>

@@ -5,6 +5,14 @@ function Asset(data) {
     this.updatedAt = data ? data.updatedAt : null;
 }
 
+function ImportProfile(data) {
+    this.id = data ? data.id : null;
+    this.name = data ? data.name : null;
+    this.keyword = data ? data.keyword : null;
+    this.createdAt = data ? data.createdAt : null;
+    this.updatedAt = data ? data.updatedAt : null;
+}
+
 ImportViewModel = BaseViewModel.extend({
     constructor : function() {
         "use strict";
@@ -48,6 +56,8 @@ ImportViewModel = BaseViewModel.extend({
         this.currentAssetPath = ko.computed(function() {
             return self.currentAsset() ? self.currentAsset().path : "";
         }, this);
+
+        this.loadImportProfiles();
     },
 
     cancelImport: function() {
@@ -100,6 +110,20 @@ ImportViewModel = BaseViewModel.extend({
         $('#selectImportDirectory').modal('hide');
     },
 
+    loadImportProfiles: function() {
+        var self = this;
+        var opts = {
+            'successCallback': function (json) {
+                var importProfiles = $.map(json.importProfiles, function(ip) {
+                    return new ImportProfile(ip);
+                });
+                self.importProfiles(importProfiles);
+            }
+        };
+
+        this.get('/api/ip', opts);
+    },
+
     createImportProfile: function() {
         var self = this;
 
@@ -111,8 +135,8 @@ ImportViewModel = BaseViewModel.extend({
         var opts = {
             'data': data,
             'successCallback': function (json) {
-                self.directoryNames(json.directoryNames);
-                self.currentPath(json.currentPath);
+                // relaod
+                self.loadImportProfiles();
             },
             'finally': function() {
                 $('#createImportProfile').modal('hide');

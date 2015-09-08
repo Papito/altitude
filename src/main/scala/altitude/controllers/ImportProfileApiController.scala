@@ -1,6 +1,7 @@
 package altitude.controllers
 
 import altitude.models.ImportProfile
+import altitude.models.search.Query
 import org.scalatra.Ok
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
@@ -13,6 +14,11 @@ class ImportProfileApiController extends BaseController {
     val importProfile: ImportProfile = app.service.importProfile.getById(id)
 
     Ok(importProfile.toJson)
+  }
+
+  get("/") {
+    val jsonImportProfiles = app.service.importProfile.query(new Query())
+    Ok(Json.obj("importProfiles" -> jsonImportProfiles)) //FIXME: constants
   }
 
   post("/") {
