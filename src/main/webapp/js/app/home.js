@@ -30,6 +30,6 @@ HomeViewModel = BaseViewModel.extend({
         }
       };
 
-      this.get('/search', opts);
+      this.get('/api/search', opts);
     }
 });

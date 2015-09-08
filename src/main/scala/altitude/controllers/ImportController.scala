@@ -6,7 +6,7 @@ import org.json4s._
 import org.scalatra._
 import org.scalatra.atmosphere._
 import org.scalatra.json.{JValueResult, JacksonJsonSupport}
-import org.scalatra.servlet.{SizeConstraintExceededException, MultipartConfig, FileUploadSupport}
+import org.scalatra.servlet.{FileItem, SizeConstraintExceededException, MultipartConfig, FileUploadSupport}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{Json, JsNumber, JsObject, JsString}
 
@@ -27,6 +27,10 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
   get("/") {
     contentType="text/html"
     ssp("/import")
+  }
+
+  post("/") {
+    val files: Seq[FileItem] = fileMultiParams("files[]")
   }
 
   get("/source/local/navigate") {
