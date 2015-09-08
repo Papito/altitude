@@ -28,19 +28,11 @@
                 <div class="progress" style="display: none" data-bind="visible: isImporting() && assetsImportedCnt() > 0">
                     <div data-bind="attr: {'aria-valuenow': percentComplete}, style: {width: percentComplete() + '%'}"
                         class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-                        <h4><span data-bind="text: percentComplete"></span>%</h4>
+                        <h4><span data-bind="html: '&nbsp;&nbsp;' + assetsImportedCnt() + '/' + totalAssetsCnt()"></span></h4>
                     </div>
                 </div>
-                <div id="collecting-data-text" style="display: none" data-bind="visible: isImporting() && assetsImportedCnt() == 0">
-                    <button type="button" class="btn btn-success">Collecting asset info ...</button>
-                </div>
-                <div id="asset-count-text" style="display: none" data-bind="visible: isImporting() && totalAssetsCnt()">
-                    <strong>
-                        Importing asset
-                        <span data-bind="text: assetsImportedCnt()"></span> of
-                        <span data-bind="text: totalAssetsCnt()"></span>
-                    </strong>
-                    <span id="currentAssetPath" data-bind="text: currentAssetPath"></span>
+                <div class="col-md-12" style="display: none; text-align: center; margin: 1em" data-bind="visible: isImporting() && assetsImportedCnt() == 0">
+                    Collecting asset info
                 </div>
                 <div class="row">
                     <div class="col-md-5">
@@ -103,7 +95,7 @@
                     <h4 class="modal-title" id="selectImportDirectoryModalLabel">Select a folder (all files will be scanned)</h4>
                 </div>
                 <div class="modal-body">
-                    <select id="directoryList" size="40" data-bind="foreach: directoryNames" name="selectedDirectory" multiple="no" >
+                    <select id="directoryList" size="20" data-bind="foreach: directoryNames" name="selectedDirectory" multiple="no" >
                         <option data-bind="attr: {'value': $data}, text: $data, event : { dblclick: $parent.dropIntoDirectory($data) }"></option>
                     </select>
                 </div>
