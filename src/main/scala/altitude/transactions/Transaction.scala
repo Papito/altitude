@@ -1,12 +1,5 @@
 package altitude.transactions
 
-object Transaction {
-  var COMMITTED = 0
-  var CREATED = 0
-  var CLOSED = 0
-  var ROLLED_BACK = 0
-}
-
 trait Transaction {
   val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
   var _level: Int  = 0

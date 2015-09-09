@@ -31,6 +31,5 @@ class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres"))
       The committed count must be kept at zero
     */
     log.info("END SETUP")
-    Transaction.COMMITTED = 0
  }
 }

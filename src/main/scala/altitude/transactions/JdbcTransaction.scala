@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory
 class JdbcTransaction(val conn: Connection) extends Transaction {
   val log =  LoggerFactory.getLogger(getClass)
 
-  Transaction.CREATED += 1
 
   log.debug(s"New JDBC transaction $id", C.tag.DB)
   def getConnection: Connection = conn
@@ -16,7 +15,6 @@ class JdbcTransaction(val conn: Connection) extends Transaction {
   override def close() = {
     if (!isNested) {
       log.debug(s"Closing connection for transaction $id", C.tag.DB)
-      Transaction.CLOSED += 1
       conn.close()
     }
   }
@@ -24,7 +22,6 @@ class JdbcTransaction(val conn: Connection) extends Transaction {
   override def commit() {
     if (!isNested) {
       log.debug(s"Committing transaction $id", C.tag.DB)
-      Transaction.COMMITTED += 1
       conn.commit()
     }
   }
@@ -32,7 +29,6 @@ class JdbcTransaction(val conn: Connection) extends Transaction {
   override def rollback() {
     if (!isNested && !conn.isReadOnly) {
       log.warn(s"ROLLBACK for transaction $id", C.tag.DB)
-      Transaction.ROLLED_BACK += 1
       conn.rollback()
     }
   }
