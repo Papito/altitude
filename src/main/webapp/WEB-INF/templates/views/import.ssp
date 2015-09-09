@@ -1,3 +1,5 @@
+<% import altitude.{Const => C} %>
+
 #set (assets)
     <script src="/js/lib/jquery-atmosphere.js" xmlns="http://www.w3.org/1999/html"></script>
     <script src="/js/app/import.js?<%= altitude.Util.randomStr(10) %>"></script>
@@ -55,7 +57,7 @@
 
                 <div class="row"  data-bind="visible: importProfiles().length > 0">
                     <div class="col-md-12">
-                        <select size="10" data-bind="foreach: importProfiles" name="importProfile">
+                        <select size="10" data-bind="foreach: importProfiles" name="${C.Api.ImportProfile.IMPORT_PROFILES}">
                             <option data-bind="attr: {'value': $data.id}, text: $data.name"></option>
                         </select>
                     </div>
@@ -119,15 +121,15 @@
                 <div class="modal-body">
                     <div id="createImportProfileForm" class="form-horizontal">
                         <div class="form-group">
-                            <label for="name" class="control-label"></label>
+                            <label for="${C.Api.ImportProfile.NAME}" class="control-label"></label>
                             <div class="col-md-12">
-                                <input type="text" class="form-control" name="name" placeholder="Profile name">
+                                <input type="text" class="form-control" name="${C.Api.ImportProfile.NAME}" placeholder="Profile name">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="keywords" class="control-label"></label>
+                            <label for="${C.Api.ImportProfile.KEYWORDS}" class="control-label"></label>
                             <div class="col-md-12">
-                                <input type="text" class="form-control" name="keywords" placeholder="keyword keyword, keyword">
+                                <input type="text" class="form-control" name="${C.Api.ImportProfile.KEYWORDS}" placeholder="keyword keyword, keyword">
                             </div>
                          </div>
                     </div>

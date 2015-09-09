@@ -69,6 +69,7 @@ object Const {
     object ImportProfile {
       val IMPORT_PROFILES = "importProfiles"
       val NAME = "name"
+      val KEYWORDS = "keywords"
     }
 
     object Search {
