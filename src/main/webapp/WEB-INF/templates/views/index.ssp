@@ -1,4 +1,5 @@
 #set (assets)
+    <script src="/js/app/models.js?<%= altitude.Util.randomStr(10) %>"></script>
     <script src="/js/app/home.js?<%= altitude.Util.randomStr(10) %>"></script>
 #end
 

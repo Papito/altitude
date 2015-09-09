@@ -1,10 +1,3 @@
-function Asset(data) {
-    this.id = data ? data.id : null;
-    this.fileName = data ? data.fileName : null;
-    this.createdAt = data ? data.createdAt : null;
-    this.updatedAt = data ? data.updatedAt : null;
-}
-
 function ImportProfile(data) {
     this.id = data ? data.id : null;
     this.name = data ? data.name : null;
