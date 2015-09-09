@@ -12,13 +12,14 @@ import play.api.libs.json.{Json, JsNumber, JsObject, JsString}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import altitude.{Const => C}
 import altitude.exceptions.{DuplicateException, StopImport}
 import altitude.models.{Asset, FileImportAsset}
 
 
 class ImportController extends BaseController  with JValueResult
 with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUploadSupport  {
-  val ONE_HUNDRED_MEGABYTES = 1024 * 1024 * 100;
+  val ONE_HUNDRED_MEGABYTES = 1024 * 1024 * 100
   configureMultipartHandling(MultipartConfig(maxFileSize = Some(ONE_HUNDRED_MEGABYTES)))
 
   val log = LoggerFactory.getLogger(getClass)
@@ -34,13 +35,13 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
   }
 
   get("/source/local/navigate") {
-    val path: String = this.params.getOrElse("path", "/") //FIXME: const
+    val path: String = this.params.getOrElse(C.Api.PATH, "/")
     log.debug(s"Getting directory name list for $path")
     val files: Seq[File] = new File(path).listFiles().toSeq
     val directoryList: Seq[String] = files.filter(_.isDirectory == true).map(_.getName)
     Json.obj(
-      "directoryNames" -> directoryList,
-      "currentPath" -> path)
+      C.Api.DIRECTORY_NAMES -> directoryList,
+      C.Api.CURRENT_PATH -> path)
   }
 
   atmosphere("/ws") {
@@ -82,25 +83,24 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
                 asset = app.service.fileImport.importAsset(importAsset.get)
               }
 
-              JsObject(Seq("asset" -> asset.get.toJson)).toString()
+              JsObject(Seq(C.Api.Asset.ASSET -> asset.get.toJson)).toString()
             }
             catch {
               case ex: StopImport => "END"
               case ex: DuplicateException => {
                 JsObject(Seq(
-                  //FIXME: constants
-                  "warning" -> JsString("Duplicate"),
-                  "asset" -> ex.asset.toJson)).toString()
+                  C.Api.WARNING -> JsString(C.MSG("warn.duplicate")),
+                  C.Api.Asset.ASSET -> ex.asset.toJson)).toString()
               }
               case ex: Throwable => {
                 importAsset.isDefined match {
                   case true => // import asset exists, we send the error and skip the asset
                     JsObject(Seq(
-                      "error" -> JsString(ex.getMessage),
-                      "importAsset" -> importAsset.get.toJson)).toString()
+                      C.Api.ERROR -> JsString(ex.getMessage),
+                      C.Api.ImportAsset.IMPORT_ASSET -> importAsset.get.toJson)).toString()
                   case false => // this is a critical error (not asset specific). We bail
                     criticalException = Some(ex)
-                    JsObject(Seq("critical" -> JsString(ex.getMessage))).toString()
+                    JsObject(Seq(C.Api.CRITICAL -> JsString(ex.getMessage))).toString()
                 }
               }
             }

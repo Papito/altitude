@@ -13,7 +13,6 @@ class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres"))
   override def beforeAll(): Unit = {
     log.info("TEST. Resetting DB schema once")
 
-
     val evolutionPath = new java.io.File( "evolutions/postgres/1.sql" ).getCanonicalPath
     val sql = scala.io.Source.fromFile(evolutionPath).mkString
     //log.info(s"Running $sql")

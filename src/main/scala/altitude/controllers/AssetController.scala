@@ -2,10 +2,11 @@ package altitude.controllers
 
 import altitude.exceptions.NotFoundException
 import altitude.models.Preview
+import altitude.{Const => C}
 
 class AssetController extends BaseController {
   get("/:id/preview") {
-    val id = params("id")
+    val id = params(C.Api.ID)
 
     try {
       val preview: Preview = app.service.library.getPreview(id)
@@ -13,7 +14,7 @@ class AssetController extends BaseController {
       preview.data
     }
     catch {
-      case ex: NotFoundException => redirect("/i/1x1.png")
+      case ex: NotFoundException => redirect("/i/1x1.png") //FIXME: preload and return binary data
     }
   }
 }

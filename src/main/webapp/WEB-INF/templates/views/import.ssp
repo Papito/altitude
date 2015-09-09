@@ -84,7 +84,6 @@
 
 <!-- MODALS -->
 
-
 <!-- Directory browser modal -->
 <div class="modal fade" id="selectImportDirectory" tabindex="-1" role="dialog" aria-labelledby="selectImportDirectoryLabel">
     <div class="modal-dialog" role="document">

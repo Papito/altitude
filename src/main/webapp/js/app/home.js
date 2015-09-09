@@ -23,7 +23,7 @@ HomeViewModel = BaseViewModel.extend({
       var self = this;
       var opts = {
         'successCallback': function (json) {
-          var assets = $.map(json.results, function(asset) {
+          var assets = $.map(json.assets, function(asset) {
             return new Asset(asset);
           });
           self.searchResults(assets);

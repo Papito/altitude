@@ -46,4 +46,38 @@ object Const {
   }
 
   object Metadata extends Common
+
+  object Api {
+    val ERROR = "error"
+    val WARNING = "warning"
+    val CRITICAL = "critical"
+
+    val ID = "id"
+    val PATH = "path"
+    val DIRECTORY_NAMES = "directoryNames"
+    val CURRENT_PATH = "currentPath"
+
+    object ImportAsset {
+      val IMPORT_ASSET = "importAsset"
+    }
+
+    object Asset {
+      val ASSET = "asset"
+      val ASSETS = "assets"
+    }
+
+    object ImportProfile {
+      val IMPORT_PROFILES = "importProfiles"
+      val NAME = "name"
+    }
+
+    object Search {
+      val ASSETS = "assets"
+    }
+  }
+
+  val MSG: Map[String, String] = Map(
+    "warn.duplicate" -> "Duplicate"
+  )
+
 }
