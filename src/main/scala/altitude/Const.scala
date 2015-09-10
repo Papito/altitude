@@ -78,7 +78,8 @@ object Const {
   }
 
   val MSG: Map[String, String] = Map(
-    "warn.duplicate" -> "Duplicate"
+    "warn.duplicate" -> "Duplicate",
+    "err.required" -> "This field is required"
   )
 
 }

@@ -10,5 +10,4 @@ import org.scalatest.Matchers._
     val assets: List[Asset] = altitude.service.library.search(new Query())
     assets.length should be(0)
   }
-
 }
