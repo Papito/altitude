@@ -3,7 +3,7 @@ package altitude.service
 import altitude.Validators.Validator
 import altitude.Altitude
 import altitude.dao.ImportProfileDao
-import altitude.models.{ImportProfile}
+import altitude.models.ImportProfile
 import altitude.transactions.TransactionId
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory

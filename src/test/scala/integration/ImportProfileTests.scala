@@ -6,8 +6,16 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
 @DoNotDiscover class ImportProfileTests(val config: Map[String, String]) extends IntegrationTestCore {
-  test("Profile validation") {
+  test("Missing profile name") {
     val importProfile: ImportProfile = new ImportProfile(name = "")
+
+    intercept[ValidationException] {
+      altitude.service.importProfile.add(importProfile)
+    }
+  }
+
+  test("Empty profile name") {
+    val importProfile: ImportProfile = new ImportProfile(name = "   \t \n")
 
     intercept[ValidationException] {
       altitude.service.importProfile.add(importProfile)
