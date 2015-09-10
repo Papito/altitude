@@ -1,29 +1,27 @@
 package altitude
 
 import altitude.exceptions.ValidationException
-import altitude.models.BaseModel
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsObject}
 import altitude.{Const => C}
 
 object Validators {
 
-  class Validator(val required: Option[List[String]] = None, val maxLengths: Option[Map[String, Int]] = None) {
+  case class Validator(required: Option[List[String]] = None,
+                       maxLengths: Option[Map[String, Int]] = None) {
 
-    def validate(model: BaseModel): Unit = {
+    def validate(json: JsObject): Unit = {
       val exception = new ValidationException
-      val json = model.toJson
-      if (required.isDefined) checkRequired(json, exception)
+      checkRequired(json, exception)
 
       if (exception.errors.nonEmpty) {
         throw new ValidationException
       }
     }
 
-    private def checkRequired(json: JsValue, ex: ValidationException): Unit = {
-      required.get.foreach { field =>
-        val value = (json \ field).asOpt[String]
-        if (value.isEmpty || value.get == "") {
-          ex.errors += (field -> C.MSG("err.required"))
+    private def checkRequired(json: JsObject, ex: ValidationException): Unit = {
+      required.getOrElse(List[String]()) foreach { field =>
+        (json \ field).asOpt[String] match {
+          case v if v.isEmpty || v.get == "" => ex.errors += (field -> C.MSG("err.required"))
         }
       }
     }
