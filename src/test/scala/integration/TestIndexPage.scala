@@ -1,6 +1,6 @@
 package integration
 
-import altitude.controllers.IndexController
+import altitude.controllers.web.IndexController
 import org.scalatest.FunSuiteLike
 import org.scalatra.test.scalatest._
 

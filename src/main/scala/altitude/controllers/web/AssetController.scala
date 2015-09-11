@@ -1,10 +1,11 @@
-package altitude.controllers
+package altitude.controllers.web
 
+import altitude.controllers.BaseController
 import altitude.exceptions.NotFoundException
 import altitude.models.Preview
 import altitude.{Const => C}
 
-class AssetController extends BaseController {
+class AssetController extends BaseWebController {
   get("/:id/preview") {
     val id = params(C.Api.ID)
 

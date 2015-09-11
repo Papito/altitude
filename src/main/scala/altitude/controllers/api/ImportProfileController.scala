@@ -1,14 +1,15 @@
-package altitude.controllers
+package altitude.controllers.api
 
+import altitude.controllers.BaseController
 import altitude.models.ImportProfile
 import altitude.models.search.Query
+import altitude.{Const => C}
 import org.scalatra.Ok
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
-import altitude.{Const => C}
 
-class ImportProfileApiController extends BaseController {
-  val log =  LoggerFactory.getLogger(getClass)
+class ImportProfileController extends BaseApiController {
+  override val log =  LoggerFactory.getLogger(getClass)
 
   get("/:id") {
     val id = params(C.Api.ID)

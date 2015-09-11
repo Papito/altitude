@@ -5,7 +5,7 @@ import altitude.exceptions.NotFoundException
 import altitude.models.BaseModel
 import altitude.models.search.Query
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
-import altitude.{Const => C, Cleaners, Validators, Altitude}
+import altitude.{Const => C, Altitude}
 import net.codingwell.scalaguice.InjectorExtensions._
 import play.api.libs.json.JsObject
 import altitude.Validators.Validator

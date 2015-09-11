@@ -1,23 +1,23 @@
-package altitude.controllers
+package altitude.controllers.web
 
 import java.io.File
 
+import altitude.controllers.BaseController
+import altitude.exceptions.{DuplicateException, StopImport}
+import altitude.models.{Asset, FileImportAsset}
+import altitude.{Const => C}
 import org.json4s._
 import org.scalatra._
 import org.scalatra.atmosphere._
 import org.scalatra.json.{JValueResult, JacksonJsonSupport}
-import org.scalatra.servlet.{FileItem, SizeConstraintExceededException, MultipartConfig, FileUploadSupport}
+import org.scalatra.servlet.{FileItem, FileUploadSupport, MultipartConfig, SizeConstraintExceededException}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{Json, JsNumber, JsObject, JsString}
+import play.api.libs.json.{JsNumber, JsObject, JsString, Json}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import altitude.{Const => C}
-import altitude.exceptions.{DuplicateException, StopImport}
-import altitude.models.{Asset, FileImportAsset}
 
-
-class ImportController extends BaseController  with JValueResult
+class ImportController extends BaseWebController  with JValueResult
 with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUploadSupport  {
   val ONE_HUNDRED_MEGABYTES = 1024 * 1024 * 100
   configureMultipartHandling(MultipartConfig(maxFileSize = Some(ONE_HUNDRED_MEGABYTES)))
