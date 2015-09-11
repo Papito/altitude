@@ -14,7 +14,6 @@ object Validators {
       checkRequired(json, exception)
 
       if (exception.errors.nonEmpty) {
-        println("HERE")
         throw exception
       }
     }
