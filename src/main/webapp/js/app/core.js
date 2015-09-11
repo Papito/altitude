@@ -64,12 +64,8 @@ BaseViewModel = Base.extend({
                 }
 
             },
-            success : function(data, textStatus, jqXHR) {
-                if (data) {
-                    console.log(data);
-                }
-                var json = JSON.parse(data);
-
+            success : function(json, textStatus, jqXHR) {
+                console.log(json);
                 if (opts.successCallback) {
                     opts.successCallback(json, textStatus, jqXHR);
                 }

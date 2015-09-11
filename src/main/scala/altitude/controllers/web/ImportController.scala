@@ -2,7 +2,6 @@ package altitude.controllers.web
 
 import java.io.File
 
-import altitude.controllers.BaseController
 import altitude.exceptions.{DuplicateException, StopImport}
 import altitude.models.{Asset, FileImportAsset}
 import altitude.{Const => C}
@@ -15,7 +14,6 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsNumber, JsObject, JsString, Json}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 
 class ImportController extends BaseWebController  with JValueResult
 with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUploadSupport  {
@@ -31,7 +29,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
   }
 
   post("/") {
-    val files: Seq[FileItem] = fileMultiParams("files[]")
+    //val files: Seq[FileItem] = fileMultiParams("files[]")
   }
 
   get("/source/local/navigate") {
@@ -39,9 +37,10 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
     log.debug(s"Getting directory name list for $path")
     val files: Seq[File] = new File(path).listFiles().toSeq
     val directoryList: Seq[String] = files.filter(_.isDirectory == true).map(_.getName)
+    contentType = "application/json"
     Json.obj(
       C.Api.DIRECTORY_NAMES -> directoryList,
-      C.Api.CURRENT_PATH -> path)
+      C.Api.CURRENT_PATH -> path).toString()
   }
 
   atmosphere("/ws") {
