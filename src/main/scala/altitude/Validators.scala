@@ -14,6 +14,7 @@ object Validators {
       checkRequired(json, exception)
 
       if (exception.errors.nonEmpty) {
+        println("HERE")
         throw exception
       }
     }
@@ -22,6 +23,7 @@ object Validators {
       required.getOrElse(List[String]()) foreach { field =>
         (json \ field).asOpt[String] match {
           case v if v.isEmpty || v.get == "" => ex.errors += (field -> C.MSG("err.required"))
+          case _ =>
         }
       }
     }

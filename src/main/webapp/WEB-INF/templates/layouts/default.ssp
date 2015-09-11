@@ -7,7 +7,7 @@
 <html>
 <head>
 <title>${config.getString("app.name")}</title>
-<link rel="stylesheet" type="text/css" href="/css/app.css">
+<link rel="stylesheet" type="text/css" href="/css/app.css?<%= altitude.Util.randomStr(10) %>">
 <link rel="stylesheet" type="text/css" href="/css/lib/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="/css/lib/select2.css">
 <link rel="stylesheet" type="text/css" href="/css/lib/select2.png">

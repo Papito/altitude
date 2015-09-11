@@ -55,7 +55,22 @@ BaseViewModel = Base.extend({
                 if (jqXHR.status === 500) {
                     console.log(jqXHR.responseText);
                 }
-                else if (opts.errorCallback) {
+
+                if (jqXHR.status === 400) {
+                    var json = jqXHR.responseJSON;
+
+                    if (json.validationErrors) {
+                        var errz = json.validationErrors;
+                        for(var field in errz) {
+                            $('[name=' + field + ']')
+                                .parent().parent().addClass('has-error')
+                                .find('> .error').text(errz[field]);
+                        }
+
+                    }
+                }
+
+                if (opts.errorCallback) {
                     opts.errorCallback(jqXHR, textStatus, errorThrown);
                 }
 

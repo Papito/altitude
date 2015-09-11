@@ -75,3 +75,11 @@ body {
     float: left;
     margin: 1em;
 }
+
+/* FORMS */
+
+.form-group .error {
+    color: Red;
+    font-weight: bold;
+    margin-left: 1.1em;
+}

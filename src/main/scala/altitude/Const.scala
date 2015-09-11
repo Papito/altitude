@@ -51,6 +51,7 @@ object Const {
     val ERROR = "error"
     val WARNING = "warning"
     val CRITICAL = "critical"
+    val VALIDATION_ERRORS = "validationErrors"
 
     val ID = "id"
     val PATH = "path"

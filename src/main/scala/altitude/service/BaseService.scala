@@ -26,7 +26,7 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
     }
     VALIDATOR match {
       case Some(validator) => VALIDATOR.get.validate(cleaned)
-      case None => cleaned
+      case None => 
     }
 
     txManager.withTransaction[JsObject] {

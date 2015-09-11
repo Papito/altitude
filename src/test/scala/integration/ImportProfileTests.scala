@@ -21,4 +21,9 @@ import org.scalatest.Matchers._
       altitude.service.importProfile.add(importProfile)
     }
   }
+
+  test("Good profile") {
+    val importProfile: ImportProfile = new ImportProfile(name = "test")
+    altitude.service.importProfile.add(importProfile)
+  }
 }

@@ -130,8 +130,6 @@ ImportViewModel = BaseViewModel.extend({
             'successCallback': function (json) {
                 // relaod
                 self.loadImportProfiles();
-            },
-            'finally': function() {
                 $('#createImportProfile').modal('hide');
             }
         };
