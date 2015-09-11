@@ -111,6 +111,7 @@ ImportViewModel = BaseViewModel.extend({
                     return new ImportProfile(ip);
                 });
                 self.importProfiles(importProfiles);
+                self.clean($('#createImportProfile'));
             }
         };
 

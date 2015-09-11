@@ -33,6 +33,10 @@ BaseViewModel = Base.extend({
     },
     // ----------------------------------------------------------------
 
+    reset: function(el) {
+        $(el).find('.has-error').removeClass('has-error').parent().find('> .error').text('');
+    },
+
     restRequest : function(url, method, opts) {
         var self = this;
 
@@ -63,7 +67,7 @@ BaseViewModel = Base.extend({
                         var errz = json.validationErrors;
                         for(var field in errz) {
                             $('[name=' + field + ']')
-                                .parent().parent().addClass('has-error')
+                                .parent().addClass('has-error').parent()
                                 .find('> .error').text(errz[field]);
                         }
 
