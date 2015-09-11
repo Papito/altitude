@@ -9,6 +9,10 @@ import play.api.libs.json.{JsObject, JsString, Json}
 class BaseApiController extends BaseController {
   val log =  LoggerFactory.getLogger(getClass)
 
+  before() {
+    contentType = "application/json"
+  }
+
   notFound {
     NotFound()
   }
