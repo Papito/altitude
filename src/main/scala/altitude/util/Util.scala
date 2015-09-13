@@ -15,5 +15,5 @@ package object Util {
 
   private val DELIM_REGEX = List(" ",",").mkString("|").r
   def parseKeywords(s: String): Set[String] =
-    DELIM_REGEX.split(s).map(_.trim).filter(_ != "").toSet
+    DELIM_REGEX.split(s).map(_.trim.toLowerCase).filter(_ != "").toSet
 }
