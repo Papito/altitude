@@ -1,6 +1,7 @@
 package altitude
 
 import altitude.exceptions.ValidationException
+import org.scalatra.Params
 import play.api.libs.json.{JsObject}
 import altitude.{Const => C}
 
@@ -25,6 +26,21 @@ object Validators {
         }
       }
       ex
+    }
+  }
+
+  case class ApiValidator(required: List[String]) {
+    def validate(params: Params): Unit = {
+      val ex: ValidationException = new ValidationException
+
+      required foreach { field =>
+        params.contains(field) match {
+          case false => ex.errors += (field -> C.MSG("err.required"))
+          case _ =>
+        }
+      }
+
+      if (ex.errors.nonEmpty) throw ex
     }
   }
 }

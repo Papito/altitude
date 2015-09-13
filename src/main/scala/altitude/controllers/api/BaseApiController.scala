@@ -1,5 +1,6 @@
 package altitude.controllers.api
 
+import altitude.Validators.ApiValidator
 import altitude.controllers.BaseController
 import altitude.exceptions.ValidationException
 import org.scalatra.{GZipSupport, BadRequest, NotFound}
@@ -9,9 +10,15 @@ import altitude.{Const => C}
 
 class BaseApiController extends BaseController with GZipSupport {
   val log =  LoggerFactory.getLogger(getClass)
+  val POST_VALIDATOR: Option[ApiValidator] = None
 
   before() {
     contentType = "application/json"
+
+    POST_VALIDATOR match {
+      case Some(ApiValidator(required)) if request.getMethod.toLowerCase == "post" => POST_VALIDATOR.get.validate(params)
+      case _ =>
+    }
   }
 
   notFound {
@@ -25,7 +32,9 @@ class BaseApiController extends BaseController with GZipSupport {
         res ++ Json.obj(key -> ex.errors(key))}
       }
 
-      BadRequest(Json.obj(C.Api.VALIDATION_ERRORS -> jsonErrors))
+      BadRequest(Json.obj(
+        C.Api.ERROR -> ex.message,
+        C.Api.VALIDATION_ERRORS -> jsonErrors))
     }
   }
 }

@@ -1,16 +1,20 @@
 package altitude.controllers.api
 
-import altitude.controllers.BaseController
+import altitude.Validators.ApiValidator
 import altitude.models.ImportProfile
 import altitude.models.search.Query
 import altitude.service.TagConfigService
 import altitude.{Const => C}
 import org.scalatra.Ok
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsNull, JsArray, JsValue, Json}
+import play.api.libs.json.{JsArray, JsValue, Json}
 
 class ImportProfileController extends BaseApiController {
   override val log =  LoggerFactory.getLogger(getClass)
+
+  override val POST_VALIDATOR = Some(ApiValidator(List(
+    C.Api.ImportProfile.NAME, C.Api.ImportProfile.KEYWORDS
+  )))
 
   get("/:id") {
     val id = params(C.Api.ID)
