@@ -18,9 +18,9 @@ abstract class BaseModel {
   def toJson: JsObject
 
   // created at
-  protected var _createdAt: Option[DateTime]  = None
+  protected var _createdAt: Option[DateTime] = None
 
-  def createdAt: Option[DateTime] = _createdAt
+  def createdAt = _createdAt
 
   def createdAt_= (arg: DateTime): Unit = {
     if (_createdAt.isDefined)
@@ -29,14 +29,28 @@ abstract class BaseModel {
   }
 
   // updated at
-  protected var _updatedAt: Option[DateTime]  = None
+  protected var _updatedAt: Option[DateTime] = None
 
-  def updatedAt: Option[DateTime] = _updatedAt
+  def updatedAt = _updatedAt
 
   def updatedAt_= (arg: DateTime): Unit = {
     if (_updatedAt.isDefined)
       throw new RuntimeException("Cannot set 'updated_at' twice")
     _updatedAt = Some(arg)
+  }
+
+  // is clean (for validation)
+  protected var _isClean = false
+
+  def isClean = _isClean
+
+  def isClean_= (arg: Boolean): Boolean = {
+    // if object is not clean, set as clean, otherwise, move along
+    if (!_isClean && arg) {
+      _isClean = true
+    }
+
+    isClean
   }
 
   /*
@@ -56,7 +70,9 @@ abstract class BaseModel {
     C.Base.UPDATED_AT -> {updatedAt match {
         case None => JsNull
         case _ => JsString(Util.isoDateTime(updatedAt))
-    }}
+    }},
+
+    C.Base.IS_CLEAN -> JsBoolean(isClean)
   ).toSeq)
 
   /*
@@ -73,6 +89,12 @@ abstract class BaseModel {
 
     if (isoUpdatedAt.isDefined) {
       updatedAt = ISODateTimeFormat.dateTime().parseDateTime(isoUpdatedAt.get)
+    }
+
+    val clean = (json \ C.Base.IS_CLEAN).asOpt[Boolean]
+
+    if (clean.isDefined) {
+      _isClean = clean.get
     }
 
     this

@@ -1,6 +1,7 @@
 package altitude
 
 import play.api.libs.json.{JsObject, Json}
+import altitude.{Const => C}
 
 object Cleaners {
   case class Cleaner(trim: Option[List[String]] = None,
@@ -8,7 +9,7 @@ object Cleaners {
                      defaults:  Option[Map[String, String]] = None) {
 
     def clean(json: JsObject): JsObject = {
-      doLower(doDefaults(doTrim(json)))
+      doLower(doDefaults(doTrim(json))) ++ Json.obj(C.Base.IS_CLEAN -> true)
     }
 
     protected def doTrim(json: JsObject): JsObject = {

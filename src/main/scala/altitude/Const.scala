@@ -11,6 +11,7 @@ object Const {
     val DATA = "data"
     val CREATED_AT = "created_at"
     val UPDATED_AT = "updated_at"
+    val IS_CLEAN = "is_clean"
   }
 
   object Base extends Common

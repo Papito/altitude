@@ -14,6 +14,10 @@ object Validators {
                        maxLengths: Option[Map[String, Int]] = None) {
 
     def validate(json: JsObject, raise: Boolean = true): ValidationException = {
+      if (!(json \ C.Base.IS_CLEAN).asOpt[Boolean].contains(true)) {
+        throw new RuntimeException("Object not sanitized for validation")
+      }
+
       val ex: ValidationException = new ValidationException
       checkRequired(json, ex)
 
