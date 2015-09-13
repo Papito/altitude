@@ -2,12 +2,12 @@ package altitude.controllers.api
 
 import altitude.controllers.BaseController
 import altitude.exceptions.ValidationException
-import org.scalatra.{BadRequest, NotFound}
+import org.scalatra.{GZipSupport, BadRequest, NotFound}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 import altitude.{Const => C}
 
-class BaseApiController extends BaseController {
+class BaseApiController extends BaseController with GZipSupport {
   val log =  LoggerFactory.getLogger(getClass)
 
   before() {

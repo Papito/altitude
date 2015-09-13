@@ -3,7 +3,7 @@ package altitude.controllers
 import javax.servlet.http.HttpServletRequest
 
 import altitude.SingleApplication
-import org.scalatra.ScalatraServlet
+import org.scalatra.{GZipSupport, ScalatraServlet}
 
 import scala.collection.mutable
 
