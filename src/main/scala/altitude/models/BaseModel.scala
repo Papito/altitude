@@ -15,7 +15,7 @@ object BaseModel {
 abstract class BaseModel {
   val id: Option[String]
 
-  val toJson: JsObject
+  def toJson: JsObject
 
   // created at
   protected var _createdAt: Option[DateTime]  = None
