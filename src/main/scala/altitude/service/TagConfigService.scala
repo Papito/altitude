@@ -8,6 +8,7 @@ class TagConfigService(val app: Altitude) {
 
   def getAll: List[AbstractTag] = {
     val keywordField = StringTag(
+      id = Some("1"),
       name = "Keywords",
       allowsMulti = true,
       restrictedValueList = EMPTY_LIST)
