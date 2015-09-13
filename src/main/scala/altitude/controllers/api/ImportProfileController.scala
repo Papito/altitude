@@ -25,24 +25,17 @@ class ImportProfileController extends BaseApiController {
   }
 
   post("/") {
-    val name = params.getOrElse(C.Api.ImportProfile.NAME, "")
-    val keywords = params.getOrElse(C.Api.ImportProfile.KEYWORDS, "")
+    val name = params.get(C.Api.ImportProfile.NAME)
+    val keywords = params.get(C.Api.ImportProfile.KEYWORDS)
 
     //TODO: parse keywords with a utility
     val keywordList = List(keywords)
 
-    val tagData: JsValue = keywordList.isEmpty match {
-      case true => JsArray(Seq(
-        Json.obj(C.Api.ID -> TagConfigService.KEYWORDS_TAG_ID, C.Api.DATA -> JsNull)
-      ))
-      case false => JsArray(Seq(
-          Json.obj(C.Api.ID -> TagConfigService.KEYWORDS_TAG_ID, C.Api.DATA -> keywordList)
-      ))
-    }
+    val tagData: JsValue = JsArray(Seq(
+          Json.obj(C.Tag.ID -> TagConfigService.KEYWORDS_TAG_ID, C.ImportProfile.VALUES -> keywordList)
+    ))
 
-
-
-    val importProfile = new ImportProfile(name = name, tagData = tagData)
+    val importProfile = new ImportProfile(name = name.get, tagData = tagData)
     log.debug(importProfile.toJson.toString())
     val newImportProfile: ImportProfile = app.service.importProfile.add(importProfile)
 

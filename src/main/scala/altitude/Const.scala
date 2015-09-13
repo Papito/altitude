@@ -7,6 +7,8 @@ object Const {
   ---------------------------------------------------------------------------*/
   trait Common {
     val ID = "id"
+    val VALUES = "values"
+    val DATA = "data"
     val CREATED_AT = "created_at"
     val UPDATED_AT = "updated_at"
   }
@@ -26,7 +28,6 @@ object Const {
 
   object Preview extends Common {
     val ASSET_ID =  "asset_id"
-    val DATA = "data"
     val MIME_TYPE = "mime_type"
   }
 
@@ -87,7 +88,8 @@ object Const {
   ---------------------------------------------------------------------------*/
   val MSG: Map[String, String] = Map(
     "warn.duplicate" -> "Duplicate",
-    "err.required" -> "This field is required"
+    "err.required" -> "This field is required",
+    "err.wrong_type" -> "This field does not match the required type (%s)"
   )
 
   /*---------------------------------------------------------------------------

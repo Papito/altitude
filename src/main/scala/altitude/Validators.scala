@@ -9,22 +9,22 @@ object Validators {
   case class Validator(required: Option[List[String]] = None,
                        maxLengths: Option[Map[String, Int]] = None) {
 
-    def validate(json: JsObject): Unit = {
-      val exception = new ValidationException
-      checkRequired(json, exception)
+    def validate(json: JsObject, raise: Boolean = true): ValidationException = {
+      val ex: ValidationException = new ValidationException
+      checkRequired(json, ex)
 
-      if (exception.errors.nonEmpty) {
-        throw exception
-      }
+      if (raise && ex.errors.nonEmpty) throw ex
+      ex
     }
 
-    private def checkRequired(json: JsObject, ex: ValidationException): Unit = {
+    protected def checkRequired(json: JsObject, ex: ValidationException): ValidationException = {
       required.getOrElse(List[String]()) foreach { field =>
-        (json \ field).asOpt[String] match {
-          case v if v.isEmpty || v.get == "" => ex.errors += (field -> C.MSG("err.required"))
+        json.keys.contains(field) match {
+          case false => ex.errors += (field -> C.MSG("err.required"))
           case _ =>
         }
       }
+      ex
     }
   }
 }

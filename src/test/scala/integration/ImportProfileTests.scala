@@ -1,11 +1,13 @@
 package integration
 
+import altitude.{Const => C}
 import altitude.exceptions.ValidationException
 import altitude.models.ImportProfile
+import altitude.service.TagConfigService
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 import integration.util.Text
-import play.api.libs.json.{JsArray, JsNull}
+import play.api.libs.json.{Json, JsArray, JsNull}
 
 @DoNotDiscover class ImportProfileTests(val config: Map[String, String]) extends IntegrationTestCore {
   test("Missing profile name") {
@@ -41,7 +43,11 @@ import play.api.libs.json.{JsArray, JsNull}
   }
 
   test("Good profile") {
-    val importProfile: ImportProfile = new ImportProfile(name = Text.randomStr(), tagData = JsNull)
+    val importProfile: ImportProfile = new ImportProfile(
+      name = Text.randomStr(),
+      tagData = JsArray(Seq(
+        Json.obj(C.Tag.ID -> TagConfigService.KEYWORDS_TAG_ID, C.ImportProfile.VALUES -> List("k1", "k2"))
+      )))
     altitude.service.importProfile.add(importProfile)
   }
 }
