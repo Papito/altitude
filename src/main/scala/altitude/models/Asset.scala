@@ -26,7 +26,7 @@ case class Asset(id: Option[String] = None,
 
   val fileName: String = FilenameUtils.getName(path)
 
-  override def toJson = Json.obj(
+  override val toJson = Json.obj(
     C.Asset.PATH -> path,
     C.Asset.MD5 -> md5,
     C.Asset.FILENAME -> fileName,

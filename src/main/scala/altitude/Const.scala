@@ -2,19 +2,9 @@ package altitude
 
 
 object Const {
-  object tag {
-    val APP     = "APP"
-    val API     = "API"
-    val WEB     = "WEB"
-    val SERVICE = "SERVICE"
-    val DB = "DB"
-  }
-
-  object IdType {
-    val ID = "ID"
-    val QUERY = "QUERY"
-  }
-
+  /*---------------------------------------------------------------------------
+  MODELS
+  ---------------------------------------------------------------------------*/
   trait Common {
     val ID = "id"
     val CREATED_AT = "created_at"
@@ -45,8 +35,17 @@ object Const {
     val KEYWORDS = "keywords"
   }
 
-  object Metadata extends Common
+  object UserMetaField extends Common {
+    val NAME = "name"
+    val TYPE = "type"
+    val MAX_LENGTH = "maxLength"
+    val ALLOWS_MULTI = "allowsMulti"
+    val RESTRICTED_VALUE_LIST = "restrictedValueList"
+  }
 
+  /*---------------------------------------------------------------------------
+  API
+  ---------------------------------------------------------------------------*/
   object Api {
     val ERROR = "error"
     val WARNING = "warning"
@@ -78,9 +77,31 @@ object Const {
     }
   }
 
+  /*---------------------------------------------------------------------------
+  MESSAGES
+  ---------------------------------------------------------------------------*/
   val MSG: Map[String, String] = Map(
     "warn.duplicate" -> "Duplicate",
     "err.required" -> "This field is required"
   )
+
+  /*---------------------------------------------------------------------------
+  LOG TAGS
+  ---------------------------------------------------------------------------*/
+  object tag {
+    val APP     = "APP"
+    val API     = "API"
+    val WEB     = "WEB"
+    val SERVICE = "SERVICE"
+    val DB = "DB"
+  }
+
+  /*---------------------------------------------------------------------------
+  MISC
+  ---------------------------------------------------------------------------*/
+  object IdType {
+    val ID = "ID"
+    val QUERY = "QUERY"
+  }
 
 }

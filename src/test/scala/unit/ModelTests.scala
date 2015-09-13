@@ -9,14 +9,14 @@ import play.api.libs.json._
 
 class ModelTests extends FunSuite {
   case class TestModel(id: Option[String] = None) extends BaseModel {
-    def toJson: JsObject = coreJsonAttrs
+    val toJson: JsObject = coreJsonAttrs
   }
 
   test("create a model") {
-    val model = TestModel()
+    TestModel()
   }
 
   test("import asset model") {
-    val model = new FileImportAsset(new File("/"))
+    new FileImportAsset(new File("/"))
   }
 }

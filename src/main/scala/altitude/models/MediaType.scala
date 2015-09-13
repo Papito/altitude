@@ -16,7 +16,7 @@ object MediaType {
 case class MediaType(mediaType: String, mediaSubtype: String, mime: String) extends BaseModel with NoId {
   override def toString = List(mediaType, mediaSubtype, mime).mkString(":")
 
-  override def toJson =  Json.obj(
+  override val toJson =  Json.obj(
     C.Asset.MIME_TYPE -> mime,
     C.Asset.MEDIA_TYPE ->  mediaType,
     C.Asset.MEDIA_SUBTYPE -> mediaSubtype

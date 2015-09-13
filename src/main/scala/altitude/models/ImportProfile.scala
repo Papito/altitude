@@ -15,7 +15,7 @@ object ImportProfile {
 case class ImportProfile(id: Option[String] = None,
                          name: String) extends BaseModel {
 
-  override def toJson = Json.obj(
+  override val toJson = Json.obj(
     C.ImportProfile.NAME -> name
   ) ++ coreJsonAttrs
 }

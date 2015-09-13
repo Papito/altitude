@@ -12,7 +12,7 @@ class FileImportAsset(val file: File) extends BaseModel with NoId {
   val absolutePath = file.getAbsolutePath
   val name = file.getName
 
-  override def toJson = Json.obj(
+  override val toJson = Json.obj(
     "absolutePath" -> absolutePath,
     "name" -> name
   )
