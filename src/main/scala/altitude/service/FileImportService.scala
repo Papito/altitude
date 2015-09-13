@@ -21,14 +21,14 @@ class FileImportService(app: Altitude) extends BaseService(app) {
   protected val SUPPORTED_MEDIA_TYPES = List("audio", "image")
 
   def getFilesToImport(path: String): List[FileImportAsset] = {
-    log.info(s"Finding assets to import @ '$path'", C.tag.SERVICE)
+    log.info(s"Finding assets to import @ '$path'", C.LogTag.SERVICE)
     val assets = DAO.iterateAssets(path = path).toList
-    log.info(s"Found ${assets.size}", C.tag.SERVICE)
+    log.info(s"Found ${assets.size}", C.LogTag.SERVICE)
     assets
   }
 
   def detectAssetType(importAsset: FileImportAsset): MediaType = {
-    log.debug(s"Detecting media type for: '$importAsset'", C.tag.SERVICE)
+    log.debug(s"Detecting media type for: '$importAsset'", C.LogTag.SERVICE)
 
     var inputStream: Option[InputStream] = None
 
@@ -45,7 +45,7 @@ class FileImportService(app: Altitude) extends BaseService(app) {
         mediaSubtype = tikaMediaType.getSubtype,
         mime = tikaMediaType.getBaseType.toString)
 
-      log.debug(s"Media type for $importAsset is: $assetMediaType", C.tag.SERVICE)
+      log.debug(s"Media type for $importAsset is: $assetMediaType", C.LogTag.SERVICE)
 
       assetMediaType
     }
@@ -55,7 +55,7 @@ class FileImportService(app: Altitude) extends BaseService(app) {
   }
 
   def importAsset(fileAsset: FileImportAsset)(implicit txId: TransactionId = new TransactionId) : Option[Asset]  = {
-    log.info(s"Importing file asset '$fileAsset'", C.tag.SERVICE)
+    log.info(s"Importing file asset '$fileAsset'", C.LogTag.SERVICE)
     val mediaType = detectAssetType(fileAsset)
 
     if (!SUPPORTED_MEDIA_TYPES.contains(mediaType.mediaType)) {

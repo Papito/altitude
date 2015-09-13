@@ -30,7 +30,7 @@ class JdbcTransactionManager extends AbstractTransactionManager {
       val res: A = f
       tx.down()
 
-      log.debug(s"TRANSACTION END: ${tx.id}", C.tag.DB)
+      log.debug(s"TRANSACTION END: ${tx.id}", C.LogTag.DB)
       tx.commit()
 
       res

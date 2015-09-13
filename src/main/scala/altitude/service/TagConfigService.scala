@@ -1,13 +1,13 @@
 package altitude.service
 
 import altitude.Altitude
-import altitude.models.usermeta.{StringField, AbstractField}
+import altitude.models.tags.{StringTag, AbstractTag}
 
-class UserMetaConfigService(val app: Altitude) {
+class TagConfigService(val app: Altitude) {
   private val EMPTY_LIST = List[String]()
 
-  def getAll: List[AbstractField] = {
-    val keywordField = StringField(
+  def getAll: List[AbstractTag] = {
+    val keywordField = StringTag(
       name = "Keywords",
       allowsMulti = true,
       restrictedValueList = EMPTY_LIST)

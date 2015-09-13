@@ -28,7 +28,7 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
   val config = new Configuration(
     additionalConfiguration = additionalConfiguration)
   protected val dataSourceType = config.getString("datasource")
-  log.info(s"Datasource type: $dataSourceType", C.tag.APP)
+  log.info(s"Datasource type: $dataSourceType", C.LogTag.APP)
 
   val app: Altitude = this
   val JDBC_TRANSACTIONS = scala.collection.mutable.Map[Int, JdbcTransaction]()
@@ -75,7 +75,7 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
     val asset = new AssetService(app)
     val preview = new PreviewService(app)
     val importProfile = new ImportProfileService(app)
-    val userMetaFieldConfig = new UserMetaConfigService(app)
+    val tagConfig = new TagConfigService(app)
   }
 
   object transactions {

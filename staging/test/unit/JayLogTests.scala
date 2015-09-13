@@ -35,21 +35,21 @@ class JayLogTests extends FunSuite {
   }
 
   test("with message and tags") {
-    val jsonText: String = log.getLogStmt(Level.INFO, "message", t = Seq[String](C.tag.APP))
+    val jsonText: String = log.getLogStmt(Level.INFO, "message", t = Seq[String](C.LogTag.APP))
     jsonText should not be Nil
     val json: JsValue = Json.parse(jsonText)
     (json \ "tags").as[List[String]] should have size 1
-    (json \ "tags").as[List[String]] should contain (C.tag.APP)
+    (json \ "tags").as[List[String]] should contain (C.LogTag.APP)
   }
 
   test("with message, tags, and values") {
-    val jsonText: String = log.getLogStmt(Level.WARNING, "message", V, Seq[String](C.tag.WEB, C.tag.DB))
+    val jsonText: String = log.getLogStmt(Level.WARNING, "message", V, Seq[String](C.LogTag.WEB, C.LogTag.DB))
     jsonText should not be Nil
     val json: JsValue = Json.parse(jsonText)
     (json \ "level").as[String] should equal (Level.WARNING.toString)
     (json \ "tags").as[List[String]] should have size 2
-    (json \ "tags").as[List[String]] should contain (C.tag.WEB)
-    (json \ "tags").as[List[String]] should contain (C.tag.DB)
+    (json \ "tags").as[List[String]] should contain (C.LogTag.WEB)
+    (json \ "tags").as[List[String]] should contain (C.LogTag.DB)
 
     json \ "v1" should not be Nil
     (json \ "v1").as[String] should equal ("value 1")

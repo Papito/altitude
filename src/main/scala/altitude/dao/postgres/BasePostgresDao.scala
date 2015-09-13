@@ -54,7 +54,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
   }
 
   override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = {
-    log.debug(s"Getting by ID '$id' from '$tableName'", C.tag.DB)
+    log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
     val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(ONE_SQL, List(id))
 
     rec match {
@@ -105,7 +105,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
   protected def manyBySqlQuery(sql: String, vals: List[Object])(implicit txId: TransactionId): List[Map[String, AnyRef]] = {
     val runner: QueryRunner = new QueryRunner()
     val res = runner.query(conn, sql, new MapListHandler(), vals: _*)
-    log.debug(s"Found ${res.size()} records", C.tag.DB)
+    log.debug(s"Found ${res.size()} records", C.LogTag.DB)
     res.map{_.toMap[String, AnyRef]}.toList
   }
 
@@ -115,7 +115,7 @@ abstract class BasePostgresDao(protected val tableName: String) extends BaseDao 
     val runner: QueryRunner = new QueryRunner()
     val res = runner.query(conn, sql, new MapListHandler(), vals:_*)
 
-    log.debug(s"Found ${res.size()} records", C.tag.DB)
+    log.debug(s"Found ${res.size()} records", C.LogTag.DB)
 
     if (res.size() == 0)
       throw new NotFoundException(C.IdType.QUERY, sql)

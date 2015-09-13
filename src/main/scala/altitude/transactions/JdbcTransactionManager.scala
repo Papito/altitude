@@ -52,7 +52,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
       tx.down()
 
       if (!tx.isNested) {
-        log.debug(s"TX. End: ${tx.id}", C.tag.DB)
+        log.debug(s"TX. End: ${tx.id}", C.LogTag.DB)
         tx.commit()
         app.transactions.COMMITTED += 1
       }
@@ -69,7 +69,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     finally {
       // clean up, if we are done with this transaction
       if (!tx.isNested) {
-        log.debug(s"TX. Closing: ${tx.id}", C.tag.DB)
+        log.debug(s"TX. Closing: ${tx.id}", C.LogTag.DB)
         tx.close()
         app.transactions.CLOSED += 1
         app.JDBC_TRANSACTIONS.remove(txId.id)
@@ -98,8 +98,8 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     }
     finally {
       if (!tx.isNested) {
-        log.debug(s"TX. End: ${tx.id}", C.tag.DB)
-        log.debug(s"TX. Closing: ${tx.id}", C.tag.DB)
+        log.debug(s"TX. End: ${tx.id}", C.LogTag.DB)
+        log.debug(s"TX. Closing: ${tx.id}", C.LogTag.DB)
         tx.close()
         app.transactions.CLOSED += 1
         app.JDBC_TRANSACTIONS.remove(txId.id)

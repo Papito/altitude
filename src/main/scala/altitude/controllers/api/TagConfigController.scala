@@ -5,14 +5,14 @@ import org.scalatra.Ok
 import play.api.libs.json.{JsArray, Json}
 import altitude.{Const => C}
 
-class UserMetaConfigController extends BaseApiController {
+class TagConfigController extends BaseApiController {
   override val log =  LoggerFactory.getLogger(getClass)
 
   get("/") {
-    val userMetaConfig = app.service.userMetaFieldConfig.getAll
+    val tagConfig = app.service.tagConfig.getAll
 
     Ok(Json.obj(
-      C.Api.UserMetaField.METAFIELDS -> JsArray(userMetaConfig.map(_.toJson))
+      C.Api.TagConfig.TAG_CONFIG -> JsArray(tagConfig.map(_.toJson))
     ))
   }
 }

@@ -9,26 +9,26 @@ class JdbcTransaction(val conn: Connection) extends Transaction {
   val log =  LoggerFactory.getLogger(getClass)
 
 
-  log.debug(s"New JDBC transaction $id", C.tag.DB)
+  log.debug(s"New JDBC transaction $id", C.LogTag.DB)
   def getConnection: Connection = conn
 
   override def close() = {
     if (!isNested) {
-      log.debug(s"Closing connection for transaction $id", C.tag.DB)
+      log.debug(s"Closing connection for transaction $id", C.LogTag.DB)
       conn.close()
     }
   }
 
   override def commit() {
     if (!isNested) {
-      log.debug(s"Committing transaction $id", C.tag.DB)
+      log.debug(s"Committing transaction $id", C.LogTag.DB)
       conn.commit()
     }
   }
 
   override def rollback() {
     if (!isNested && !conn.isReadOnly) {
-      log.warn(s"ROLLBACK for transaction $id", C.tag.DB)
+      log.warn(s"ROLLBACK for transaction $id", C.LogTag.DB)
       conn.rollback()
     }
   }

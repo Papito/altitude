@@ -43,7 +43,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
       val dataSourceType = altitude.config.getString("datasource")
-      log.info(s"Datasource type: $dataSourceType", C.tag.APP)
+      log.info(s"Datasource type: $dataSourceType", C.LogTag.APP)
 
       dataSourceType match {
         case "mongo" =>

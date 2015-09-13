@@ -82,7 +82,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   }
 
   override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = {
-    log.debug(s"Getting by ID '$id'", C.tag.DB)
+    log.debug(s"Getting by ID '$id'", C.LogTag.DB)
 
     val o: Option[DBObject] = COLLECTION.findOneByID(id)
 

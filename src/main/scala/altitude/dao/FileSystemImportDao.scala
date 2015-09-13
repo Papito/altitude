@@ -19,7 +19,7 @@ class FileSystemImportDao(val app: Altitude) extends BaseDao {
 
   def iterateAssets(path: String): Iterator[FileImportAsset] = {
     require(path != null)
-    log.info(s"Importing from '$path'", C.tag.DB)
+    log.info(s"Importing from '$path'", C.LogTag.DB)
 
     val files = FileUtils.iterateFiles(new File(path), ANY_FILE_FILTER, ANY_FILE_FILTER)
     new Iterable[FileImportAsset] {

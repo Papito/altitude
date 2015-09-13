@@ -12,12 +12,12 @@ class JdbcTransaction extends Transaction {
   private val ds: DataSource = null //FIXME
   val conn: Connection = ds.getConnection
 
-  log.debug(s"New JDBC transaction $id", C.tag.DB)
+  log.debug(s"New JDBC transaction $id", C.LogTag.DB)
   def getConnection: Connection = conn
 
   override def close() = {
     if (!isNested) {
-      log.debug(s"Closing connection for transaction $id", C.tag.DB)
+      log.debug(s"Closing connection for transaction $id", C.LogTag.DB)
       Transaction.CLOSED += 1
       conn.close()
     }
@@ -25,7 +25,7 @@ class JdbcTransaction extends Transaction {
 
   override def commit() {
     if (!isNested) {
-      log.debug(s"Committing transaction $id", C.tag.DB)
+      log.debug(s"Committing transaction $id", C.LogTag.DB)
       Transaction.COMMITTED += 1
       conn.commit()
     }
@@ -33,7 +33,7 @@ class JdbcTransaction extends Transaction {
 
   override def rollback() {
     if (!isNested && !conn.isReadOnly) {
-      log.warn(s"ROLLBACK for transaction $id", C.tag.DB)
+      log.warn(s"ROLLBACK for transaction $id", C.LogTag.DB)
       Transaction.ROLLED_BACK += 1
       conn.rollback()
     }

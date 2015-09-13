@@ -35,7 +35,7 @@ object Const {
     val KEYWORDS = "keywords"
   }
 
-  object UserMetaField extends Common {
+  object Tag extends Common {
     val NAME = "name"
     val TYPE = "type"
     val MAX_LENGTH = "maxLength"
@@ -76,8 +76,8 @@ object Const {
       val ASSETS = "assets"
     }
 
-    object UserMetaField {
-      val METAFIELDS = "metafields"
+    object TagConfig {
+      val TAG_CONFIG = "tagConfig"
     }
   }
 
@@ -92,7 +92,7 @@ object Const {
   /*---------------------------------------------------------------------------
   LOG TAGS
   ---------------------------------------------------------------------------*/
-  object tag {
+  object LogTag {
     val APP     = "APP"
     val API     = "API"
     val WEB     = "WEB"
