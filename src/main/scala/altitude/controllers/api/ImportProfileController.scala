@@ -8,6 +8,7 @@ import altitude.{Const => C}
 import org.scalatra.Ok
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsArray, JsValue, Json}
+import altitude.Util
 
 class ImportProfileController extends BaseApiController {
   override val log =  LoggerFactory.getLogger(getClass)
@@ -32,8 +33,7 @@ class ImportProfileController extends BaseApiController {
     val name = params.get(C.Api.ImportProfile.NAME)
     val keywords = params.get(C.Api.ImportProfile.KEYWORDS)
 
-    //TODO: parse keywords with a utility
-    val keywordList = List(keywords)
+    val keywordList = Util.parseKeywords(keywords.get)
 
     val tagData: JsValue = JsArray(Seq(
           Json.obj(C.Tag.ID -> TagConfigService.KEYWORDS_TAG_ID, C.ImportProfile.VALUES -> keywordList)

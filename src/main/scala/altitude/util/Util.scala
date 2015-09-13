@@ -12,4 +12,8 @@ package object Util {
   }
 
   def randomStr(size: Int = 10) = scala.util.Random.alphanumeric.take(size).mkString
+
+  private val DELIM_REGEX = List(" ",",").mkString("|").r
+  def parseKeywords(s: String): Set[String] =
+    DELIM_REGEX.split(s).map(_.trim).filter(_ != "").toSet
 }
