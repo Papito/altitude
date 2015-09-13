@@ -17,6 +17,7 @@ CREATE TABLE asset (
   image_data BYTEA,
   size_bytes BIGINT NOT NULL
 ) INHERITS (_core);
+CREATE UNIQUE INDEX asset_md5 ON asset(md5);
 
 CREATE TABLE preview (
   id varchar(24) PRIMARY KEY,
@@ -25,4 +26,11 @@ CREATE TABLE preview (
   data TEXT NOT NULL
 ) INHERITS (_core);
 
-CREATE UNIQUE INDEX asset_md5 ON asset(md5);
+
+CREATE TABLE import_profile (
+  id varchar(24) PRIMARY KEY,
+  name varchar(255) NOT NULL,
+  tag_data jsonb NOT NULL
+) INHERITS (_core);
+
+CREATE UNIQUE INDEX import_profile_name ON import_profile(name);

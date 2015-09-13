@@ -24,7 +24,7 @@ case class Preview(id: Option[String]=None,
                    mime_type: String,
                    data: Array[Byte]) extends BaseModel {
 
-  override val toJson = {
+  override def toJson = {
     Json.obj(
       C.Preview.ASSET_ID -> asset_id,
       C.Preview.MIME_TYPE -> mime_type,

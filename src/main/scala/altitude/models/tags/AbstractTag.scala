@@ -11,7 +11,7 @@ abstract class AbstractTag extends BaseModel {
   val allowsMulti: Boolean
   val restrictedValueList: List[String]
 
-  lazy val toJson: JsObject = Json.obj(
+  def toJson: JsObject = Json.obj(
     C.Tag.NAME -> name,
     C.Tag.TYPE -> tagType.toString,
     C.Tag.MAX_LENGTH -> maxLength,

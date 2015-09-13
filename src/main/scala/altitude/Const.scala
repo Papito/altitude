@@ -32,16 +32,15 @@ object Const {
 
   object ImportProfile extends Common {
     val NAME = "name"
-    val KEYWORDS = "keywords"
-    val TAG_DATA = "tagData"
+    val TAG_DATA = "tag_data"
   }
 
   object Tag extends Common {
     val NAME = "name"
     val TYPE = "type"
-    val MAX_LENGTH = "maxLength"
-    val ALLOWS_MULTI = "allowsMulti"
-    val RESTRICTED_VALUE_LIST = "restrictedValueList"
+    val MAX_LENGTH = "max_length"
+    val ALLOWS_MULTI = "allows_multi"
+    val RESTRICTED_VALUE_LIST = "restricted_value_list"
   }
 
   /*---------------------------------------------------------------------------

@@ -26,7 +26,7 @@ class ImportProfileController extends BaseApiController {
 
   post("/") {
     val name = params.getOrElse(C.Api.ImportProfile.NAME, "")
-    val keywords = params.getOrElse(C.ImportProfile.KEYWORDS, "")
+    val keywords = params.getOrElse(C.Api.ImportProfile.KEYWORDS, "")
 
     //TODO: parse keywords with a utility
     val keywordList = List(keywords)
