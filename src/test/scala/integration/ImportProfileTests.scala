@@ -4,7 +4,8 @@ import altitude.exceptions.ValidationException
 import altitude.models.ImportProfile
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
-import play.api.libs.json.JsNull
+import integration.util.Text
+import play.api.libs.json.{JsArray, JsNull}
 
 @DoNotDiscover class ImportProfileTests(val config: Map[String, String]) extends IntegrationTestCore {
   test("Missing profile name") {
@@ -23,8 +24,24 @@ import play.api.libs.json.JsNull
     }
   }
 
-  test("Good profile") {
+  test("NULL Json tag data") {
     val importProfile: ImportProfile = new ImportProfile(name = "test", tagData = JsNull)
+
+    intercept[ValidationException] {
+      altitude.service.importProfile.add(importProfile)
+    }
+  }
+
+  test("Empty tag data") {
+    val importProfile: ImportProfile = new ImportProfile(name = Text.randomStr(), tagData = JsArray())
+
+    intercept[ValidationException] {
+      altitude.service.importProfile.add(importProfile)
+    }
+  }
+
+  test("Good profile") {
+    val importProfile: ImportProfile = new ImportProfile(name = Text.randomStr(), tagData = JsNull)
     altitude.service.importProfile.add(importProfile)
   }
 }
