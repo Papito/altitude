@@ -33,6 +33,7 @@ object Const {
   object ImportProfile extends Common {
     val NAME = "name"
     val KEYWORDS = "keywords"
+    val TAG_DATA = "tagData"
   }
 
   object Tag extends Common {
@@ -53,6 +54,7 @@ object Const {
     val VALIDATION_ERRORS = "validationErrors"
 
     val ID = "id"
+    val DATA = "data"
     val PATH = "path"
     val DIRECTORY_NAMES = "directoryNames"
     val CURRENT_PATH = "currentPath"
