@@ -7,6 +7,9 @@ import altitude.{Const => C}
 
 object Validators {
 
+  /*
+  WEB VALIDATOR
+   */
   case class Validator(required: Option[List[String]] = None,
                        maxLengths: Option[Map[String, Int]] = None) {
 
@@ -21,14 +24,24 @@ object Validators {
     protected def checkRequired(json: JsObject, ex: ValidationException): ValidationException = {
       required.getOrElse(List[String]()) foreach { field =>
         json.keys.contains(field) match {
+          // see of the value is defined
           case false => ex.errors += (field -> C.MSG("err.required"))
-          case _ =>
+          case _ => {
+            (json \ field).asOpt[String] match {
+              // see if the value is an empty string
+              case Some("") => ex.errors += (field -> C.MSG("err.required"))
+              case _ =>
+            }
+          }
         }
       }
       ex
     }
   }
 
+  /*
+  API VALIDATOR
+   */
   case class ApiValidator(required: List[String]) {
     def validate(params: Params): Unit = {
       val ex: ValidationException = new ValidationException
@@ -43,4 +56,5 @@ object Validators {
       if (ex.errors.nonEmpty) throw ex
     }
   }
+
 }

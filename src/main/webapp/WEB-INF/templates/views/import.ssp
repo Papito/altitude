@@ -52,7 +52,12 @@
             <div class="col-md-12">
                 <div class="row">
                     <div class="col-md-12" style="text-align: center">
-                        <h3>Import Profile <button type="button" class="btn btn-default" data-bind="click: function(){reset('#createImportProfile')}" data-toggle="modal" data-target="#createImportProfile">Create New</button></h3>
+                        <h3>Import Profile
+                            <button type="button"
+                                    class="btn btn-default"
+                                    data-bind="click: function(){resetFormErrors('#createImportProfile'); hide('#createImportProfileError');}"
+                                    data-toggle="modal"
+                                    data-target="#createImportProfile">Create New</button></h3>
                     </div>
                 </div>
 
@@ -120,6 +125,7 @@
                     <h4 class="modal-title" id="createImportProfileLabel">Create a New Import Profile</h4>
                 </div>
                 <div class="modal-body">
+                    <div id="createImportProfileError" class="alert alert-danger" role="alert"></div>
                     <div id="createImportProfileForm" class="form-horizontal">
                         <div class="form-group">
                             <label for="${C.Api.ImportProfile.NAME}" class="control-label"></label>
@@ -135,6 +141,7 @@
                             </div>
                             <div class="error"></div>
                          </div>
+
                     </div>
                 </div>
                 <div class="modal-footer">

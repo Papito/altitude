@@ -131,7 +131,8 @@ ImportViewModel = BaseViewModel.extend({
                 // relaod
                 self.loadImportProfiles();
                 $('#createImportProfile').modal('hide');
-            }
+            },
+            'errorContainer': 'createImportProfileError'
         };
         this.post('/api/ip/', opts);
     },

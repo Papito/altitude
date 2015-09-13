@@ -10,8 +10,12 @@ import integration.util.Text
 import play.api.libs.json.{Json, JsArray, JsNull}
 
 @DoNotDiscover class ImportProfileTests(val config: Map[String, String]) extends IntegrationTestCore {
+  private val VALID_TAG_DATA = JsArray(Seq(
+    Json.obj(C.Tag.ID -> TagConfigService.KEYWORDS_TAG_ID, C.ImportProfile.VALUES -> List("k1", "k2"))
+  ))
+
   test("Missing profile name") {
-    val importProfile: ImportProfile = new ImportProfile(name = "", tagData = JsNull)
+    val importProfile: ImportProfile = new ImportProfile(name = "", tagData = VALID_TAG_DATA)
 
     intercept[ValidationException] {
       altitude.service.importProfile.add(importProfile)
@@ -19,7 +23,9 @@ import play.api.libs.json.{Json, JsArray, JsNull}
   }
 
   test("Empty profile name") {
-    val importProfile: ImportProfile = new ImportProfile(name = "   \t \n", tagData = JsNull)
+    val importProfile: ImportProfile = new ImportProfile(
+    name = "   \t \n",
+    tagData = VALID_TAG_DATA)
 
     intercept[ValidationException] {
       altitude.service.importProfile.add(importProfile)
@@ -45,9 +51,8 @@ import play.api.libs.json.{Json, JsArray, JsNull}
   test("Good profile") {
     val importProfile: ImportProfile = new ImportProfile(
       name = Text.randomStr(),
-      tagData = JsArray(Seq(
-        Json.obj(C.Tag.ID -> TagConfigService.KEYWORDS_TAG_ID, C.ImportProfile.VALUES -> List("k1", "k2"))
-      )))
+      tagData = VALID_TAG_DATA)
+
     altitude.service.importProfile.add(importProfile)
   }
 }

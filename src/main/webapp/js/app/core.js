@@ -33,8 +33,12 @@ BaseViewModel = Base.extend({
     },
     // ----------------------------------------------------------------
 
-    reset: function(el) {
+    resetFormErrors: function(el) {
         $(el).find('.has-error').removeClass('has-error').parent().find('> .error').text('');
+    },
+
+    hide: function(el) {
+      $(el).hide();
     },
 
     restRequest : function(url, method, opts) {
@@ -56,10 +60,12 @@ BaseViewModel = Base.extend({
             data : data,
             cache : false,
             error : function(jqXHR, textStatus, errorThrown) {
+                // unhandled exceptions
                 if (jqXHR.status === 500) {
                     console.log(jqXHR.responseText);
                 }
 
+                // validation errors
                 if (jqXHR.status === 400) {
                     var json = jqXHR.responseJSON;
 
@@ -72,6 +78,14 @@ BaseViewModel = Base.extend({
                         }
 
                     }
+                }
+
+                // if error container given, dump the message there
+                if (opts.errorContainer) {
+                    var errJson = jqXHR.responseJSON;
+                    var errText = jqXHR.responseText;
+                    var text = errJson ? errJson.error : errText;
+                    $('#' + opts.errorContainer).text(text).show();
                 }
 
                 if (opts.errorCallback) {
