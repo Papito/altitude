@@ -18,7 +18,7 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
   log.info(s"Initializing Altitude application instance with ID $id")
 
   val environment = Environment.ENV match {
-    case Environment.DEV => "development"
+    case Environment.DEV => "developGment"
     case Environment.PROD => "production"
     case Environment.TEST => "test"
   }
@@ -69,12 +69,13 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
 
   // declare singleton services
   object service {
-    val fileImport: FileImportService = new FileImportService(app)
-    val metadata: AbstractMetadataService = new TikaMetadataService
-    val library: LibraryService = new LibraryService(app)
-    val asset: AssetService = new AssetService(app)
-    val preview: PreviewService = new PreviewService(app)
-    val importProfile: ImportProfileService = new ImportProfileService(app)
+    val fileImport = new FileImportService(app)
+    val metadata = new TikaMetadataService
+    val library = new LibraryService(app)
+    val asset = new AssetService(app)
+    val preview = new PreviewService(app)
+    val importProfile = new ImportProfileService(app)
+    val userMetaFieldConfig = new UserMetaConfigService(app)
   }
 
   object transactions {

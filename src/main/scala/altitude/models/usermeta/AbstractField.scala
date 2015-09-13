@@ -10,7 +10,7 @@ abstract class AbstractField {
   val allowsMulti: Boolean
   val restrictedValueList: List[String]
 
-  val toJson: JsObject = Json.obj(
+  lazy val toJson: JsObject = Json.obj(
     C.UserMetaField.NAME -> name,
     C.UserMetaField.TYPE -> fieldType.toString,
     C.UserMetaField.MAX_LENGTH -> maxLength,

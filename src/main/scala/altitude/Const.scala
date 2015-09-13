@@ -75,6 +75,10 @@ object Const {
     object Search {
       val ASSETS = "assets"
     }
+
+    object UserMetaField {
+      val METAFIELDS = "metafields"
+    }
   }
 
   /*---------------------------------------------------------------------------
