@@ -23,7 +23,18 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     }
 
     // get a connection and a new transaction
-    val conn: Connection = app.dataSourceType match {
+    val conn: Connection = connection
+
+    val tx: JdbcTransaction = new JdbcTransaction(conn)
+    app.JDBC_TRANSACTIONS. += (tx.id -> tx)
+    // assign the integer transaction ID to the mutable transaction id "carrier" object
+    txId.id = tx.id
+    app.transactions.CREATED += 1
+    tx
+  }
+
+  def connection: Connection = {
+    app.dataSourceType match {
       case "postgres"  => {
         val props = new Properties
         val user = app.config.getString("db.postgres.user")
@@ -39,13 +50,6 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
       }
       case _ => throw new IllegalArgumentException("Do not know of datasource: ${altitude.dataSourceType}")
     }
-
-    val tx: JdbcTransaction = new JdbcTransaction(conn)
-    app.JDBC_TRANSACTIONS. += (tx.id -> tx)
-    // assign the integer transaction ID to the mutable transaction id "carrier" object
-    txId.id = tx.id
-    app.transactions.CREATED += 1
-    tx
   }
 
   override def withTransaction[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {

@@ -21,11 +21,10 @@ class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres"))
     implicit val txId: TransactionId = new TransactionId
     val txManager = new JdbcTransactionManager(altitude)
 
-    txManager.withTransaction {
-      log.info("SETUP")
-      val stmt = txManager.transaction.conn.createStatement()
-      stmt.executeUpdate(sql)
-    }
+    log.info("SETUP")
+    val stmt = txManager.connection.createStatement()
+    stmt.executeUpdate(sql)
+
     /*
       We have to commit this, however, later we make sure everything is rolled back.
       The committed count must be kept at zero

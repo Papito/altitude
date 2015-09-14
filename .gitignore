@@ -83,3 +83,4 @@ Thumbs.db
 /.idea
 /.idea_modules
 
+*.sqlite.db
