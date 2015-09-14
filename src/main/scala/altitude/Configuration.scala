@@ -29,6 +29,8 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
     "db.postgres.url" -> "jdbc:postgresql://localhost/altitude-test",
     "db.postgres.user" -> "altitude-test",
 
+    "db.sqlite.url" -> "jdbc:sqlite::memory:",
+
     "db.mongo.db" -> "altitude-test"
   )
 
