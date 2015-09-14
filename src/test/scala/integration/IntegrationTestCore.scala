@@ -42,15 +42,14 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
 
   class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
-      val dataSourceType = altitude.config.getString("datasource")
-      log.info(s"Datasource type: $dataSourceType", C.LogTag.APP)
+      log.info(s"Datasource type: ${altitude.dataSourceType}", C.LogTag.APP)
 
-      dataSourceType match {
+      altitude.dataSourceType match {
         case "mongo" =>
           bind[UtilitiesDao].toInstance(new dao.mongo.UtilitiesDao(altitude))
         case "postgres" | "sqlite" =>
           bind[UtilitiesDao].toInstance(new dao.jdbc.UtilitiesDao(altitude))
-        case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
+        case _ => throw new IllegalArgumentException("Do not know of datasource: ${altitude.dataSourceType}")
       }
     }
   }

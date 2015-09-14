@@ -7,7 +7,7 @@ import altitude.{Altitude, Const => C}
 import org.slf4j.LoggerFactory
 
 class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManager {
-  val log =  LoggerFactory.getLogger(getClass)
+  val log = LoggerFactory.getLogger(getClass)
 
   /*
   Get an existing transaction if we are already withing a transaction context,
@@ -23,14 +23,22 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     }
 
     // get a connection and a new transaction
-
-    val props = new Properties
-    val user = app.config.getString("db.postgres.user")
-    props.setProperty("user", user)
-    val password = app.config.getString("db.postgres.password")
-    props.setProperty("password", password)
-    val url = app.config.getString("db.postgres.url")
-    val conn: Connection = DriverManager.getConnection(url, props)
+    val conn: Connection = app.dataSourceType match {
+      case "postgres"  => {
+        val props = new Properties
+        val user = app.config.getString("db.postgres.user")
+        props.setProperty("user", user)
+        val password = app.config.getString("db.postgres.password")
+        props.setProperty("password", password)
+        val url = app.config.getString("db.postgres.url")
+        DriverManager.getConnection(url, props)
+      }
+      case "sqlite" => {
+        val url = app.config.getString("db.sqlite.url")
+        DriverManager.getConnection(url)
+      }
+      case _ => throw new IllegalArgumentException("Do not know of datasource: ${altitude.dataSourceType}")
+    }
 
     val tx: JdbcTransaction = new JdbcTransaction(conn)
     app.JDBC_TRANSACTIONS. += (tx.id -> tx)

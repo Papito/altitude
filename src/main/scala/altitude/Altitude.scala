@@ -27,7 +27,7 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
 
   val config = new Configuration(
     additionalConfiguration = additionalConfiguration)
-  protected val dataSourceType = config.getString("datasource")
+  val dataSourceType = config.getString("datasource")
   log.info(s"Datasource type: $dataSourceType", C.LogTag.APP)
 
   val app: Altitude = this

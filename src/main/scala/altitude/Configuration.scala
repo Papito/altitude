@@ -18,6 +18,8 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
     "db.postgres.password" -> "dba",
     "db.postgres.url" -> "jdbc:postgresql://localhost/altitude",
 
+    "db.sqlite.url" -> "jdbc:sqlite:db.sqlite",
+
     "db.mongo.host" -> "localhost",
     "db.mongo.db" -> "altitude",
     "db.mongo.port" -> "27017"
