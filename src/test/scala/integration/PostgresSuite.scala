@@ -17,7 +17,7 @@ class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres"))
     val sql = scala.io.Source.fromFile(evolutionPath).mkString
     //log.info(s"Running $sql")
 
-    val altitude: Altitude = new Altitude
+    val altitude: Altitude = new Altitude(config)
     implicit val txId: TransactionId = new TransactionId
     val txManager = new JdbcTransactionManager(altitude)
 
