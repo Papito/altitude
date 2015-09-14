@@ -48,8 +48,8 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
       dataSourceType match {
         case "mongo" =>
           bind[UtilitiesDao].toInstance(new dao.mongo.UtilitiesDao(altitude))
-        case "postgres" =>
-          bind[UtilitiesDao].toInstance(new dao.postgres.UtilitiesDao(altitude))
+        case "postgres" | "sqlite" =>
+          bind[UtilitiesDao].toInstance(new dao.jdbc.UtilitiesDao(altitude))
         case _ => throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
       }
     }

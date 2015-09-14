@@ -43,9 +43,11 @@ object AltitudeBuild extends Build {
         "ch.qos.logback"               % "logback-classic"       % "1.1.2" % "runtime",
         "net.codingwell"              %% "scala-guice"           % "4.0.0-beta5",
         "org.imgscalr"                 % "imgscalr-lib"          % "4.2",
+
         "org.postgresql"               % "postgresql"            % "9.4-1201-jdbc41",
         "org.mongodb"                  % "casbah_2.11"           % "2.8.1",
         "org.mongodb"                  % "casbah-commons_2.11"   % "2.8.1",
+        "org.xerial"                   % "sqlite-jdbc"           % "3.8.11.1",
 
         "org.eclipse.jetty"            %  "jetty-plus"           % jettyVersion % "container;provided",
         "org.eclipse.jetty"            %  "jetty-webapp"         % jettyVersion % "container",

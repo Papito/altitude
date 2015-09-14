@@ -20,10 +20,13 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
   protected val CLEANER: Option[Cleaner] = None
 
   def add(objIn: Model)(implicit txId: TransactionId = new TransactionId): JsObject = {
+    // clean
     val cleaned = CLEANER match {
       case None => objIn.toJson
       case _ => CLEANER.get.clean(objIn.toJson)
     }
+
+    // validate
     VALIDATOR match {
       case Some(validator) => VALIDATOR.get.validate(cleaned)
       case None => 
@@ -39,8 +42,8 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
       val res: Option[JsObject] = DAO.getById(id)
 
       res.isDefined match {
-        case false => throw new NotFoundException(C.IdType.ID, id)
         case true => res.get
+        case false => throw new NotFoundException(C.IdType.ID, id)
       }
     }
   }

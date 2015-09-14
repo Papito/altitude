@@ -40,19 +40,25 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
     override def configure(): Unit = {
       dataSourceType match {
         case "mongo" => {
-          // transaction manager
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.VoidTransactionManager(app))
-          // DAOs
           bind[AssetDao].toInstance(new altitude.dao.mongo.AssetDao(app))
           bind[PreviewDao].toInstance(new altitude.dao.mongo.PreviewDao(app))
           bind[ImportProfileDao].toInstance(new altitude.dao.mongo.ImportProfileDao(app))
         }
         case "postgres" => {
-          // register the JDBC driver
           DriverManager.registerDriver(new org.postgresql.Driver)
-          // transaction manager
+
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
-          // DAOs
+
+          bind[AssetDao].toInstance(new altitude.dao.postgres.AssetDao(app))
+          bind[PreviewDao].toInstance(new altitude.dao.postgres.PreviewDao(app))
+          bind[ImportProfileDao].toInstance(new altitude.dao.postgres.ImportProfileDao(app))
+        }
+        case "sqlite" => {
+          DriverManager.registerDriver(new org.sqlite.JDBC)
+
+          bind[AbstractTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
+
           bind[AssetDao].toInstance(new altitude.dao.postgres.AssetDao(app))
           bind[PreviewDao].toInstance(new altitude.dao.postgres.PreviewDao(app))
           bind[ImportProfileDao].toInstance(new altitude.dao.postgres.ImportProfileDao(app))

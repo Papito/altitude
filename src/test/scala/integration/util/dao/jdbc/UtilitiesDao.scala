@@ -1,10 +1,12 @@
-package integration.util.dao.postgres
+package integration.util.dao.jdbc
 
 import altitude.Altitude
+import altitude.dao.jdbc.BaseJdbcDao
 import altitude.dao.postgres.BasePostgresDao
 import altitude.transactions.TransactionId
 
-class UtilitiesDao(val app: Altitude) extends BasePostgresDao("") with integration.util.dao.UtilitiesDao {
+class UtilitiesDao(val app: Altitude) extends BaseJdbcDao with integration.util.dao.UtilitiesDao {
+  protected val tableName = ""
   override def dropDatabase() = Unit
 
   override def rollback() = {
