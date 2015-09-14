@@ -31,7 +31,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
 
     "db.sqlite.url" -> "jdbc:sqlite:test.sqlite.db",
 
-    "db.mongo.db" -> "altitude-test"
+    "db.mongo.db" -> s"altitude-test${scala.util.Random.alphanumeric.take(6).mkString}"
   )
 
   val prod = default ++ HashMap()
