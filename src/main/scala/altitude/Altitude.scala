@@ -41,11 +41,6 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
     override def configure(): Unit = {
       dataSourceType match {
         case "mongo" => {
-          BaseMongoDao.client(app)
-          val dbName = config.getString("db.mongo.db")
-          val db = BaseMongoDao.client(app)(dbName)
-          BaseMongoDao.gridFS(app, db, "preview")
-
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.VoidTransactionManager(app))
           bind[AssetDao].toInstance(new altitude.dao.mongo.AssetDao(app))
           bind[PreviewDao].toInstance(new altitude.dao.mongo.PreviewDao(app))

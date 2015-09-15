@@ -9,18 +9,13 @@ class MongoSuite extends AllTests(config = Map("datasource" -> "mongo")) with Be
 
   override def afterAll(): Unit = {
     // delete all test databases created in this suite
-
-    val coreConfig = new Configuration
-    val host: String = coreConfig.getString("db.mongo.host")
-    val dbPort: Int = Integer.parseInt(coreConfig.getString("db.mongo.port"))
-    def client = MongoClient(host, dbPort)
+    def client = BaseMongoDao.CLIENT.get
 
     client.databaseNames().
-      filter({_.startsWith("altitude-test")}).foreach {dbName: String =>
+      filter({_.startsWith("altitude-test-")}).foreach {dbName: String =>
         println(s"Deleting $dbName")
         client.dropDatabase(dbName)
     }
-
     client.close()
   }
 }

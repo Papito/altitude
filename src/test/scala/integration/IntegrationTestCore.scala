@@ -25,7 +25,6 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   implicit val txId: TransactionId = new TransactionId
 
   override def beforeEach() = {
-    println("---- STARTING A TEST")
     dbUtilities.dropDatabase()
     dbUtilities.createTransaction(txId)
     log.info(s"TX. Test transaction ID is ${txId.id}")

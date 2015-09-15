@@ -19,6 +19,7 @@ object AltitudeBuild extends Build {
     settings = ScalatraPlugin.scalatraWithJRebel ++ scalateSettings ++ Seq(
       organization := Organization,
       name := Name,
+      parallelExecution in Test := false,
       version := Version,
       scalaVersion := ScalaVersion,
       resolvers += Classpaths.typesafeReleases,
