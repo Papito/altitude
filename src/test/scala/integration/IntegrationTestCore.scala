@@ -19,7 +19,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   val config: Map[String, String]
 
   // force environment to always be TEST
-  protected lazy val altitude: Altitude = new Altitude(additionalConfiguration = config)
+  protected var altitude: Altitude = new Altitude(additionalConfiguration = config)
   val injector = Guice.createInjector(new InjectionModule)
   protected val dbUtilities = injector.instance[UtilitiesDao]
   implicit val txId: TransactionId = new TransactionId
@@ -32,9 +32,13 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   }
 
   override def afterEach() {
-    dbUtilities.cleanup()
+    dbUtilities.cleanupTest()
     // should not have committed anything for tests
     require(altitude.transactions.COMMITTED == 0)
+  }
+
+  after {
+    dbUtilities.cleanupTests()
   }
 
   class InjectionModule extends AbstractModule with ScalaModule  {

@@ -38,8 +38,10 @@ object BaseMongoDao {
   def removeClient(app: Altitude) = {
     val client = BaseMongoDao.CLIENTS.get(app.id)
     if (client.isDefined) {
+      println(s"Closing mongo client for app ${app.id}")
       client.get.close()
     }
+    println(s"Removing mongo client for app ${app.id}")
     BaseMongoDao.CLIENTS.remove(app.id)
   }
 
@@ -51,6 +53,7 @@ object BaseMongoDao {
     BaseMongoDao.GRID_FSs.contains(gridFsId) match {
       case true => BaseMongoDao.GRID_FSs.get(gridFsId).get
       case false => {
+        println(s"Creating preview gridFS for app ${app.id}")
         val gridFs = JodaGridFS(db, colName)
         GRID_FSs += (gridFsId -> gridFs)
         gridFs
@@ -60,6 +63,7 @@ object BaseMongoDao {
 
   def removeGridFS(app: Altitude, colName: String): Unit = {
     val gridFsId = s"${app.id}-$colName"
+    println(s"Removing preview gridFS for app ${app.id}")
     BaseMongoDao.GRID_FSs.remove(gridFsId)
   }
 }
@@ -69,7 +73,6 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
 
   private val DB_NAME: String = app.config.getString("db.mongo.db")
   protected def DB = BaseMongoDao.client(app)(DB_NAME)
-
   protected def COLLECTION: MongoCollection = DB(collectionName)
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {

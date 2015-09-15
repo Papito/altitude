@@ -9,14 +9,18 @@ class UtilitiesDao(val app: Altitude) extends BaseMongoDao("") with integration.
     DB.dropDatabase()
     close()
     BaseMongoDao.client(app)
-    BaseMongoDao.gridFS(app, DB, "preview")
+    val dbName = app.config.getString("db.mongo.db")
+    val db = BaseMongoDao.client(app)(dbName)
+    BaseMongoDao.gridFS(app, db, "preview")
   }
 
   override def close() = {
     BaseMongoDao.removeGridFS(app, "preview")
     BaseMongoDao.removeClient(app)
   }
+
   override def rollback() = Unit
-  override def cleanup() = close()
+  override def cleanupTest() = close()
+  override def cleanupTests() = Unit
   override def createTransaction(tx: TransactionId) = Unit
 }

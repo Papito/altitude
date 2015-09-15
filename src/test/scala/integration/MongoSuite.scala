@@ -1,23 +1,26 @@
 package integration
 
-import altitude.Altitude
+import altitude.{Configuration, Altitude}
 import altitude.dao.mongo.BaseMongoDao
+import com.mongodb.casbah.MongoClient
 import org.scalatest.BeforeAndAfterAll
 
 class MongoSuite extends AllTests(config = Map("datasource" -> "mongo")) with BeforeAndAfterAll {
 
   override def afterAll(): Unit = {
     // delete all test databases created in this suite
-    val altitude: Altitude = new Altitude(additionalConfiguration = config)
-    val client = BaseMongoDao.client(altitude)
-    val thisDbName = altitude.config.getString("db.mongo.db")
+
+    val coreConfig = new Configuration
+    val host: String = coreConfig.getString("db.mongo.host")
+    val dbPort: Int = Integer.parseInt(coreConfig.getString("db.mongo.port"))
+    def client = MongoClient(host, dbPort)
 
     client.databaseNames().
-      filter({_.startsWith("altitude-test-")}).
-      filter(_ != thisDbName).foreach {dbName: String =>
+      filter({_.startsWith("altitude-test")}).foreach {dbName: String =>
         println(s"Deleting $dbName")
         client.dropDatabase(dbName)
     }
+
     client.close()
   }
 }

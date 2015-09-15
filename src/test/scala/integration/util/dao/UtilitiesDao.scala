@@ -9,6 +9,7 @@ trait UtilitiesDao extends BaseDao {
   def dropDatabase(): Unit
   protected def rollback(): Unit
   protected def close(): Unit
-  def cleanup(): Unit
+  def cleanupTest(): Unit
+  def cleanupTests(): Unit
   def createTransaction(tx: TransactionId): Unit
 }

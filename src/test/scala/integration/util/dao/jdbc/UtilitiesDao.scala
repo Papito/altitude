@@ -23,11 +23,13 @@ class UtilitiesDao(val app: Altitude) extends BaseJdbcDao with integration.util.
     })
   }
 
-  override def cleanup() = {
+  override def cleanupTest() = {
     rollback()
     close()
     app.JDBC_TRANSACTIONS.clear()
   }
+
+  override def cleanupTests() = Unit
 
   override def createTransaction(txId: TransactionId): Unit = {
     val tx = jdbcTxManager.transaction(txId)

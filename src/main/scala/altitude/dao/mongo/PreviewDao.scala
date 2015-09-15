@@ -11,8 +11,6 @@ import play.api.libs.json.JsObject
 
 class PreviewDao(val app: Altitude) extends BaseMongoDao("preview") with altitude.dao.PreviewDao {
   protected def GRID_FS = BaseMongoDao.gridFS(app, DB, this.collectionName)
-  // make sure GridFS is available before the first query
-  GRID_FS
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     val preview: Preview = jsonIn
