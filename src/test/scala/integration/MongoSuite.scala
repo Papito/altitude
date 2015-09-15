@@ -18,5 +18,6 @@ class MongoSuite extends AllTests(config = Map("datasource" -> "mongo")) with Be
         println(s"Deleting $dbName")
         client.dropDatabase(dbName)
     }
+    client.close()
   }
 }

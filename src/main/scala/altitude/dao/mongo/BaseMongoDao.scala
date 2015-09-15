@@ -23,8 +23,10 @@ object BaseMongoDao {
       case true => BaseMongoDao.CLIENTS.get(app.id).get
       case false => {
         // create the client (and connection pool for this app once)
+
         val host: String = app.config.getString("db.mongo.host")
         val dbPort: Int = Integer.parseInt(app.config.getString("db.mongo.port"))
+        println(s"Creating mongo client for app ${app.id}")
         def client = MongoClient(host, dbPort)
         // save the client for this app once
         BaseMongoDao.CLIENTS += (app.id -> client)
@@ -34,6 +36,10 @@ object BaseMongoDao {
   }
 
   def removeClient(app: Altitude) = {
+    val client = BaseMongoDao.CLIENTS.get(app.id)
+    if (client.isDefined) {
+      client.get.close()
+    }
     BaseMongoDao.CLIENTS.remove(app.id)
   }
 
@@ -63,6 +69,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
 
   private val DB_NAME: String = app.config.getString("db.mongo.db")
   protected def DB = BaseMongoDao.client(app)(DB_NAME)
+
   protected def COLLECTION: MongoCollection = DB(collectionName)
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {

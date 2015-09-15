@@ -7,17 +7,16 @@ import altitude.transactions.TransactionId
 class UtilitiesDao(val app: Altitude) extends BaseMongoDao("") with integration.util.dao.UtilitiesDao {
   override def dropDatabase(): Unit = {
     DB.dropDatabase()
-    BaseMongoDao.removeClient(app)
-    BaseMongoDao.removeGridFS(app, "preview")
+    close()
+    BaseMongoDao.client(app)
+    BaseMongoDao.gridFS(app, DB, "preview")
   }
 
   override def close() = {
-    val client = BaseMongoDao.CLIENTS.get(app.id)
-    if (client.isDefined) {
-      client.get.close()
-    }
+    BaseMongoDao.removeGridFS(app, "preview")
+    BaseMongoDao.removeClient(app)
   }
   override def rollback() = Unit
-  override def cleanup() = Unit
+  override def cleanup() = close()
   override def createTransaction(tx: TransactionId) = Unit
 }
