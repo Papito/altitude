@@ -23,6 +23,8 @@ with BeforeAndAfterAll {
 
     val stmt = txManager.connection.createStatement()
     stmt.executeUpdate(sql)
+    stmt.close()
+    txManager.connection.close()
 
     /*
       We have to commit this, however, later we make sure everything is rolled back.

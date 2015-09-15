@@ -24,7 +24,8 @@ class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres"))
     log.info("SETUP")
     val stmt = txManager.connection.createStatement()
     stmt.executeUpdate(sql)
-
+    stmt.close()
+    txManager.connection.close()
     /*
       We have to commit this, however, later we make sure everything is rolled back.
       The committed count must be kept at zero
