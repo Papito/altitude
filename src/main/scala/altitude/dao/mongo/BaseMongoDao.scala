@@ -19,17 +19,18 @@ object BaseMongoDao {
   var CLIENTS = scala.collection.mutable.Map[Int, MongoClient]()
 
   def client(app: Altitude): MongoClient = {
-    if (BaseMongoDao.CLIENTS.contains(app.id)) {
-      return BaseMongoDao.CLIENTS.get(app.id).get
+    BaseMongoDao.CLIENTS.contains(app.id) match {
+      case true => BaseMongoDao.CLIENTS.get(app.id).get
+      case false => {
+        // create the client (and connection pool for this app once)
+        val host: String = app.config.getString("db.mongo.host")
+        val dbPort: Int = Integer.parseInt(app.config.getString("db.mongo.port"))
+        def client = MongoClient(host, dbPort)
+        // save the client for this app once
+        BaseMongoDao.CLIENTS += (app.id -> client)
+        client
+      }
     }
-
-    // create the client (and connection pool for this app once)
-    val host: String = app.config.getString("db.mongo.host")
-    val dbPort: Int = Integer.parseInt(app.config.getString("db.mongo.port"))
-    def client = MongoClient(host, dbPort)
-    // save the client for this app once
-    BaseMongoDao.CLIENTS += (app.id -> client)
-    client
   }
 
   def removeClient(app: Altitude) = {
@@ -39,18 +40,20 @@ object BaseMongoDao {
   var GRID_FSs = scala.collection.mutable.Map[String, JodaGridFS]()
 
   def gridFS(app: Altitude, db: MongoDB, colName: String): JodaGridFS = {
-    val gridFsId = s"{app.id}-$colName"
-    if (BaseMongoDao.GRID_FSs.contains(gridFsId)) {
-      return BaseMongoDao.GRID_FSs.get(gridFsId).get
-    }
+    val gridFsId = s"${app.id}-$colName"
 
-    val gridFs = JodaGridFS(db, colName)
-    GRID_FSs += (gridFsId -> gridFs)
-    gridFs
+    BaseMongoDao.GRID_FSs.contains(gridFsId) match {
+      case true => BaseMongoDao.GRID_FSs.get(gridFsId).get
+      case false => {
+        val gridFs = JodaGridFS(db, colName)
+        GRID_FSs += (gridFsId -> gridFs)
+        gridFs
+      }
+    }
   }
 
   def removeGridFS(app: Altitude, colName: String): Unit = {
-    val gridFsId = s"{app.id}-$colName"
+    val gridFsId = s"${app.id}-$colName"
     BaseMongoDao.GRID_FSs.remove(gridFsId)
   }
 }
