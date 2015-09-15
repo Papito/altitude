@@ -34,6 +34,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     dbUtilities.cleanupTest()
     // should not have committed anything for tests
     require(altitude.transactions.COMMITTED == 0)
+    require(altitude.JDBC_TRANSACTIONS.isEmpty)
   }
 
   after {
@@ -53,5 +54,4 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
       }
     }
   }
-
 }
