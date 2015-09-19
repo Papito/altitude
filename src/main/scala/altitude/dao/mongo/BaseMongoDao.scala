@@ -19,18 +19,23 @@ object BaseMongoDao {
   private val host: String = config.getString("db.mongo.host")
   private val dbPort: Int = Integer.parseInt(config.getString("db.mongo.port"))
   private val dataSource = config.getString("datasource")
+
   val CLIENT: Option[MongoClient] = dataSource match {
     case "mongo" => Some(MongoClient(host, dbPort))
     case _ => None
+  }
+
+  private val DB_NAME: String = config.getString("db.mongo.db")
+  def DB = CLIENT match {
+    case None => None
+    case _ => Some(CLIENT.get(DB_NAME))
   }
 }
 
 abstract class BaseMongoDao(protected val collectionName: String) extends BaseDao {
   val log =  LoggerFactory.getLogger(getClass)
 
-  private val DB_NAME: String = app.config.getString("db.mongo.db")
-  protected def DB = BaseMongoDao.CLIENT.get(DB_NAME)
-  protected def COLLECTION: MongoCollection = DB(collectionName)
+  protected def COLLECTION: MongoCollection = BaseMongoDao.DB.get(collectionName)
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     log.debug(s"Starting database INSERT for: $jsonIn")

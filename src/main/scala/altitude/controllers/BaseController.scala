@@ -2,8 +2,8 @@ package altitude.controllers
 
 import javax.servlet.http.HttpServletRequest
 
-import altitude.SingleApplication
-import org.scalatra.{GZipSupport, ScalatraServlet}
+import altitude.{SingleApplication}
+import org.scalatra.{ScalatraServlet}
 
 import scala.collection.mutable
 
@@ -22,4 +22,9 @@ abstract class BaseController extends ScalatraServlet with AltitudeStack with Si
       layoutTemplate(path)
     } orElse serveStaticResource() getOrElse resourceNotFound()
   }
+
+  error {
+    case ex: Exception => ex.printStackTrace()
+  }
+
 }

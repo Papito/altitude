@@ -9,9 +9,13 @@ import com.mongodb.casbah.gridfs.Imports._
 import org.apache.commons.io.IOUtils
 import play.api.libs.json.JsObject
 
+object PreviewDao {
+  private var GRID_FS: JodaGridFS = null
+  def initGridFs() = GRID_FS = JodaGridFS(BaseMongoDao.DB.get, "preview")
+}
+
 class PreviewDao(val app: Altitude) extends BaseMongoDao("preview") with altitude.dao.PreviewDao {
-  protected def GRID_FS = JodaGridFS(DB, this.collectionName)
-  GRID_FS
+  PreviewDao.initGridFs()
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     val preview: Preview = jsonIn
@@ -25,7 +29,7 @@ class PreviewDao(val app: Altitude) extends BaseMongoDao("preview") with altitud
 
     try {
       is = Some(new ByteArrayInputStream(preview.data))
-      GRID_FS(is.get) { fh =>
+      PreviewDao.GRID_FS(is.get) { fh =>
         fh.filename = asset.path
         fh.contentType = asset.mediaType.mime
       }
@@ -40,7 +44,7 @@ class PreviewDao(val app: Altitude) extends BaseMongoDao("preview") with altitud
   override def getById(asset_id: String)(implicit txId: TransactionId): Option[JsObject] = {
     val asset: Asset = app.service.asset.getById(asset_id)
 
-    val gridFsFile: Option[JodaGridFSDBFile] = GRID_FS.findOne(asset.path)
+    val gridFsFile: Option[JodaGridFSDBFile] = PreviewDao.GRID_FS.findOne(asset.path)
 
     if (gridFsFile.isEmpty)
       return None

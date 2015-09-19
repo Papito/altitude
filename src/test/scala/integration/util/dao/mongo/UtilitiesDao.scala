@@ -1,12 +1,13 @@
 package integration.util.dao.mongo
 
 import altitude.Altitude
-import altitude.dao.mongo.BaseMongoDao
+import altitude.dao.mongo.{PreviewDao, BaseMongoDao}
 import altitude.transactions.TransactionId
 
 class UtilitiesDao(val app: Altitude) extends BaseMongoDao("") with integration.util.dao.UtilitiesDao {
   override def dropDatabase(): Unit = {
-    DB.dropDatabase()
+    BaseMongoDao.DB.get.dropDatabase()
+    PreviewDao.initGridFs()
   }
 
   override def close() = Unit
