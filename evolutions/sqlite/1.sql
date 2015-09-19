@@ -11,7 +11,7 @@ CREATE TABLE asset (
   media_type varchar(64) NOT NULL,
   media_subtype varchar(64) NOT NULL,
   mime_type varchar(64) NOT NULL,
-  metadata jsonb,
+  metadata TEXT,
   path TEXT NOT NULL,
   filename TEXT NOT NULL,
   image_data BYTEA,
@@ -33,7 +33,7 @@ CREATE TABLE preview (
 CREATE TABLE import_profile (
   id varchar(24) PRIMARY KEY,
   name varchar(255) NOT NULL,
-  tag_data jsonb NOT NULL,
+  tag_data TEXT NOT NULL,
   created_at timestamp WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp WITHOUT TIME ZONE DEFAULT NULL
 );
