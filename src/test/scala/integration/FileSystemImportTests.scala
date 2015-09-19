@@ -17,6 +17,7 @@ import org.scalatest.Matchers._
     preview.data.length should not be 0
   }
 
+/*
   test("import duplicate") {
     importFile("images/1.jpg")
     val path = getClass.getResource(s"../files/incoming/images/1.jpg").getPath
@@ -39,6 +40,7 @@ import org.scalatest.Matchers._
     val assets = altitude.service.fileImport.getFilesToImport(path=incomingPath)
     assets should not be empty
   }
+*/
 
   protected def importFile(p: String): Asset = {
     val path = getClass.getResource(s"../files/incoming/$p").getPath
