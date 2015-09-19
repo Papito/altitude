@@ -16,10 +16,9 @@ import play.api.libs.json._
 
 import scala.collection.JavaConversions._
 
-abstract class BaseJdbcDao extends BaseDao {
+abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   val log = LoggerFactory.getLogger(getClass)
 
-  protected val tableName: String
   protected val jdbcTxManager = new JdbcTransactionManager(app)
 
   protected def conn(implicit txId: TransactionId): Connection = {
