@@ -60,9 +60,9 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
 
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
 
-          bind[AssetDao].toInstance(new altitude.dao.postgres.AssetDao(app))
-          bind[PreviewDao].toInstance(new altitude.dao.postgres.PreviewDao(app))
-          bind[ImportProfileDao].toInstance(new altitude.dao.postgres.ImportProfileDao(app))
+          bind[AssetDao].toInstance(new altitude.dao.sqlite.AssetDao(app))
+          bind[PreviewDao].toInstance(new altitude.dao.sqlite.PreviewDao(app))
+          bind[ImportProfileDao].toInstance(new altitude.dao.sqlite.ImportProfileDao(app))
         }
         case _ => {
           throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)

@@ -5,7 +5,7 @@ import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
 import play.api.libs.json.{JsObject, Json}
 
-class ImportProfileDao(val app: Altitude) extends BaseJdbcDao("import_profile") with altitude.dao.ImportProfileDao {
+abstract class ImportProfileDao(val app: Altitude) extends BaseJdbcDao("import_profile") with altitude.dao.ImportProfileDao {
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val model = ImportProfile(
       id = Some(rec.get(C.ImportProfile.ID).get.asInstanceOf[String]),

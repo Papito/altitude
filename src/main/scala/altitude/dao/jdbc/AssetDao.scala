@@ -6,9 +6,10 @@ import altitude.{Altitude, Const => C}
 import play.api.libs.json._
 
 
-class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with altitude.dao.AssetDao {
+abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with altitude.dao.AssetDao {
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
+    println("record: " + rec.toString())
     val mediaType = new MediaType(
       mediaType = rec.get(C.Asset.MEDIA_TYPE).get.asInstanceOf[String],
       mediaSubtype = rec.get(C.Asset.MEDIA_SUBTYPE).get.asInstanceOf[String],
@@ -18,7 +19,7 @@ class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with altitude.dao
       path = rec.get(C.Asset.PATH).get.asInstanceOf[String],
       md5 = rec.get(C.Asset.MD5).get.asInstanceOf[String],
       mediaType = mediaType,
-      sizeBytes = rec.get(C.Asset.SIZE_BYTES).get.asInstanceOf[Long],
+      sizeBytes = rec.get(C.Asset.SIZE_BYTES).get.asInstanceOf[Int],
       metadata = Json.parse(rec.get(C.Asset.METADATA).get.toString))
 
     addCoreAttrs(model, rec)
@@ -26,6 +27,8 @@ class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with altitude.dao
   }
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
+    println(jsonIn.toString())
+
     val asset = jsonIn: Asset
 
     // Postgres will reject this sequence with jsonb

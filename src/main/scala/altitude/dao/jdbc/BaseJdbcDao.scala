@@ -26,14 +26,10 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     jdbcTxManager.transaction.conn
   }
 
-  protected val CORE_SQL_COLS_FOR_INSERT = s"${C.Base.ID}, ${C.Base.CREATED_AT}"
-  protected val CORE_SQL_VALS_FOR_INSERT = "?, TO_TIMESTAMP(?)"
+  protected val CORE_SQL_COLS_FOR_INSERT = s"${C.Base.ID}"
+  protected def CORE_SQL_VALS_FOR_INSERT: String
 
-  protected val DEFAULT_SQL_COLS_FOR_SELECT = s"""
-      ${C.Base.ID}, *,
-      EXTRACT(EPOCH FROM created_at) AS created_at,
-      EXTRACT(EPOCH FROM updated_at) AS updated_at
-    """
+  protected def DEFAULT_SQL_COLS_FOR_SELECT: String
 
   protected def utcNow = Util.utcNow
 
@@ -92,7 +88,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     val createdAt = utcNow
 
     // prepend ID and CREATED AT to the values, as those are required for any record
-    val values: List[Object] = id :: createdAt.getMillis.asInstanceOf[Object] :: vals
+    val values: List[Object] = id :: vals
     //log.debug(s"SQL: $q. ARGS: ${values.toString()}")
 
     val runner: QueryRunner = new QueryRunner()
@@ -126,7 +122,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
     val rec = res.get(0)
 
-    //log.debug(s"Record: $rec")
+    //log.debug(s"RECORD: $rec")
     Some(rec.toMap[String, AnyRef])
   }
 
@@ -161,15 +157,5 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
   /* Given a model and an SQL record, decipher and set certain core properties
    */
-  protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit = {
-    val createdAtMilis = rec.getOrElse(C.Base.CREATED_AT, 0d).asInstanceOf[Double].toLong
-    if (createdAtMilis != 0d) {
-      model.createdAt = new DateTime(createdAtMilis)
-    }
-
-    val updatedAtMilis = rec.getOrElse(C.Base.UPDATED_AT, 0d).asInstanceOf[Double].toLong
-    if (updatedAtMilis != 0d) {
-      model.createdAt = new DateTime(createdAtMilis)
-    }
-  }
+  protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit
 }

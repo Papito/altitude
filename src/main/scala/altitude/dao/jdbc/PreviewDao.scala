@@ -7,7 +7,7 @@ import org.apache.commons.codec.binary.Base64
 import play.api.libs.json._
 
 
-class PreviewDao(val app: Altitude) extends BaseJdbcDao("preview") with altitude.dao.PreviewDao {
+abstract class PreviewDao(val app: Altitude) extends BaseJdbcDao("preview") with altitude.dao.PreviewDao {
 
   override def add(json: JsObject)(implicit txId: TransactionId): JsObject = {
     val preview: Preview = json
