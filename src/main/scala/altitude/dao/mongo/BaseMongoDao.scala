@@ -4,12 +4,11 @@ import altitude.dao.BaseDao
 import altitude.models.BaseModel
 import altitude.models.search.Query
 import altitude.transactions.TransactionId
-import altitude.{Const => C, Util}
+import altitude.{Const => C, Environment, Util, Configuration}
 import com.mongodb.casbah.Imports._
 import com.mongodb.casbah.MongoClient
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
-import altitude.Configuration
 
 object BaseMongoDao {
   import com.mongodb.casbah.commons.conversions.scala._
@@ -20,10 +19,11 @@ object BaseMongoDao {
   private val dbPort: Int = Integer.parseInt(config.getString("db.mongo.port"))
   private val dataSource = config.getString("datasource")
 
-  val CLIENT: Option[MongoClient] = dataSource match {
-    case "mongo" => Some(MongoClient(host, dbPort))
-    case _ => None
-  }
+  // create mongo client if it's the datasource, or we are in the test harness
+  val CLIENT: Option[MongoClient] =
+    if (dataSource == "mongo" || Environment.ENV == Environment.TEST) {
+      Some(MongoClient(host, dbPort))
+    } else None
 
   private val DB_NAME: String = config.getString("db.mongo.db")
   def DB = CLIENT match {
