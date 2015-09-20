@@ -15,9 +15,9 @@ CREATE TABLE asset (
   path TEXT NOT NULL,
   filename TEXT NOT NULL,
   image_data BYTEA,
-  size_bytes BIGINT NOT NULL,
-  created_at timestamp WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at timestamp WITHOUT TIME ZONE DEFAULT NULL
+  size_bytes INT NOT NULL,
+  created_at DATE DEFAULT (datetime('now', 'localtime')),
+  updated_at timestamp DEFAULT NULL
 );
 CREATE UNIQUE INDEX asset_md5 ON asset(md5);
 
@@ -26,7 +26,7 @@ CREATE TABLE preview (
   asset_id varchar(24),
   mime_type varchar(64) NOT NULL,
   data TEXT NOT NULL,
-  created_at timestamp WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at DATE DEFAULT (datetime('now', 'localtime')),
   updated_at timestamp WITHOUT TIME ZONE DEFAULT NULL
 );
 
@@ -34,7 +34,7 @@ CREATE TABLE import_profile (
   id varchar(24) PRIMARY KEY,
   name varchar(255) NOT NULL,
   tag_data TEXT NOT NULL,
-  created_at timestamp WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at DATE DEFAULT (datetime('now', 'localtime')),
   updated_at timestamp WITHOUT TIME ZONE DEFAULT NULL
 );
 
