@@ -11,14 +11,12 @@ import org.scalatest.Matchers._
 
   test("import image (JPEG)") {
     val asset = importFile("images/1.jpg")
-    println(asset)
     val preview: Preview = altitude.service.library.getPreview(asset.id.get)
     preview.id should not be None
     preview.mime_type should equal("image/jpeg")
     preview.data.length should not be 0
   }
 
-/*
   test("import duplicate") {
     importFile("images/1.jpg")
     val path = getClass.getResource(s"../files/incoming/images/1.jpg").getPath
@@ -29,19 +27,18 @@ import org.scalatest.Matchers._
     }
   }
 
-  test("import audio (MP3)") {
-    val asset = importFile("audio/all.mp3")
-    val optAuthor = (asset.metadata \ "Author").asOpt[String]
-    optAuthor should not be None
-    optAuthor.get should equal("Whitney Houston")
-  }
+    test("import audio (MP3)") {
+      val asset = importFile("audio/all.mp3")
+      val optAuthor = (asset.metadata \ "Author").asOpt[String]
+      optAuthor should not be None
+      optAuthor.get should equal("Whitney Houston")
+    }
 
-  test("import file list") {
-    val incomingPath = getClass.getResource("../files/incoming").getPath
-    val assets = altitude.service.fileImport.getFilesToImport(path=incomingPath)
-    assets should not be empty
-  }
-*/
+    test("import file list") {
+      val incomingPath = getClass.getResource("../files/incoming").getPath
+      val assets = altitude.service.fileImport.getFilesToImport(path=incomingPath)
+      assets should not be empty
+    }
 
   protected def importFile(p: String): Asset = {
     val path = getClass.getResource(s"../files/incoming/$p").getPath

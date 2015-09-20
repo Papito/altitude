@@ -3,6 +3,7 @@ package altitude.dao.postgres
 import altitude.models.BaseModel
 import altitude.{Const => C}
 import org.joda.time.DateTime
+import play.api.libs.json.JsValue
 
 
 trait Postgres {
@@ -13,6 +14,8 @@ trait Postgres {
       EXTRACT(EPOCH FROM created_at) AS created_at,
       EXTRACT(EPOCH FROM updated_at) AS updated_at
     """
+
+  protected def JSON_PLACEHOLDER = "CAST(? as jsonb)"
 
   protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit = {
     val createdAtMilis = rec.getOrElse(C.Base.CREATED_AT, 0d).asInstanceOf[Double].toLong

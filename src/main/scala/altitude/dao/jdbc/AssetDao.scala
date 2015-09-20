@@ -9,7 +9,6 @@ import play.api.libs.json._
 abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with altitude.dao.AssetDao {
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
-    println("record: " + rec.toString())
     val mediaType = new MediaType(
       mediaType = rec.get(C.Asset.MEDIA_TYPE).get.asInstanceOf[String],
       mediaSubtype = rec.get(C.Asset.MEDIA_SUBTYPE).get.asInstanceOf[String],
@@ -43,7 +42,7 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
              ${C.Asset.FILENAME}, ${C.Asset.SIZE_BYTES},
              ${C.Asset.MEDIA_TYPE}, ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE},
              ${C.Asset.METADATA})
-            VALUES($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?, ?, ?, ?, ?, CAST(? AS jsonb))
+            VALUES($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?, ?, ?, ?, ?, $JSON_PLACEHOLDER)
     """
 
     val sqlVals: List[Object] = List(

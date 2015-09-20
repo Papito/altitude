@@ -28,8 +28,8 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
   protected val CORE_SQL_COLS_FOR_INSERT = s"${C.Base.ID}"
   protected def CORE_SQL_VALS_FOR_INSERT: String
-
   protected def DEFAULT_SQL_COLS_FOR_SELECT: String
+  protected def JSON_PLACEHOLDER: String
 
   protected def utcNow = Util.utcNow
 
