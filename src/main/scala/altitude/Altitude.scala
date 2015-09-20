@@ -19,7 +19,7 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
   log.info(s"Initializing Altitude application instance with ID $id")
 
   val environment = Environment.ENV match {
-    case Environment.DEV => "developGment"
+    case Environment.DEV => "development"
     case Environment.PROD => "production"
     case Environment.TEST => "test"
   }
