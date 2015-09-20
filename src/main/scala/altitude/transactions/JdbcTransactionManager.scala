@@ -33,23 +33,21 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     tx
   }
 
-  def connection: Connection = {
-    app.dataSourceType match {
-      case "postgres"  => {
-        val props = new Properties
-        val user = app.config.getString("db.postgres.user")
-        props.setProperty("user", user)
-        val password = app.config.getString("db.postgres.password")
-        props.setProperty("password", password)
-        val url = app.config.getString("db.postgres.url")
-        DriverManager.getConnection(url, props)
-      }
-      case "sqlite" => {
-        val url = app.config.getString("db.sqlite.url")
-        DriverManager.getConnection(url)
-      }
-      case _ => throw new IllegalArgumentException("Do not know of datasource: ${altitude.dataSourceType}")
+  def connection: Connection = app.dataSourceType match {
+    case "postgres"  => {
+      val props = new Properties
+      val user = app.config.getString("db.postgres.user")
+      props.setProperty("user", user)
+      val password = app.config.getString("db.postgres.password")
+      props.setProperty("password", password)
+      val url = app.config.getString("db.postgres.url")
+      DriverManager.getConnection(url, props)
     }
+    case "sqlite" => {
+      val url = app.config.getString("db.sqlite.url")
+      DriverManager.getConnection(url)
+    }
+    case _ => throw new IllegalArgumentException("Do not know of datasource: ${altitude.dataSourceType}")
   }
 
   override def withTransaction[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
@@ -93,7 +91,9 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     val tx = transaction
 
     try {
-      tx.setReadOnly(flag=true)
+      if (supportsReadOnlyConnections) {
+        tx.setReadOnly(flag=true)
+      }
 
       tx.up()
       val res: A = f
@@ -117,5 +117,10 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
         app.JDBC_TRANSACTIONS.remove(txId.id)
       }
     }
+  }
+
+  def supportsReadOnlyConnections = app.dataSourceType match {
+    case "postgres"  => true
+    case _ => false
   }
 }

@@ -8,6 +8,7 @@ import play.api.libs.json._
 
 
 abstract class PreviewDao(val app: Altitude) extends BaseJdbcDao("preview") with altitude.dao.PreviewDao {
+  protected def makeModel(rec: Map[String, AnyRef]): JsObject = Json.obj()
 
   override def add(json: JsObject)(implicit txId: TransactionId): JsObject = {
     val preview: Preview = json

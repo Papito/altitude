@@ -1,17 +1,17 @@
 package integration.util.dao.jdbc
 
-import altitude.{Const, Altitude}
+import altitude.Altitude
 import altitude.dao.jdbc.BaseJdbcDao
-import altitude.dao.postgres.Postgres
 import altitude.models.BaseModel
 import altitude.transactions.TransactionId
-import org.joda.time.DateTime
+import play.api.libs.json.{JsObject, Json}
 
 class UtilitiesDao(val app: Altitude) extends BaseJdbcDao("") with integration.util.dao.UtilitiesDao {
   protected def CORE_SQL_VALS_FOR_INSERT = ""
   protected def DEFAULT_SQL_COLS_FOR_SELECT = ""
   protected def JSON_PLACEHOLDER = ""
   protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit = Unit
+  protected def makeModel(rec: Map[String, AnyRef]): JsObject = Json.obj()
 
   override def dropDatabase() = Unit
 

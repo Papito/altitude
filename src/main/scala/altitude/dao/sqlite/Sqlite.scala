@@ -3,7 +3,6 @@ package altitude.dao.sqlite
 import altitude.models.BaseModel
 import altitude.{Const => C}
 import org.joda.time.DateTime
-import play.api.libs.json.JsValue
 
 trait Sqlite {
   protected def CORE_SQL_VALS_FOR_INSERT = "?"
@@ -11,7 +10,7 @@ trait Sqlite {
   protected def DEFAULT_SQL_COLS_FOR_SELECT = s"""
       ${C.Base.ID}, *,
       CAST(STRFTIME('%s', created_at) AS INT) AS created_at,
-      CAST(STRFTIME('%s', updated_at) AS INT) updated_at
+      CAST(STRFTIME('%s', updated_at) AS INT) AS updated_at
     """
 
   protected def JSON_PLACEHOLDER = "?"
