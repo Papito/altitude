@@ -8,6 +8,8 @@ import org.scalatra.sbt.DistPlugin.DistKeys._
 import com.mojolly.scalate._
 import com.mojolly.scalate.ScalatePlugin._
 import com.mojolly.scalate.ScalatePlugin.ScalateKeys._
+import sbtassembly.{AssemblyKeys, MergeStrategy}
+import sbtassembly.AssemblyPlugin._
 
 object AltitudeBuild extends Build {
   val Organization = "altitude"
@@ -52,9 +54,9 @@ object AltitudeBuild extends Build {
         "org.mongodb"                  % "casbah-commons_2.11"   % "2.8.1",
         "org.xerial"                   % "sqlite-jdbc"           % "3.8.11.1",
 
-        "org.eclipse.jetty"            %  "jetty-plus"           % jettyVersion,
-        "org.eclipse.jetty.websocket"  %  "websocket-server"     % jettyVersion,
-        "org.eclipse.jetty"            %  "jetty-webapp"         % jettyVersion,
+        "org.eclipse.jetty"            %  "jetty-plus"           % jettyVersion % "container;compile",
+        "org.eclipse.jetty.websocket"  %  "websocket-server"     % jettyVersion % "container;compile",
+        "org.eclipse.jetty"            %  "jetty-webapp"         % jettyVersion % "container;compile",
         "javax.servlet"                %  "javax.servlet-api"    % "3.1.0" % "provided"
       )
     )
@@ -75,6 +77,21 @@ object AltitudeBuild extends Build {
       }
     )
 
+  // settings for sbt-assembly plugin
+  val deployAssemblySettings = assemblySettings ++ Seq(
+    // copy web resources to /webapp folder
+    resourceGenerators in Compile <+= (resourceManaged, baseDirectory) map {
+      (managedBase, base) =>
+        val webappBase = base / "src" / "main" / "webapp"
+        for {
+          (from, to) <- webappBase ** "*" x rebase(webappBase, managedBase / "main" / "webapp")
+        } yield {
+          Sync.copy(from, to)
+          to
+        }
+    }
+  )
+
   val distSettings = DistPlugin.distSettings ++ Seq(
     mainClass in Dist := Some("ScalatraLauncher"),
     memSetting in Dist := "2g",
@@ -88,6 +105,7 @@ object AltitudeBuild extends Build {
 
   lazy val project = Project("altitude", file("."))
     .settings(projectSettings: _*)
+    .settings(deployAssemblySettings:_*)
     .settings(scalateSettings: _*)
-    .settings(distSettings: _*)
+    //.settings(distSettings: _*)
 }

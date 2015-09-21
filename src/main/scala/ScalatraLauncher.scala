@@ -7,7 +7,7 @@ import org.scalatra.servlet.ScalatraListener
 object ScalatraLauncher extends App {
 
   // in development mode start with -DresourceBase=target/webapp
-  val resourceBase = sys.props.getOrElse("resourceBase", "webapp")
+  val resourceBase = getClass.getClassLoader.getResource("webapp").toExternalForm
   val host = "localhost"
   val port = 8080
 
@@ -29,5 +29,4 @@ object ScalatraLauncher extends App {
 
   server.start()
   server.join()
-
 }
