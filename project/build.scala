@@ -105,7 +105,7 @@ object AltitudeBuild extends Build {
 
   lazy val project = Project("altitude", file("."))
     .settings(projectSettings: _*)
-    .settings(deployAssemblySettings:_*)
     .settings(scalateSettings: _*)
+    .settings(deployAssemblySettings:_*)
     //.settings(distSettings: _*)
 }

@@ -6,6 +6,6 @@ class IndexController extends BaseWebController {
 
   get("/") {
     contentType = "text/html"
-    ssp("/index")
+    layoutTemplate("/WEB-INF/templates/views/index.ssp")
   }
 }

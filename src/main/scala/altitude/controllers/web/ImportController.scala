@@ -25,8 +25,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
 
   get("/") {
     contentType="text/html"
-    ssp("/import")
-  }
+    layoutTemplate("/WEB-INF/templates/views/import.ssp")  }
 
   post("/") {
     //val files: Seq[FileItem] = fileMultiParams("files[]")

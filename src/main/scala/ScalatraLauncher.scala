@@ -18,14 +18,12 @@ object ScalatraLauncher extends App {
   val connector = new ServerConnector(server)
   connector.setHost(host)
   connector.setPort(port)
-
   server.addConnector(connector)
 
-  val webAppContext = new WebAppContext
-  webAppContext.setContextPath("/")
-  webAppContext.setResourceBase(resourceBase)
-  webAppContext.setEventListeners(Array(new ScalatraListener))
-  server.setHandler(webAppContext)
+  val context = new WebAppContext(getClass.getClassLoader.getResource("webapp").toExternalForm, "/")
+  context.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false")
+  context.setEventListeners(Array(new ScalatraListener))
+  server.setHandler(context)
 
   server.start()
   server.join()
