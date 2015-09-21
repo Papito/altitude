@@ -24,8 +24,9 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
   implicit protected val jsonFormats: Formats = DefaultFormats
 
   get("/") {
-    contentType="text/html"
-    layoutTemplate("/WEB-INF/templates/views/import.ssp")  }
+    contentType = "text/html"
+    ssp("import")
+  }
 
   post("/") {
     //val files: Seq[FileItem] = fileMultiParams("files[]")

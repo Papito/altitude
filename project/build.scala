@@ -2,13 +2,10 @@ import sbt._
 import Keys._
 
 import org.scalatra.sbt._
-import org.scalatra.sbt.DistPlugin._
-import org.scalatra.sbt.DistPlugin.DistKeys._
 
 import com.mojolly.scalate._
 import com.mojolly.scalate.ScalatePlugin._
 import com.mojolly.scalate.ScalatePlugin.ScalateKeys._
-import sbtassembly.{AssemblyKeys, MergeStrategy}
 import sbtassembly.AssemblyPlugin._
 
 object AltitudeBuild extends Build {
@@ -92,20 +89,8 @@ object AltitudeBuild extends Build {
     }
   )
 
-  val distSettings = DistPlugin.distSettings ++ Seq(
-    mainClass in Dist := Some("ScalatraLauncher"),
-    memSetting in Dist := "2g",
-    permGenSetting in Dist := "256m",
-    envExports in Dist := Seq("LC_CTYPE=en_US.UTF-8", "LC_ALL=en_US.utf-8"),
-    javaOptions in Dist ++= Seq("-Xss4m",
-      "-Dfile.encoding=UTF-8",
-      //"-Dlogback.configurationFile=logback.production.xml",
-      "-Dorg.scalatra.environment=production")
-  )
-
   lazy val project = Project("altitude", file("."))
     .settings(projectSettings: _*)
     .settings(scalateSettings: _*)
     .settings(deployAssemblySettings:_*)
-    //.settings(distSettings: _*)
 }
