@@ -81,7 +81,7 @@ object AltitudeBuild extends Build {
       (managedBase, base) =>
         val webappBase = base / "src" / "main" / "webapp"
         for {
-          (from, to) <- webappBase ** "*" x rebase(webappBase, managedBase / "main" / "webapp")
+          (from, to) <- webappBase ** "*" pair rebase(webappBase, managedBase / "main" / "webapp")
         } yield {
           Sync.copy(from, to)
           to
