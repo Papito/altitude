@@ -86,7 +86,7 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
     val preview = new PreviewService(app)
     val importProfile = new ImportProfileService(app)
     val tagConfig = new TagConfigService(app)
-    val migration = new MigratioService(app)
+    val migration = new MigrationService(app)
   }
 
   object transactions {

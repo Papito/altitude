@@ -1,5 +1,5 @@
 import sbt._
-import Keys._
+import sbt.Keys._
 
 import org.scalatra.sbt._
 
@@ -7,6 +7,7 @@ import com.mojolly.scalate._
 import com.mojolly.scalate.ScalatePlugin._
 import com.mojolly.scalate.ScalatePlugin.ScalateKeys._
 import sbtassembly.AssemblyPlugin._
+import sbtassembly.AssemblyKeys._
 
 object AltitudeBuild extends Build {
   val Organization = "altitude"
@@ -86,7 +87,8 @@ object AltitudeBuild extends Build {
           Sync.copy(from, to)
           to
         }
-    }
+    },
+    test in assembly := {}
   )
 
   lazy val project = Project("altitude", file("."))

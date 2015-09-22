@@ -6,7 +6,7 @@ import altitude.transactions.{TransactionId, AbstractTransactionManager}
 import org.slf4j.LoggerFactory
 import net.codingwell.scalaguice.InjectorExtensions._
 
-class MigratioService(app: Altitude) {
+class MigrationService(app: Altitude) {
   val log =  LoggerFactory.getLogger(getClass)
   protected val txManager = app.injector.instance[AbstractTransactionManager]
   protected val DAO = app.injector.instance[MigrationDao]
@@ -18,7 +18,7 @@ class MigratioService(app: Altitude) {
     log.info("Checking if migration is required")
     val version = currentVersion
     log.info(s"Current database version is @ $version")
-    val isRequired =version < CURRENT_VERSION
+    val isRequired = version < CURRENT_VERSION
     log.info(s"Migration required? : $isRequired")
     isRequired
   }
@@ -33,9 +33,17 @@ class MigratioService(app: Altitude) {
   def migrate(oldVersion: Int): Unit = {
     log.warn("!!!! MIGRATING !!!!")
     log.info(s"From version $oldVersion to $CURRENT_VERSION")
+
+    for (version <- oldVersion + 1 to CURRENT_VERSION) runMigration(version)
   }
 
-  protected def currentVersion(implicit txId: TransactionId = new TransactionId): Int = {
+  private def runMigration(version: Int): Unit = {
+    log.info(s"RUNNING MIGRATION TO VERSION $version")
+    val evolutionFilePath = getClass.getResource(rootEvolutionsPath + "1.sql").getPath
+    log.info(s"Evolution file path: $evolutionFilePath")
+  }
+
+  private def currentVersion(implicit txId: TransactionId = new TransactionId): Int = {
     val version = txManager.asReadOnly[Int] {
       DAO.currentVersion
     }
@@ -43,4 +51,13 @@ class MigratioService(app: Altitude) {
     version
   }
 
+  private def rootEvolutionsPath: String =  {
+    val dirName = app.dataSourceType match {
+      case "mongo"    => "mongo/"
+      case "postgres" => "postgres/"
+      case "sqlite"   => "sqlite/"
+      case _ => throw new Exception(s"Do not know of datasource ${app.dataSourceType} ")
+    }
+    "/evolutions/" + dirName
+  }
 }
