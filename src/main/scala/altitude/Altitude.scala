@@ -95,7 +95,6 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
     var CLOSED = 0
   }
 
-  if (Environment.ENV != Environment.TEST) {
-    service.migration.checkCurrentVersion()
-  }
+  val migrationRequired = service.migration.migrationRequired()
+  log.warn("Migration is required!")
 }

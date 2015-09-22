@@ -26,10 +26,11 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     jdbcTxManager.transaction.conn
   }
 
-  protected val CORE_SQL_COLS_FOR_INSERT = s"${C.Base.ID}"
   protected def CORE_SQL_VALS_FOR_INSERT: String
   protected def DEFAULT_SQL_COLS_FOR_SELECT: String
   protected def JSON_PLACEHOLDER: String
+  protected val CORE_SQL_COLS_FOR_INSERT = s"${C.Base.ID}"
+  protected val VERSION_TABLE_NAME = "db_version"
 
   protected def utcNow = Util.utcNow
 
@@ -106,7 +107,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     res.map{_.toMap[String, AnyRef]}.toList
   }
 
-  protected def oneBySqlQuery(sql: String, vals: List[Object])(implicit txId: TransactionId): Option[Map[String, AnyRef]] = {
+  protected def oneBySqlQuery(sql: String, vals: List[Object] = List())(implicit txId: TransactionId): Option[Map[String, AnyRef]] = {
     //log.debug(s"SQL: $sql")
 
     val runner: QueryRunner = new QueryRunner()

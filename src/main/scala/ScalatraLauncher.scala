@@ -1,10 +1,11 @@
+import altitude.SingleApplication
 import org.eclipse.jetty.server.Server
 
 import org.eclipse.jetty.server._
 import org.eclipse.jetty.webapp.WebAppContext
 import org.scalatra.servlet.ScalatraListener
 
-object ScalatraLauncher extends App {
+object ScalatraLauncher extends App  with SingleApplication {
 
   // in development mode start with -DresourceBase=target/webapp
   val resourceBase = getClass.getClassLoader.getResource("webapp").toExternalForm
