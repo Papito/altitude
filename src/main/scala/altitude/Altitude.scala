@@ -3,7 +3,7 @@ package altitude
 import java.sql.DriverManager
 
 import altitude.dao.mongo.BaseMongoDao
-import altitude.dao.{ImportProfileDao, AssetDao, PreviewDao}
+import altitude.dao._
 import altitude.service._
 import altitude.transactions.{AbstractTransactionManager, JdbcTransaction}
 import altitude.{Const => C}
@@ -42,27 +42,30 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
       dataSourceType match {
         case "mongo" => {
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.VoidTransactionManager(app))
-          bind[AssetDao].toInstance(new altitude.dao.mongo.AssetDao(app))
-          bind[PreviewDao].toInstance(new altitude.dao.mongo.PreviewDao(app))
-          bind[ImportProfileDao].toInstance(new altitude.dao.mongo.ImportProfileDao(app))
+          bind[AssetDao].toInstance(new mongo.AssetDao(app))
+          bind[PreviewDao].toInstance(new mongo.PreviewDao(app))
+          bind[ImportProfileDao].toInstance(new mongo.ImportProfileDao(app))
+          bind[MigrationDao].toInstance(new mongo.MigrationDao(app))
         }
         case "postgres" => {
           DriverManager.registerDriver(new org.postgresql.Driver)
 
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
 
-          bind[AssetDao].toInstance(new altitude.dao.postgres.AssetDao(app))
-          bind[PreviewDao].toInstance(new altitude.dao.postgres.PreviewDao(app))
-          bind[ImportProfileDao].toInstance(new altitude.dao.postgres.ImportProfileDao(app))
+          bind[AssetDao].toInstance(new postgres.AssetDao(app))
+          bind[PreviewDao].toInstance(new postgres.PreviewDao(app))
+          bind[ImportProfileDao].toInstance(new postgres.ImportProfileDao(app))
+          bind[MigrationDao].toInstance(new postgres.MigrationDao(app))
         }
         case "sqlite" => {
           DriverManager.registerDriver(new org.sqlite.JDBC)
 
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
 
-          bind[AssetDao].toInstance(new altitude.dao.sqlite.AssetDao(app))
-          bind[PreviewDao].toInstance(new altitude.dao.sqlite.PreviewDao(app))
-          bind[ImportProfileDao].toInstance(new altitude.dao.sqlite.ImportProfileDao(app))
+          bind[AssetDao].toInstance(new sqlite.AssetDao(app))
+          bind[PreviewDao].toInstance(new sqlite.PreviewDao(app))
+          bind[ImportProfileDao].toInstance(new sqlite.ImportProfileDao(app))
+          bind[MigrationDao].toInstance(new sqlite.MigrationDao(app))
         }
         case _ => {
           throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
@@ -83,11 +86,16 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
     val preview = new PreviewService(app)
     val importProfile = new ImportProfileService(app)
     val tagConfig = new TagConfigService(app)
+    val migration = new MigratioService(app)
   }
 
   object transactions {
     var CREATED = 0
     var COMMITTED = 0
     var CLOSED = 0
+  }
+
+  if (Environment.ENV != Environment.TEST) {
+    service.migration.checkCurrentVersion()
   }
 }
