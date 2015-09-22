@@ -12,6 +12,7 @@
   </root>
 
   <logger name="altitude" level="DEBUG" />
+  <logger name="altitude.transactions" level="WARN" />
   <logger name="org.fusesource.scalate.util" level="WARN" />
   <logger name="org.atmosphere" level="WARN" />
   <logger name="org.fusesource.scalate.servlet" level="WARN" />

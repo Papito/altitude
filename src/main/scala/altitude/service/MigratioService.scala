@@ -15,14 +15,32 @@ class MigratioService(app: Altitude) {
   log.info("Migration service initialized")
 
   def migrationRequired(implicit txId: TransactionId = new TransactionId): Boolean = {
+    log.info("Checking if migration is required")
+    val version = currentVersion
+    log.info(s"Current database version is @ $version")
+    val isRequired =version < CURRENT_VERSION
+    log.info(s"Migration required? : $isRequired")
+    isRequired
+  }
+
+  def initDb(): Unit = {
+    if (currentVersion == 0) {
+      log.warn("NEW DATABASE. FORCING MIGRATION")
+      migrate(0)
+    }
+  }
+
+  def migrate(oldVersion: Int): Unit = {
+    log.warn("!!!! MIGRATING !!!!")
+    log.info(s"From version $oldVersion to $CURRENT_VERSION")
+  }
+
+  protected def currentVersion(implicit txId: TransactionId = new TransactionId): Int = {
     val version = txManager.asReadOnly[Int] {
       DAO.currentVersion
     }
-    log.info(s"Current database version is @ $version")
-    version < CURRENT_VERSION
+    log.info(s"Database is version $version")
+    version
   }
 
-  def migrate(): Unit = {
-
-  }
 }
