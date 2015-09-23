@@ -14,9 +14,9 @@ class SqliteSuite extends AllTests(config = Map("datasource" -> "sqlite")) with 
   override def beforeAll(): Unit = {
     log.info("TEST. Resetting DB schema once")
     val url: String = new Configuration().getString("db.sqlite.url")
-    log.info(url)
     DriverManager.registerDriver(new org.sqlite.JDBC)
 
+    log.info("Clearing sqlite database")
     val sql =
       """
         |PRAGMA writable_schema = 1;

@@ -13,7 +13,9 @@ import org.slf4j.LoggerFactory
 object IntegrationTestCore {
   /*
    initialize app instances for all known datasources to avoid creating
-   this for every test class
+   this for every test class.
+
+   The test suite
   */
   val sqliteApp = new Altitude(Map("datasource" -> "sqlite"))
   //val postgresApp = new Altitude(Map("datasource" -> "postgres"))
