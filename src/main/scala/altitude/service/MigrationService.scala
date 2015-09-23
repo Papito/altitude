@@ -1,22 +1,23 @@
 package altitude.service
 
-import altitude.Altitude
-import altitude.dao.MigrationDao
-import altitude.transactions.{TransactionId, AbstractTransactionManager}
+import altitude.transactions.TransactionId
 import org.slf4j.LoggerFactory
-import net.codingwell.scalaguice.InjectorExtensions._
 
-class MigrationService(app: Altitude) {
-  val log =  LoggerFactory.getLogger(getClass)
-  protected val txManager = app.injector.instance[AbstractTransactionManager]
-  protected val DAO = app.injector.instance[MigrationDao]
+abstract class MigrationService {
+  private val log =  LoggerFactory.getLogger(getClass)
+
   protected val CURRENT_VERSION = 1
 
-  log.info("Migration service initialized")
+  protected val ROOT_EVOLUTIONS_PATH = "/evolutions/"
+  protected val EVOLUTIONS_DIR: String
+  protected val FILE_EXTENSION: String
+
+  protected def runMigration(version: Int): Unit
+  protected def existingVersion(implicit txId: TransactionId = new TransactionId): Int
 
   def migrationRequired(implicit txId: TransactionId = new TransactionId): Boolean = {
     log.info("Checking if migration is required")
-    val version = currentVersion
+    val version = existingVersion
     log.info(s"Current database version is @ $version")
     val isRequired = version < CURRENT_VERSION
     log.info(s"Migration required? : $isRequired")
@@ -24,7 +25,7 @@ class MigrationService(app: Altitude) {
   }
 
   def initDb(): Unit = {
-    if (currentVersion == 0) {
+    if (existingVersion == 0) {
       log.warn("NEW DATABASE. FORCING MIGRATION")
       migrate(0)
     }
@@ -33,31 +34,7 @@ class MigrationService(app: Altitude) {
   def migrate(oldVersion: Int): Unit = {
     log.warn("!!!! MIGRATING !!!!")
     log.info(s"From version $oldVersion to $CURRENT_VERSION")
-
     for (version <- oldVersion + 1 to CURRENT_VERSION) runMigration(version)
   }
 
-  private def runMigration(version: Int): Unit = {
-    log.info(s"RUNNING MIGRATION TO VERSION $version")
-    val evolutionFilePath = getClass.getResource(rootEvolutionsPath + "1.sql").getPath
-    log.info(s"Evolution file path: $evolutionFilePath")
-  }
-
-  private def currentVersion(implicit txId: TransactionId = new TransactionId): Int = {
-    val version = txManager.asReadOnly[Int] {
-      DAO.currentVersion
-    }
-    log.info(s"Database is version $version")
-    version
-  }
-
-  private def rootEvolutionsPath: String =  {
-    val dirName = app.dataSourceType match {
-      case "mongo"    => "mongo/"
-      case "postgres" => "postgres/"
-      case "sqlite"   => "sqlite/"
-      case _ => throw new Exception(s"Do not know of datasource ${app.dataSourceType} ")
-    }
-    "/evolutions/" + dirName
-  }
 }

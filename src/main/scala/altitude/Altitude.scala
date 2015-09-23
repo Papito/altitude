@@ -45,7 +45,6 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
           bind[AssetDao].toInstance(new mongo.AssetDao(app))
           bind[PreviewDao].toInstance(new mongo.PreviewDao(app))
           bind[ImportProfileDao].toInstance(new mongo.ImportProfileDao(app))
-          bind[MigrationDao].toInstance(new mongo.MigrationDao(app))
         }
         case "postgres" => {
           DriverManager.registerDriver(new org.postgresql.Driver)
@@ -55,7 +54,6 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
           bind[AssetDao].toInstance(new postgres.AssetDao(app))
           bind[PreviewDao].toInstance(new postgres.PreviewDao(app))
           bind[ImportProfileDao].toInstance(new postgres.ImportProfileDao(app))
-          bind[MigrationDao].toInstance(new postgres.MigrationDao(app))
         }
         case "sqlite" => {
           DriverManager.registerDriver(new org.sqlite.JDBC)
@@ -65,7 +63,6 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
           bind[AssetDao].toInstance(new sqlite.AssetDao(app))
           bind[PreviewDao].toInstance(new sqlite.PreviewDao(app))
           bind[ImportProfileDao].toInstance(new sqlite.ImportProfileDao(app))
-          bind[MigrationDao].toInstance(new sqlite.MigrationDao(app))
         }
         case _ => {
           throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
@@ -86,7 +83,11 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
     val preview = new PreviewService(app)
     val importProfile = new ImportProfileService(app)
     val tagConfig = new TagConfigService(app)
-    val migration = new MigrationService(app)
+    val migration = dataSourceType match {
+      case "mongo" => new MongoMigrationService(app)
+      case "sqlite" => new SqliteMigrationService(app)
+      case "postgres" => new PostgresMigrationService(app)
+    }
   }
 
   object transactions {
