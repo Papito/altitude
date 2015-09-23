@@ -2,7 +2,7 @@ package altitude.service
 
 import altitude.Altitude
 import altitude.dao.MigrationDao
-import altitude.transactions.{TransactionId, AbstractTransactionManager}
+import altitude.transactions.{JdbcTransactionManager, TransactionId, AbstractTransactionManager}
 import org.slf4j.LoggerFactory
 import net.codingwell.scalaguice.InjectorExtensions._
 
@@ -16,10 +16,20 @@ abstract class JdbcMigrationService(app: Altitude) extends MigrationService {
   log.info("JDBC migration service initialized")
 
   override def runMigration(version: Int): Unit = {
-    log.info(s"RUNNING MIGRATION TO VERSION $version")
-    val evolutionFilePath = getClass.getResource(
-      s"$ROOT_EVOLUTIONS_PATH$EVOLUTIONS_DIR$version$FILE_EXTENSION").getPath
-    log.info(s"Evolution file path: $evolutionFilePath")
+    val migrationCommands = parseMigrationCommands(version)
+    val txManager = new JdbcTransactionManager(app)
+
+    val conn = txManager.connection
+    conn.setAutoCommit(false)
+    for (sql <- migrationCommands) {
+      log.debug(s"Executing $sql")
+      val stmt = conn.createStatement()
+      stmt.executeUpdate(sql)
+      stmt.close()
+    }
+
+    conn.commit()
+    conn.close()
   }
 
   override def existingVersion(implicit txId: TransactionId = new TransactionId): Int = {

@@ -99,5 +99,6 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
   service.migration.initDb()
 
   val migrationRequired = service.migration.migrationRequired()
-  log.warn("Migration is required!")
+
+  if (migrationRequired) log.warn("Migration is required!")
 }

@@ -3,11 +3,12 @@ package altitude.service
 import altitude.transactions.TransactionId
 import org.slf4j.LoggerFactory
 
+import scala.io.Source
+
 abstract class MigrationService {
   private val log =  LoggerFactory.getLogger(getClass)
 
   protected val CURRENT_VERSION = 1
-
   protected val ROOT_EVOLUTIONS_PATH = "/evolutions/"
   protected val EVOLUTIONS_DIR: String
   protected val FILE_EXTENSION: String
@@ -35,6 +36,13 @@ abstract class MigrationService {
     log.warn("!!!! MIGRATING !!!!")
     log.info(s"From version $oldVersion to $CURRENT_VERSION")
     for (version <- oldVersion + 1 to CURRENT_VERSION) runMigration(version)
+  }
+
+  def parseMigrationCommands(version: Int): List[String] = {
+    log.info(s"RUNNING MIGRATION TO VERSION $version")
+    val path = s"$ROOT_EVOLUTIONS_PATH$EVOLUTIONS_DIR$version$FILE_EXTENSION"
+    val r = getClass.getResource(path)
+    Source.fromURL(r).mkString.split(";").toList
   }
 
 }
