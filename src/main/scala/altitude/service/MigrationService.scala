@@ -28,11 +28,14 @@ abstract class MigrationService {
   def initDb(): Unit = {
     if (existingVersion == 0) {
       log.warn("NEW DATABASE. FORCING MIGRATION")
-      migrate(0)
+      migrate()
     }
   }
 
-  def migrate(oldVersion: Int): Unit = {
+  def migrationConfirmed = false
+
+  def migrate(): Unit = {
+    val oldVersion = existingVersion
     log.warn("!!!! MIGRATING !!!!")
     log.info(s"From version $oldVersion to $CURRENT_VERSION")
     for (version <- oldVersion + 1 to CURRENT_VERSION) runMigration(version)

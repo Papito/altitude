@@ -74,7 +74,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
   val injector = Guice.createInjector(new InjectionModule)
   val txManager = app.injector.instance[AbstractTransactionManager]
 
-  // declare singleton services
+  // create all services
   object service {
     val fileImport = new FileImportService(app)
     val metadata = new TikaMetadataService
@@ -99,6 +99,13 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
   if (config.getFlag("evolutionsEnabled")) {
     service.migration.initDb()
     val migrationRequired = service.migration.migrationRequired()
-    if (migrationRequired) log.warn("Migration is required!")
+    if (migrationRequired) {
+      log.warn("Migration is required!")
+    }
+
+    if (migrationRequired && service.migration.migrationConfirmed) {
+      log.info("Migration go-ahead confirmed by user")
+      service.migration.migrate()
+    }
   }
 }
