@@ -12,7 +12,7 @@ import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
 import org.slf4j.LoggerFactory
 
-class Altitude(additionalConfiguration: Map[String, String] = Map()) {
+class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
   val log =  LoggerFactory.getLogger(getClass)
 
   val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
@@ -96,9 +96,9 @@ class Altitude(additionalConfiguration: Map[String, String] = Map()) {
     var CLOSED = 0
   }
 
-  service.migration.initDb()
-
-  val migrationRequired = service.migration.migrationRequired()
-
-  if (migrationRequired) log.warn("Migration is required!")
+  if (config.getFlag("evolutionsEnabled")) {
+    service.migration.initDb()
+    val migrationRequired = service.migration.migrationRequired()
+    if (migrationRequired) log.warn("Migration is required!")
+  }
 }

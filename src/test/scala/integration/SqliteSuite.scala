@@ -33,7 +33,7 @@ class SqliteSuite extends AllTests(config = Map("datasource" -> "sqlite")) with 
     stmt.close()
     conn.close()
 
-    val altitude: Altitude = new Altitude(config)
+    val altitude: Altitude = new Altitude(config ++ Map("evolutionsEnabled" -> true))
     /*
       We have to commit this, however, later we make sure everything is rolled back.
       The committed count must be kept at zero
