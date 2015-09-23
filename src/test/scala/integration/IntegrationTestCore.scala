@@ -19,7 +19,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   val config: Map[String, String]
 
   // force environment to always be TEST
-  protected var altitude: Altitude = new Altitude(additionalConfiguration = config)
+  protected lazy val altitude: Altitude = new Altitude(additionalConfiguration = config)
   val injector = Guice.createInjector(new InjectionModule)
   protected val dbUtilities = injector.instance[UtilitiesDao]
   implicit val txId: TransactionId = new TransactionId

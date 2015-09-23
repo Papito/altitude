@@ -10,7 +10,6 @@ abstract class JdbcMigrationService(app: Altitude) extends MigrationService {
   private val log =  LoggerFactory.getLogger(getClass)
   protected val DAO: MigrationDao
   protected val txManager = app.injector.instance[AbstractTransactionManager]
-
   val FILE_EXTENSION = ".sql"
 
   log.info("JDBC migration service initialized")
@@ -20,15 +19,13 @@ abstract class JdbcMigrationService(app: Altitude) extends MigrationService {
     val txManager = new JdbcTransactionManager(app)
 
     val conn = txManager.connection
-    conn.setAutoCommit(false)
     for (sql <- migrationCommands) {
-      log.debug(s"Executing $sql")
+      log.info(s"Executing $sql")
       val stmt = conn.createStatement()
       stmt.executeUpdate(sql)
       stmt.close()
     }
 
-    conn.commit()
     conn.close()
   }
 
