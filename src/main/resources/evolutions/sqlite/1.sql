@@ -1,4 +1,5 @@
 CREATE TABLE db_version(
+  id varchar(24) PRIMARY KEY,
   version INT NOT NULL DEFAULT 0
 );
 CREATE UNIQUE INDEX db_version_idx ON db_version(version);
@@ -38,4 +39,4 @@ CREATE TABLE import_profile (
 
 CREATE UNIQUE INDEX import_profile_name ON import_profile(name);
 
-INSERT INTO db_version (version) VALUES(1);
+INSERT INTO db_version (id, version) VALUES(1, 1);
