@@ -8,7 +8,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
 
   val default = HashMap(
     "app.name" -> "Altitude",
-    "datasource" -> "sqlite", // mongo, postgres, sqlite
+    "datasource" -> "postgres", // mongo, postgres, sqlite
 
     "preview.box.pixels" -> 200,
 
@@ -22,7 +22,8 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
 
     "db.mongo.host" -> "localhost",
     "db.mongo.db" -> "altitude",
-    "db.mongo.port" -> "27017"
+    "db.mongo.port" -> "27017",
+    "evolutionsEnabled" -> true
   )
 
   val test = default ++ HashMap(
@@ -31,7 +32,10 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
 
     "db.sqlite.url" -> "jdbc:sqlite:test.sqlite.db",
 
-    "db.mongo.db" -> s"altitude-test"
+    "db.mongo.db" -> s"altitude-test",
+
+    "evolutionsEnabled" -> false
+
   )
 
   val prod = default ++ HashMap()

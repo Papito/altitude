@@ -10,6 +10,18 @@ import net.codingwell.scalaguice.ScalaModule
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach, FunSuite}
 import org.slf4j.LoggerFactory
 
+object IntegrationTestCore {
+  /*
+   initialize app instances for all known datasources to avoid creating
+   this for every test class.
+
+   The test suite
+  */
+  val sqliteApp = new Altitude(Map("datasource" -> "sqlite"))
+  val postgresApp = new Altitude(Map("datasource" -> "postgres"))
+  val mongoDbApp = new Altitude(Map("datasource" -> "mongo"))
+}
+
 abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with BeforeAndAfterEach {
   val log =  LoggerFactory.getLogger(getClass)
   Environment.ENV = Environment.TEST
@@ -19,7 +31,13 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   val config: Map[String, String]
 
   // force environment to always be TEST
-  protected var altitude: Altitude = new Altitude(additionalConfiguration = config)
+  protected def altitude: Altitude = config.get("datasource") match {
+    case Some("mongo") => IntegrationTestCore.mongoDbApp
+    case Some("postgres") => IntegrationTestCore.postgresApp
+    case Some("sqlite") => IntegrationTestCore.sqliteApp
+    case _ => throw new IllegalArgumentException("Do not know of datasource: ${config.get(\"datasource\")}")
+  }
+
   val injector = Guice.createInjector(new InjectionModule)
   protected val dbUtilities = injector.instance[UtilitiesDao]
   implicit val txId: TransactionId = new TransactionId

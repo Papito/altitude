@@ -1,5 +1,5 @@
 import sbt._
-import Keys._
+import sbt.Keys._
 
 import org.scalatra.sbt._
 
@@ -7,6 +7,7 @@ import com.mojolly.scalate._
 import com.mojolly.scalate.ScalatePlugin._
 import com.mojolly.scalate.ScalatePlugin.ScalateKeys._
 import sbtassembly.AssemblyPlugin._
+import sbtassembly.AssemblyKeys._
 
 object AltitudeBuild extends Build {
   val Organization = "altitude"
@@ -24,6 +25,7 @@ object AltitudeBuild extends Build {
       version := Version,
       scalaVersion := ScalaVersion,
       resolvers += Classpaths.typesafeReleases,
+      resolvers += "Typesafe" at "http://dl.bintray.com/typesafe/maven-releases",
       resolvers += "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases",
       resolvers += "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
       resolvers += "Akka Repo" at "http://repo.akka.io/repository",
@@ -34,12 +36,12 @@ object AltitudeBuild extends Build {
         "org.scalatra"                %% "scalatra-scalatest"    % ScalatraVersion % "test",
         "org.json4s"                  %% "json4s-jackson"        % json4sversion,
         "org.json4s"                  %% "json4s-mongo"          % json4sversion,
-        "com.typesafe.play"           %% "play-json"             % "2.3.4",
+        "com.typesafe.play"           %% "play-json"             % "2.3.10",
 
 
         "org.apache.tika"              % "tika-parsers"          % "1.7",
         "org.apache.tika"              % "tika-serialization"    % "1.7",
-        "org.apache.commons"           % "commons-io"            % "1.3.2",
+        "commons-io"                   % "commons-io"            % "2.4",
         "commons-dbutils"              % "commons-dbutils"       % "1.6",
 
         "ch.qos.logback"               % "logback-classic"       % "1.1.2" % "runtime",
@@ -81,12 +83,13 @@ object AltitudeBuild extends Build {
       (managedBase, base) =>
         val webappBase = base / "src" / "main" / "webapp"
         for {
-          (from, to) <- webappBase ** "*" x rebase(webappBase, managedBase / "main" / "webapp")
+          (from, to) <- webappBase ** "*" pair rebase(webappBase, managedBase / "main" / "webapp")
         } yield {
           Sync.copy(from, to)
           to
         }
-    }
+    },
+    test in assembly := {}
   )
 
   lazy val project = Project("altitude", file("."))

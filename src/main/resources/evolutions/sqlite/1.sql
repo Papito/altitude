@@ -1,11 +1,11 @@
-PRAGMA writable_schema = 1;
-delete from sqlite_master where type in ('table', 'index', 'trigger');
-PRAGMA writable_schema = 0;
+CREATE TABLE db_version(
+  id varchar(24) PRIMARY KEY,
+  version INT NOT NULL DEFAULT 0,
+  migration_allowed INT NOT NULL DEFAULT 0
+);
+CREATE UNIQUE INDEX db_version_idx ON db_version(version);
 
-VACUUM;
-PRAGMA INTEGRITY_CHECK;
-
-CREATE TABLE asset (
+CREATE TABLE asset  (
   id varchar(24) PRIMARY KEY,
   md5 varchar(32) NOT NULL,
   media_type varchar(64) NOT NULL,
@@ -39,3 +39,5 @@ CREATE TABLE import_profile (
 );
 
 CREATE UNIQUE INDEX import_profile_name ON import_profile(name);
+
+INSERT INTO db_version (id, version) VALUES(1, 1);
