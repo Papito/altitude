@@ -1,11 +1,11 @@
-### DEVELOPMENT SETUP
+#### DEVELOPMENT SETUP
 
 ##### Core system requirements
 
 * Java (8)
 * Postgres database (9.4.4)
 
-###### DB Roles
+##### DB Roles
 
 And into the prompt to create some roles and users:
     
