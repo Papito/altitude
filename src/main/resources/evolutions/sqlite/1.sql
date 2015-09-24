@@ -1,6 +1,7 @@
 CREATE TABLE db_version(
   id varchar(24) PRIMARY KEY,
-  version INT NOT NULL DEFAULT 0
+  version INT NOT NULL DEFAULT 0,
+  migration_allowed INT NOT NULL DEFAULT 0
 );
 CREATE UNIQUE INDEX db_version_idx ON db_version(version);
 

@@ -8,7 +8,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
 
   val default = HashMap(
     "app.name" -> "Altitude",
-    "datasource" -> "sqlite", // mongo, postgres, sqlite
+    "datasource" -> "postgres", // mongo, postgres, sqlite
 
     "preview.box.pixels" -> 200,
 
