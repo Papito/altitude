@@ -4,6 +4,7 @@
 
 * Java (8)
 * Postgres database (9.4.4)
+* Mongo 2.6.5
 
 ##### DB Roles
 
