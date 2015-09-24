@@ -18,7 +18,7 @@ object IntegrationTestCore {
    The test suite
   */
   val sqliteApp = new Altitude(Map("datasource" -> "sqlite"))
-  //val postgresApp = new Altitude(Map("datasource" -> "postgres"))
+  val postgresApp = new Altitude(Map("datasource" -> "postgres"))
   val mongoDbApp = new Altitude(Map("datasource" -> "mongo"))
 }
 
@@ -33,7 +33,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   // force environment to always be TEST
   protected def altitude: Altitude = config.get("datasource") match {
     case Some("mongo") => IntegrationTestCore.mongoDbApp
-    //case Some("postgres") => IntegrationTestCore.postgresApp
+    case Some("postgres") => IntegrationTestCore.postgresApp
     case Some("sqlite") => IntegrationTestCore.sqliteApp
     case _ => throw new IllegalArgumentException("Do not know of datasource: ${config.get(\"datasource\")}")
   }

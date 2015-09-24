@@ -1,5 +1,3 @@
-DROP SCHEMA IF EXISTS "altitude-test" CASCADE; CREATE SCHEMA "altitude-test";
-
 CREATE TABLE _core (
   created_at timestamp WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp WITHOUT TIME ZONE DEFAULT NULL

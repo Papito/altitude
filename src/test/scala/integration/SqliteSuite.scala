@@ -27,18 +27,17 @@ class SqliteSuite extends AllTests(config = Map("datasource" -> "sqlite")) with 
       """.stripMargin
 
     val conn = DriverManager.getConnection(url)
-
     val stmt = conn.createStatement()
-    stmt.executeUpdate(sql)
-    stmt.close()
-    conn.close()
+
+    try {
+      stmt.executeUpdate(sql)
+    }
+    finally {
+      if (stmt != null) stmt.close()
+      if (conn != null) conn.close()
+    }
 
     IntegrationTestCore.sqliteApp.service.migration.migrate()
-
-   /*
-      We have to commit this, however, later we make sure everything is rolled back.
-      The committed count must be kept at zero
-    */
     log.info("END SETUP")
   }
 }

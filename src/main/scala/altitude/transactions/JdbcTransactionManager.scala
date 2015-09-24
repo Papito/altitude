@@ -72,7 +72,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     catch {
       case ex: Exception => {
         tx.down()
-        log.error(ex.getMessage)
+        log.error("TX. Error: " + ex.getMessage)
         throw ex
       }
     }
@@ -104,7 +104,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     catch {
       case ex: Exception => {
         tx.down()
-        log.error(ex.getMessage);
+        log.error("TX. Error: " + ex.getMessage)
         throw ex
       }
     }
