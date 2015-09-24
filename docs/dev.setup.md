@@ -1,5 +1,7 @@
 ### DEVELOPMENT SETUP
 
+##### Core system requirements
+
 * Java (8)
 * Postgres database (9.4.4)
 
