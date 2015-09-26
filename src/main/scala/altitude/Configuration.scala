@@ -8,6 +8,9 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
 
   val default = HashMap(
     "app.name" -> "Altitude",
+    "dataDir" -> "data",
+    "previewDir" -> "p",
+
     "datasource" -> "postgres", // mongo, postgres, sqlite
 
     "preview.box.pixels" -> 200,
@@ -18,7 +21,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
     "db.postgres.password" -> "dba",
     "db.postgres.url" -> "jdbc:postgresql://localhost/altitude",
 
-    "db.sqlite.url" -> "jdbc:sqlite:db.sqlite",
+    "db.sqlite.url" -> "jdbc:sqlite:data/db",
 
     "db.mongo.host" -> "localhost",
     "db.mongo.db" -> "altitude",
@@ -27,10 +30,12 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
   )
 
   val test = default ++ HashMap(
+    "dataDir" -> "tmp/test/data",
+
     "db.postgres.url" -> "jdbc:postgresql://localhost/altitude-test",
     "db.postgres.user" -> "altitude-test",
 
-    "db.sqlite.url" -> "jdbc:sqlite:test.sqlite.db",
+    "db.sqlite.url" -> "jdbc:sqlite:tmp/test.sqlite.db",
 
     "db.mongo.db" -> s"altitude-test",
 

@@ -1,5 +1,7 @@
 package integration
 
+import java.io.File
+
 import altitude.transactions.{Transaction, TransactionId}
 import altitude.{Altitude, Const => C, Environment}
 import com.google.inject.{AbstractModule, Guice}
@@ -7,6 +9,7 @@ import integration.util.dao
 import integration.util.dao.UtilitiesDao
 import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
+import org.apache.commons.io.FileUtils
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach, FunSuite}
 import org.slf4j.LoggerFactory
 
@@ -15,7 +18,6 @@ object IntegrationTestCore {
    initialize app instances for all known datasources to avoid creating
    this for every test class.
 
-   The test suite
   */
   val sqliteApp = new Altitude(Map("datasource" -> "sqlite"))
   val postgresApp = new Altitude(Map("datasource" -> "postgres"))
@@ -44,6 +46,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
 
   override def beforeEach() = {
     dbUtilities.dropDatabase()
+    FileUtils.deleteDirectory(new File(altitude.dataPath))
     dbUtilities.createTransaction(txId)
     log.info(s"TX. Test transaction ID is ${txId.id}")
   }
@@ -53,10 +56,6 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     // should not have committed anything for tests
     require(altitude.transactions.COMMITTED == 0)
     require(altitude.JDBC_TRANSACTIONS.isEmpty)
-  }
-
-  after {
-    dbUtilities.cleanupTests()
   }
 
   class InjectionModule extends AbstractModule with ScalaModule  {

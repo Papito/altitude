@@ -29,8 +29,6 @@ class UtilitiesDao(app: Altitude) extends VoidJdbcDao(app) with integration.util
     app.JDBC_TRANSACTIONS.clear()
   }
 
-  override def cleanupTests() = Unit
-
   override def createTransaction(txId: TransactionId): Unit = {
     val tx = jdbcTxManager.transaction(txId)
     tx.setReadOnly(flag = false)

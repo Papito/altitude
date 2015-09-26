@@ -70,8 +70,8 @@ class LibraryService(app: Altitude) {
         log.info(s"Saving preview for ${asset.path}")
 
         val preview: Preview = Preview(
-          asset_id=asset.id.get,
-          mime_type=asset.mediaType.mime,
+          assetId=asset.id.get,
+          mimeType=asset.mediaType.mime,
           data=previewData)
 
         app.service.preview.add(preview)

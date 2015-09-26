@@ -1,12 +1,30 @@
 package altitude.service
 
-import altitude.Altitude
-import altitude.dao.PreviewDao
-import altitude.models.Preview
-import net.codingwell.scalaguice.InjectorExtensions._
-import org.slf4j.LoggerFactory
+import java.io.File
 
-class PreviewService(app: Altitude) extends BaseService[Preview](app) {
+import altitude.Altitude
+import altitude.models.Preview
+import org.slf4j.LoggerFactory
+import org.apache.commons.io.{FileUtils, FilenameUtils}
+
+class PreviewService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
-  override protected val DAO = app.injector.instance[PreviewDao]
+
+  def add(preview: Preview): Unit = {
+    log.info(s"Adding preview for asset ${preview.assetId}")
+
+    val filePath = previewFilePath(preview.assetId)
+    val dirPath = FilenameUtils.getFullPath(filePath)
+    log.info(dirPath)
+    FileUtils.forceMkdir(new File(dirPath))
+  }
+
+  def getById(id: String): Preview = {
+    throw new NotImplementedError()
+  }
+
+  private def previewFilePath(assetId: String): String = {
+    val dirName = assetId.substring(0, 3)
+    app.previewPath + dirName + "/" + assetId + ".jpg"
+  }
 }

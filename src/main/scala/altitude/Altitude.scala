@@ -47,7 +47,6 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
         case "mongo" => {
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.VoidTransactionManager(app))
           bind[AssetDao].toInstance(new mongo.AssetDao(app))
-          bind[PreviewDao].toInstance(new mongo.PreviewDao(app))
           bind[ImportProfileDao].toInstance(new mongo.ImportProfileDao(app))
         }
         case "postgres" => {
@@ -56,7 +55,6 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
 
           bind[AssetDao].toInstance(new postgres.AssetDao(app))
-          bind[PreviewDao].toInstance(new postgres.PreviewDao(app))
           bind[ImportProfileDao].toInstance(new postgres.ImportProfileDao(app))
         }
         case "sqlite" => {
@@ -65,7 +63,6 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
 
           bind[AssetDao].toInstance(new sqlite.AssetDao(app))
-          bind[PreviewDao].toInstance(new sqlite.PreviewDao(app))
           bind[ImportProfileDao].toInstance(new sqlite.ImportProfileDao(app))
         }
         case _ => {
@@ -112,4 +109,10 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
       service.migration.migrate()
     }
   }
+
+  val workPath = System.getProperty("user.dir")
+  val dataDir = config.getString("dataDir")
+  val dataPath = workPath + "/" + dataDir + "/"
+  log.info(s"Data path is '$dataPath'")
+  val previewPath = dataPath + "p/"
 }

@@ -14,7 +14,7 @@ class AssetController extends BaseWebController {
 
     try {
       val preview: Preview = app.service.library.getPreview(id)
-      this.contentType = preview.mime_type
+      this.contentType = preview.mimeType
       preview.data
     }
     catch {

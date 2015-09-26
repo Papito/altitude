@@ -10,6 +10,5 @@ trait UtilitiesDao extends BaseDao {
   protected def rollback(): Unit
   protected def close(): Unit
   def cleanupTest(): Unit
-  def cleanupTests(): Unit
   def createTransaction(tx: TransactionId): Unit
 }

@@ -12,22 +12,22 @@ object Preview {
 
     Preview(
       id = (json \ C.Preview.ID).asOpt[String],
-      asset_id = (json \ C.Preview.ASSET_ID).as[String],
-      mime_type = (json \ C.Preview.MIME_TYPE).as[String],
+      assetId = (json \ C.Preview.ASSET_ID).as[String],
+      mimeType = (json \ C.Preview.MIME_TYPE).as[String],
       data =  Base64.decodeBase64(data)
     ).withCoreAttr(json)
   }
 }
 
 case class Preview(id: Option[String]=None,
-                   asset_id: String,
-                   mime_type: String,
+                   assetId: String,
+                   mimeType: String,
                    data: Array[Byte]) extends BaseModel {
 
   override def toJson = {
     Json.obj(
-      C.Preview.ASSET_ID -> asset_id,
-      C.Preview.MIME_TYPE -> mime_type,
+      C.Preview.ASSET_ID -> assetId,
+      C.Preview.MIME_TYPE -> mimeType,
       C.Preview.DATA -> Base64.encodeBase64String(data)
     ) ++ coreJsonAttrs
   }
