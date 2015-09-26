@@ -10,7 +10,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
   val log = LoggerFactory.getLogger(getClass)
 
   /*
-  Get an existing transaction if we are already withing a transaction context,
+  Get an existing transaction if we are already within a transaction context,
   else, create a new one
    */
   def transaction(implicit txId: TransactionId): JdbcTransaction = {

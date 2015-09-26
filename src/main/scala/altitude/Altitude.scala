@@ -28,6 +28,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
 
   val config = new Configuration(
     additionalConfiguration = additionalConfiguration)
+
   val dataSourceType = config.getString("datasource")
   log.info(s"Datasource type: $dataSourceType", C.LogTag.APP)
 
@@ -72,7 +73,6 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
   }
 
   val injector = Guice.createInjector(new InjectionModule)
-  val txManager = app.injector.instance[AbstractTransactionManager]
 
   // create all services
   object service {
@@ -83,6 +83,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
     val preview = new PreviewService(app)
     val importProfile = new ImportProfileService(app)
     val tagConfig = new TagConfigService(app)
+
     val migration = dataSourceType match {
       case "mongo" => new MongoMigrationService(app)
       case "sqlite" => new SqliteMigrationService(app)
