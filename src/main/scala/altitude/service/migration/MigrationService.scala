@@ -1,4 +1,4 @@
-package altitude.service
+package altitude.service.migration
 
 import altitude.transactions.TransactionId
 import org.slf4j.LoggerFactory
@@ -9,8 +9,8 @@ abstract class MigrationService {
   private final val log = LoggerFactory.getLogger(getClass)
 
   protected val CURRENT_VERSION = 1
-  protected val ROOT_EVOLUTIONS_PATH = "/evolutions/"
-  protected val EVOLUTIONS_DIR: String
+  protected val ROOT_MIGRATIONS_PATH = "/migrations/"
+  protected val MIGRATIONS_DIR: String
   protected val FILE_EXTENSION: String
 
   protected def runMigration(version: Int): Unit
@@ -43,7 +43,7 @@ abstract class MigrationService {
 
   def parseMigrationCommands(version: Int): List[String] = {
     log.info(s"RUNNING MIGRATION TO VERSION $version")
-    val path = s"$ROOT_EVOLUTIONS_PATH$EVOLUTIONS_DIR$version$FILE_EXTENSION"
+    val path = s"$ROOT_MIGRATIONS_PATH$MIGRATIONS_DIR$version$FILE_EXTENSION"
     val r = getClass.getResource(path)
     Source.fromURL(r).mkString.split(";").toList
   }

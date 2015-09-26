@@ -1,10 +1,10 @@
-package altitude.service
+package altitude.service.migration
 
 import altitude.Altitude
 import altitude.dao.MigrationDao
-import altitude.transactions.{JdbcTransactionManager, TransactionId, AbstractTransactionManager}
-import org.slf4j.LoggerFactory
+import altitude.transactions.{AbstractTransactionManager, JdbcTransactionManager, TransactionId}
 import net.codingwell.scalaguice.InjectorExtensions._
+import org.slf4j.LoggerFactory
 
 abstract class JdbcMigrationService(app: Altitude) extends MigrationService {
   private final val log = LoggerFactory.getLogger(getClass)

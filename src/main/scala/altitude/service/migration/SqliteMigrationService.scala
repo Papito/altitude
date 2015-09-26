@@ -1,13 +1,13 @@
-package altitude.service
+package altitude.service.migration
 
 import altitude.Altitude
-import altitude.dao.{sqlite, MigrationDao}
+import altitude.dao.sqlite
 import org.slf4j.LoggerFactory
 
 class SqliteMigrationService(app: Altitude) extends JdbcMigrationService(app) {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  val EVOLUTIONS_DIR = "sqlite/"
+  val MIGRATIONS_DIR = "sqlite/"
   override val DAO = new sqlite.MigrationDao(app)
 
   log.info("SQLITE migration service initialized")

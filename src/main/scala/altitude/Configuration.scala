@@ -23,7 +23,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
     "db.mongo.host" -> "localhost",
     "db.mongo.db" -> "altitude",
     "db.mongo.port" -> "27017",
-    "evolutionsEnabled" -> true
+    "migrationsEnabled" -> true
   )
 
   val test = default ++ HashMap(
@@ -34,7 +34,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
 
     "db.mongo.db" -> s"altitude-test",
 
-    "evolutionsEnabled" -> false
+    "migrationsEnabled" -> false
 
   )
 

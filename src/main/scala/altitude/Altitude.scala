@@ -5,6 +5,7 @@ import java.sql.DriverManager
 import altitude.dao.mongo.BaseMongoDao
 import altitude.dao._
 import altitude.service._
+import altitude.service.migration.{SqliteMigrationService, MongoMigrationService, PostgresMigrationService}
 import altitude.transactions.{AbstractTransactionManager, JdbcTransaction}
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
@@ -99,7 +100,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
     var CLOSED = 0
   }
 
-  if (config.getFlag("evolutionsEnabled")) {
+  if (config.getFlag("migrationsEnabled")) {
     service.migration.initDb()
     val migrationRequired = service.migration.migrationRequired()
     if (migrationRequired) {
