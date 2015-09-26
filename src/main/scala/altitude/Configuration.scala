@@ -35,7 +35,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
     "db.postgres.url" -> "jdbc:postgresql://localhost/altitude-test",
     "db.postgres.user" -> "altitude-test",
 
-    "db.sqlite.url" -> "jdbc:sqlite:tmp/test.sqlite.db",
+    "db.sqlite.url" -> "jdbc:sqlite:tmp/test/test.sqlite.db",
 
     "db.mongo.db" -> s"altitude-test",
 
@@ -45,7 +45,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
 
   val prod = default ++ HashMap()
 
-  private val config: Map[String, Any] =  Environment.ENV match {
+  private val config: Map[String, Any] = Environment.ENV match {
     case Environment.TEST => test ++ additionalConfiguration
     case Environment.DEV => default ++ additionalConfiguration
     case Environment.PROD => prod ++ additionalConfiguration

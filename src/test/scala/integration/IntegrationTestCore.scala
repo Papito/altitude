@@ -46,7 +46,10 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
 
   override def beforeEach() = {
     dbUtilities.dropDatabase()
-    FileUtils.deleteDirectory(new File(altitude.dataPath))
+
+    val dataDirFile = new File(altitude.dataPath)
+    FileUtils.deleteDirectory(dataDirFile)
+    FileUtils.forceMkdir(dataDirFile)
     dbUtilities.createTransaction(txId)
     log.info(s"TX. Test transaction ID is ${txId.id}")
   }
