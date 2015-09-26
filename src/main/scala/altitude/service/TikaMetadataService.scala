@@ -9,13 +9,14 @@ import org.apache.tika.exception.TikaException
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.serialization.JsonMetadata
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
-import org.apache.tika.parser.AbstractParser
+import org.apache.tika.parser.{AutoDetectParser, AbstractParser}
 import org.apache.tika.parser.audio.AudioParser
 import org.apache.tika.parser.image.ImageParser
 import org.apache.tika.parser.mp3.Mp3Parser
 import org.slf4j.LoggerFactory
 import org.xml.sax.helpers.DefaultHandler
 import play.api.libs.json.{JsNull, JsValue, Json}
+import org.apache.tika.parser.jpeg.JpegParser
 
 class TikaMetadataService extends AbstractMetadataService {
   val log =  LoggerFactory.getLogger(getClass)
@@ -30,7 +31,7 @@ class TikaMetadataService extends AbstractMetadataService {
 
   override def extract(importAsset: FileImportAsset, mediaType: MediaType): JsValue = mediaType match {
     case mt: MediaType if mt.mediaType == "image" =>
-      extractMetadata(importAsset, PARSERS.IMAGE)
+      extractMetadata(importAsset, new JpegParser)
     case mt: MediaType if mt.mediaType == "audio" && mt.mediaSubtype == "mpeg" =>
       extractMetadata(importAsset, PARSERS.MPEG_AUDIO)
     case mt: MediaType if mt.mediaType == "audio" =>
