@@ -13,7 +13,7 @@ import net.codingwell.scalaguice.ScalaModule
 import org.slf4j.LoggerFactory
 
 class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
-  val log =  LoggerFactory.getLogger(getClass)
+  private final val log = LoggerFactory.getLogger(getClass)
 
   val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
   log.info(s"Initializing Altitude application instance with ID $id")
@@ -33,6 +33,8 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
   log.info(s"Datasource type: $dataSourceType", C.LogTag.APP)
 
   val app: Altitude = this
+
+  //FIXME: see how we can use typing to make this more abstract
   val JDBC_TRANSACTIONS = scala.collection.mutable.Map[Int, JdbcTransaction]()
 
   /*

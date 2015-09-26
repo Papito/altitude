@@ -33,7 +33,7 @@ object BaseMongoDao {
 }
 
 abstract class BaseMongoDao(protected val collectionName: String) extends BaseDao {
-  val log =  LoggerFactory.getLogger(getClass)
+  private final val log = LoggerFactory.getLogger(getClass)
 
   protected def COLLECTION: MongoCollection = BaseMongoDao.DB.get(collectionName)
 

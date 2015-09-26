@@ -13,7 +13,7 @@ import play.api.libs.json.JsObject
 
 
 class FileSystemImportDao(val app: Altitude) extends BaseDao {
-  val log =  LoggerFactory.getLogger(getClass)
+  private final val log = LoggerFactory.getLogger(getClass)
 
   private val ANY_FILE_FILTER: IOFileFilter = TrueFileFilter.INSTANCE
 

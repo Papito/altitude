@@ -5,7 +5,7 @@ import altitude.transactions.TransactionId
 import org.slf4j.LoggerFactory
 
 class MongoMigrationService(app: Altitude) extends MigrationService {
-  private val log =  LoggerFactory.getLogger(getClass)
+  private final val log = LoggerFactory.getLogger(getClass)
 
   val EVOLUTIONS_DIR = "mongo/"
   val FILE_EXTENSION = ".mongo"

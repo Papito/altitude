@@ -17,10 +17,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class ImportController extends BaseWebController  with JValueResult
 with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUploadSupport  {
+  private final val log = LoggerFactory.getLogger(getClass)
+
   val ONE_HUNDRED_MEGABYTES = 1024 * 1024 * 100
   configureMultipartHandling(MultipartConfig(maxFileSize = Some(ONE_HUNDRED_MEGABYTES)))
 
-  val log = LoggerFactory.getLogger(getClass)
   implicit protected val jsonFormats: Formats = DefaultFormats
 
   get("/") {

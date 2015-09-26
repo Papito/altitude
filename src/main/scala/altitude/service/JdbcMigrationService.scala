@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 import net.codingwell.scalaguice.InjectorExtensions._
 
 abstract class JdbcMigrationService(app: Altitude) extends MigrationService {
-  private val log =  LoggerFactory.getLogger(getClass)
+  private final val log = LoggerFactory.getLogger(getClass)
   protected val DAO: MigrationDao
   protected val txManager = app.injector.instance[AbstractTransactionManager]
   val FILE_EXTENSION = ".sql"

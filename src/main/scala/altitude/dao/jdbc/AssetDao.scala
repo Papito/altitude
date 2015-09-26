@@ -3,10 +3,12 @@ package altitude.dao.jdbc
 import altitude.models.{Asset, MediaType}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
+import org.slf4j.LoggerFactory
 import play.api.libs.json._
 
 
 abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with altitude.dao.AssetDao {
+  private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val mediaType = new MediaType(

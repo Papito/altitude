@@ -4,9 +4,12 @@ import altitude.controllers.BaseController
 import altitude.models.search.Query
 import altitude.{Const => C}
 import org.scalatra.Ok
+import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 
 class SearchController extends BaseApiController {
+  private final val log = LoggerFactory.getLogger(getClass)
+
   get("/") {
     val assets = app.service.library.search(new Query())
     val jsonAssets = for (asset <- assets) yield asset.toJson

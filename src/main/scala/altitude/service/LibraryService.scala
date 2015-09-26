@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
 class LibraryService(app: Altitude) {
-  val log =  LoggerFactory.getLogger(getClass)
+  private final val log = LoggerFactory.getLogger(getClass)
   protected val txManager = app.injector.instance[AbstractTransactionManager]
 
   val PREVIEW_BOX_SIZE = app.config.getInt("preview.box.pixels")

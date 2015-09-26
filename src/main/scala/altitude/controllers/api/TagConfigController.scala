@@ -6,7 +6,7 @@ import play.api.libs.json.{JsArray, Json}
 import altitude.{Const => C}
 
 class TagConfigController extends BaseApiController {
-  override val log =  LoggerFactory.getLogger(getClass)
+  private final val log = LoggerFactory.getLogger(getClass)
 
   get("/") {
     val tagConfig = app.service.tagConfig.getAll

@@ -9,7 +9,7 @@ import play.api.libs.json.Json
 import altitude.{Const => C}
 
 class BaseApiController extends BaseController with GZipSupport {
-  val log =  LoggerFactory.getLogger(getClass)
+  private final val log = LoggerFactory.getLogger(getClass)
   val POST_VALIDATOR: Option[ApiValidator] = None
 
   before() {

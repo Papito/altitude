@@ -7,7 +7,7 @@ import altitude.{Altitude, Const => C}
 import org.slf4j.LoggerFactory
 
 class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManager {
-  val log = LoggerFactory.getLogger(getClass)
+  private final val log = LoggerFactory.getLogger(getClass)
 
   /*
   Get an existing transaction if we are already within a transaction context,

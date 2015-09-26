@@ -3,9 +3,12 @@ package altitude.dao.jdbc
 import altitude.models.ImportProfile
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
+import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, Json}
 
 abstract class ImportProfileDao(val app: Altitude) extends BaseJdbcDao("import_profile") with altitude.dao.ImportProfileDao {
+  private final val log = LoggerFactory.getLogger(getClass)
+
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val model = ImportProfile(
       id = Some(rec.get(C.ImportProfile.ID).get.asInstanceOf[String]),

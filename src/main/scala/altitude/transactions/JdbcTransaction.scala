@@ -6,7 +6,7 @@ import altitude.{Const => C}
 import org.slf4j.LoggerFactory
 
 class JdbcTransaction(val conn: Connection) extends Transaction {
-  val log =  LoggerFactory.getLogger(getClass)
+  private final val log = LoggerFactory.getLogger(getClass)
 
   log.debug(s"New JDBC transaction $id", C.LogTag.DB)
   def getConnection: Connection = conn

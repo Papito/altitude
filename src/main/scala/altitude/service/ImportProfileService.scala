@@ -32,7 +32,7 @@ object ImportProfileService {
 }
 
 class ImportProfileService(app: Altitude) extends BaseService[ImportProfile](app) {
-  val log =  LoggerFactory.getLogger(getClass)
+  private final val log = LoggerFactory.getLogger(getClass)
   override protected val DAO = app.injector.instance[ImportProfileDao]
 
 

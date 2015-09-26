@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory
 import scala.io.Source
 
 abstract class MigrationService {
-  private val log =  LoggerFactory.getLogger(getClass)
+  private final val log = LoggerFactory.getLogger(getClass)
 
   protected val CURRENT_VERSION = 1
   protected val ROOT_EVOLUTIONS_PATH = "/evolutions/"

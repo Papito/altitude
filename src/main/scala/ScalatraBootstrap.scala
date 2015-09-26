@@ -8,7 +8,7 @@ import org.scalatra._
 import org.slf4j.LoggerFactory
 
 class ScalatraBootstrap extends LifeCycle {
-  val log =  LoggerFactory.getLogger(getClass)
+  private final val log = LoggerFactory.getLogger(getClass)
 
   override def init(context: ServletContext) {
     context.mount(new IndexController, "/*")

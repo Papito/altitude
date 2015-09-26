@@ -4,8 +4,11 @@ import altitude.controllers.BaseController
 import altitude.exceptions.NotFoundException
 import altitude.models.Preview
 import altitude.{Const => C}
+import org.slf4j.LoggerFactory
 
 class AssetController extends BaseWebController {
+  private final val log = LoggerFactory.getLogger(getClass)
+
   get("/:id/preview") {
     val id = params(C.Api.ID)
 

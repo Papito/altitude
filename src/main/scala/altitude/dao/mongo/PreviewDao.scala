@@ -7,6 +7,7 @@ import altitude.models.{Asset, Preview}
 import altitude.transactions.TransactionId
 import com.mongodb.casbah.gridfs.Imports._
 import org.apache.commons.io.IOUtils
+import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
 object PreviewDao {
@@ -15,6 +16,8 @@ object PreviewDao {
 }
 
 class PreviewDao(val app: Altitude) extends BaseMongoDao("preview") with altitude.dao.PreviewDao {
+  private final val log = LoggerFactory.getLogger(getClass)
+
   PreviewDao.initGridFs()
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {

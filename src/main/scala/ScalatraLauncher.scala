@@ -4,8 +4,10 @@ import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server._
 import org.eclipse.jetty.webapp.WebAppContext
 import org.scalatra.servlet.ScalatraListener
+import org.slf4j.LoggerFactory
 
 object ScalatraLauncher extends App  with SingleApplication {
+  private final val log = LoggerFactory.getLogger(getClass)
 
   // in development mode start with -DresourceBase=target/webapp
   val resourceBase = getClass.getClassLoader.getResource("webapp").toExternalForm

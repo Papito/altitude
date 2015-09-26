@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsValue
 
 class FileImportService(app: Altitude) extends BaseService(app) {
-  val log =  LoggerFactory.getLogger(getClass)
+  private final val log = LoggerFactory.getLogger(getClass)
 
   protected val DAO = new FileSystemImportDao(app)
   protected val SUPPORTED_MEDIA_TYPES = List("audio", "image")

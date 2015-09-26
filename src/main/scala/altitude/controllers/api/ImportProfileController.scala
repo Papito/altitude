@@ -11,7 +11,7 @@ import play.api.libs.json.{JsArray, JsValue, Json}
 import altitude.Util
 
 class ImportProfileController extends BaseApiController {
-  override val log =  LoggerFactory.getLogger(getClass)
+  private final val log = LoggerFactory.getLogger(getClass)
 
   override val POST_VALIDATOR = Some(ApiValidator(List(
     C.Api.ImportProfile.NAME, C.Api.ImportProfile.KEYWORDS

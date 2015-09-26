@@ -18,7 +18,7 @@ import org.xml.sax.helpers.DefaultHandler
 import play.api.libs.json.{JsNull, JsValue, Json}
 
 class TikaMetadataService extends AbstractMetadataService {
-  val log =  LoggerFactory.getLogger(getClass)
+  private final val log = LoggerFactory.getLogger(getClass)
 
   private object PARSERS {
     final val IMAGE = new ImageParser

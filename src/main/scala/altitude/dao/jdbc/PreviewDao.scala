@@ -4,10 +4,13 @@ import altitude.models.Preview
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
 import org.apache.commons.codec.binary.Base64
+import org.slf4j.LoggerFactory
 import play.api.libs.json._
 
 
 abstract class PreviewDao(val app: Altitude) extends BaseJdbcDao("preview") with altitude.dao.PreviewDao {
+  private final val log = LoggerFactory.getLogger(getClass)
+
   protected def makeModel(rec: Map[String, AnyRef]): JsObject = Json.obj()
 
   override def add(json: JsObject)(implicit txId: TransactionId): JsObject = {
