@@ -40,7 +40,7 @@ import org.scalatest.Matchers._
       assets should not be empty
     }
 
-  protected def importFile(p: String): Asset = {
+  private def importFile(p: String): Asset = {
     val path = getClass.getResource(s"../files/incoming/$p").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
     val importedAsset = altitude.service.fileImport.importAsset(fileImportAsset).get

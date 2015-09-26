@@ -18,7 +18,7 @@ import org.xml.sax.helpers.DefaultHandler
 import play.api.libs.json.{JsNull, JsValue, Json}
 
 class TikaMetadataService extends AbstractMetadataService {
-  private final val log = LoggerFactory.getLogger(getClass)
+  val log =  LoggerFactory.getLogger(getClass)
 
   private object PARSERS {
     final val IMAGE = new ImageParser
@@ -61,7 +61,6 @@ class TikaMetadataService extends AbstractMetadataService {
       }
       val jsonData = writer.toString
       Json.parse(jsonData)
-      //println(Json.prettyPrint(json))
     }
     finally {
       if (writer != null) writer.close()
