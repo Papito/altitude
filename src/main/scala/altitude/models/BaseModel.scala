@@ -100,5 +100,5 @@ abstract class BaseModel {
     this
   }
 
-  override def toString = this.toJson.toString()
+  override def toString = toJson.toString()
 }

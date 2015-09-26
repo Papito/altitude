@@ -32,6 +32,7 @@ abstract class MigrationService {
     }
   }
 
+  //FIXME: must come from DB
   def migrationConfirmed = false
 
   def migrate(): Unit = {
