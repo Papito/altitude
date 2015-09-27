@@ -77,6 +77,7 @@ object Const {
 
     object Search {
       val ASSETS = "assets"
+      val RESULT_BOX_SIZE = "resultBoxSize"
     }
 
     object TagConfig {

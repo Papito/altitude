@@ -13,6 +13,10 @@ class SearchController extends BaseApiController {
   get("/") {
     val assets = app.service.library.search(new Query())
     val jsonAssets = for (asset <- assets) yield asset.toJson
-    Ok(Json.obj(C.Api.Search.ASSETS -> jsonAssets))
+
+    Ok(Json.obj(
+      C.Api.Search.RESULT_BOX_SIZE -> app.config.getInt("result.box.pixels"),
+      C.Api.Search.ASSETS -> jsonAssets
+    ))
   }
 }

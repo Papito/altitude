@@ -21,7 +21,7 @@
 <script src="/js/lib/modernizr.custom.js"></script>
 <script src="/js/lib/select2.min.js"></script>
 <script src="/js/lib/Base.js"></script>
-<script src="/js/app/core.js"></script>
+<script src="/js/app/core.js?<%= altitude.Util.randomStr(10) %>"></script>
 
 </head>
 <body>

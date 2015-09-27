@@ -19,7 +19,7 @@ class LibraryService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
   protected val txManager = app.injector.instance[AbstractTransactionManager]
 
-  val PREVIEW_BOX_SIZE = app.config.getInt("preview.box.pixels")
+  val PREVIEW_BOX_SIZE = app.config.getInt("result.box.pixels")
   val COMPOSITE_IMAGE: BufferedImage = new BufferedImage(PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE, BufferedImage.TYPE_INT_ARGB)
   val G2D: Graphics2D = COMPOSITE_IMAGE.createGraphics
 
