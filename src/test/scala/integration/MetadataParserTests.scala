@@ -22,7 +22,7 @@ import play.api.libs.json.{Json, JsValue}
   private def getMetadata(p: String): JsValue = {
     val path = getClass.getResource(s"../import/$p").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
-    val mediaType = altitude.service.fileImport.detectAssetType(fileImportAsset)
+    val mediaType = altitude.service.fileImport.detectAssetMediaType(fileImportAsset)
     altitude.service.metadata.extract(fileImportAsset, mediaType)
   }
 

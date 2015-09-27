@@ -12,12 +12,11 @@ import org.scalatest.Matchers._
   test("import image (JPEG)") {
     val asset = importFile("images/basic/1.jpg")
     val preview: Preview = altitude.service.library.getPreview(asset.id.get)
-    preview.id should not be None
-    preview.mimeType should equal("image/jpeg")
+    preview.mimeType should equal("image/png")
     preview.data.length should not be 0
   }
 
-/*
+
   test("import duplicate") {
     importFile("images/basic/1.jpg")
     val path = getClass.getResource(s"../import/images/basic/1.jpg").getPath
@@ -40,7 +39,6 @@ import org.scalatest.Matchers._
       val assets = altitude.service.fileImport.getFilesToImport(path=incomingPath)
       assets should not be empty
     }
-*/
 
   private def importFile(p: String): Asset = {
     val path = getClass.getResource(s"../import/$p").getPath

@@ -7,6 +7,7 @@
 ######################
 bin
 db
+data
 eclipse
 .eclipse
 log

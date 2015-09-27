@@ -11,7 +11,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
     "dataDir" -> "data",
     "previewDir" -> "p",
 
-    "datasource" -> "postgres", // mongo, postgres, sqlite
+    "datasource" -> "mongo", // mongo, postgres, sqlite
 
     "preview.box.pixels" -> 200,
 

@@ -45,7 +45,6 @@ class LibraryService(app: Altitude) {
   }
 
   def getPreview(asset_id: String)(implicit txId: TransactionId = new TransactionId): Preview = {
-    log.debug(s"Getting preview for '$asset_id'")
     app.service.preview.getById(asset_id)
   }
 

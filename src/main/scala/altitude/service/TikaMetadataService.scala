@@ -3,12 +3,15 @@ package altitude.service
 import java.io.{InputStream, StringWriter}
 
 import altitude.exceptions.MetadataExtractorException
+import altitude.models.MediaType
 import altitude.models.{FileImportAsset, MediaType}
 import altitude.{Const => C}
+import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.exception.TikaException
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.serialization.JsonMetadata
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
+import org.apache.tika.mime.{MediaType => TikaMediaType}
 import org.apache.tika.parser.{AutoDetectParser, AbstractParser}
 import org.apache.tika.parser.audio.AudioParser
 import org.apache.tika.parser.image.ImageParser
@@ -67,5 +70,19 @@ class TikaMetadataService extends AbstractMetadataService {
       if (writer != null) writer.close()
       if (inputStream.isDefined) inputStream.get.close()
     }
+  }
+
+  def detectMediaTypeFromStream(is: InputStream): MediaType = {
+    val metadata: TikaMetadata = new TikaMetadata
+
+    val detector: Detector = new DefaultDetector
+    val tikaMediaType: TikaMediaType = detector.detect(is, metadata)
+
+    val assetMediaType = MediaType(
+      mediaType = tikaMediaType.getType,
+      mediaSubtype = tikaMediaType.getSubtype,
+      mime = tikaMediaType.getBaseType.toString)
+
+    assetMediaType
   }
 }

@@ -27,7 +27,7 @@ class FileImportService(app: Altitude) extends BaseService(app) {
     assets
   }
 
-  def detectAssetType(importAsset: FileImportAsset): MediaType = {
+  def detectAssetMediaType(importAsset: FileImportAsset): MediaType = {
     log.debug(s"Detecting media type for: '$importAsset'", C.LogTag.SERVICE)
 
     var inputStream: Option[InputStream] = None
@@ -36,18 +36,7 @@ class FileImportService(app: Altitude) extends BaseService(app) {
       val url: java.net.URL = importAsset.file.toURI.toURL
       val metadata: TikaMetadata = new TikaMetadata
       inputStream = Some(TikaInputStream.get(url, metadata))
-
-      val detector: Detector = new DefaultDetector
-      val tikaMediaType: TikaMediaType = detector.detect(inputStream.get, metadata)
-
-      val assetMediaType = MediaType(
-        mediaType = tikaMediaType.getType,
-        mediaSubtype = tikaMediaType.getSubtype,
-        mime = tikaMediaType.getBaseType.toString)
-
-      log.debug(s"Media type for $importAsset is: $assetMediaType", C.LogTag.SERVICE)
-
-      assetMediaType
+      app.service.metadata.detectMediaTypeFromStream(inputStream.get)
     }
     finally {
       if (inputStream.isDefined) inputStream.get.close()
@@ -56,7 +45,7 @@ class FileImportService(app: Altitude) extends BaseService(app) {
 
   def importAsset(fileAsset: FileImportAsset)(implicit txId: TransactionId = new TransactionId) : Option[Asset]  = {
     log.info(s"Importing file asset '$fileAsset'", C.LogTag.SERVICE)
-    val mediaType = detectAssetType(fileAsset)
+    val mediaType = detectAssetMediaType(fileAsset)
 
     if (!SUPPORTED_MEDIA_TYPES.contains(mediaType.mediaType)) {
       log.warn(s"Ignoring ${fileAsset.absolutePath} of type ${mediaType.mediaType}")
