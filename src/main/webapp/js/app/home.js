@@ -20,14 +20,14 @@ HomeViewModel = BaseViewModel.extend({
     var self = this;
     var opts = {
       'successCallback': function (json) {
-        var assets = $.map(json.assets, function(asset) {
+        var assets = $.map(json['assets'], function(asset) {
           return new Asset(asset);
         });
 
         var searchResultsWidth = $("#searchResults").width();
         var viewportW = searchResultsWidth - (searchResultsWidth * 0.025);
 
-        var assetW = json.resultBoxSize;
+        var assetW = json['resultBoxSize'];
         self.resultBoxPadding(parseInt(assetW * 0.05));
         self.resultBoxMargin(parseInt(assetW * 0.05));
         self.resultBoxWidth(assetW +
