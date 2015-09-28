@@ -110,6 +110,15 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
     }
   }
 
+  def freeResources(): Unit = {
+    if (BaseMongoDao.CLIENT.isDefined) {
+      log.info("Closing MONGO client")
+      BaseMongoDao.CLIENT.get.close()
+    }
+    log.info("Freeing transaction list")
+    JDBC_TRANSACTIONS.clear()
+  }
+
   val workPath = System.getProperty("user.dir")
   val dataDir = config.getString("dataDir")
   val dataPath = workPath + "/" + dataDir + "/"
