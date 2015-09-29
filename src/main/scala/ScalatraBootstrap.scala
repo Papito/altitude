@@ -11,14 +11,15 @@ class ScalatraBootstrap extends LifeCycle with SingleApplication {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override def init(context: ServletContext) {
-    context.mount(new web.IndexController, "/")
-    context.mount(new web.ImportController, "/cl/import/*")
-    context.mount(new web.SearchController, "/cl/search/*")
+    context.mount(new ClientController, "/client/*")
+    //context.mount(new web.IndexController, "/")
+    //context.mount(new web.ImportController, "/cl/import/*")
+    //context.mount(new web.SearchController, "/cl/search/*")
 
-    context.mount(new AssetController, "/assets/*")
-    context.mount(new ImportController, "/import/*")
+    //context.mount(new AssetController, "/assets/*")
+    //context.mount(new ImportController, "/import/*")
 
-    context.mount(new api.SearchController, "/api/v1/search/*")
+    //context.mount(new api.SearchController, "/api/v1/search/*")
     //context.mount(new api.ImportProfileController, "/api/v1/ip/*")
     //context.mount(new api.TagConfigController, "/api/v1/tagconfig/*")
 
