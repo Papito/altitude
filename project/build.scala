@@ -8,6 +8,8 @@ import com.mojolly.scalate.ScalatePlugin._
 import com.mojolly.scalate.ScalatePlugin.ScalateKeys._
 import sbtassembly.AssemblyPlugin._
 import sbtassembly.AssemblyKeys._
+import xerial.sbt.Pack._
+
 
 object AltitudeBuild extends Build {
   val Organization = "altitude"
@@ -95,5 +97,5 @@ object AltitudeBuild extends Build {
   lazy val project = Project("altitude", file("."))
     .settings(projectSettings: _*)
     .settings(scalateSettings: _*)
-    .settings(deployAssemblySettings:_*)
+    .settings(packAutoSettings:_*)
 }

@@ -124,4 +124,5 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
   val dataPath = workPath + "/" + dataDir + "/"
   log.info(s"Data path is '$dataPath'")
   val previewPath = dataPath + "p/"
+  log.info(s"Altitude instance initialized")
 }
