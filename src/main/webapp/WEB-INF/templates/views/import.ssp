@@ -2,8 +2,8 @@
 
 #set (assets)
     <script src="/js/lib/jquery-atmosphere.js" xmlns="http://www.w3.org/1999/html"></script>
-    <script src="/js/app/models.js?<%= altitude.Util.randomStr(10) %>"></script>
-    <script src="/js/app/import.js?<%= altitude.Util.randomStr(10) %>"></script>
+    <script src="/js/app/models.js"></script>
+    <script src="/js/app/import.js"></script>
 #end
 
 <% attributes("screenTitle")= "Import" %>
@@ -152,7 +152,6 @@
         </div>
     </div>
 </div>
-
 
 
 <script>

@@ -1,9 +1,9 @@
-HomeViewModel = BaseViewModel.extend({
+SearchViewModel = BaseViewModel.extend({
   constructor : function() {
     "use strict";
 
     this.base();
-    console.log('Initializing home view model');
+    console.log('Initializing search view model');
 
     var self = this;
     this.searchResults = ko.observableArray();
@@ -13,7 +13,7 @@ HomeViewModel = BaseViewModel.extend({
     this.resultBoxSideMargin = ko.observable();
     this.resultBoxPadding = ko.observable();
     this.resultBoxWidth = ko.observable();
-    this.searchLatest();
+    //this.searchLatest();
   },
 
   searchLatest: function() {
