@@ -2,12 +2,12 @@ package altitude.controllers.web
 
 import org.slf4j.LoggerFactory
 
-class ImportController extends BaseWebController {
+class SearchController extends BaseWebController {
   private final val log = LoggerFactory.getLogger(getClass)
 
   get("/") {
     contentType = "text/html"
-    ssp("import")
+    ssp("search")
   }
 }
 

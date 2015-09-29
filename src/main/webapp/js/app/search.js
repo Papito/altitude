@@ -44,6 +44,6 @@ SearchViewModel = BaseViewModel.extend({
       }
     };
 
-    this.get('/api/search', opts);
+    this.get('/api/v1/search', opts);
   }
 });

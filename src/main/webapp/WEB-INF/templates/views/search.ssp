@@ -23,7 +23,7 @@
 
 <script>
     $(document).ready(function() {
-    var searchViewModel = new SearchViewModel();
-    ko.applyBindings(searchViewModel);
+        var searchViewModel = new SearchViewModel();
+        ko.applyBindings(searchViewModel);
     });
 </script>

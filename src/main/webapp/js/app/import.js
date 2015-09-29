@@ -50,7 +50,7 @@ ImportViewModel = BaseViewModel.extend({
             return self.currentAsset() ? self.currentAsset().path : "";
         }, this);
 
-        this.loadImportProfiles();
+        //this.loadImportProfiles();
     },
 
     cancelImport: function() {
@@ -103,6 +103,7 @@ ImportViewModel = BaseViewModel.extend({
         $('#selectImportDirectory').modal('hide');
     },
 
+/*
     loadImportProfiles: function() {
         var self = this;
         var opts = {
@@ -114,7 +115,7 @@ ImportViewModel = BaseViewModel.extend({
             }
         };
 
-        this.get('/api/ip', opts);
+        this.get('/api/v1/ip', opts);
     },
 
     createImportProfile: function() {
@@ -136,6 +137,7 @@ ImportViewModel = BaseViewModel.extend({
         };
         this.post('/api/ip/', opts);
     },
+ */
 
     addWarning: function(asset, message) {
         $("#importMessages").prepend(
