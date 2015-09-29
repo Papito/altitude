@@ -5,25 +5,25 @@
 
 
 <div class="row" id="home">
+<div class="col-md-12 col-lg-12">
+<div class="row" data-bind="visible: searchResults">
     <div class="col-md-12 col-lg-12">
-        <div class="row" data-bind="visible: searchResults">
-            <div class="col-md-12 col-lg-12">
-                <div id="searchResults">
-                    <div data-bind="foreach: searchResults">
-                        <div class="result-box"
-                         data-bind="style: {'margin-left': $root.resultBoxSideMargin, 'margin-right': $root.resultBoxSideMargin, 'margin-bottom': $root.resultBoxMargin, padding: $root.resultBoxPadding, 'border-width': $root.resultBoxBorder}">
-                            <img data-bind="attr: {src: '/assets/'+ $data.id +'/preview'}" class="img-responsive">
-                        </div>
+        <div id="searchResults">
+            <div data-bind="foreach: searchResults">
+                <div class="result-box"
+                    data-bind="style: {'margin-left': $root.resultBoxSideMargin, 'margin-right': $root.resultBoxSideMargin, 'margin-bottom': $root.resultBoxMargin, padding: $root.resultBoxPadding, 'border-width': $root.resultBoxBorder}">
+                    <img data-bind="attr: {src: '/assets/'+ $data.id +'/preview'}" class="img-responsive">
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+</div>
 
 <script>
     $(document).ready(function() {
-        var homeViewModel = new HomeViewModel();
-        ko.applyBindings(homeViewModel);
+    var homeViewModel = new HomeViewModel();
+    ko.applyBindings(homeViewModel);
     });
 </script>

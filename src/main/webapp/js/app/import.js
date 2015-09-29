@@ -69,31 +69,31 @@ ImportViewModel = BaseViewModel.extend({
 
 
     getDirectoryNames: function(path) {
-      var self = this;
-      var opts = {
+        var self = this;
+        var opts = {
             'successCallback': function (json) {
                 self.directoryNames(json.directoryNames);
                 self.currentPath(json.currentPath);
             },
             'finally': function() {
-              self.disableDoubleClick = false;
+                self.disableDoubleClick = false;
             }
         };
 
         if (path) {
-          opts.data = {'path': path}
+            opts.data = {'path': path}
         }
 
-      // some browsers can fire the doubleclick event when populating the list
-      this.disableDoubleClick = true;
-      this.get('/import/source/local/navigate', opts);
+        // some browsers can fire the doubleclick event when populating the list
+        this.disableDoubleClick = true;
+        this.get('/import/source/local/navigate', opts);
     },
 
     dropIntoDirectory: function(directoryName) {
-      if (this.disableDoubleClick == true) {
-        return;
-      }
-      this.getDirectoryNames(this.currentPath() + "/" + directoryName);
+        if (this.disableDoubleClick == true) {
+            return;
+        }
+        this.getDirectoryNames(this.currentPath() + "/" + directoryName);
     },
 
     selectImportDirectory: function() {
@@ -161,8 +161,8 @@ ImportViewModel = BaseViewModel.extend({
     addSuccess: function(asset) {
         $("#importMessages").prepend(
             '<div class="message">' +
-                '<button type="button" class="btn btn-success">Imported</button>' +
-                '&nbsp;&nbsp;' + asset.path +
+            '<button type="button" class="btn btn-success">Imported</button>' +
+            '&nbsp;&nbsp;' + asset.path +
             '</div>');
         this.trimMessages();
     },
