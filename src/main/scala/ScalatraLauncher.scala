@@ -12,14 +12,8 @@ import org.slf4j.LoggerFactory
 object ScalatraLauncher extends App  with SingleApplication {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  var jarPath: Option[File] = None
-
-  try {
-    val url = ScalatraLauncher.getClass.getProtectionDomain.getCodeSource.getLocation
-    jarPath = Some(new File(url.toURI).getParentFile)
-  } catch {
-    case ex: URISyntaxException => log.error("jarPath ERROR: " + ex.getMessage)
-  }
+  val url = ScalatraLauncher.getClass.getProtectionDomain.getCodeSource.getLocation
+  val jarPath = new File(url.toURI).getParentFile
 
   val host = "localhost"
   val port = 8080
@@ -33,7 +27,7 @@ object ScalatraLauncher extends App  with SingleApplication {
   connector.setPort(port)
   server.addConnector(connector)
 
-  val context = new WebAppContext(jarPath.get.getPath + File.separator + ".." + File.separator + "client", "/")
+  val context = new WebAppContext(jarPath.getPath + File.separator + "client", "/")
   context.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false")
   context.setEventListeners(Array(new ScalatraListener))
 

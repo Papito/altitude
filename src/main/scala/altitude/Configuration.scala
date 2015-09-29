@@ -1,5 +1,14 @@
 package altitude
+
+import java.io.File
+import java.net.URISyntaxException
+
 import scala.collection.immutable.HashMap
+
+object Configuration {
+    val url = Configuration.getClass.getProtectionDomain.getCodeSource.getLocation
+    val root = new File(url.toURI).getParentFile
+}
 
 class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
   def getString(key: String) = config.getOrElse(key, "").asInstanceOf[String]
@@ -11,7 +20,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
     "dataDir" -> "data",
     "previewDir" -> "p",
 
-    "datasource" -> "mongo", // mongo, postgres, sqlite
+    "datasource" -> "sqlite", // mongo, postgres, sqlite
 
     "result.box.pixels" -> 200,
 
@@ -21,7 +30,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
     "db.postgres.password" -> "dba",
     "db.postgres.url" -> "jdbc:postgresql://localhost/altitude",
 
-    "db.sqlite.url" -> "jdbc:sqlite:data/db",
+    "db.sqlite.url" -> s"jdbc:sqlite:${Configuration.root.getPath}${File.separator}data/db",
 
     "db.mongo.host" -> "localhost",
     "db.mongo.db" -> "altitude",
