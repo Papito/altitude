@@ -5,7 +5,6 @@ SearchViewModel = BaseViewModel.extend({
     this.base();
     console.log('Initializing search view model');
 
-    var self = this;
     this.searchResults = ko.observableArray();
 
     this.resultBoxBorder = 2; //pixels
@@ -13,11 +12,13 @@ SearchViewModel = BaseViewModel.extend({
     this.resultBoxSideMargin = ko.observable();
     this.resultBoxPadding = ko.observable();
     this.resultBoxWidth = ko.observable();
-    //this.searchLatest();
+    this.search();
   },
 
-  searchLatest: function() {
+  search: function() {
     var self = this;
+    var queryString = window.location.search;
+
     var opts = {
       'successCallback': function (json) {
         var assets = $.map(json['assets'], function(asset) {
@@ -44,6 +45,6 @@ SearchViewModel = BaseViewModel.extend({
       }
     };
 
-    this.get('/api/v1/search', opts);
+    this.get('/api/v1/search' + queryString, opts);
   }
 });

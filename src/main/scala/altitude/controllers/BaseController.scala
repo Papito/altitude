@@ -40,6 +40,11 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
 
   private def isAssetUri: Boolean = {
     val uri = request.getRequestURI
-    uri.startsWith("/js/") || uri.startsWith("/css/") || uri.startsWith("/i/")
+    //FIXME: clunky
+    uri.startsWith("/js/") ||
+      uri.startsWith("/css/") ||
+      uri.startsWith("/i/") ||
+      uri.startsWith("/assets/") ||
+      uri.startsWith("/static/")
   }
 }

@@ -78,6 +78,7 @@ object Const {
     object Search {
       val ASSETS = "assets"
       val RESULT_BOX_SIZE = "resultBoxSize"
+      val QUERY_STRING = "queryString"
     }
 
     object TagConfig {
