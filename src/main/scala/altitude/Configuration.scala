@@ -5,11 +5,6 @@ import java.net.URISyntaxException
 
 import scala.collection.immutable.HashMap
 
-object Configuration {
-    val url = Configuration.getClass.getProtectionDomain.getCodeSource.getLocation
-    val root = new File(url.toURI).getParentFile
-}
-
 class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
   def getString(key: String) = config.getOrElse(key, "").asInstanceOf[String]
   def getFlag(key: String) = config.getOrElse(key, false).asInstanceOf[Boolean]
@@ -30,7 +25,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
     "db.postgres.password" -> "dba",
     "db.postgres.url" -> "jdbc:postgresql://localhost/altitude",
 
-    "db.sqlite.url" -> s"jdbc:sqlite:${Configuration.root.getPath}${File.separator}data/db",
+    "db.sqlite.url" -> s"jdbc:sqlite:${Environment.root}data/db",
 
     "db.mongo.host" -> "localhost",
     "db.mongo.db" -> "altitude",

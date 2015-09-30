@@ -60,9 +60,40 @@ object AltitudeBuild extends Build {
       "javax.servlet"                %  "javax.servlet-api"    % "3.1.0" % "provided"
     )
   )
+  val scalateSettings =
+    ScalatePlugin.scalateSettings ++ Seq(
+      scalateTemplateConfig in Compile <<= (sourceDirectory in Compile) { base =>
+        Seq(
+          TemplateConfig(
+            base / "webapp" / "WEB-INF" / "templates",
+            Seq.empty, /* default imports should be added here */
+            Seq(
+              Binding("context", "_root_.org.scalatra.scalate.ScalatraRenderContext", importMembers = true, isImplicit = true)
+            ), /* add extra bindings here */
+            Some("templates")
+          )
+        )
+      }
+    )
+
+  // settings for sbt-assembly plugin
+  val deployAssemblySettings = assemblySettings ++ Seq(
+    // copy web resources to /webapp folder
+    resourceGenerators in Compile <+= (resourceManaged, baseDirectory) map {
+      (managedBase, base) =>
+        val webappBase = base / "src" / "main" / "webapp"
+        for {
+          (from, to) <- webappBase ** "*" pair rebase(webappBase, managedBase / "main" / "webapp")
+        } yield {
+          Sync.copy(from, to)
+          to
+        }
+    },
+    test in assembly := {}
+  )
 
   lazy val project = Project("altitude", file("."))
     .settings(projectSettings: _*)
-    .settings(ScalatePlugin.scalateSettings: _*)
-    .settings(assemblySettings:_*)
+    .settings(scalateSettings: _*)
+    .settings(deployAssemblySettings:_*)
 }
