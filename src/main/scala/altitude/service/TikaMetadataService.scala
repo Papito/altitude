@@ -65,7 +65,7 @@ class TikaMetadataService extends AbstractMetadataService {
         case ex: Throwable => throw new MetadataExtractorException(ex)
       }
 
-      val jsonData = writer.toString
+      val jsonData = writer.get.toString
       Json.parse(jsonData)
     }
     finally {
