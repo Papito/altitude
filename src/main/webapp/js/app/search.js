@@ -12,12 +12,34 @@ SearchViewModel = BaseViewModel.extend({
     this.resultBoxSideMargin = ko.observable();
     this.resultBoxPadding = ko.observable();
     this.resultBoxWidth = ko.observable();
-    this.search();
+
+    this.getResultBoxSize();
   },
 
-  search: function() {
+  search: function(resultBoxSize) {
     var self = this;
     var queryString = window.location.search;
+
+    var content = $("#content");
+    var searchResultsWidth = content.width();
+    var searchResultsHeight = content.height();
+
+    var viewportW = searchResultsWidth - (searchResultsWidth * 0.025);
+
+    self.resultBoxPadding(parseInt(resultBoxSize * 0.05));
+    self.resultBoxMargin(parseInt(resultBoxSize * 0.05));
+
+    self.resultBoxWidth(resultBoxSize +
+        (self.resultBoxMargin() + self.resultBoxPadding() + self.resultBoxBorder) * 2);
+
+    var fitsHorizontally = parseInt(viewportW / self.resultBoxWidth(), 10);
+    var viewPortRemainder = viewportW - (fitsHorizontally * self.resultBoxWidth());
+    var remainderPerSide = parseInt(viewPortRemainder / (fitsHorizontally * 2));
+
+    var resultBoxHeight = (resultBoxSize + (self.resultBoxPadding() + self.resultBoxBorder) * 2);
+
+    var approxRowsPerPage = parseInt(searchResultsHeight / resultBoxHeight, 10);
+    var rpp = (approxRowsPerPage * fitsHorizontally) * 2
 
     var opts = {
       'successCallback': function (json) {
@@ -25,26 +47,22 @@ SearchViewModel = BaseViewModel.extend({
           return new Asset(asset);
         });
 
-        var searchResultsWidth = $("#searchResults").width();
-        var viewportW = searchResultsWidth - (searchResultsWidth * 0.025);
-
-        var assetW = json['resultBoxSize'];
-        self.resultBoxPadding(parseInt(assetW * 0.05));
-        self.resultBoxMargin(parseInt(assetW * 0.05));
-        self.resultBoxWidth(assetW +
-            (self.resultBoxMargin() + self.resultBoxPadding() + self.resultBoxBorder) * 2);
-
-        var fitsHorizontally = parseInt(viewportW / self.resultBoxWidth(), 10);
-        var viewPortRemainder = viewportW - (fitsHorizontally * self.resultBoxWidth());
-        var remainderPerSide = parseInt(viewPortRemainder / (fitsHorizontally * 2));
-
         self.searchResults(assets);
         self.resultBoxSideMargin(self.resultBoxMargin() + remainderPerSide);
-        //searchResultsWidth = fitsHorizontally * self.resultBoxWidth() + ((self.resultBoxMargin() + self.resultBoxPadding() + self.resultBoxBorder) *2);
-        //console.log("total: " + searchResultsWidth);
       }
     };
 
-    this.get('/api/v1/search' + queryString, opts);
+    this.get('/api/v1/search' + queryString + "&rpp=" + rpp, opts);
+  },
+
+  getResultBoxSize: function() {
+    var self = this;
+    var opts = {
+      'successCallback': function (json) {
+        self.search(json['resultBoxSize']);
+      }
+    };
+
+    this.get('/api/v1/search/meta/box', opts);
   }
 });
