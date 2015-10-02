@@ -37,13 +37,6 @@
                 <div class="col-md-12" style="display: none; text-align: center; margin: 1em" data-bind="visible: isImporting() && assetsImportedCnt() == 0">
                     Collecting asset info
                 </div>
-                <div class="row">
-                    <div class="col-md-5">
-                    </div>
-                    <div class="col-md-7">
-                        <img src="" id="imagePreview" data-bind="visible: previewUrl(), attr: {'src': previewUrl()}"/>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -61,13 +54,13 @@
                     </div>
                 </div>
 
-                <div class="row"  data-bind="visible: importProfiles().length > 0">
+                <!-- div class="row"  data-bind="visible: importProfiles().length > 0">
                     <div class="col-md-12">
                         <select size="10" data-bind="foreach: importProfiles" name="${C.Api.ImportProfile.IMPORT_PROFILES}">
                             <option data-bind="attr: {'value': $data.id}, text: $data.name"></option>
                         </select>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
         <div class="row">
@@ -83,7 +76,7 @@
         </div>
 
         <div class="row">
-            <div id="importMessages" class="col-md-12">
+            <div id="importedAssets" class="col-md-12">
             </div>
         </div>
     </div>
@@ -116,7 +109,7 @@
 </div>
 
 <!-- Import profile modal -->
-<div class="modal fade" id="createImportProfile" tabindex="-1" role="dialog" aria-labelledby="createImportProfileLabel">
+<!-- div class="modal fade" id="createImportProfile" tabindex="-1" role="dialog" aria-labelledby="createImportProfileLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form>
@@ -151,7 +144,7 @@
             </form>
         </div>
     </div>
-</div>
+</div> -->
 
 
 <script>

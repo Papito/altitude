@@ -65,25 +65,18 @@ section #content{
   width: 90%;
 }
 
-#importControls #imagePreview {
-  margin: 1em;
-}
-
-#importControls #currentPath {
-  font-size: .8em;
-}
-
 #readyToImport {
   margin-bottom: 1em;
   text-align: center;
 }
 
-#importMessages {
+#importedAssets {
   margin-top: 1.5em;
 }
 
-#importMessages .message {
-  font-size: .9em;
+#importedAssets .asset {
+  float: left;
+  margin: 1em;
 }
 
 #selectImportDirectory select, #importProfiles select {

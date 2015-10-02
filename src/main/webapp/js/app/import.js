@@ -22,9 +22,8 @@ ImportViewModel = BaseViewModel.extend({
         this.isImporting = ko.observable(false);
         this.totalAssetsCnt = ko.observable(0);
         this.assetsImportedCnt = ko.observable(0);
-        this.currentAsset = ko.observable();
         this.importMode = ko.observable();
-        this.importProfiles = ko.observableArray();
+        //this.importProfiles = ko.observableArray();
         this.directoryNames = ko.observableArray();
         this.currentPath = ko.observable();
         this.importDirectory = ko.observable();
@@ -39,17 +38,6 @@ ImportViewModel = BaseViewModel.extend({
             return percent;
         }, this);
 
-        this.previewUrl = ko.computed(function() {
-            if (!self.currentAsset())
-                return null;
-
-            return "/assets/" + self.currentAsset().id + "/preview";
-        }, this);
-
-        this.currentAssetPath = ko.computed(function() {
-            return self.currentAsset() ? self.currentAsset().path : "";
-        }, this);
-
         //this.loadImportProfiles();
     },
 
@@ -57,16 +45,13 @@ ImportViewModel = BaseViewModel.extend({
         console.log('Closing websocket');
         this.isImporting(false);
         this.subSocket.close();
-        this.currentAsset(null);
         this.totalAssetsCnt(0);
         this.assetsImportedCnt(0);
         this.importMode(null);
         this.importDirectory(null);
-        this.currentPath(null);
         $('#imported-assets').html("");
-        $("#importMessages").html("");
+        $("#importedAssets").html("");
     },
-
 
     getDirectoryNames: function(path) {
         var self = this;
@@ -140,40 +125,41 @@ ImportViewModel = BaseViewModel.extend({
  */
 
     addWarning: function(asset, message) {
-        $("#importMessages").prepend(
-            '<div class="message"><button type="button" class="btn btn-warning">' +
+        $("#importedAssets").prepend(
+            '<div class="asset"><button type="button" class="btn btn-warning">' +
             message + '</button>&nbsp;&nbsp;' + asset.path + '</div>');
         this.trimMessages();
     },
 
     addError: function(asset, message) {
-        $("#importMessages").prepend(
-            '<div class="message"><button type="button" class="btn btn-danger">' +
+        $("#importedAssets").prepend(
+            '<div class="asset"><button type="button" class="btn btn-danger">' +
             message + '</button>&nbsp;&nbsp;' + asset.absolutePath + '</div>');
         this.trimMessages();
     },
 
+    //FIXME: should display global error banner message and bail
     addCritical: function(asset, message) {
-        $("#importMessages").prepend(
-            '<div class="message"><button type="button" class="btn btn-danger">' +
+        $("#importedAssets").prepend(
+            '<div class="asset"><button type="button" class="btn btn-danger">' +
             message + '</button>&nbsp;&nbsp;</div>');
         this.trimMessages();
     },
 
     addSuccess: function(asset) {
-        $("#importMessages").prepend(
-            '<div class="message">' +
-            '<button type="button" class="btn btn-success">Imported</button>' +
-            '&nbsp;&nbsp;' + asset.path +
-            '</div>');
+        $("#importedAssets").prepend(
+            '<div class="asset">' +
+            '<button type="button" class="btn btn-success">' +
+            '<img src="/assets/' + asset.id + '/preview">' +
+            '</button></div>');
         this.trimMessages();
     },
 
     trimMessages: function() {
-        var messageCount = $("#importMessages .message").length;
+        var messageCount = $("#importedAssets .asset").length;
 
         if (messageCount > 20) {
-            var el = $("#importMessages .message").last();
+            var el = $("#importedAssets .asset").last();
             $(el).remove();
         }
     },
@@ -242,10 +228,6 @@ ImportViewModel = BaseViewModel.extend({
 
     handleAsset: function (json) {
         this.assetsImportedCnt(this.assetsImportedCnt() + 1);
-        if (json.asset) {
-            this.currentAsset(json.asset);
-        }
-
         if (json.warning) {
             this.addWarning(json.asset, json.warning);
         }
