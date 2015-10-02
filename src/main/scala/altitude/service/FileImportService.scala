@@ -3,6 +3,7 @@ package altitude.service
 import java.io.{File, FileInputStream, InputStream}
 
 import altitude.dao.FileSystemImportDao
+import altitude.exceptions.MetadataExtractorException
 import altitude.models.{Asset, FileImportAsset, MediaType}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
@@ -12,7 +13,7 @@ import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.JsValue
+import play.api.libs.json.{Json, JsValue}
 
 class FileImportService(app: Altitude) extends BaseService(app) {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -52,7 +53,19 @@ class FileImportService(app: Altitude) extends BaseService(app) {
       return None
     }
 
-    val metadata: JsValue = app.service.metadata.extract(fileAsset, mediaType)
+    var parserException: Option[MetadataExtractorException] = None
+    val metadata: JsValue = try {
+      app.service.metadata.extract(fileAsset, mediaType)
+    }
+    catch {
+      case ex: MetadataExtractorException => {
+        log.error(ex.getCause.getMessage)
+        ex.printStackTrace()
+        parserException = Some(ex)
+        Json.obj()
+      }
+    }
+
     val fileSizeInBytes: Long = new File(fileAsset.absolutePath).length()
 
     val asset = Asset(
@@ -63,6 +76,12 @@ class FileImportService(app: Altitude) extends BaseService(app) {
       metadata = metadata)
 
     val res = app.service.library.add(asset)
+
+    // if there was a parser error, throw exception, the caller needs to know there was an error
+    if (parserException.isDefined) {
+      throw parserException.get
+    }
+
     Some(res)
   }
 

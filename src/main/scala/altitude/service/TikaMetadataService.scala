@@ -48,27 +48,31 @@ class TikaMetadataService extends AbstractMetadataService {
     log.info(s"Extracting metadata for '$importAsset' with ${parser.getClass.getSimpleName}")
 
     var inputStream: Option[InputStream] = None
-    val writer: StringWriter = new StringWriter()
+    var writer: Option[StringWriter] = None
 
     try {
-      val url: java.net.URL = importAsset.file.toURI.toURL
-      val metadata: TikaMetadata = new TikaMetadata
-      inputStream = Some(TikaInputStream.get(url, metadata))
-
-      parser.parse(inputStream.get, TIKA_HANDLER, metadata, null)
-
       try {
-        JsonMetadata.toJson(metadata, writer)
+        val url: java.net.URL = importAsset.file.toURI.toURL
+        val metadata: TikaMetadata = new TikaMetadata
+        inputStream = Some(TikaInputStream.get(url, metadata))
+        writer = Some(new StringWriter())
+
+        parser.parse(inputStream.get, TIKA_HANDLER, metadata, null)
+
+        JsonMetadata.toJson(metadata, writer.get)
       }
       catch {
-        case reason: TikaException => throw new MetadataExtractorException(reason)
+        case ex: Throwable => throw new MetadataExtractorException(ex)
       }
+
       val jsonData = writer.toString
       Json.parse(jsonData)
     }
     finally {
-      if (writer != null) writer.close()
-      if (inputStream.isDefined) inputStream.get.close()
+      if (writer.isDefined)
+        writer.get.close()
+      if (inputStream.isDefined)
+        inputStream.get.close()
     }
   }
 

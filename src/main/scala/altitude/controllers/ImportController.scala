@@ -3,7 +3,7 @@ package altitude.controllers
 import java.io.File
 
 import altitude.controllers.web.BaseWebController
-import altitude.exceptions.{DuplicateException, StopImport}
+import altitude.exceptions.{MetadataExtractorException, DuplicateException, StopImport}
 import altitude.models.{Asset, FileImportAsset}
 import altitude.{Const => C}
 import org.json4s._
@@ -74,7 +74,9 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
               importAsset = None
               asset = None
               while (asset.isEmpty) {
-                if (!assetsIt.get.hasNext || criticalException.isDefined) throw new StopImport
+                if (!assetsIt.get.hasNext || criticalException.isDefined)
+                  throw new StopImport
+
                 importAsset = Some(assetsIt.get.next())
                 asset = app.service.fileImport.importAsset(importAsset.get)
               }
@@ -88,16 +90,14 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
                   C.Api.WARNING -> JsString(C.MSG("warn.duplicate")),
                   C.Api.Asset.ASSET -> ex.asset.toJson)).toString()
               }
+              case ex: MetadataExtractorException => {
+                JsObject(Seq(
+                  C.Api.ERROR -> JsString(s"Metadata parser error: ${ex.getMessage}. (Asset still imported)"), C.Api.ImportAsset.IMPORT_ASSET -> importAsset.get.toJson)).toString()
+              }
               case ex: Throwable => {
-                importAsset.isDefined match {
-                  case true => // import asset exists, we send the error and skip the asset
-                    JsObject(Seq(
-                      C.Api.ERROR -> JsString(ex.getMessage),
-                      C.Api.ImportAsset.IMPORT_ASSET -> importAsset.get.toJson)).toString()
-                  case false => // this is a critical error (not asset specific). We bail
-                    criticalException = Some(ex)
-                    JsObject(Seq(C.Api.CRITICAL -> JsString(ex.getMessage))).toString()
-                }
+                ex.printStackTrace()
+                criticalException = Some(ex)
+                JsObject(Seq(C.Api.CRITICAL -> JsString(ex.getMessage))).toString()
               }
             }
           }
