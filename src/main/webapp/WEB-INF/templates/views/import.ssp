@@ -14,8 +14,8 @@
             <div class="col-md-5 col-lg-5">
                 <button class="large btn btn-default btn-lg btn-block" data-bind="click: function(){getDirectoryNames(null)}" data-toggle="modal" data-target="#selectImportDirectory">Select a folder</button>
             </div>
-            <div class="col-md-2 col-lg-2">
-                 <button type="button" class="large btn btn-primary btn-lg btn-block">OR</button>
+            <div class="col-md-2 col-lg-2" style="text-align: center; padding-top: 2em;">
+                 <h4>OR</h4>
             </div>
             <div class="col-md-5 col-lg-5">
                 <form method="POST" enctype="multipart/form-data" action="/import">
