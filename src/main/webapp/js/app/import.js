@@ -160,9 +160,8 @@ ImportViewModel = BaseViewModel.extend({
   addSuccess: function(asset) {
     $("#importedAssets").prepend(
         '<div class="asset">' +
-        '<button type="button" class="btn btn-success">' +
         '<img src="/assets/' + asset.id + '/preview">' +
-        '</button></div>');
+        '</div>');
     this.statsImported(this.statsImported() + 1);
     this.trimMessages();
   },
