@@ -26,6 +26,10 @@ section #content{
   overflow: auto;
 }
 
+#content:focus {
+  outline: 0;
+}
+
 /* IMPORT */
 #importControls {
   border-bottom: 1px solid #1c1e22;

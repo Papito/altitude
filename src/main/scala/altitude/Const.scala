@@ -80,6 +80,7 @@ object Const {
       val RESULT_BOX_SIZE = "resultBoxSize"
       val QUERY_STRING = "queryString"
       val RESULTS_PER_PAGE = "rpp"
+      val PAGE = "p"
     }
 
     object TagConfig {

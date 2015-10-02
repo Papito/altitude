@@ -14,8 +14,9 @@ class SearchController extends BaseApiController {
   get("/") {
     val queryString = this.params.getOrElse(C.Api.Search.QUERY_STRING, "")
     val rpp = this.params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, "20").toInt
+    val page = this.params.getOrElse(C.Api.Search.PAGE, "1").toInt
 
-    val q = Query(rpp = rpp)
+    val q = Query(rpp = rpp, page = page)
     val assets = app.service.library.search(q)
     val jsonAssets = for (asset <- assets) yield asset.toJson
 

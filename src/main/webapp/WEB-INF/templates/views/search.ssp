@@ -1,10 +1,10 @@
 #set (assets)
     <script src="/static/js/app/models.js"></script>
     <script src="/static/js/app/search.js"></script>
+    <script src="/static/js/lib/jquery.endless-scroll.js"></script>
 #end
 
-<div class="row" id="home">
-<div class="col-md-12 col-lg-12">
+<div id="search" class="col-md-12 col-lg-12">
 <div class="row" data-bind="visible: searchResults">
     <div class="col-md-12 col-lg-12">
         <div id="searchResults">
@@ -17,7 +17,6 @@
             </div>
         </div>
     </div>
-</div>
 </div>
 
 
