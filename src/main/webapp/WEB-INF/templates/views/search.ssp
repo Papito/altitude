@@ -1,6 +1,6 @@
 #set (assets)
-    <script src="/js/app/models.js"></script>
-    <script src="/js/app/search.js"></script>
+    <script src="/static/js/app/models.js"></script>
+    <script src="/static/js/app/search.js"></script>
 #end
 
 <div class="row" id="home">

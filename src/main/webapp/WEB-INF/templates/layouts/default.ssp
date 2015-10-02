@@ -9,18 +9,19 @@
 <html>
 <head>
 <title>${config.getString("app.name")}</title>
-<link rel="stylesheet" type="text/css" href="/css/app.css?<%= altitude.Util.randomStr(10) %>">
-<link rel="stylesheet" type="text/css" href="/css/lib/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="/css/lib/select2.css">
 
-<script src="/js/lib/jquery-2.1.1.min.js"></script>
-<script src="/js/lib/bootstrap.js"></script>
-<script src="/js/lib/knockout-3.2.0.js"></script>
-<script src="/js/lib/knockout-custom-bindings.js"></script>
-<script src="/js/lib/modernizr.custom.js"></script>
-<script src="/js/lib/select2.min.js"></script>
-<script src="/js/lib/Base.js"></script>
-<script src="/js/app/core.js?"></script>
+<link rel="stylesheet" type="text/css" href="/static/css/app.css?<%= altitude.Util.randomStr(10) %>">
+<link rel="stylesheet" type="text/css" href="/static/css/lib/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="/static/css/lib/select2.css">
+
+<script src="/static/js/lib/jquery-2.1.1.min.js"></script>
+<script src="/static/js/lib/bootstrap.js"></script>
+<script src="/static/js/lib/knockout-3.2.0.js"></script>
+<script src="/static/js/lib/knockout-custom-bindings.js"></script>
+<script src="/static/js/lib/modernizr.custom.js"></script>
+<script src="/static/js/lib/select2.min.js"></script>
+<script src="/static/js/lib/Base.js"></script>
+<script src="/static/js/app/core.js?"></script>
 
 </head>
 <body>

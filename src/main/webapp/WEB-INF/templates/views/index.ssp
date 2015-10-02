@@ -1,6 +1,6 @@
 #set (assets)
-    <script src="/js/app/models.js"></script>
-    <script src="/js/app/index.js"></script>
+    <script src="/static/js/app/models.js"></script>
+    <script src="/static/js/app/index.js"></script>
 #end
 
 This is home

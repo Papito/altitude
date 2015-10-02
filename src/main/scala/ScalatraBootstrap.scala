@@ -3,7 +3,7 @@ import javax.servlet.ServletContext
 import altitude.{SingleApplication, Environment}
 import altitude.controllers._
 import altitude.controllers.api.{TagConfigController, SearchController, ImportProfileController}
-import altitude.controllers.web.{IndexController, AssetController, SearchController}
+import altitude.controllers.web.{StaticAssetController, IndexController, AssetController, SearchController}
 import org.scalatra._
 import org.slf4j.LoggerFactory
 
@@ -17,6 +17,8 @@ class ScalatraBootstrap extends LifeCycle with SingleApplication {
 
     context.mount(new AssetController, "/assets/*")
     context.mount(new ImportController, "/import/*")
+
+    context.mount(new StaticAssetController, "/static/*")
 
     context.mount(new api.SearchController, "/api/v1/search/*")
     //context.mount(new api.ImportProfileController, "/api/v1/ip/*")
