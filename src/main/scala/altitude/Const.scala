@@ -79,6 +79,7 @@ object Const {
       val ASSETS = "assets"
       val RESULT_BOX_SIZE = "resultBoxSize"
       val QUERY_STRING = "queryString"
+      val RESULTS_PER_PAGE = "rpp"
     }
 
     object TagConfig {

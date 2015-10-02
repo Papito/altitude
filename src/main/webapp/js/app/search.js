@@ -39,7 +39,7 @@ SearchViewModel = BaseViewModel.extend({
     var resultBoxHeight = (resultBoxSize + (self.resultBoxPadding() + self.resultBoxBorder) * 2);
 
     var approxRowsPerPage = parseInt(searchResultsHeight / resultBoxHeight, 10);
-    var rpp = (approxRowsPerPage * fitsHorizontally) * 2
+    var rpp = (approxRowsPerPage * fitsHorizontally) * 3;
 
     var opts = {
       'successCallback': function (json) {
