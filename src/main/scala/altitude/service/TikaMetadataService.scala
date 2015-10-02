@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory
 import org.xml.sax.helpers.DefaultHandler
 import play.api.libs.json.{JsNull, JsValue, Json}
 import org.apache.tika.parser.jpeg.JpegParser
+import org.apache.tika.parser.image.TiffParser
 
 class TikaMetadataService extends AbstractMetadataService {
   val log =  LoggerFactory.getLogger(getClass)
@@ -34,7 +35,7 @@ class TikaMetadataService extends AbstractMetadataService {
 
   override def extract(importAsset: FileImportAsset, mediaType: MediaType): JsValue = mediaType match {
     case mt: MediaType if mt.mediaType == "image" =>
-      extractMetadata(importAsset, new JpegParser)
+      extractMetadata(importAsset, new TiffParser)
     case mt: MediaType if mt.mediaType == "audio" && mt.mediaSubtype == "mpeg" =>
       extractMetadata(importAsset, PARSERS.MPEG_AUDIO)
     case mt: MediaType if mt.mediaType == "audio" =>
