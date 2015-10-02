@@ -1,6 +1,29 @@
 /* GLOBAL */
-body {
-  padding-top: 70px;
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+header {
+  display: block;
+  height: 4em;
+}
+
+footer {
+  margin-top: .5em;
+  height: 2.5em;
+  display: block;
+  padding-top: 0.5em;
+  padding-left: 1em;
+  border-top: 0.1em solid #000;
+  background-image: linear-gradient(rgb(72, 78, 85), rgb(58, 63, 68) 60%, rgb(49, 53, 57));
+}
+
+section {
+  height: calc(100% - 7.1em);
+  display:block;
+  overflow: auto;
 }
 
 /* IMPORT */

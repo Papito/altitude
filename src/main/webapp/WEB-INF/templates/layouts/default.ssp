@@ -25,33 +25,39 @@
 
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="/">${config.getString("app.name")}</a>
-            <p class="navbar-text">${screenTitle}</p>
-        </div>
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="/cl/import">Import</a></li>
-            </ul>
-            <form class="navbar-form navbar-right" method="GET" action="/cl/search">
-                <input type="text" name="${C.Api.Search.QUERY_STRING}" class="form-control" placeholder="Search..." maxlength="200">
-                </form>
+    <header>
+        <div class="navbar navbar-inverse" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">${config.getString("app.name")}</a>
+                <p class="navbar-text">${screenTitle}</p>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/cl/import">Import</a></li>
+                </ul>
+                <form class="navbar-form navbar-right" method="GET" action="/cl/search">
+                    <input type="text" name="${C.Api.Search.QUERY_STRING}" class="form-control" placeholder="Search..." maxlength="200">
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="container-fluid">
-        ${unescape(body)}
+        </header>
 
-    </div>
+        <section>
+            <div id="content" class="container-fluid">
+            ${unescape(body)}
+            </div>
+        </section>
 
-    ${unescape(assets)}
+        <footer>footer</footer>
+
+        ${unescape(assets)}
     </body>
 </html>
