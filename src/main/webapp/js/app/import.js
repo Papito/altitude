@@ -48,14 +48,17 @@ ImportViewModel = BaseViewModel.extend({
     console.log('Closing websocket');
     this.isImporting(false);
     this.subSocket.close();
-    this.totalAssetsCnt(0);
-    this.assetsImportedCnt(0);
     this.importMode(null);
     this.importDirectory(null);
+  },
+
+  reset: function() {
+    console.log('Resetting');
+    this.totalAssetsCnt(0);
+    this.assetsImportedCnt(0);
     this.statsImported(0);
     this.statsWarnings(0);
     this.statsErrors(0);
-    $('#imported-assets').html("");
     $("#importedAssets").html("");
     $("#errors").html("");
     $("#warnings").html("");
@@ -175,7 +178,7 @@ ImportViewModel = BaseViewModel.extend({
 
   importAssets: function() {
     var self = this;
-
+    this.reset();
     this.socket = $.atmosphere;
 
     this.request = {
@@ -221,7 +224,6 @@ ImportViewModel = BaseViewModel.extend({
 
     this.request.onError = function(rs) {
       //FIXME: banner error
-      self.cancelImport();
       console.log("Socket Error");
       console.log(rs);
     };
