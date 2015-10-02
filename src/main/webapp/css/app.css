@@ -59,6 +59,11 @@ section #content{
 
 #importControls #startStop{
   text-align: center;
+  margin: 2em;
+}
+
+#importControls .tab-pane {
+  margin: 1em;
 }
 
 #importControls #startStop button {
@@ -77,6 +82,16 @@ section #content{
 #importedAssets .asset {
   float: left;
   margin: 1em;
+}
+
+#importControls #warnings {
+  color: orange;
+  font-size: 0.9em;
+}
+
+#importControls #errors {
+  color: firebrick;
+  font-size: 0.9em;
 }
 
 #selectImportDirectory select, #importProfiles select {

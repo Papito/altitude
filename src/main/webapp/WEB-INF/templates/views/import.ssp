@@ -40,7 +40,7 @@
             </div>
         </div>
 
-        <!-- Import profiles -->
+        <!-- Import profiles
         <div class="row well" id="importProfiles" style="display: none" data-bind="visible: importMode() && !isImporting()">
             <div class="col-md-12">
                 <div class="row">
@@ -54,30 +54,42 @@
                     </div>
                 </div>
 
-                <!-- div class="row"  data-bind="visible: importProfiles().length > 0">
+                <div class="row"  data-bind="visible: importProfiles().length > 0">
                     <div class="col-md-12">
                         <select size="10" data-bind="foreach: importProfiles" name="${C.Api.ImportProfile.IMPORT_PROFILES}">
                             <option data-bind="attr: {'value': $data.id}, text: $data.name"></option>
                         </select>
                     </div>
-                </div> -->
+                </div>
             </div>
-        </div>
+        </div>-->
         <div class="row">
             <div id="readyToImport" class="col-md-12" style="display: none" data-bind="visible: importMode() == $root.IMPORT_MODE.DIRECTORY && isImporting() == false">
                 <span data-bind="html: 'Ready to import from <strong>' + importDirectory() + '</strong>'"></span>
             </div>
         </div>
         <div class="row">
-            <div id="startStop" class="col-md-12" data-bind="visible: importMode()">
+            <div class="col-md-4">&nbsp;</div>
+            <div id="startStop" class="col-md-4" data-bind="visible: importMode()">
                 <button id="start" style="display: none" type="button" data-bind="visible: !isImporting(), click: importAssets" class="btn btn-success">Start Import</button>
                 <button id="stop" style="display: none" type="button" data-bind=" visible: isImporting(), click: cancelImport" class="btn btn-danger">STOP</button>
             </div>
         </div>
 
         <div class="row">
-            <div id="importedAssets" class="col-md-12">
-            </div>
+          <!-- Nav tabs -->
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#importedAssets" aria-controls="imported" role="tab" data-toggle="tab" data-bind="text: 'Imported (' + statsImported() + ')'"></a></li>
+            <li role="presentation"><a href="#warnings" aria-controls="warnings" role="tab" data-toggle="tab" data-bind="text: 'Warnings (' + statsWarnings() + ')'"></a></li>
+            <li role="presentation"><a href="#errors" aria-controls="errors" role="tab" data-toggle="tab" data-bind="text: 'Errors (' + statsErrors() + ')'"></a></li>
+          </ul>
+
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="importedAssets"></div>
+            <div role="tabpanel" class="tab-pane" id="warnings"></div>
+            <div role="tabpanel" class="tab-pane" id="errors"></div>
+          </div>
         </div>
     </div>
 </div>
