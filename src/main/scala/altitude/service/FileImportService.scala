@@ -53,15 +53,15 @@ class FileImportService(app: Altitude) extends BaseService(app) {
       return None
     }
 
-    var parserException: Option[MetadataExtractorException] = None
+    var metadataParserException: Option[Exception] = None
     val metadata: JsValue = try {
       app.service.metadata.extract(fileAsset, mediaType)
     }
     catch {
-      case ex: MetadataExtractorException => {
-        log.error(ex.getCause.getMessage)
+      case ex: Exception => {
+        log.error(s"${ex.toString} for $fileAsset")
         ex.printStackTrace()
-        parserException = Some(ex)
+        metadataParserException = Some(ex)
         Json.obj()
       }
     }
@@ -78,8 +78,8 @@ class FileImportService(app: Altitude) extends BaseService(app) {
     val res = app.service.library.add(asset)
 
     // if there was a parser error, throw exception, the caller needs to know there was an error
-    if (parserException.isDefined) {
-      throw parserException.get
+    if (metadataParserException.isDefined) {
+      throw MetadataExtractorException(asset, metadataParserException.get)
     }
 
     Some(res)

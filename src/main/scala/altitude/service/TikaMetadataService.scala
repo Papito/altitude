@@ -35,7 +35,7 @@ class TikaMetadataService extends AbstractMetadataService {
 
   override def extract(importAsset: FileImportAsset, mediaType: MediaType): JsValue = mediaType match {
     case mt: MediaType if mt.mediaType == "image" =>
-      extractMetadata(importAsset, new TiffParser)
+      extractMetadata(importAsset, new JpegParser)
     case mt: MediaType if mt.mediaType == "audio" && mt.mediaSubtype == "mpeg" =>
       extractMetadata(importAsset, PARSERS.MPEG_AUDIO)
     case mt: MediaType if mt.mediaType == "audio" =>
@@ -52,20 +52,14 @@ class TikaMetadataService extends AbstractMetadataService {
     var writer: Option[StringWriter] = None
 
     try {
-      try {
-        val url: java.net.URL = importAsset.file.toURI.toURL
-        val metadata: TikaMetadata = new TikaMetadata
-        inputStream = Some(TikaInputStream.get(url, metadata))
-        writer = Some(new StringWriter())
+      val url: java.net.URL = importAsset.file.toURI.toURL
+      val metadata: TikaMetadata = new TikaMetadata
+      inputStream = Some(TikaInputStream.get(url, metadata))
+      writer = Some(new StringWriter())
 
-        parser.parse(inputStream.get, TIKA_HANDLER, metadata, null)
+      parser.parse(inputStream.get, TIKA_HANDLER, metadata, null)
 
-        JsonMetadata.toJson(metadata, writer.get)
-      }
-      catch {
-        case ex: Throwable => throw new MetadataExtractorException(ex)
-      }
-
+      JsonMetadata.toJson(metadata, writer.get)
       val jsonData = writer.get.toString
       Json.parse(jsonData)
     }

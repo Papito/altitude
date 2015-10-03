@@ -12,7 +12,7 @@ import org.scalatra.atmosphere._
 import org.scalatra.json.{JValueResult, JacksonJsonSupport}
 import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintExceededException}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsNumber, JsObject, JsString, Json}
+import play.api.libs.json._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -92,12 +92,19 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
               }
               case ex: MetadataExtractorException => {
                 JsObject(Seq(
-                  C.Api.ERROR -> JsString(s"Metadata parser error: ${ex.getMessage}. (Asset still imported)"), C.Api.ImportAsset.IMPORT_ASSET -> importAsset.get.toJson)).toString()
+                  C.Api.WARNING -> JsString(
+                    s"Metadata parser error. Detail: ${ex.getMessage}"),
+                  C.Api.Asset.ASSET -> ex.asset.toJson,
+                  C.Api.Import.IMPORTED -> JsBoolean(true))).toString()
               }
-              case ex: Throwable => {
+              case ex: Exception => {
                 ex.printStackTrace()
                 criticalException = Some(ex)
-                JsObject(Seq(C.Api.CRITICAL -> JsString(ex.getMessage))).toString()
+
+                JsObject(Seq(
+                  C.Api.CRITICAL -> JsString(ex.getMessage),
+                  C.Api.Import.IMPORTED -> JsBoolean(false)
+                )).toString()
               }
             }
           }

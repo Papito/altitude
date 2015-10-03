@@ -60,6 +60,10 @@ object Const {
     val DIRECTORY_NAMES = "directoryNames"
     val CURRENT_PATH = "currentPath"
 
+    object Import {
+      val IMPORTED = "imported"
+    }
+
     object ImportAsset {
       val IMPORT_ASSET = "importAsset"
     }

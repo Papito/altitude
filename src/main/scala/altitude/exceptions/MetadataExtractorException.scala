@@ -1,3 +1,5 @@
 package altitude.exceptions
 
-class MetadataExtractorException(ex: Throwable) extends Exception(ex)
+import altitude.models.Asset
+
+case class MetadataExtractorException(asset: Asset, ex: Throwable) extends Exception(ex)

@@ -211,10 +211,11 @@ ImportViewModel = BaseViewModel.extend({
 
       try {
         var json = jQuery.parseJSON(message);
-        self.responseHandler(json);
       } catch (e) {
         console.log('This doesn\'t look like a valid JSON object: ', message);
       }
+
+      self.responseHandler(json);
     };
 
     this.request.onClose = function(rs) {
