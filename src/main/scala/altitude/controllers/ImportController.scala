@@ -2,9 +2,10 @@ package altitude.controllers
 
 import java.io.File
 
+import altitude.Const.Api.ImportAsset
 import altitude.controllers.web.BaseWebController
 import altitude.exceptions.{MetadataExtractorException, DuplicateException, StopImport}
-import altitude.models.{Asset, FileImportAsset}
+import altitude.models.{FileImportAsset, Asset}
 import altitude.{Const => C}
 import org.json4s._
 import org.scalatra._
@@ -81,19 +82,24 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
                 asset = app.service.fileImport.importAsset(importAsset.get)
               }
 
-              JsObject(Seq(C.Api.Asset.ASSET -> asset.get.toJson)).toString()
+              JsObject(Seq(
+                C.Api.Asset.ASSET -> asset.get.toJson,
+                C.Api.Import.IMPORTED -> JsBoolean(true)
+              )).toString()
             }
             catch {
               case ex: StopImport => "END"
               case ex: DuplicateException => {
                 JsObject(Seq(
                   C.Api.WARNING -> JsString(C.MSG("warn.duplicate")),
-                  C.Api.Asset.ASSET -> ex.asset.toJson)).toString()
+                  C.Api.Asset.ASSET -> ex.asset.toJson,
+                  C.Api.Import.IMPORTED -> JsBoolean(false)
+                )).toString()
               }
               case ex: MetadataExtractorException => {
                 JsObject(Seq(
                   C.Api.WARNING -> JsString(
-                    s"Metadata parser error. Detail: ${ex.getMessage}"),
+                    s"Metadata parser error. Asset still imported"),
                   C.Api.Asset.ASSET -> ex.asset.toJson,
                   C.Api.Import.IMPORTED -> JsBoolean(true))).toString()
               }

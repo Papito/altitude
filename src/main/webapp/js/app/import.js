@@ -158,6 +158,7 @@ ImportViewModel = BaseViewModel.extend({
   },
 
   addSuccess: function(asset) {
+    console.log(asset.id);
     $("#importedAssets").prepend(
         '<div class="asset">' +
         '<img src="/assets/' + asset.id + '/preview">' +
@@ -246,10 +247,10 @@ ImportViewModel = BaseViewModel.extend({
       this.addError(json.importAsset, json.error);
     }
     else if (json.critical) {
-      //FIXME: banner error
-      this.addCritical(json.asset, json.critical);
+      //FIXME: banner error and exit
+      this.addCritical(json.critical);
     }
-    else {
+    if (json.imported === true) {
       this.addSuccess(json.asset);
     }
 

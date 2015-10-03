@@ -79,7 +79,7 @@ class FileImportService(app: Altitude) extends BaseService(app) {
 
     // if there was a parser error, throw exception, the caller needs to know there was an error
     if (metadataParserException.isDefined) {
-      throw MetadataExtractorException(asset, metadataParserException.get)
+      throw MetadataExtractorException(res, metadataParserException.get)
     }
 
     Some(res)
