@@ -142,9 +142,11 @@ ImportViewModel = BaseViewModel.extend({
     this.trimMessages();
   },
 
-  addError: function(asset, message) {
+  addError: function(importAsset, message) {
+    var path = importAsset ? ': ' + importAsset['absolutePath'] : '';
+
     $("#errors").prepend(
-        '<div><strong>' +  message + '</strong>: ' + asset['absolutePath'] + '</div>');
+        '<div><strong>' +  message + '</strong>' + path + '</div>');
     this.statsErrors(this.statsErrors() + 1);
     this.trimMessages();
   },

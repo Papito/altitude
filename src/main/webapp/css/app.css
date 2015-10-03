@@ -97,12 +97,12 @@ section #content{
 
 #importControls #warnings {
   color: orange;
-  font-size: 0.9em;
+  font-size: 1em;
 }
 
 #importControls #errors {
-  color: firebrick;
-  font-size: 0.9em;
+  color: indianred;
+  font-size: 1em;
 }
 
 #selectImportDirectory select, #importProfiles select {

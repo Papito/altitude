@@ -45,7 +45,6 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
     new AtmosphereClient {
       var assets: Option[List[FileImportAsset]] = None
       var assetsIt: Option[Iterator[FileImportAsset]] = None
-      var criticalException: Option[Throwable] = None
       var path: Option[String] = None
 
       def receive: AtmoReceive = {
@@ -75,7 +74,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
               importAsset = None
               asset = None
               while (asset.isEmpty) {
-                if (!assetsIt.get.hasNext || criticalException.isDefined)
+                if (!assetsIt.get.hasNext)
                   throw new StopImport
 
                 importAsset = Some(assetsIt.get.next())
@@ -105,11 +104,16 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
               }
               case ex: Exception => {
                 ex.printStackTrace()
-                criticalException = Some(ex)
+
+                val importAssetJson = importAsset match {
+                  case None => JsNull
+                  case _ => importAsset.get.toJson
+                }
 
                 JsObject(Seq(
-                  C.Api.CRITICAL -> JsString(ex.getMessage),
-                  C.Api.Import.IMPORTED -> JsBoolean(false)
+                  C.Api.ERROR -> JsString(ex.toString),
+                  C.Api.Import.IMPORTED -> JsBoolean(false),
+                  C.Api.ImportAsset.IMPORT_ASSET -> importAssetJson
                 )).toString()
               }
             }
