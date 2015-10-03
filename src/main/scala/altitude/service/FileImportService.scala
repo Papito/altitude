@@ -59,8 +59,6 @@ class FileImportService(app: Altitude) extends BaseService(app) {
     }
     catch {
       case ex: Exception => {
-        log.error(s"${ex.toString} for $fileAsset")
-        ex.printStackTrace()
         metadataParserException = Some(ex)
         Json.obj()
       }
@@ -79,7 +77,7 @@ class FileImportService(app: Altitude) extends BaseService(app) {
 
     // if there was a parser error, throw exception, the caller needs to know there was an error
     if (metadataParserException.isDefined) {
-      throw MetadataExtractorException(res, metadataParserException.get)
+      throw MetadataExtractorException(asset, metadataParserException.get)
     }
 
     Some(res)

@@ -35,39 +35,69 @@ class TikaMetadataService extends AbstractMetadataService {
 
   override def extract(importAsset: FileImportAsset, mediaType: MediaType): JsValue = mediaType match {
     case mt: MediaType if mt.mediaType == "image" =>
-      extractMetadata(importAsset, new JpegParser)
+      extractMetadata(importAsset, List(new JpegParser, new TiffParser))
+/*
     case mt: MediaType if mt.mediaType == "audio" && mt.mediaSubtype == "mpeg" =>
-      extractMetadata(importAsset, PARSERS.MPEG_AUDIO)
+      extractMetadata(importAsset, List(PARSERS.MPEG_AUDIO))
     case mt: MediaType if mt.mediaType == "audio" =>
-      extractMetadata(importAsset, PARSERS.ANY_AUDIO)
+      extractMetadata(importAsset, List(PARSERS.ANY_AUDIO))
+*/
     case _ =>
       log.warn(s"No metadata extractor found for $importAsset of type '$mediaType'", C.LogTag.SERVICE)
       JsNull
   }
 
-  private def extractMetadata(importAsset: FileImportAsset, parser: AbstractParser): JsValue = {
-    log.info(s"Extracting metadata for '$importAsset' with ${parser.getClass.getSimpleName}")
-
+  private def extractMetadata(importAsset: FileImportAsset, parsers: List[AbstractParser]): JsValue = {
     var inputStream: Option[InputStream] = None
     var writer: Option[StringWriter] = None
 
+    class AllDone extends Exception
+
+    var metadata: Option[TikaMetadata] = None
+
     try {
-      val url: java.net.URL = importAsset.file.toURI.toURL
-      val metadata: TikaMetadata = new TikaMetadata
-      inputStream = Some(TikaInputStream.get(url, metadata))
-      writer = Some(new StringWriter())
+      for (parser <- parsers) {
+        log.info(s"Extracting metadata for '$importAsset' with ${parser.getClass.getSimpleName}")
+        metadata = None
 
-      parser.parse(inputStream.get, TIKA_HANDLER, metadata, null)
+        try {
+          val url: java.net.URL = importAsset.file.toURI.toURL
+          metadata = Some(new TikaMetadata)
+          inputStream = Some(TikaInputStream.get(url, metadata.get))
+          writer = Some(new StringWriter())
 
-      JsonMetadata.toJson(metadata, writer.get)
-      val jsonData = writer.get.toString
-      Json.parse(jsonData)
+          parser.parse(inputStream.get, TIKA_HANDLER, metadata.get, null)
+          throw new AllDone
+        }
+        catch {
+          case ex: AllDone => throw ex
+          case ex: Exception => {
+            ex.printStackTrace()
+            log.error(
+              s"Error extracting metadata for '$importAsset' with ${parser.getClass.getSimpleName}: ${ex.toString}")
+          }
+        }
+        finally {
+          if (writer.isDefined)
+            writer.get.close()
+          if (inputStream.isDefined)
+            inputStream.get.close()
+        }
+      }
     }
-    finally {
-      if (writer.isDefined)
-        writer.get.close()
-      if (inputStream.isDefined)
-        inputStream.get.close()
+    catch {
+      case ex: AllDone =>
+    }
+
+    metadata match {
+      case None => {
+        throw new Exception(s"All matching metadata parsers failed for $importAsset")
+      }
+      case _ => {
+        JsonMetadata.toJson(metadata.get, writer.get)
+        val jsonData = writer.get.toString
+        Json.parse(jsonData)
+      }
     }
   }
 

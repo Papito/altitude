@@ -27,18 +27,12 @@ import org.scalatest.Matchers._
     }
   }
 
-    test("import audio (MP3)") {
-      val asset = importFile("audio/all.mp3")
-      val optAuthor = (asset.metadata \ "Author").asOpt[String]
-      optAuthor should not be None
-      optAuthor.get should equal("Whitney Houston")
-    }
 
-    test("import file list") {
-      val incomingPath = getClass.getResource("../import").getPath
-      val assets = altitude.service.fileImport.getFilesToImport(path=incomingPath)
-      assets should not be empty
-    }
+  test("import file list") {
+    val incomingPath = getClass.getResource("../import").getPath
+    val assets = altitude.service.fileImport.getFilesToImport(path=incomingPath)
+    assets should not be empty
+  }
 
   private def importFile(p: String): Asset = {
     val path = getClass.getResource(s"../import/$p").getPath

@@ -98,7 +98,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
               case ex: MetadataExtractorException => {
                 JsObject(Seq(
                   C.Api.WARNING -> JsString(
-                    s"Metadata parser error. Asset still imported"),
+                    s"Metadata parser(s) failed. Asset still imported"),
                   C.Api.Asset.ASSET -> ex.asset.toJson,
                   C.Api.Import.IMPORTED -> JsBoolean(true))).toString()
               }

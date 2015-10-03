@@ -68,13 +68,13 @@ section #content{
 
 #importControls .asset {
   padding: 1em;
-  background: -moz-linear-gradient(top, rgba(180,227,145,0.2) 0%, rgba(97,196,25,0.2) 50%, rgba(180,227,145,0.2) 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(180,227,145,0.2)), color-stop(50%,rgba(97,196,25,0.2)), color-stop(100%,rgba(180,227,145,0.2))); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top, rgba(180,227,145,0.2) 0%,rgba(97,196,25,0.2) 50%,rgba(180,227,145,0.2) 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top, rgba(180,227,145,0.2) 0%,rgba(97,196,25,0.2) 50%,rgba(180,227,145,0.2) 100%); /* Opera 11.10+ */
-  background: -ms-linear-gradient(top, rgba(180,227,145,0.2) 0%,rgba(97,196,25,0.2) 50%,rgba(180,227,145,0.2) 100%); /* IE10+ */
-  background: linear-gradient(to bottom, rgba(180,227,145,0.2) 0%,rgba(97,196,25,0.2) 50%,rgba(180,227,145,0.2) 100%); /* W3C */  -moz-border-radius: 12px;
-  border-radius: 12px;
+  background: -moz-linear-gradient(top, rgba(216,224,222,0.3) 0%, rgba(174,191,188,0.3) 22%, rgba(153,175,171,0.3) 33%, rgba(142,166,162,0.3) 50%, rgba(130,157,152,0.3) 67%, rgba(78,92,90,0.3) 82%, rgba(14,14,14,0.3) 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(216,224,222,0.3)), color-stop(22%,rgba(174,191,188,0.3)), color-stop(33%,rgba(153,175,171,0.3)), color-stop(50%,rgba(142,166,162,0.3)), color-stop(67%,rgba(130,157,152,0.3)), color-stop(82%,rgba(78,92,90,0.3)), color-stop(100%,rgba(14,14,14,0.3))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, rgba(216,224,222,0.3) 0%,rgba(174,191,188,0.3) 22%,rgba(153,175,171,0.3) 33%,rgba(142,166,162,0.3) 50%,rgba(130,157,152,0.3) 67%,rgba(78,92,90,0.3) 82%,rgba(14,14,14,0.3) 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, rgba(216,224,222,0.3) 0%,rgba(174,191,188,0.3) 22%,rgba(153,175,171,0.3) 33%,rgba(142,166,162,0.3) 50%,rgba(130,157,152,0.3) 67%,rgba(78,92,90,0.3) 82%,rgba(14,14,14,0.3) 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, rgba(216,224,222,0.3) 0%,rgba(174,191,188,0.3) 22%,rgba(153,175,171,0.3) 33%,rgba(142,166,162,0.3) 50%,rgba(130,157,152,0.3) 67%,rgba(78,92,90,0.3) 82%,rgba(14,14,14,0.3) 100%); /* IE10+ */
+  background: linear-gradient(to bottom, rgba(216,224,222,0.3) 0%,rgba(174,191,188,0.3) 22%,rgba(153,175,171,0.3) 33%,rgba(142,166,162,0.3) 50%,rgba(130,157,152,0.3) 67%,rgba(78,92,90,0.3) 82%,rgba(14,14,14,0.3) 100%); /* W3C */
+  border-radius: 8px;
 }
 
 #importControls #startStop button {
@@ -95,12 +95,11 @@ section #content{
   margin: 1em;
 }
 
-#importControls #warnings {
+#importControls #warnings strong {
   color: orange;
-  font-size: 1em;
 }
 
-#importControls #errors {
+#importControls #errors strong {
   color: indianred;
   font-size: 1em;
 }

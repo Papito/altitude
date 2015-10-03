@@ -143,10 +143,10 @@ ImportViewModel = BaseViewModel.extend({
   },
 
   addError: function(importAsset, message) {
-    var path = importAsset ? ': ' + importAsset['absolutePath'] : '';
+    var path = importAsset ? importAsset['absolutePath'] : 'Did not create import asset';
 
     $("#errors").prepend(
-        '<div><strong>' +  message + '</strong>' + path + '</div>');
+        '<div><strong>' +  message + '</strong>: ' + path + '</div>');
     this.statsErrors(this.statsErrors() + 1);
     this.trimMessages();
   },
