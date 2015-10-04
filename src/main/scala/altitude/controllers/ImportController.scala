@@ -4,7 +4,7 @@ import java.io.File
 
 import altitude.Const.Api.ImportAsset
 import altitude.controllers.web.BaseWebController
-import altitude.exceptions.{MetadataExtractorException, DuplicateException, StopImport}
+import altitude.exceptions.{MetadataExtractorException, DuplicateException, AllDone}
 import altitude.models.{FileImportAsset, Asset}
 import altitude.{Const => C}
 import org.json4s._
@@ -73,9 +73,10 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
               // get the first asset that we *can* import
               importAsset = None
               asset = None
+
               while (asset.isEmpty) {
                 if (!assetsIt.get.hasNext)
-                  throw new StopImport
+                  throw new AllDone
 
                 importAsset = Some(assetsIt.get.next())
                 asset = app.service.fileImport.importAsset(importAsset.get)
@@ -87,7 +88,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
               )).toString()
             }
             catch {
-              case ex: StopImport => "END"
+              case ex: AllDone => "END"
               case ex: DuplicateException => {
                 JsObject(Seq(
                   C.Api.WARNING -> JsString(C.MSG("warn.duplicate")),
@@ -129,7 +130,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
           log.info("Client connected")
 
         case Disconnected(disconnector, Some(error)) =>
-          log.info("Client disconnected")
+          log.info("Client disconnected " + disconnector.)
 
         case Error(Some(error)) =>
           // FIXME: log

@@ -2,7 +2,7 @@ package altitude.service
 
 import java.io.{InputStream, StringWriter}
 
-import altitude.exceptions.MetadataExtractorException
+import altitude.exceptions.{AllDone, MetadataExtractorException}
 import altitude.models.MediaType
 import altitude.models.{FileImportAsset, MediaType}
 import altitude.{Const => C}
@@ -50,8 +50,6 @@ class TikaMetadataService extends AbstractMetadataService {
   private def extractMetadata(importAsset: FileImportAsset, parsers: List[AbstractParser]): JsValue = {
     var inputStream: Option[InputStream] = None
     var writer: Option[StringWriter] = None
-
-    class AllDone extends Exception
 
     var metadata: Option[TikaMetadata] = None
 
