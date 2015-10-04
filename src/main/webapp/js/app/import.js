@@ -21,7 +21,7 @@ ImportViewModel = BaseViewModel.extend({
     var self = this;
     this.isImporting = ko.observable(false);
     this.totalAssetsCnt = ko.observable(0);
-    this.assetsImportedCnt = ko.observable(0);
+    this.assetsProcessedCnt = ko.observable(0);
     this.importMode = ko.observable();
     //this.importProfiles = ko.observableArray();
     this.directoryNames = ko.observableArray();
@@ -35,8 +35,8 @@ ImportViewModel = BaseViewModel.extend({
 
     this.percentComplete = ko.computed(function() {
       var percent = 0;
-      if (self.assetsImportedCnt() > 0) {
-        percent = Math.floor((self.assetsImportedCnt()/ self.totalAssetsCnt()) * 100);
+      if (self.assetsProcessedCnt() > 0) {
+        percent = Math.floor((self.assetsProcessedCnt()/ self.totalAssetsCnt()) * 100);
       }
       return percent;
     }, this);
@@ -55,7 +55,7 @@ ImportViewModel = BaseViewModel.extend({
   reset: function() {
     console.log('Resetting');
     this.totalAssetsCnt(0);
-    this.assetsImportedCnt(0);
+    this.assetsProcessedCnt(0);
     this.statsImported(0);
     this.statsWarnings(0);
     this.statsErrors(0);
@@ -172,7 +172,7 @@ ImportViewModel = BaseViewModel.extend({
   trimMessages: function() {
     var messageCount = $("#importedAssets .asset").length;
 
-    if (messageCount > 20) {
+    if (messageCount > 4) {
       var el = $("#importedAssets .asset").last();
       $(el).remove();
     }
@@ -241,7 +241,7 @@ ImportViewModel = BaseViewModel.extend({
   },
 
   handleAsset: function (json) {
-    this.assetsImportedCnt(this.assetsImportedCnt() + 1);
+    this.assetsProcessedCnt(this.assetsProcessedCnt() + 1);
     if (json.warning) {
       this.addWarning(json.asset, json.warning);
     }

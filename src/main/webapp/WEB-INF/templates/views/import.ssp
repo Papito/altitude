@@ -28,13 +28,13 @@
         </div>
         <div class="row">
            <div class="col-md-12 col-lg-12">
-                <div class="progress" style="display: none" data-bind="visible: isImporting() && assetsImportedCnt() > 0">
+                <div class="progress" style="display: none" data-bind="visible: isImporting() && assetsProcessedCnt() > 0">
                     <div data-bind="attr: {'aria-valuenow': percentComplete}, style: {width: percentComplete() + '%'}"
                         class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-                        <h4><span data-bind="html: '&nbsp;&nbsp;' + assetsImportedCnt() + '/' + totalAssetsCnt()"></span></h4>
+                        <h4><span data-bind="html: '&nbsp;&nbsp;' + assetsProcessedCnt() + '/' + totalAssetsCnt()"></span></h4>
                     </div>
                 </div>
-                <div class="col-md-12" style="display: none; text-align: center; margin: 1em" data-bind="visible: isImporting() && assetsImportedCnt() == 0">
+                <div class="col-md-12" style="display: none; text-align: center; margin: 1em" data-bind="visible: isImporting() && assetsProcessedCnt() == 0">
                     Collecting asset info
                 </div>
             </div>
