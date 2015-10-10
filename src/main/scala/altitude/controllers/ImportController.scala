@@ -2,12 +2,13 @@ package altitude.controllers
 
 import java.io.File
 
-import altitude.Const.Api.ImportAsset
 import altitude.controllers.web.BaseWebController
 import altitude.exceptions.{MetadataExtractorException, DuplicateException, AllDone}
 import altitude.models.{FileImportAsset, Asset}
 import altitude.{Const => C}
+import org.json4s.JsonAST.JObject
 import org.json4s._
+import JsonDSL._
 import org.scalatra._
 import org.scalatra.atmosphere._
 import org.scalatra.json.{JValueResult, JacksonJsonSupport}
@@ -43,25 +44,59 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
 
   atmosphere("/ws") {
     new AtmosphereClient {
+      private def uuidJson: JObject = "uid" -> uuid
+      private var stopImport = false
+
       var assets: Option[List[FileImportAsset]] = None
       var assetsIt: Option[Iterator[FileImportAsset]] = None
       var path: Option[String] = None
 
+      private def writeToYou(jsonMessage: JValue): Unit = {
+        log.info(s"YOU -> $jsonMessage")
+        this.send(jsonMessage)
+      }
+
+      private def writeToAll(jsonMessage: JValue): Unit = {
+        log.info(s"ALL -> $jsonMessage")
+        this.broadcast(jsonMessage, Everyone)
+      }
+
+      private def writeToRest(jsonMessage: JValue): Unit = {
+        log.info(s"REST -> $jsonMessage")
+        this.broadcast(jsonMessage)
+      }
+
       def receive: AtmoReceive = {
-        case txt: TextMessage if txt.content.startsWith("total") =>
-          log.info(s"WS -> $txt")
+        case message @ JsonMessage(JObject(JField("action", JString("getUID")) :: fields)) => {
+          val json: JValue = message.content
+          log.info(s"WS <- $json")
+          this.writeToYou(uuidJson)
+        }
+
+        case message @ JsonMessage(JObject(JField("action", JString("getFileCount")) :: fields)) => {
+          val json: JValue = message.content
+          log.info(s"WS <- $json")
 
           // get the path we will be importing from
-          //FIXME: not defensive
-          val separatorIdx = txt.content.indexOf(' ')
-          path = Some(txt.content.substring(separatorIdx + 1))
+          // FIXME: not defensive
+          val path: String = (json \ "path").extract[String]
 
-
-          assets = Some(app.service.fileImport.getFilesToImport(path=path.get))
+          assets = Some(app.service.fileImport.getFilesToImport(path = path))
           assetsIt = Some(assets.get.toIterator)
-          val responseTxt = JsObject(Seq("total" -> JsNumber(assets.get.size))).toString()
-          log.info(s"WS <- $responseTxt")
-          this.send(responseTxt)
+
+          this.writeToYou("total" -> assets.get.size)
+        }
+
+        case message @ JsonMessage(JObject(JField("action", JString("startImport")) :: fields)) => {
+          val json: JValue = message.content
+          log.info(s"WS <- $json")
+        }
+
+        case message @ JsonMessage(JObject(JField("action", JString("stopImport")) :: fields)) => {
+          val json: JValue = message.content
+          log.info(s"WS <- $json")
+          this.writeToYou("end" -> true)
+        }
 
         case TextMessage("next") => {
           log.info("WS -> next")
@@ -130,7 +165,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
           log.info("Client connected")
 
         case Disconnected(disconnector, Some(error)) =>
-          log.info("Client disconnected " + disconnector.)
+          log.info("Client disconnected")
 
         case Error(Some(error)) =>
           // FIXME: log
