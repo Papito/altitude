@@ -91,14 +91,11 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
           log.info(s"WS <- $json")
 
           Future {
-            try {
-              importAssets()
-            }
-            catch {
-              case ex: AllDone => {
-                stopImport = false
-                this.writeToYou(JsObject(Seq("end" -> JsBoolean(true))))
-              }
+            importAssets()
+          } onFailure {
+            case ex: AllDone => {
+              stopImport = false
+              this.writeToYou(JsObject(Seq("end" -> JsBoolean(true))))
             }
           }
         }
