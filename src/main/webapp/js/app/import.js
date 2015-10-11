@@ -99,7 +99,9 @@ ImportProtocolHandler = ProtocolHandler.extend({
       }
 
       if (json.end) {
-        self.viewModel.cancelImport();
+        self.viewModel.isImporting(false);
+        self.viewModel.importMode(null);
+        self.viewModel.importDirectory(null);
       }
     };
 
@@ -178,10 +180,7 @@ ImportViewModel = BaseViewModel.extend({
   },
 
   cancelImport: function() {
-    console.log('Closing websocket');
-    this.isImporting(false);
-    this.importMode(null);
-    this.importDirectory(null);
+    this.protocol.stopImport();
   },
 
   reset: function() {

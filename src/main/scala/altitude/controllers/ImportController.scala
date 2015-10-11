@@ -8,13 +8,15 @@ import altitude.models.{FileImportAsset, Asset}
 import altitude.{Const => C}
 import org.json4s.JsonAST.JObject
 import org.json4s._
-import JsonDSL._
 import org.scalatra._
 import org.scalatra.atmosphere._
 import org.scalatra.json.{JValueResult, JacksonJsonSupport}
 import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintExceededException}
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
+import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Success, Failure}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -44,26 +46,16 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
 
   atmosphere("/ws") {
     new AtmosphereClient {
-      private def uuidJson: JObject = "uid" -> uuid
+      private def uuidJson: JsValue = JsObject(Seq("uid" -> JsString(uuid)))
       private var stopImport = false
 
       var assets: Option[List[FileImportAsset]] = None
       var assetsIt: Option[Iterator[FileImportAsset]] = None
       var path: Option[String] = None
 
-      private def writeToYou(jsonMessage: JValue): Unit = {
+      private def writeToYou(jsonMessage: JsValue): Unit = {
         log.info(s"YOU -> $jsonMessage")
-        this.send(jsonMessage)
-      }
-
-      private def writeToAll(jsonMessage: JValue): Unit = {
-        log.info(s"ALL -> $jsonMessage")
-        this.broadcast(jsonMessage, Everyone)
-      }
-
-      private def writeToRest(jsonMessage: JValue): Unit = {
-        log.info(s"REST -> $jsonMessage")
-        this.broadcast(jsonMessage)
+        this.send(jsonMessage.toString())
       }
 
       def receive: AtmoReceive = {
@@ -78,85 +70,38 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
           log.info(s"WS <- $json")
 
           // get the path we will be importing from
-          // FIXME: not defensive
+          // FIXME: not defensive enough, check if defined
           val path: String = (json \ "path").extract[String]
 
           assets = Some(app.service.fileImport.getFilesToImport(path = path))
           assetsIt = Some(assets.get.toIterator)
 
-          this.writeToYou("total" -> assets.get.size)
-        }
-
-        case message @ JsonMessage(JObject(JField("action", JString("startImport")) :: fields)) => {
-          val json: JValue = message.content
-          log.info(s"WS <- $json")
+          this.writeToYou(JsObject(Seq("total" -> JsNumber(assets.get.size))))
         }
 
         case message @ JsonMessage(JObject(JField("action", JString("stopImport")) :: fields)) => {
           val json: JValue = message.content
           log.info(s"WS <- $json")
-          this.writeToYou("end" -> true)
+          stopImport = true
+          this.writeToYou(JsObject(Seq("end" -> JsBoolean(true))))
         }
 
-        case TextMessage("next") => {
-          log.info("WS -> next")
-          val responseTxt: String = {
-            var asset: Option[Asset] = None
-            var importAsset: Option[FileImportAsset] = None
+        case message @ JsonMessage(JObject(JField("action", JString("startImport")) :: fields)) => {
+          val json: JValue = message.content
+          log.info(s"WS <- $json")
 
+          Future {
             try {
-              // get the first asset that we *can* import
-              importAsset = None
-              asset = None
-
-              while (asset.isEmpty) {
-                if (!assetsIt.get.hasNext)
-                  throw new AllDone
-
-                importAsset = Some(assetsIt.get.next())
-                asset = app.service.fileImport.importAsset(importAsset.get)
-              }
-
-              JsObject(Seq(
-                C.Api.Asset.ASSET -> asset.get.toJson,
-                C.Api.Import.IMPORTED -> JsBoolean(true)
-              )).toString()
+              importAssets()
             }
             catch {
-              case ex: AllDone => "END"
-              case ex: DuplicateException => {
-                JsObject(Seq(
-                  C.Api.WARNING -> JsString(C.MSG("warn.duplicate")),
-                  C.Api.Asset.ASSET -> ex.asset.toJson,
-                  C.Api.Import.IMPORTED -> JsBoolean(false)
-                )).toString()
-              }
-              case ex: MetadataExtractorException => {
-                JsObject(Seq(
-                  C.Api.WARNING -> JsString(
-                    s"Metadata parser(s) failed. Asset still imported"),
-                  C.Api.Asset.ASSET -> ex.asset.toJson,
-                  C.Api.Import.IMPORTED -> JsBoolean(true))).toString()
-              }
-              case ex: Exception => {
-                ex.printStackTrace()
-
-                val importAssetJson = importAsset match {
-                  case None => JsNull
-                  case _ => importAsset.get.toJson
-                }
-
-                JsObject(Seq(
-                  C.Api.ERROR -> JsString(ex.toString),
-                  C.Api.Import.IMPORTED -> JsBoolean(false),
-                  C.Api.ImportAsset.IMPORT_ASSET -> importAssetJson
-                )).toString()
+              case ex: AllDone => {
+                stopImport = false
+                this.writeToYou(JsObject(Seq("end" -> JsBoolean(true))))
               }
             }
           }
-          log.info(s"WS <- $responseTxt")
-          this.send(responseTxt)
-        } // end "next"
+        }
 
         case TextMessage(data: String) =>
           log.info(s"WS -> $data")
@@ -171,6 +116,61 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
           // FIXME: log
           error.printStackTrace()
 
+      }
+
+      private def importAssets() = {
+        case class NotImportable() extends Exception
+
+        while (assetsIt.get.hasNext && !stopImport) {
+          val importAsset: Option[FileImportAsset] = Some(assetsIt.get.next())
+
+          try {
+            val asset: Option[Asset] = app.service.fileImport.importAsset(importAsset.get)
+            if (asset.isEmpty) throw NotImportable()
+
+            val resp = JsObject(Seq(
+              C.Api.Asset.ASSET -> asset.get.toJson,
+              C.Api.Import.IMPORTED -> JsBoolean(true)
+            ))
+            this.writeToYou(resp)
+          }
+          catch {
+            case ex: NotImportable => {/* next */}
+            case ex: DuplicateException => {
+              val resp =JsObject(Seq(
+                C.Api.WARNING -> JsString(C.MSG("warn.duplicate")),
+                C.Api.Asset.ASSET -> ex.asset.toJson,
+                C.Api.Import.IMPORTED -> JsBoolean(false)
+              ))
+              this.writeToYou(resp)
+            }
+            case ex: MetadataExtractorException => {
+              val resp =JsObject(Seq(
+                C.Api.WARNING -> JsString(
+                  s"Metadata parser(s) failed. Asset still imported"),
+                C.Api.Asset.ASSET -> ex.asset.toJson,
+                C.Api.Import.IMPORTED -> JsBoolean(true)))
+              this.writeToYou(resp)
+            }
+            case ex: Exception => {
+              ex.printStackTrace()
+
+              val importAssetJson = importAsset match {
+                case None => JsNull
+                case _ => importAsset.get.toJson
+              }
+
+              val resp = JsObject(Seq(
+                C.Api.ERROR -> JsString(ex.toString),
+                C.Api.Import.IMPORTED -> JsBoolean(false),
+                C.Api.ImportAsset.IMPORT_ASSET -> importAssetJson
+              ))
+              this.writeToYou(resp)
+            }
+          }
+        }
+
+        throw new AllDone
       }
     }
   }
