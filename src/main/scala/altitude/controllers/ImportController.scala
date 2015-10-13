@@ -1,6 +1,8 @@
 package altitude.controllers
 
 import java.io.File
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 
 import altitude.controllers.web.BaseWebController
 import altitude.exceptions.{MetadataExtractorException, DuplicateException, AllDone}
@@ -48,9 +50,11 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
     new AtmosphereClient {
       private def uuidJson: JsValue = JsObject(Seq("uid" -> JsString(uuid)))
       private var stopImport = false
+      private case class NotImportable() extends Exception
+      private val workerNum: AtomicInteger = new AtomicInteger(0)
 
       var assets: Option[List[FileImportAsset]] = None
-      var assetsIt: Option[Iterator[FileImportAsset]] = None
+      @volatile var assetsIt: Option[Iterator[FileImportAsset]] = None
       var path: Option[String] = None
 
       private def writeToYou(jsonMessage: JsValue): Unit = {
@@ -83,19 +87,28 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
           val json: JValue = message.content
           log.info(s"WS <- $json")
           stopImport = true
-          this.writeToYou(JsObject(Seq("end" -> JsBoolean(true))))
         }
 
         case message @ JsonMessage(JObject(JField("action", JString("startImport")) :: fields)) => {
           val json: JValue = message.content
           log.info(s"WS <- $json")
 
-          Future {
-            importAssets()
-          } onFailure {
-            case ex: AllDone => {
-              stopImport = false
-              this.writeToYou(JsObject(Seq("end" -> JsBoolean(true))))
+          val numWorkers = sys.runtime.availableProcessors
+          val pool = Executors.newFixedThreadPool(numWorkers)
+          implicit val ec = ExecutionContext.fromExecutorService(pool)
+
+          if (stopImport) throw new IllegalStateException("Still shutting down")
+
+          for (threadIdx <- 1 to numWorkers) {
+            log.debug(s"About to start worker: $threadIdx")
+            Future {
+              runImportWorker(threadIdx)
+            } onFailure {
+              case allDone: AllDone => cleanupWorker()
+              case ex: Exception => {
+                cleanupWorker()
+                log.error("Unknown worker exception: $ex")
+              }
             }
           }
         }
@@ -115,14 +128,27 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
 
       }
 
-      private def importAssets() = {
-        case class NotImportable() extends Exception
+      private def cleanupWorker() = {
+        // decrement worker and see what we have left
+        val workersNow = workerNum.decrementAndGet()
+        log.info(s"Workers left: $workersNow")
+        if (workersNow == 0) {
+          log.debug(s"ALL DONE")
+          stopImport = false
+          this.writeToYou(JsObject(Seq("end" -> JsBoolean(true))))
+        }
+      }
+
+      private def runImportWorker(workerIdx: Int) = {
+        log.info(s"Started import worker $workerIdx")
+        workerNum.incrementAndGet()
 
         while (assetsIt.get.hasNext && !stopImport) {
-          val importAsset: Option[FileImportAsset] = Some(assetsIt.get.next())
+          val importAsset: FileImportAsset = Some(assetsIt.get.next()).get
+          log.info(s"Processing import assset $importAsset")
 
           try {
-            val asset: Option[Asset] = app.service.fileImport.importAsset(importAsset.get)
+            val asset: Option[Asset] = app.service.fileImport.importAsset(importAsset)
             if (asset.isEmpty) throw NotImportable()
 
             val resp = JsObject(Seq(
@@ -152,21 +178,17 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
             case ex: Exception => {
               ex.printStackTrace()
 
-              val importAssetJson = importAsset match {
-                case None => JsNull
-                case _ => importAsset.get.toJson
-              }
-
               val resp = JsObject(Seq(
                 C.Api.ERROR -> JsString(ex.toString),
                 C.Api.Import.IMPORTED -> JsBoolean(false),
-                C.Api.ImportAsset.IMPORT_ASSET -> importAssetJson
+                C.Api.ImportAsset.IMPORT_ASSET -> importAsset.toJson
               ))
               this.writeToYou(resp)
             }
           }
         }
 
+        log.info(s"Import worker $workerIdx done iterating")
         throw new AllDone
       }
     }
