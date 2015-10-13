@@ -148,14 +148,17 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
           log.info(s"Processing import assset $importAsset")
 
           try {
-            val asset: Option[Asset] = app.service.fileImport.importAsset(importAsset)
-            if (asset.isEmpty) throw NotImportable()
+            synchronized {
+              val asset: Option[Asset] = app.service.fileImport.importAsset(importAsset)
 
-            val resp = JsObject(Seq(
-              C.Api.Asset.ASSET -> asset.get.toJson,
-              C.Api.Import.IMPORTED -> JsBoolean(true)
-            ))
-            this.writeToYou(resp)
+              if (asset.isEmpty) throw NotImportable()
+
+              val resp = JsObject(Seq(
+                C.Api.Asset.ASSET -> asset.get.toJson,
+                C.Api.Import.IMPORTED -> JsBoolean(true)
+              ))
+              this.writeToYou(resp)
+            }
           }
           catch {
             case ex: NotImportable => {/* next */}
