@@ -3,8 +3,22 @@ package altitude.transactions
 import java.sql.{Connection, DriverManager}
 import java.util.Properties
 
-import altitude.{Altitude, Const => C}
+import altitude.{Const => C, Environment, Configuration, Altitude}
+import com.mongodb.casbah.MongoClient
 import org.slf4j.LoggerFactory
+
+object JdbcTransactionManager {
+  private final val log = LoggerFactory.getLogger(getClass)
+  private val config = new Configuration()
+  private val url = config.getString("db.sqlite.url")
+  private val dataSource = config.getString("datasource")
+
+  val SQLITE_CONNECTION: Option[Connection] =
+    if (dataSource == "sqlite" || Environment.ENV == Environment.TEST) {
+      Some(DriverManager.getConnection(url))
+    } else None
+
+}
 
 class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManager {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -22,10 +36,13 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
       return app.JDBC_TRANSACTIONS.get(txId.id).get
     }
 
-    // get a connection and a new transaction
-    val conn: Connection = connection
+    val reuseConnection = app.dataSourceType match {
+      case "postgres"  => false
+      case "sqlite" => true
+      case _ => throw new IllegalArgumentException("Do not know of datasource: ${altitude.dataSourceType}")
+    }
 
-    val tx: JdbcTransaction = new JdbcTransaction(conn)
+    val tx: JdbcTransaction = new JdbcTransaction(connection, reuseConnection = reuseConnection)
     app.JDBC_TRANSACTIONS. += (tx.id -> tx)
     // assign the integer transaction ID to the mutable transaction id "carrier" object
     txId.id = tx.id
@@ -44,8 +61,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
       DriverManager.getConnection(url, props)
     }
     case "sqlite" => {
-      val url = app.config.getString("db.sqlite.url")
-      DriverManager.getConnection(url)
+      JdbcTransactionManager.SQLITE_CONNECTION.get
     }
     case _ => throw new IllegalArgumentException("Do not know of datasource: ${altitude.dataSourceType}")
   }
