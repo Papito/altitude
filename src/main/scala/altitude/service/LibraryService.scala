@@ -20,8 +20,6 @@ class LibraryService(app: Altitude) {
   protected val txManager = app.injector.instance[AbstractTransactionManager]
 
   val PREVIEW_BOX_SIZE = app.config.getInt("result.box.pixels")
-  val COMPOSITE_IMAGE: BufferedImage = new BufferedImage(PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE, BufferedImage.TYPE_INT_ARGB)
-  val G2D: Graphics2D = COMPOSITE_IMAGE.createGraphics
 
   def add(obj: Asset)(implicit txId: TransactionId = new TransactionId): JsObject = {
     txManager.withTransaction[JsObject] {
@@ -96,6 +94,9 @@ class LibraryService(app: Altitude) {
       case true => (PREVIEW_BOX_SIZE - height) / 2
       case false => 0
     }
+
+    val COMPOSITE_IMAGE: BufferedImage = new BufferedImage(PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE, BufferedImage.TYPE_INT_ARGB)
+    val G2D: Graphics2D = COMPOSITE_IMAGE.createGraphics
 
     G2D.setComposite(AlphaComposite.Clear)
     G2D.fillRect(0, 0, PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE)
