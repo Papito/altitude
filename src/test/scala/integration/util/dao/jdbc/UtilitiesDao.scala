@@ -12,14 +12,15 @@ class UtilitiesDao(app: Altitude) extends VoidJdbcDao(app) with integration.util
   override def dropDatabase() = {}
 
   override def rollback() = {
-    app.JDBC_TRANSACTIONS.foreach(tx => {
+
+    txManager.txContainer.foreach(tx => {
       tx._2.down()
       tx._2.rollback()
     })
   }
 
   override def close() = {
-    app.JDBC_TRANSACTIONS.foreach(tx => {
+    txManager.txContainer.foreach(tx => {
       tx._2.down()
       tx._2.close()
     })
@@ -28,7 +29,7 @@ class UtilitiesDao(app: Altitude) extends VoidJdbcDao(app) with integration.util
   override def cleanupTest() = {
     rollback()
     close()
-    app.JDBC_TRANSACTIONS.clear()
+    txManager.txContainer.clear()
   }
 
   override def createTransaction(txId: TransactionId): Unit = {

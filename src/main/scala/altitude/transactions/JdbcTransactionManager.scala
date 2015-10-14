@@ -6,7 +6,7 @@ import java.util.Properties
 import altitude.{Altitude, Const => C}
 import org.slf4j.LoggerFactory
 
-class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManager {
+class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collection.mutable.Map[Int, JdbcTransaction]) extends AbstractTransactionManager {
   private final val log = LoggerFactory.getLogger(getClass)
 
   /*
@@ -17,16 +17,16 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     log.debug(s"TX. Getting transaction for ${txId.id}")
 
     // see if we already have a transaction id defined
-    if (app.JDBC_TRANSACTIONS.contains(txId.id)) {
+    if (txContainer.contains(txId.id)) {
       // we do, eh
-      return app.JDBC_TRANSACTIONS.get(txId.id).get
+      return txContainer.get(txId.id).get
     }
 
     // get a connection and a new transaction
     val conn: Connection = connection
 
     val tx: JdbcTransaction = new JdbcTransaction(conn)
-    app.JDBC_TRANSACTIONS += (tx.id -> tx)
+    txContainer += (tx.id -> tx)
     // assign the integer transaction ID to the mutable transaction id "carrier" object
     txId.id = tx.id
     app.transactions.CREATED += 1
@@ -91,7 +91,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
         log.debug(s"TX. Closing: ${tx.id}", C.LogTag.DB)
         closeTransaction(tx)
         app.transactions.CLOSED += 1
-        app.JDBC_TRANSACTIONS.remove(txId.id)
+        txContainer.remove(txId.id)
       }
     }
   }
@@ -121,7 +121,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
         log.debug(s"TX. Closing: ${tx.id}", C.LogTag.DB)
         closeTransaction(tx)
         app.transactions.CLOSED += 1
-        app.JDBC_TRANSACTIONS.remove(txId.id)
+        txContainer.remove(txId.id)
       }
     }
   }

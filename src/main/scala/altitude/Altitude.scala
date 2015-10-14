@@ -35,9 +35,6 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
 
   val app: Altitude = this
 
-  //FIXME: see how we can use typing to make this more abstract
-  val JDBC_TRANSACTIONS = scala.collection.mutable.Map[Int, JdbcTransaction]()
-
   /*
   Inject dependencies
    */
@@ -52,8 +49,10 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
         case "postgres" => {
           DriverManager.registerDriver(new org.postgresql.Driver)
 
-          bind[AbstractTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
-          bind[JdbcTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
+          val JDBC_TRANSACTIONS = scala.collection.mutable.Map[Int, JdbcTransaction]()
+          val jdbcTxManager = new altitude.transactions.JdbcTransactionManager(app, JDBC_TRANSACTIONS)
+          bind[AbstractTransactionManager].toInstance(jdbcTxManager)
+          bind[JdbcTransactionManager].toInstance(jdbcTxManager)
 
           bind[AssetDao].toInstance(new postgres.AssetDao(app))
           bind[ImportProfileDao].toInstance(new postgres.ImportProfileDao(app))
@@ -61,8 +60,10 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
         case "sqlite" => {
           DriverManager.registerDriver(new org.sqlite.JDBC)
 
-          bind[AbstractTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
-          bind[JdbcTransactionManager].toInstance(new altitude.transactions.SqliteTransactionManager(app))
+          val JDBC_TRANSACTIONS = scala.collection.mutable.Map[Int, JdbcTransaction]()
+          val jdbcTxManager = new SqliteTransactionManager(app, JDBC_TRANSACTIONS)
+          bind[AbstractTransactionManager].toInstance(jdbcTxManager)
+          bind[JdbcTransactionManager].toInstance(jdbcTxManager)
 
           bind[AssetDao].toInstance(new sqlite.AssetDao(app))
           bind[ImportProfileDao].toInstance(new sqlite.ImportProfileDao(app))
@@ -118,7 +119,6 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
       BaseMongoDao.CLIENT.get.close()
     }
     log.info("Freeing transaction list")
-    JDBC_TRANSACTIONS.clear()
   }
 
   val workPath = System.getProperty("user.dir")

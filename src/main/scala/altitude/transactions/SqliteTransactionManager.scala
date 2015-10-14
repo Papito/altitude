@@ -6,7 +6,8 @@ import altitude.Altitude
 import org.slf4j.LoggerFactory
 import org.sqlite.SQLiteConfig
 
-class SqliteTransactionManager(app: Altitude) extends JdbcTransactionManager(app) {
+class SqliteTransactionManager(app: Altitude, txContainer: scala.collection.mutable.Map[Int, JdbcTransaction])
+  extends JdbcTransactionManager(app, txContainer) {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override def connection: Connection = {
@@ -20,7 +21,7 @@ class SqliteTransactionManager(app: Altitude) extends JdbcTransactionManager(app
     config.setReadOnly(true)
     DriverManager.getConnection(url, config.toProperties)
   }
-  
+
   override protected def closeTransaction(tx: JdbcTransaction) = {
     closeConnection(tx.getConnection)
   }
