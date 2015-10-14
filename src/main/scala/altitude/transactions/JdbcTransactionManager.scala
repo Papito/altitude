@@ -26,7 +26,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     val conn: Connection = connection
 
     val tx: JdbcTransaction = new JdbcTransaction(conn)
-    app.JDBC_TRANSACTIONS. += (tx.id -> tx)
+    app.JDBC_TRANSACTIONS += (tx.id -> tx)
     // assign the integer transaction ID to the mutable transaction id "carrier" object
     txId.id = tx.id
     app.transactions.CREATED += 1
@@ -37,29 +37,34 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     conn.close()
   }
 
-  def connection: Connection = app.dataSourceType match {
-    case "postgres"  => {
-      val props = new Properties
-      val user = app.config.getString("db.postgres.user")
-      props.setProperty("user", user)
-      val password = app.config.getString("db.postgres.password")
-      props.setProperty("password", password)
-      val url = app.config.getString("db.postgres.url")
-      DriverManager.getConnection(url, props)
-    }
-    case "sqlite" => {
-      val url = app.config.getString("db.sqlite.url")
-      DriverManager.getConnection(url)
-    }
-    case _ => throw new IllegalArgumentException("Do not know of datasource: ${altitude.dataSourceType}")
+  protected def closeTransaction(tx: JdbcTransaction) = {
+    tx.close()
+  }
+
+  protected def setReadOnly(tx: JdbcTransaction, value: Boolean): Unit = {
+    tx.setReadOnly(value)
+  }
+
+  protected def setAutoCommit(tx: JdbcTransaction, value: Boolean): Unit = {
+    tx.setAutoCommit(value)
+  }
+
+  def connection: Connection = {
+    val props = new Properties
+    val user = app.config.getString("db.postgres.user")
+    props.setProperty("user", user)
+    val password = app.config.getString("db.postgres.password")
+    props.setProperty("password", password)
+    val url = app.config.getString("db.postgres.url")
+    DriverManager.getConnection(url, props)
   }
 
   override def withTransaction[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
     val tx = transaction
 
     try {
-      tx.setReadOnly(false)
-      tx.setAutoCommit(false)
+      setReadOnly(tx, value = false)
+      setAutoCommit(tx, value = false)
 
       tx.up() // level up - any new transactions within will be "nested"
       val res: A = f
@@ -84,7 +89,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
       // clean up, if we are done with this transaction
       if (!tx.isNested) {
         log.debug(s"TX. Closing: ${tx.id}", C.LogTag.DB)
-        tx.close()
+        closeTransaction(tx)
         app.transactions.CLOSED += 1
         app.JDBC_TRANSACTIONS.remove(txId.id)
       }
@@ -95,9 +100,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     val tx = transaction
 
     try {
-      if (supportsReadOnlyConnections) {
-        tx.setReadOnly(true)
-      }
+      setReadOnly(tx, value = true)
 
       tx.up()
       val res: A = f
@@ -116,15 +119,11 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
       if (!tx.isNested) {
         log.debug(s"TX. End: ${tx.id}", C.LogTag.DB)
         log.debug(s"TX. Closing: ${tx.id}", C.LogTag.DB)
-        tx.close()
+        closeTransaction(tx)
         app.transactions.CLOSED += 1
         app.JDBC_TRANSACTIONS.remove(txId.id)
       }
     }
   }
 
-  def supportsReadOnlyConnections = app.dataSourceType match {
-    case "postgres"  => true
-    case _ => false
-  }
 }
