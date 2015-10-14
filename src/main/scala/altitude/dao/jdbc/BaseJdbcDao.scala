@@ -20,7 +20,7 @@ import net.codingwell.scalaguice.InjectorExtensions._
 abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  protected val txManager = app.injector.instance[JdbcTransactionManager]
+  protected final def txManager = app.injector.instance[JdbcTransactionManager]
 
   protected def conn(implicit txId: TransactionId): Connection = {
     // get transaction from the global lookup
