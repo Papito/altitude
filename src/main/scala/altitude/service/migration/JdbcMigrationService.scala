@@ -1,8 +1,5 @@
 package altitude.service.migration
 
-import java.sql.DriverManager
-import java.util.Properties
-
 import altitude.Altitude
 import altitude.dao.MigrationDao
 import altitude.transactions.{AbstractTransactionManager, JdbcTransactionManager, TransactionId}
@@ -29,11 +26,7 @@ abstract class JdbcMigrationService(app: Altitude) extends MigrationService {
       stmt.close()
     }
 
-    app.dataSourceType match {
-      case "postgres"  => conn.close()
-      case "sqlite" => {}
-      case _ => throw new IllegalArgumentException("Do not know of datasource: ${altitude.dataSourceType}")
-    }
+    conn.close()
   }
 
   override def existingVersion(implicit txId: TransactionId = new TransactionId): Int = {

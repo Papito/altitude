@@ -6,7 +6,7 @@ import altitude.dao.mongo.BaseMongoDao
 import altitude.dao._
 import altitude.service._
 import altitude.service.migration.{SqliteMigrationService, MongoMigrationService, PostgresMigrationService}
-import altitude.transactions.{JdbcTransactionManager, AbstractTransactionManager, JdbcTransaction}
+import altitude.transactions.{AbstractTransactionManager, JdbcTransaction}
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
 import net.codingwell.scalaguice.InjectorExtensions._
@@ -116,12 +116,6 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
       BaseMongoDao.CLIENT.get.close()
     }
     log.info("Freeing transaction list")
-
-    if (JdbcTransactionManager.SQLITE_CONNECTION.isDefined) {
-      log.info("Closing SQLite connection")
-      JdbcTransactionManager.SQLITE_CONNECTION.get.close()
-    }
-
     JDBC_TRANSACTIONS.clear()
   }
 

@@ -23,7 +23,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
   protected def conn(implicit txId: TransactionId): Connection = {
     // get transaction from the global lookup
-    jdbcTxManager.transaction.getConnection
+    jdbcTxManager.transaction.conn
   }
 
   protected def CORE_SQL_VALS_FOR_INSERT: String

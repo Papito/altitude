@@ -5,14 +5,14 @@ import java.sql.Connection
 import altitude.{Const => C}
 import org.slf4j.LoggerFactory
 
-class JdbcTransaction(private val conn: Connection, val reuseConnection: Boolean = false) extends Transaction {
+class JdbcTransaction(val conn: Connection) extends Transaction {
   private final val log = LoggerFactory.getLogger(getClass)
 
   log.debug(s"New JDBC transaction $id", C.LogTag.DB)
   def getConnection: Connection = conn
 
   override def close() = {
-    if (!isNested && !reuseConnection) {
+    if (!isNested) {
       log.debug(s"Closing connection for transaction $id", C.LogTag.DB)
       conn.close()
     }
