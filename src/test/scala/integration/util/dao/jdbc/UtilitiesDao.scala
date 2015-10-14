@@ -3,11 +3,13 @@ package integration.util.dao.jdbc
 import altitude.Altitude
 import altitude.dao.jdbc.{VoidJdbcDao, BaseJdbcDao}
 import altitude.models.BaseModel
-import altitude.transactions.TransactionId
+import altitude.transactions.{JdbcTransactionManager, TransactionId}
 import play.api.libs.json.{JsObject, Json}
+import net.codingwell.scalaguice.InjectorExtensions._
 
 class UtilitiesDao(app: Altitude) extends VoidJdbcDao(app) with integration.util.dao.UtilitiesDao {
-  override def dropDatabase() = Unit
+
+  override def dropDatabase() = {}
 
   override def rollback() = {
     app.JDBC_TRANSACTIONS.foreach(tx => {
@@ -30,9 +32,9 @@ class UtilitiesDao(app: Altitude) extends VoidJdbcDao(app) with integration.util
   }
 
   override def createTransaction(txId: TransactionId): Unit = {
-    val tx = jdbcTxManager.transaction(txId)
-    tx.setReadOnly(flag = false)
-    tx.setAutoCommit(flag = false)
+    val tx = txManager.transaction(txId)
+    tx.setReadOnly(false)
+    tx.setAutoCommit(false)
     // up one level so it does not get committed or closed
     tx.up()
   }

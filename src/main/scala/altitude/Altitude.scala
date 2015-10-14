@@ -6,7 +6,7 @@ import altitude.dao.mongo.BaseMongoDao
 import altitude.dao._
 import altitude.service._
 import altitude.service.migration.{SqliteMigrationService, MongoMigrationService, PostgresMigrationService}
-import altitude.transactions.{AbstractTransactionManager, JdbcTransaction}
+import altitude.transactions._
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
 import net.codingwell.scalaguice.InjectorExtensions._
@@ -53,6 +53,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           DriverManager.registerDriver(new org.postgresql.Driver)
 
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
+          bind[JdbcTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
 
           bind[AssetDao].toInstance(new postgres.AssetDao(app))
           bind[ImportProfileDao].toInstance(new postgres.ImportProfileDao(app))
@@ -61,6 +62,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           DriverManager.registerDriver(new org.sqlite.JDBC)
 
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.JdbcTransactionManager(app))
+          bind[JdbcTransactionManager].toInstance(new altitude.transactions.SqliteTransactionManager(app))
 
           bind[AssetDao].toInstance(new sqlite.AssetDao(app))
           bind[ImportProfileDao].toInstance(new sqlite.ImportProfileDao(app))

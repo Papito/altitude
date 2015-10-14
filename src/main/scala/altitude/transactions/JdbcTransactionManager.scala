@@ -33,6 +33,10 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     tx
   }
 
+  def closeConnection(conn: Connection): Unit = {
+    conn.close()
+  }
+
   def connection: Connection = app.dataSourceType match {
     case "postgres"  => {
       val props = new Properties
@@ -54,8 +58,8 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     val tx = transaction
 
     try {
-      tx.setReadOnly(flag=false)
-      tx.setAutoCommit(flag=false)
+      tx.setReadOnly(false)
+      tx.setAutoCommit(false)
 
       tx.up() // level up - any new transactions within will be "nested"
       val res: A = f
@@ -92,7 +96,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
 
     try {
       if (supportsReadOnlyConnections) {
-        tx.setReadOnly(flag=true)
+        tx.setReadOnly(true)
       }
 
       tx.up()

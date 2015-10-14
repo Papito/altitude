@@ -15,15 +15,16 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json._
 
 import scala.collection.JavaConversions._
+import net.codingwell.scalaguice.InjectorExtensions._
 
 abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  protected val jdbcTxManager = new JdbcTransactionManager(app)
+  protected val txManager = app.injector.instance[JdbcTransactionManager]
 
   protected def conn(implicit txId: TransactionId): Connection = {
     // get transaction from the global lookup
-    jdbcTxManager.transaction.conn
+    txManager.transaction.getConnection
   }
 
   protected def CORE_SQL_VALS_FOR_INSERT: String
