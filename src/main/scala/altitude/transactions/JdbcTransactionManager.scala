@@ -13,7 +13,7 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
   Get an existing transaction if we are already within a transaction context,
   else, create a new one
    */
-  def transaction(implicit txId: TransactionId): JdbcTransaction = {
+  def transaction(implicit txId: TransactionId, readOnly: Boolean = false): JdbcTransaction = {
     log.debug(s"TX. Getting transaction for ${txId.id}")
 
     // see if we already have a transaction id defined
@@ -23,7 +23,7 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
     }
 
     // get a connection and a new transaction
-    val conn: Connection = connection
+    val conn: Connection = connection(readOnly)
 
     val tx: JdbcTransaction = new JdbcTransaction(conn)
     txContainer += (tx.id -> tx)
@@ -34,6 +34,7 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
   }
 
   def closeConnection(conn: Connection): Unit = {
+    log.info(s"Closing connection $conn")
     conn.close()
   }
 
@@ -41,31 +42,31 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
     tx.close()
   }
 
-  protected def setReadOnly(tx: JdbcTransaction, value: Boolean): Unit = {
-    tx.setReadOnly(value)
-  }
-
-  protected def setAutoCommit(tx: JdbcTransaction, value: Boolean): Unit = {
-    tx.setAutoCommit(value)
-  }
-
-  def connection: Connection = {
+  def connection(readOnly: Boolean): Connection = {
     val props = new Properties
     val user = app.config.getString("db.postgres.user")
     props.setProperty("user", user)
     val password = app.config.getString("db.postgres.password")
     props.setProperty("password", password)
     val url = app.config.getString("db.postgres.url")
-    DriverManager.getConnection(url, props)
+    val conn = DriverManager.getConnection(url, props)
+    log.info(s"Opening connection $conn. Read-only: $readOnly")
+
+    readOnly match {
+      case true => conn.setReadOnly(true)
+      case false =>  {
+        conn.setReadOnly(false)
+        conn.setAutoCommit(false)
+      }
+    }
+
+    conn
   }
 
   override def withTransaction[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
-    val tx = transaction
+    val tx = transaction(txId, readOnly = false)
 
     try {
-      setReadOnly(tx, value = false)
-      setAutoCommit(tx, value = false)
-
       tx.up() // level up - any new transactions within will be "nested"
       val res: A = f
       tx.down()
@@ -97,11 +98,9 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
   }
 
   override def asReadOnly[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
-    val tx = transaction
+    val tx = transaction(txId, readOnly = true)
 
     try {
-      setReadOnly(tx, value = true)
-
       tx.up()
       val res: A = f
       tx.down()

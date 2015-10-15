@@ -31,7 +31,4 @@ class JdbcTransaction(private val conn: Connection) extends Transaction {
       conn.rollback()
     }
   }
-
-  override def setReadOnly(flag: Boolean): Unit = if (!isNested) conn.setReadOnly(flag)
-  override def setAutoCommit(flag: Boolean): Unit = if (!isNested) conn.setAutoCommit(flag)
 }

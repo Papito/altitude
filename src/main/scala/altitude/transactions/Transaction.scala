@@ -11,7 +11,5 @@ trait Transaction {
   def close(): Unit
   def commit(): Unit
   def rollback(): Unit
-  def setReadOnly(flag: Boolean): Unit
-  def setAutoCommit(flag: Boolean): Unit
 
 }

@@ -17,14 +17,14 @@ abstract class JdbcMigrationService(app: Altitude) extends MigrationService {
   override def runMigration(version: Int): Unit = {
     val migrationCommands = parseMigrationCommands(version)
 
-    val conn = txManager.connection
+    val conn = txManager.connection(readOnly = false)
     for (sql <- migrationCommands) {
       log.info(s"Executing $sql")
       val stmt = conn.createStatement()
       stmt.executeUpdate(sql)
       stmt.close()
     }
-
+    conn.commit()
     txManager.closeConnection(conn)
   }
 

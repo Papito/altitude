@@ -11,8 +11,8 @@
     <appender-ref ref="STDOUT" />
   </root>
 
-  <logger name="altitude" level="DEBUG" />
-  <logger name="altitude.transactions" level="WARN" />
+  <logger name="altitude" level="OFF" />
+  <logger name="altitude.transactions" level="DEBUG" />
   <logger name="org.fusesource.scalate.util" level="WARN" />
   <logger name="org.atmosphere" level="WARN" />
   <logger name="org.fusesource.scalate.servlet" level="WARN" />

@@ -33,9 +33,7 @@ class UtilitiesDao(app: Altitude) extends VoidJdbcDao(app) with integration.util
   }
 
   override def createTransaction(txId: TransactionId): Unit = {
-    val tx = txManager.transaction(txId)
-    tx.setReadOnly(false)
-    tx.setAutoCommit(false)
+    val tx = txManager.transaction(txId, readOnly = false)
     // up one level so it does not get committed or closed
     tx.up()
   }
