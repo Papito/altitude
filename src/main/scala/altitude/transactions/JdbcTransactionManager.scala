@@ -38,7 +38,7 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
     conn.close()
   }
 
-  protected def closeTransaction(tx: JdbcTransaction) = {
+  def closeTransaction(tx: JdbcTransaction) = {
     tx.close()
   }
 

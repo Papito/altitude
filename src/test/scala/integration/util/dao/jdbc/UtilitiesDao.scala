@@ -22,7 +22,7 @@ class UtilitiesDao(app: Altitude) extends VoidJdbcDao(app) with integration.util
   override def close() = {
     txManager.txContainer.foreach(tx => {
       tx._2.down()
-      tx._2.close()
+      txManager.closeTransaction(tx._2)
     })
   }
 
