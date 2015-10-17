@@ -63,10 +63,14 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
     conn
   }
 
+  protected def lock(tx: Transaction): Unit = {}
+  protected def unlock(tx: Transaction): Unit = {}
+
   override def withTransaction[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
     val tx = transaction(txId, readOnly = false)
 
     try {
+      lock(tx)
       tx.up() // level up - any new transactions within will be "nested"
       val res: A = f
       tx.down()
@@ -94,6 +98,7 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
         app.transactions.CLOSED += 1
         txContainer.remove(txId.id)
       }
+      unlock(tx)
     }
   }
 
