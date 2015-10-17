@@ -56,8 +56,6 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
 
   override def afterEach() {
     dbUtilities.cleanupTest()
-    // should not have committed anything for tests
-    require(altitude.transactions.COMMITTED == 0)
   }
 
   class InjectionModule extends AbstractModule with ScalaModule  {
