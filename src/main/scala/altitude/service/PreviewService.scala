@@ -44,11 +44,10 @@ class PreviewService(app: Altitude) {
     val is: InputStream = new ByteArrayInputStream(byteArray)
 
     try {
-      val previewMediaType = app.service.metadata.detectMediaTypeFromStream(is)
       Preview(
         assetId = assetId,
         data = byteArray,
-        mimeType = previewMediaType.mime)
+        mimeType = "application/octet-stream")
     }
     finally {
       if (is != null) is.close()
