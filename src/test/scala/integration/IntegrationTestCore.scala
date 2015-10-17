@@ -45,6 +45,8 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   implicit val txId: TransactionId = new TransactionId
 
   override def beforeEach() = {
+    // because we use the writable connection to get DB version No
+    IntegrationTestCore.sqliteApp.transactions.COMMITTED = 0
     dbUtilities.dropDatabase()
 
     val dataDirFile = new File(altitude.dataPath)
@@ -56,6 +58,8 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
 
   override def afterEach() {
     dbUtilities.cleanupTest()
+    // should not have committed anything for tests
+    require(altitude.transactions.COMMITTED == 0)
   }
 
   class InjectionModule extends AbstractModule with ScalaModule  {
