@@ -12,7 +12,7 @@ import org.scalatest.Matchers._
   test("import image (JPEG)") {
     val asset = importFile("images/basic/1.jpg")
     val preview: Preview = altitude.service.library.getPreview(asset.id.get)
-    preview.mimeType should equal("image/png")
+    preview.mimeType should equal("application/octet-stream")
     preview.data.length should not be 0
   }
 
