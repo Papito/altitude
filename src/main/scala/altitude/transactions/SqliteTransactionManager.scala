@@ -10,13 +10,12 @@ import org.sqlite.SQLiteConfig
 object SqliteTransactionManager {
   private val config = new Configuration()
   val url = config.getString("db.sqlite.url")
-  println(s"URL!!!!: $url")
   private val LOCK = new ReentrantLock()
 
   val sqliteConfig: SQLiteConfig = new SQLiteConfig()
   sqliteConfig.setReadOnly(true)
-  private val roConnection = DriverManager.getConnection(url, sqliteConfig.toProperties)
-  private val wConnection = DriverManager.getConnection(url)
+  private lazy val roConnection = DriverManager.getConnection(url, sqliteConfig.toProperties)
+  private lazy val wConnection = DriverManager.getConnection(url)
   wConnection.setAutoCommit(false)
 }
 
@@ -35,24 +34,20 @@ class SqliteTransactionManager(app: Altitude, txContainer: scala.collection.muta
   }
 
   override def lock(tx: Transaction): Unit = {
-    println("!!!!!!!!!!!!!!!!!!!!!")
     if (tx.isNested) {
       // already inside a transaction
       return
     }
-    println("===================================")
 
     log.debug("Acquiring SQLite write lock")
     SqliteTransactionManager.LOCK.lock()
   }
 
   override def unlock(tx: Transaction): Unit = {
-    println("!!!!!!!!!!!!!!!!!!!!!")
     if (tx.isNested) {
       // already inside a transaction
       return
     }
-    println("===================================")
 
     log.debug("releasing SQLite write lock")
     SqliteTransactionManager.LOCK.unlock()
