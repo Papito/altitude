@@ -25,10 +25,11 @@ SearchViewModel = BaseViewModel.extend({
       content.attr("tabindex",-1).focus();
     }
 
-    var gridAdjustment = getGridAdjustment(content, self.resultBoxSize, self.resultBoxBorder);
+    var gridAdjustment = Util.getGridAdjustment(content, self.resultBoxSize, self.resultBoxBorder);
     self.resultBoxMargin(gridAdjustment.boxMargin);
     self.resultBoxPadding(gridAdjustment.boxPadding);
     self.resultBoxWidth(gridAdjustment.boxWidth);
+    self.resultBoxSideMargin(gridAdjustment.boxSideMargin);
 
     var approxRowsPerPage = parseInt(gridAdjustment.containerHeight / gridAdjustment.boxHeight, 10);
     var rpp = (approxRowsPerPage * gridAdjustment.fitsHorizontally) * 3;
@@ -47,7 +48,6 @@ SearchViewModel = BaseViewModel.extend({
         for (var idx in assets) {
           self.searchResults.push(assets[idx]);
         }
-        self.resultBoxSideMargin(gridAdjustment.boxSideMargin);
 
         if (assets.length) {
           $("#content").endlessScroll({

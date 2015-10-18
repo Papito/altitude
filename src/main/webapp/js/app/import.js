@@ -142,6 +142,7 @@ ImportProtocolHandler = ProtocolHandler.extend({
 ImportViewModel = BaseViewModel.extend({
   constructor : function() {
     "use strict";
+    var self = this;
 
     this.IMPORT_MODE = {
       'DIRECTORY': 'directory',
@@ -151,7 +152,6 @@ ImportViewModel = BaseViewModel.extend({
     this.base();
     console.log('Initializing import view-model');
 
-    var self = this;
     this.isImporting = ko.observable(false);
     this.totalAssetsCnt = ko.observable(0);
     this.assetsProcessedCnt = ko.observable(0);
@@ -163,7 +163,9 @@ ImportViewModel = BaseViewModel.extend({
     this.statsWarnings = ko.observable(0);
     this.statsErrors = ko.observable(0);
     this.disableDoubleClick = false;
-    this.responseHandler = null;
+
+    this.boxBorder = 2; //pixels
+    this.gridAdjustment = null;
 
     this.percentComplete = ko.computed(function() {
       var percent = 0;
@@ -177,6 +179,8 @@ ImportViewModel = BaseViewModel.extend({
     var socket = $.atmosphere;
     this.protocol = new ImportProtocolHandler(socket, self);
     console.log('Import protocol handler attached');
+
+    self.getResultBoxSize();
   },
 
   cancelImport: function() {
@@ -255,9 +259,16 @@ ImportViewModel = BaseViewModel.extend({
   },
 
   addSuccess: function(asset) {
+    var self = this;
     console.log(asset.id);
+    var style = 'margin-left:' + self.gridAdjustment.boxSideMargin +
+        '; margin-right:' +  self.gridAdjustment.boxSideMargin +
+        '; margin-bottom:' +  self.gridAdjustment.boxMargin +
+        '; padding:' +  self.gridAdjustment.boxPadding +
+        '; border-width: ' + self.boxBorder;
+
     $("#importedAssets").prepend(
-        '<div class="asset">' +
+        '<div class="asset" style="' + style +'">' +
         '<img src="/assets/' + asset.id + '/preview">' +
         '</div>');
     this.statsImported(this.statsImported() + 1);
@@ -265,10 +276,12 @@ ImportViewModel = BaseViewModel.extend({
   },
 
   trimMessages: function() {
-    var assetSel = $("#importedAssets .asset");
+    var self = this;
+
+    var assetSel = $('#importedAssets').find('.asset');
     var messageCount = assetSel.length;
 
-    if (messageCount > 4) {
+    if (messageCount > self.gridAdjustment.fitsHorizontally) {
       var el = assetSel.last();
       $(el).remove();
     }
@@ -277,5 +290,23 @@ ImportViewModel = BaseViewModel.extend({
   importAssets: function() {
     this.reset();
     this.protocol.getTotal();
+  },
+
+  getResultBoxSize: function() {
+    var self = this;
+    var opts = {
+      'successCallback': function (json) {
+        var boxSize = json['resultBoxSize'];
+
+        self.gridAdjustment = Util.getGridAdjustment($('#importedAssets'), boxSize, self.boxBorder);;
+        self.resultBoxMargin = self.gridAdjustment.boxMargin;
+        self.resultBoxPadding = self.gridAdjustment.boxPadding;
+        self.resultBoxWidth = self.gridAdjustment.boxWidth;
+        self.resultBoxSideMargin = self.gridAdjustment.boxSideMargin;
+        console.log(self.gridAdjustment);
+      }
+    };
+
+    this.get('/api/v1/search/meta/box', opts);
   }
 });
