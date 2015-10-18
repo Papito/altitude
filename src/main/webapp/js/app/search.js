@@ -25,28 +25,15 @@ SearchViewModel = BaseViewModel.extend({
       content.attr("tabindex",-1).focus();
     }
 
+    var gridAdjustment = getGridAdjustment(content, self.resultBoxSize, self.resultBoxBorder);
+    self.resultBoxMargin(gridAdjustment.boxMargin);
+    self.resultBoxPadding(gridAdjustment.boxPadding);
+    self.resultBoxWidth(gridAdjustment.boxWidth);
+
+    var approxRowsPerPage = parseInt(gridAdjustment.containerHeight / gridAdjustment.boxHeight, 10);
+    var rpp = (approxRowsPerPage * gridAdjustment.fitsHorizontally) * 3;
+
     var queryString = window.location.search;
-
-    var searchResultsWidth = content.width();
-    var searchResultsHeight = content.height();
-
-    var viewportW = searchResultsWidth - (searchResultsWidth * 0.025);
-
-    self.resultBoxPadding(parseInt(self.resultBoxSize * 0.05));
-    self.resultBoxMargin(parseInt(self.resultBoxSize * 0.05));
-
-    self.resultBoxWidth(self.resultBoxSize +
-        (self.resultBoxMargin() + self.resultBoxPadding() + self.resultBoxBorder) * 2);
-
-    var fitsHorizontally = parseInt(viewportW / self.resultBoxWidth(), 10);
-    var viewPortRemainder = viewportW - (fitsHorizontally * self.resultBoxWidth());
-    var remainderPerSide = parseInt(viewPortRemainder / (fitsHorizontally * 2));
-
-    var resultBoxHeight = (self.resultBoxSize +
-      (self.resultBoxPadding() + self.resultBoxBorder) * 2);
-
-    var approxRowsPerPage = parseInt(searchResultsHeight / resultBoxHeight, 10);
-    var rpp = (approxRowsPerPage * fitsHorizontally) * 3;
 
     var opts = {
       'successCallback': function (json) {
@@ -60,7 +47,7 @@ SearchViewModel = BaseViewModel.extend({
         for (var idx in assets) {
           self.searchResults.push(assets[idx]);
         }
-        self.resultBoxSideMargin(self.resultBoxMargin() + remainderPerSide);
+        self.resultBoxSideMargin(gridAdjustment.boxSideMargin);
 
         if (assets.length) {
           $("#content").endlessScroll({
