@@ -72,7 +72,10 @@
             <div class="col-md-4">&nbsp;</div>
             <div id="startStop" class="col-md-4" data-bind="visible: importMode()">
                 <button id="start" style="display: none" type="button" data-bind="visible: !isImporting(), click: importAssets" class="btn btn-success">Start Import</button>
-                <button id="stop" style="display: none" type="button" data-bind=" visible: isImporting(), click: cancelImport" class="btn btn-danger">STOP</button>
+                <button id="stop" style="display: none" type="button" data-bind=" visible: isImporting(), click: cancelImport" class="btn btn-danger">
+                    <span data-bind="if: !isStopping()">STOP</span>
+                    <span data-bind="if: isStopping()">HALTING ...</span>
+                </button>
             </div>
         </div>
 

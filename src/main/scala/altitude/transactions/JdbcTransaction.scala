@@ -13,6 +13,7 @@ class JdbcTransaction(private val conn: Connection) extends Transaction {
 
   override def close() = {
     if (!isNested) {
+      // FIXME: try/catch/log to avoid hanging lock on error
       log.debug(s"Closing connection for transaction $id", C.LogTag.DB)
       conn.close()
     }
@@ -20,6 +21,7 @@ class JdbcTransaction(private val conn: Connection) extends Transaction {
 
   override def commit() {
     if (!isNested) {
+      // FIXME: try/catch/log to avoid hanging lock on error
       log.debug(s"Committing transaction $id", C.LogTag.DB)
       conn.commit()
     }
@@ -27,6 +29,7 @@ class JdbcTransaction(private val conn: Connection) extends Transaction {
 
   override def rollback() {
     if (!isNested && !conn.isReadOnly) {
+      // FIXME: try/catch/log to avoid hanging lock on error
       log.warn(s"ROLLBACK for transaction $id", C.LogTag.DB)
       conn.rollback()
     }

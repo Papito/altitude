@@ -100,6 +100,7 @@ ImportProtocolHandler = ProtocolHandler.extend({
 
       if (json.end) {
         self.viewModel.isImporting(false);
+        self.viewModel.isStopping(false);
         self.viewModel.importMode(null);
         self.viewModel.importDirectory(null);
       }
@@ -131,6 +132,12 @@ ImportProtocolHandler = ProtocolHandler.extend({
   stopImport: function() {
     var self = this;
 
+    if (self.viewModel.isStopping()) {
+      console.log("void");
+      return;
+    }
+
+    self.viewModel.isStopping(true);
     var message = {
       'action': "stopImport"
     };
@@ -153,6 +160,7 @@ ImportViewModel = BaseViewModel.extend({
     console.log('Initializing import view-model');
 
     this.isImporting = ko.observable(false);
+    this.isStopping = ko.observable(false);
     this.totalAssetsCnt = ko.observable(0);
     this.assetsProcessedCnt = ko.observable(0);
     this.importMode = ko.observable();
@@ -260,7 +268,6 @@ ImportViewModel = BaseViewModel.extend({
 
   addSuccess: function(asset) {
     var self = this;
-    console.log(asset.id);
     var style = 'margin-left:' + self.gridAdjustment.boxSideMargin +
         '; margin-right:' +  self.gridAdjustment.boxSideMargin +
         '; margin-bottom:' +  self.gridAdjustment.boxMargin +
