@@ -1,13 +1,13 @@
 #set (assets)
-    <script src="/static/js/app/models.js"></script>
-    <script src="/static/js/app/index.js"></script>
+  <script src="/static/js/app/models.js"></script>
+  <script src="/static/js/app/index.js"></script>
 #end
 
 This is home
 
 <script>
-    $(document).ready(function() {
-        var indexViewModel = new IndexViewModel();
-        ko.applyBindings(indexViewModel);
-    });
+  $(document).ready(function() {
+  var indexViewModel = new IndexViewModel();
+  ko.applyBindings(indexViewModel);
+  });
 </script>
