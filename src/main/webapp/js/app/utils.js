@@ -3,7 +3,7 @@ var Util = {
     var containerWidth = containerEl.width();
     var containerHeight = containerEl.height();
 
-    var viewportW = containerWidth - (containerWidth * 0.025);
+    var viewportW = containerWidth - (containerWidth * 0.02);
 
     var boxPadding = parseInt(boxSize * 0.05);
     var boxMargin = parseInt(boxSize * 0.05);

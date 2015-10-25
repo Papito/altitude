@@ -10,6 +10,7 @@ SearchViewModel = BaseViewModel.extend({
     this.resultBoxBorder = 2; //pixels
     this.resultBoxMargin = ko.observable();
     this.resultBoxSideMargin = ko.observable();
+    this.resultBoxDblSideMargin = ko.observable();
     this.resultBoxPadding = ko.observable();
     this.resultBoxWidth = ko.observable();
     this.resultBoxSize = null;
@@ -19,17 +20,21 @@ SearchViewModel = BaseViewModel.extend({
 
   search: function(append, page) {
     var self = this;
-    var content = $("#content");
+    var content = $("#searchResults");
 
     if (page == 1) {
       content.attr("tabindex",-1).focus();
     }
 
-    var gridAdjustment = Util.getGridAdjustment(content, self.resultBoxSize, self.resultBoxBorder);
+    var gridAdjustment = Util.getGridAdjustment(
+        content, self.resultBoxSize, self.resultBoxBorder
+    );
+    console.log(gridAdjustment);
     self.resultBoxMargin(gridAdjustment.boxMargin);
     self.resultBoxPadding(gridAdjustment.boxPadding);
     self.resultBoxWidth(gridAdjustment.boxWidth);
     self.resultBoxSideMargin(gridAdjustment.boxSideMargin);
+    self.resultBoxDblSideMargin(self.resultBoxSideMargin() * 2);
 
     var approxRowsPerPage = parseInt(gridAdjustment.containerHeight / gridAdjustment.boxHeight, 10);
     var rpp = (approxRowsPerPage * gridAdjustment.fitsHorizontally) * 3;
@@ -50,7 +55,7 @@ SearchViewModel = BaseViewModel.extend({
         }
 
         if (assets.length) {
-          $("#content").endlessScroll({
+          $("#searchResults").endlessScroll({
             loader: '<div class="loading"><div>',
             callback: function(p){
               self.search(/*append=*/true, /*page=*/page + 1);
