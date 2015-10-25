@@ -38,10 +38,10 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="/">${config.getString("app.name")}</a>
-        <p class="navbar-text">${screenTitle}</p>
+        <p class="navbar-text"><span id="screenTitle">${screenTitle}</span></p>
       </div>
       <div class="navbar-collapse collapse">
-        <ul class="nav navbar-nav navbar-right">
+        <ul class="nav navbar-nav navbar-left">
           <li><a href="/cl/import">Import</a></li>
         </ul>
         <form class="navbar-form navbar-right" method="GET" action="/cl/search">
@@ -50,7 +50,7 @@
         </div>
       </div>
     </div>
-    </header>
+  </header>
 
     <section>
       <div id="content" class="container-fluid">

@@ -10,8 +10,12 @@
     <div class="row">
       <div class="col-md-12" style="height: 60%">
         <div id="folders">
-          <div class="header">
-            <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;&nbsp;Folders
+          <div>
+            <span class="header" style="float: left">
+              <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+              &nbsp;&nbsp;Folders
+            </span>
+            <span style="float: right"><button type="button" class="btn btn-default btn-xs">+ Add</button></span>
           </div>
         </div>
       </div>

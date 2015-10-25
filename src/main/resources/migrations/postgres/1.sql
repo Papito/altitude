@@ -19,18 +19,9 @@ CREATE TABLE asset (
   metadata jsonb,
   path TEXT NOT NULL,
   filename TEXT NOT NULL,
-  image_data BYTEA,
   size_bytes INT NOT NULL
 ) INHERITS (_core);
 CREATE UNIQUE INDEX asset_md5 ON asset(md5);
-
-CREATE TABLE preview (
-  id varchar(24) PRIMARY KEY,
-  asset_id varchar(24),
-  mime_type varchar(64) NOT NULL,
-  data TEXT NOT NULL
-) INHERITS (_core);
-
 
 CREATE TABLE import_profile (
   id varchar(24) PRIMARY KEY,
