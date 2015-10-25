@@ -12,10 +12,9 @@
   </root>
 
   <logger name="altitude" level="DEBUG" />
-  <logger name="altitude.transactions" level="DEBUG" />
-  <logger name="org.fusesource.scalate.util" level="WARN" />
+  <logger name="altitude.transactions" level="INFO" />
+  <logger name="org.fusesource" level="WARN" />
   <logger name="org.atmosphere" level="WARN" />
-  <logger name="org.fusesource.scalate.servlet" level="WARN" />
   <logger name="org.scalatra.servlet.ScalatraListener" level="INFO" />
 
 

@@ -120,7 +120,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
           log.info("Client connected")
 
         case Disconnected(disconnector, Some(error)) =>
-          log.info("Client disconnected")
+          log.info("Client disconnected" + disconnector)
 
         case Error(Some(error)) =>
           // FIXME: log
