@@ -6,9 +6,21 @@
 <% attributes("screenTitle")= "Search" %>
 
 <div class="row">
-  <div class="col-md-2" style="margin: 0; padding: 0">
-    <div id="folders">
-      Folders
+  <div class="col-md-2" id="left">
+    <div class="row">
+      <div class="col-md-12" style="height: 60%">
+        <div id="folders">
+          <div class="header">
+            <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;&nbsp;Folders
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12" style="height: 40%">
+        <div id="preview">
+        </div>
+      </div>
     </div>
   </div>
 

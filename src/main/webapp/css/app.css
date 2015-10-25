@@ -131,7 +131,15 @@ footer {
 
 #folders {
     width: 100%;
-    height: 100%;
+    margin-top: .5em;
+    padding-left: .4em;
+}
+
+#folders .header {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: .9em;
+    color: #fff;
 }
 
 /* FORMS */
