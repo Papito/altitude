@@ -56,6 +56,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
 
           bind[AssetDao].toInstance(new postgres.AssetDao(app))
           bind[ImportProfileDao].toInstance(new postgres.ImportProfileDao(app))
+          bind[FolderDao].toInstance(new postgres.FolderDao(app))
         }
         case "sqlite" => {
           DriverManager.registerDriver(new org.sqlite.JDBC)
@@ -67,6 +68,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
 
           bind[AssetDao].toInstance(new sqlite.AssetDao(app))
           bind[ImportProfileDao].toInstance(new sqlite.ImportProfileDao(app))
+          bind[FolderDao].toInstance(new sqlite.FolderDao(app))
         }
         case _ => {
           throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
@@ -84,6 +86,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
     val library = new LibraryService(app)
     val asset = new AssetService(app)
     val preview = new PreviewService(app)
+    val folder = new FolderService(app)
     val importProfile = new ImportProfileService(app)
     val tagConfig = new TagConfigService(app)
 

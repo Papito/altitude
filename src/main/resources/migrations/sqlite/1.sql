@@ -19,6 +19,7 @@ CREATE TABLE asset  (
   updated_at timestamp DEFAULT NULL
 );
 CREATE UNIQUE INDEX asset_md5 ON asset(md5);
+CREATE UNIQUE INDEX asset_path ON asset(path);
 
 CREATE TABLE import_profile (
   id varchar(24) PRIMARY KEY,
@@ -30,12 +31,15 @@ CREATE TABLE import_profile (
 
 CREATE UNIQUE INDEX import_profile_name ON import_profile(name);
 
-CREATE TABLE folder(
+CREATE TABLE folder (
   id varchar(24) PRIMARY KEY,
   name varchar(255) NOT NULL,
-  parent_id varchar(24),
+  parent_id varchar(24) NOT NULL references folder(id),
+  numOfAssets INTEGER NOT NULL DEFAULT 0,
   created_at DATE DEFAULT (datetime('now', 'localtime')),
   updated_at timestamp WITHOUT TIME ZONE DEFAULT NULL
 );
+
+CREATE UNIQUE INDEX folder_parent_id_and_name ON folder(parent_id, name);
 
 INSERT INTO db_version (id, version) VALUES(1, 1);

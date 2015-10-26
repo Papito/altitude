@@ -27,6 +27,12 @@ object Const {
     val METADATA = "metadata"
   }
 
+  object Folder extends Common {
+    val NAME = "name"
+    val PARENT_ID = "parent_id"
+    val SIZE = "size"
+  }
+
   object Preview extends Common {
     val ASSET_ID =  "asset_id"
     val MIME_TYPE = "mime_type"

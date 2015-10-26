@@ -86,21 +86,30 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     recs.map{makeModel}
   }
 
-  protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object])(implicit txId: TransactionId): JsObject = {
-    //log.info(s"POSTGRES INSERT: $jsonIn", C.tag.DB)
-    val id = BaseModel.genId
+  protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object], id: Option[String] = None)
+                         (implicit txId: TransactionId): JsObject = {
+    log.info(s"JDBC INSERT: $jsonIn")
+
+    // create ID unless there is an override
+    val _id = id.isDefined match {
+      case false => BaseModel.genId
+      case true => id.get
+    }
     val createdAt = utcNow
 
     // prepend ID and CREATED AT to the values, as those are required for any record
-    val values: List[Object] = id :: vals
+    val values: List[Object] = _id :: vals
     //log.debug(s"SQL: $q. ARGS: ${values.toString()}")
 
     val runner: QueryRunner = new QueryRunner()
     runner.update(conn, q, values:_*)
 
-    jsonIn ++ JsObject(Seq(
-      C.Base.ID -> JsString(id),
+    val recordJson = jsonIn ++ JsObject(Seq(
+      C.Base.ID -> JsString(_id),
       C.Base.CREATED_AT -> dtAsJsString{createdAt}))
+
+    log.debug(s"Added: $recordJson")
+    recordJson
   }
 
   protected def manyBySqlQuery(sql: String, vals: List[Object])(implicit txId: TransactionId): List[Map[String, AnyRef]] = {
