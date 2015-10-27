@@ -16,13 +16,12 @@ import integration.util.Text
     val folder1: Folder = altitude.service.folder.add(
       Folder(name = Text.randomStr()))
 
-    folder1.parentId should not be None
+    folder1.parentId should be(None)
 
     val folder1_1: Folder = altitude.service.folder.add(
       Folder(name = Text.randomStr(), parentId = folder1.id))
 
     folder1_1.parentId should not be None
-    folder1_1.parentId.get should be(folder1.id.get)
 
     val folder1_2: Folder = altitude.service.folder.add(
       Folder(name = Text.randomStr(), parentId = folder1.id))
@@ -39,7 +38,7 @@ import integration.util.Text
     val folder2: Folder = altitude.service.folder.add(
       Folder(name = Text.randomStr()))
 
-    folder2.parentId should not be None
+    folder2.parentId should be(None)
 
     val folder2_1: Folder = altitude.service.folder.add(
       Folder(name = Text.randomStr(), parentId = folder2.id))
@@ -70,19 +69,11 @@ import integration.util.Text
     val folder1: Folder = altitude.service.folder.add(
       Folder(name = Text.randomStr()))
 
-    folder1.parentId should not be None
-
     val folder1_1: Folder = altitude.service.folder.add(
       Folder(name = Text.randomStr(), parentId = folder1.id))
 
-    folder1_1.parentId should not be None
-    folder1_1.parentId.get should be(folder1.id.get)
-
     val folder1_2: Folder = altitude.service.folder.add(
       Folder(name = Text.randomStr(), parentId = folder1.id))
-
-    folder1_2.parentId should not be None
-    folder1_2.parentId.get should be(folder1.id.get)
 
     altitude.service.folder.deleteById(folder1.id.get)
 
@@ -91,11 +82,13 @@ import integration.util.Text
     }
 
     // children should be removed as well
+/*
     intercept[NotFoundException] {
       altitude.service.folder.getById(folder1_1.id.get)
     }
     intercept[NotFoundException] {
       altitude.service.folder.getById(folder1_2.id.get)
     }
+*/
   }
 }

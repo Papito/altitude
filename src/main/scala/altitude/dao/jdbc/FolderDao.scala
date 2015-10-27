@@ -23,11 +23,8 @@ abstract class FolderDao(val app: Altitude) extends BaseJdbcDao("folder") with a
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     val folder = jsonIn: Folder
 
-    val folderId = BaseModel.genId
-
-    // parent id is THIS id, unless other parent id is given
     val parentId = folder.parentId match {
-      case None => folderId
+      case None => null
       case _ => folder.parentId.get
     }
 
@@ -41,7 +38,6 @@ abstract class FolderDao(val app: Altitude) extends BaseJdbcDao("folder") with a
       folder.name,
       parentId)
 
-    addRecord(jsonIn, sql, sqlVals, id = Some(folderId)) ++
-      JsObject(Seq(C.Folder.PARENT_ID -> JsString(parentId)))
+    addRecord(jsonIn, sql, sqlVals)
   }
 }

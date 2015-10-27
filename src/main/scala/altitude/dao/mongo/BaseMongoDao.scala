@@ -63,7 +63,11 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   override def deleteByQuery(q: Query)(implicit txId: TransactionId) = {
     val query = fixMongoQuery(q)
     val mongoQuery: DBObject = query.params
-    COLLECTION.remove(mongoQuery)
+    log.info(mongoQuery.toString)
+    val res = COLLECTION.remove(mongoQuery)
+    val numDeleted = res.getN
+    log.debug(s"Deleted records: $numDeleted")
+    numDeleted
   }
 
   override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = {
@@ -104,11 +108,11 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
 
   protected final def fixMongoQuery(q: Query): Query = {
     // _id -> id
-    q.params.contains("_id") match {
+    q.params.contains("id")  match {
       case false => q
       case true => {
-        val id = q.params.get("_id").get
-        val params = (q.params - "_id") ++ Map(C.Base.ID -> id)
+        val id = q.params.get("id").get
+        val params = (q.params - "id") ++ Map("_id" -> id)
         Query(params = params, rpp = q.rpp, page = q.page)
       }
     }

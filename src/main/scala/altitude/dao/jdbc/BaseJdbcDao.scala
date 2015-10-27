@@ -81,6 +81,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     val runner: QueryRunner = new QueryRunner()
     val numDeleted = runner.update(conn, sql,  q.params.values.toList:_*)
     log.debug(s"Deleted records: $numDeleted")
+    numDeleted
   }
 
   override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {

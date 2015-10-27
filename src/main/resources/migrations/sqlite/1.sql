@@ -36,7 +36,7 @@ CREATE UNIQUE INDEX import_profile_name ON import_profile(name);
 CREATE TABLE folder (
   id varchar(24) PRIMARY KEY,
   name varchar(255) NOT NULL,
-  parent_id varchar(24) NOT NULL references folder(id),
+  parent_id varchar(24),
   numOfAssets INTEGER NOT NULL DEFAULT 0,
   created_at DATE DEFAULT (datetime('now', 'localtime')),
   updated_at timestamp WITHOUT TIME ZONE DEFAULT NULL
