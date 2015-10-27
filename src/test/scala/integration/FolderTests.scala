@@ -75,7 +75,8 @@ import integration.util.Text
     val folder1_2: Folder = altitude.service.folder.add(
       Folder(name = Text.randomStr(), parentId = folder1.id))
 
-    altitude.service.folder.deleteById(folder1.id.get)
+    val deleted = altitude.service.folder.deleteById(folder1.id.get)
+    deleted should be(1)
 
     intercept[NotFoundException] {
       altitude.service.folder.getById(folder1.id.get)

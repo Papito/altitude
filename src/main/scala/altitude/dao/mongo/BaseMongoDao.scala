@@ -60,7 +60,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     )
   }
 
-  override def deleteByQuery(q: Query)(implicit txId: TransactionId) = {
+  override def deleteByQuery(q: Query)(implicit txId: TransactionId): Int = {
     val query = fixMongoQuery(q)
     val mongoQuery: DBObject = query.params
     log.info(mongoQuery.toString)

@@ -62,9 +62,9 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     }
   }
 
-  override def deleteByQuery(q: Query)(implicit txId: TransactionId): Unit = {
+  override def deleteByQuery(q: Query)(implicit txId: TransactionId): Int = {
     if (q.params.isEmpty) {
-      return
+      return 0
     }
 
     log.debug(s"Deleting record by query: $q")

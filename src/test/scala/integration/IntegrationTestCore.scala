@@ -53,7 +53,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     FileUtils.deleteDirectory(dataDirFile)
     FileUtils.forceMkdir(dataDirFile)
     dbUtilities.createTransaction(txId)
-    log.info(s"TX. Test transaction ID is ${txId.id}")
+    //log.debug(s"Test transaction ID is ${txId.id}")
   }
 
   override def afterEach() {
