@@ -40,12 +40,16 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     log.debug(s"Starting database INSERT for: $jsonIn")
 
-    // create DBObject for insert with input data  + required core attributes
-    val id: String = BaseModel.genId
+    // create id UNLESS specified
+    val id: String = (jsonIn \ C.Base.ID).asOpt[String] match {
+      case Some(id: String) => id
+      case _ => BaseModel.genId
+    }
+
     val createdAt = Util.utcNow
     val origObj: DBObject =  com.mongodb.util.JSON.parse(
       jsonIn.toString()).asInstanceOf[DBObject]
-    val coreAttrObj = MongoDBObject("id" -> id, "_id" -> id, C.Base.CREATED_AT -> createdAt)
+    val coreAttrObj = MongoDBObject("_id" -> id, C.Base.CREATED_AT -> createdAt)
     val obj: DBObject = origObj ++ coreAttrObj
 
     COLLECTION.insert(obj)

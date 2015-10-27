@@ -45,6 +45,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.VoidTransactionManager(app))
           bind[AssetDao].toInstance(new mongo.AssetDao(app))
           bind[ImportProfileDao].toInstance(new mongo.ImportProfileDao(app))
+          bind[FolderDao].toInstance(new mongo.FolderDao(app))
         }
         case "postgres" => {
           DriverManager.registerDriver(new org.postgresql.Driver)

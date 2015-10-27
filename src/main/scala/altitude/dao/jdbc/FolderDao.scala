@@ -24,6 +24,8 @@ abstract class FolderDao(val app: Altitude) extends BaseJdbcDao("folder") with a
     val folder = jsonIn: Folder
 
     val folderId = BaseModel.genId
+
+    // parent id is THIS id, unless other parent id is given
     val parentId = folder.parentId match {
       case None => folderId
       case _ => folder.parentId.get
