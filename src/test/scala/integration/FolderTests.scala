@@ -90,7 +90,7 @@ import integration.util.Text
       altitude.service.folder.getById(folder1.id.get)
     }
 
-    // children are removed as well
+    // children should be removed as well
     intercept[NotFoundException] {
       altitude.service.folder.getById(folder1_1.id.get)
     }
