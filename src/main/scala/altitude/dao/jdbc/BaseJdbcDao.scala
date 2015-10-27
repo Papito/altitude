@@ -61,7 +61,26 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
       case _ => Some(makeModel(rec.get))
     }
   }
-  override def deleteByQuery(q: Query)(implicit txId: TransactionId) = {
+
+  override def deleteByQuery(q: Query)(implicit txId: TransactionId): Unit = {
+    if (q.params.isEmpty) {
+      return
+    }
+
+    log.debug(s"Deleting record by query: $q")
+    val fieldPlaceholders: List[String] = for (field <- q.params.keys.toList) yield s"$field = ?"
+
+    // TODO: safeguards to prevent mass-deletion
+    val sql = s"""
+      DELETE
+        FROM $tableName
+       WHERE ${fieldPlaceholders.mkString(",")}
+      """
+
+    log.debug(s"Delete SQL: $sql, with values: ${q.params.values.toList}")
+    val runner: QueryRunner = new QueryRunner()
+    val numDeleted = runner.update(conn, sql,  q.params.values.toList:_*)
+    log.debug(s"Deleted records: $numDeleted")
   }
 
   override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {
@@ -130,7 +149,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     log.debug(s"Found ${res.size()} records", C.LogTag.DB)
 
     if (res.size() == 0)
-      throw new NotFoundException(C.IdType.QUERY, sql)
+      return None
 
     if (res.size() > 1)
       throw new Exception("getById should return only a single result")
