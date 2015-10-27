@@ -61,6 +61,8 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
       case _ => Some(makeModel(rec.get))
     }
   }
+  override def deleteByQuery(q: Query)(implicit txId: TransactionId) = {
+  }
 
   override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {
     val (sqlColumns, sqlValues) = query.params.unzip

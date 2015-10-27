@@ -53,11 +53,17 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     val obj: DBObject = origObj ++ coreAttrObj
 
     COLLECTION.insert(obj)
-    
+
     jsonIn ++ Json.obj(
       C.Base.ID -> JsString(id),
       C.Base.CREATED_AT -> Util.isoDateTime(Some(Util.utcNow))
     )
+  }
+
+  override def deleteByQuery(q: Query)(implicit txId: TransactionId) = {
+    val query = fixMongoQuery(q)
+    val mongoQuery: DBObject = query.params
+    COLLECTION.remove(mongoQuery)
   }
 
   override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = {
@@ -88,11 +94,23 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   /*
   Return a JSON record with timestamp and ID fields translated from Mongo's "extended" format
    */
-  protected def fixMongoFields(json: JsObject): JsObject = {
+  protected final def fixMongoFields(json: JsObject): JsObject = {
     json ++ Json.obj(
       C.Base.ID -> (json \ "_id").as[String],
       C.Base.CREATED_AT ->  (json \ C.Base.CREATED_AT \ "$date").asOpt[String],
       C.Base.UPDATED_AT -> (json \ C.Base.UPDATED_AT \ "$date").asOpt[String]
     )
+  }
+
+  protected final def fixMongoQuery(q: Query): Query = {
+    // _id -> id
+    q.params.contains("_id") match {
+      case false => q
+      case true => {
+        val id = q.params.get("_id").get
+        val params = (q.params - "_id") ++ Map(C.Base.ID -> id)
+        Query(params = params, rpp = q.rpp, page = q.page)
+      }
+    }
   }
 }

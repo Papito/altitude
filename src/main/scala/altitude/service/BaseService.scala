@@ -59,4 +59,16 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
       DAO.query(query)
     }
   }
+
+  def deleteById(id: String)(implicit txId: TransactionId = new TransactionId) = {
+    txManager.withTransaction[Unit] {
+      DAO.deleteById(id)
+    }
+  }
+
+  def deleteByQuery(query: Query)(implicit txId: TransactionId = new TransactionId) = {
+    txManager.withTransaction[Unit] {
+      DAO.deleteByQuery(query)
+    }
+  }
 }
