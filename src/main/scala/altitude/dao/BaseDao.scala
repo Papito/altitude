@@ -17,7 +17,7 @@ trait BaseDao {
   def query(q: Query)(implicit txId: TransactionId): List[JsObject]
 
   def deleteById(id: String)(implicit txId: TransactionId): Int = {
-    val q: Query = Query(params = Map(C.Base.ID -> id))
+    val q: Query = Query(Map(C.Base.ID -> id))
     deleteByQuery(q)
   }
 }
