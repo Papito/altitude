@@ -95,16 +95,24 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     }
 
     log.info("OFFSET " + (query.page - 1) * query.rpp)
-    val sql = s"""
+    val sqlWithoutPaging = s"""
       SELECT $DEFAULT_SQL_COLS_FOR_SELECT
         FROM $tableName
         $whereClause
-       LIMIT ${query.rpp}
-      OFFSET ${(query.page - 1) * query.rpp}"""
+    """
 
+    val sql = query.rpp match {
+      case 0 => sqlWithoutPaging
+      case _ => sqlWithoutPaging + s"""
+        LIMIT ${query.rpp}
+        OFFSET ${(query.page - 1) * query.rpp}"""
+    }
+
+    log.debug(s"QUERY: $sql")
     val recs = manyBySqlQuery(sql, sqlValues.toList)
 
     log.debug(s"Found: ${recs.length}")
+    log.debug(recs.map(_.toString()).mkString("\n"))
     recs.map{makeModel}
   }
 
@@ -157,7 +165,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
     val rec = res.get(0)
 
-    //log.debug(s"RECORD: $rec")
+    log.debug(s"RECORD: $rec")
     Some(rec.toMap[String, AnyRef])
   }
 

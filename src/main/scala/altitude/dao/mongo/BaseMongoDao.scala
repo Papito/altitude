@@ -85,7 +85,12 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
 
   override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {
     val mongoQuery: DBObject = query.params
-    val cursor: MongoCursor = COLLECTION.find(mongoQuery).skip((query.page - 1) * query.rpp).limit(query.rpp)
+
+    val cursor: MongoCursor = query.rpp match {
+      case 0 => COLLECTION.find(mongoQuery)
+      case _ => COLLECTION.find(mongoQuery).skip((query.page - 1) * query.rpp).limit(query.rpp)
+    }
+
     log.debug(s"Found ${cursor.length} records")
 
     // iterate through results and "fix" mongo fields

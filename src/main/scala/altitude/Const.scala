@@ -30,7 +30,8 @@ object Const {
   object Folder extends Common {
     val NAME = "name"
     val PARENT_ID = "parent_id"
-    val SIZE = "size"
+    val NUM_OF_ASSETS = "num_of_assets"
+    val CHILDREN = "children"
   }
 
   object Preview extends Common {
@@ -91,6 +92,10 @@ object Const {
       val QUERY_STRING = "queryString"
       val RESULTS_PER_PAGE = "rpp"
       val PAGE = "p"
+    }
+
+    object Folder {
+      val FOLDERS = "folder"
     }
 
     object TagConfig {

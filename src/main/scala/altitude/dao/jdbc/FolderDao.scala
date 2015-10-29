@@ -4,7 +4,7 @@ import altitude.transactions.TransactionId
 import altitude.{Const => C, Altitude}
 import altitude.models.{BaseModel, Folder}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsString, JsObject}
+import play.api.libs.json.{JsValue, JsString, JsObject}
 
 abstract class FolderDao(val app: Altitude) extends BaseJdbcDao("folder") with altitude.dao.FolderDao {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -13,8 +13,11 @@ abstract class FolderDao(val app: Altitude) extends BaseJdbcDao("folder") with a
     val model = Folder(
       id = Some(rec.get(C.Folder.ID).get.asInstanceOf[String]),
       name = rec.get(C.Folder.NAME).get.asInstanceOf[String],
-      parentId = Some(rec.get(C.Folder.PARENT_ID).get.asInstanceOf[String]),
-      size = rec.get(C.Folder.SIZE).get.asInstanceOf[Int]
+      parentId = rec.get(C.Folder.PARENT_ID).get match {
+        case null => None
+        case v @ _ => Some( rec.get(C.Folder.PARENT_ID).get.asInstanceOf[String])
+      },
+      numOfAssets = rec.get(C.Folder.NUM_OF_ASSETS).get.asInstanceOf[Int]
     )
     addCoreAttrs(model, rec)
     model

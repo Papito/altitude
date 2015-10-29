@@ -13,7 +13,7 @@ trait BaseDao {
   def add(json: JsObject)(implicit txId: TransactionId): JsObject
   def deleteByQuery(q: Query)(implicit txId: TransactionId): Int
   def getById(id: String)(implicit txId: TransactionId): Option[JsObject]
-  def getAll()(implicit txId: TransactionId): List[JsObject] = throw new NotImplementedError
+  def getAll()(implicit txId: TransactionId): List[JsObject] = query(Query())
   def query(q: Query)(implicit txId: TransactionId): List[JsObject]
 
   def deleteById(id: String)(implicit txId: TransactionId): Int = {
