@@ -74,6 +74,7 @@ import altitude.{Const => C}
     folder1_1
       folder1_1_1
         folder1_1_1_1
+        folder1_1_1_2
     folder1_2
   */
     val folder1: Folder = altitude.service.folder.add(
@@ -88,11 +89,14 @@ import altitude.{Const => C}
     val folder1_1_1_1: Folder = altitude.service.folder.add(
       Folder(name = "folder1_1_1_1", parentId = folder1_1_1.id))
 
+    val folder1_1_1_2: Folder = altitude.service.folder.add(
+      Folder(name = "folder1_1_1_2", parentId = folder1_1_1.id))
+
     val folder1_2: Folder = altitude.service.folder.add(
       Folder(name = "folder1_2", parentId = folder1.id))
 
     val deleted = altitude.service.folder.deleteById(folder1.id.get)
-    deleted should be(1)
+    deleted should be(6)
 
     intercept[NotFoundException] {
       altitude.service.folder.getById(folder1.id.get)
@@ -107,6 +111,9 @@ import altitude.{Const => C}
     }
     intercept[NotFoundException] {
       altitude.service.folder.getById(folder1_1_1_1.id.get)
+    }
+    intercept[NotFoundException] {
+      altitude.service.folder.getById(folder1_1_1_2.id.get)
     }
     intercept[NotFoundException] {
       altitude.service.folder.getById(folder1_2.id.get)
