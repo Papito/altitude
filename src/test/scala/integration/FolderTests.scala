@@ -1,6 +1,6 @@
 package integration
 
-import altitude.exceptions.NotFoundException
+import altitude.exceptions.{DuplicateException, NotFoundException}
 import altitude.models.Folder
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
@@ -17,18 +17,17 @@ import altitude.{Const => C}
     val folder1: Folder = altitude.service.folder.add(
       Folder(name = "folder1"))
 
-    folder1.parentId should be(None)
+    folder1.parentId should be("0")
 
     val folder1_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_1", parentId = folder1.id))
+      Folder(name = "folder1_1", parentId = folder1.id.get))
 
     folder1_1.parentId should not be None
 
     val folder1_2: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_2", parentId = folder1.id))
+      Folder(name = "folder1_2", parentId = folder1.id.get))
 
-    folder1_2.parentId should not be None
-    folder1_2.parentId.get should be(folder1.id.get)
+    folder1.id should contain(folder1_2.parentId)
 
     /*
       folder2
@@ -39,26 +38,23 @@ import altitude.{Const => C}
     val folder2: Folder = altitude.service.folder.add(
       Folder(name = "folder2"))
 
-    folder2.parentId should be(None)
+    folder2.parentId should be("0")
 
     val folder2_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder2_1", parentId = folder2.id))
+      Folder(name = "folder2_1", parentId = folder2.id.get))
 
-    folder2_1.parentId should not be None
-    folder2_1.parentId.get should be(folder2.id.get)
+    folder2.id should contain(folder2_1.parentId)
 
     val folder2_1_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder2_1_1", parentId = folder2_1.id))
+      Folder(name = "folder2_1_1", parentId = folder2_1.id.get))
 
-    folder2_1_1.parentId should not be None
-    folder2_1_1.parentId.get should be(folder2_1.id.get)
+    folder2_1.id should contain(folder2_1_1.parentId)
 
 
     val folder2_2: Folder = altitude.service.folder.add(
-      Folder(name = "folder2_2", parentId = folder2.id))
+      Folder(name = "folder2_2", parentId = folder2.id.get))
 
-    folder2_2.parentId should not be None
-    folder2_2.parentId.get should be(folder2.id.get)
+    folder2.id should contain(folder2_2.parentId)
 
     val folders = altitude.service.folder.getHierarchy()
     folders.size should be(2)
@@ -66,6 +62,17 @@ import altitude.{Const => C}
     folders(1).children.size should be (2)
     folders(1).children.head.children.size should be(1)
     folders(1).children(1).children.size should be(0)
+  }
+
+  test("duplicate") {
+    val folder: Folder = altitude.service.folder.add(Folder(name = "folder1"))
+
+    intercept[DuplicateException] {
+      altitude.service.folder.add(Folder(name = folder.name))
+    }
+
+    val folders = altitude.service.folder.getHierarchy()
+    folders.size should be(1)
   }
 
   test("delete folder") {
@@ -81,19 +88,19 @@ import altitude.{Const => C}
       Folder(name = "folder1"))
 
     val folder1_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_1", parentId = folder1.id))
+      Folder(name = "folder1_1", parentId = folder1.id.get))
 
     val folder1_1_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_1_1", parentId = folder1_1.id))
+      Folder(name = "folder1_1_1", parentId = folder1_1.id.get))
 
     val folder1_1_1_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_1_1_1", parentId = folder1_1_1.id))
+      Folder(name = "folder1_1_1_1", parentId = folder1_1_1.id.get))
 
     val folder1_1_1_2: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_1_1_2", parentId = folder1_1_1.id))
+      Folder(name = "folder1_1_1_2", parentId = folder1_1_1.id.get))
 
     val folder1_2: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_2", parentId = folder1.id))
+      Folder(name = "folder1_2", parentId = folder1.id.get))
 
     val deleted = altitude.service.folder.deleteById(folder1.id.get)
     deleted should be(6)

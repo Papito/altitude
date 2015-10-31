@@ -13,26 +13,26 @@ object Folder {
       id = (json \ C.Folder.ID).asOpt[String],
       name = (json \ C.Folder.NAME).as[String],
       children = childrenJson.map(Folder.fromJson),
-      parentId = (json \ C.Folder.PARENT_ID).asOpt[String],
+      parentId = (json \ C.Folder.PARENT_ID).as[String],
       numOfAssets = (json \ C.Folder.NUM_OF_ASSETS).as[Int]
     ).withCoreAttr(json)
   }
 }
 
 case class Folder(id: Option[String] = None,
-                  parentId: Option[String] = None,
+                  parentId: String = C.Folder.Ids.ROOT_PARENT,
                   name: String,
                   children: List[Folder] = List(),
                   numOfAssets: Int = 0) extends BaseModel {
+
+  private val nameLowercase = name.toLowerCase
 
   override def toJson = {
     val childrenJson: List[JsValue] = children.map(_.toJson)
     Json.obj(
       C.Folder.NAME -> name,
-      C.Folder.PARENT_ID -> {parentId match {
-        case None => JsNull
-        case _ => parentId.get
-      }},
+      C.Folder.NAME_LC -> nameLowercase,
+      C.Folder.PARENT_ID -> parentId,
       C.Folder.CHILDREN ->  JsArray(childrenJson),
       C.Folder.NUM_OF_ASSETS -> numOfAssets
     ) ++ coreJsonAttrs

@@ -17,17 +17,19 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   private final val log = LoggerFactory.getLogger(getClass)
   override protected val DAO = app.injector.instance[FolderDao]
 
-  def getHierarchy(rootId: Option[String] = None)(implicit txId: TransactionId) = findChildren(DAO.getAll())
+  def getHierarchy(rootId: String = C.Folder.Ids.ROOT_PARENT)(implicit txId: TransactionId) = {
+    findChildren(DAO.getAll(), parentId = rootId)
+  }
 
-  private def findChildren(all: List[JsValue], parentId: Option[String] = None): List[Folder] = {
+  private def findChildren(all: List[JsValue], parentId: String): List[Folder] = {
     val children = all.filter(json =>
-      (json \ C.Folder.PARENT_ID).asOpt[String] == parentId)
+      (json \ C.Folder.PARENT_ID).as[String] == parentId)
 
     for (folder <- children) yield  {
-      val id: Option[String] = (folder \ C.Folder.ID).asOpt[String]
+      val id: String = (folder \ C.Folder.ID).as[String]
       val name = (folder \ C.Folder.NAME).as[String]
 
-      Folder(id = id, name = name,
+      Folder(id = Some(id), name = name,
         children = findChildren(all, id))
     }
   }

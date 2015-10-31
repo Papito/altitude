@@ -13,10 +13,7 @@ abstract class FolderDao(val app: Altitude) extends BaseJdbcDao("folder") with a
     val model = Folder(
       id = Some(rec.get(C.Folder.ID).get.asInstanceOf[String]),
       name = rec.get(C.Folder.NAME).get.asInstanceOf[String],
-      parentId = rec.get(C.Folder.PARENT_ID).get match {
-        case null => None
-        case v @ _ => Some( rec.get(C.Folder.PARENT_ID).get.asInstanceOf[String])
-      },
+      parentId = rec.get(C.Folder.PARENT_ID).get.asInstanceOf[String],
       numOfAssets = rec.get(C.Folder.NUM_OF_ASSETS).get.asInstanceOf[Int]
     )
     addCoreAttrs(model, rec)
@@ -26,11 +23,6 @@ abstract class FolderDao(val app: Altitude) extends BaseJdbcDao("folder") with a
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     val folder = jsonIn: Folder
 
-    val parentId = folder.parentId match {
-      case None => null
-      case _ => folder.parentId.get
-    }
-
     val sql = s"""
         INSERT INTO $tableName (
              $CORE_SQL_COLS_FOR_INSERT, ${C.Folder.NAME}, ${C.Folder.PARENT_ID})
@@ -39,7 +31,7 @@ abstract class FolderDao(val app: Altitude) extends BaseJdbcDao("folder") with a
 
     val sqlVals: List[Object] = List(
       folder.name,
-      parentId)
+      folder.parentId)
 
     addRecord(jsonIn, sql, sqlVals)
   }
