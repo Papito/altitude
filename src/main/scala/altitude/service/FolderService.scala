@@ -17,6 +17,14 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   private final val log = LoggerFactory.getLogger(getClass)
   override protected val DAO = app.injector.instance[FolderDao]
 
+  def add(folder: Folder)(implicit txId: TransactionId): JsObject = {
+    val dupQuery = Query(Map(
+      C.Folder.PARENT_ID -> folder.parentId,
+      C.Folder.NAME_LC -> folder.nameLowercase))
+
+    super.add(folder, Some(dupQuery))
+  }
+
   def getHierarchy(rootId: String = C.Folder.Ids.ROOT_PARENT)(implicit txId: TransactionId) = {
     findChildren(DAO.getAll(), parentId = rootId)
   }

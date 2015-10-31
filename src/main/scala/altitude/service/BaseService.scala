@@ -1,12 +1,13 @@
 package altitude.service
 
 import altitude.dao.BaseDao
-import altitude.exceptions.NotFoundException
+import altitude.exceptions.{DuplicateException, NotFoundException}
 import altitude.models.BaseModel
 import altitude.models.search.Query
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import altitude.{Const => C, Altitude}
 import net.codingwell.scalaguice.InjectorExtensions._
+import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import altitude.Validators.Validator
 import altitude.Cleaners.Cleaner
@@ -14,13 +15,26 @@ import altitude.Cleaners.Cleaner
 import scala.language.implicitConversions
 
 abstract class BaseService[Model <: BaseModel](app: Altitude) {
+  private final val log = LoggerFactory.getLogger(getClass)
   protected val DAO: BaseDao
   protected val txManager = app.injector.instance[AbstractTransactionManager]
   protected val VALIDATOR: Option[Validator] = None
   protected val CLEANER: Option[Cleaner] = None
 
-  def add(objIn: Model)(implicit txId: TransactionId = new TransactionId): JsObject = {
-    // clean
+  def add(objIn: Model, queryForDup: Option[Query] = None)(implicit txId: TransactionId = new TransactionId): JsObject = {
+    val cleaned = cleanAndValidate(objIn)
+
+    if (queryForDup.isDefined && query(queryForDup.get).nonEmpty) {
+      log.debug(s"Duplicate found for $objIn and query: ${queryForDup.get.params}")
+      throw new DuplicateException(objIn)
+    }
+
+    txManager.withTransaction[JsObject] {
+      DAO.add(cleaned)
+    }
+  }
+
+  def cleanAndValidate(objIn: Model): JsObject = {
     val cleaned = CLEANER match {
       case None => objIn.toJson
       case _ => CLEANER.get.clean(objIn.toJson)
@@ -28,12 +42,11 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
 
     // validate
     VALIDATOR match {
-      case Some(validator) => VALIDATOR.get.validate(cleaned)
-      case None => 
-    }
-
-    txManager.withTransaction[JsObject] {
-      DAO.add(cleaned)
+      case Some(validator) => {
+        VALIDATOR.get.validate(cleaned)
+        cleaned
+      }
+      case _ => cleaned
     }
   }
 

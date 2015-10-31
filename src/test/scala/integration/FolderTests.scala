@@ -64,7 +64,6 @@ import altitude.{Const => C}
     folders(1).children(1).children.size should be(0)
   }
 
-/*
   test("duplicate") {
     val folder: Folder = altitude.service.folder.add(Folder(name = "folder1"))
 
@@ -75,7 +74,6 @@ import altitude.{Const => C}
     val folders = altitude.service.folder.getHierarchy()
     folders.size should be(1)
   }
-*/
 
   test("delete folder") {
     /*

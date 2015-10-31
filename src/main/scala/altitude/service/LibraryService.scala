@@ -29,7 +29,7 @@ class LibraryService(app: Altitude) {
 
       if (existing.nonEmpty) {
         log.warn(s"Asset already exists for ${obj.path}")
-        throw new DuplicateException(obj)
+        throw new DuplicateException(obj.toJson)
       }
 
       val assetJson: JsObject = app.service.asset.add(obj)

@@ -91,7 +91,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
     val whereClause = whereClauses.length match {
       case 0 => ""
-      case _ => s"""WHERE ${whereClauses.mkString("AND")}"""
+      case _ => s"""WHERE ${whereClauses.mkString(" AND ")}"""
     }
 
     log.info("OFFSET " + (query.page - 1) * query.rpp)
@@ -108,7 +108,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
         OFFSET ${(query.page - 1) * query.rpp}"""
     }
 
-    log.debug(s"QUERY: $sql")
+    log.debug(s"QUERY: $sql with $sqlValues")
     val recs = manyBySqlQuery(sql, sqlValues.toList)
 
     log.debug(s"Found: ${recs.length}")
