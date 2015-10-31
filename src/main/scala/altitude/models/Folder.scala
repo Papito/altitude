@@ -25,7 +25,7 @@ case class Folder(id: Option[String] = None,
                   children: List[Folder] = List(),
                   numOfAssets: Int = 0) extends BaseModel {
 
-  private val nameLowercase = name.toLowerCase
+  val nameLowercase = name.toLowerCase
 
   override def toJson = {
     val childrenJson: List[JsValue] = children.map(_.toJson)
