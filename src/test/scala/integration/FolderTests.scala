@@ -55,16 +55,20 @@ import altitude.{Const => C}
 
     folder2.id should contain(folder2_2.parentId)
 
-    val folders = altitude.service.folder.getHierarchy()
+    val folders = altitude.service.folder.hierarchy()
     folders.size should be(2)
     folders.head.children.size should be (2)
     folders(1).children.size should be (2)
     folders(1).children.head.children.size should be(1)
     folders(1).children(1).children.size should be(0)
 
+
     // check immediate children of the second folder
-    val immediateChildren = altitude.app.service.folder.getImmediateChildren(rootId = folder2_1.id.get)
+    val immediateChildren = altitude.app.service.folder.immediateChildren(rootId = folder2_1.id.get)
     immediateChildren.size should be (1)
+
+
+    // check breadcrumb
   }
 
   test("duplicate") {
@@ -74,7 +78,7 @@ import altitude.{Const => C}
       altitude.service.folder.add(Folder(name = folder.name))
     }
 
-    val folders = altitude.service.folder.getHierarchy()
+    val folders = altitude.service.folder.hierarchy()
     folders.size should be(1)
   }
 

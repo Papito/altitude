@@ -25,13 +25,21 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     super.add(folder, Some(dupQuery))
   }
 
-  def getHierarchy(rootId: String = C.Folder.Ids.ROOT_PARENT)(implicit txId: TransactionId) = {
-    getChildren(DAO.getAll(), parentId = rootId)
+  def hierarchy(rootId: String = C.Folder.Ids.ROOT_PARENT)(implicit txId: TransactionId) = {
+    children(DAO.getAll(), parentId = rootId)
   }
 
-  /** Get children for the root given, but only a single level - non-recursive
+  /**
+   * Breadcrumbs
    */
-  def getImmediateChildren(rootId: String = C.Folder.Ids.ROOT_PARENT, all: List[JsValue] = List())
+  def path(folderId: String): List[Folder] = {
+    List[Folder]()
+  }
+
+  /**
+   * Get children for the root given, but only a single level - non-recursive
+   */
+  def immediateChildren(rootId: String = C.Folder.Ids.ROOT_PARENT, all: List[JsValue] = List())
                           (implicit txId: TransactionId) = {
     (all.isEmpty match {
       case true => DAO.getAll()
@@ -39,16 +47,16 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     }) filter (json => (json \ C.Folder.PARENT_ID).as[String] == rootId)
   }
 
-  private def getChildren(all: List[JsValue], parentId: String)
+  private def children(all: List[JsValue], parentId: String)
                          (implicit txId: TransactionId): List[Folder] = {
-    val children = getImmediateChildren(parentId, all)
+    val immediateChildren = this.immediateChildren(parentId, all)
 
-    for (folder <- children) yield  {
+    for (folder <- immediateChildren) yield  {
       val id: String = (folder \ C.Folder.ID).as[String]
       val name = (folder \ C.Folder.NAME).as[String]
 
       Folder(id = Some(id), name = name,
-        children = getChildren(all, id))
+        children = this.children(all, id))
     }
   }
 
@@ -64,7 +72,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       log.info(s"Deleting folder $folder")
 
       // get the list of tuples - (depth, id), with most-deep first
-      val childrenAndDepths: List[(Int, String)] = findChildrenAndFlatten(DAO.getAll(), id).sortBy(_._1).reverse
+      val childrenAndDepths: List[(Int, String)] = flatChildren(DAO.getAll(), id).sortBy(_._1).reverse
 
       // now delete the children, most-deep first
       childrenAndDepths.foreach{t =>
@@ -76,13 +84,13 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     }
   }
 
-  private def findChildrenAndFlatten(all: List[JsValue], parentId: String, depth: Int = 0): List[(Int, String)]  = {
+  private def flatChildren(all: List[JsValue], parentId: String, depth: Int = 0): List[(Int, String)]  = {
     val children = all.filter(j => (j \ C.Folder.PARENT_ID).asOpt[String].contains(parentId))
 
     // recursively combine with the result of deeper child levels + this one (depth-first)
     (depth, parentId) :: children.foldLeft(List[(Int, String)]()) { (res, json) =>
       val folderId = (json \ C.Folder.ID).as[String]
-      res ++ findChildrenAndFlatten(all, folderId, depth + 1)}
+      res ++ flatChildren(all, folderId, depth + 1)}
   }
 
   override def deleteByQuery(query: Query)(implicit txId: TransactionId = new TransactionId): Int = {
