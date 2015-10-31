@@ -56,19 +56,22 @@ import altitude.{Const => C}
     folder2.id should contain(folder2_2.parentId)
 
     val folders = altitude.service.folder.hierarchy()
-    folders.size should be(2)
-    folders.head.children.size should be (2)
-    folders(1).children.size should be (2)
-    folders(1).children.head.children.size should be(1)
-    folders(1).children(1).children.size should be(0)
-
+    folders.length should be(2)
+    folders.head.children.length should be (2)
+    folders(1).children.length should be (2)
+    folders(1).children.head.children.length should be(1)
+    folders(1).children(1).children.length should be(0)
 
     // check immediate children of the second folder
     val immediateChildren = altitude.app.service.folder.immediateChildren(rootId = folder2_1.id.get)
-    immediateChildren.size should be (1)
+    immediateChildren.length should be (1)
 
 
     // check breadcrumb
+    val path = altitude.app.service.folder.path(folderId = folder2_1_1.id.get)
+    path.length should be(3)
+    path.head.id should be(folder2.id)
+    path.last.id should be(folder2_1_1.id)
   }
 
   test("duplicate") {
@@ -79,7 +82,7 @@ import altitude.{Const => C}
     }
 
     val folders = altitude.service.folder.hierarchy()
-    folders.size should be(1)
+    folders.length should be(1)
   }
 
   test("delete folder") {

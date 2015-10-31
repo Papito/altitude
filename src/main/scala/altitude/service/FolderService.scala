@@ -32,8 +32,29 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   /**
    * Breadcrumbs
    */
-  def path(folderId: String): List[Folder] = {
-    List[Folder]()
+  def path(folderId: String)(implicit txId: TransactionId): List[Folder] = {
+    val all = getAll()
+
+    val folderEl = all.filter(json => (json \ C.Folder.ID).as[String] == folderId).head
+    val folder: Folder = Folder.fromJson(folderEl)
+    val parents = findParents(folderId =folderId, all = getAll())
+
+    (folder :: parents).reverse
+  }
+
+  def findParents(folderId: String, all: List[JsValue] = List()):  List[Folder] = {
+    //FIXME: NotFoundException
+    val folderEl = all.filter(json => (json \ C.Folder.ID).as[String] == folderId).head
+    val parentId = (folderEl \ C.Folder.PARENT_ID).as[String]
+    val parentElements = all filter (json => (json \ C.Folder.ID).as[String] == parentId)
+
+    parentElements.isEmpty match {
+      case true => List()
+      case false => {
+        val folder = Folder.fromJson(parentElements.head)
+        List(folder) ++ findParents(folderId = folder.id.get, all)
+      }
+    }
   }
 
   /**
@@ -80,15 +101,15 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
         DAO.deleteById(folderId)}
 
       // return number of folders deleted
-      childrenAndDepths.size
+      childrenAndDepths.length
     }
   }
 
   private def flatChildren(all: List[JsValue], parentId: String, depth: Int = 0): List[(Int, String)]  = {
-    val children = all.filter(j => (j \ C.Folder.PARENT_ID).asOpt[String].contains(parentId))
+    val childElements = all.filter(j => (j \ C.Folder.PARENT_ID).asOpt[String].contains(parentId))
 
     // recursively combine with the result of deeper child levels + this one (depth-first)
-    (depth, parentId) :: children.foldLeft(List[(Int, String)]()) { (res, json) =>
+    (depth, parentId) :: childElements.foldLeft(List[(Int, String)]()) { (res, json) =>
       val folderId = (json \ C.Folder.ID).as[String]
       res ++ flatChildren(all, folderId, depth + 1)}
   }
