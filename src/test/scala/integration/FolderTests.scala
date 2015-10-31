@@ -50,7 +50,6 @@ import altitude.{Const => C}
 
     folder2_1.id should contain(folder2_1_1.parentId)
 
-
     val folder2_2: Folder = altitude.service.folder.add(
       Folder(name = "folder2_2", parentId = folder2.id.get))
 
@@ -62,6 +61,10 @@ import altitude.{Const => C}
     folders(1).children.size should be (2)
     folders(1).children.head.children.size should be(1)
     folders(1).children(1).children.size should be(0)
+
+    // check immediate children of the second folder
+    val immediateChildren = altitude.app.service.folder.getImmediateChildren(rootId = folder2_1.id.get)
+    immediateChildren.size should be (1)
   }
 
   test("duplicate") {

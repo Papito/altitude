@@ -26,19 +26,29 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   }
 
   def getHierarchy(rootId: String = C.Folder.Ids.ROOT_PARENT)(implicit txId: TransactionId) = {
-    findChildren(DAO.getAll(), parentId = rootId)
+    getChildren(DAO.getAll(), parentId = rootId)
   }
 
-  private def findChildren(all: List[JsValue], parentId: String): List[Folder] = {
-    val children = all.filter(json =>
-      (json \ C.Folder.PARENT_ID).as[String] == parentId)
+  /** Get children for the root given, but only a single level - non-recursive
+   */
+  def getImmediateChildren(rootId: String = C.Folder.Ids.ROOT_PARENT, all: List[JsValue] = List())
+                          (implicit txId: TransactionId) = {
+    (all.isEmpty match {
+      case true => DAO.getAll()
+      case false => all
+    }) filter (json => (json \ C.Folder.PARENT_ID).as[String] == rootId)
+  }
+
+  private def getChildren(all: List[JsValue], parentId: String)
+                         (implicit txId: TransactionId): List[Folder] = {
+    val children = getImmediateChildren(parentId, all)
 
     for (folder <- children) yield  {
       val id: String = (folder \ C.Folder.ID).as[String]
       val name = (folder \ C.Folder.NAME).as[String]
 
       Folder(id = Some(id), name = name,
-        children = findChildren(all, id))
+        children = getChildren(all, id))
     }
   }
 
