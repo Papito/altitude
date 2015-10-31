@@ -66,12 +66,29 @@ import altitude.{Const => C}
     val immediateChildren = altitude.app.service.folder.immediateChildren(rootId = folder2_1.id.get)
     immediateChildren.length should be (1)
 
-
     // check breadcrumb
     val path = altitude.app.service.folder.path(folderId = folder2_1_1.id.get)
     path.length should be(3)
     path.head.id should be(folder2.id)
     path.last.id should be(folder2_1_1.id)
+  }
+
+  test("bad root for immediate children") {
+    intercept[NotFoundException] {
+      altitude.app.service.folder.immediateChildren(rootId = "bogus")
+    }
+  }
+
+  test("bad hierarchy root") {
+    intercept[NotFoundException] {
+      altitude.service.folder.hierarchy(rootId = "bogus")
+    }
+  }
+
+  test("bad path") {
+    intercept[NotFoundException] {
+      altitude.app.service.folder.path(folderId = "bogus")
+    }
   }
 
   test("duplicate") {
@@ -134,6 +151,12 @@ import altitude.{Const => C}
     }
     intercept[NotFoundException] {
       altitude.service.folder.getById(folder1_2.id.get)
+    }
+  }
+
+  test("delete bad folder") {
+    intercept[NotFoundException] {
+      altitude.service.folder.deleteById("bogus")
     }
   }
 }

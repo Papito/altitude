@@ -3,7 +3,6 @@ package altitude.dao.jdbc
 import java.sql.Connection
 
 import altitude.dao.BaseDao
-import altitude.exceptions.NotFoundException
 import altitude.models.BaseModel
 import altitude.models.search.Query
 import altitude.transactions.{JdbcTransactionManager, TransactionId}

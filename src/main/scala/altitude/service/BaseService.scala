@@ -56,7 +56,7 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
 
       res.isDefined match {
         case true => res.get
-        case false => throw new NotFoundException(C.IdType.ID, id)
+        case false => throw new NotFoundException(s"Cannot find ID '$id'")
       }
     }
   }
