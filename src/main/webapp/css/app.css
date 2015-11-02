@@ -1,3 +1,9 @@
+/* BS OVERRIDES */
+
+.form-control {
+    height: 2em;
+}
+
 /* GLOBAL */
 html, body {
     height: 100%;
@@ -131,10 +137,14 @@ footer {
     border: outset #0c0d0e;
 }
 
+#addFolderForm input {
+    margin-top: 1em;
+    width: 100%;
+}
+
 /* FOLDERS */
 
 #folders {
-    width: 100%;
     margin-top: .5em;
     padding-left: .4em;
 }

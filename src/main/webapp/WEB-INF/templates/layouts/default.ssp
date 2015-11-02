@@ -10,9 +10,9 @@
 <head>
 <title>${config.getString("app.name")}</title>
 
-<link rel="stylesheet" type="text/css" href="/static/css/app.css?<%= altitude.Util.randomStr(10) %>">
 <link rel="stylesheet" type="text/css" href="/static/css/lib/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="/static/css/lib/select2.css">
+<link rel="stylesheet" type="text/css" href="/static/css/app.css">
 
 <script src="/static/js/lib/jquery-2.1.1.min.js"></script>
 <script src="/static/js/lib/bootstrap.js"></script>

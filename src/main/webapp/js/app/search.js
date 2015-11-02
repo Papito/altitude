@@ -6,6 +6,7 @@ SearchViewModel = BaseViewModel.extend({
     console.log('Initializing search view model');
 
     this.searchResults = ko.observableArray();
+    this._showAddFolder = ko.observable(false);
 
     this.resultBoxBorder = 2; //pixels
     this.resultBoxMargin = ko.observable();
@@ -16,6 +17,11 @@ SearchViewModel = BaseViewModel.extend({
     this.resultBoxSize = null;
 
     this.getResultBoxSize();
+
+    $('#addFolderForm').on('submit', function(e) {
+      e.preventDefault();
+      console.log("HERE");
+    });
   },
 
   search: function(append, page) {
@@ -23,13 +29,13 @@ SearchViewModel = BaseViewModel.extend({
     var content = $("#searchResults");
 
     if (page == 1) {
-      content.attr("tabindex",-1).focus();
+      content.attr("tabindex", -1).focus();
     }
 
     var gridAdjustment = Util.getGridAdjustment(
         content, self.resultBoxSize, self.resultBoxBorder
     );
-    console.log(gridAdjustment);
+    //console.log(gridAdjustment);
     self.resultBoxMargin(gridAdjustment.boxMargin);
     self.resultBoxPadding(gridAdjustment.boxPadding);
     self.resultBoxWidth(gridAdjustment.boxWidth);
@@ -68,6 +74,14 @@ SearchViewModel = BaseViewModel.extend({
     this.get('/api/v1/search' + queryString + "&rpp=" + rpp + "&p=" + page, opts);
   },
 
+  showAddFolder: function() {
+    this._showAddFolder(true);
+    $('#addFolder').find('input').attr("tabindex",-1).focus();
+  },
+
+  hideAddFolder: function() {
+    this._showAddFolder(false);
+  },
   getResultBoxSize: function() {
     var self = this;
     var opts = {
