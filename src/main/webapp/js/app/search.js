@@ -3,6 +3,7 @@ SearchViewModel = BaseViewModel.extend({
     "use strict";
 
     this.base();
+    var self = this;
     console.log('Initializing search view model');
 
     this.searchResults = ko.observableArray();
@@ -20,7 +21,7 @@ SearchViewModel = BaseViewModel.extend({
 
     $('#addFolderForm').on('submit', function(e) {
       e.preventDefault();
-      console.log("HERE");
+      self.addFolder();
     });
   },
 
@@ -82,6 +83,21 @@ SearchViewModel = BaseViewModel.extend({
   hideAddFolder: function() {
     this._showAddFolder(false);
   },
+
+  addFolder: function() {
+    var opts = {
+      'successCallback': function (json) {
+        console.log(json);
+      },
+      data: {
+        'name': $('#newFolderName').val(),
+        'parentId': "0"
+      }
+    };
+
+    this.post('/api/v1/folders', opts);
+  },
+
   getResultBoxSize: function() {
     var self = this;
     var opts = {

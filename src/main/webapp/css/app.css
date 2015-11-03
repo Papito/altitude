@@ -134,7 +134,7 @@ footer {
 
 #searchResults .result-box {
     float: left;
-    border: outset #0c0d0e;
+    border: solid #0c0d0e;
 }
 
 #addFolderForm input {

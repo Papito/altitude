@@ -17,7 +17,8 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   private final val log = LoggerFactory.getLogger(getClass)
   override protected val DAO = app.injector.instance[FolderDao]
 
-  def add(folder: Folder)(implicit txId: TransactionId): JsObject = {
+  override def add(folder: Folder, queryForDup: Option[Query] = None)
+                  (implicit txId: TransactionId = new TransactionId): JsObject = {
     val dupQuery = Query(Map(
       C.Folder.PARENT_ID -> folder.parentId,
       C.Folder.NAME_LC -> folder.nameLowercase))

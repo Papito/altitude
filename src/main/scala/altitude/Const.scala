@@ -100,6 +100,9 @@ object Const {
 
     object Folder {
       val FOLDERS = "folder"
+      val FOLDER = "folder"
+      val NAME = "name"
+      val PARENT_ID = "parentId"
     }
 
     object TagConfig {
