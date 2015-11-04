@@ -125,6 +125,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
       // get the list of tuples - (depth, id), with most-deep first
       val childrenAndDepths: List[(Int, String)] = flatChildren(DAO.getAll(), id).sortBy(_._1).reverse
+                                                                               /* sort by depth */
 
       // now delete the children, most-deep first
       childrenAndDepths.foreach{t =>
