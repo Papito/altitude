@@ -10,7 +10,7 @@ import play.api.libs.json.Json
 class FolderController  extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override val POST_VALIDATOR = Some(ApiValidator(List(
+  override val HTTP_POST_VALIDATOR = Some(ApiValidator(List(
     C.Api.Folder.NAME, C.Api.Folder.PARENT_ID
   )))
 

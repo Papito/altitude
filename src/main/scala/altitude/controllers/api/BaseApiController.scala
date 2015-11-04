@@ -10,13 +10,13 @@ import altitude.{Const => C}
 
 class BaseApiController extends BaseController with GZipSupport {
   private final val log = LoggerFactory.getLogger(getClass)
-  val POST_VALIDATOR: Option[ApiValidator] = None
+  val HTTP_POST_VALIDATOR: Option[ApiValidator] = None
 
   before() {
     contentType = "application/json"
 
-    POST_VALIDATOR match {
-      case Some(ApiValidator(required)) if request.getMethod.toLowerCase == "post" => POST_VALIDATOR.get.validate(params)
+    HTTP_POST_VALIDATOR match {
+      case Some(ApiValidator(required)) if request.getMethod.toLowerCase == "post" => HTTP_POST_VALIDATOR.get.validate(params)
       case _ =>
     }
   }

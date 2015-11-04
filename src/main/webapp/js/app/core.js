@@ -74,7 +74,7 @@ BaseViewModel = Base.extend({
             for(var field in errz) {
               $('[name=' + field + ']')
                   .parent().addClass('has-error').parent()
-                  .find('> .error').text(errz[field]);
+                  .find('.error').text(errz[field]);
             }
 
           }

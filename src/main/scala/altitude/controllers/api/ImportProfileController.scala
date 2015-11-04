@@ -13,7 +13,7 @@ import altitude.Util
 class ImportProfileController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override val POST_VALIDATOR = Some(ApiValidator(List(
+  override val HTTP_POST_VALIDATOR = Some(ApiValidator(List(
     C.Api.ImportProfile.NAME, C.Api.ImportProfile.KEYWORDS
   )))
 

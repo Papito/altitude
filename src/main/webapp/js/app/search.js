@@ -81,10 +81,16 @@ SearchViewModel = BaseViewModel.extend({
   },
 
   hideAddFolder: function() {
+    this.resetAddFolderForm();
     this._showAddFolder(false);
   },
 
+  resetAddFolderForm: function() {
+    $('#addFolderForm').find('.has-error').removeClass('has-error').find('.error').text('');
+  },
+
   addFolder: function() {
+    var self = this;
     var opts = {
       'successCallback': function (json) {
         console.log(json);
