@@ -1,6 +1,6 @@
 package integration
 
-import altitude.exceptions.{DuplicateException, NotFoundException}
+import altitude.exceptions.{ValidationException, DuplicateException, NotFoundException}
 import altitude.models.Folder
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
@@ -100,6 +100,29 @@ import altitude.{Const => C}
 
     val folders = altitude.service.folder.hierarchy()
     folders.length should be(1)
+  }
+
+  test("validate") {
+    intercept[ValidationException] {
+      altitude.service.folder.add(Folder(name = ""))
+    }
+    intercept[ValidationException] {
+      altitude.service.folder.add(Folder(name = " "))
+    }
+    intercept[ValidationException] {
+      altitude.service.folder.add(Folder(name = " "))
+    }
+    intercept[ValidationException] {
+      altitude.service.folder.add(Folder(name = "\t \t   "))
+    }
+  }
+
+  test("sanitize") {
+    val folder1: Folder = altitude.service.folder.add(Folder(name = " folder  "))
+    folder1.name should be("folder")
+
+    val folder2:Folder = altitude.service.folder.add(Folder(name = " Folder one \n"))
+    folder2.name should be("Folder one")
   }
 
   test("delete folder") {

@@ -1,6 +1,7 @@
 package altitude.service
 
-import altitude.Altitude
+import altitude.Validators.Validator
+import altitude.{Const => C, Cleaners, Altitude}
 import altitude.dao.FolderDao
 import altitude.exceptions.NotFoundException
 import altitude.models.Folder
@@ -10,12 +11,19 @@ import altitude.transactions.TransactionId
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, JsValue}
-import altitude.{Const => C}
 
+object FolderService {
+  class NewFolderValidator
+    extends Validator(
+      required = Some(List(C.Folder.NAME, C.Folder.PARENT_ID)))
+}
 
 class FolderService(app: Altitude) extends BaseService[Folder](app){
   private final val log = LoggerFactory.getLogger(getClass)
   override protected val DAO = app.injector.instance[FolderDao]
+
+  override val CLEANER = Some(Cleaners.Cleaner(trim = Some(List(C.Folder.NAME, C.Folder.PARENT_ID))))
+  override val VALIDATOR = Some(new FolderService.NewFolderValidator)
 
   override def add(folder: Folder, queryForDup: Option[Query] = None)
                   (implicit txId: TransactionId = new TransactionId): JsObject = {
