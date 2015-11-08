@@ -154,10 +154,25 @@ footer {
 }
 
 #folders .header {
+    width: 50%;
     text-transform: uppercase;
     font-weight: bold;
     font-size: .9em;
     color: #fff;
+}
+
+#folders .showAddFolder {
+    width: 50%;
+}
+
+#folders .showAddFolder button {
+    float: right;
+}
+
+#folders ul {
+    margin-top: 0.5em;
+    list-style-type: none;
+    padding-left: 0.3em;
 }
 
 /* FORMS */

@@ -14,6 +14,11 @@ class FolderController  extends BaseApiController {
     C.Api.Folder.NAME, C.Api.Folder.PARENT_ID
   )))
 
+  get("/") {
+    val jsonFolders = app.service.folder.getAll()
+    Ok(Json.obj(C.Api.Folder.FOLDERS -> jsonFolders))
+  }
+
   post("/") {
     val name = params.get(C.Api.Folder.NAME)
     val parentId = params.get(C.Api.Folder.PARENT_ID)

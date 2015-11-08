@@ -70,9 +70,7 @@ abstract class BaseModel {
     C.Base.UPDATED_AT -> {updatedAt match {
         case None => JsNull
         case _ => JsString(Util.isoDateTime(updatedAt))
-    }},
-
-    C.Base.IS_CLEAN -> JsBoolean(isClean)
+    }}
   ).toSeq)
 
   /*
@@ -89,12 +87,6 @@ abstract class BaseModel {
 
     if (isoUpdatedAt.isDefined) {
       updatedAt = ISODateTimeFormat.dateTime().parseDateTime(isoUpdatedAt.get)
-    }
-
-    val clean = (json \ C.Base.IS_CLEAN).asOpt[Boolean]
-
-    if (clean.isDefined) {
-      _isClean = clean.get
     }
 
     this

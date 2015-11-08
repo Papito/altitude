@@ -7,6 +7,8 @@ SearchViewModel = BaseViewModel.extend({
     console.log('Initializing search view model');
 
     this.searchResults = ko.observableArray();
+    this.folders = ko.observableArray();
+
     this._showAddFolder = ko.observable(false);
 
     this.resultBoxBorder = 2; //pixels
@@ -18,6 +20,8 @@ SearchViewModel = BaseViewModel.extend({
     this.resultBoxSize = null;
 
     this.getResultBoxSize();
+    this.loadFolders();
+
 
     $('#addFolderForm').on('submit', function(e) {
       e.preventDefault();
@@ -50,8 +54,8 @@ SearchViewModel = BaseViewModel.extend({
 
     var opts = {
       'successCallback': function (json) {
-        var assets = $.map(json['assets'], function(asset) {
-          return new Asset(asset);
+        var assets = $.map(json['assets'], function(data) {
+          return new Asset(data);
         });
 
         if (!append) {
@@ -97,6 +101,8 @@ SearchViewModel = BaseViewModel.extend({
       'successCallback': function (json) {
         console.log(json);
         self.hideAddFolder();
+
+        self.loadFolders();
       },
       data: {
         'name': $('#newFolderName').val(),
@@ -117,5 +123,20 @@ SearchViewModel = BaseViewModel.extend({
     };
 
     this.get('/api/v1/search/meta/box', opts);
+  },
+
+  loadFolders: function() {
+    var self = this;
+    var opts = {
+      'successCallback': function (json) {
+        var folders = $.map(json['folders'], function(data) {
+          return new Folder(data);
+        });
+
+        self.folders(folders);
+      }
+    };
+
+    this.get('/api/v1/folders', opts);
   }
 });

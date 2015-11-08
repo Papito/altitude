@@ -33,9 +33,10 @@ object Const {
     val PARENT_ID = "parent_id"
     val NUM_OF_ASSETS = "num_of_assets"
     val CHILDREN = "children"
-      object Ids {
-        val ROOT_PARENT = "0"
-      }
+
+    object Ids {
+      val ROOT_PARENT = "0"
+    }
   }
 
   object Preview extends Common {
@@ -99,10 +100,11 @@ object Const {
     }
 
     object Folder {
-      val FOLDERS = "folder"
+      val FOLDERS = "folders"
       val FOLDER = "folder"
       val NAME = "name"
       val PARENT_ID = "parentId"
+      val NUM_OF_ASSETS = "numOfAssets"
     }
 
     object TagConfig {
