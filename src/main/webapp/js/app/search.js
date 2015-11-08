@@ -8,6 +8,7 @@ SearchViewModel = BaseViewModel.extend({
 
     this.searchResults = ko.observableArray();
     this.folders = ko.observableArray();
+    this.parentFolderId = ko.observable(0);
 
     this._showAddFolder = ko.observable(false);
 
@@ -106,7 +107,7 @@ SearchViewModel = BaseViewModel.extend({
       },
       data: {
         'name': $('#newFolderName').val(),
-        'parentId': "0"
+        'parentId': self.parentFolderId()
       }
     };
 
@@ -137,6 +138,6 @@ SearchViewModel = BaseViewModel.extend({
       }
     };
 
-    this.get('/api/v1/folders', opts);
+    this.get('/api/v1/folders/' + self.parentFolderId(), opts);
   }
 });

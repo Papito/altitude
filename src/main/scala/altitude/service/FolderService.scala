@@ -42,7 +42,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     }
   }
 
-  def hierarchy(rootId: String = C.Folder.Ids.ROOT_PARENT)(implicit txId: TransactionId) = {
+  def hierarchy(rootId: String = C.Folder.Ids.ROOT_PARENT)(implicit txId: TransactionId): List[Folder] = {
     val all = getAll()
     val rootEl = all.find(json => (json \ C.Folder.ID).as[String] == rootId)
 
@@ -92,7 +92,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
    * Get children for the root given, but only a single level - non-recursive
    */
   def immediateChildren(rootId: String = C.Folder.Ids.ROOT_PARENT, all: List[JsValue] = List())
-                          (implicit txId: TransactionId) = {
+                          (implicit txId: TransactionId = new TransactionId): List[Folder] = {
     val _all = all.isEmpty match {
       case true => DAO.getAll()
       case false => all
@@ -100,24 +100,30 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
     val rootEl = _all.find(json => (json \ C.Folder.ID).as[String] == rootId)
 
-    rootId == C.Folder.Ids.ROOT_PARENT || rootEl.isDefined match {
-      case true =>  _all filter (json => (json \ C.Folder.PARENT_ID).as[String] == rootId)
+    val folders = rootId == C.Folder.Ids.ROOT_PARENT || rootEl.isDefined match {
+      case true =>  _all
+        .filter(json => (json \ C.Folder.PARENT_ID).as[String] == rootId)
+        .map{json => Folder.fromJson(json)}
       case false => throw new NotFoundException(
         s"Cannot get immediate children. Root folder $rootId does not exist")
     }
+
+    folders.sortBy(_.nameLowercase)
   }
 
   private def children(all: List[JsValue], parentId: String)
                          (implicit txId: TransactionId): List[Folder] = {
     val immediateChildren = this.immediateChildren(parentId, all)
 
-    for (folder <- immediateChildren) yield  {
+    val folders = for (folder <- immediateChildren) yield  {
       val id: String = (folder \ C.Folder.ID).as[String]
       val name = (folder \ C.Folder.NAME).as[String]
 
       Folder(id = Some(id), name = name,
         children = this.children(all, id))
     }
+
+    folders.sortBy(_.nameLowercase)
   }
 
   override def deleteById(id: String)(implicit txId: TransactionId = new TransactionId): Int = {
