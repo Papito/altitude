@@ -3,7 +3,7 @@ package altitude.service
 import altitude.Validators.Validator
 import altitude.{Const => C, Cleaners, Altitude}
 import altitude.dao.FolderDao
-import altitude.exceptions.NotFoundException
+import altitude.exceptions.{ValidationException, DuplicateException, NotFoundException}
 import altitude.models.Folder
 import altitude.models.search.Query
 import altitude.transactions.TransactionId
@@ -31,7 +31,15 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       C.Folder.PARENT_ID -> folder.parentId,
       C.Folder.NAME_LC -> folder.nameLowercase))
 
-    super.add(folder, Some(dupQuery))
+    try {
+      super.add(folder, Some(dupQuery))
+    } catch {
+      case _: DuplicateException => {
+        val ex = ValidationException()
+        ex.errors += (C.Folder.NAME -> C.MSG("warn.duplicate"))
+        throw ex
+      }
+    }
   }
 
   def hierarchy(rootId: String = C.Folder.Ids.ROOT_PARENT)(implicit txId: TransactionId) = {

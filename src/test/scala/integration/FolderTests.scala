@@ -94,7 +94,7 @@ import altitude.{Const => C}
   test("duplicate") {
     val folder: Folder = altitude.service.folder.add(Folder(name = "folder1"))
 
-    intercept[DuplicateException] {
+    intercept[ValidationException] {
       altitude.service.folder.add(Folder(name = folder.name))
     }
 
