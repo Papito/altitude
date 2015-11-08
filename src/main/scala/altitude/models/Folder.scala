@@ -20,7 +20,7 @@ object Folder {
 }
 
 case class Folder(id: Option[String] = None,
-                  parentId: String = C.Folder.Ids.ROOT_PARENT,
+                  parentId: String = C.Folder.Ids.ROOT,
                   name: String,
                   children: List[Folder] = List(),
                   numOfAssets: Int = 0) extends BaseModel {

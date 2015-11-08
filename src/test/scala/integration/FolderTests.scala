@@ -85,6 +85,11 @@ import altitude.{Const => C}
     }
   }
 
+  test("root path") {
+    val path: List[Folder] = altitude.app.service.folder.path(folderId = C.Folder.Ids.ROOT)
+    path.length should equal(0)
+  }
+
   test("bad path") {
     intercept[NotFoundException] {
       altitude.app.service.folder.path(folderId = "bogus")

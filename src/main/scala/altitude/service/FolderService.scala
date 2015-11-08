@@ -42,11 +42,12 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     }
   }
 
-  def hierarchy(rootId: String = C.Folder.Ids.ROOT_PARENT)(implicit txId: TransactionId): List[Folder] = {
+  def hierarchy(rootId: String = C.Folder.Ids.ROOT)
+               (implicit txId: TransactionId = new TransactionId): List[Folder] = {
     val all = getAll()
     val rootEl = all.find(json => (json \ C.Folder.ID).as[String] == rootId)
 
-    rootId == C.Folder.Ids.ROOT_PARENT || rootEl.isDefined match {
+    rootId == C.Folder.Ids.ROOT || rootEl.isDefined match {
       case true => children(all, parentId = rootId)
       case false => throw new NotFoundException(s"Cannot get hierarchy. Root folder $rootId does not exist")
     }
@@ -55,7 +56,13 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   /**
    * Breadcrumbs
    */
-  def path(folderId: String)(implicit txId: TransactionId): List[Folder] = {
+  def path(folderId: String)
+          (implicit txId: TransactionId = new TransactionId): List[Folder] = {
+    // short-circuit for root folder
+    if (folderId == C.Folder.Ids.ROOT) {
+      return List[Folder]()
+    }
+
     val all = getAll()
 
     val folderEl = all.find(json => (json \ C.Folder.ID).as[String] == folderId)
@@ -69,30 +76,11 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     (folder :: parents).reverse
   }
 
-  def findParents(folderId: String, all: List[JsValue] = List()):  List[Folder] = {
-    val folderEl = all.find(json => (json \ C.Folder.ID).as[String] == folderId)
-
-    val parentId = folderEl.isDefined match {
-      case true => (folderEl.get \ C.Folder.PARENT_ID).as[String]
-      case false => throw new NotFoundException(s"Folder with ID '$folderId' not found")
-    }
-
-    val parentElements = all filter (json => (json \ C.Folder.ID).as[String] == parentId)
-
-    parentElements.isEmpty match {
-      case true => List()
-      case false => {
-        val folder = Folder.fromJson(parentElements.head)
-        List(folder) ++ findParents(folderId = folder.id.get, all)
-      }
-    }
-  }
-
   /**
    * Get children for the root given, but only a single level - non-recursive
    */
-  def immediateChildren(rootId: String = C.Folder.Ids.ROOT_PARENT, all: List[JsValue] = List())
-                          (implicit txId: TransactionId = new TransactionId): List[Folder] = {
+  def immediateChildren(rootId: String = C.Folder.Ids.ROOT, all: List[JsValue] = List())
+                       (implicit txId: TransactionId = new TransactionId): List[Folder] = {
     val _all = all.isEmpty match {
       case true => DAO.getAll()
       case false => all
@@ -100,7 +88,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
     val rootEl = _all.find(json => (json \ C.Folder.ID).as[String] == rootId)
 
-    val folders = rootId == C.Folder.Ids.ROOT_PARENT || rootEl.isDefined match {
+    val folders = rootId == C.Folder.Ids.ROOT || rootEl.isDefined match {
       case true =>  _all
         .filter(json => (json \ C.Folder.PARENT_ID).as[String] == rootId)
         .map{json => Folder.fromJson(json)}
@@ -111,22 +99,8 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     folders.sortBy(_.nameLowercase)
   }
 
-  private def children(all: List[JsValue], parentId: String)
-                         (implicit txId: TransactionId): List[Folder] = {
-    val immediateChildren = this.immediateChildren(parentId, all)
-
-    val folders = for (folder <- immediateChildren) yield  {
-      val id: String = (folder \ C.Folder.ID).as[String]
-      val name = (folder \ C.Folder.NAME).as[String]
-
-      Folder(id = Some(id), name = name,
-        children = this.children(all, id))
-    }
-
-    folders.sortBy(_.nameLowercase)
-  }
-
-  override def deleteById(id: String)(implicit txId: TransactionId = new TransactionId): Int = {
+  override def deleteById(id: String)
+                         (implicit txId: TransactionId = new TransactionId): Int = {
     txManager.withTransaction[Int] {
       val res: Option[JsObject] = DAO.getById(id)
 
@@ -151,6 +125,44 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     }
   }
 
+  override def deleteByQuery(query: Query)(implicit txId: TransactionId = new TransactionId): Int = {
+    throw new NotImplementedError("Cannot delete folders by query")
+  }
+
+  private def children(all: List[JsValue], parentId: String)
+                         (implicit txId: TransactionId): List[Folder] = {
+    val immediateChildren = this.immediateChildren(parentId, all)
+
+    val folders = for (folder <- immediateChildren) yield  {
+      val id: String = (folder \ C.Folder.ID).as[String]
+      val name = (folder \ C.Folder.NAME).as[String]
+
+      Folder(id = Some(id), name = name,
+        children = this.children(all, id))
+    }
+
+    folders.sortBy(_.nameLowercase)
+  }
+
+  private def findParents(folderId: String, all: List[JsValue] = List()):  List[Folder] = {
+    val folderEl = all.find(json => (json \ C.Folder.ID).as[String] == folderId)
+
+    val parentId = folderEl.isDefined match {
+      case true => (folderEl.get \ C.Folder.PARENT_ID).as[String]
+      case false => throw new NotFoundException(s"Folder with ID '$folderId' not found")
+    }
+
+    val parentElements = all filter (json => (json \ C.Folder.ID).as[String] == parentId)
+
+    parentElements.isEmpty match {
+      case true => List()
+      case false => {
+        val folder = Folder.fromJson(parentElements.head)
+        List(folder) ++ findParents(folderId = folder.id.get, all)
+      }
+    }
+  }
+
   private def flatChildren(all: List[JsValue], parentId: String, depth: Int = 0): List[(Int, String)]  = {
     val childElements = all.filter(j => (j \ C.Folder.PARENT_ID).asOpt[String].contains(parentId))
 
@@ -160,7 +172,4 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       res ++ flatChildren(all, folderId, depth + 1)}
   }
 
-  override def deleteByQuery(query: Query)(implicit txId: TransactionId = new TransactionId): Int = {
-    throw new NotImplementedError("Cannot delete folders by query")
-  }
 }

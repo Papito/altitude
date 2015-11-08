@@ -35,7 +35,7 @@ object Const {
     val CHILDREN = "children"
 
     object Ids {
-      val ROOT_PARENT = "0"
+      val ROOT = "0"
     }
   }
 
@@ -102,6 +102,7 @@ object Const {
     object Folder {
       val FOLDERS = "folders"
       val FOLDER = "folder"
+      val PATH = "path"
       val NAME = "name"
       val PARENT_ID = "parentId"
       val NUM_OF_ASSETS = "numOfAssets"
