@@ -8,7 +8,8 @@ SearchViewModel = BaseViewModel.extend({
 
     this.searchResults = ko.observableArray();
     this.folders = ko.observableArray();
-    this.parentFolderId = ko.observable(0);
+    this.currentFolderPath = ko.observableArray();
+    this.currentFolderId = ko.observable(0);
 
     this._showAddFolder = ko.observable(false);
 
@@ -21,7 +22,7 @@ SearchViewModel = BaseViewModel.extend({
     this.resultBoxSize = null;
 
     this.getResultBoxSize();
-    this.loadFolders();
+    this.loadFolders(self.currentFolderId());
 
 
     $('#addFolderForm').on('submit', function(e) {
@@ -103,11 +104,11 @@ SearchViewModel = BaseViewModel.extend({
         console.log(json);
         self.hideAddFolder();
 
-        self.loadFolders();
+        self.loadFolders(self.currentFolderId());
       },
       data: {
         'name': $('#newFolderName').val(),
-        'parentId': self.parentFolderId()
+        'parentId': self.currentFolderId()
       }
     };
 
@@ -126,7 +127,7 @@ SearchViewModel = BaseViewModel.extend({
     this.get('/api/v1/search/meta/box', opts);
   },
 
-  loadFolders: function() {
+  loadFolders: function(folderId) {
     var self = this;
     var opts = {
       'successCallback': function (json) {
@@ -134,10 +135,16 @@ SearchViewModel = BaseViewModel.extend({
           return new Folder(data);
         });
 
+        var path = $.map(json['path'], function(data) {
+          return new Folder(data);
+        });
+
+        self.currentFolderId(folderId);
         self.folders(folders);
+        self.currentFolderPath(path);
       }
     };
 
-    this.get('/api/v1/folders/' + self.parentFolderId(), opts);
+    this.get('/api/v1/folders/' + folderId, opts);
   }
 });

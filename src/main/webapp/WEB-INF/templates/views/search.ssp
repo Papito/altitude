@@ -7,6 +7,15 @@
 
 <% attributes("screenTitle")= "Search" %>
 
+<div id="path" class="row" data-bind="visible: currentFolderPath().length > 0" style="display: none">
+  <div class="col-md-11 well well-sm" data-bind="foreach: currentFolderPath">
+    <!-- ko if: ($index() > 0 && $index() < ($parent.currentFolderPath().length)) -->
+      &#8658;&nbsp;
+    <!-- /ko -->
+    <span><a href="#" data-bind="text: $data.name"></a></span>
+  </div>
+</div>
+
 <div class="row">
   <div class="col-md-2" id="left">
     <div class="row">
@@ -38,7 +47,7 @@
         </div>
 
         <ul data-bind="foreach: folders">
-          <li><a href="#" data-bind="text: name"></a></li>
+          <li><a href="#" data-bind="text: name, click: function() {$root.loadFolders($data.id)}"></a></li>
         </ul>
       </div><!-- /folders -->
     </div><!-- /row -->

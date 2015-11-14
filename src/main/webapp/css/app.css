@@ -4,6 +4,11 @@
     height: 2em;
 }
 
+.well-sm {
+    padding: .2em;
+    border-radius: .3em;
+}
+
 /* GLOBAL */
 html, body {
     height: 100%;
@@ -173,6 +178,11 @@ footer {
     margin-top: 0.5em;
     list-style-type: none;
     padding-left: 0.3em;
+}
+
+#path {
+    margin-left: 0em;
+    margin-top: 0.5em;
 }
 
 /* FORMS */
