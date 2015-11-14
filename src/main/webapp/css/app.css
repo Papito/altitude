@@ -181,8 +181,12 @@ footer {
 }
 
 #path {
-    margin-left: 0em;
+    margin-left: 0;
     margin-top: 0.5em;
+}
+
+#path div.well-sm {
+    padding-left: 0.5em;
 }
 
 /* FORMS */

@@ -12,7 +12,7 @@
     <!-- ko if: ($index() > 0 && $index() < ($parent.currentFolderPath().length)) -->
       &#8658;&nbsp;
     <!-- /ko -->
-    <span><a href="#" data-bind="text: $data.name"></a></span>
+    <span><a href="#" data-bind="text: $data.name, click: function() {$root.loadFolders($data.id)}"></a></span>
   </div>
 </div>
 
