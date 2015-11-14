@@ -24,6 +24,7 @@ SearchViewModel = BaseViewModel.extend({
     this.getResultBoxSize();
     this.loadFolders(self.currentFolderId());
 
+    this.rootFolder = new Folder({name: 'Root', id: '0'});
 
     $('#addFolderForm').on('submit', function(e) {
       e.preventDefault();
@@ -142,6 +143,7 @@ SearchViewModel = BaseViewModel.extend({
         self.currentFolderId(folderId);
         self.folders(folders);
         self.currentFolderPath(path);
+        self.currentFolderPath.unshift(self.rootFolder);
       }
     };
 
