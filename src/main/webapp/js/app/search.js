@@ -30,6 +30,46 @@ SearchViewModel = BaseViewModel.extend({
       e.preventDefault();
       self.addFolder();
     });
+
+    // register the context menu
+    $.contextMenu({
+      selector: 'span.context-menu',
+      items: {
+        rename: {
+          name: "Rename",
+          callback: function(key, opt){
+            var folderId = opt.$trigger.context.attributes.getNamedItem('folder-id').nodeValue;
+            self.renameFolder(folderId);
+          }
+        },
+        move: {
+          name: "Move",
+          callback: function(key, opt){
+            var folderId = opt.$trigger.context.attributes.getNamedItem('folder-id').nodeValue;
+            self.moveFolder(folderId);
+          }
+        },
+        delete: {
+          name: "Delete",
+          callback: function(key, opt){
+            var folderId = opt.$trigger.context.attributes.getNamedItem('folder-id').nodeValue;
+            self.deleteFolder(folderId);
+          }
+        }
+      }
+    });
+  },
+
+  renameFolder: function(folderId) {
+    console.log('Renaming', folderId);
+  },
+
+  moveFolder: function(folderId) {
+    console.log('Moving', folderId);
+  },
+
+  deleteFolder: function(folderId) {
+    console.log('Deleting', folderId);
   },
 
   search: function(append, page) {

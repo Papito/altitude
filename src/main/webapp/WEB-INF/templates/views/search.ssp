@@ -50,7 +50,11 @@
         </div>
 
         <ul data-bind="foreach: folders">
-          <li><a href="#" data-bind="text: name, click: function() {$root.loadFolders($data.id)}"></a></li>
+          <li>
+            <span class="context-menu" data-bind="attr: {'folder-id': $data.id}">
+              <a href="#" data-bind="text: name, click: function() {$root.loadFolders($data.id)}"></a>
+            </span>
+          </li>
         </ul>
       </div><!-- /folders -->
     </div><!-- /row -->
@@ -79,7 +83,7 @@
 
 <script>
   $(document).ready(function() {
-  var searchViewModel = new SearchViewModel();
-  ko.applyBindings(searchViewModel);
+    var searchViewModel = new SearchViewModel();
+    ko.applyBindings(searchViewModel);
   });
 </script>
