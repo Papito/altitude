@@ -9,6 +9,14 @@
     border-radius: .3em;
 }
 
+.modal-body {
+    padding: 1em;
+}
+
+.modal-footer {
+    padding: 1em;
+}
+
 /* GLOBAL */
 html, body {
     height: 100%;
@@ -142,7 +150,7 @@ footer {
     border: solid #0c0d0e;
 }
 
-#addFolderForm input {
+#addFolderForm input, #renameFolderForm input {
     margin-top: 1em;
     width: 100%;
 }

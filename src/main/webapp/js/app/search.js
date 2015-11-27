@@ -26,9 +26,18 @@ SearchViewModel = BaseViewModel.extend({
 
     this.rootFolder = new Folder({name: 'Root', id: '0'});
 
+    $('#renameFolderForm').on('submit', function(e) {
+      e.preventDefault();
+      self.renameFolder();
+    });
+
     $('#addFolderForm').on('submit', function(e) {
       e.preventDefault();
       self.addFolder();
+    });
+
+    $('#renameFolderModal').on('shown.bs.modal', function () {
+      $('#renameFolderInput').focus().select();
     });
 
     // register the context menu
@@ -39,7 +48,7 @@ SearchViewModel = BaseViewModel.extend({
           name: "Rename",
           callback: function(key, opt){
             var folderId = opt.$trigger.context.attributes.getNamedItem('folder-id').nodeValue;
-            self.renameFolder(folderId);
+            self.showRenameFolder(folderId);
           }
         },
         move: {
@@ -58,18 +67,6 @@ SearchViewModel = BaseViewModel.extend({
         }
       }
     });
-  },
-
-  renameFolder: function(folderId) {
-    console.log('Renaming', folderId);
-  },
-
-  moveFolder: function(folderId) {
-    console.log('Moving', folderId);
-  },
-
-  deleteFolder: function(folderId) {
-    console.log('Deleting', folderId);
   },
 
   search: function(append, page) {
@@ -188,5 +185,30 @@ SearchViewModel = BaseViewModel.extend({
     };
 
     this.get('/api/v1/folders/' + folderId, opts);
+  },
+
+  deleteFolder: function(folderId) {
+    console.log('Deleting', folderId);
+  },
+
+  showRenameFolder: function(folderId) {
+    console.log('Renaming', folderId);
+    var modal = $('#renameFolderModal');
+    var folderToRename = $.grep(this.folders(), function(f){ return f.id == folderId; })[0];
+    $('#renameFolderInput').val(folderToRename.name);
+    $('#renameFolderId').val(folderId);
+    modal.modal();
+  },
+
+  renameFolder: function() {
+    var folderId = $('#renameFolderId').val();
+    var newFolderName = $('#renameFolderInput').val();
+    console.log('Renaming folder', folderId, 'with new name', newFolderName);
+    $('#renameFolderModal').modal('hide');
+  },
+
+  moveFolder: function(folderId) {
+    console.log('Moving', folderId);
   }
+
 });
