@@ -14,6 +14,13 @@ class FolderController  extends BaseApiController {
     C.Api.Folder.NAME, C.Api.Folder.PARENT_ID
   )))
 
+  get() {
+    val folders = app.service.folder.hierarchy()
+    Ok(Json.obj(
+      C.Api.Folder.HIERARCHY ->folders.map(_.toJson)
+    ))
+  }
+
   get("/:parentId") {
     val parentId = params.getAs[String](C.Api.Folder.PARENT_ID).get
     val folders = app.service.folder.immediateChildren(parentId)

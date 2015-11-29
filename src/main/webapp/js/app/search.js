@@ -55,7 +55,7 @@ SearchViewModel = BaseViewModel.extend({
           name: "Move",
           callback: function(key, opt){
             var folderId = opt.$trigger.context.attributes.getNamedItem('folder-id').nodeValue;
-            self.moveFolder(folderId);
+            self.showMoveFolder(folderId);
           }
         },
         delete: {
@@ -187,10 +187,6 @@ SearchViewModel = BaseViewModel.extend({
     this.get('/api/v1/folders/' + folderId, opts);
   },
 
-  deleteFolder: function(folderId) {
-    console.log('Deleting', folderId);
-  },
-
   showRenameFolder: function(folderId) {
     console.log('Renaming', folderId);
     var modal = $('#renameFolderModal');
@@ -200,6 +196,53 @@ SearchViewModel = BaseViewModel.extend({
     modal.modal();
   },
 
+  showMoveFolder: function(folderId) {
+    var self = this;
+    $('#moveFolderId').val(folderId);
+    console.log('Moving', folderId);
+
+    var opts = {
+      'successCallback': function (json) {
+        // traverse the hierarchy and "massage" the tree. name -> text
+        var hierarchy = json.hierarchy;
+
+        function _processFolderNode(node) {
+          node.text = node.name;
+          for (var i = 0; i < node.children.length; ++i) {
+            var child = node.children[i];
+            _processFolderNode(child);
+          }
+        }
+
+        for (var i = 0; i < hierarchy.length; ++i) {
+          var node = hierarchy[i];
+          _processFolderNode(node);
+        }
+
+        $.jstree.defaults.core.themes.variant = "large";
+
+        var moveToFolderTreeEl = $('#moveToFolderTree');
+        moveToFolderTreeEl.jstree({
+          'core' : {
+            "multiple" : false,
+            "animation" : 0},
+          "plugins" : ["search"]
+        });
+
+        moveToFolderTreeEl.jstree(true).settings.core.data = hierarchy;
+        moveToFolderTreeEl.jstree(true).refresh();
+
+        $('#selectFolderToMoveToModal').modal();
+      }
+    };
+
+    this.get('/api/v1/folders', opts);
+  },
+
+  deleteFolder: function(folderId) {
+    console.log('Deleting', folderId);
+  },
+
   renameFolder: function() {
     var folderId = $('#renameFolderId').val();
     var newFolderName = $('#renameFolderInput').val();
@@ -207,8 +250,8 @@ SearchViewModel = BaseViewModel.extend({
     $('#renameFolderModal').modal('hide');
   },
 
-  moveFolder: function(folderId) {
-    console.log('Moving', folderId);
+  moveFolder: function() {
+    var moveFolderId = $('#moveFolderId').val();
+    //console.log('Moving', folderId, 'to', moveFofolderId);
   }
-
 });

@@ -100,6 +100,7 @@ object Const {
     }
 
     object Folder {
+      val HIERARCHY = "hierarchy"
       val FOLDERS = "folders"
       val FOLDER = "folder"
       val PATH = "path"

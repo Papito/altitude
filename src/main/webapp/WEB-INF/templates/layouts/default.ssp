@@ -16,7 +16,9 @@
 <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery.contextMenu.min.css">
 <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery.contextMenu.min.css.map">
 
-<script src="/static/js/lib/jquery-2.1.1.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jstree/themes/default/style.min.css">
+
+    <script src="/static/js/lib/jquery-2.1.1.min.js"></script>
 <script src="/static/js/lib/bootstrap.js"></script>
 <script src="/static/js/lib/knockout-3.2.0.js"></script>
 <script src="/static/js/lib/knockout-custom-bindings.js"></script>
@@ -24,6 +26,7 @@
 <!--script src="/static/js/lib/select2.min.js"></script-->
 <script src="/static/js/lib/context-menu/jquery.contextMenu.min.js"></script>
 <script src="/static/js/lib/context-menu/jquery.ui.position.min.js"></script>
+<script src="/static/js/lib/jstree/jstree.min.js"></script>
 <script src="/static/js/lib/Base.js"></script>
 <script src="/static/js/app/utils.js?"></script>
 <script src="/static/js/app/core.js?"></script>
