@@ -10,3 +10,7 @@ $ ./sbt
 ```
 
 If `browse` doesn't launch your browser, manually open [http://localhost:8080/](http://localhost:8080/) in your browser.
+
+## Running tests against a particular database:
+
+    testOnly integration.[SqliteSuite|MongoSuite|PostgresSuite]
