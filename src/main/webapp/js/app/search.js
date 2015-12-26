@@ -67,6 +67,9 @@ SearchViewModel = BaseViewModel.extend({
         }
       }
     });
+
+    // predefined elements
+    this.moveToFolderTreeEl = $('#moveToFolderTree');
   },
 
   search: function(append, page) {
@@ -221,16 +224,15 @@ SearchViewModel = BaseViewModel.extend({
 
         $.jstree.defaults.core.themes.variant = "large";
 
-        var moveToFolderTreeEl = $('#moveToFolderTree');
-        moveToFolderTreeEl.jstree({
+        self.moveToFolderTreeEl.jstree({
           'core' : {
             "multiple" : false,
             "animation" : 0},
           "plugins" : ["search"]
         });
 
-        moveToFolderTreeEl.jstree(true).settings.core.data = hierarchy;
-        moveToFolderTreeEl.jstree(true).refresh();
+        self.moveToFolderTreeEl.jstree(true).settings.core.data = hierarchy;
+        self.moveToFolderTreeEl.jstree(true).refresh();
 
         $('#selectFolderToMoveToModal').modal();
       }
@@ -252,6 +254,7 @@ SearchViewModel = BaseViewModel.extend({
 
   moveFolder: function() {
     var moveFolderId = $('#moveFolderId').val();
-    //console.log('Moving', folderId, 'to', moveFofolderId);
+    var moveToFofolderId = this.moveToFolderTreeEl.jstree('get_selected')[0];
+    console.log('Moving', folderId, 'to', moveToFofolderId);
   }
 });
