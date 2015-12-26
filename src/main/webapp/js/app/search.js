@@ -255,6 +255,6 @@ SearchViewModel = BaseViewModel.extend({
   moveFolder: function() {
     var moveFolderId = $('#moveFolderId').val();
     var moveToFofolderId = this.moveToFolderTreeEl.jstree('get_selected')[0];
-    console.log('Moving', folderId, 'to', moveToFofolderId);
+    console.log('Moving', moveFolderId, 'to', moveToFofolderId);
   }
 });
