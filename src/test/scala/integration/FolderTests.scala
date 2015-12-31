@@ -8,6 +8,7 @@ import integration.util.Text
 import altitude.{Const => C}
 
 @DoNotDiscover class FolderTests (val config: Map[String, String]) extends IntegrationTestCore {
+/*
   test("hierarchy") {
     /*
       folder1
@@ -186,5 +187,32 @@ import altitude.{Const => C}
     intercept[NotFoundException] {
       altitude.service.folder.deleteById("bogus")
     }
+  }
+*/
+
+  test("move folder") {
+    /*
+  folder1
+    folder1_1
+      folder1_1_1
+    folder1_2
+  folder2
+  */
+    val folder1: Folder = altitude.service.folder.add(
+      Folder(name = "folder1"))
+
+    val folder1_1: Folder = altitude.service.folder.add(
+      Folder(name = "folder1_1", parentId = folder1.id.get))
+
+    val folder1_1_1: Folder = altitude.service.folder.add(
+      Folder(name = "folder1_1_1", parentId = folder1_1.id.get))
+
+    val folder1_2: Folder = altitude.service.folder.add(
+      Folder(name = "folder1_2", parentId = folder1.id.get))
+
+    val folder2: Folder = altitude.service.folder.add(
+      Folder(name = "folder2"))
+
+    altitude.service.folder.move(folder1_1_1.id.get, folder2.id.get)
   }
 }

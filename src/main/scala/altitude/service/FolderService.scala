@@ -10,7 +10,7 @@ import altitude.transactions.TransactionId
 
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsObject, JsValue}
+import play.api.libs.json.{Json, JsObject, JsValue}
 
 object FolderService {
   class NewFolderValidator
@@ -172,4 +172,9 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       res ++ flatChildren(all, folderId, depth + 1)}
   }
 
+  def move(movedId: String, targetId: String)(implicit txId: TransactionId): Unit = {
+    log.debug(s"Moving folder $movedId to $targetId")
+    val updateJson = Json.obj(C.Folder.PARENT_ID -> targetId)
+    this.update(movedId, updateJson)
+  }
 }

@@ -168,6 +168,10 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     Some(rec.toMap[String, AnyRef])
   }
 
+  override def update(jsonObj: JsObject, data: JsObject)(implicit txId: TransactionId): JsObject = {
+    throw new NotImplementedError
+  }
+
   /*
     Implementations should define this method, which returns an optional
     JSON object which is guaranteed to serialize into a valid model of interest.

@@ -122,4 +122,9 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
       }
     }
   }
+
+  override def update(json: JsObject, data: JsObject)(implicit txId: TransactionId): JsObject = {
+    throw new NotImplementedError
+  }
+
 }

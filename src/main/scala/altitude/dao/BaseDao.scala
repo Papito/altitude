@@ -1,6 +1,7 @@
 package altitude.dao
 
 import altitude.Altitude
+import altitude.exceptions.NotFoundException
 import altitude.models.search.Query
 import altitude.transactions.TransactionId
 import play.api.libs.json.JsObject
@@ -20,4 +21,15 @@ trait BaseDao {
     val q: Query = Query(Map(C.Base.ID -> id))
     deleteByQuery(q)
   }
+
+  def update(id: String, data: JsObject)(implicit txId: TransactionId): JsObject = {
+    val obj: Option[JsObject] = getById(id)
+
+    obj.isDefined match {
+      case false => throw new NotFoundException(s"Cannot update object. ID $id does not exist")
+      case true => update(obj.get, data)
+    }
+  }
+
+  def update(jsonObj: JsObject, data: JsObject)(implicit txId: TransactionId): JsObject
 }
