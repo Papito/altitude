@@ -180,9 +180,10 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
        WHERE ${queryFieldPlaceholders.mkString(",")}
       """
 
-    log.debug(s"Update SQL: $sql, with query values: ${q.params.values.toList} and data: ${data.values.toList}")
+    val updateWithDataValues = data.values.map(_.as[String]).toList
+    log.debug(s"Update SQL: $sql, with query values: ${q.params.values.toList} and data: $updateWithDataValues")
     val runner: QueryRunner = new QueryRunner()
-    val values = data.values.map(_.as[String]).toList ::: q.params.values.toList
+    val values = updateWithDataValues ::: q.params.values.toList
     val numUpdated = runner.update(conn, sql,  values:_*)
     numUpdated
   }
