@@ -86,6 +86,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       case false => all
     }
 
+
     val rootEl = _all.find(json => (json \ C.Folder.ID).as[String] == rootId)
 
     val folders = rootId == C.Folder.Ids.ROOT || rootEl.isDefined match {

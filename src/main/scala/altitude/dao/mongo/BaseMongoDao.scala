@@ -124,7 +124,15 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   }
 
   override def updateByQuery(q: Query, data: JsObject)(implicit txId: TransactionId): Int = {
-    throw new NotImplementedError
+    log.debug(s"Updating with data $data for $q")
+    val query  = fixMongoQuery(q)
+    val mongoQuery: DBObject = query.params
+    log.debug(s"Updating with data $data for $mongoQuery")
+    val o: DBObject =  MongoDBObject(
+      "$set" -> com.mongodb.util.JSON.parse(data.toString()).asInstanceOf[DBObject]
+    )
+    val res: WriteResult = COLLECTION.update(mongoQuery, o)
+    log.debug(s"Updated ${res.getN} records")
+    res.getN
   }
-
 }
