@@ -103,13 +103,11 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   /*
   Return a JSON record with timestamp and ID fields translated from Mongo's "extended" format
    */
-  protected final def fixMongoFields(json: JsObject): JsObject = {
-    json ++ Json.obj(
+  protected final def fixMongoFields(json: JsObject): JsObject = json ++ Json.obj(
       C.Base.ID -> (json \ "_id").as[String],
       C.Base.CREATED_AT ->  (json \ C.Base.CREATED_AT \ "$date").asOpt[String],
       C.Base.UPDATED_AT -> (json \ C.Base.UPDATED_AT \ "$date").asOpt[String]
     )
-  }
 
   protected final def fixMongoQuery(q: Query): Query = {
     // _id -> id
@@ -123,13 +121,18 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     }
   }
 
-  override def updateByQuery(q: Query, data: JsObject)(implicit txId: TransactionId): Int = {
-    log.debug(s"Updating with data $data for $q")
+  override def updateByQuery(q: Query, json: JsObject)(implicit txId: TransactionId): Int = {
+    log.debug(s"Updating with data $json for $q")
     val query  = fixMongoQuery(q)
     val mongoQuery: DBObject = query.params
-    log.debug(s"Updating with data $data for $mongoQuery")
+    log.debug(s"Updating with data $json for $mongoQuery")
+
+    val updateJson = json ++ Json.obj(
+      C.Base.UPDATED_AT -> Util.isoDateTime(Some(Util.utcNow))
+    )
+
     val o: DBObject =  MongoDBObject(
-      "$set" -> com.mongodb.util.JSON.parse(data.toString()).asInstanceOf[DBObject]
+      "$set" -> com.mongodb.util.JSON.parse(updateJson.toString()).asInstanceOf[DBObject]
     )
     val res: WriteResult = COLLECTION.update(mongoQuery, o)
     val updated = res.getN

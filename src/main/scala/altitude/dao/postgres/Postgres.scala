@@ -15,6 +15,8 @@ trait Postgres {
       EXTRACT(EPOCH FROM updated_at) AS updated_at
     """
 
+  protected def CURRENT_TIME_FUNC = "current_timestamp"
+
   protected def JSON_PLACEHOLDER = "CAST(? as jsonb)"
 
   protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit = {
@@ -25,7 +27,7 @@ trait Postgres {
 
     val updatedAtMilis = rec.getOrElse(C.Base.UPDATED_AT, 0d).asInstanceOf[Double].toLong
     if (updatedAtMilis != 0d) {
-      model.createdAt = new DateTime(createdAtMilis * 1000)
+      model.updatedAt = new DateTime(createdAtMilis * 1000)
     }
   }
 }

@@ -29,6 +29,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   protected def CORE_SQL_VALS_FOR_INSERT: String
   protected def DEFAULT_SQL_COLS_FOR_SELECT: String
   protected def JSON_PLACEHOLDER: String
+  protected def CURRENT_TIME_FUNC: String
   protected val CORE_SQL_COLS_FOR_INSERT = s"${C.Base.ID}"
   protected val VERSION_TABLE_NAME = "db_version"
 
@@ -169,21 +170,23 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     Some(rec.toMap[String, AnyRef])
   }
 
-  override def updateByQuery(q: Query, data: JsObject)(implicit txId: TransactionId): Int = {
-    log.debug(s"Updating record by query $q with data $data")
-    val queryFieldPlaceholders: List[String] =  q.params.keys.map(_ + " = ?").toList
-    val updateFieldPlaceholders: List[String] = data.keys.map(_ + " = ?").toList
+  override def updateByQuery(q: Query, json: JsObject)(implicit txId: TransactionId): Int = {
+    log.debug(s"Updating record by query $q with data $json")
+
+    val queryFieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
+    val updateFieldPlaceholders: List[String] = json.keys.map(_ + " = ?").toList
 
     val sql = s"""
       UPDATE $tableName
-       SET ${updateFieldPlaceholders.mkString(",")}
+         SET ${C.Base.UPDATED_AT} = $CURRENT_TIME_FUNC, ${updateFieldPlaceholders.mkString(",")}
        WHERE ${queryFieldPlaceholders.mkString(",")}
       """
 
-    val updateWithDataValues = data.values.map(_.as[String]).toList
+    val updateWithDataValues = json.values.map(_.as[String]).toList
     log.debug(s"Update SQL: $sql, with query values: ${q.params.values.toList} and data: $updateWithDataValues")
     val runner: QueryRunner = new QueryRunner()
     val values = updateWithDataValues ::: q.params.values.toList
+
     val numUpdated = runner.update(conn, sql,  values:_*)
     numUpdated
   }

@@ -13,6 +13,8 @@ trait Sqlite {
       CAST(STRFTIME('%s', updated_at) AS INT) AS updated_at
     """
 
+  protected def CURRENT_TIME_FUNC = "datetime('now', 'localtime')"
+
   protected def JSON_PLACEHOLDER = "?"
 
   protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit = {
@@ -23,7 +25,7 @@ trait Sqlite {
 
     val updatedAtSeconds = rec.getOrElse(C.Base.UPDATED_AT, 0).asInstanceOf[Int]
     if (updatedAtSeconds != 0) {
-      model.createdAt = new DateTime(updatedAtSeconds.toLong * 1000)
+      model.updatedAt = new DateTime(updatedAtSeconds.toLong * 1000)
     }
   }
 }
