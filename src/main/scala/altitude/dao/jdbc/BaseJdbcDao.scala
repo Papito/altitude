@@ -67,7 +67,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     }
 
     log.debug(s"Deleting record by query: $q")
-    val fieldPlaceholders: List[String] = for (field <- q.params.keys.toList) yield s"$field = ?"
+    val fieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
 
     // TODO: safeguards to prevent mass-deletion
     val sql = s"""
@@ -86,7 +86,8 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {
     val (sqlColumns, sqlValues) = query.params.unzip
     // create pairs of column names and value placeholders, to be joined in the final clause
-    val whereClauses: List[String] = for (column <- sqlColumns.toList) yield  s"$column = ?"
+    val whereClauses: List[String] = sqlColumns.map(_ + " = ?").toList
+
 
     val whereClause = whereClauses.length match {
       case 0 => ""
@@ -168,8 +169,22 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     Some(rec.toMap[String, AnyRef])
   }
 
-  override def update(jsonObj: JsObject, data: JsObject)(implicit txId: TransactionId): JsObject = {
-    throw new NotImplementedError
+  override def updateByQuery(q: Query, data: JsObject)(implicit txId: TransactionId): Int = {
+    log.debug(s"Updating record by query $q with data $data")
+    val queryFieldPlaceholders: List[String] =  q.params.keys.map(_ + " = ?").toList
+    val updateFieldPlaceholders: List[String] = data.keys.map(_ + " = ?").toList
+
+    val sql = s"""
+      UPDATE $tableName
+       SET ${updateFieldPlaceholders.mkString(",")}
+       WHERE ${queryFieldPlaceholders.mkString(",")}
+      """
+
+    log.debug(s"Update SQL: $sql, with query values: ${q.params.values.toList} and data: ${data.values.toList}")
+    val runner: QueryRunner = new QueryRunner()
+    val values = data.values.map(_.as[String]).toList ::: q.params.values.toList
+    val numUpdated = runner.update(conn, sql,  values:_*)
+    numUpdated
   }
 
   /*

@@ -213,6 +213,17 @@ import altitude.{Const => C}
     val folder2: Folder = altitude.service.folder.add(
       Folder(name = "folder2"))
 
+    // assert initial state
+    // target
+    altitude.app.service.folder.immediateChildren(rootId = folder2.id.get).length should be (0)
+    // source
+    altitude.app.service.folder.immediateChildren(rootId = folder1_1.id.get).length should be (1)
+
+    // move folder1_1_1 to folder2
     altitude.service.folder.move(folder1_1_1.id.get, folder2.id.get)
+    // target
+    altitude.app.service.folder.immediateChildren(rootId = folder2.id.get).length should be (1)
+    // source
+    altitude.app.service.folder.immediateChildren(rootId = folder1_1.id.get).length should be (0)
   }
 }

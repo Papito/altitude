@@ -85,14 +85,9 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
     }
   }
 
-  def update(id: String, data: JsObject)(implicit txId: TransactionId): JsObject = {
-    val obj: JsObject = getById(id)
-    update(obj, data)
-  }
-
-  def update(jsonObj: JsObject, data: JsObject)(implicit txId: TransactionId): JsObject = {
-    txManager.withTransaction[JsObject] {
-      DAO.update(jsonObj, data)
+  def updateById(id: String, data: JsObject)(implicit txId: TransactionId): Int = {
+    txManager.withTransaction[Int] {
+      DAO.updateById(id, data)
     }
   }
 }

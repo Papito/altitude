@@ -89,7 +89,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     val rootEl = _all.find(json => (json \ C.Folder.ID).as[String] == rootId)
 
     val folders = rootId == C.Folder.Ids.ROOT || rootEl.isDefined match {
-      case true =>  _all
+      case true => _all
         .filter(json => (json \ C.Folder.PARENT_ID).as[String] == rootId)
         .map{json => Folder.fromJson(json)}
       case false => throw new NotFoundException(
@@ -175,6 +175,6 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   def move(movedId: String, targetId: String)(implicit txId: TransactionId): Unit = {
     log.debug(s"Moving folder $movedId to $targetId")
     val updateJson = Json.obj(C.Folder.PARENT_ID -> targetId)
-    this.update(movedId, updateJson)
+    this.updateById(movedId, updateJson)
   }
 }

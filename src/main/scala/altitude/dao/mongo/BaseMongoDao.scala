@@ -123,7 +123,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     }
   }
 
-  override def update(json: JsObject, data: JsObject)(implicit txId: TransactionId): JsObject = {
+  override def updateByQuery(q: Query, data: JsObject)(implicit txId: TransactionId): Int = {
     throw new NotImplementedError
   }
 

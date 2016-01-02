@@ -22,14 +22,10 @@ trait BaseDao {
     deleteByQuery(q)
   }
 
-  def update(id: String, data: JsObject)(implicit txId: TransactionId): JsObject = {
-    val obj: Option[JsObject] = getById(id)
-
-    obj.isDefined match {
-      case false => throw new NotFoundException(s"Cannot update object. ID $id does not exist")
-      case true => update(obj.get, data)
-    }
+  def updateById(id: String, data: JsObject)(implicit txId: TransactionId): Int = {
+    val q: Query = Query(Map(C.Base.ID -> id))
+    updateByQuery(q, data)
   }
 
-  def update(jsonObj: JsObject, data: JsObject)(implicit txId: TransactionId): JsObject
+  def updateByQuery(q: Query, data: JsObject)(implicit txId: TransactionId): Int
 }
