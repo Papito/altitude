@@ -1,6 +1,6 @@
 package integration
 
-import altitude.exceptions.{ValidationException, DuplicateException, NotFoundException}
+import altitude.exceptions.{IllegalOperationException, ValidationException, DuplicateException, NotFoundException}
 import altitude.models.Folder
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
@@ -8,7 +8,6 @@ import integration.util.Text
 import altitude.{Const => C}
 
 @DoNotDiscover class FolderTests (val config: Map[String, String]) extends IntegrationTestCore {
-/*
   test("hierarchy") {
     /*
       folder1
@@ -188,7 +187,6 @@ import altitude.{Const => C}
       altitude.service.folder.deleteById("bogus")
     }
   }
-*/
 
   test("move folder") {
     /*
@@ -225,5 +223,31 @@ import altitude.{Const => C}
     altitude.app.service.folder.immediateChildren(rootId = folder2.id.get).length should be (1)
     // source
     altitude.app.service.folder.immediateChildren(rootId = folder1_1.id.get).length should be (0)
+  }
+
+  test("illegal move") {
+    /*
+    folder1
+      folder1_1
+        folder1_1_1
+    */
+    val folder1: Folder = altitude.service.folder.add(
+      Folder(name = "folder1"))
+
+    val folder1_1: Folder = altitude.service.folder.add(
+      Folder(name = "folder1_1", parentId = folder1.id.get))
+
+    val folder1_1_1: Folder = altitude.service.folder.add(
+      Folder(name = "folder1_1_1", parentId = folder1_1.id.get))
+
+    // move into itself
+    intercept[IllegalOperationException] {
+      altitude.service.folder.move(folder1.id.get, folder1.id.get)
+    }
+
+    // move into a child
+    intercept[IllegalOperationException] {
+      altitude.service.folder.move(folder1.id.get, folder1_1_1.id.get)
+    }
   }
 }

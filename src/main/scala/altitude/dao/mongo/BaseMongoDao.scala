@@ -132,7 +132,8 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
       "$set" -> com.mongodb.util.JSON.parse(data.toString()).asInstanceOf[DBObject]
     )
     val res: WriteResult = COLLECTION.update(mongoQuery, o)
-    log.debug(s"Updated ${res.getN} records")
-    res.getN
+    val updated = res.getN
+    log.debug(s"Updated $updated records")
+    updated
   }
 }

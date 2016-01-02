@@ -1,3 +1,3 @@
 package altitude.exceptions
 
-class FieldValueException extends IllegalArgumentException
+case class FieldValueException() extends IllegalArgumentException

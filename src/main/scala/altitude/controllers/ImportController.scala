@@ -189,7 +189,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
         }
 
         log.info(s"Import worker $workerIdx done iterating")
-        throw new AllDone
+        throw AllDone()
       }
     }
   }

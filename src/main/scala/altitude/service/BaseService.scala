@@ -26,7 +26,7 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
 
     if (queryForDup.isDefined && query(queryForDup.get).nonEmpty) {
       log.debug(s"Duplicate found for $objIn and query: ${queryForDup.get.params}")
-      throw new DuplicateException(objIn)
+      throw DuplicateException(objIn)
     }
 
     txManager.withTransaction[JsObject] {
@@ -56,7 +56,7 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
 
       res.isDefined match {
         case true => res.get
-        case false => throw new NotFoundException(s"Cannot find ID '$id'")
+        case false => throw NotFoundException(s"Cannot find ID '$id'")
       }
     }
   }

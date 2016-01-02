@@ -64,7 +64,7 @@ class TikaMetadataService extends AbstractMetadataService {
           inputStream = Some(TikaInputStream.get(url, metadata.get))
           writer = Some(new StringWriter())
           parser.parse(inputStream.get, TIKA_HANDLER, metadata.get, null)
-          throw new AllDone
+          throw AllDone()
         }
         catch {
           case ex: AllDone => throw ex

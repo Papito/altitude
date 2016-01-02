@@ -18,7 +18,7 @@ object Validators {
         throw new RuntimeException("Object not sanitized for validation")
       }
 
-      val ex: ValidationException = new ValidationException
+      val ex: ValidationException = ValidationException()
       checkRequired(json, ex)
 
       if (raise && ex.errors.nonEmpty) throw ex
@@ -48,7 +48,7 @@ object Validators {
    */
   case class ApiValidator(required: List[String]) {
     def validate(params: Params): Unit = {
-      val ex: ValidationException = new ValidationException
+      val ex: ValidationException = ValidationException()
 
       required foreach { field =>
         params.contains(field) match {

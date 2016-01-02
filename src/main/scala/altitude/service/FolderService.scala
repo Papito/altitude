@@ -3,7 +3,7 @@ package altitude.service
 import altitude.Validators.Validator
 import altitude.{Const => C, Cleaners, Altitude}
 import altitude.dao.FolderDao
-import altitude.exceptions.{ValidationException, DuplicateException, NotFoundException}
+import altitude.exceptions.{IllegalOperationException, ValidationException, DuplicateException, NotFoundException}
 import altitude.models.Folder
 import altitude.models.search.Query
 import altitude.transactions.TransactionId
@@ -49,12 +49,13 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
     rootId == C.Folder.Ids.ROOT || rootEl.isDefined match {
       case true => children(all, parentId = rootId)
-      case false => throw new NotFoundException(s"Cannot get hierarchy. Root folder $rootId does not exist")
+      case false => throw NotFoundException(s"Cannot get hierarchy. Root folder $rootId does not exist")
     }
   }
 
   /**
-   * Breadcrumbs
+   * Breadcrumbs.
+   * This is the parent list, only reversed.
    */
   def path(folderId: String)
           (implicit txId: TransactionId = new TransactionId): List[Folder] = {
@@ -68,7 +69,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     val folderEl = all.find(json => (json \ C.Folder.ID).as[String] == folderId)
     val folder: Folder = folderEl.isDefined match {
       case true => Folder.fromJson(folderEl.get)
-      case false => throw new NotFoundException(s"Folder with ID '$folderId' not found")
+      case false => throw NotFoundException(s"Folder with ID '$folderId' not found")
     }
 
     val parents = findParents(folderId =folderId, all = getAll())
@@ -79,6 +80,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   /**
    * Get children for the root given, but only a single level - non-recursive
    */
+  // FIXME: retrieve with a query
   def immediateChildren(rootId: String = C.Folder.Ids.ROOT, all: List[JsValue] = List())
                        (implicit txId: TransactionId = new TransactionId): List[Folder] = {
     val _all = all.isEmpty match {
@@ -93,21 +95,20 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       case true => _all
         .filter(json => (json \ C.Folder.PARENT_ID).as[String] == rootId)
         .map{json => Folder.fromJson(json)}
-      case false => throw new NotFoundException(
+      case false => throw NotFoundException(
         s"Cannot get immediate children. Root folder $rootId does not exist")
     }
 
     folders.sortBy(_.nameLowercase)
   }
 
-  override def deleteById(id: String)
-                         (implicit txId: TransactionId = new TransactionId): Int = {
+  override def deleteById(id: String)(implicit txId: TransactionId = new TransactionId): Int = {
     txManager.withTransaction[Int] {
       val res: Option[JsObject] = DAO.getById(id)
 
       val folder: Folder = res.isDefined match {
         case true => res.get
-        case false => throw new NotFoundException(s"Cannot find folder ID '$id'")
+        case false => throw NotFoundException(s"Cannot find folder ID '$id'")
       }
 
       log.info(s"Deleting folder $folder")
@@ -130,6 +131,10 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     throw new NotImplementedError("Cannot delete folders by query")
   }
 
+  /**
+   * Returns a nested list of children for a given folder.
+   * Not a flat list! Subsequent children are in each folders' "children" element.
+    */
   private def children(all: List[JsValue], parentId: String)
                          (implicit txId: TransactionId): List[Folder] = {
     val immediateChildren = this.immediateChildren(parentId, all)
@@ -145,12 +150,16 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     folders.sortBy(_.nameLowercase)
   }
 
+  /**
+   * Returns a list of parents for a given folder ID.
+   * The list goes from closest parent to farthest.
+   */
   private def findParents(folderId: String, all: List[JsValue] = List()):  List[Folder] = {
     val folderEl = all.find(json => (json \ C.Folder.ID).as[String] == folderId)
 
     val parentId = folderEl.isDefined match {
       case true => (folderEl.get \ C.Folder.PARENT_ID).as[String]
-      case false => throw new NotFoundException(s"Folder with ID '$folderId' not found")
+      case false => throw NotFoundException(s"Folder with ID '$folderId' not found")
     }
 
     val parentElements = all filter (json => (json \ C.Folder.ID).as[String] == parentId)
@@ -164,6 +173,10 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     }
   }
 
+  /**
+   * Returns the children for a folder as a flat list.
+   * Useful for quick searches and verifying that a certain child is in a folder's hierarchy.
+   */
   private def flatChildren(all: List[JsValue], parentId: String, depth: Int = 0): List[(Int, String)]  = {
     val childElements = all.filter(j => (j \ C.Folder.PARENT_ID).asOpt[String].contains(parentId))
 
@@ -175,6 +188,17 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
   def move(movedId: String, targetId: String)(implicit txId: TransactionId): Unit = {
     log.debug(s"Moving folder $movedId to $targetId")
+
+    // cannot move into itself
+    if (movedId == targetId) {
+      throw IllegalOperationException(s"Cannot move a folder into itself. ID: $movedId")
+    }
+
+    // cannot move into own child
+    if (flatChildren(getAll(), movedId).map (_._2).contains(targetId)) {
+      throw IllegalOperationException(s"Cannot move a folder into own child. $targetId ID in $movedId path")
+    }
+
     val updateJson = Json.obj(C.Folder.PARENT_ID -> targetId)
     this.updateById(movedId, updateJson)
   }

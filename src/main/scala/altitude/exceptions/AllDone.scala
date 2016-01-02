@@ -1,3 +1,3 @@
 package altitude.exceptions
 
-class AllDone extends Exception
+case class AllDone() extends Exception
