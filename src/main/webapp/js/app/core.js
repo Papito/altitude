@@ -69,7 +69,6 @@ BaseViewModel = Base.extend({
                   .parent().addClass('has-error').parent()
                   .find('.error').text(errz[field]);
             }
-
           }
         }
 

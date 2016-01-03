@@ -19,10 +19,9 @@ class BaseApiController extends BaseController with GZipSupport {
   before() {
     log.info(s"API ${request.getRequestURI} ${request.getMethod.toUpperCase} request with parameters ${request.getParameterMap}")
 
-    request.getMethod.toLowerCase match {
-      case "get" | "update" | "post" =>
-        contentType = "application/json; charset=UTF-8"
-      case _ =>
+    contentType = request.getMethod.toLowerCase match {
+      case "get" | "update" | "post" => "application/json; charset=UTF-8"
+      case _ => "application/json"
     }
 
     /*
