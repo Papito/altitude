@@ -195,7 +195,8 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       res ++ flatChildren(all, folderId, depth + 1)}
   }
 
-  def move(folderBeingMovedId: String, destFolderId: String)(implicit txId: TransactionId): Unit = {
+  def move(folderBeingMovedId: String, destFolderId: String)
+          (implicit txId: TransactionId = new TransactionId): Unit = {
     log.debug(s"Moving folder $folderBeingMovedId to $destFolderId")
 
     // cannot move into itself
@@ -224,7 +225,8 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       Some(dupQuery))
   }
 
-  def rename(folderId: String, newName: String)(implicit txId: TransactionId): Unit = {
+  def rename(folderId: String, newName: String)
+            (implicit txId: TransactionId = new TransactionId): Unit = {
     val folder: Folder = getById(folderId)
 
     // new folder name cannot match the new one
