@@ -34,6 +34,20 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
     }
   }
 
+  def updateById(id: String, objIn: Model, fields: List[String], queryForDup: Option[Query] = None)
+                (implicit txId: TransactionId): Int = {
+    val cleaned = cleanAndValidate(objIn)
+
+    if (queryForDup.isDefined && query(queryForDup.get).nonEmpty) {
+      log.debug(s"Duplicate found for $objIn and query: ${queryForDup.get.params}")
+      throw DuplicateException(objIn)
+    }
+
+    txManager.withTransaction[Int] {
+      DAO.updateById(id, cleaned, fields)
+    }
+  }
+
   def cleanAndValidate(objIn: Model): JsObject = {
     val cleaned = CLEANER match {
       case None => objIn.toJson
@@ -82,12 +96,6 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
   def deleteByQuery(query: Query)(implicit txId: TransactionId = new TransactionId): Int = {
     txManager.withTransaction[Int] {
       DAO.deleteByQuery(query)
-    }
-  }
-
-  def updateById(id: String, data: JsObject)(implicit txId: TransactionId): Int = {
-    txManager.withTransaction[Int] {
-      DAO.updateById(id, data)
     }
   }
 }

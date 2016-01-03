@@ -170,24 +170,29 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     Some(rec.toMap[String, AnyRef])
   }
 
-  override def updateByQuery(q: Query, json: JsObject)(implicit txId: TransactionId): Int = {
+  override def updateByQuery(q: Query, json: JsObject, fields: List[String])(implicit txId: TransactionId): Int = {
     log.debug(s"Updating record by query $q with data $json")
 
     val queryFieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
-    val updateFieldPlaceholders: List[String] = json.keys.map(_ + " = ?").toList
+    val updateFieldPlaceholders: List[String] = json.keys.filter(fields.contains(_)).map(_ + " = ?").toList
 
     val sql = s"""
       UPDATE $tableName
-         SET ${C.Base.UPDATED_AT} = $CURRENT_TIME_FUNC, ${updateFieldPlaceholders.mkString(",")}
+         SET ${C.Base.UPDATED_AT} = $CURRENT_TIME_FUNC, ${updateFieldPlaceholders.mkString(", ")}
        WHERE ${queryFieldPlaceholders.mkString(",")}
       """
 
-    val updateWithDataValues = json.values.map(_.as[String]).toList
-    log.debug(s"Update SQL: $sql, with query values: ${q.params.values.toList} and data: $updateWithDataValues")
-    val runner: QueryRunner = new QueryRunner()
-    val values = updateWithDataValues ::: q.params.values.toList
+    val dataUpdateValues = json.fieldSet.filter{
+      // extract only the json elements we want to update
+      v: (String, JsValue) => fields.contains(v._1)}.map{
+      // convert the values to string
+      v: (String, JsValue) => v._2.as[String]}.toList
 
-    val numUpdated = runner.update(conn, sql,  values:_*)
+    log.debug(s"Update SQL: $sql, with query values: ${q.params.values.toList} and data: $dataUpdateValues")
+    val runner: QueryRunner = new QueryRunner()
+    val valuesForAllPlaceholders = dataUpdateValues ::: q.params.values.toList
+
+    val numUpdated = runner.update(conn, sql,  valuesForAllPlaceholders:_*)
     numUpdated
   }
 

@@ -121,19 +121,24 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     }
   }
 
-  override def updateByQuery(q: Query, json: JsObject)(implicit txId: TransactionId): Int = {
+  override def updateByQuery(q: Query, json: JsObject, fields: List[String])(implicit txId: TransactionId): Int = {
     log.debug(s"Updating with data $json for $q")
+
     val query  = fixMongoQuery(q)
     val mongoQuery: DBObject = query.params
-    log.debug(s"Updating with data $json for $mongoQuery")
 
-    val updateJson = json ++ Json.obj(
-      C.Base.UPDATED_AT -> Util.isoDateTime(Some(Util.utcNow))
+    // combine the selected fields we want to update from the JSON repr of the mode, with updated_at
+    val updateJson = JsObject(
+      json.fieldSet.filter {v: (String, JsValue) => fields.contains(v._1)}.toSeq) ++ Json.obj(
+        C.Base.UPDATED_AT -> Util.isoDateTime(Some(Util.utcNow))
     )
 
     val o: DBObject =  MongoDBObject(
       "$set" -> com.mongodb.util.JSON.parse(updateJson.toString()).asInstanceOf[DBObject]
     )
+
+    log.debug(s"Updating with data $updateJson for $mongoQuery")
+
     val res: WriteResult = COLLECTION.update(mongoQuery, o)
     val updated = res.getN
     log.debug(s"Updated $updated records")

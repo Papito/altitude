@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.{Json, JsObject, JsValue}
 
 object FolderService {
-  class NewFolderValidator
+  class FolderValidator
     extends Validator(
       required = Some(List(C.Folder.NAME, C.Folder.PARENT_ID)))
 }
@@ -23,7 +23,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   override protected val DAO = app.injector.instance[FolderDao]
 
   override val CLEANER = Some(Cleaners.Cleaner(trim = Some(List(C.Folder.NAME, C.Folder.PARENT_ID))))
-  override val VALIDATOR = Some(new FolderService.NewFolderValidator)
+  override val VALIDATOR = Some(new FolderService.FolderValidator)
 
   override def add(folder: Folder, queryForDup: Option[Query] = None)
                   (implicit txId: TransactionId = new TransactionId): JsObject = {
@@ -186,20 +186,64 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       res ++ flatChildren(all, folderId, depth + 1)}
   }
 
-  def move(movedId: String, targetId: String)(implicit txId: TransactionId): Unit = {
-    log.debug(s"Moving folder $movedId to $targetId")
+  def move(folderBeingMovedId: String, destFolderId: String)(implicit txId: TransactionId): Unit = {
+    log.debug(s"Moving folder $folderBeingMovedId to $destFolderId")
 
     // cannot move into itself
-    if (movedId == targetId) {
-      throw IllegalOperationException(s"Cannot move a folder into itself. ID: $movedId")
+    if (folderBeingMovedId == destFolderId) {
+      throw IllegalOperationException(s"Cannot move a folder into itself. ID: $folderBeingMovedId")
     }
 
     // cannot move into own child
-    if (flatChildren(getAll(), movedId).map (_._2).contains(targetId)) {
-      throw IllegalOperationException(s"Cannot move a folder into own child. $targetId ID in $movedId path")
+    if (flatChildren(getAll(), folderBeingMovedId).map (_._2).contains(destFolderId)) {
+      throw IllegalOperationException(s"Cannot move a folder into own child. $destFolderId ID in $folderBeingMovedId path")
     }
 
-    val updateJson = Json.obj(C.Folder.PARENT_ID -> targetId)
-    this.updateById(movedId, updateJson)
+    val folder: Folder = getById(folderBeingMovedId)
+
+    // destination parent cannot have folder by the same name
+    val dupQuery = Query(Map(
+      C.Folder.PARENT_ID -> destFolderId,
+      C.Folder.NAME_LC -> folder.nameLowercase))
+
+    try {
+      val folderForUpdate = Folder(parentId = destFolderId, name = folder.name)
+
+      updateById(
+        folderBeingMovedId,
+        folderForUpdate,
+        List(C.Folder.PARENT_ID),
+        Some(dupQuery))
+    } catch {
+      case _: DuplicateException => {
+        val ex = ValidationException()
+        ex.errors += (C.Folder.NAME -> C.MSG("warn.duplicate"))
+        throw ex
+      }
+    }
+  }
+
+  def rename(folderId: String, newName: String)(implicit txId: TransactionId): Unit = {
+    val folder: Folder = getById(folderId)
+
+    val dupQuery = Query(Map(
+      C.Folder.PARENT_ID -> folder.parentId,
+      C.Folder.NAME_LC -> newName.toLowerCase))
+
+    try {
+      val folderForUpdate = Folder(parentId = folder.parentId, name = newName)
+
+      updateById(
+        folderId,
+        folderForUpdate,
+        List(C.Folder.NAME, C.Folder.NAME_LC),
+        Some(dupQuery))
+    } catch {
+      case _: DuplicateException => {
+        val ex = ValidationException()
+        ex.errors += (C.Folder.NAME -> C.MSG("warn.duplicate"))
+        throw ex
+      }
+    }
   }
 }
