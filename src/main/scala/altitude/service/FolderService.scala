@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.{Json, JsObject, JsValue}
 
 object FolderService {
+
   class FolderValidator
     extends Validator(
       required = Some(List(C.Folder.NAME, C.Folder.PARENT_ID)))
@@ -22,8 +23,12 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   private final val log = LoggerFactory.getLogger(getClass)
   override protected val DAO = app.injector.instance[FolderDao]
 
-  override val CLEANER = Some(Cleaners.Cleaner(trim = Some(List(C.Folder.NAME, C.Folder.PARENT_ID))))
-  override val VALIDATOR = Some(new FolderService.FolderValidator)
+  override val CLEANER = Some(Cleaners.Cleaner(
+    trim = Some(
+      List(C.Folder.NAME, C.Folder.PARENT_ID))))
+
+  override val VALIDATOR = Some(
+    new FolderService.FolderValidator)
 
   override def add(folder: Folder, queryForDup: Option[Query] = None)
                   (implicit txId: TransactionId = new TransactionId): JsObject = {
@@ -42,6 +47,10 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     }
   }
 
+  /**
+   * Get the entire hierarchy, with nested children. The root folders are returned
+   * as a list.
+   */
   def hierarchy(rootId: String = C.Folder.Ids.ROOT)
                (implicit txId: TransactionId = new TransactionId): List[Folder] = {
     val all = getAll()
