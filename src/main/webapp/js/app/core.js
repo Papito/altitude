@@ -42,16 +42,9 @@ BaseViewModel = Base.extend({
   },
 
   restRequest : function(url, method, opts) {
-    var self = this;
-
     method = method.toUpperCase();
 
     data = opts.data || {};
-
-    if (method == 'DELETE' && !opts.successCallback) {
-      alert('Cannot call "DELETE" method without successCallback defined');
-      return;
-    }
 
     $.ajax({
       type : method,
@@ -98,7 +91,10 @@ BaseViewModel = Base.extend({
 
       },
       success : function(json, textStatus, jqXHR) {
-        console.log(json);
+        if (json) {
+          console.log(json);
+        }
+
         if (opts.successCallback) {
           opts.successCallback(json, textStatus, jqXHR);
         }

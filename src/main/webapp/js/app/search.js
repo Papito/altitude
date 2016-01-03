@@ -242,7 +242,17 @@ SearchViewModel = BaseViewModel.extend({
   },
 
   deleteFolder: function(folderId) {
+    var self = this;
+
     console.log('Deleting', folderId);
+
+    var opts = {
+      'successCallback': function() {
+        self.loadFolders(self.currentFolderId());
+      }
+    };
+
+    this.del('/api/v1/folders/' + folderId, opts);
   },
 
   renameFolder: function() {

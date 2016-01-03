@@ -16,5 +16,7 @@
   <logger name="org.fusesource" level="WARN" />
   <logger name="org.atmosphere" level="WARN" />
   <logger name="org.scalatra.servlet.ScalatraListener" level="INFO" />
+  <logger name="org.fusesource.scalate.util" level="WARN" />
+  <logger name="eu.medsea" level="WARN" />
   <logger name="com.mongodb" level="INFO" />
 </configuration>

@@ -37,10 +37,17 @@ class FolderController  extends BaseApiController {
     val name = params.get(C.Api.Folder.NAME)
     val parentId = params.get(C.Api.Folder.PARENT_ID)
 
-    log.debug(s"Adding new folder '$name' to parent '$parentId'")
+    log.info(s"Adding new folder '$name' to parent '$parentId'")
     val newFolder: Folder = app.service.folder.add(Folder(name = name.get, parentId = parentId.get))
     log.debug(s"New folder: $newFolder")
 
     Ok(Json.obj(C.Api.Folder.FOLDER -> newFolder.toJson))
+  }
+
+  delete("/:id") {
+    val id = params.get(C.Api.ID)
+    log.info(s"Deleting folder $id")
+    app.service.folder.deleteById(id.get)
+    Ok()
   }
 }

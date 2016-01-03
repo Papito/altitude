@@ -95,7 +95,6 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
       case _ => s"""WHERE ${whereClauses.mkString(" AND ")}"""
     }
 
-    log.info("OFFSET " + (query.page - 1) * query.rpp)
     val sqlWithoutPaging = s"""
       SELECT $DEFAULT_SQL_COLS_FOR_SELECT
         FROM $tableName

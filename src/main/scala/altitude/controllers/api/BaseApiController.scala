@@ -12,12 +12,41 @@ class BaseApiController extends BaseController with GZipSupport {
   private final val log = LoggerFactory.getLogger(getClass)
   val HTTP_POST_VALIDATOR: Option[ApiValidator] = None
 
-  before() {
-    contentType = "application/json"
+  val HTTP_DELETE_VALIDATOR: Option[ApiValidator] = None
 
+  val HTTP_UPDATE_VALIDATOR: Option[ApiValidator] = None
+
+  before() {
+    log.info(s"API ${request.getRequestURI} ${request.getMethod.toUpperCase} request with parameters ${request.getParameterMap}")
+
+    request.getMethod.toLowerCase match {
+      case "get" | "update" | "post" =>
+        contentType = "application/json; charset=UTF-8"
+      case _ =>
+    }
+
+    /*
+    Process all validators that may be set for this request, per method.
+     */
     HTTP_POST_VALIDATOR match {
       case Some(ApiValidator(required)) if request.getMethod.toLowerCase == "post" => HTTP_POST_VALIDATOR.get.validate(params)
-      case _ =>
+      case _ if request.getMethod.toLowerCase == "post" =>
+        log.warn(s"No POST validator specified for ${this.getClass.getName}")
+      case _ => {}
+    }
+
+    HTTP_DELETE_VALIDATOR match {
+      case Some(ApiValidator(fields)) if request.getMethod.toLowerCase == "delete" => HTTP_DELETE_VALIDATOR.get.validate(params)
+      case _ if request.getMethod.toLowerCase == "delete" =>
+        log.warn(s"No DELETE validator specified for ${this.getClass.getName}")
+      case _ => {}
+    }
+
+    HTTP_UPDATE_VALIDATOR match {
+      case Some(ApiValidator(required)) if request.getMethod.toLowerCase == "upodate" => HTTP_UPDATE_VALIDATOR.get.validate(params)
+      case _ if request.getMethod.toLowerCase == "update"  =>
+        log.warn(s"No UPDATE validator specified for ${this.getClass.getName}")
+      case _ => {}
     }
   }
 
