@@ -206,26 +206,19 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       C.Folder.PARENT_ID -> destFolderId,
       C.Folder.NAME_LC -> folder.nameLowercase))
 
-    try {
-      val folderForUpdate = Folder(parentId = destFolderId, name = folder.name)
+    val folderForUpdate = Folder(parentId = destFolderId, name = folder.name)
 
-      updateById(
-        folderBeingMovedId,
-        folderForUpdate,
-        List(C.Folder.PARENT_ID),
-        Some(dupQuery))
-    } catch {
-      case _: DuplicateException => {
-        val ex = ValidationException()
-        ex.errors += (C.Folder.NAME -> C.MSG("warn.duplicate"))
-        throw ex
-      }
-    }
+    updateById(
+      folderBeingMovedId,
+      folderForUpdate,
+      List(C.Folder.PARENT_ID),
+      Some(dupQuery))
   }
 
   def rename(folderId: String, newName: String)(implicit txId: TransactionId): Unit = {
     val folder: Folder = getById(folderId)
 
+    // new folder name cannot match the new one
     val dupQuery = Query(Map(
       C.Folder.PARENT_ID -> folder.parentId,
       C.Folder.NAME_LC -> newName.toLowerCase))
