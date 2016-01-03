@@ -206,9 +206,11 @@ SearchViewModel = BaseViewModel.extend({
 
     var opts = {
       'successCallback': function (json) {
-        // traverse the hierarchy and "massage" the tree. name -> text
         var hierarchy = json.hierarchy;
 
+        self._removeFolder(folderId, hierarchy);
+
+        // traverse the hierarchy and "massage" the tree. name -> text
         function _processFolderNode(node) {
           node.text = node.name;
           for (var i = 0; i < node.children.length; ++i) {
@@ -227,13 +229,13 @@ SearchViewModel = BaseViewModel.extend({
         self.moveToFolderTreeEl.jstree({
           'core' : {
             "multiple" : false,
-            "animation" : 0},
+            "animation" : 0,
+            "check_callback": true},
           "plugins" : ["search"]
         });
 
         self.moveToFolderTreeEl.jstree(true).settings.core.data = hierarchy;
         self.moveToFolderTreeEl.jstree(true).refresh();
-
         $('#selectFolderToMoveToModal').modal();
       }
     };
@@ -243,7 +245,6 @@ SearchViewModel = BaseViewModel.extend({
 
   deleteFolder: function(folderId) {
     var self = this;
-
     console.log('Deleting', folderId);
 
     var opts = {
@@ -256,15 +257,61 @@ SearchViewModel = BaseViewModel.extend({
   },
 
   renameFolder: function() {
+    var self = this;
     var folderId = $('#renameFolderId').val();
     var newFolderName = $('#renameFolderInput').val();
     console.log('Renaming folder', folderId, 'with new name', newFolderName);
-    $('#renameFolderModal').modal('hide');
+
+    var opts = {
+      'successCallback': function() {
+        self.loadFolders(self.currentFolderId());
+      },
+      'finally': function() {
+        $('#renameFolderModal').modal('hide');
+      },
+      'data': {
+        'name': newFolderName
+      }
+    };
+
+    this.put('/api/v1/folders/' + folderId, opts);
   },
 
   moveFolder: function() {
+    var self = this;
     var moveFolderId = $('#moveFolderId').val();
     var moveToFofolderId = this.moveToFolderTreeEl.jstree('get_selected')[0];
     console.log('Moving', moveFolderId, 'to', moveToFofolderId);
+
+    var opts = {
+      'successCallback': function() {
+        self.loadFolders(self.currentFolderId());
+      },
+      'finally': function() {
+        $('#selectFolderToMoveToModal').modal('hide');
+      },
+      'data': {
+        'parentId': moveToFofolderId
+      }
+    };
+
+    this.put('/api/v1/folders/' + moveFolderId, opts);
+  },
+
+  _removeFolder: function(id, hierarchy) {
+    for(var i=0; i < hierarchy.length; ++i) {
+      var o = hierarchy[i];
+
+      if (o.id == id) {
+        hierarchy.splice(i, 1);
+        return true;
+      }
+      else {
+        var deleted = this._removeFolder(id, o.children);
+        if (deleted) {
+          return true;
+        }
+      }
+    }
   }
 });

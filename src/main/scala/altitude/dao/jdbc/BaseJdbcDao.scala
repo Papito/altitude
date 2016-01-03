@@ -170,7 +170,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   }
 
   override def updateByQuery(q: Query, json: JsObject, fields: List[String])(implicit txId: TransactionId): Int = {
-    log.debug(s"Updating record by query $q with data $json")
+    log.debug(s"Updating record by query $q with data $json for fields: $fields")
 
     val queryFieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
     val updateFieldPlaceholders: List[String] = json.keys.filter(fields.contains(_)).map(_ + " = ?").toList
@@ -181,7 +181,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
        WHERE ${queryFieldPlaceholders.mkString(",")}
       """
 
-    val dataUpdateValues = json.fieldSet.filter{
+    val dataUpdateValues = json.fields.filter{
       // extract only the json elements we want to update
       v: (String, JsValue) => fields.contains(v._1)}.map{
       // convert the values to string

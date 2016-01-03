@@ -16,7 +16,11 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
   }
 
   error {
-    case ex: Exception => ex.printStackTrace()
+    case ex: Exception => {
+      ex.printStackTrace()
+      this.status = 500
+    }
+
   }
 
   before() {

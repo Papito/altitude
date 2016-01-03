@@ -21,6 +21,15 @@ class FolderController  extends BaseApiController {
     ))
   }
 
+  get("/:id") {
+    val id = params.get(C.Api.ID).get
+    val folder: Folder = app.service.folder.getById(id)
+
+    Ok(Json.obj(
+      C.Api.Folder.FOLDER -> folder.toJson
+    ))
+  }
+
   get("/:parentId") {
     val parentId = params.getAs[String](C.Api.Folder.PARENT_ID).get
     val folders = app.service.folder.immediateChildren(parentId)
@@ -37,7 +46,6 @@ class FolderController  extends BaseApiController {
     val name = params.get(C.Api.Folder.NAME)
     val parentId = params.get(C.Api.Folder.PARENT_ID)
 
-    log.info(s"Adding new folder '$name' to parent '$parentId'")
     val newFolder: Folder = app.service.folder.add(Folder(name = name.get, parentId = parentId.get))
     log.debug(s"New folder: $newFolder")
 
@@ -48,6 +56,22 @@ class FolderController  extends BaseApiController {
     val id = params.get(C.Api.ID)
     log.info(s"Deleting folder $id")
     app.service.folder.deleteById(id.get)
+    Ok()
+  }
+
+  put("/:id") {
+    val id = params.get(C.Api.ID).get
+    val newName = params.get(C.Api.Folder.NAME)
+    val newParentId = params.get(C.Api.Folder.PARENT_ID)
+
+    if (newName.isDefined) {
+      app.service.folder.rename(id, newName.get)
+    }
+
+    if (newParentId.isDefined) {
+      app.service.folder.move(id, newParentId.get)
+    }
+
     Ok()
   }
 }
