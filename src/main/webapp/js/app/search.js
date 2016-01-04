@@ -206,14 +206,22 @@ SearchViewModel = BaseViewModel.extend({
 
     var opts = {
       'successCallback': function (json) {
-        var hierarchy = json.hierarchy;
+        var allFolders = json.hierarchy;
 
-        self._removeFolder(folderId, hierarchy);
+        self._removeFolder(folderId, allFolders);
 
-        if (hierarchy.length === 0) {
+        if (allFolders.length === 0) {
           self.blinkWarning("No possible folders to move to");
           return;
         }
+
+        var hierarchy = [{
+          'id': self.rootFolder.id,
+          'name': self.rootFolder.name,
+          'children': allFolders
+        }];
+        
+        console.log(hierarchy);
 
         // traverse the hierarchy and "massage" the tree. name -> text
         function _processFolderNode(node) {
