@@ -70,7 +70,15 @@ SearchViewModel = BaseViewModel.extend({
 
     // predefined elements
     this.moveToFolderTreeEl = $('#moveToFolderTree');
-  },
+
+    this.moveFolderEl = $('#moveFolder');
+
+    // when a folder is selected, enable the "move" button
+    this.moveToFolderTreeEl.bind(
+        "select_node.jstree", function(evt, data){
+          self.moveFolderEl.removeAttr('disabled');
+        }
+    ); },
 
   search: function(append, page) {
     var self = this;
@@ -204,6 +212,14 @@ SearchViewModel = BaseViewModel.extend({
     $('#moveFolderId').val(folderId);
     console.log('Moving', folderId);
 
+    var targetSelected = typeof $('#moveToFolderTree').jstree('get_selected')[0] === "string";
+
+    if (targetSelected) {
+      self.moveFolderEl.removeAttr('disabled');
+    } else {
+      self.moveFolderEl.attr('disabled','disabled');
+    }
+
     var opts = {
       'successCallback': function (json) {
         var allFolders = json.hierarchy;
@@ -263,6 +279,7 @@ SearchViewModel = BaseViewModel.extend({
     var opts = {
       'successCallback': function() {
         self.loadFolders(self.currentFolderId());
+        self.blinkSuccess("Folder deleted");
       }
     };
 
