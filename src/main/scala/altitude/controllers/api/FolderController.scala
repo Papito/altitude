@@ -56,7 +56,7 @@ class FolderController  extends BaseApiController {
     val id = params.get(C.Api.ID)
     log.info(s"Deleting folder $id")
     app.service.folder.deleteById(id.get)
-    Ok()
+    Ok("{}")
   }
 
   put("/:id") {
@@ -72,6 +72,6 @@ class FolderController  extends BaseApiController {
       app.service.folder.move(id, newParentId.get)
     }
 
-    Ok()
+    Ok("{}")
   }
 }
