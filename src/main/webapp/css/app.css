@@ -4,6 +4,7 @@
     height: 2.2em;
 }
 
+
 select {
     color: #000;
     background-color: #FFF;
@@ -20,6 +21,10 @@ select {
 
 .modal-footer {
     padding: 1em;
+}
+
+.alert {
+    padding: .2em 0.5em .2em 0.5em;
 }
 
 /* GLOBAL */
@@ -51,6 +56,10 @@ footer {
 #content {
     height: calc(100% - 7.1em);
     display:block;
+}
+
+#warningMessage {
+    width: 100%;
 }
 
 /* IMPORT */

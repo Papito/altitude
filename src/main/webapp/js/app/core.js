@@ -10,6 +10,46 @@ BaseViewModel = Base.extend({
   constructor : function() {
     console.log('Initializing base view model');
     this.base();
+
+    this.successMessage = ko.observable();
+    this.successEl = $('#successMessage');
+
+    this.infoMessage = ko.observable();
+    this.infoEl = $('#infoMessage');
+
+    this.warningMessage = ko.observable();
+    this.warningEl = $('#warningMessage');
+
+    this.errorMessage = ko.observable();
+    this.errorEl = $('#errorMessage');
+  },
+  // ----------------------------------------------------------------
+
+  blinkSuccess: function(msg) {
+    this.successEl.show();
+    this.successMessage(msg);
+    this.successEl.fadeOut(5000);
+  },
+  // ----------------------------------------------------------------
+
+  blinkInfo: function(msg) {
+    this.infoEl.show();
+    this.infoMessage(msg);
+    this.infoEl.fadeOut(5000);
+  },
+  // ----------------------------------------------------------------
+
+  blinkWarning: function(msg) {
+    this.warningEl.show();
+    this.warningMessage(msg);
+    this.warningEl.fadeOut(5000);
+  },
+  // ----------------------------------------------------------------
+
+  blinkError: function(msg) {
+    this.errorEl.show();
+    this.errorMessage(msg);
+    this.errorEl.fadeOut(5000);
   },
   // ----------------------------------------------------------------
 

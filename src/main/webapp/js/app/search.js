@@ -210,6 +210,11 @@ SearchViewModel = BaseViewModel.extend({
 
         self._removeFolder(folderId, hierarchy);
 
+        if (hierarchy.length === 0) {
+          self.blinkWarning("No possible folders to move to");
+          return;
+        }
+
         // traverse the hierarchy and "massage" the tree. name -> text
         function _processFolderNode(node) {
           node.text = node.name;
@@ -286,6 +291,7 @@ SearchViewModel = BaseViewModel.extend({
     var opts = {
       'successCallback': function() {
         self.loadFolders(self.currentFolderId());
+        self.blinkSuccess("Folder moved");
       },
       'finally': function() {
         $('#selectFolderToMoveToModal').modal('hide');
