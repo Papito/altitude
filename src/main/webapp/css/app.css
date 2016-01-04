@@ -1,7 +1,12 @@
 /* BS OVERRIDES */
 
 .form-control {
-    height: 2em;
+    height: 2.2em;
+}
+
+select {
+    color: #000;
+    background-color: #FFF;
 }
 
 .well-sm {
@@ -30,12 +35,12 @@ header {
 }
 
 footer {
-    margin-top: .5em;
-    height: 2.5em;
     display: block;
-    padding-top: 0.5em;
-    padding-left: 1em;
-    border-top: 0.1em solid #000;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    height: 2.5em;
+    padding-top: .5em;
     background-image: linear-gradient(rgb(72, 78, 85), rgb(58, 63, 68) 60%, rgb(49, 53, 57));
 }
 
