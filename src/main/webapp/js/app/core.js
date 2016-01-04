@@ -21,7 +21,7 @@ BaseViewModel = Base.extend({
     this.warningEl = $('#warningMessage');
 
     this.errorMessage = ko.observable();
-    this.errorEl = $('#errorMessage');
+    this.errorStacktrace = ko.observable();
   },
   // ----------------------------------------------------------------
 
@@ -43,13 +43,6 @@ BaseViewModel = Base.extend({
     this.warningEl.show();
     this.warningMessage(msg);
     this.warningEl.fadeOut(5000);
-  },
-  // ----------------------------------------------------------------
-
-  blinkError: function(msg) {
-    this.errorEl.show();
-    this.errorMessage(msg);
-    this.errorEl.fadeOut(5000);
   },
   // ----------------------------------------------------------------
 
@@ -82,6 +75,7 @@ BaseViewModel = Base.extend({
   },
 
   restRequest : function(url, method, opts) {
+    var self = this;
     method = method.toUpperCase();
 
     data = opts.data || {};
@@ -96,6 +90,11 @@ BaseViewModel = Base.extend({
         // unhandled exceptions
         if (jqXHR.status === 500) {
           console.log(jqXHR.responseText);
+          var msg = jqXHR.responseJSON ? jqXHR.responseJSON.error : jqXHR.responseText;
+          var stacktrace = jqXHR.responseJSON ? jqXHR.responseJSON.stacktrace : jqXHR.responseText;
+          self.showError();
+          self.errorMessage(msg);
+          self.errorStacktrace(stacktrace);
         }
 
         // validation errors
@@ -143,5 +142,17 @@ BaseViewModel = Base.extend({
         }
       }
     });
+  },
+
+  reportError: function() {
+    console.log("error report placeholder");
+  },
+
+  showError: function() {
+    $('#errorContainer').show();
+  },
+
+  dismissError: function() {
+    $('#errorContainer').hide();
   }
 });

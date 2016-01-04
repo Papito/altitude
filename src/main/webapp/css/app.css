@@ -27,6 +27,10 @@ select {
     padding: .2em 0.5em .2em 0.5em;
 }
 
+.alert .close {
+    color: #FFF;
+}
+
 /* GLOBAL */
 html, body {
     height: 100%;

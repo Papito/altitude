@@ -76,8 +76,19 @@
 
         </div>
 
-        <div id="errorMessage" class="alert alert-danger" style="display: none" role="alert"
-        data-bind="text: errorMessage">
+
+        <div id="errorContainer" class="alert alert-danger alert-dismissible fade in" role="alert" style="display: none">
+          <button type="button" class="close" aria-label=Close data-bind="click: dismissError"><span aria-hidden=true>&times;</span></button>
+          <h4 data-bind="visible: errorMessage">
+            Error. <span data-bind="text: errorMessage, visible: errorMessage"></span>
+          </h4>
+
+          <p>
+            <button type="button" class="btn btn-info" data-bind="click: reportError">Send anonymous error report (pretty please?)</button>
+            <button type="button" class="btn btn-default" data-bind="click: dismissError">Dismiss</button>
+          </p>
+          <h4 data-bind="visible: errorStacktrace" style="margin-top: 2em">Detail</h4>
+          <p data-bind="text: errorStacktrace, visible: errorStacktrace"></p>
 
         </div>
 

@@ -62,6 +62,7 @@ object Const {
   ---------------------------------------------------------------------------*/
   object Api {
     val ERROR = "error"
+    val STACKTRACE = "stacktrace"
     val WARNING = "warning"
     val CRITICAL = "critical"
     val VALIDATION_ERRORS = "validationErrors"

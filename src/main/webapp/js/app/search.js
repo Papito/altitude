@@ -220,7 +220,7 @@ SearchViewModel = BaseViewModel.extend({
           'name': self.rootFolder.name,
           'children': allFolders
         }];
-        
+
         console.log(hierarchy);
 
         // traverse the hierarchy and "massage" the tree. name -> text

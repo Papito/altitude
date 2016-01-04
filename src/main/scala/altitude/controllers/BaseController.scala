@@ -1,8 +1,10 @@
 package altitude.controllers
 
+import java.io.{PrintWriter, StringWriter}
 import javax.servlet.http.HttpServletRequest
 
 import altitude.SingleApplication
+import org.scalatra.InternalServerError
 import org.slf4j.LoggerFactory
 
 import scala.collection.mutable
@@ -18,9 +20,12 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
   error {
     case ex: Exception => {
       ex.printStackTrace()
-      this.status = 500
+      val sw: StringWriter = new StringWriter()
+      val pw: PrintWriter = new PrintWriter(sw)
+      ex.printStackTrace(pw)
+      log.error(s"Exception ${sw.toString}")
+      InternalServerError(sw.toString)
     }
-
   }
 
   before() {
