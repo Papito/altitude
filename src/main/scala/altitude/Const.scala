@@ -36,6 +36,11 @@ object Const {
 
     object Ids {
       val ROOT = "0"
+      val UNCATEGORIZED = "1"
+    }
+
+    object Names {
+      val UNCATEGORIZED = "Uncategorized" //TODO: not i18n
     }
   }
 

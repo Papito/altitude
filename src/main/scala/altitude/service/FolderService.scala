@@ -56,9 +56,22 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     val all = getAll()
     val rootEl = all.find(json => (json \ C.Folder.ID).as[String] == rootId)
 
-    rootId == C.Folder.Ids.ROOT || rootEl.isDefined match {
+    val folders = rootId == C.Folder.Ids.ROOT || rootId == C.Folder.Ids.UNCATEGORIZED || rootEl.isDefined match {
       case true => children(all, parentId = rootId)
       case false => throw NotFoundException(s"Cannot get hierarchy. Root folder $rootId does not exist")
+    }
+
+    // prepend the "uncategorized" system folder for root
+    rootId == C.Folder.Ids.ROOT match {
+      case true => {
+        val uncategorizedFolder = Folder(
+          id = Some(C.Folder.Ids.UNCATEGORIZED),
+          name = C.Folder.Names.UNCATEGORIZED,
+          parentId = C.Folder.Ids.ROOT
+        )
+        uncategorizedFolder :: folders
+      }
+      case false => folders
     }
   }
 
@@ -191,6 +204,15 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
   def move(folderBeingMovedId: String, destFolderId: String)
           (implicit txId: TransactionId = new TransactionId): Unit = {
+
+    if (isSystem(folderBeingMovedId)) {
+      throw new IllegalOperationException("Cannot move a system folder")
+    }
+
+    if (isUncategorized(destFolderId)) {
+      throw new IllegalOperationException("Cannot move into a system folder")
+    }
+
     log.debug(s"Moving folder $folderBeingMovedId to $destFolderId")
 
     // cannot move into itself
@@ -221,6 +243,10 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
   def rename(folderId: String, newName: String)
             (implicit txId: TransactionId = new TransactionId): Unit = {
+    if (isSystem(folderId)) {
+      throw new IllegalOperationException("Cannot rename a system folder")
+    }
+
     val folder: Folder = getById(folderId)
 
     // new folder name cannot match the new one
@@ -244,4 +270,8 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       }
     }
   }
+
+  private def isRoot(id: String) = id == C.Folder.Ids.ROOT
+  private def isUncategorized(id: String) = id == C.Folder.Ids.UNCATEGORIZED
+  private def isSystem(id: String) = isRoot(id) || isUncategorized(id)
 }

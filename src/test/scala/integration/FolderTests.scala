@@ -10,6 +10,7 @@ import altitude.{Const => C}
 @DoNotDiscover class FolderTests (val config: Map[String, String]) extends IntegrationTestCore {
   test("hierarchy") {
     /*
+      uncategorized
       folder1
         folder1_1
         folder1_2
@@ -30,6 +31,7 @@ import altitude.{Const => C}
     folder1.id should contain(folder1_2.parentId)
 
     /*
+      uncategorized
       folder2
         folder2_1
           folder2_1_1
@@ -56,11 +58,11 @@ import altitude.{Const => C}
     folder2.id should contain(folder2_2.parentId)
 
     val folders = altitude.service.folder.hierarchy()
-    folders.length should be(2)
-    folders.head.children.length should be (2)
+    folders.length should be(3)
     folders(1).children.length should be (2)
-    folders(1).children.head.children.length should be(1)
-    folders(1).children(1).children.length should be(0)
+    folders(2).children.length should be (2)
+    folders(2).children.head.children.length should be(1)
+    folders(2).children(1).children.length should be(0)
 
     // check immediate children of the second folder
     val immediateChildren = altitude.app.service.folder.immediateChildren(rootId = folder2_1.id.get)
@@ -98,7 +100,7 @@ import altitude.{Const => C}
     }
 
     val folders = altitude.service.folder.hierarchy()
-    folders.length should be(1)
+    folders.length should be(2)
   }
 
   test("validate") {
@@ -293,7 +295,16 @@ import altitude.{Const => C}
 
     // rename to same but with different casing
     intercept[ValidationException] {
-      altitude.service.folder.rename(folder1.id.get, folder1.name.toUpperCase())
+      altitude.service.folder.rename(folder1.id.get, folder1.name.toUpperCase)
+    }
+
+    // rename a system folder
+    intercept[IllegalOperationException] {
+      altitude.service.folder.rename(C.Folder.Ids.ROOT, folder1.name)
+    }
+
+    intercept[IllegalOperationException] {
+      altitude.service.folder.rename(C.Folder.Ids.UNCATEGORIZED, folder1.name)
     }
   }
 }
