@@ -33,11 +33,12 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   val config: Map[String, String]
 
   // force environment to always be TEST
-  protected def altitude: Altitude = config.get("datasource") match {
+  val datasource = config.get("datasource")
+  protected def altitude: Altitude = datasource match {
     case Some("mongo") => IntegrationTestCore.mongoDbApp
     case Some("postgres") => IntegrationTestCore.postgresApp
     case Some("sqlite") => IntegrationTestCore.sqliteApp
-    case _ => throw new IllegalArgumentException("Do not know of datasource: ${config.get(\"datasource\")}")
+    case _ => throw new IllegalArgumentException(s"Do not know of datasource: $datasource")
   }
 
   val injector = Guice.createInjector(new InjectionModule)
@@ -71,7 +72,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
           bind[UtilitiesDao].toInstance(new dao.mongo.UtilitiesDao(altitude))
         case "postgres" | "sqlite" =>
           bind[UtilitiesDao].toInstance(new dao.jdbc.UtilitiesDao(altitude))
-        case _ => throw new IllegalArgumentException("Do not know of datasource: ${altitude.dataSourceType}")
+        case _ => throw new IllegalArgumentException(s"Do not know of datasource: ${altitude.dataSourceType}")
       }
     }
   }

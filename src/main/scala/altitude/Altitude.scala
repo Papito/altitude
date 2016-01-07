@@ -72,7 +72,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           bind[FolderDao].toInstance(new sqlite.FolderDao(app))
         }
         case _ => {
-          throw new IllegalArgumentException("Do not know of datasource: " + dataSourceType)
+          throw new IllegalArgumentException(s"Do not know of datasource $dataSourceType")
         }
       }
     }
