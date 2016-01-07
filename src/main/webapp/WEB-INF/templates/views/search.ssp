@@ -36,8 +36,8 @@
             <form id="addFolderForm" class="form-inline">
               <div class="form-group">
                 <label for="${C.Api.Folder.NAME}" class="control-label"></label>
-                <input type="text" class="form-control" name="${C.Api.Folder.NAME}" id="newFolderName" maxlength="255" placeholder="New folder name">
                 <div class="error"></div>
+                <input type="text" class="form-control" name="${C.Api.Folder.NAME}" id="newFolderName" maxlength="255" placeholder="New folder name">
               </div>
             </form>
 
@@ -99,7 +99,8 @@
             <input type="hidden" id="renameFolderId">
             <div class="form-group">
               <label for="${C.Api.Folder.NAME}" class="control-label"></label>
-              <input id="renameFolderInput" type="text" class="form-control">
+              <div class="error"></div>
+              <input id="renameFolderInput" name="${C.Api.Folder.NAME}" type="text" class="form-control">
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

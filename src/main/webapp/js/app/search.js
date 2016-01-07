@@ -68,9 +68,8 @@ SearchViewModel = BaseViewModel.extend({
       }
     });
 
-    // predefined elements
+    // initialize commonly used elements
     this.moveToFolderTreeEl = $('#moveToFolderTree');
-
     this.moveFolderEl = $('#moveFolder');
 
     // when a folder is selected, enable the "move" button
@@ -152,9 +151,9 @@ SearchViewModel = BaseViewModel.extend({
       'successCallback': function (json) {
         console.log(json);
         self.hideAddFolder();
-
         self.loadFolders(self.currentFolderId());
       },
+      errorContainerId: 'addFolder',
       data: {
         'name': $('#newFolderName').val(),
         'parentId': self.currentFolderId()
@@ -199,12 +198,14 @@ SearchViewModel = BaseViewModel.extend({
   },
 
   showRenameFolder: function(folderId) {
+    var self = this;
     console.log('Renaming', folderId);
     var modal = $('#renameFolderModal');
     var folderToRename = $.grep(this.folders(), function(f){ return f.id == folderId; })[0];
     $('#renameFolderInput').val(folderToRename.name);
     $('#renameFolderId').val(folderId);
     modal.modal();
+    self.resetFormErrors('#renameFolderForm');
   },
 
   showMoveFolder: function(folderId) {
@@ -295,10 +296,9 @@ SearchViewModel = BaseViewModel.extend({
     var opts = {
       'successCallback': function() {
         self.loadFolders(self.currentFolderId());
-      },
-      'finally': function() {
         $('#renameFolderModal').modal('hide');
       },
+      errorContainerId: 'renameFolderForm',
       'data': {
         'name': newFolderName
       }

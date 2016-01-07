@@ -67,7 +67,7 @@ BaseViewModel = Base.extend({
   // ----------------------------------------------------------------
 
   resetFormErrors: function(el) {
-    $(el).find('.has-error').removeClass('has-error').parent().find('> .error').text('');
+    $(el).find('.has-error').removeClass('has-error').parent().find('.error').text('');
   },
 
   hide: function(el) {
@@ -101,10 +101,17 @@ BaseViewModel = Base.extend({
         if (jqXHR.status === 400) {
           var json = jqXHR.responseJSON;
 
+          // if there is a container where we want to look for errors, we must specify it
+
           if (json.validationErrors) {
             var errz = json.validationErrors;
+            var errElId = '#' + opts.errorContainerId;
+
             for(var field in errz) {
-              $('[name=' + field + ']')
+              var errSelector = '[name=' + field + ']';
+              var selector = errElId ? errElId + ' ' + errSelector : errSelector;
+              console.log("eror selector:", selector);
+              $(selector)
                   .parent().addClass('has-error').parent()
                   .find('.error').text(errz[field]);
             }
