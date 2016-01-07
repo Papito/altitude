@@ -1,6 +1,6 @@
 package altitude.controllers
 
-import java.io.File
+import java.io.{PrintWriter, StringWriter, File}
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -123,8 +123,11 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
           log.info("Client disconnected" + disconnector)
 
         case Error(Some(error)) =>
-          // FIXME: log
+          val sw: StringWriter = new StringWriter()
+          val pw: PrintWriter = new PrintWriter(sw)
+          error.printStackTrace(pw)
           error.printStackTrace()
+          log.error(s"Error: ${error.getMessage}. ${sw.toString}")
 
       }
 

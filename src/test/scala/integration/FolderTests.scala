@@ -73,12 +73,6 @@ import altitude.{Const => C}
     path.last.id should be(folder2_1_1.id)
   }
 
-  test("bad root for immediate children") {
-    intercept[NotFoundException] {
-      altitude.app.service.folder.immediateChildren(rootId = "bogus")
-    }
-  }
-
   test("bad hierarchy root") {
     intercept[NotFoundException] {
       altitude.service.folder.hierarchy(rootId = "bogus")

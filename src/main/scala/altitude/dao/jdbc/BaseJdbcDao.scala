@@ -70,7 +70,6 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     log.debug(s"Deleting record by query: $q")
     val fieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
 
-    // TODO: safeguards to prevent mass-deletion
     val sql = s"""
       DELETE
         FROM $tableName
@@ -185,7 +184,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
       // extract only the json elements we want to update
       v: (String, JsValue) => fields.contains(v._1)}.map{
       // convert the values to string
-      v: (String, JsValue) => v._2.as[String]}.toList
+      v: (String, JsValue) => v._2.as[String]}.toList.reverse
 
     log.debug(s"Update SQL: $sql, with query values: ${q.params.values.toList} and data: $dataUpdateValues")
     val runner: QueryRunner = new QueryRunner()

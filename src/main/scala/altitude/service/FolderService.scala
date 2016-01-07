@@ -89,26 +89,20 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   /**
    * Get children for the root given, but only a single level - non-recursive
    */
-  // FIXME: retrieve with a query
   def immediateChildren(rootId: String = C.Folder.Ids.ROOT, all: List[JsValue] = List())
                        (implicit txId: TransactionId = new TransactionId): List[Folder] = {
     val _all = all.isEmpty match {
-      case true => DAO.getAll()
+      case true =>  {
+        val query = Query(Map(C.Folder.PARENT_ID -> rootId))
+        DAO.query(q = query)
+      }
       case false => all
     }
 
-
-    val rootEl = _all.find(json => (json \ C.Folder.ID).as[String] == rootId)
-
-    val folders = rootId == C.Folder.Ids.ROOT || rootEl.isDefined match {
-      case true => _all
-        .filter(json => (json \ C.Folder.PARENT_ID).as[String] == rootId)
-        .map{json => Folder.fromJson(json)}
-      case false => throw NotFoundException(
-        s"Cannot get immediate children. Root folder $rootId does not exist")
-    }
-
-    folders.sortBy(_.nameLowercase)
+    _all
+      .filter(json => (json \ C.Folder.PARENT_ID).as[String] == rootId)
+      .map{json => Folder.fromJson(json)}
+      .sortBy(_.nameLowercase)
   }
 
   override def deleteById(id: String)(implicit txId: TransactionId = new TransactionId): Int = {

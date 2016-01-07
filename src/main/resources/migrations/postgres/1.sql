@@ -42,6 +42,7 @@ CREATE TABLE folder (
   parent_id varchar(24) NOT NULL DEFAULT '0',
   num_of_assets INTEGER NOT NULL DEFAULT 0
 ) INHERITS (_core);
+CREATE INDEX folder_parent_id ON folder(parent_id);
 CREATE UNIQUE INDEX folder_parent_id_and_name ON folder(parent_id, name);
 
 

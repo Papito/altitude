@@ -42,6 +42,7 @@ CREATE TABLE folder (
   created_at DATE DEFAULT (datetime('now', 'localtime')),
   updated_at DATE DEFAULT NULL
 );
+CREATE INDEX folder_parent_id ON folder(parent_id);
 CREATE UNIQUE INDEX folder_parent_id_and_name ON folder(parent_id, name);
 
 
