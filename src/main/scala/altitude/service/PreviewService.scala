@@ -37,7 +37,7 @@ class PreviewService(app: Altitude) {
     val f: File = new File(previewFilePath(assetId))
 
     if (!f.isFile) {
-      throw new NotFoundException(C.IdType.ID, assetId)
+      throw NotFoundException(s"Cannot find preview for asset '$assetId'")
     }
 
     val byteArray = FileUtils.readFileToByteArray(f)

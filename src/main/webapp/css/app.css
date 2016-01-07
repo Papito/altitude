@@ -1,134 +1,226 @@
+/* BS OVERRIDES */
+
+.form-control {
+    height: 2.2em;
+}
+
+.form-group .error {
+    color: #ff544d;
+    font-weight: normal;
+    margin-left: .5em;
+    font-size: .9em;
+    margin-bottom: .2em;
+}
+
+select {
+    color: #000;
+    background-color: #FFF;
+}
+
+.well-sm {
+    padding: .2em;
+    border-radius: .3em;
+}
+
+.modal-body {
+    padding: 1em;
+}
+
+.modal-footer {
+    padding: 1em;
+}
+
+.alert {
+    padding: .2em 0.5em .2em 0.5em;
+}
+
+.alert .close {
+    color: #FFF;
+}
+
 /* GLOBAL */
 html, body {
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
 }
 
 header {
-  display: block;
-  height: 4em;
+    display: block;
+    height: 4em;
 }
 
 footer {
-  margin-top: .5em;
-  height: 2.5em;
-  display: block;
-  padding-top: 0.5em;
-  padding-left: 1em;
-  border-top: 0.1em solid #000;
-  background-image: linear-gradient(rgb(72, 78, 85), rgb(58, 63, 68) 60%, rgb(49, 53, 57));
+    display: block;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    height: 2.5em;
+    padding-top: .5em;
+    background-image: linear-gradient(rgb(72, 78, 85), rgb(58, 63, 68) 60%, rgb(49, 53, 57));
 }
 
-section #content{
-  height: calc(100% - 7.1em);
-  display:block;
-  overflow: auto;
+#screenTitle {
+    text-transform: uppercase;
 }
 
-#content:focus {
-  outline: 0;
+#content {
+    height: calc(100% - 7.1em);
+    display:block;
+}
+
+#warningMessage {
+    width: 100%;
 }
 
 /* IMPORT */
 #importControls {
-  border-bottom: 1px solid #1c1e22;
-  padding-bottom: 0.8em;
-  margin-bottom: 0.8em;
-  margin-top: 3em;
+    border-bottom: 1px solid #1c1e22;
+    padding-bottom: 0.8em;
+    margin-bottom: 0.8em;
+    margin-top: 3em;
 }
 
 #selectImportMode .large {
-  height: 6em;
+    height: 6em;
 }
 
 #importControls .progress {
-  height: 2.8em;
-  margin-bottom: 0;
+    height: 2.8em;
+    margin-bottom: 0;
 }
 
 #importControls .progress h4 {
-  height: 2.8em;
-  padding-top: .05em;
+    height: 2.8em;
+    padding-top: .05em;
 }
 
 #importControls #asset-count-text {
-  padding-right: 0.5em;
-  padding-top: .5em;
+    padding-right: 0.5em;
+    padding-top: .5em;
 }
 
 #importControls #startStop{
-  text-align: center;
-  margin: 2em;
+    text-align: center;
+    margin: 2em;
 }
 
 #importControls .tab-pane {
-  margin: 1em;
+    margin: 1em;
 }
 
 #importControls .asset {
-  padding: 1em;
-  background: -moz-linear-gradient(top, rgba(216,224,222,0.3) 0%, rgba(174,191,188,0.3) 22%, rgba(153,175,171,0.3) 33%, rgba(142,166,162,0.3) 50%, rgba(130,157,152,0.3) 67%, rgba(78,92,90,0.3) 82%, rgba(14,14,14,0.3) 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(216,224,222,0.3)), color-stop(22%,rgba(174,191,188,0.3)), color-stop(33%,rgba(153,175,171,0.3)), color-stop(50%,rgba(142,166,162,0.3)), color-stop(67%,rgba(130,157,152,0.3)), color-stop(82%,rgba(78,92,90,0.3)), color-stop(100%,rgba(14,14,14,0.3))); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top, rgba(216,224,222,0.3) 0%,rgba(174,191,188,0.3) 22%,rgba(153,175,171,0.3) 33%,rgba(142,166,162,0.3) 50%,rgba(130,157,152,0.3) 67%,rgba(78,92,90,0.3) 82%,rgba(14,14,14,0.3) 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top, rgba(216,224,222,0.3) 0%,rgba(174,191,188,0.3) 22%,rgba(153,175,171,0.3) 33%,rgba(142,166,162,0.3) 50%,rgba(130,157,152,0.3) 67%,rgba(78,92,90,0.3) 82%,rgba(14,14,14,0.3) 100%); /* Opera 11.10+ */
-  background: -ms-linear-gradient(top, rgba(216,224,222,0.3) 0%,rgba(174,191,188,0.3) 22%,rgba(153,175,171,0.3) 33%,rgba(142,166,162,0.3) 50%,rgba(130,157,152,0.3) 67%,rgba(78,92,90,0.3) 82%,rgba(14,14,14,0.3) 100%); /* IE10+ */
-  background: linear-gradient(to bottom, rgba(216,224,222,0.3) 0%,rgba(174,191,188,0.3) 22%,rgba(153,175,171,0.3) 33%,rgba(142,166,162,0.3) 50%,rgba(130,157,152,0.3) 67%,rgba(78,92,90,0.3) 82%,rgba(14,14,14,0.3) 100%); /* W3C */
-  border-radius: 8px;
+    padding: 1em;
+    background: -moz-linear-gradient(top, rgba(216,224,222,0.3) 0%, rgba(174,191,188,0.3) 22%, rgba(153,175,171,0.3) 33%, rgba(142,166,162,0.3) 50%, rgba(130,157,152,0.3) 67%, rgba(78,92,90,0.3) 82%, rgba(14,14,14,0.3) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(216,224,222,0.3)), color-stop(22%,rgba(174,191,188,0.3)), color-stop(33%,rgba(153,175,171,0.3)), color-stop(50%,rgba(142,166,162,0.3)), color-stop(67%,rgba(130,157,152,0.3)), color-stop(82%,rgba(78,92,90,0.3)), color-stop(100%,rgba(14,14,14,0.3))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, rgba(216,224,222,0.3) 0%,rgba(174,191,188,0.3) 22%,rgba(153,175,171,0.3) 33%,rgba(142,166,162,0.3) 50%,rgba(130,157,152,0.3) 67%,rgba(78,92,90,0.3) 82%,rgba(14,14,14,0.3) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, rgba(216,224,222,0.3) 0%,rgba(174,191,188,0.3) 22%,rgba(153,175,171,0.3) 33%,rgba(142,166,162,0.3) 50%,rgba(130,157,152,0.3) 67%,rgba(78,92,90,0.3) 82%,rgba(14,14,14,0.3) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, rgba(216,224,222,0.3) 0%,rgba(174,191,188,0.3) 22%,rgba(153,175,171,0.3) 33%,rgba(142,166,162,0.3) 50%,rgba(130,157,152,0.3) 67%,rgba(78,92,90,0.3) 82%,rgba(14,14,14,0.3) 100%); /* IE10+ */
+    background: linear-gradient(to bottom, rgba(216,224,222,0.3) 0%,rgba(174,191,188,0.3) 22%,rgba(153,175,171,0.3) 33%,rgba(142,166,162,0.3) 50%,rgba(130,157,152,0.3) 67%,rgba(78,92,90,0.3) 82%,rgba(14,14,14,0.3) 100%); /* W3C */
+    border-radius: 8px;
 }
 
 #importControls #startStop button {
-  width: 90%;
+    width: 90%;
 }
 
 #readyToImport {
-  margin-bottom: 1em;
-  text-align: center;
+    margin-bottom: 1em;
+    text-align: center;
 }
 
 #importedAssets {
-  margin-top: 1.5em;
+    margin-top: 1.5em;
 }
 
 #importedAssets .asset {
-  float: left;
-  margin: 1em;
+    float: left;
+    margin: 1em;
 }
 
 #importControls #warnings strong {
-  color: orange;
+    color: orange;
 }
 
 #importControls #errors strong {
-  color: indianred;
-  font-size: 1em;
+    color: indianred;
+    font-size: 1em;
 }
 
 #selectImportDirectory select, #importProfiles select {
-  width: 100%;
-  color: #000000;
+    width: 100%;
+    color: #000000;
 }
 
 #importProfiles select {
-  width: 100%;
-  color: #f9f2f4;
-  background-color: #1c1e22;
+    width: 100%;
+    color: #f9f2f4;
+    background-color: #1c1e22;
 }
 
 /* SEARCH */
 
 #searchResults {
+    height: 100%;
+    display:block;
+    overflow: auto;
+}
+
+#searchResults:focus {
+    outline: 0;
 }
 
 #searchResults .result-box {
-  float: left;
-  border: outset #0c0d0e;
+    float: left;
+    border: solid #0c0d0e;
 }
 
-/* FORMS */
+#addFolderForm input, #renameFolderForm input {
+    width: 100%;
+}
 
-.form-group .error {
-  color: Red;
-  font-weight: bold;
-  margin-left: 1.1em;
+#addFolder {
+    margin-top: 1em;
+}
+
+/* FOLDERS */
+
+#folders {
+    margin-top: .5em;
+    padding-left: .4em;
+}
+
+#folders button {
+    line-height: 1.2em;
+}
+
+#folders .header {
+    width: 50%;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: .9em;
+    color: #fff;
+}
+
+#folders .showAddFolder {
+    width: 50%;
+}
+
+#folders .showAddFolder button {
+    float: right;
+}
+
+#folders ul {
+    margin-top: 0.5em;
+    list-style-type: none;
+    padding-left: 0.3em;
+}
+
+#path {
+    margin-left: 0;
+    margin-top: 0.5em;
+}
+
+#path div.well-sm {
+    padding-left: 0.5em;
 }

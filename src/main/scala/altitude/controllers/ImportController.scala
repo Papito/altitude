@@ -160,9 +160,9 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
           catch {
             case ex: NotImportable => {/* next */}
             case ex: DuplicateException => {
-              val resp =JsObject(Seq(
+              val resp = JsObject(Seq(
                 C.Api.WARNING -> JsString(C.MSG("warn.duplicate")),
-                C.Api.Asset.ASSET -> ex.asset.toJson,
+                C.Api.Asset.ASSET -> ex.objJson,
                 C.Api.Import.IMPORTED -> JsBoolean(false)
               ))
               this.writeToYou(resp)
@@ -189,7 +189,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
         }
 
         log.info(s"Import worker $workerIdx done iterating")
-        throw new AllDone
+        throw AllDone()
       }
     }
   }

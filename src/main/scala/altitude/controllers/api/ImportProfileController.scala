@@ -13,7 +13,7 @@ import altitude.Util
 class ImportProfileController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override val POST_VALIDATOR = Some(ApiValidator(List(
+  override val HTTP_POST_VALIDATOR = Some(ApiValidator(List(
     C.Api.ImportProfile.NAME, C.Api.ImportProfile.KEYWORDS
   )))
 
@@ -39,7 +39,7 @@ class ImportProfileController extends BaseApiController {
           Json.obj(C.Tag.ID -> TagConfigService.KEYWORDS_TAG_ID, C.ImportProfile.VALUES -> keywordList)
     ))
 
-    val importProfile = new ImportProfile(name = name.get, tagData = tagData)
+    val importProfile = ImportProfile(name = name.get, tagData = tagData)
     log.debug(importProfile.toJson.toString())
     val newImportProfile: ImportProfile = app.service.importProfile.add(importProfile)
 

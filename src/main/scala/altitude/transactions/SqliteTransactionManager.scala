@@ -29,7 +29,7 @@ class SqliteTransactionManager(app: Altitude, txContainer: scala.collection.muta
       case false => SqliteTransactionManager.wConnection
     }
 
-    log.info(s"Getting connection $conn. Read-only: $readOnly")
+    log.debug(s"Getting connection $conn. Read-only: $readOnly")
     conn
   }
 

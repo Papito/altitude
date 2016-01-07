@@ -14,7 +14,7 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
   else, create a new one
    */
   def transaction(implicit txId: TransactionId, readOnly: Boolean = false): JdbcTransaction = {
-    log.debug(s"TX. Getting transaction for ${txId.id}")
+    log.debug(s"Getting transaction for ${txId.id}")
 
     // see if we already have a transaction id defined
     if (txContainer.contains(txId.id)) {
@@ -77,7 +77,7 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
       tx.down()
 
       if (!tx.isNested) {
-        log.debug(s"TX. End: ${tx.id}", C.LogTag.DB)
+        log.debug(s"End: ${tx.id}", C.LogTag.DB)
         tx.commit()
         app.transactions.COMMITTED += 1
       }
@@ -87,14 +87,14 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
     catch {
       case ex: Exception => {
         tx.down()
-        log.error("TX. Error: " + ex.getMessage)
+        log.error(s"Error (${ex.getClass.getName}): ${ex.getMessage}")
         throw ex
       }
     }
     finally {
       // clean up, if we are done with this transaction
       if (!tx.isNested) {
-        log.debug(s"TX. Closing: ${tx.id}", C.LogTag.DB)
+        log.debug(s"Closing: ${tx.id}", C.LogTag.DB)
         closeTransaction(tx)
         app.transactions.CLOSED += 1
         txContainer.remove(txId.id)
@@ -117,14 +117,14 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
     catch {
       case ex: Exception => {
         tx.down()
-        log.error("TX. Error: " + ex.getMessage)
+        log.error(s"Error (${ex.getClass.getName}): ${ex.getMessage}")
         throw ex
       }
     }
     finally {
       if (!tx.isNested) {
-        log.debug(s"TX. End: ${tx.id}", C.LogTag.DB)
-        log.debug(s"TX. Closing: ${tx.id}", C.LogTag.DB)
+        log.debug(s"End: ${tx.id}", C.LogTag.DB)
+        log.debug(s"Closing: ${tx.id}", C.LogTag.DB)
         closeTransaction(tx)
         app.transactions.CLOSED += 1
         txContainer.remove(txId.id)

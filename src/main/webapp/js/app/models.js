@@ -5,3 +5,9 @@ function Asset(data) {
   this.createdAt = data ? data.createdAt : null;
   this.updatedAt = data ? data.updatedAt : null;
 }
+
+function Folder(data) {
+  this.id = data ? data.id : null;
+  this.name = data ? data.name : null;
+  this.numOfAssets = data ? data.numOfAssets : null;
+}

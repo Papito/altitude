@@ -5,10 +5,12 @@ CREATE TABLE db_version(
 );
 CREATE UNIQUE INDEX db_version_idx ON db_version(version);
 
+
 CREATE TABLE _core (
   created_at timestamp WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp WITHOUT TIME ZONE DEFAULT NULL
 );
+
 
 CREATE TABLE asset (
   id varchar(24) PRIMARY KEY,
@@ -19,17 +21,10 @@ CREATE TABLE asset (
   metadata jsonb,
   path TEXT NOT NULL,
   filename TEXT NOT NULL,
-  image_data BYTEA,
   size_bytes INT NOT NULL
 ) INHERITS (_core);
 CREATE UNIQUE INDEX asset_md5 ON asset(md5);
-
-CREATE TABLE preview (
-  id varchar(24) PRIMARY KEY,
-  asset_id varchar(24),
-  mime_type varchar(64) NOT NULL,
-  data TEXT NOT NULL
-) INHERITS (_core);
+CREATE UNIQUE INDEX asset_path ON asset(path);
 
 
 CREATE TABLE import_profile (
@@ -37,7 +32,17 @@ CREATE TABLE import_profile (
   name varchar(255) NOT NULL,
   tag_data jsonb NOT NULL
 ) INHERITS (_core);
-
 CREATE UNIQUE INDEX import_profile_name ON import_profile(name);
+
+
+CREATE TABLE folder (
+  id varchar(24) PRIMARY KEY,
+  name varchar(255) NOT NULL,
+  name_lc varchar(255) NOT NULL,
+  parent_id varchar(24) NOT NULL DEFAULT '0',
+  num_of_assets INTEGER NOT NULL DEFAULT 0
+) INHERITS (_core);
+CREATE UNIQUE INDEX folder_parent_id_and_name ON folder(parent_id, name);
+
 
 INSERT INTO db_version (id, version) VALUES(1, 1);

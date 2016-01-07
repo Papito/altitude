@@ -27,6 +27,18 @@ object Const {
     val METADATA = "metadata"
   }
 
+  object Folder extends Common {
+    val NAME = "name"
+    val NAME_LC = "name_lc"
+    val PARENT_ID = "parent_id"
+    val NUM_OF_ASSETS = "num_of_assets"
+    val CHILDREN = "children"
+
+    object Ids {
+      val ROOT = "0"
+    }
+  }
+
   object Preview extends Common {
     val ASSET_ID =  "asset_id"
     val MIME_TYPE = "mime_type"
@@ -50,6 +62,7 @@ object Const {
   ---------------------------------------------------------------------------*/
   object Api {
     val ERROR = "error"
+    val STACKTRACE = "stacktrace"
     val WARNING = "warning"
     val CRITICAL = "critical"
     val VALIDATION_ERRORS = "validationErrors"
@@ -85,6 +98,16 @@ object Const {
       val QUERY_STRING = "queryString"
       val RESULTS_PER_PAGE = "rpp"
       val PAGE = "p"
+    }
+
+    object Folder {
+      val HIERARCHY = "hierarchy"
+      val FOLDERS = "folders"
+      val FOLDER = "folder"
+      val PATH = "path"
+      val NAME = "name"
+      val PARENT_ID = "parentId"
+      val NUM_OF_ASSETS = "numOfAssets"
     }
 
     object TagConfig {

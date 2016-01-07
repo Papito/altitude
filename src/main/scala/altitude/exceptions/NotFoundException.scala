@@ -1,5 +1,4 @@
 package altitude.exceptions
 
-class NotFoundException(idType: String, id: String)
-  extends Exception(s"Record for $idType:$id not found")
+case class NotFoundException(msg: String) extends Exception(msg)
 

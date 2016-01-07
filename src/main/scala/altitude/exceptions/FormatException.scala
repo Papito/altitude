@@ -1,3 +1,3 @@
 package altitude.exceptions
 
-class FormatException(msg: String) extends RuntimeException(msg)
+case class FormatException(msg: String) extends RuntimeException(msg)

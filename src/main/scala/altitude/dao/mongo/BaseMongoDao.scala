@@ -40,20 +40,34 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     log.debug(s"Starting database INSERT for: $jsonIn")
 
-    // create DBObject for insert with input data  + required core attributes
-    val id: String = BaseModel.genId
+    // create id UNLESS specified
+    val id: String = (jsonIn \ C.Base.ID).asOpt[String] match {
+      case Some(id: String) => id
+      case _ => BaseModel.genId
+    }
+
     val createdAt = Util.utcNow
     val origObj: DBObject =  com.mongodb.util.JSON.parse(
       jsonIn.toString()).asInstanceOf[DBObject]
-    val coreAttrObj = MongoDBObject("id" -> id, "_id" -> id, C.Base.CREATED_AT -> createdAt)
+    val coreAttrObj = MongoDBObject("_id" -> id, C.Base.CREATED_AT -> createdAt)
     val obj: DBObject = origObj ++ coreAttrObj
 
     COLLECTION.insert(obj)
-    
+
     jsonIn ++ Json.obj(
       C.Base.ID -> JsString(id),
       C.Base.CREATED_AT -> Util.isoDateTime(Some(Util.utcNow))
     )
+  }
+
+  override def deleteByQuery(q: Query)(implicit txId: TransactionId): Int = {
+    val query = fixMongoQuery(q)
+    val mongoQuery: DBObject = query.params
+    log.info(mongoQuery.toString)
+    val res = COLLECTION.remove(mongoQuery)
+    val numDeleted = res.getN
+    log.debug(s"Deleted records: $numDeleted")
+    numDeleted
   }
 
   override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = {
@@ -71,7 +85,12 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
 
   override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {
     val mongoQuery: DBObject = query.params
-    val cursor: MongoCursor = COLLECTION.find(mongoQuery).skip((query.page - 1) * query.rpp).limit(query.rpp)
+
+    val cursor: MongoCursor = query.rpp match {
+      case 0 => COLLECTION.find(mongoQuery)
+      case _ => COLLECTION.find(mongoQuery).skip((query.page - 1) * query.rpp).limit(query.rpp)
+    }
+
     log.debug(s"Found ${cursor.length} records")
 
     // iterate through results and "fix" mongo fields
@@ -84,11 +103,45 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   /*
   Return a JSON record with timestamp and ID fields translated from Mongo's "extended" format
    */
-  protected def fixMongoFields(json: JsObject): JsObject = {
-    json ++ Json.obj(
+  protected final def fixMongoFields(json: JsObject): JsObject = json ++ Json.obj(
       C.Base.ID -> (json \ "_id").as[String],
       C.Base.CREATED_AT ->  (json \ C.Base.CREATED_AT \ "$date").asOpt[String],
       C.Base.UPDATED_AT -> (json \ C.Base.UPDATED_AT \ "$date").asOpt[String]
     )
+
+  protected final def fixMongoQuery(q: Query): Query = {
+    // _id -> id
+    q.params.contains("id")  match {
+      case false => q
+      case true => {
+        val id = q.params.get("id").get
+        val params = (q.params - "id") ++ Map("_id" -> id)
+        Query(params = params, rpp = q.rpp, page = q.page)
+      }
+    }
+  }
+
+  override def updateByQuery(q: Query, json: JsObject, fields: List[String])(implicit txId: TransactionId): Int = {
+    log.debug(s"Updating with data $json for $q")
+
+    val query  = fixMongoQuery(q)
+    val mongoQuery: DBObject = query.params
+
+    // combine the selected fields we want to update from the JSON repr of the mode, with updated_at
+    val updateJson = JsObject(
+      json.fieldSet.filter {v: (String, JsValue) => fields.contains(v._1)}.toSeq) ++ Json.obj(
+        C.Base.UPDATED_AT -> Util.isoDateTime(Some(Util.utcNow))
+    )
+
+    val o: DBObject =  MongoDBObject(
+      "$set" -> com.mongodb.util.JSON.parse(updateJson.toString()).asInstanceOf[DBObject]
+    )
+
+    log.debug(s"Updating with data $updateJson for $mongoQuery")
+
+    val res: WriteResult = COLLECTION.update(mongoQuery, o)
+    val updated = res.getN
+    log.debug(s"Updated $updated records")
+    updated
   }
 }

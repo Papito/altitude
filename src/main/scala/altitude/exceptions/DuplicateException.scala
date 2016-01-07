@@ -1,5 +1,5 @@
 package altitude.exceptions
 
-import altitude.models.Asset
+import play.api.libs.json.JsObject
 
-case class DuplicateException(asset: Asset) extends Exception
+case class DuplicateException(objJson: JsObject) extends Exception

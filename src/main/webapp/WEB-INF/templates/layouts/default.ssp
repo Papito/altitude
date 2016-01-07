@@ -10,16 +10,23 @@
 <head>
 <title>${config.getString("app.name")}</title>
 
-<link rel="stylesheet" type="text/css" href="/static/css/app.css?<%= altitude.Util.randomStr(10) %>">
 <link rel="stylesheet" type="text/css" href="/static/css/lib/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="/static/css/lib/select2.css">
+<!--link rel="stylesheet" type="text/css" href="/static/css/lib/select2.css"-->
+<link rel="stylesheet" type="text/css" href="/static/css/app.css">
+<link rel="stylesheet" type="text/css" href="/static/css/lib/jquery.contextMenu.min.css">
+<link rel="stylesheet" type="text/css" href="/static/css/lib/jquery.contextMenu.min.css.map">
 
-<script src="/static/js/lib/jquery-2.1.1.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jstree/themes/default/style.min.css">
+
+    <script src="/static/js/lib/jquery-2.1.1.min.js"></script>
 <script src="/static/js/lib/bootstrap.js"></script>
 <script src="/static/js/lib/knockout-3.2.0.js"></script>
 <script src="/static/js/lib/knockout-custom-bindings.js"></script>
-<script src="/static/js/lib/modernizr.custom.js"></script>
-<script src="/static/js/lib/select2.min.js"></script>
+<!--script src="/static/js/lib/modernizr.custom.js"></script-->
+<!--script src="/static/js/lib/select2.min.js"></script-->
+<script src="/static/js/lib/context-menu/jquery.contextMenu.min.js"></script>
+<script src="/static/js/lib/context-menu/jquery.ui.position.min.js"></script>
+<script src="/static/js/lib/jstree/jstree.min.js"></script>
 <script src="/static/js/lib/Base.js"></script>
 <script src="/static/js/app/utils.js?"></script>
 <script src="/static/js/app/core.js?"></script>
@@ -38,10 +45,10 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="/">${config.getString("app.name")}</a>
-        <p class="navbar-text">${screenTitle}</p>
+        <p class="navbar-text"><span id="screenTitle">${screenTitle}</span></p>
       </div>
       <div class="navbar-collapse collapse">
-        <ul class="nav navbar-nav navbar-right">
+        <ul class="nav navbar-nav navbar-left">
           <li><a href="/cl/import">Import</a></li>
         </ul>
         <form class="navbar-form navbar-right" method="GET" action="/cl/search">
@@ -50,15 +57,46 @@
         </div>
       </div>
     </div>
-    </header>
+  </header>
 
     <section>
       <div id="content" class="container-fluid">
+
+        <div id="successMessage" class="alert alert-success" style="display: none" role="alert"
+             data-bind="text: successMessage">
+        </div>
+
+        <div id="infoMessage" class="alert alert-info" style="display: none" role="alert"
+        data-bind="text: infoMessage">
+
+        </div>
+
+        <div id="warningMessage" class="alert alert-warning" style="display: none" role="alert"
+        data-bind="text: warningMessage">
+
+        </div>
+
+
+        <div id="errorContainer" class="alert alert-danger alert-dismissible fade in" role="alert" style="display: none">
+          <button type="button" class="close" aria-label=Close data-bind="click: dismissError"><span aria-hidden=true>&times;</span></button>
+          <h4 data-bind="visible: errorMessage">
+            Error. <span data-bind="text: errorMessage, visible: errorMessage"></span>
+          </h4>
+
+          <p>
+            <button type="button" class="btn btn-info" data-bind="click: reportError">Send anonymous error report (pretty please?)</button>
+            <button type="button" class="btn btn-default" data-bind="click: dismissError">Dismiss</button>
+          </p>
+          <h4 data-bind="visible: errorStacktrace" style="margin-top: 2em">Detail</h4>
+          <p data-bind="text: errorStacktrace, visible: errorStacktrace"></p>
+
+        </div>
+
       ${unescape(body)}
       </div>
     </section>
 
-    <footer>footer</footer>
+    <footer></footer>
 
     ${unescape(assets)}
   </body>

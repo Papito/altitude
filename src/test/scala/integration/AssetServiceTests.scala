@@ -1,8 +1,9 @@
 package integration
 
 import altitude.exceptions.NotFoundException
+import org.scalatest.DoNotDiscover
 
-class AssetServiceTests (val config: Map[String, String]) extends IntegrationTestCore {
+@DoNotDiscover class AssetServiceTests (val config: Map[String, String]) extends IntegrationTestCore {
   test("get asset by invalid id") {
     intercept[NotFoundException] {
       altitude.service.library.getById("invalid")

@@ -1,6 +1,5 @@
 package altitude.controllers.web
 
-import altitude.controllers.BaseController
 import altitude.exceptions.NotFoundException
 import altitude.models.Preview
 import altitude.{Const => C}

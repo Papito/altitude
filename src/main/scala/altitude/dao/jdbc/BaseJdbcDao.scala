@@ -3,7 +3,6 @@ package altitude.dao.jdbc
 import java.sql.Connection
 
 import altitude.dao.BaseDao
-import altitude.exceptions.NotFoundException
 import altitude.models.BaseModel
 import altitude.models.search.Query
 import altitude.transactions.{JdbcTransactionManager, TransactionId}
@@ -30,6 +29,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   protected def CORE_SQL_VALS_FOR_INSERT: String
   protected def DEFAULT_SQL_COLS_FOR_SELECT: String
   protected def JSON_PLACEHOLDER: String
+  protected def CURRENT_TIME_FUNC: String
   protected val CORE_SQL_COLS_FOR_INSERT = s"${C.Base.ID}"
   protected val VERSION_TABLE_NAME = "db_version"
 
@@ -62,45 +62,84 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     }
   }
 
+  override def deleteByQuery(q: Query)(implicit txId: TransactionId): Int = {
+    if (q.params.isEmpty) {
+      return 0
+    }
+
+    log.debug(s"Deleting record by query: $q")
+    val fieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
+
+    // TODO: safeguards to prevent mass-deletion
+    val sql = s"""
+      DELETE
+        FROM $tableName
+       WHERE ${fieldPlaceholders.mkString(",")}
+      """
+
+    log.debug(s"Delete SQL: $sql, with values: ${q.params.values.toList}")
+    val runner: QueryRunner = new QueryRunner()
+    val numDeleted = runner.update(conn, sql,  q.params.values.toList:_*)
+    log.debug(s"Deleted records: $numDeleted")
+    numDeleted
+  }
+
   override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {
     val (sqlColumns, sqlValues) = query.params.unzip
     // create pairs of column names and value placeholders, to be joined in the final clause
-    val whereClauses: List[String] = for (column <- sqlColumns.toList) yield  s"$column = ?"
+    val whereClauses: List[String] = sqlColumns.map(_ + " = ?").toList
+
 
     val whereClause = whereClauses.length match {
       case 0 => ""
-      case _ => s"""WHERE ${whereClauses.mkString("AND")}"""
+      case _ => s"""WHERE ${whereClauses.mkString(" AND ")}"""
     }
 
-    log.info("OFFSET " + (query.page - 1) * query.rpp)
-    val sql = s"""
+    val sqlWithoutPaging = s"""
       SELECT $DEFAULT_SQL_COLS_FOR_SELECT
         FROM $tableName
         $whereClause
-       LIMIT ${query.rpp}
-      OFFSET ${(query.page - 1) * query.rpp}"""
+    """
 
+    val sql = query.rpp match {
+      case 0 => sqlWithoutPaging
+      case _ => sqlWithoutPaging + s"""
+        LIMIT ${query.rpp}
+        OFFSET ${(query.page - 1) * query.rpp}"""
+    }
+
+    log.debug(s"QUERY: $sql with $sqlValues")
     val recs = manyBySqlQuery(sql, sqlValues.toList)
 
     log.debug(s"Found: ${recs.length}")
+    log.debug(recs.map(_.toString()).mkString("\n"))
     recs.map{makeModel}
   }
 
-  protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object])(implicit txId: TransactionId): JsObject = {
-    //log.info(s"POSTGRES INSERT: $jsonIn", C.tag.DB)
-    val id = BaseModel.genId
+  protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object], id: Option[String] = None)
+                         (implicit txId: TransactionId): JsObject = {
+    log.info(s"JDBC INSERT: $jsonIn")
+
+    // create ID unless there is an override
+    val _id = id.isDefined match {
+      case false => BaseModel.genId
+      case true => id.get
+    }
     val createdAt = utcNow
 
     // prepend ID and CREATED AT to the values, as those are required for any record
-    val values: List[Object] = id :: vals
+    val values: List[Object] = _id :: vals
     //log.debug(s"SQL: $q. ARGS: ${values.toString()}")
 
     val runner: QueryRunner = new QueryRunner()
     runner.update(conn, q, values:_*)
 
-    jsonIn ++ JsObject(Seq(
-      C.Base.ID -> JsString(id),
+    val recordJson = jsonIn ++ JsObject(Seq(
+      C.Base.ID -> JsString(_id),
       C.Base.CREATED_AT -> dtAsJsString{createdAt}))
+
+    log.debug(s"Added: $recordJson")
+    recordJson
   }
 
   protected def manyBySqlQuery(sql: String, vals: List[Object])(implicit txId: TransactionId): List[Map[String, AnyRef]] = {
@@ -119,15 +158,41 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     log.debug(s"Found ${res.size()} records", C.LogTag.DB)
 
     if (res.size() == 0)
-      throw new NotFoundException(C.IdType.QUERY, sql)
+      return None
 
     if (res.size() > 1)
       throw new Exception("getById should return only a single result")
 
     val rec = res.get(0)
 
-    //log.debug(s"RECORD: $rec")
+    log.debug(s"RECORD: $rec")
     Some(rec.toMap[String, AnyRef])
+  }
+
+  override def updateByQuery(q: Query, json: JsObject, fields: List[String])(implicit txId: TransactionId): Int = {
+    log.debug(s"Updating record by query $q with data $json for fields: $fields")
+
+    val queryFieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
+    val updateFieldPlaceholders: List[String] = json.keys.filter(fields.contains(_)).map(_ + " = ?").toList
+
+    val sql = s"""
+      UPDATE $tableName
+         SET ${C.Base.UPDATED_AT} = $CURRENT_TIME_FUNC, ${updateFieldPlaceholders.mkString(", ")}
+       WHERE ${queryFieldPlaceholders.mkString(",")}
+      """
+
+    val dataUpdateValues = json.fields.filter{
+      // extract only the json elements we want to update
+      v: (String, JsValue) => fields.contains(v._1)}.map{
+      // convert the values to string
+      v: (String, JsValue) => v._2.as[String]}.toList
+
+    log.debug(s"Update SQL: $sql, with query values: ${q.params.values.toList} and data: $dataUpdateValues")
+    val runner: QueryRunner = new QueryRunner()
+    val valuesForAllPlaceholders = dataUpdateValues ::: q.params.values.toList
+
+    val numUpdated = runner.update(conn, sql,  valuesForAllPlaceholders:_*)
+    numUpdated
   }
 
   /*

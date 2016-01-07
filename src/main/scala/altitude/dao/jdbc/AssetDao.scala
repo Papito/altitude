@@ -16,7 +16,8 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
       mediaSubtype = rec.get(C.Asset.MEDIA_SUBTYPE).get.asInstanceOf[String],
       mime = rec.get(C.Asset.MIME_TYPE).get.asInstanceOf[String])
 
-    val model = Asset(id = Some(rec.get(C.Asset.ID).get.asInstanceOf[String]),
+    val model = Asset(
+      id = Some(rec.get(C.Asset.ID).get.asInstanceOf[String]),
       path = rec.get(C.Asset.PATH).get.asInstanceOf[String],
       md5 = rec.get(C.Asset.MD5).get.asInstanceOf[String],
       mediaType = mediaType,

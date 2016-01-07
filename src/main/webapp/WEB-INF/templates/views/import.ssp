@@ -9,7 +9,7 @@
 <% attributes("screenTitle")= "Import" %>
 
 <div class="row" id="importControls">
-    <div class="col-md-12 col-lg-12">
+    <div class="col-md-12">
         <div class="row" id="selectImportMode" data-bind="visible: importMode() == null">
             <div class="col-md-5 col-lg-5">
                 <button class="large btn btn-default btn-lg btn-block" data-bind="click: function(){getDirectoryNames(null)}" data-toggle="modal" data-target="#selectImportDirectory">Select a folder</button>
@@ -27,7 +27,7 @@
             </div>
         </div>
         <div class="row">
-           <div class="col-md-12 col-lg-12">
+           <div class="col-md-12">
                 <div class="progress" style="display: none" data-bind="visible: isImporting() && assetsProcessedCnt() > 0">
                     <div data-bind="attr: {'aria-valuenow': percentComplete}, style: {width: percentComplete() + '%'}"
                         class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">

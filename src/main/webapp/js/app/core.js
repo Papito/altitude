@@ -10,6 +10,39 @@ BaseViewModel = Base.extend({
   constructor : function() {
     console.log('Initializing base view model');
     this.base();
+
+    this.successMessage = ko.observable();
+    this.successEl = $('#successMessage');
+
+    this.infoMessage = ko.observable();
+    this.infoEl = $('#infoMessage');
+
+    this.warningMessage = ko.observable();
+    this.warningEl = $('#warningMessage');
+
+    this.errorMessage = ko.observable();
+    this.errorStacktrace = ko.observable();
+  },
+  // ----------------------------------------------------------------
+
+  blinkSuccess: function(msg) {
+    this.successEl.show();
+    this.successMessage(msg);
+    this.successEl.fadeOut(5000);
+  },
+  // ----------------------------------------------------------------
+
+  blinkInfo: function(msg) {
+    this.infoEl.show();
+    this.infoMessage(msg);
+    this.infoEl.fadeOut(5000);
+  },
+  // ----------------------------------------------------------------
+
+  blinkWarning: function(msg) {
+    this.warningEl.show();
+    this.warningMessage(msg);
+    this.warningEl.fadeOut(5000);
   },
   // ----------------------------------------------------------------
 
@@ -34,7 +67,7 @@ BaseViewModel = Base.extend({
   // ----------------------------------------------------------------
 
   resetFormErrors: function(el) {
-    $(el).find('.has-error').removeClass('has-error').parent().find('> .error').text('');
+    $(el).find('.has-error').removeClass('has-error').parent().find('.error').text('');
   },
 
   hide: function(el) {
@@ -43,15 +76,9 @@ BaseViewModel = Base.extend({
 
   restRequest : function(url, method, opts) {
     var self = this;
-
     method = method.toUpperCase();
 
     data = opts.data || {};
-
-    if (method == 'DELETE' && !opts.successCallback) {
-      alert('Cannot call "DELETE" method without successCallback defined');
-      return;
-    }
 
     $.ajax({
       type : method,
@@ -63,20 +90,31 @@ BaseViewModel = Base.extend({
         // unhandled exceptions
         if (jqXHR.status === 500) {
           console.log(jqXHR.responseText);
+          var msg = jqXHR.responseJSON ? jqXHR.responseJSON.error : jqXHR.responseText;
+          var stacktrace = jqXHR.responseJSON ? jqXHR.responseJSON.stacktrace : jqXHR.responseText;
+          self.showError();
+          self.errorMessage(msg);
+          self.errorStacktrace(stacktrace);
         }
 
         // validation errors
         if (jqXHR.status === 400) {
           var json = jqXHR.responseJSON;
 
+          // if there is a container where we want to look for errors, we must specify it
+
           if (json.validationErrors) {
             var errz = json.validationErrors;
-            for(var field in errz) {
-              $('[name=' + field + ']')
-                  .parent().addClass('has-error').parent()
-                  .find('> .error').text(errz[field]);
-            }
+            var errElId = '#' + opts.errorContainerId;
 
+            for(var field in errz) {
+              var errSelector = '[name=' + field + ']';
+              var selector = errElId ? errElId + ' ' + errSelector : errSelector;
+              console.log("eror selector:", selector);
+              $(selector)
+                  .parent().addClass('has-error').parent()
+                  .find('.error').text(errz[field]);
+            }
           }
         }
 
@@ -98,7 +136,10 @@ BaseViewModel = Base.extend({
 
       },
       success : function(json, textStatus, jqXHR) {
-        console.log(json);
+        if (json) {
+          console.log(json);
+        }
+
         if (opts.successCallback) {
           opts.successCallback(json, textStatus, jqXHR);
         }
@@ -108,5 +149,17 @@ BaseViewModel = Base.extend({
         }
       }
     });
+  },
+
+  reportError: function() {
+    console.log("error report placeholder");
+  },
+
+  showError: function() {
+    $('#errorContainer').show();
+  },
+
+  dismissError: function() {
+    $('#errorContainer').hide();
   }
 });
