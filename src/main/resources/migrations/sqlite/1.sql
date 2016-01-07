@@ -14,6 +14,7 @@ CREATE TABLE asset  (
   mime_type varchar(64) NOT NULL,
   metadata TEXT,
   path TEXT NOT NULL,
+  folder_id varchar(24) NOT NULL DEFAULT "1",
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
   created_at DATE DEFAULT (datetime('now', 'localtime')),
@@ -21,6 +22,7 @@ CREATE TABLE asset  (
 );
 CREATE UNIQUE INDEX asset_md5 ON asset(md5);
 CREATE UNIQUE INDEX asset_path ON asset(path);
+CREATE INDEX asset_folder ON asset(folder_id);
 
 
 CREATE TABLE import_profile (

@@ -51,26 +51,19 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
    * Get the entire hierarchy, with nested children. The root folders are returned
    * as a list.
    */
-  def hierarchy(rootId: String = C.Folder.Ids.ROOT)
+  def hierarchy(rootId: String = Folder.ROOT.id.get)
                (implicit txId: TransactionId = new TransactionId): List[Folder] = {
     val all = getAll()
     val rootEl = all.find(json => (json \ C.Folder.ID).as[String] == rootId)
 
-    val folders = rootId == C.Folder.Ids.ROOT || rootId == C.Folder.Ids.UNCATEGORIZED || rootEl.isDefined match {
+    val folders = Folder.IS_ROOT(Some(rootId)) || Folder.IS_UNCATEGORIZED(Some(rootId)) || rootEl.isDefined match {
       case true => children(all, parentId = rootId)
       case false => throw NotFoundException(s"Cannot get hierarchy. Root folder $rootId does not exist")
     }
 
     // prepend the "uncategorized" system folder for root
-    rootId == C.Folder.Ids.ROOT match {
-      case true => {
-        val uncategorizedFolder = Folder(
-          id = Some(C.Folder.Ids.UNCATEGORIZED),
-          name = C.Folder.Names.UNCATEGORIZED,
-          parentId = C.Folder.Ids.ROOT
-        )
-        uncategorizedFolder :: folders
-      }
+    Folder.IS_ROOT(Some(rootId)) match {
+      case true => Folder.SYSTEM_FOLDERS ::: folders
       case false => folders
     }
   }
@@ -81,9 +74,15 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
    */
   def path(folderId: String)
           (implicit txId: TransactionId = new TransactionId): List[Folder] = {
+
     // short-circuit for root folder
-    if (folderId == C.Folder.Ids.ROOT) {
+    if (Folder.IS_ROOT(Some(folderId))) {
       return List[Folder]()
+    }
+
+    // handle uncategorized
+    if (Folder.IS_UNCATEGORIZED(Some(folderId))) {
+      return List[Folder](Folder.ROOT, Folder.UNCATEGORIZED)
     }
 
     val all = getAll()
@@ -96,13 +95,13 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
     val parents = findParents(folderId =folderId, all = getAll())
 
-    (folder :: parents).reverse
+    List(Folder.ROOT) ::: (folder :: parents).reverse
   }
 
   /**
    * Get children for the root given, but only a single level - non-recursive
    */
-  def immediateChildren(rootId: String = C.Folder.Ids.ROOT, all: List[JsValue] = List())
+  def immediateChildren(rootId: String = Folder.ROOT.id.get, all: List[JsValue] = List())
                        (implicit txId: TransactionId = new TransactionId): List[Folder] = {
     val _all = all.isEmpty match {
       case true =>  {
@@ -112,10 +111,15 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       case false => all
     }
 
-    _all
-      .filter(json => (json \ C.Folder.PARENT_ID).as[String] == rootId)
-      .map{json => Folder.fromJson(json)}
-      .sortBy(_.nameLowercase)
+    val folders = _all
+        .filter(json => (json \ C.Folder.PARENT_ID).as[String] == rootId)
+        .map{json => Folder.fromJson(json)}
+        .sortBy(_.nameLowercase)
+
+    Folder.IS_ROOT(Some(rootId)) match {
+      case true => Folder.SYSTEM_FOLDERS ::: folders
+      case false => folders
+    }
   }
 
   override def deleteById(id: String)(implicit txId: TransactionId = new TransactionId): Int = {
@@ -205,11 +209,11 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   def move(folderBeingMovedId: String, destFolderId: String)
           (implicit txId: TransactionId = new TransactionId): Unit = {
 
-    if (isSystem(folderBeingMovedId)) {
+    if (Folder.IS_SYSTEM(Some(folderBeingMovedId)) == true || Folder.IS_ROOT(Some(folderBeingMovedId))) {
       throw new IllegalOperationException("Cannot move a system folder")
     }
 
-    if (isUncategorized(destFolderId)) {
+    if (Folder.IS_SYSTEM(Some(destFolderId)) == true) {
       throw new IllegalOperationException("Cannot move into a system folder")
     }
 
@@ -243,7 +247,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
   def rename(folderId: String, newName: String)
             (implicit txId: TransactionId = new TransactionId): Unit = {
-    if (isSystem(folderId)) {
+    if (Folder.IS_SYSTEM(Some(folderId)) == true || Folder.IS_ROOT(Some(folderId))) {
       throw new IllegalOperationException("Cannot rename a system folder")
     }
 
@@ -270,8 +274,4 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       }
     }
   }
-
-  private def isRoot(id: String) = id == C.Folder.Ids.ROOT
-  private def isUncategorized(id: String) = id == C.Folder.Ids.UNCATEGORIZED
-  private def isSystem(id: String) = isRoot(id) || isUncategorized(id)
 }

@@ -33,6 +33,9 @@ object Const {
     val PARENT_ID = "parent_id"
     val NUM_OF_ASSETS = "num_of_assets"
     val CHILDREN = "children"
+    val IS_ROOT = "is_root"
+    val IS_UNCATEGORIZED = "is_uncategorized"
+    val IS_SYSTEM = "is_system"
 
     object Ids {
       val ROOT = "0"
@@ -40,7 +43,8 @@ object Const {
     }
 
     object Names {
-      val UNCATEGORIZED = "Uncategorized" //TODO: not i18n
+      val UNCATEGORIZED = "Uncategorized"  //TODO: not i18n
+      val ROOT = "Root" //TODO: not i18n
     }
   }
 

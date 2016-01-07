@@ -58,7 +58,7 @@ import altitude.{Const => C}
     folder2.id should contain(folder2_2.parentId)
 
     val folders = altitude.service.folder.hierarchy()
-    folders.length should be(3)
+    folders.length should be(4)
     folders(1).children.length should be (2)
     folders(2).children.length should be (2)
     folders(2).children.head.children.length should be(1)
@@ -70,8 +70,8 @@ import altitude.{Const => C}
 
     // check breadcrumb
     val path = altitude.app.service.folder.path(folderId = folder2_1_1.id.get)
-    path.length should be(3)
-    path.head.id should be(folder2.id)
+    path.length should be(4)
+    path(1).id should be(folder2.id)
     path.last.id should be(folder2_1_1.id)
   }
 
@@ -100,7 +100,7 @@ import altitude.{Const => C}
     }
 
     val folders = altitude.service.folder.hierarchy()
-    folders.length should be(2)
+    folders.length should be(3)
   }
 
   test("validate") {
@@ -300,11 +300,11 @@ import altitude.{Const => C}
 
     // rename a system folder
     intercept[IllegalOperationException] {
-      altitude.service.folder.rename(C.Folder.Ids.ROOT, folder1.name)
+      altitude.service.folder.rename(Folder.ROOT.id.get, folder1.name)
     }
 
     intercept[IllegalOperationException] {
-      altitude.service.folder.rename(C.Folder.Ids.UNCATEGORIZED, folder1.name)
+      altitude.service.folder.rename(Folder.UNCATEGORIZED.id.get, folder1.name)
     }
   }
 }
