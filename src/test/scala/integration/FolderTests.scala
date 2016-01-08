@@ -31,11 +31,11 @@ import altitude.{Const => C}
     folder1.id should contain(folder1_2.parentId)
 
     /*
-      uncategorized
       folder2
         folder2_1
           folder2_1_1
         folder2_2
+      uncategorized
       */
     val folder2: Folder = altitude.service.folder.add(
       Folder(name = "folder2"))
@@ -58,7 +58,7 @@ import altitude.{Const => C}
     folder2.id should contain(folder2_2.parentId)
 
     val folders = altitude.service.folder.hierarchy()
-    folders.length should be(4)
+    folders.length should be(3)
     folders(1).children.length should be (2)
     folders(2).children.length should be (2)
     folders(2).children.head.children.length should be(1)
@@ -100,7 +100,7 @@ import altitude.{Const => C}
     }
 
     val folders = altitude.service.folder.hierarchy()
-    folders.length should be(3)
+    folders.length should be(2)
   }
 
   test("validate") {
@@ -307,4 +307,5 @@ import altitude.{Const => C}
       altitude.service.folder.rename(Folder.UNCATEGORIZED.id.get, folder1.name)
     }
   }
+
 }

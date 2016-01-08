@@ -16,6 +16,7 @@ class FolderController  extends BaseApiController {
 
   get() {
     val folders = app.service.folder.hierarchy()
+
     Ok(Json.obj(
       C.Api.Folder.HIERARCHY ->folders.map(_.toJson)
     ))

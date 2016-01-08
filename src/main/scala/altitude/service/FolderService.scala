@@ -56,15 +56,9 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     val all = getAll()
     val rootEl = all.find(json => (json \ C.Folder.ID).as[String] == rootId)
 
-    val folders = Folder.IS_ROOT(Some(rootId)) || Folder.IS_UNCATEGORIZED(Some(rootId)) || rootEl.isDefined match {
+    Folder.IS_ROOT(Some(rootId)) || Folder.IS_UNCATEGORIZED(Some(rootId)) || rootEl.isDefined match {
       case true => children(all, parentId = rootId)
       case false => throw NotFoundException(s"Cannot get hierarchy. Root folder $rootId does not exist")
-    }
-
-    // prepend the "uncategorized" system folder for root
-    Folder.IS_ROOT(Some(rootId)) match {
-      case true => Folder.SYSTEM_FOLDERS ::: folders
-      case false => folders
     }
   }
 
@@ -117,7 +111,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
         .sortBy(_.nameLowercase)
 
     Folder.IS_ROOT(Some(rootId)) match {
-      case true => Folder.SYSTEM_FOLDERS ::: folders
+      case true =>  Folder.SYSTEM_FOLDERS ::: folders
       case false => folders
     }
   }
@@ -209,11 +203,11 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   def move(folderBeingMovedId: String, destFolderId: String)
           (implicit txId: TransactionId = new TransactionId): Unit = {
 
-    if (Folder.IS_SYSTEM(Some(folderBeingMovedId)) == true || Folder.IS_ROOT(Some(folderBeingMovedId))) {
+    if (Folder.IS_SYSTEM(Some(folderBeingMovedId)) || Folder.IS_ROOT(Some(folderBeingMovedId))) {
       throw new IllegalOperationException("Cannot move a system folder")
     }
 
-    if (Folder.IS_SYSTEM(Some(destFolderId)) == true) {
+    if (Folder.IS_SYSTEM(Some(destFolderId))) {
       throw new IllegalOperationException("Cannot move into a system folder")
     }
 
@@ -247,7 +241,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
   def rename(folderId: String, newName: String)
             (implicit txId: TransactionId = new TransactionId): Unit = {
-    if (Folder.IS_SYSTEM(Some(folderId)) == true || Folder.IS_ROOT(Some(folderId))) {
+    if (Folder.IS_SYSTEM(Some(folderId)) || Folder.IS_ROOT(Some(folderId))) {
       throw new IllegalOperationException("Cannot rename a system folder")
     }
 

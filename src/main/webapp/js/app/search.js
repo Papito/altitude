@@ -230,8 +230,8 @@ SearchViewModel = BaseViewModel.extend({
         }
 
         var hierarchy = [{
-          'id': self.rootFolder.id,
-          'name': self.rootFolder.name,
+          'id': 0,
+          'name': 'Root',
           'children': allFolders
         }];
 
