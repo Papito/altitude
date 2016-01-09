@@ -8,7 +8,7 @@
 <% attributes("screenTitle")= "Search" %>
 
 <div id="path" class="row" data-bind="visible: currentFolderPath().length > 1" style="display: none">
-  <div class="col-md-11 well well-sm" data-bind="foreach: currentFolderPath">
+  <div class="col-md-12 well well-sm" data-bind="foreach: currentFolderPath">
     <!-- ko if: $index() < $parent.currentFolderPath().length - 1 -->
       <span><a href="#" data-bind="text: $data.name, click: function() {$root.loadFolders($data.id)}"></a></span>
       &#8658;&nbsp;
@@ -21,8 +21,12 @@
 
 <div class="row">
   <div class="col-md-2" id="left">
+
+    <!--
+      folders
+    -->
     <div class="row">
-      <div id="folders" style="height: 60%">
+      <div id="folders">
         <div>
           <span class="header">
             <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
@@ -57,6 +61,30 @@
         </ul>
       </div><!-- /folders -->
     </div><!-- /row -->
+
+    <!--
+      system folders
+    -->
+    <div class="row">
+      <div id="systemFolders">
+        <div class="system-folder">
+          <span class="header">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            &nbsp;&nbsp;<a href="">Uncategorized</a>
+          </span>
+        </div>
+        <div class="system-folder trash">
+          <span class="header">
+            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+            &nbsp;&nbsp;<a href="">Trash</a>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!--
+      preview
+    -->
     <div class="row">
       <div class="col-md-12" style="height: 40%">
         <div id="preview">
