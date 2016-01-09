@@ -225,6 +225,35 @@ import altitude.{Const => C}
     altitude.app.service.folder.immediateChildren(rootId = folder1_1.id.get).length should be (0)
   }
 
+  test("move folder to root") {
+    /*
+  folder1
+    folder1_1
+      folder1_1_1
+  folder2
+  */
+    val folder1: Folder = altitude.service.folder.add(
+      Folder(name = "folder1"))
+
+    val folder1_1: Folder = altitude.service.folder.add(
+      Folder(name = "folder1_1", parentId = folder1.id.get))
+
+    val folder1_1_1: Folder = altitude.service.folder.add(
+      Folder(name = "folder1_1_1", parentId = folder1_1.id.get))
+
+    val folder2: Folder = altitude.service.folder.add(
+      Folder(name = "folder2"))
+
+    // assert initial state
+    altitude.app.service.folder.immediateChildren(rootId = Folder.ROOT.id.get).length should be (2)
+
+    altitude.service.folder.move(folder1_1_1.id.get, Folder.ROOT.id.get)
+    altitude.app.service.folder.immediateChildren(rootId = Folder.ROOT.id.get).length should be (3)
+
+    altitude.service.folder.move(folder1_1.id.get, Folder.ROOT.id.get)
+    altitude.app.service.folder.immediateChildren(rootId = Folder.ROOT.id.get).length should be (4)
+  }
+
   test("illegal move") {
     /*
     folder1
@@ -276,6 +305,11 @@ import altitude.{Const => C}
     // move into a parent with the same immediate child name (different casing_
     intercept[DuplicateException] {
       altitude.service.folder.move(folder1_1_1.id.get, folder3.id.get)
+    }
+
+    // move into a folder that does not exist
+    intercept[IllegalOperationException] {
+    altitude.service.folder.move(folder1.id.get, "bogus")
     }
   }
 

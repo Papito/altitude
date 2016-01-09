@@ -182,6 +182,16 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   }
 
   /**
+   * Handle special case of the root folder, which does not persist
+   */
+  override def getById(id: String)(implicit txId: TransactionId = new TransactionId): JsObject = {
+    Folder.IS_ROOT(Some(id)) match {
+      case true => Folder.ROOT
+      case false => super.getById(id)
+    }
+  }
+
+  /**
    * Returns the children for a folder as a flat list.
    * Useful for quick searches and verifying that a certain child is in a folder's hierarchy.
    */
@@ -213,20 +223,22 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       throw IllegalOperationException(s"Cannot move a folder into own child. $destFolderId ID in $folderBeingMovedId path")
     }
 
-    val folder: Folder = getById(folderBeingMovedId)
+    // check that the destination folder exists
+    try {
+        getById(destFolderId)
+    } catch {
+      case ex: NotFoundException => throw new IllegalOperationException("Destination folder does not exist")
+    }
+
+    val folderBeingMoved: Folder = getById(folderBeingMovedId)
 
     // destination parent cannot have folder by the same name
     val dupQuery = Query(Map(
       C.Folder.PARENT_ID -> destFolderId,
-      C.Folder.NAME_LC -> folder.nameLowercase))
+      C.Folder.NAME_LC -> folderBeingMoved.nameLowercase))
 
-    val folderForUpdate = Folder(parentId = destFolderId, name = folder.name)
-
-    updateById(
-      folderBeingMovedId,
-      folderForUpdate,
-      List(C.Folder.PARENT_ID),
-      Some(dupQuery))
+    val folderForUpdate = Folder(parentId = destFolderId, name = folderBeingMoved.name)
+    updateById(folderBeingMovedId, folderForUpdate, List(C.Folder.PARENT_ID), Some(dupQuery))
   }
 
   def rename(folderId: String, newName: String)
@@ -244,12 +256,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
     try {
       val folderForUpdate = Folder(parentId = folder.parentId, name = newName)
-
-      updateById(
-        folderId,
-        folderForUpdate,
-        List(C.Folder.NAME, C.Folder.NAME_LC),
-        Some(dupQuery))
+      updateById(folderId, folderForUpdate, List(C.Folder.NAME, C.Folder.NAME_LC), Some(dupQuery))
     } catch {
       case _: DuplicateException => {
         val ex = ValidationException()
