@@ -56,7 +56,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     val all = getAll()
     val rootEl = all.find(json => (json \ C.Folder.ID).as[String] == rootId)
 
-    Folder.IS_ROOT(Some(rootId)) || Folder.IS_UNCATEGORIZED(Some(rootId)) || rootEl.isDefined match {
+    Folder.IS_ROOT(Some(rootId)) || rootEl.isDefined match {
       case true => children(all, parentId = rootId)
       case false => throw NotFoundException(s"Cannot get hierarchy. Root folder $rootId does not exist")
     }
@@ -72,11 +72,6 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     // short-circuit for root folder
     if (Folder.IS_ROOT(Some(folderId))) {
       return List[Folder]()
-    }
-
-    // handle uncategorized
-    if (Folder.IS_UNCATEGORIZED(Some(folderId))) {
-      return List[Folder](Folder.ROOT, Folder.UNCATEGORIZED)
     }
 
     val all = getAll()
@@ -105,18 +100,17 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       case false => all
     }
 
-    val folders = _all
+    _all
         .filter(json => (json \ C.Folder.PARENT_ID).as[String] == rootId)
         .map{json => Folder.fromJson(json)}
         .sortBy(_.nameLowercase)
-
-    Folder.IS_ROOT(Some(rootId)) match {
-      case true =>  Folder.SYSTEM_FOLDERS ::: folders
-      case false => folders
-    }
   }
 
   override def deleteById(id: String)(implicit txId: TransactionId = new TransactionId): Int = {
+    if (Folder.IS_ROOT(Some(id))) {
+      throw new IllegalOperationException("Cannot delete the root folder")
+    }
+
     txManager.withTransaction[Int] {
       val res: Option[JsObject] = DAO.getById(id)
 
@@ -203,12 +197,8 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   def move(folderBeingMovedId: String, destFolderId: String)
           (implicit txId: TransactionId = new TransactionId): Unit = {
 
-    if (Folder.IS_SYSTEM(Some(folderBeingMovedId)) || Folder.IS_ROOT(Some(folderBeingMovedId))) {
-      throw new IllegalOperationException("Cannot move a system folder")
-    }
-
-    if (Folder.IS_SYSTEM(Some(destFolderId))) {
-      throw new IllegalOperationException("Cannot move into a system folder")
+    if (Folder.IS_ROOT(Some(folderBeingMovedId))) {
+      throw new IllegalOperationException("Cannot move the root folder")
     }
 
     log.debug(s"Moving folder $folderBeingMovedId to $destFolderId")
@@ -241,8 +231,8 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
   def rename(folderId: String, newName: String)
             (implicit txId: TransactionId = new TransactionId): Unit = {
-    if (Folder.IS_SYSTEM(Some(folderId)) || Folder.IS_ROOT(Some(folderId))) {
-      throw new IllegalOperationException("Cannot rename a system folder")
+    if (Folder.IS_ROOT(Some(folderId))) {
+      throw new IllegalOperationException("Cannot rename the root folder")
     }
 
     val folder: Folder = getById(folderId)
