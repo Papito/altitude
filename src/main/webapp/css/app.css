@@ -62,10 +62,16 @@ footer {
 
 #screenTitle {
     text-transform: uppercase;
+    font-weight: bold;
+}
+
+#divider {
+    border-bottom: 1px inset #494744;
+    margin-bottom: 1em;
 }
 
 #content {
-    height: calc(100% - 7.1em);
+    height: calc(100% - 8em);
     display:block;
 }
 
@@ -162,7 +168,7 @@ footer {
 
 #searchResults {
     height: 100%;
-    display:block;
+    display: block;
     overflow: auto;
 }
 
@@ -172,7 +178,7 @@ footer {
 
 #searchResults .result-box {
     float: left;
-    border: solid #0c0d0e;
+    border: solid 1px #212223;
 }
 
 #addFolderForm input, #renameFolderForm input {
