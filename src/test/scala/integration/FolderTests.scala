@@ -308,7 +308,7 @@ import altitude.{Const => C}
     }
 
     // move into a folder that does not exist
-    intercept[IllegalOperationException] {
+    intercept[ValidationException] {
     altitude.service.folder.move(folder1.id.get, "bogus")
     }
   }

@@ -227,7 +227,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     try {
         getById(destFolderId)
     } catch {
-      case ex: NotFoundException => throw new IllegalOperationException("Destination folder does not exist")
+      case ex: NotFoundException => throw new ValidationException(s"Destination folder ID $destFolderId does not exist")
     }
 
     val folderBeingMoved: Folder = getById(folderBeingMovedId)

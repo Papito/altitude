@@ -131,6 +131,7 @@ object Const {
   val MSG: Map[String, String] = Map(
     "warn.duplicate" -> "Duplicate",
     "err.required" -> "This field is required",
+    "err.validation_error" -> "Validation error",
     "err.validation_errors" -> "There are validation errors in: %s",
     "err.wrong_type" -> "This field does not match the required type (%s)"
   )
