@@ -223,11 +223,12 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       throw IllegalOperationException(s"Cannot move a folder into own child. $destFolderId ID in $folderBeingMovedId path")
     }
 
+    var destFolder: Option[Folder] = None
     // check that the destination folder exists
     try {
-        getById(destFolderId)
+      destFolder = Some(getById(destFolderId))
     } catch {
-      case ex: NotFoundException => throw new ValidationException(s"Destination folder ID $destFolderId does not exist")
+      case ex: NotFoundException => throw ValidationException(s"Destination folder ID $destFolderId does not exist")
     }
 
     val folderBeingMoved: Folder = getById(folderBeingMovedId)
@@ -238,7 +239,13 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       C.Folder.NAME_LC -> folderBeingMoved.nameLowercase))
 
     val folderForUpdate = Folder(parentId = destFolderId, name = folderBeingMoved.name)
-    updateById(folderBeingMovedId, folderForUpdate, List(C.Folder.PARENT_ID), Some(dupQuery))
+
+    try {
+      updateById(folderBeingMovedId, folderForUpdate, List(C.Folder.PARENT_ID), Some(dupQuery))
+    } catch {
+      case ex: DuplicateException => throw ValidationException(
+        s"Cannot move to '${destFolder.get.name}' as a folder by this name already exists")
+    }
   }
 
   def rename(folderId: String, newName: String)

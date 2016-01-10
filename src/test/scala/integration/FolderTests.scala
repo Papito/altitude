@@ -298,12 +298,12 @@ import altitude.{Const => C}
     }
 
     // move into a parent with the same immediate child name
-    intercept[DuplicateException] {
+    intercept[ValidationException] {
       altitude.service.folder.move(folder1_1_1.id.get, folder2.id.get)
     }
 
     // move into a parent with the same immediate child name (different casing_
-    intercept[DuplicateException] {
+    intercept[ValidationException] {
       altitude.service.folder.move(folder1_1_1.id.get, folder3.id.get)
     }
 
