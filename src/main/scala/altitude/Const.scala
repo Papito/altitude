@@ -45,7 +45,7 @@ object Const {
 
     object Names {
       val UNCATEGORIZED = "Uncategorized"  //TODO: not i18n
-      val ROOT = "Root" //TODO: not i18n
+      val ROOT = "Home" //TODO: not i18n
     }
   }
 
