@@ -69,13 +69,28 @@ BaseViewModel = Base.extend({
   resetFormErrors: function(el) {
     $(el).find('.has-error').removeClass('has-error').parent().find('.error').text('');
   },
+  // ----------------------------------------------------------------
+
+  resetAllMessages: function() {
+    this.successMessage(null);
+    this.infoMessage(null);
+    this.warningMessage(null);
+    this.errorMessage(null);
+    this.errorStacktrace(null);
+    this.dismissError();
+  },
+  // ----------------------------------------------------------------
 
   hide: function(el) {
     $(el).hide();
   },
+  // ----------------------------------------------------------------
 
   restRequest : function(url, method, opts) {
     var self = this;
+
+    self.resetAllMessages();
+
     method = method.toUpperCase();
 
     data = opts.data || {};
