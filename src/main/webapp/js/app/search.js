@@ -72,7 +72,7 @@ SearchViewModel = BaseViewModel.extend({
 
     // when a folder is selected, enable the "move" button
     this.moveToFolderTreeEl.bind(
-        "select_node.jstree", function(evt, data){
+        "select_node.jstree", function(){
           self.moveFolderEl.removeAttr('disabled');
         }
     ); },
@@ -99,6 +99,7 @@ SearchViewModel = BaseViewModel.extend({
     var rpp = (approxRowsPerPage * gridAdjustment.fitsHorizontally) * 3;
 
     var queryString = window.location.search;
+    console.log('q', queryString);
 
     var opts = {
       'successCallback': function (json) {
@@ -116,7 +117,7 @@ SearchViewModel = BaseViewModel.extend({
         if (assets.length) {
           $("#searchResults").endlessScroll({
             loader: '<div class="loading"><div>',
-            callback: function(p){
+            callback: function(){
               self.search(/*append=*/true, /*page=*/page + 1);
             }
           });
@@ -124,7 +125,7 @@ SearchViewModel = BaseViewModel.extend({
       }
     };
 
-    this.get('/api/v1/search' + queryString + "&rpp=" + rpp + "&p=" + page, opts);
+    this.get('/api/v1/search/p/' +  page + '/rpp/' + rpp, opts);
   },
 
   showAddFolder: function() {
