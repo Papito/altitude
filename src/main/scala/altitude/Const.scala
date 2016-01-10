@@ -41,11 +41,13 @@ object Const {
     object Ids {
       val ROOT = "0"
       val UNCATEGORIZED = "1"
+      val TRASH = "2"
     }
 
     object Names {
-      val UNCATEGORIZED = "Uncategorized"  //TODO: not i18n
       val ROOT = "Home" //TODO: not i18n
+      val UNCATEGORIZED = "Uncategorized"  //TODO: not i18n
+      val TRASH = "Trash"  //TODO: not i18n
     }
   }
 
