@@ -2,13 +2,13 @@
   <div class="system-folder">
     <span class="header">
       <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-      &nbsp;&nbsp;<a href="">Uncategorized</a>
+      &nbsp;&nbsp;<a href="/cl/uncategorized">Uncategorized</a>
     </span>
   </div>
   <div class="system-folder trash">
     <span class="header">
       <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-      &nbsp;&nbsp;<a href="">Trash</a>
+      &nbsp;&nbsp;<a href="/cl/trash">Trash</a>
     </span>
   </div>
 </div>

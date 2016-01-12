@@ -243,11 +243,8 @@ footer {
 
 /* PATH (BREADCRUMBS) */
 
-#path {
-    margin-left: 0;
-    margin-top: 0.5em;
-}
 
 #path div.well-sm {
     padding-left: 0.5em;
+    padding-right: 0.5em;
 }

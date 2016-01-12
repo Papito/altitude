@@ -1,10 +1,8 @@
 package altitude.controllers.web
 
-
-class ImportController extends BaseWebController {
+class UncategorizedController extends BaseWebController {
   get("/") {
     contentType = "text/html"
-    ssp("import")
+    ssp("uncategorized")
   }
 }
-

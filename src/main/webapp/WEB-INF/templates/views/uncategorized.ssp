@@ -1,0 +1,42 @@
+<% import altitude.{Const => C} %>
+
+#set (assets)
+  <script src="/static/js/app/search.js"></script>
+  <script src="/static/js/app/uncategorized.js"></script>
+  <script src="/static/js/lib/jquery.endless-scroll.js"></script>
+#end
+
+<% attributes("screenTitle")= "Uncategorized" %>
+
+<div class="row">
+<div class="col-md-2" id="left">
+
+  <!--
+  preview
+  -->
+  <div class="row">
+    <div class="col-md-12" style="height: 40%">
+      ${include("partials/preview.ssp")}
+    </div>
+  </div>
+</div>
+
+<div class="col-md-10">
+  <div class="row" data-bind="visible: searchResults" style="display: none">
+    <div class="col-md-12">
+      ${include("partials/search_results.ssp")}
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- MODALS -->
+${include("partials/modals.ssp")}
+
+
+<script>
+  $(document).ready(function() {
+  var uncategorizedViewModel = new UncategorizedViewModel();
+  ko.applyBindings(uncategorizedViewModel);
+  });
+</script>
