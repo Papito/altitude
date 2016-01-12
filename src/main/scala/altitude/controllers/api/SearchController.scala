@@ -23,8 +23,12 @@ class SearchController extends BaseApiController {
   get(s"/p/:${C.Api.Search.PAGE}/rpp/:${C.Api.Search.RESULTS_PER_PAGE}") {
     val rpp = this.params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, "20").toInt
     val page = this.params.getOrElse(C.Api.Search.PAGE, "1").toInt
+    val foldersQuery = this.params.getOrElse(C.Api.Search.FOLDERS, "")
 
-    val q = Query(rpp = rpp, page = page)
+    // folders can be multiple
+    val folders: Set[String] = foldersQuery.split(s"\\${C.Api.MULTI_VALUE_DELIM}").toSet
+
+    val q = Query(rpp = rpp, page = page, folders = folders)
     val assets = app.service.library.search(q)
     val jsonAssets = for (asset <- assets) yield asset.toJson
 

@@ -50,7 +50,7 @@
             <li><a href="/cl/import">Import</a></li>
           </ul>
           <form class="navbar-form navbar-right" method="GET" action="/cl/search">
-            <input type="text" name="${C.Api.Search.QUERY_STRING}" class="form-control" placeholder="Search..." maxlength="200">
+            <input type="text" name="${C.Api.Search.QUERY_TEXT}" class="form-control" placeholder="Search..." maxlength="200">
             </form>
         </div>
       </div>

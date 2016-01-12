@@ -5,9 +5,9 @@ import java.awt.{AlphaComposite, Graphics2D}
 import java.io._
 import javax.imageio.ImageIO
 
-import altitude.exceptions.DuplicateException
+import altitude.exceptions.{ValidationException, DuplicateException}
 import altitude.models.search.Query
-import altitude.models.{Asset, Preview}
+import altitude.models.{Folder, Asset, Preview}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import altitude.{Altitude, Const => C}
 import net.codingwell.scalaguice.InjectorExtensions._
@@ -47,8 +47,14 @@ class LibraryService(app: Altitude) {
   }
 
   def search(query: Query)(implicit txId: TransactionId = new TransactionId): List[Asset] = {
+    // set query default folder
+    val _query: Query = query.folders.isEmpty match {
+      case false => query
+      case true => Query(page = query.page, rpp = query.rpp, folders = Set(Folder.ROOT.id.get))
+    }
+
     txManager.asReadOnly[List[Asset] ] {
-      val searchResultData: List[JsObject] = app.service.asset.query(query)
+      val searchResultData: List[JsObject] = app.service.asset.query(_query)
       for (data <- searchResultData) yield Asset.fromJson(data)
     }
   }

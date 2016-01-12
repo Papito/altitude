@@ -55,6 +55,6 @@ UncategorizedViewModel = SearchViewModel.extend({
       }
     };
 
-    this.get('/api/v1/search/p/' +  page + '/rpp/' + rpp, opts);
+    this.get('/api/v1/search/p/' +  page + '/rpp/' + rpp + '?folders=1', opts);
   }
 });

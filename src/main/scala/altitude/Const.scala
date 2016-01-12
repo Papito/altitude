@@ -78,6 +78,7 @@ object Const {
     val WARNING = "warning"
     val CRITICAL = "critical"
     val VALIDATION_ERRORS = "validationErrors"
+    val MULTI_VALUE_DELIM = "+"
 
     val ID = "id"
     val DATA = "data"
@@ -107,9 +108,10 @@ object Const {
     object Search {
       val ASSETS = "assets"
       val RESULT_BOX_SIZE = "resultBoxSize"
-      val QUERY_STRING = "queryString"
+      val QUERY_TEXT = "queryTxt"
       val RESULTS_PER_PAGE = "rpp"
       val PAGE = "p"
+      val FOLDERS = "folders"
     }
 
     object Folder {
