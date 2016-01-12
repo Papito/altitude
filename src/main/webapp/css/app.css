@@ -57,7 +57,8 @@ footer {
     bottom: 0;
     height: 2.5em;
     padding-top: .5em;
-    background-image: linear-gradient(rgb(72, 78, 85), rgb(58, 63, 68) 60%, rgb(49, 53, 57));
+    border-top: 1px solid #494744;
+    background-color: #272b30;
 }
 
 #screenTitle {
