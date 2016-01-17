@@ -115,6 +115,26 @@ BrowseViewModel = SearchViewModel.extend({
         self.currentFolderId(folderId);
         self.folders(folders);
         self.currentFolderPath(path);
+
+        var elFolderTargets = $(".folder-target");
+        elFolderTargets.droppable({
+          accept: ".result-box",
+          hoverClass: "highlight",
+          tolerance: "pointer"
+        });
+
+/*
+        elFolderTargets.on("over", function( event, ui ) {
+          console.log("OVER", ui);
+        });
+        elFolderTargets.on("out", function( event, ui ) {
+          console.log("OUT", ui);
+        });
+*/
+
+        elFolderTargets.on("drop", function( event, ui ) {
+          console.log("DROPPED", ui);
+        });
       }
     };
 

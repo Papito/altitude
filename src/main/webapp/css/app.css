@@ -241,6 +241,10 @@ footer {
     font-weight: bold;
 }
 
+#folders .highlight {
+    background-color: #5a5855;
+}
+
 /* PATH (BREADCRUMBS) */
 
 

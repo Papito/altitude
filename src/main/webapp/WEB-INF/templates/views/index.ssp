@@ -57,7 +57,7 @@ breadcrumbs
           </div>
 
           <ul data-bind="foreach: folders">
-          <li>
+          <li class="folder-target">
             <span class="context-menu" data-bind="attr: {'folder-id': $data.id}">
             <a href="#" data-bind="text: name, click: function() {$root.loadFolders($data.id)}"></a>
             </span>
