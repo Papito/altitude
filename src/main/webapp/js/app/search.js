@@ -52,8 +52,14 @@ SearchViewModel = BaseViewModel.extend({
           self.searchResults([]);
         }
         for (var idx in assets) {
-          self.searchResults.push(assets[idx]);
+          var asset = assets[idx];
+          self.searchResults.push(asset);
         }
+        $('.result-box').draggable({
+          helper: "clone",
+          appendTo: "body",
+          opacity: 0.4
+        });
 
         if (assets.length) {
           $("#searchResults").endlessScroll({
