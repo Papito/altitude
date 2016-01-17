@@ -47,11 +47,30 @@ class LibraryService(app: Altitude) {
   }
 
   def search(query: Query)(implicit txId: TransactionId = new TransactionId): List[Asset] = {
-    // set query default folder
-    val _query: Query = query.folders.isEmpty match {
-      case false => query
-      case true => Query(page = query.page, rpp = query.rpp, folders = Set(Folder.ROOT.id.get))
+    log.debug(s"Asset query $query")
+
+    // parse out folder ids as a set
+    val folderIds: Set[String] = query.params.getOrElse(C.Api.Folder.QUERY_ARG_NAME, "")
+      .toString.split(s"\\${C.Api.MULTI_VALUE_DELIM}").map(_.trim).filter(_.nonEmpty).toSet
+
+    log.debug(s"${folderIds.size} folder ids: $folderIds")
+
+    val _query: Query = folderIds.isEmpty match {
+      case false => {
+        val allFolders = app.service.folder.getAll()
+        val allFolderIds = app.service.folder.flatChildren(parentIds = folderIds, all = allFolders)
+        log.debug(s"Expanded folder ids: $allFolderIds")
+
+        // repackage the query to include all folders (they will have to reparsed again)
+        Query(
+          params = query.params
+            ++ Map(C.Api.Folder.QUERY_ARG_NAME -> allFolderIds.mkString(C.Api.MULTI_VALUE_DELIM)),
+          page = query.page, rpp = query.rpp)
+      }
+      case true => query
     }
+
+    log.info("SEARCH QUERY: " + _query)
 
     txManager.asReadOnly[List[Asset] ] {
       val searchResultData: List[JsObject] = app.service.asset.query(_query)

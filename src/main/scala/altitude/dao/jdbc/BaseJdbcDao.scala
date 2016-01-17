@@ -37,12 +37,14 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
   protected def dtAsJsString(dt: DateTime) = JsString(Util.isoDateTime(Some(dt)))
 
+  protected lazy val SQL_QUERY_BUILDER = new SqlQueryBuilder(DEFAULT_SQL_COLS_FOR_SELECT, tableName)
+
+
   // SQL to select the whole record, in very simple cases
   protected val ONE_SQL = s"""
       SELECT $DEFAULT_SQL_COLS_FOR_SELECT
         FROM $tableName
        WHERE ${C.Base.ID} = ?"""
-
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     val sql: String =s"""
@@ -84,32 +86,8 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   }
 
   override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {
-    val (sqlColumns, sqlValues) = query.params.unzip
-    // create pairs of column names and value placeholders, to be joined in the final clause
-    val whereClauses: List[String] = sqlColumns.map(_ + " = ?").toList
-
-
-    val whereClause = whereClauses.length match {
-      case 0 => ""
-      case _ => s"""WHERE ${whereClauses.mkString(" AND ")}"""
-    }
-
-    val sqlWithoutPaging = s"""
-      SELECT $DEFAULT_SQL_COLS_FOR_SELECT
-        FROM $tableName
-        $whereClause
-    """
-
-    val sql = query.rpp match {
-      case 0 => sqlWithoutPaging
-      case _ => sqlWithoutPaging + s"""
-        LIMIT ${query.rpp}
-        OFFSET ${(query.page - 1) * query.rpp}"""
-    }
-
-    log.debug(s"QUERY: $sql with $sqlValues")
-    val recs = manyBySqlQuery(sql, sqlValues.toList)
-
+    val sqlQuery: SqlQuery = SQL_QUERY_BUILDER.toSelectQuery(query)
+    val recs = manyBySqlQuery(sqlQuery.queryString, sqlQuery.selectBindValues)
     log.debug(s"Found: ${recs.length}")
     log.debug(recs.map(_.toString()).mkString("\n"))
     recs.map{makeModel}
@@ -128,7 +106,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
     // prepend ID and CREATED AT to the values, as those are required for any record
     val values: List[Object] = _id :: vals
-    //log.debug(s"SQL: $q. ARGS: ${values.toString()}")
+    log.debug(s"INSERT SQL: $q. ARGS: ${values.toString()}")
 
     val runner: QueryRunner = new QueryRunner()
     runner.update(conn, q, values:_*)

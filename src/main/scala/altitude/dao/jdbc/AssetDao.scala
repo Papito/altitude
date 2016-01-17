@@ -44,8 +44,8 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
              $CORE_SQL_COLS_FOR_INSERT, ${C.Asset.PATH}, ${C.Asset.MD5},
              ${C.Asset.FILENAME}, ${C.Asset.SIZE_BYTES},
              ${C.Asset.MEDIA_TYPE}, ${C.Asset.MEDIA_SUBTYPE}, ${C.Asset.MIME_TYPE},
-             ${C.Asset.METADATA})
-            VALUES($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?, ?, ?, ?, ?, $JSON_PLACEHOLDER)
+             ${C.Asset.FOLDER_ID}, ${C.Asset.METADATA})
+            VALUES($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?, ?, ?, ?, ?, ?, $JSON_PLACEHOLDER)
     """
 
     val sqlVals: List[Object] = List(
@@ -56,6 +56,7 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
       asset.mediaType.mediaType,
       asset.mediaType.mediaSubtype,
       asset.mediaType.mime,
+      asset.folderId,
       metadata)
 
     addRecord(jsonIn, sql, sqlVals)

@@ -1,6 +1,7 @@
 package altitude.dao.mongo
 
 import altitude.dao.BaseDao
+import altitude.dao.jdbc.SqlQueryBuilder
 import altitude.models.BaseModel
 import altitude.models.search.Query
 import altitude.transactions.TransactionId
@@ -22,8 +23,12 @@ object BaseMongoDao {
   // create mongo client if it's the datasource, or we are in the test harness
   val CLIENT: Option[MongoClient] =
     if (dataSource == "mongo" || Environment.ENV == Environment.TEST) {
-      Some(MongoClient(host, dbPort))
-    } else None
+      val client = Some(MongoClient(host, dbPort))
+      client.get.setWriteConcern(WriteConcern.Journaled)
+      client
+    } else {
+      None
+    }
 
   private val DB_NAME: String = config.getString("db.mongo.db")
   def DB = CLIENT match {
@@ -36,6 +41,8 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   private final val log = LoggerFactory.getLogger(getClass)
 
   protected def COLLECTION: MongoCollection = BaseMongoDao.DB.get(collectionName)
+
+  protected lazy val MONGO_QUERY_BUILDER = new MongoQueryBuilder(COLLECTION)
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     log.debug(s"Starting database INSERT for: $jsonIn")
@@ -84,12 +91,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   }
 
   override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {
-    val mongoQuery: DBObject = query.params
-
-    val cursor: MongoCursor = query.rpp match {
-      case 0 => COLLECTION.find(mongoQuery)
-      case _ => COLLECTION.find(mongoQuery).skip((query.page - 1) * query.rpp).limit(query.rpp)
-    }
+    val cursor: MongoCursor = MONGO_QUERY_BUILDER.toSelectCursor(query)
 
     log.debug(s"Found ${cursor.length} records")
 

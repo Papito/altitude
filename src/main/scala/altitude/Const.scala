@@ -115,6 +115,7 @@ object Const {
     }
 
     object Folder {
+      val QUERY_ARG_NAME = "__FOLDERS__"
       val HIERARCHY = "hierarchy"
       val FOLDERS = "folders"
       val FOLDER = "folder"

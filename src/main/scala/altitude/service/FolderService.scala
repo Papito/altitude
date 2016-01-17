@@ -122,7 +122,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       log.info(s"Deleting folder $folder")
 
       // get the list of tuples - (depth, id), with most-deep first
-      val childrenAndDepths: List[(Int, String)] = flatChildren(DAO.getAll(), id).sortBy(_._1).reverse
+      val childrenAndDepths: List[(Int, String)] = flatChildren(id, DAO.getAll()).sortBy(_._1).reverse
                                                                                /* sort by depth */
 
       // now delete the children, most-deep first
@@ -185,24 +185,32 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
    * Handle special case of the root folder, which does not persist
    */
   override def getById(id: String)(implicit txId: TransactionId = new TransactionId): JsObject = {
-    Folder.IS_ROOT(Some(id)) match {
-      case true => Folder.ROOT
-      case false => super.getById(id)
-    }
+    if (Folder.IS_ROOT(Some(id))) Folder.ROOT else super.getById(id)
   }
 
   /**
    * Returns the children for a folder as a flat list.
-   * Useful for quick searches and verifying that a certain child is in a folder's hierarchy.
    */
-  private def flatChildren(all: List[JsValue], parentId: String, depth: Int = 0): List[(Int, String)]  = {
-    val childElements = all.filter(j => (j \ C.Folder.PARENT_ID).asOpt[String].contains(parentId))
+  def flatChildren(parentId: String, all: List[JsValue] = List(), depth: Int = 0): List[(Int, String)]  = {
+    val _all = if (all.isEmpty) getAll else all
+
+    val childElements = _all.filter(j => (j \ C.Folder.PARENT_ID).asOpt[String].contains(parentId))
 
     // recursively combine with the result of deeper child levels + this one (depth-first)
     (depth, parentId) :: childElements.foldLeft(List[(Int, String)]()) { (res, json) =>
       val folderId = (json \ C.Folder.ID).as[String]
-      res ++ flatChildren(all, folderId, depth + 1)}
+      res ++ flatChildren(folderId, all, depth + 1)}
   }
+
+  /**
+   * Returns a unique set of folder ids for one OR more folder ids.
+   * The difference between the other method signature is that folder deapths are not returned.
+   * It's a "raw" list of folder ids.
+   */
+  def flatChildren(parentIds: Set[String], all: List[JsValue]): Set[String]  =
+    parentIds.foldLeft(Set[String]()) {(s, id) => {
+      s ++ app.service.folder.flatChildren(all = all, parentId = id).map(_._2).toSet
+    }}
 
   def move(folderBeingMovedId: String, destFolderId: String)
           (implicit txId: TransactionId = new TransactionId): Unit = {
@@ -219,7 +227,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     }
 
     // cannot move into own child
-    if (flatChildren(getAll(), folderBeingMovedId).map (_._2).contains(destFolderId)) {
+    if (flatChildren(folderBeingMovedId, getAll()).map (_._2).contains(destFolderId)) {
       throw IllegalOperationException(s"Cannot move a folder into own child. $destFolderId ID in $folderBeingMovedId path")
     }
 

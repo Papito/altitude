@@ -1,6 +1,3 @@
 package altitude.models.search
 
-case class Query(params: Map[String, String] = Map(),
-                 rpp: Int = 0,
-                 page: Int = 1,
-                 folders: Set[String] = Set())
+case class Query(params: Map[String, Object] = Map(), rpp: Int = 0, page: Int = 1)
