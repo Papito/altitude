@@ -132,4 +132,23 @@ class LibraryService(app: Altitude) {
 
     byteArray.toByteArray
   }
+
+  def moveToFolder(assetId: String, folderId: String)(implicit txId: TransactionId = new TransactionId): Asset = {
+    val asset: Asset = this.getById(assetId)
+    // we can go straight to DB, but we need to do a check on folder validity
+    val folder: Folder = app.service.folder.getById(folderId)
+
+    val updateObj: Asset = new Asset(
+      id = asset.id,
+      path = asset.path,
+      md5 = asset.md5,
+      mediaType = asset.mediaType,
+      sizeBytes = asset.sizeBytes,
+      folderId = folder.id.get,
+      metadata = asset.metadata)
+
+    app.service.asset.updateById(assetId, updateObj, fields = List(C.Asset.FOLDER_ID))
+    updateObj
+  }
+
 }
