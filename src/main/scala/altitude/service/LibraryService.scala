@@ -155,4 +155,11 @@ class LibraryService(app: Altitude) {
     updateObj
   }
 
+  def moveToUncategorized(assetId: String)(implicit txId: TransactionId = new TransactionId) = {
+    moveToFolder(assetId, Folder.UNCATEGORIZED.id.get)
+  }
+
+  def moveToTrash(assetId: String)(implicit txId: TransactionId = new TransactionId) = {
+    moveToFolder(assetId, Folder.TRASH.id.get)
+  }
 }

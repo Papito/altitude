@@ -11,8 +11,12 @@ CREATE TABLE _core (
 );
 
 CREATE TABLE system (
-  uncategorized_count INTEGER NOT NULL DEFAULT 0
+  id INT PRIMARY KEY,
+  uncategorized_count INTEGER NOT NULL,
+  trash_count INTEGER NOT NULL
 );
+INSERT INTO system (id, uncategorized_count, trash_count) VALUES (0, 0, 0);
+
 
 CREATE TABLE asset (
   id varchar(24) PRIMARY KEY,

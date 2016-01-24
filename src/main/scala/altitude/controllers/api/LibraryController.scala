@@ -15,4 +15,15 @@ class LibraryController extends BaseApiController {
 
     app.service.library.moveToFolder(id, folderId)
   }
-}
+
+  get(s"/assets/move/:id/uncategorized") {
+    val id = params.get(C.Api.ID).get
+    log.info(s"Moving $id to UNCATEGORIZED")
+    app.service.library.moveToUncategorized(id)
+  }
+
+  get(s"/assets/move/:id/trash") {
+    val id = params.get(C.Api.ID).get
+    log.info(s"Moving $id to TRASH")
+    app.service.library.moveToTrash(id)
+  }}

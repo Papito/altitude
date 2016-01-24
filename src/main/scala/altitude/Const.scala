@@ -16,6 +16,11 @@ object Const {
 
   object Base extends Common
 
+  object System {
+    val UNCATEGORIZED_COUNT = "uncategorized_count"
+    val TRASH_COUNT = "trash_count"
+  }
+
   object Asset extends Common {
     val MEDIA_TYPE = "media_type"
     val PATH = "path"
@@ -118,6 +123,9 @@ object Const {
     object Folder {
       val QUERY_ARG_NAME = "__FOLDERS__"
       val HIERARCHY = "hierarchy"
+      val SYSTEM = "system"
+      val UNCATEGORIZED = "uncategorized"
+      val TRASH = "trash"
       val FOLDERS = "folders"
       val FOLDER = "folder"
       val PATH = "path"

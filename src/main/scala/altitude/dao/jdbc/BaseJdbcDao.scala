@@ -119,7 +119,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     recordJson
   }
 
-  protected def manyBySqlQuery(sql: String, vals: List[Object])(implicit txId: TransactionId): List[Map[String, AnyRef]] = {
+  protected def manyBySqlQuery(sql: String, vals: List[Object] = List())(implicit txId: TransactionId): List[Map[String, AnyRef]] = {
     val runner: QueryRunner = new QueryRunner()
     val res = runner.query(conn, sql, new MapListHandler(), vals: _*)
     log.debug(s"Found ${res.size()} records", C.LogTag.DB)

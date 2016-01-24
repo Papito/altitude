@@ -66,14 +66,14 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
    * Breadcrumbs.
    * This is the parent list, only reversed.
    */
-  def path(folderId: String)
-          (implicit txId: TransactionId = new TransactionId): List[Folder] = {
+  def path(folderId: String)(implicit txId: TransactionId = new TransactionId): List[Folder] = {
 
     // short-circuit for root folder
     if (Folder.IS_ROOT(Some(folderId))) {
       return List[Folder]()
     }
 
+    txManager.asReadOnly[List[Folder]] {
     val all = getAll()
 
     val folderEl = all.find(json => (json \ C.Folder.ID).as[String] == folderId)
@@ -85,6 +85,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     val parents = findParents(folderId =folderId, all = getAll())
 
     List(Folder.ROOT) ::: (folder :: parents).reverse
+    }
   }
 
   /**
@@ -92,18 +93,21 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
    */
   def immediateChildren(rootId: String = Folder.ROOT.id.get, all: List[JsValue] = List())
                        (implicit txId: TransactionId = new TransactionId): List[Folder] = {
-    val _all = all.isEmpty match {
-      case true =>  {
-        val query = Query(Map(C.Folder.PARENT_ID -> rootId))
-        DAO.query(q = query)
-      }
-      case false => all
-    }
 
-    _all
+    txManager.asReadOnly[List[Folder]] {
+      val _all = all.isEmpty match {
+        case true =>  {
+          val query = Query(Map(C.Folder.PARENT_ID -> rootId))
+          DAO.query(q = query)
+        }
+        case false => all
+      }
+
+      _all
         .filter(json => (json \ C.Folder.PARENT_ID).as[String] == rootId)
         .map{json => Folder.fromJson(json)}
         .sortBy(_.nameLowercase)
+    }
   }
 
   override def deleteById(id: String)(implicit txId: TransactionId = new TransactionId): Int = {
@@ -126,12 +130,14 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
                                                                                /* sort by depth */
 
       // now delete the children, most-deep first
-      childrenAndDepths.foreach{t =>
-        val folderId = t._2
-        DAO.deleteById(folderId)}
+      txManager.withTransaction[Int] {
+        childrenAndDepths.foreach{t =>
+          val folderId = t._2
+          DAO.deleteById(folderId)}
 
-      // return number of folders deleted
-      childrenAndDepths.length
+        // return number of folders deleted
+        childrenAndDepths.length
+      }
     }
   }
 
@@ -226,33 +232,35 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       throw IllegalOperationException(s"Cannot move a folder into itself. ID: $folderBeingMovedId")
     }
 
-    // cannot move into own child
-    if (flatChildren(folderBeingMovedId, getAll()).map (_._2).contains(destFolderId)) {
-      throw IllegalOperationException(s"Cannot move a folder into own child. $destFolderId ID in $folderBeingMovedId path")
-    }
+    txManager.asReadOnly {
+      // cannot move into own child
+      if (flatChildren(folderBeingMovedId, getAll()).map (_._2).contains(destFolderId)) {
+        throw IllegalOperationException(s"Cannot move a folder into own child. $destFolderId ID in $folderBeingMovedId path")
+      }
 
-    var destFolder: Option[Folder] = None
-    // check that the destination folder exists
-    try {
-      destFolder = Some(getById(destFolderId))
-    } catch {
-      case ex: NotFoundException => throw ValidationException(s"Destination folder ID $destFolderId does not exist")
-    }
+      var destFolder: Option[Folder] = None
+      // check that the destination folder exists
+      try {
+        destFolder = Some(getById(destFolderId))
+      } catch {
+        case ex: NotFoundException => throw ValidationException(s"Destination folder ID $destFolderId does not exist")
+      }
 
-    val folderBeingMoved: Folder = getById(folderBeingMovedId)
+      val folderBeingMoved: Folder = getById(folderBeingMovedId)
 
-    // destination parent cannot have folder by the same name
-    val dupQuery = Query(Map(
-      C.Folder.PARENT_ID -> destFolderId,
-      C.Folder.NAME_LC -> folderBeingMoved.nameLowercase))
+      // destination parent cannot have folder by the same name
+      val dupQuery = Query(Map(
+        C.Folder.PARENT_ID -> destFolderId,
+        C.Folder.NAME_LC -> folderBeingMoved.nameLowercase))
 
-    val folderForUpdate = Folder(parentId = destFolderId, name = folderBeingMoved.name)
+      val folderForUpdate = Folder(parentId = destFolderId, name = folderBeingMoved.name)
 
-    try {
-      updateById(folderBeingMovedId, folderForUpdate, List(C.Folder.PARENT_ID), Some(dupQuery))
-    } catch {
-      case ex: DuplicateException => throw ValidationException(
-        s"Cannot move to '${destFolder.get.name}' as a folder by this name already exists")
+      try {
+        updateById(folderBeingMovedId, folderForUpdate, List(C.Folder.PARENT_ID), Some(dupQuery))
+      } catch {
+        case ex: DuplicateException => throw ValidationException(
+          s"Cannot move to '${destFolder.get.name}' as a folder by this name already exists")
+      }
     }
   }
 
@@ -262,32 +270,47 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       throw new IllegalOperationException("Cannot rename the root folder")
     }
 
-    val folder: Folder = getById(folderId)
+    txManager.withTransaction {
+      val folder: Folder = getById(folderId)
 
-    // new folder name cannot match the new one
-    val dupQuery = Query(Map(
-      C.Folder.PARENT_ID -> folder.parentId,
-      C.Folder.NAME_LC -> newName.toLowerCase))
+      // new folder name cannot match the new one
+      val dupQuery = Query(Map(
+        C.Folder.PARENT_ID -> folder.parentId,
+        C.Folder.NAME_LC -> newName.toLowerCase))
 
-    try {
-      val folderForUpdate = Folder(parentId = folder.parentId, name = newName)
-      updateById(folderId, folderForUpdate, List(C.Folder.NAME, C.Folder.NAME_LC), Some(dupQuery))
-    } catch {
-      case _: DuplicateException => {
-        val ex = ValidationException()
-        ex.errors += (C.Folder.NAME -> C.MSG("warn.duplicate"))
-        throw ex
+      try {
+        val folderForUpdate = Folder(parentId = folder.parentId, name = newName)
+        updateById(folderId, folderForUpdate, List(C.Folder.NAME, C.Folder.NAME_LC), Some(dupQuery))
+      } catch {
+        case _: DuplicateException => {
+          val ex = ValidationException()
+          ex.errors += (C.Folder.NAME -> C.MSG("warn.duplicate"))
+          throw ex
+        }
       }
     }
   }
 
   def incrAssetCount(folderId: String, count: Int = 1)(implicit txId: TransactionId) = {
     log.debug(s"Incrementing folder $folderId count by $count")
-    DAO.increment(folderId, C.Folder.NUM_OF_ASSETS, count)
+
+    txManager.withTransaction {
+      DAO.increment(folderId, C.Folder.NUM_OF_ASSETS, count)
+    }
   }
 
   def decrAssetCount(folderId: String, count: Int = 1)(implicit txId: TransactionId) = {
     log.debug(s"Decrementing folder $folderId count by $count")
-    DAO.decrement(folderId, C.Folder.NUM_OF_ASSETS, count)
+
+    txManager.withTransaction {
+      DAO.decrement(folderId, C.Folder.NUM_OF_ASSETS, count)
+    }
   }
+
+  def getSystemFolders(implicit txId: TransactionId): Map[String, Folder] = {
+    txManager.asReadOnly[Map[String, Folder]] {
+      DAO.getSystemFolders
+    }
+  }
+
 }
