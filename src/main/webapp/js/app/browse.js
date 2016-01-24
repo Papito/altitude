@@ -148,8 +148,8 @@ BrowseViewModel = SearchViewModel.extend({
     var self = this;
     var opts = {
       'successCallback': function() {
-        self.blinkSuccess("Asset moved");
         self.loadFolders(self.currentFolderId());
+        self.blinkSuccess("Asset moved");
       }
     };
 
