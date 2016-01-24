@@ -77,39 +77,39 @@ object Const {
     val STACKTRACE = "stacktrace"
     val WARNING = "warning"
     val CRITICAL = "critical"
-    val VALIDATION_ERRORS = "validationErrors"
+    val VALIDATION_ERRORS = "validation_errors"
     val MULTI_VALUE_DELIM = "+"
 
     val ID = "id"
     val DATA = "data"
     val PATH = "path"
-    val DIRECTORY_NAMES = "directoryNames"
-    val CURRENT_PATH = "currentPath"
+    val DIRECTORY_NAMES = "directory_names"
+    val CURRENT_PATH = "current_path"
 
     object Import {
       val IMPORTED = "imported"
     }
 
     object ImportAsset {
-      val IMPORT_ASSET = "importAsset"
+      val IMPORT_ASSET = "import_asset"
     }
 
     object Asset {
       val ASSET = "asset"
-      val FOLDER_ID = "folderId"
+      val FOLDER_ID = "folder_id"
       val ASSETS = "assets"
     }
 
     object ImportProfile {
-      val IMPORT_PROFILES = "importProfiles"
+      val IMPORT_PROFILES = "import_profiles"
       val NAME = "name"
       val KEYWORDS = "keywords"
     }
 
     object Search {
       val ASSETS = "assets"
-      val RESULT_BOX_SIZE = "resultBoxSize"
-      val QUERY_TEXT = "queryTxt"
+      val RESULT_BOX_SIZE = "result_box_size"
+      val QUERY_TEXT = "query_txt"
       val RESULTS_PER_PAGE = "rpp"
       val PAGE = "p"
       val FOLDERS = "folders"
@@ -122,12 +122,11 @@ object Const {
       val FOLDER = "folder"
       val PATH = "path"
       val NAME = "name"
-      val PARENT_ID = "parentId"
-      val NUM_OF_ASSETS = "numOfAssets"
+      val PARENT_ID = "parent_id"
     }
 
     object TagConfig {
-      val TAG_CONFIG = "tagConfig"
+      val TAG_CONFIG = "tag_config"
     }
   }
 

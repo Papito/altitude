@@ -117,8 +117,8 @@ BaseViewModel = Base.extend({
           var json = jqXHR.responseJSON;
 
           // if there is a container where we want to look for errors, we must specify it
-          if (json.validationErrors) {
-            var errz = json.validationErrors;
+          if (json.validation_errors) {
+            var errz = json.validation_errors;
             var errElId = '#' + opts.errorContainerId;
 
             for(var field in errz) {

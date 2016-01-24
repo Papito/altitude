@@ -93,7 +93,7 @@ BrowseViewModel = SearchViewModel.extend({
       errorContainerId: 'addFolder',
       data: {
         'name': $('#newFolderName').val(),
-        'parentId': self.currentFolderId()
+        'parent_id': self.currentFolderId()
       }
     };
 
@@ -281,7 +281,7 @@ BrowseViewModel = SearchViewModel.extend({
         $('#selectFolderToMoveToModal').modal('hide');
       },
       'data': {
-        'parentId': moveToFofolderId
+        'parent_id': moveToFofolderId
       }
     };
 

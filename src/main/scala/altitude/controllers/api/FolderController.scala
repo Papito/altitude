@@ -31,7 +31,7 @@ class FolderController  extends BaseApiController {
     ))
   }
 
-  get("/:parentId") {
+  get(s"/:${C.Api.Folder.PARENT_ID}") {
     val parentId = params.getAs[String](C.Api.Folder.PARENT_ID).get
     val folders = app.service.folder.immediateChildren(parentId)
 

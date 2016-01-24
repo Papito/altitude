@@ -211,8 +211,8 @@ ImportViewModel = BaseViewModel.extend({
     var self = this;
     var opts = {
       'successCallback': function (json) {
-        self.directoryNames(json.directoryNames);
-        self.currentPath(json.currentPath);
+        self.directoryNames(json.directory_names);
+        self.currentPath(json.current_path);
       },
       'finally': function() {
         self.disableDoubleClick = false;
@@ -303,7 +303,7 @@ ImportViewModel = BaseViewModel.extend({
     var self = this;
     var opts = {
       'successCallback': function (json) {
-        var boxSize = json['resultBoxSize'];
+        var boxSize = json['result_box_size'];
 
         self.gridAdjustment = Util.getGridAdjustment($('#importedAssets'), boxSize, self.boxBorder);;
         self.resultBoxMargin = self.gridAdjustment.boxMargin;

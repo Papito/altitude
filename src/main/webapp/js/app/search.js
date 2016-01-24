@@ -79,7 +79,7 @@ SearchViewModel = BaseViewModel.extend({
     var self = this;
     var opts = {
       'successCallback': function (json) {
-        self.resultBoxSize = json['resultBoxSize'];
+        self.resultBoxSize = json['result_box_size'];
         self.search(/*append=*/true, /*page=*/1);
       }
     };
