@@ -236,12 +236,12 @@ footer {
     margin: .5em 0 .5em .5em;
 }
 
-#systemFolders .system-folder.trash a {
+#trash a {
     color: #ff4e41;
     font-weight: bold;
 }
 
-#folders .highlight {
+#folders .highlight, #systemFolders .highlight {
     background-color: #5a5855;
 }
 

@@ -58,13 +58,72 @@ BrowseViewModel = SearchViewModel.extend({
     // initialize commonly used elements
     this.moveToFolderTreeEl = $('#moveToFolderTree');
     this.moveFolderEl = $('#moveFolder');
+    this.uncategorizedEl = $('#uncategorized');
+    this.trashEl = $('#trash');
 
     // when a folder is selected, enable the "move" button
     this.moveToFolderTreeEl.bind(
         "select_node.jstree", function(){
           self.moveFolderEl.removeAttr('disabled');
         }
-    ); },
+    );
+
+    /*
+    system folders
+     */
+
+    // uncategorized
+    this.uncategorizedEl.droppable({
+      accept: ".result-box",
+      hoverClass: "highlight",
+      tolerance: "pointer"
+    });
+
+    this.uncategorizedEl.on("drop", function( event, ui ) {
+      var assetId = $(ui.draggable.context).attr('asset_id');
+      self.moveToUncategorized(assetId);
+    });
+
+    // trash
+    this.trashEl.droppable({
+      accept: ".result-box",
+      hoverClass: "highlight",
+      tolerance: "pointer"
+    });
+
+    this.trashEl.on("drop", function( event, ui ) {
+      var assetId = $(ui.draggable.context).attr('asset_id');
+      self.moveToTrash(assetId);
+    });
+  },
+
+  moveToUncategorized: function() {
+    console.log(assetId, 'to uncategorized');
+
+    var self = this;
+    var opts = {
+      'successCallback': function() {
+        self.loadFolders(self.currentFolderId());
+        self.blinkSuccess("Folder cleared");
+      }
+    };
+
+    this.get('/api/v1/library/assets/move/' + assetId + '/1/uncategorized', opts);
+  },
+
+  moveToTrash: function(assetId) {
+    console.log(assetId, 'to trash');
+
+    var self = this;
+    var opts = {
+      'successCallback': function() {
+        self.loadFolders(self.currentFolderId());
+        self.blinkSuccess("Moved to trash");
+      }
+    };
+
+    this.get('/api/v1/library/assets/move/' + assetId + '/trash', opts);
+  },
 
   showAddFolder: function() {
     this._showAddFolder(true);
