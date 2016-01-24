@@ -96,6 +96,7 @@ object Const {
 
     object Asset {
       val ASSET = "asset"
+      val FOLDER_ID = "folderId"
       val ASSETS = "assets"
     }
 

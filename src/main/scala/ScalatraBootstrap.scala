@@ -2,7 +2,7 @@ import javax.servlet.ServletContext
 
 import altitude.{SingleApplication, Environment}
 import altitude.controllers._
-import altitude.controllers.api.{TagConfigController, SearchController, ImportProfileController}
+import altitude.controllers.api.{LibraryController, TagConfigController, SearchController, ImportProfileController}
 import altitude.controllers.web.{StaticAssetController, IndexController, AssetController, SearchController}
 import org.scalatra._
 import org.slf4j.LoggerFactory
@@ -11,6 +11,7 @@ class ScalatraBootstrap extends LifeCycle with SingleApplication {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override def init(context: ServletContext) {
+    context.mount(new LibraryController, "/api/v1/library/*")
     context.mount(new web.IndexController, "/")
     context.mount(new web.ImportController, "/cl/import/*")
     context.mount(new web.SearchController, "/cl/search/*")

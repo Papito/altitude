@@ -34,21 +34,21 @@ BrowseViewModel = SearchViewModel.extend({
         rename: {
           name: "Rename",
           callback: function(key, opt){
-            var folderId = opt.$trigger.context.attributes.getNamedItem('folder-id').nodeValue;
+            var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
             self.showRenameFolder(folderId);
           }
         },
         move: {
           name: "Move",
           callback: function(key, opt){
-            var folderId = opt.$trigger.context.attributes.getNamedItem('folder-id').nodeValue;
+            var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
             self.showMoveFolder(folderId);
           }
         },
         delete: {
           name: "Delete",
           callback: function(key, opt){
-            var folderId = opt.$trigger.context.attributes.getNamedItem('folder-id').nodeValue;
+            var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
             self.deleteFolder(folderId);
           }
         }
@@ -133,12 +133,27 @@ BrowseViewModel = SearchViewModel.extend({
 */
 
         elFolderTargets.on("drop", function( event, ui ) {
-          console.log("DROPPED", ui);
+          var assetId = $(ui.draggable.context).attr('asset_id');
+          var folderId = $(event.target).find('span').attr('folder_id');
+          console.log(folderId);
+          self.moveToFolder(assetId, folderId);
         });
       }
     };
 
     this.get('/api/v1/folders/' + folderId, opts);
+  },
+
+  moveToFolder: function(assetId, folderId) {
+    var self = this;
+    var opts = {
+      'successCallback': function() {
+        self.blinkSuccess("Asset moved");
+        self.loadFolders(self.currentFolderId());
+      }
+    };
+
+    this.get('/api/v1/library/assets/move/' + assetId + '/' + folderId, opts);
   },
 
   showRenameFolder: function(folderId) {
