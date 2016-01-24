@@ -5,6 +5,9 @@ CREATE TABLE db_version(
 );
 CREATE UNIQUE INDEX db_version_idx ON db_version(version);
 
+CREATE TABLE system (
+  uncategorized_count INTEGER NOT NULL DEFAULT 0
+);
 
 CREATE TABLE asset  (
   id varchar(24) PRIMARY KEY,
