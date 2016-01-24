@@ -33,6 +33,8 @@ class LibraryService(app: Altitude) {
       }
 
       val assetJson: JsObject = app.service.asset.add(obj)
+      app.service.folder.incrAssetCount(obj.folderId)
+
       addPreview(assetJson)
       assetJson
     }
@@ -148,6 +150,8 @@ class LibraryService(app: Altitude) {
       metadata = asset.metadata)
 
     app.service.asset.updateById(assetId, updateObj, fields = List(C.Asset.FOLDER_ID))
+    app.service.folder.decrAssetCount(asset.folderId)
+    app.service.folder.incrAssetCount(updateObj.folderId)
     updateObj
   }
 

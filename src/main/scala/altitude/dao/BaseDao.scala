@@ -28,4 +28,7 @@ trait BaseDao {
   }
 
   def updateByQuery(q: Query, data: JsObject, fields: List[String])(implicit txId: TransactionId): Int
+
+  def increment(id: String, field: String, count: Int = 1)(implicit txId: TransactionId)
+  def decrement(id: String, field: String, count: Int = 1)(implicit txId: TransactionId)
 }

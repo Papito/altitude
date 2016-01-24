@@ -280,4 +280,14 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       }
     }
   }
+
+  def incrAssetCount(folderId: String, count: Int = 1)(implicit txId: TransactionId) = {
+    log.debug(s"Incrementing folder $folderId count by $count")
+    DAO.increment(folderId, C.Folder.NUM_OF_ASSETS, count)
+  }
+
+  def decrAssetCount(folderId: String, count: Int = 1)(implicit txId: TransactionId) = {
+    log.debug(s"Decrementing folder $folderId count by $count")
+    DAO.decrement(folderId, C.Folder.NUM_OF_ASSETS, count)
+  }
 }

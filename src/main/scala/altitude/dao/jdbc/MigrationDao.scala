@@ -20,4 +20,7 @@ class MigrationDao(app: Altitude) extends altitude.dao.MigrationDao(app) {
     version
   }
   def versionUp(implicit txId: TransactionId): Unit = Unit
+
+  override def increment(id: String, field: String, count: Int = 1)(implicit txId: TransactionId): Unit = Unit
+  override def decrement(id: String, field: String, count: Int = 1)(implicit txId: TransactionId): Unit = Unit
 }

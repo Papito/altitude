@@ -23,7 +23,7 @@ case class Asset(id: Option[String] = None,
                  path: String,
                  md5: String,
                  sizeBytes: Long,
-                 folderId: String = Folder.UNCATEGORIZED.id.get,
+                 folderId: String,
                  metadata: JsValue = JsNull) extends BaseModel {
 
   val fileName: String = FilenameUtils.getName(path)

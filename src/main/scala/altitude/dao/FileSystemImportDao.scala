@@ -41,4 +41,11 @@ class FileSystemImportDao(val app: Altitude) extends BaseDao {
   override def updateByQuery(q: Query, data: JsObject, fields: List[String])(implicit txId: TransactionId): Int = {
     throw new NotImplementedError
   }
+
+  override def increment(id: String, field: String, count: Int = 1)(implicit txId: TransactionId): Unit = {
+    throw new NotImplementedError
+  }
+  override def decrement(id: String, field: String, count: Int = 1)(implicit txId: TransactionId): Unit = {
+    throw new NotImplementedError
+  }
 }

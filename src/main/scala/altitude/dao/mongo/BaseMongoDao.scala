@@ -146,4 +146,19 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     log.debug(s"Updated $updated records")
     updated
   }
+
+  override def increment(id: String, field: String, count: Int = 1)(implicit txId: TransactionId) = {
+    val query: DBObject =  MongoDBObject(
+      "_id" -> id
+    )
+    val o: DBObject =  MongoDBObject(
+      "$inc" -> MongoDBObject(field -> count)
+    )
+
+    COLLECTION.update(query, o)
+  }
+
+  override def decrement(id: String,  field: String, count: Int = 1)(implicit txId: TransactionId) = {
+    increment(id, field, -count)
+  }
 }

@@ -4,7 +4,7 @@ import java.io.{File, FileInputStream, InputStream}
 
 import altitude.dao.FileSystemImportDao
 import altitude.exceptions.MetadataExtractorException
-import altitude.models.{Asset, FileImportAsset, MediaType}
+import altitude.models.{Folder, Asset, FileImportAsset, MediaType}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
 import org.apache.commons.codec.digest.DigestUtils
@@ -71,6 +71,7 @@ class FileImportService(app: Altitude) extends BaseService(app) {
       md5 = getChecksum(fileAsset.absolutePath),
       mediaType = mediaType,
       sizeBytes = fileSizeInBytes,
+      folderId = Folder.UNCATEGORIZED.id.get,
       metadata = metadata)
 
     val res = app.service.library.add(asset)

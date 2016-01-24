@@ -172,6 +172,23 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     numUpdated
   }
 
+  override def increment(id: String, field: String, count: Int = 1)(implicit txId: TransactionId) = {
+    val sql = s"""
+      UPDATE $tableName
+         SET $field = $field + $count
+       WHERE id = ?
+      """
+    log.debug(s"INCR SQL: $sql, for $id")
+
+    val runner: QueryRunner = new QueryRunner()
+    runner.update(conn, sql, id)
+  }
+
+  override def decrement(id: String,  field: String, count: Int = 1)(implicit txId: TransactionId) = {
+    increment(id, field, -count)
+  }
+
+
   /*
     Implementations should define this method, which returns an optional
     JSON object which is guaranteed to serialize into a valid model of interest.

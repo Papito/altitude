@@ -14,7 +14,12 @@ import org.scalatest.Matchers._
 
   test("test search root folder") {
     val mediaType = new MediaType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
-    val asset = new Asset(mediaType = mediaType, path = "path", md5 = "md5", sizeBytes = 1L)
+    val asset = new Asset(
+      mediaType = mediaType,
+      path = "path",
+      md5 = "md5",
+      folderId = Folder.UNCATEGORIZED.id.get,
+      sizeBytes = 1L)
     altitude.service.asset.add(asset)
 
     val assets: List[Asset] = altitude.service.library.search(Query())
@@ -23,7 +28,12 @@ import org.scalatest.Matchers._
 
   test("test search uncategorized folder") {
     val mediaType = new MediaType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
-    val asset = new Asset(mediaType = mediaType, path = "path", md5 = "md5", sizeBytes = 1L)
+    val asset = new Asset(
+      mediaType = mediaType,
+      path = "path",
+      md5 = "md5",
+      folderId = Folder.UNCATEGORIZED.id.get,
+      sizeBytes = 1L)
     altitude.service.asset.add(asset)
 
     val query = Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> Folder.UNCATEGORIZED.id.get))
