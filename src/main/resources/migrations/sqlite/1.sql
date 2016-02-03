@@ -54,5 +54,9 @@ CREATE TABLE folder (
 CREATE INDEX folder_parent_id ON folder(parent_id);
 CREATE UNIQUE INDEX folder_parent_id_and_name ON folder(parent_id, name);
 
+INSERT INTO folder (id, name, name_lc) VALUES
+  ('000000000000000000000001', 'Uncategorized', 'uncategorized'),
+  ('000000000000000000000002', 'Trash', 'trash');
+
 
 INSERT INTO db_version (id, version) VALUES(1, 1);

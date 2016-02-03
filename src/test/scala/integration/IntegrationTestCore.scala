@@ -48,7 +48,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   override def beforeEach() = {
     // because we use the writable connection to get DB version No
     IntegrationTestCore.sqliteApp.transactions.COMMITTED = 0
-    dbUtilities.dropDatabase()
+    dbUtilities.migrateDatabase()
 
     val dataDirFile = new File(altitude.dataPath)
     FileUtils.deleteDirectory(dataDirFile)

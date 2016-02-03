@@ -7,7 +7,7 @@ import scala.language.implicitConversions
 
 object Folder {
   implicit def fromJson(json: JsValue): Folder = {
-    val childrenJson = (json \ C.Folder.CHILDREN).as[List[JsValue]];
+    val childrenJson = (json \ C.Folder.CHILDREN).as[List[JsValue]]
 
     Folder(
       id = (json \ C.Folder.ID).asOpt[String],

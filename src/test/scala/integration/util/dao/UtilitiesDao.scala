@@ -6,7 +6,7 @@ import altitude.transactions.TransactionId
 
 trait UtilitiesDao extends BaseDao {
   val app: Altitude
-  def dropDatabase(): Unit
+  def migrateDatabase(): Unit
   protected def rollback(): Unit
   protected def close(): Unit
   def cleanupTest(): Unit

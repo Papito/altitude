@@ -15,7 +15,7 @@ import org.apache.tika.mime.{MediaType => TikaMediaType}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{Json, JsValue}
 
-class FileImportService(app: Altitude) extends BaseService(app) {
+class FileImportService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
 
   protected val DAO = new FileSystemImportDao(app)

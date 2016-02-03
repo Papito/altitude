@@ -1,20 +1,56 @@
 package altitude.service.migration
 
-import altitude.transactions.TransactionId
+import altitude.Altitude
+import altitude.dao.MigrationDao
+import net.codingwell.scalaguice.InjectorExtensions._
+import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import org.slf4j.LoggerFactory
 
 import scala.io.Source
 
-abstract class MigrationService {
+abstract class MigrationService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
+
+  protected val DAO: MigrationDao = app.injector.instance[MigrationDao]
+  protected val txManager = app.injector.instance[AbstractTransactionManager]
 
   protected val CURRENT_VERSION = 1
   protected val ROOT_MIGRATIONS_PATH = "/migrations/"
   protected val MIGRATIONS_DIR: String
   protected val FILE_EXTENSION: String
 
-  protected def runMigration(version: Int): Unit
-  protected def existingVersion(implicit txId: TransactionId = new TransactionId): Int
+  def runMigration(version: Int)(implicit txId: TransactionId = new TransactionId): Unit = {
+    val migrationCommands = parseMigrationCommands(version)
+
+    txManager.withTransaction {
+      for (command <- migrationCommands) {
+        log.info(s"Executing $command")
+        DAO.executeCommand(command)
+      }
+    }
+
+    // must have schema committed
+    txManager.withTransaction {
+      version match {
+        case 1 => v1
+      }
+    }
+
+    // clean slate for commit count
+    app.transactions.COMMITTED = 0
+  }
+
+  private def v1(implicit txId: TransactionId = new TransactionId): Unit = {
+    //FIXME: the system to pass a hardcoded ID is very poor
+    //app.service.folder.add(Folder.UNCATEGORIZED)
+    //app.service.folder.add(Folder.TRASH)
+  }
+
+  def existingVersion(implicit txId: TransactionId = new TransactionId): Int = {
+    txManager.asReadOnly[Int] {
+      DAO.currentVersion
+    }
+  }
 
   def migrationRequired(implicit txId: TransactionId = new TransactionId): Boolean = {
     log.info("Checking if migration is required")
@@ -32,21 +68,23 @@ abstract class MigrationService {
     }
   }
 
-  //FIXME: must come from DB
+  //FIXME: placeholder, not DB-backed
   def migrationConfirmed = false
 
   def migrate(): Unit = {
     val oldVersion = existingVersion
     log.warn("!!!! MIGRATING !!!!")
     log.info(s"From version $oldVersion to $CURRENT_VERSION")
-    for (version <- oldVersion + 1 to CURRENT_VERSION) runMigration(version)
+    for (version <- oldVersion + 1 to CURRENT_VERSION) {
+      runMigration(version)
+    }
   }
 
   def parseMigrationCommands(version: Int): List[String] = {
     log.info(s"RUNNING MIGRATION TO VERSION $version")
     val path = s"$ROOT_MIGRATIONS_PATH$MIGRATIONS_DIR$version$FILE_EXTENSION"
     val r = getClass.getResource(path)
-    Source.fromURL(r).mkString.split(";").toList
+    Source.fromURL(r).mkString.split(";").map(_.trim).toList.filter(_.nonEmpty)
   }
 
 }

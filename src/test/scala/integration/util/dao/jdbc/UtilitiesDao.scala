@@ -9,7 +9,7 @@ import net.codingwell.scalaguice.InjectorExtensions._
 
 class UtilitiesDao(app: Altitude) extends VoidJdbcDao(app) with integration.util.dao.UtilitiesDao {
 
-  override def dropDatabase() = {}
+  override def migrateDatabase() = {}
 
   override def rollback() = {
 

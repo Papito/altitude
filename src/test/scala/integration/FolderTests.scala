@@ -17,7 +17,7 @@ import altitude.{Const => C}
     val folder1: Folder = altitude.service.folder.add(
       Folder(name = "folder1"))
 
-    folder1.parentId should be("0")
+    folder1.parentId should be(Folder.ROOT.id.get)
 
     val folder1_1: Folder = altitude.service.folder.add(
       Folder(name = "folder1_1", parentId = folder1.id.get))
@@ -38,7 +38,7 @@ import altitude.{Const => C}
     val folder2: Folder = altitude.service.folder.add(
       Folder(name = "folder2"))
 
-    folder2.parentId should be("0")
+    folder2.parentId should be(Folder.ROOT.id.get)
 
     val folder2_1: Folder = altitude.service.folder.add(
       Folder(name = "folder2_1", parentId = folder2.id.get))

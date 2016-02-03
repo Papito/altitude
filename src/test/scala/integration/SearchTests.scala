@@ -49,9 +49,7 @@ import org.scalatest.Matchers._
   */
     val folder1: Folder = altitude.service.folder.add(
       Folder(name = "folder1"))
-
-    folder1.parentId should be("0")
-
+    
     val folder1_1: Folder = altitude.service.folder.add(
       Folder(name = "folder1_1", parentId = folder1.id.get))
 

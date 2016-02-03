@@ -48,6 +48,19 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   }
 
   /**
+   * Return all folders EXCEPT the system folders.
+   */
+  override def getAll()(implicit txId: TransactionId = new TransactionId): List[JsObject] = {
+    txManager.asReadOnly[List[JsObject]] {
+      DAO.getAll.filter(json => {
+        val id = (json \ C.Folder.ID).asOpt[String]
+        !Folder.IS_SYSTEM(id)
+      })
+    }
+  }
+
+
+  /**
    * Get the entire hierarchy, with nested children. The root folders are returned
    * as a list.
    */
@@ -104,7 +117,11 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       }
 
       _all
-        .filter(json => (json \ C.Folder.PARENT_ID).as[String] == rootId)
+        .filter(json => {
+          val id = (json \ C.Folder.ID).as[String]
+          val parentId = (json \ C.Folder.PARENT_ID).as[String]
+          parentId == rootId && !Folder.IS_SYSTEM(Some(id))
+        })
         .map{json => Folder.fromJson(json)}
         .sortBy(_.nameLowercase)
     }
@@ -309,8 +326,17 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
   def getSystemFolders(implicit txId: TransactionId): Map[String, Folder] = {
     txManager.asReadOnly[Map[String, Folder]] {
-      DAO.getSystemFolders
+      val allSysFolders = DAO.getByIds(Set(
+        Folder.UNCATEGORIZED.id.get,
+        Folder.TRASH.id.get))
+
+      // create the lookup map
+      allSysFolders.map(j => {
+        val id = (j \ C.Folder.ID).as[String]
+        println(j)
+        val folder = Folder.fromJson(j)
+        id -> folder
+      }).toMap
     }
   }
-
 }

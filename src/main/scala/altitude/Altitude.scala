@@ -43,6 +43,8 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
       dataSourceType match {
         case "mongo" => {
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.VoidTransactionManager(app))
+
+          bind[MigrationDao].toInstance(new mongo.MigrationDao(app))
           bind[AssetDao].toInstance(new mongo.AssetDao(app))
           bind[ImportProfileDao].toInstance(new mongo.ImportProfileDao(app))
           bind[FolderDao].toInstance(new mongo.FolderDao(app))
@@ -55,6 +57,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           bind[AbstractTransactionManager].toInstance(jdbcTxManager)
           bind[JdbcTransactionManager].toInstance(jdbcTxManager)
 
+          bind[MigrationDao].toInstance(new postgres.MigrationDao(app))
           bind[AssetDao].toInstance(new postgres.AssetDao(app))
           bind[ImportProfileDao].toInstance(new postgres.ImportProfileDao(app))
           bind[FolderDao].toInstance(new postgres.FolderDao(app))
@@ -67,6 +70,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           bind[AbstractTransactionManager].toInstance(jdbcTxManager)
           bind[JdbcTransactionManager].toInstance(jdbcTxManager)
 
+          bind[MigrationDao].toInstance(new sqlite.MigrationDao(app))
           bind[AssetDao].toInstance(new sqlite.AssetDao(app))
           bind[ImportProfileDao].toInstance(new sqlite.ImportProfileDao(app))
           bind[FolderDao].toInstance(new sqlite.FolderDao(app))

@@ -106,10 +106,10 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   Return a JSON record with timestamp and ID fields translated from Mongo's "extended" format
    */
   protected final def fixMongoFields(json: JsObject): JsObject = json ++ Json.obj(
-      C.Base.ID -> (json \ "_id").as[String],
-      C.Base.CREATED_AT ->  (json \ C.Base.CREATED_AT \ "$date").asOpt[String],
-      C.Base.UPDATED_AT -> (json \ C.Base.UPDATED_AT \ "$date").asOpt[String]
-    )
+    C.Base.ID -> (json \ "_id").as[String],
+    C.Base.CREATED_AT ->  (json \ C.Base.CREATED_AT \ "$date").asOpt[String],
+    C.Base.UPDATED_AT -> (json \ C.Base.UPDATED_AT \ "$date").asOpt[String]
+  )
 
   protected final def fixMongoQuery(q: Query): Query = {
     // _id -> id
@@ -123,6 +123,20 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     }
   }
 
+  override def getByIds(ids: Set[String])(implicit txId: TransactionId): List[JsObject] = {
+    val query: DBObject =  MongoDBObject(
+      "_id" -> MongoDBObject("$in" -> ids)
+    )
+
+    val cursor: MongoCursor = COLLECTION.find(query)
+
+    // iterate through results and "fix" mongo fields
+    cursor.map(o => {
+      val json: JsObject = Json.parse(o.toString).as[JsObject]
+      fixMongoFields(json)
+    }).toList
+  }
+
   override def updateByQuery(q: Query, json: JsObject, fields: List[String])(implicit txId: TransactionId): Int = {
     log.debug(s"Updating with data $json for $q")
 
@@ -132,7 +146,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     // combine the selected fields we want to update from the JSON repr of the mode, with updated_at
     val updateJson = JsObject(
       json.fieldSet.filter {v: (String, JsValue) => fields.contains(v._1)}.toSeq) ++ Json.obj(
-        C.Base.UPDATED_AT -> Util.isoDateTime(Some(Util.utcNow))
+      C.Base.UPDATED_AT -> Util.isoDateTime(Some(Util.utcNow))
     )
 
     val o: DBObject =  MongoDBObject(

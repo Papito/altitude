@@ -1,8 +1,5 @@
 package altitude
 
-import java.io.File
-import java.net.URISyntaxException
-
 import scala.collection.immutable.HashMap
 
 class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
@@ -15,7 +12,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
     "dataDir" -> "data",
     "previewDir" -> "p",
 
-    "datasource" -> "sqlite", // mongo, postgres, sqlite
+    "datasource" -> "mongo", // mongo, postgres, sqlite
 
     "result.box.pixels" -> 200,
 

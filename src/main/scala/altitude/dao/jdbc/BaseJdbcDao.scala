@@ -127,7 +127,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   }
 
   protected def oneBySqlQuery(sql: String, vals: List[Object] = List())(implicit txId: TransactionId): Option[Map[String, AnyRef]] = {
-    //log.debug(s"SQL: $sql")
+    log.debug(s"SQL: $sql")
 
     val runner: QueryRunner = new QueryRunner()
     val res = runner.query(conn, sql, new MapListHandler(), vals:_*)
@@ -144,6 +144,23 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
     log.debug(s"RECORD: $rec")
     Some(rec.toMap[String, AnyRef])
+  }
+
+  override def getByIds(ids: Set[String])(implicit txId: TransactionId): List[JsObject] = {
+    val placeholders = ids.toSeq.map(x => "?")
+    val sql = s"""
+      SELECT $DEFAULT_SQL_COLS_FOR_SELECT
+        FROM $tableName
+       WHERE id IN (${placeholders.mkString(",")})
+      """
+
+    log.debug(s"SQL: $sql")
+
+    val runner: QueryRunner = new QueryRunner()
+    val res = runner.query(conn, sql, new MapListHandler(), ids.toList: _*)
+    log.debug(s"Found ${res.size()} records", C.LogTag.DB)
+    val recs = res.map{_.toMap[String, AnyRef]}.toList
+    recs.map{makeModel}
   }
 
   override def updateByQuery(q: Query, json: JsObject, fields: List[String])(implicit txId: TransactionId): Int = {

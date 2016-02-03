@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 class MigrationDao(app: Altitude) extends altitude.dao.MigrationDao(app) {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  def currentVersion(implicit txId: TransactionId): Int = {
+  def currentVersion(implicit txId: TransactionId = new TransactionId): Int = {
     val sql = s"SELECT * FROM $VERSION_TABLE_NAME"
     val version = try {
       val rec = oneBySqlQuery(sql)
@@ -19,6 +19,13 @@ class MigrationDao(app: Altitude) extends altitude.dao.MigrationDao(app) {
     }
     version
   }
+
+  def executeCommand(command: String)(implicit txId: TransactionId): Unit = {
+    val stmt = conn.createStatement()
+    stmt.executeUpdate(command)
+    stmt.close()
+  }
+
   def versionUp(implicit txId: TransactionId): Unit = Unit
 
   override def increment(id: String, field: String, count: Int = 1)(implicit txId: TransactionId): Unit = Unit

@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
 
-class FileSystemImportDao(val app: Altitude) extends BaseDao {
+class FileSystemImportDao(val app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
 
   private val ANY_FILE_FILTER: IOFileFilter = TrueFileFilter.INSTANCE
@@ -32,20 +32,5 @@ class FileSystemImportDao(val app: Altitude) extends BaseDao {
         }
       }
     }.toIterator
-  }
-
-  override def add(json: JsObject)(implicit txId: TransactionId): JsObject = throw new NotImplementedError
-  override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = throw new NotImplementedError
-  override def query(q: Query)(implicit txId: TransactionId): List[JsObject] = throw new NotImplementedError
-  override def deleteByQuery(q: Query)(implicit txId: TransactionId) = throw new NotImplementedError
-  override def updateByQuery(q: Query, data: JsObject, fields: List[String])(implicit txId: TransactionId): Int = {
-    throw new NotImplementedError
-  }
-
-  override def increment(id: String, field: String, count: Int = 1)(implicit txId: TransactionId): Unit = {
-    throw new NotImplementedError
-  }
-  override def decrement(id: String, field: String, count: Int = 1)(implicit txId: TransactionId): Unit = {
-    throw new NotImplementedError
   }
 }
