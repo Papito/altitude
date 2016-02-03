@@ -39,6 +39,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
     "db.sqlite.url" -> "jdbc:sqlite:tmp/test/test.sqlite.db",
 
     "db.mongo.db" -> s"altitude-test",
+    "db.mongo.port" -> "27018",
 
     "migrationsEnabled" -> false
 

@@ -24,7 +24,6 @@ object BaseMongoDao {
   val CLIENT: Option[MongoClient] =
     if (dataSource == "mongo" || Environment.ENV == Environment.TEST) {
       val client = Some(MongoClient(host, dbPort))
-      client.get.setWriteConcern(WriteConcern.Journaled)
       client
     } else {
       None
