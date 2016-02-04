@@ -2,13 +2,14 @@ package altitude.dao.jdbc
 
 import altitude.transactions.TransactionId
 import altitude.{Const, Altitude}
+import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 
 class MigrationDao(app: Altitude) extends altitude.dao.MigrationDao(app) {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  def currentVersion(implicit txId: TransactionId = new TransactionId): Int = {
-    val sql = s"SELECT * FROM $VERSION_TABLE_NAME"
+  override def currentVersion(implicit txId: TransactionId = new TransactionId): Int = {
+    val sql = s"SELECT version FROM $SYSTEM_TABLE"
     val version = try {
       val rec = oneBySqlQuery(sql)
       rec.get("version").asInstanceOf[Int]
@@ -20,14 +21,17 @@ class MigrationDao(app: Altitude) extends altitude.dao.MigrationDao(app) {
     version
   }
 
-  def executeCommand(command: String)(implicit txId: TransactionId): Unit = {
+  override def executeCommand(command: String)(implicit txId: TransactionId): Unit = {
     val stmt = conn.createStatement()
     stmt.executeUpdate(command)
     stmt.close()
   }
 
-  def versionUp(implicit txId: TransactionId): Unit = Unit
-
-  override def increment(id: String, field: String, count: Int = 1)(implicit txId: TransactionId): Unit = Unit
-  override def decrement(id: String, field: String, count: Int = 1)(implicit txId: TransactionId): Unit = Unit
+  override def versionUp()(implicit txId: TransactionId): Unit = {
+    log.info("VERSION UP")
+    val runner: QueryRunner = new QueryRunner()
+    val sql = s"UPDATE $SYSTEM_TABLE SET version = 1 WHERE id = 0"
+    log.info(sql)
+    runner.update(conn, sql)
+  }
 }

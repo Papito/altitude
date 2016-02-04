@@ -2,6 +2,7 @@ package altitude.service.migration
 
 import altitude.Altitude
 import altitude.dao.MigrationDao
+import altitude.models.Folder
 import net.codingwell.scalaguice.InjectorExtensions._
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import org.slf4j.LoggerFactory
@@ -29,11 +30,13 @@ abstract class MigrationService(app: Altitude) {
       }
     }
 
-    // must have schema committed
+    // must have schema changes committed
     txManager.withTransaction {
       version match {
         case 1 => v1
       }
+
+      DAO.versionUp()
     }
 
     // clean slate for commit count
@@ -41,9 +44,8 @@ abstract class MigrationService(app: Altitude) {
   }
 
   private def v1(implicit txId: TransactionId = new TransactionId): Unit = {
-    //FIXME: the system to pass a hardcoded ID is very poor
-    //app.service.folder.add(Folder.UNCATEGORIZED)
-    //app.service.folder.add(Folder.TRASH)
+    app.service.folder.add(Folder.UNCATEGORIZED)
+    app.service.folder.add(Folder.TRASH)
   }
 
   def existingVersion(implicit txId: TransactionId = new TransactionId): Int = {

@@ -10,6 +10,13 @@ CREATE TABLE _core (
   updated_at timestamp WITHOUT TIME ZONE DEFAULT NULL
 );
 
+CREATE TABLE system (
+  id INT NOT NULL,
+  version INT NOT NULL
+);
+CREATE UNIQUE INDEX system_record ON system(id);
+INSERT INTO system(id, version) VALUES(0, 0);
+
 CREATE TABLE asset (
   id varchar(24) PRIMARY KEY,
   md5 varchar(32) NOT NULL,
@@ -45,8 +52,4 @@ CREATE TABLE folder (
 CREATE INDEX folder_parent_id ON folder(parent_id);
 CREATE UNIQUE INDEX folder_parent_id_and_name ON folder(parent_id, name);
 
-INSERT INTO folder (id, name, name_lc) VALUES
-  ('000000000000000000000001', 'Uncategorized', 'uncategorized'),
-  ('000000000000000000000002', 'Trash', 'trash');
 
-INSERT INTO db_version (id, version) VALUES(1, 1);

@@ -6,6 +6,6 @@ import altitude.transactions.TransactionId
 
 abstract class MigrationDao(app: Altitude) extends VoidJdbcDao(app) {
   def currentVersion(implicit txId: TransactionId): Int
-  def versionUp(implicit txId: TransactionId): Unit
+  def versionUp()(implicit txId: TransactionId): Unit
   def executeCommand(command: String)(implicit txId: TransactionId): Unit
 }

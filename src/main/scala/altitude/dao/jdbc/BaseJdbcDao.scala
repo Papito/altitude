@@ -31,7 +31,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   protected def JSON_PLACEHOLDER: String
   protected def CURRENT_TIME_FUNC: String
   protected val CORE_SQL_COLS_FOR_INSERT = s"${C.Base.ID}"
-  protected val VERSION_TABLE_NAME = "db_version"
+  protected val SYSTEM_TABLE = "system"
 
   protected def utcNow = Util.utcNow
 
@@ -93,26 +93,25 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     recs.map{makeModel}
   }
 
-  protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object], id: Option[String] = None)
+  protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object])
                          (implicit txId: TransactionId): JsObject = {
     log.info(s"JDBC INSERT: $jsonIn")
 
+    val existingObjId: Option[String] = (jsonIn \ C.Base.ID).asOpt[String]
+
     // create ID unless there is an override
-    val _id = id.isDefined match {
-      case false => BaseModel.genId
-      case true => id.get
-    }
+    val id = if (existingObjId.isDefined) existingObjId.get else BaseModel.genId
     val createdAt = utcNow
 
     // prepend ID and CREATED AT to the values, as those are required for any record
-    val values: List[Object] = _id :: vals
+    val values: List[Object] = id :: vals
     log.debug(s"INSERT SQL: $q. ARGS: ${values.toString()}")
 
     val runner: QueryRunner = new QueryRunner()
     runner.update(conn, q, values:_*)
 
     val recordJson = jsonIn ++ JsObject(Seq(
-      C.Base.ID -> JsString(_id),
+      C.Base.ID -> JsString(id),
       C.Base.CREATED_AT -> dtAsJsString{createdAt}))
 
     log.debug(s"Added: $recordJson")
