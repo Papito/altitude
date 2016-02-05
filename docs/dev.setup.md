@@ -10,6 +10,9 @@
 #### Database
 
 If you have a fully-functioning setup, skip to setting up roles.
+    
+    sudo apt-get install libpq-dev
+    sudo apt-get install libreadline-dev
 
     sudo adduser --shell /bin/bash postgres
     sudo mkdir -p /var/lib/pgsql/data
