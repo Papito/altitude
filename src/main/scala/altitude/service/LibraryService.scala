@@ -59,7 +59,7 @@ class LibraryService(app: Altitude) {
 
     val _query: Query = folderIds.isEmpty match {
       case false => {
-        val allFolders = app.service.folder.getAll()
+        val allFolders = app.service.folder.getAll
         val allFolderIds = app.service.folder.flatChildren(parentIds = folderIds, all = allFolders)
         log.debug(s"Expanded folder ids: $allFolderIds")
 

@@ -75,7 +75,7 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
     }
   }
 
-  def getAll()(implicit txId: TransactionId = new TransactionId): List[JsObject] = {
+  def getAll(implicit txId: TransactionId = new TransactionId): List[JsObject] = {
     txManager.asReadOnly[List[JsObject]] {
       DAO.getAll
     }

@@ -48,13 +48,36 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   }
 
   /**
-   * Return all folders EXCEPT the system folders.
+   * Return all folders.
    */
-  override def getAll()(implicit txId: TransactionId = new TransactionId): List[JsObject] = {
+  override def getAll(implicit txId: TransactionId = new TransactionId): List[JsObject] = {
     txManager.asReadOnly[List[JsObject]] {
-      DAO.getAll.filter(json => {
+      DAO.getAll
+    }
+  }
+
+  /**
+   * Return all NON-system folders.
+   */
+  def getNonSysFolders(all: List[JsObject] = List())(implicit txId: TransactionId = new TransactionId): List[JsObject] = {
+    txManager.asReadOnly[List[JsObject]] {
+      val _all = if (all.isEmpty) getAll else all
+      _all.filter(json => {
         val id = (json \ C.Folder.ID).asOpt[String]
         !Folder.IS_SYSTEM(id)
+      })
+    }
+  }
+
+  /**
+   * Return all system folders.
+   */
+  def getSysFolders(all: List[JsObject] = List())(implicit txId: TransactionId = new TransactionId): List[JsObject] = {
+    txManager.asReadOnly[List[JsObject]] {
+      val _all = if (all.isEmpty) getAll else all
+      _all.filter(json => {
+        val id = (json \ C.Folder.ID).asOpt[String]
+        Folder.IS_SYSTEM(id)
       })
     }
   }
@@ -65,7 +88,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
    */
   def hierarchy(rootId: String = Folder.ROOT.id.get)
                (implicit txId: TransactionId = new TransactionId): List[Folder] = {
-    val all = getAll()
+    val all = getNonSysFolders()
     val rootEl = all.find(json => (json \ C.Folder.ID).as[String] == rootId)
 
     Folder.IS_ROOT(Some(rootId)) || rootEl.isDefined match {
@@ -86,17 +109,17 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     }
 
     txManager.asReadOnly[List[Folder]] {
-    val all = getAll()
+      val all = getAll
 
-    val folderEl = all.find(json => (json \ C.Folder.ID).as[String] == folderId)
-    val folder: Folder = folderEl.isDefined match {
-      case true => Folder.fromJson(folderEl.get)
-      case false => throw NotFoundException(s"Folder with ID '$folderId' not found")
-    }
+      val folderEl = all.find(json => (json \ C.Folder.ID).as[String] == folderId)
+      val folder: Folder = folderEl.isDefined match {
+        case true => Folder.fromJson(folderEl.get)
+        case false => throw NotFoundException(s"Folder with ID '$folderId' not found")
+      }
 
-    val parents = findParents(folderId =folderId, all = getAll())
+      val parents = findParents(folderId =folderId, all = all)
 
-    List(Folder.ROOT) ::: (folder :: parents).reverse
+      List(Folder.ROOT) ::: (folder :: parents).reverse
     }
   }
 
@@ -142,8 +165,8 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       log.info(s"Deleting folder $folder")
 
       // get the list of tuples - (depth, id), with most-deep first
-      val childrenAndDepths: List[(Int, String)] = flatChildren(id, DAO.getAll()).sortBy(_._1).reverse
-                                                                               /* sort by depth */
+      val childrenAndDepths: List[(Int, String)] = flatChildren(id, getNonSysFolders()).sortBy(_._1).reverse
+                                                                                  /* sort by depth */
 
       // now delete the children, most-deep first
       txManager.withTransaction[Int] {
@@ -214,7 +237,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
    * Returns the children for a folder as a flat list.
    */
   def flatChildren(parentId: String, all: List[JsValue] = List(), depth: Int = 0): List[(Int, String)]  = {
-    val _all = if (all.isEmpty) getAll else all
+    val _all = if (all.isEmpty) getNonSysFolders() else all
 
     val childElements = _all.filter(j => (j \ C.Folder.PARENT_ID).asOpt[String].contains(parentId))
 
@@ -250,7 +273,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
     txManager.asReadOnly {
       // cannot move into own child
-      if (flatChildren(folderBeingMovedId, getAll()).map (_._2).contains(destFolderId)) {
+      if (flatChildren(folderBeingMovedId, getNonSysFolders()).map (_._2).contains(destFolderId)) {
         throw IllegalOperationException(s"Cannot move a folder into own child. $destFolderId ID in $folderBeingMovedId path")
       }
 
@@ -323,17 +346,34 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     }
   }
 
-  def getSystemFolders(implicit txId: TransactionId): Map[String, Folder] = {
+  def getSystemFolders(all: List[JsObject] = List())(implicit txId: TransactionId): Map[String, Folder] = {
     txManager.asReadOnly[Map[String, Folder]] {
-      val sysFolderIds: Set[String] = Folder.SYSTEM_FOLDERS.map(_.id.get).toSet
-      val allSysFolders = DAO.getByIds(sysFolderIds)
-
-      // create the lookup map
-      allSysFolders.map(j => {
-        val id = (j \ C.Folder.ID).as[String]
-        val folder = Folder.fromJson(j)
-        id -> folder
-      }).toMap
+      all.isEmpty match {
+        case true => {
+          val sysFolderIds: Set[String] = Folder.SYSTEM_FOLDERS.map(_.id.get).toSet
+          val allSysFolders = DAO.getByIds(sysFolderIds)
+          getSystemFolderLookup(allSysFolders)
+        }
+        case false => {
+          val allSysFolders = all.filter(json => {
+            val id = (json \ C.Folder.ID).asOpt[String]
+              Folder.IS_SYSTEM(id)
+          })
+          getSystemFolderLookup(allSysFolders)
+        }
+      }
     }
+  }
+
+  /**
+   * Given a list of system folders, create a lookup-by-folder-id map
+   */
+  private def getSystemFolderLookup(allSysFolders: List[JsObject]): Map[String, Folder] = {
+    // create the lookup map
+    allSysFolders.map(j => {
+      val id = (j \ C.Folder.ID).as[String]
+      val folder = Folder.fromJson(j)
+      id -> folder
+    }).toMap
   }
 }
