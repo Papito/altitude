@@ -20,10 +20,8 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
 
     (altitude.service.folder.getById(folder1.id.get): Folder).numOfAssets should be (0)
 
-    // uncategorized should be empty
+    // uncategorized folder should be empty
     val systemFolders = altitude.service.folder.getSystemFolders
-    println("!!!!!!!!!!")
-    println(systemFolders)
     systemFolders(Folder.UNCATEGORIZED.id.get).numOfAssets should be (0)
 
     val mediaType = new MediaType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")

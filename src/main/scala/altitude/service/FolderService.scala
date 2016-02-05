@@ -59,7 +59,6 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     }
   }
 
-
   /**
    * Get the entire hierarchy, with nested children. The root folders are returned
    * as a list.
@@ -326,14 +325,12 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
   def getSystemFolders(implicit txId: TransactionId): Map[String, Folder] = {
     txManager.asReadOnly[Map[String, Folder]] {
-      val allSysFolders = DAO.getByIds(Set(
-        Folder.UNCATEGORIZED.id.get,
-        Folder.TRASH.id.get))
+      val sysFolderIds: Set[String] = Folder.SYSTEM_FOLDERS.map(_.id.get).toSet
+      val allSysFolders = DAO.getByIds(sysFolderIds)
 
       // create the lookup map
       allSysFolders.map(j => {
         val id = (j \ C.Folder.ID).as[String]
-        println(j)
         val folder = Folder.fromJson(j)
         id -> folder
       }).toMap
