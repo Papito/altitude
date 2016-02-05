@@ -4,7 +4,8 @@
 
 * Java (8)
 * Postgres database (9.4.4)
-* Mongo 2.6.5
+* Mongo 3.x running on standard port
+* Mongo 3.x ephemealForTest engine running on 27018 
 
 ##### DB Roles
 
