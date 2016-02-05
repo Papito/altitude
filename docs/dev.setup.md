@@ -7,14 +7,41 @@
 * Mongo 3.x running on standard port
 * Mongo 3.x ephemealForTest engine running on 27018 
 
-##### DB Roles
+#### Database
+
+If you have a fully-functioning setup, skip to setting up roles.
+
+    sudo adduser --shell /bin/bash postgres
+    sudo mkdir -p /var/lib/pgsql/data
+    sudo chown postgres /var/lib/pgsql/data
+    sudo su - postgres
+    /usr/local/pgsql/bin/initdb -D /var/lib/pgsql/data
+    # in source
+    cd contrib/start-scripts/
+    
+Path:
+
+    PATH="/usr/local/pgsql/bin:$PATH"
+
+Edit _linux_ and **update the file to set PGDATA variable to our data location**
+    
+    sudo cp linux /etc/init.d/postgresql
+    sudo chmod 755 /etc/init.d/postgresql
+    sudo /etc/init.d/postgresql start
+    
+For startup (on _Ubuntu 12.10+_):
+
+    sudo apt-get install sysv-rc-conf
+    sudo sysv-rc-conf postgresql on
+
+###### DB Roles
 
 And into the prompt to create some roles and users:
     
     sudo su - postgres
     psql
     
-    postgres $> CREATE ROLE andrei WITH LOGIN CREATEROLE CREATEDB;
+    psql $> CREATE ROLE andrei WITH LOGIN CREATEROLE CREATEDB;
     
 Exit ...
 
