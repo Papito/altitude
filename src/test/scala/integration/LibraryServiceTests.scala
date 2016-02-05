@@ -23,6 +23,7 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
     // uncategorized folder should be empty
     val systemFolders = altitude.service.folder.getSystemFolders
     systemFolders(Folder.UNCATEGORIZED.id.get).numOfAssets should be (0)
+    systemFolders(Folder.TRASH.id.get).numOfAssets should be (0)
 
     val mediaType = new MediaType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
 
@@ -62,6 +63,13 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
       Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2.id.get))
     ).length should be(1)
     (altitude.service.folder.getById(folder2.id.get): Folder).numOfAssets should be (1)
+
+    altitude.service.library.moveToFolder(asset2.id.get, folder1.id.get)
+    altitude.service.library.moveToFolder(asset.id.get, Folder.TRASH.id.get)
+
+    val systemFolders3 = altitude.service.folder.getSystemFolders
+    systemFolders3(Folder.UNCATEGORIZED.id.get).numOfAssets should be (0)
+    systemFolders3(Folder.TRASH.id.get).numOfAssets should be (1)
   }
 
 }
