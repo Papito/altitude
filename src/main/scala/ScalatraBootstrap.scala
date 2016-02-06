@@ -16,6 +16,7 @@ class ScalatraBootstrap extends LifeCycle with SingleApplication {
     context.mount(new web.ImportController, "/cl/import/*")
     context.mount(new web.SearchController, "/cl/search/*")
     context.mount(new web.UncategorizedController, "/cl/uncategorized")
+    context.mount(new web.TrashController, "/cl/trash")
 
     context.mount(new AssetController, "/assets/*")
     context.mount(new ImportController, "/import/*")
