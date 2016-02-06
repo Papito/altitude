@@ -120,7 +120,7 @@ BrowseViewModel = SearchViewModel.extend({
     var opts = {
       'successCallback': function() {
         self.loadFolders(self.currentFolderId());
-        self.blinkSuccess("Asset moved to trash");
+        self.blinkWarning("Asset moved to trash");
       }
     };
 

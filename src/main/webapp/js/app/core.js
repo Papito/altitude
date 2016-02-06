@@ -35,14 +35,14 @@ BaseViewModel = Base.extend({
   blinkInfo: function(msg) {
     this.infoEl.show();
     this.infoMessage(msg);
-    this.infoEl.fadeOut(5000);
+    this.infoEl.fadeOut(1800);
   },
   // ----------------------------------------------------------------
 
   blinkWarning: function(msg) {
     this.warningEl.show();
     this.warningMessage(msg);
-    this.warningEl.fadeOut(5000);
+    this.warningEl.fadeOut(1800);
   },
   // ----------------------------------------------------------------
 
