@@ -99,18 +99,18 @@ BrowseViewModel = SearchViewModel.extend({
     });
   },
 
-  moveToUncategorized: function() {
+  moveToUncategorized: function(assetId) {
     console.log(assetId, 'to uncategorized');
 
     var self = this;
     var opts = {
       'successCallback': function() {
         self.loadFolders(self.currentFolderId());
-        self.blinkSuccess("Folder cleared");
+        self.blinkSuccess("Asset folder cleared");
       }
     };
 
-    this.get('/api/v1/library/assets/move/' + assetId + '/1/uncategorized', opts);
+    this.post('/api/v1/library/assets/move/' + assetId + '/uncategorized', opts);
   },
 
   moveToTrash: function(assetId) {
@@ -120,11 +120,11 @@ BrowseViewModel = SearchViewModel.extend({
     var opts = {
       'successCallback': function() {
         self.loadFolders(self.currentFolderId());
-        self.blinkSuccess("Moved to trash");
+        self.blinkSuccess("Asset moved to trash");
       }
     };
 
-    this.get('/api/v1/library/assets/move/' + assetId + '/trash', opts);
+    this.post('/api/v1/library/assets/move/' + assetId + '/trash', opts);
   },
 
   showAddFolder: function() {
@@ -210,7 +210,7 @@ BrowseViewModel = SearchViewModel.extend({
       }
     };
 
-    this.get('/api/v1/library/assets/move/' + assetId + '/' + folderId, opts);
+    this.post('/api/v1/library/assets/move/' + assetId + '/' + folderId, opts);
   },
 
   showRenameFolder: function(folderId) {
