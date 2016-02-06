@@ -43,25 +43,30 @@
 </head>
 <body>
   <header>
-    <div class="navbar navbar-inverse" role="navigation">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="/">${config.getString("app.name")}</a>
+    <div class="row" id="navigation">
+      <div id="brand" class="col-md-2">
+        <h4>
+          <a href="/">${config.getString("app.name")}</a>
+        </h4>
+      </div>
+      <div class="col-md-4">
+        <div id="menulist">
+          <div class="row">
+            <div class="col-md-12">
+              <a href="/cl/import">Import</a>
+            </div>
+          </div>
         </div>
-        <div class="navbar-collapse collapse">
-          <ul class="nav navbar-nav navbar-left">
-            <li><a href="/cl/import">Import</a></li>
-          </ul>
-          <form class="navbar-form navbar-right" method="GET" action="/cl/search">
-            <input type="text" name="${C.Api.Search.QUERY_TEXT}" class="form-control" placeholder="Search..." maxlength="200">
-            </form>
-        </div>
+      </div>
+      <div id="screenTitle" class="col-md-3">
+        <h5>
+          ${screenTitle}
+        </h5>
+      </div>
+      <div class="col-md-3">
+        <form method="GET" action="/cl/search">
+          <input type="text" name="${C.Api.Search.QUERY_TEXT}" class="form-control" placeholder="Search..." maxlength="200">
+        </form>
       </div>
     </div>
   </header>
@@ -91,14 +96,6 @@
             <p data-bind="text: errorStacktrace"></p>
           </div>
         </div>
-
-      <div class="row">
-        <div class="col-md-12">
-          <h5><span id="screenTitle">
-            ${screenTitle}</span>
-          </h5>
-        </div>
-      </div>
 
       <!-- divider -->
       <div class="row">

@@ -45,11 +45,6 @@ html, body {
     overflow: hidden;
 }
 
-header {
-    display: block;
-    height: 4em;
-}
-
 footer {
     display: block;
     position: absolute;
@@ -59,11 +54,6 @@ footer {
     padding-top: .5em;
     border-top: 1px solid #494744;
     background-color: #272b30;
-}
-
-#screenTitle {
-    text-transform: uppercase;
-    font-weight: bold;
 }
 
 #divider {
@@ -82,6 +72,44 @@ footer {
 
 #errorContainer h4 {
     margin: 0;
+}
+/* NAV */
+
+#navigation {
+    padding-top: 0.8em;
+}
+
+#menulist {
+    background-color: #4b5257;
+    border-radius: 0.3em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    text-align: center;
+}
+
+#navigation .form-control {
+    width: 95%;
+}
+
+#brand {
+    text-align: left;
+}
+
+#brand h4 {
+    padding-left: 1em;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+#screenTitle {
+    text-align: center;
+}
+
+#screenTitle, #brand {
+    text-transform: uppercase;
+}
+
+#screenTitle h5, #brand a {
+    font-weight: bolder;
 }
 
 /* IMPORT */
