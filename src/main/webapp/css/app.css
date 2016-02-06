@@ -44,6 +44,17 @@ select {
     color: #FFF;
 }
 
+.breadcrumb {
+    background-image: None;
+    background-color: #363d42;
+    border-radius: 0.2em;
+    margin-bottom: 1em;
+    border-color: #3b3b3b;
+    border-left: None;
+    border-right: None;
+    padding: .4em;
+}
+
 /* GLOBAL */
 html, body {
     height: 100%;
