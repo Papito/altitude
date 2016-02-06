@@ -2,13 +2,15 @@
   <div id="uncategorized" class="system-folder">
     <span class="header">
       <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-      &nbsp;&nbsp;<a data-bind="html: uncategorizedFolder().name + '&nbsp;<span class=folder-count>(' + uncategorizedFolder().numOfAssets + ')</span>'" href="/cl/uncategorized"></a>
+        <a data-bind="text: uncategorizedFolder().name" href="/cl/uncategorized"></a>
+        <span data-bind="html: '<span class=folder-count>(' + uncategorizedFolder().numOfAssets + ')</span>'"></span>
     </span>
   </div>
   <div id="trash" class="system-folder">
     <span class="header">
       <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-      &nbsp;&nbsp;<a href="/cl/trash"><span data-bind="html: trashFolder().name + '&nbsp;<span class=folder-count>(' + trashFolder().numOfAssets + ')</span>'"></span></a>
+        <a data-bind="text: trashFolder().name" href="/cl/trash"></a>
+        <span data-bind="html: '<span class=folder-count>(' + trashFolder().numOfAssets + ')</span>'"></span>
     </span>
   </div>
 </div>

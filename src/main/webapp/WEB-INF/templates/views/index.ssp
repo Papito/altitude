@@ -14,9 +14,6 @@
   </ol>
 
   <div class="col-md-2" id="left">
-      <!--
-      folders
-      -->
       <div class="row">
         <div id="folders">
           <div>
@@ -47,7 +44,9 @@
             <li class="folder-target">
               <span class="context-menu" data-bind="attr: {'folder_id': $data.id}">
                 <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
-                &nbsp;&nbsp;<a href="#" data-bind="html: name + '&nbsp;<span class=folder-count>(' + numOfAssets + ')</span>', click: function() {$root.loadFolders($data.id)}"></a>
+                &nbsp;
+                <a href="#" data-bind="text: name, click: function() {$root.loadFolders($data.id)}"></a>
+                <span data-bind="html: '<span class=folder-count>(' + numOfAssets + ')</span>'"></span>
               </span>
             </li>
             </ul>
