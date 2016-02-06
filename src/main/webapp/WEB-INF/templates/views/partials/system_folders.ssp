@@ -8,7 +8,7 @@
   <div id="trash" class="system-folder">
     <span class="header">
       <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-      &nbsp;&nbsp;<a href="/cl/trash"><span data-bind="html: trashFolder().name + '&nbsp;<span class=folder-count>(' + trashFolder()numOfAssets + ')</span>'"></span></a>
+      &nbsp;&nbsp;<a href="/cl/trash"><span data-bind="html: trashFolder().name + '&nbsp;<span class=folder-count>(' + trashFolder().numOfAssets + ')</span>'"></span></a>
     </span>
   </div>
 </div>
