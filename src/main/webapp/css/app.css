@@ -31,7 +31,9 @@ select {
 }
 
 .alert {
-    padding: .2em 0.5em .2em 0.5em;
+    padding: .1em 0.5em .1em 0.5em;
+    border-radius: 0;
+    width: 100%;
 }
 
 .alert .close {
@@ -66,6 +68,10 @@ footer {
     display:block;
 }
 
+#hud {
+    height: 2.4em;
+}
+
 #warningMessage {
     width: 100%;
 }
@@ -77,6 +83,7 @@ footer {
 
 #navigation {
     padding-top: 0.8em;
+    background-color: #363d42;
 }
 
 #menulist {

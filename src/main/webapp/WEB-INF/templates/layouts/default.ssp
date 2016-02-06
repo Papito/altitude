@@ -69,43 +69,34 @@
         </form>
       </div>
     </div>
+    <div id="hud">
+      <div id="successMessage" class="alert alert-success" style="display: none" role="alert" data-bind="text: successMessage">
+      </div>
+      <div id="infoMessage" class="alert alert-info" style="display: none" role="alert" data-bind="text: infoMessage">
+      </div>
+      <div id="warningMessage" class="alert alert-warning" style="display: none" role="alert" data-bind="text: warningMessage">
+      </div>
+    </div>
   </header>
 
-    <section>
-      <div id="content" class="container-fluid">
-        <div id="successMessage" class="alert alert-success" style="display: none" role="alert"
-             data-bind="text: successMessage">
-        </div>
-        <div id="infoMessage" class="alert alert-info" style="display: none" role="alert"
-        data-bind="text: infoMessage">
-        </div>
-        <div id="warningMessage" class="alert alert-warning" style="display: none" role="alert"
-        data-bind="text: warningMessage">
-        </div>
-        <div id="errorContainer" class="alert alert-danger alert-dismissible fade in" role="alert" style="display: none">
-          <button type="button" class="close" aria-label=Close data-bind="click: dismissError"><span aria-hidden=true>&times;</span></button>
-          <h4 data-bind="visible: errorMessage">
-            Error. <span data-bind="text: errorMessage, visible: errorMessage"></span>
-          </h4>
-          <div data-bind="visible: errorStacktrace" style="margin-top: 2em">
-            <p>
-              <button type="button" class="btn btn-info" data-bind="click: reportError">Send anonymous error report (pretty please?)</button>
-              <button type="button" class="btn btn-default" data-bind="click: dismissError">Dismiss</button>
-            </p>
-            <h4 style="margin-top: 2em">Detail</h4>
-            <p data-bind="text: errorStacktrace"></p>
-          </div>
-        </div>
-
-      <!-- divider -->
-      <div class="row">
-        <div id="divider" class="col-md-12">
-        </div>
+  <div id="content" class="container-fluid">
+    <div id="errorContainer" class="alert alert-danger alert-dismissible fade in" role="alert" style="display: none">
+      <button type="button" class="close" aria-label=Close data-bind="click: dismissError"><span aria-hidden=true>&times;</span></button>
+      <h4 data-bind="visible: errorMessage">
+        Error. <span data-bind="text: errorMessage, visible: errorMessage"></span>
+      </h4>
+      <div data-bind="visible: errorStacktrace" style="margin-top: 2em">
+        <p>
+          <button type="button" class="btn btn-info" data-bind="click: reportError">Send anonymous error report (pretty please?)</button>
+          <button type="button" class="btn btn-default" data-bind="click: dismissError">Dismiss</button>
+        </p>
+        <h4 style="margin-top: 2em">Detail</h4>
+        <p data-bind="text: errorStacktrace"></p>
       </div>
+    </div>
 
-      ${unescape(body)}
-      </div>
-    </section>
+    ${unescape(body)}
+  </div>
 
     <footer></footer>
 
