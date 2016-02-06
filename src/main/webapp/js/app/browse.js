@@ -7,6 +7,8 @@ BrowseViewModel = SearchViewModel.extend({
     console.log('Initializing browse view model');
 
     this.folders = ko.observableArray();
+    this.uncategorizedFolder = ko.observable(new Folder({name: ''}));
+    this.trashFolder = ko.observable(new Folder({name: ''}));
     this.currentFolderPath = ko.observableArray();
     this.currentFolderId = ko.observable("000000000000000000000000");
     this._showAddFolder = ko.observable(false);
@@ -175,21 +177,17 @@ BrowseViewModel = SearchViewModel.extend({
         self.folders(folders);
         self.currentFolderPath(path);
 
+        var uncategorizedFolder = new Folder(json['system']['000000000000000000000001']);
+        self.uncategorizedFolder(uncategorizedFolder);
+        var trashFolder = new Folder(json['system']['000000000000000000000002']);
+        self.trashFolder(trashFolder);
+
         var elFolderTargets = $(".folder-target");
         elFolderTargets.droppable({
           accept: ".result-box",
           hoverClass: "highlight",
           tolerance: "pointer"
         });
-
-/*
-        elFolderTargets.on("over", function( event, ui ) {
-          console.log("OVER", ui);
-        });
-        elFolderTargets.on("out", function( event, ui ) {
-          console.log("OUT", ui);
-        });
-*/
 
         elFolderTargets.on("drop", function( event, ui ) {
           var assetId = $(ui.draggable.context).attr('asset_id');
@@ -200,7 +198,7 @@ BrowseViewModel = SearchViewModel.extend({
       }
     };
 
-    this.get('/api/v1/folders/' + folderId, opts);
+    this.get('/api/v1/folders/' + folderId + "/children", opts);
   },
 
   moveToFolder: function(assetId, folderId) {

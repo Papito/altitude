@@ -70,29 +70,18 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   }
 
   /**
-   * Return all system folders.
-   */
-  def getSysFolders(all: List[JsObject] = List())(implicit txId: TransactionId = new TransactionId): List[JsObject] = {
-    txManager.asReadOnly[List[JsObject]] {
-      val _all = if (all.isEmpty) getAll else all
-      _all.filter(json => {
-        val id = (json \ C.Folder.ID).asOpt[String]
-        Folder.IS_SYSTEM(id)
-      })
-    }
-  }
-
-  /**
    * Get the entire hierarchy, with nested children. The root folders are returned
    * as a list.
    */
-  def hierarchy(rootId: String = Folder.ROOT.id.get)
+  def hierarchy(rootId: String = Folder.ROOT.id.get, all: List[JsObject] = List())
                (implicit txId: TransactionId = new TransactionId): List[Folder] = {
-    val all = getNonSysFolders()
-    val rootEl = all.find(json => (json \ C.Folder.ID).as[String] == rootId)
+    val _all = if (all.isEmpty) getAll else all
+    val nonSysFolders = getNonSysFolders(all = _all)
+
+    val rootEl = nonSysFolders.find(json => (json \ C.Folder.ID).as[String] == rootId)
 
     Folder.IS_ROOT(Some(rootId)) || rootEl.isDefined match {
-      case true => children(all, parentId = rootId)
+      case true => children(nonSysFolders, parentId = rootId)
       case false => throw NotFoundException(s"Cannot get hierarchy. Root folder $rootId does not exist")
     }
   }
@@ -102,7 +91,6 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
    * This is the parent list, only reversed.
    */
   def path(folderId: String)(implicit txId: TransactionId = new TransactionId): List[Folder] = {
-
     // short-circuit for root folder
     if (Folder.IS_ROOT(Some(folderId))) {
       return List[Folder]()
@@ -330,7 +318,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     }
   }
 
-  def incrAssetCount(folderId: String, count: Int = 1)(implicit txId: TransactionId) = {
+  def incrAssetCount(folderId: String, count: Int = 1)(implicit txId: TransactionId = new TransactionId) = {
     log.debug(s"Incrementing folder $folderId count by $count")
 
     txManager.withTransaction {
@@ -338,7 +326,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     }
   }
 
-  def decrAssetCount(folderId: String, count: Int = 1)(implicit txId: TransactionId) = {
+  def decrAssetCount(folderId: String, count: Int = 1)(implicit txId: TransactionId = new TransactionId) = {
     log.debug(s"Decrementing folder $folderId count by $count")
 
     txManager.withTransaction {
@@ -346,7 +334,8 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     }
   }
 
-  def getSystemFolders(all: List[JsObject] = List())(implicit txId: TransactionId): Map[String, Folder] = {
+  def getSysFolders(all: List[JsObject] = List())
+                   (implicit txId: TransactionId = new TransactionId): Map[String, Folder] = {
     txManager.asReadOnly[Map[String, Folder]] {
       all.isEmpty match {
         case true => {

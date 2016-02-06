@@ -5,7 +5,7 @@ import altitude.models.Folder
 import org.scalatra.Ok
 import org.slf4j.LoggerFactory
 import altitude.{Const => C}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, JsString, JsObject, Json}
 
 class FolderController  extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -18,7 +18,7 @@ class FolderController  extends BaseApiController {
     val folders = app.service.folder.hierarchy()
 
     Ok(Json.obj(
-      C.Api.Folder.HIERARCHY ->folders.map(_.toJson)
+      C.Api.Folder.HIERARCHY -> folders.map(_.toJson)
     ))
   }
 
@@ -31,15 +31,21 @@ class FolderController  extends BaseApiController {
     ))
   }
 
-  get(s"/:${C.Api.Folder.PARENT_ID}") {
+  get(s"/:${C.Api.Folder.PARENT_ID}/children") {
     val parentId = params.getAs[String](C.Api.Folder.PARENT_ID).get
-    val folders = app.service.folder.immediateChildren(parentId)
-
+    val all = app.service.folder.getAll
+    val folders = app.service.folder.immediateChildren(parentId, all = all)
+    val sysFolders = app.service.folder.getSysFolders(all = all)
     val path = app.service.folder.path(parentId)
 
     Ok(Json.obj(
       C.Api.Folder.FOLDERS -> folders.map(_.toJson),
-      C.Api.Folder.PATH -> path.map(_.toJson)
+      C.Api.Folder.PATH -> path.map(_.toJson),
+      C.Api.Folder.SYSTEM -> JsObject(
+        sysFolders.map { case (folderId, folder) =>
+          folderId -> folder.toJson
+        }.toSeq
+      )
     ))
   }
 

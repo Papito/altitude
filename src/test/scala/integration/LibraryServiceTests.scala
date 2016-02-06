@@ -21,7 +21,7 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
     (altitude.service.folder.getById(folder1.id.get): Folder).numOfAssets should be (0)
 
     // uncategorized folder should be empty
-    val systemFolders = altitude.service.folder.getSystemFolders()
+    val systemFolders = altitude.service.folder.getSysFolders()
     systemFolders(Folder.UNCATEGORIZED.id.get).numOfAssets should be (0)
     systemFolders(Folder.TRASH.id.get).numOfAssets should be (0)
 
@@ -44,7 +44,7 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
         sizeBytes = 1L))
 
     // there is an uncategorized asset
-    val systemFolders2 = altitude.service.folder.getSystemFolders()
+    val systemFolders2 = altitude.service.folder.getSysFolders()
     systemFolders2(Folder.UNCATEGORIZED.id.get).numOfAssets should be (1)
 
     altitude.service.library.search(
@@ -67,7 +67,7 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
     altitude.service.library.moveToFolder(asset2.id.get, folder1.id.get)
     altitude.service.library.moveToFolder(asset.id.get, Folder.TRASH.id.get)
 
-    val systemFolders3 = altitude.service.folder.getSystemFolders()
+    val systemFolders3 = altitude.service.folder.getSysFolders()
     systemFolders3(Folder.UNCATEGORIZED.id.get).numOfAssets should be (0)
     systemFolders3(Folder.TRASH.id.get).numOfAssets should be (1)
   }

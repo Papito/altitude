@@ -2,13 +2,13 @@
   <div id="uncategorized" class="system-folder">
     <span class="header">
       <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-      &nbsp;&nbsp;<a href="/cl/uncategorized">Uncategorized</a>
+      &nbsp;&nbsp;<a data-bind="html: uncategorizedFolder().name + '&nbsp;<span class=folder-count>(' + uncategorizedFolder().numOfAssets + ')</span>'" href="/cl/uncategorized"></a>
     </span>
   </div>
   <div id="trash" class="system-folder">
     <span class="header">
       <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-      &nbsp;&nbsp;<a href="/cl/trash">Trash</a>
+      &nbsp;&nbsp;<a href="/cl/trash"><span data-bind="html: trashFolder().name + '&nbsp;<span class=folder-count>(' + trashFolder()numOfAssets + ')</span>'"></span></a>
     </span>
   </div>
 </div>

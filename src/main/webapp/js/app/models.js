@@ -7,5 +7,5 @@ function Asset(data) {
 function Folder(data) {
   this.id = data ? data.id : null;
   this.name = data ? data.name : null;
-  this.numOfAssets = data ? data.num_of_assets : null;
+  this.numOfAssets = data ? data.num_of_assets : 0;
 }
