@@ -36,6 +36,10 @@ select {
     width: 100%;
 }
 
+.alert-success {
+    background-color: #379337;
+}
+
 .alert .close {
     color: #FFF;
 }
@@ -88,7 +92,7 @@ footer {
 
 #menulist {
     background-color: #4b5257;
-    border-radius: 0.3em;
+    border-radius: 0.2em;
     padding-top: 0.5em;
     padding-bottom: 0.5em;
     text-align: center;
@@ -100,6 +104,10 @@ footer {
 
 #brand {
     text-align: left;
+}
+
+#brand a {
+    color: #677076;
 }
 
 #brand h4 {
@@ -259,16 +267,16 @@ footer {
 #folders ul {
     margin-top: 0.5em;
     list-style-type: none;
-    padding-left: 0.3em;
+    padding-left: 0.7em;
 }
 
 #systemFolders {
-    border: 1px solid #494744;
-    margin-left: .5em;
+    padding-left: .4em;
 }
 
 #systemFolders .system-folder {
-    margin: .5em 0 .5em .5em;
+    padding-left: 0.8em;
+    margin-bottom: .4em;
 }
 
 #trash a {

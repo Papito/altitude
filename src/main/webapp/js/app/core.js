@@ -28,7 +28,7 @@ BaseViewModel = Base.extend({
   blinkSuccess: function(msg) {
     this.successEl.show();
     this.successMessage(msg);
-    this.successEl.fadeOut(5000);
+    this.successEl.fadeOut(1500);
   },
   // ----------------------------------------------------------------
 

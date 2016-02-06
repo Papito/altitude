@@ -33,8 +33,7 @@ breadcrumbs
       <div id="folders">
         <div>
           <span class="header">
-          <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
-          &nbsp;&nbsp;Folders
+            Folders
           </span>
           <span class="showAddFolder">
           <button type="button" data-bind="click: showAddFolder" class="btn btn-default btn-xs">+ Add</button>
@@ -59,7 +58,8 @@ breadcrumbs
           <ul data-bind="foreach: folders">
           <li class="folder-target">
             <span class="context-menu" data-bind="attr: {'folder_id': $data.id}">
-            <a href="#" data-bind="html: name + '&nbsp;<span class=folder-count>(' + numOfAssets + ')</span>', click: function() {$root.loadFolders($data.id)}"></a>
+              <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+              &nbsp;&nbsp;<a href="#" data-bind="html: name + '&nbsp;<span class=folder-count>(' + numOfAssets + ')</span>', click: function() {$root.loadFolders($data.id)}"></a>
             </span>
           </li>
           </ul>
