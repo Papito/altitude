@@ -174,6 +174,9 @@ import altitude.{Const => C}
     intercept[NotFoundException] {
       altitude.service.folder.getById(folder1_2.id.get)
     }
+    intercept[NotFoundException] {
+      altitude.service.folder.getById(folder1.id.get)
+    }
   }
 
   test("delete bad folder") {
