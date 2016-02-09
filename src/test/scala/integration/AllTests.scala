@@ -9,7 +9,7 @@ abstract class AllTests(val config: Map[String, String]) extends Suites(
   new ImportProfileTests(config),
   new SearchTests(config),
   new AssetServiceTests(config),
-  new FolderTests(config)
 */
+  new FolderTests(config),
   new LibraryServiceTests(config)
 )

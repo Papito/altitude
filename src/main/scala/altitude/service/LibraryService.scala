@@ -22,9 +22,10 @@ class LibraryService(app: Altitude) {
   val PREVIEW_BOX_SIZE = app.config.getInt("result.box.pixels")
 
   def add(obj: Asset)(implicit txId: TransactionId = new TransactionId): JsObject = {
+    log.info(s"\nAdding asset with MD5: ${obj.md5}\n")
+    val query = Query(Map(C.Asset.MD5 -> obj.md5))
+
     txManager.withTransaction[JsObject] {
-      log.info(s"\nAdding asset with MD5: ${obj.md5}\n")
-      val query = Query(Map(C.Asset.MD5 -> obj.md5))
       val existing = app.service.asset.query(query)
 
       if (existing.nonEmpty) {
@@ -41,10 +42,12 @@ class LibraryService(app: Altitude) {
   }
 
   def getById(id: String)(implicit txId: TransactionId = new TransactionId): JsObject = {
-    app.service.asset.getById(id)
+    txManager.asReadOnly[JsObject] {
+      app.service.asset.getById(id)
+    }
   }
 
-  def getPreview(asset_id: String)(implicit txId: TransactionId = new TransactionId): Preview = {
+  def getPreview(asset_id: String): Preview = {
     app.service.preview.getById(asset_id)
   }
 
@@ -57,30 +60,30 @@ class LibraryService(app: Altitude) {
 
     log.debug(s"${folderIds.size} folder ids: $folderIds")
 
-    val _query: Query = folderIds.isEmpty match {
-      case false => {
-        val allFolders = app.service.folder.getAll
-        val allFolderIds = app.service.folder.flatChildrenIds(parentIds = folderIds, all = allFolders)
-        log.debug(s"Expanded folder ids: $allFolderIds")
+    txManager.asReadOnly[List[Asset]] {
+      val _query: Query = folderIds.isEmpty match {
+        case false => {
+          val allFolders = app.service.folder.getAll
+          val allFolderIds = app.service.folder.flatChildrenIds(parentIds = folderIds, all = allFolders)
+          log.debug(s"Expanded folder ids: $allFolderIds")
 
-        // repackage the query to include all folders (they will have to reparsed again)
-        Query(
-          params = query.params
-            ++ Map(C.Api.Folder.QUERY_ARG_NAME -> allFolderIds.mkString(C.Api.MULTI_VALUE_DELIM)),
-          page = query.page, rpp = query.rpp)
+          // repackage the query to include all folders (they will have to reparsed again)
+          Query(
+            params = query.params
+              ++ Map(C.Api.Folder.QUERY_ARG_NAME -> allFolderIds.mkString(C.Api.MULTI_VALUE_DELIM)),
+            page = query.page, rpp = query.rpp)
+        }
+        case true => query
       }
-      case true => query
-    }
 
-    log.info("SEARCH QUERY: " + _query)
+      log.info("SEARCH QUERY: " + _query)
 
-    txManager.asReadOnly[List[Asset] ] {
       val searchResultData: List[JsObject] = app.service.asset.query(_query)
       for (data <- searchResultData) yield Asset.fromJson(data)
     }
   }
 
-  private def addPreview(asset: Asset)(implicit txId: TransactionId = new TransactionId): Option[Preview] = {
+  private def addPreview(asset: Asset): Option[Preview] = {
     require(asset.id.nonEmpty)
 
     val previewData: Array[Byte] = asset.mediaType.mediaType match {
@@ -136,30 +139,36 @@ class LibraryService(app: Altitude) {
   }
 
   def moveToFolder(assetId: String, folderId: String)(implicit txId: TransactionId = new TransactionId): Asset = {
-    val asset: Asset = this.getById(assetId)
-    // we can go straight to DB, but we need to do a check on folder validity
-    val folder: Folder = app.service.folder.getById(folderId)
+    txManager.withTransaction[Asset] {
+      val asset: Asset = this.getById(assetId)
+      // we can go straight to DB, but we need to do a check on folder validity
+      val folder: Folder = app.service.folder.getById(folderId)
 
-    val updateObj: Asset = new Asset(
-      id = asset.id,
-      path = asset.path,
-      md5 = asset.md5,
-      mediaType = asset.mediaType,
-      sizeBytes = asset.sizeBytes,
-      folderId = folder.id.get,
-      metadata = asset.metadata)
+      val updateObj: Asset = new Asset(
+        id = asset.id,
+        path = asset.path,
+        md5 = asset.md5,
+        mediaType = asset.mediaType,
+        sizeBytes = asset.sizeBytes,
+        folderId = folder.id.get,
+        metadata = asset.metadata)
 
-    app.service.asset.updateById(assetId, updateObj, fields = List(C.Asset.FOLDER_ID))
-    app.service.folder.decrAssetCount(asset.folderId)
-    app.service.folder.incrAssetCount(updateObj.folderId)
-    updateObj
+      app.service.asset.updateById(assetId, updateObj, fields = List(C.Asset.FOLDER_ID))
+      app.service.folder.decrAssetCount(asset.folderId)
+      app.service.folder.incrAssetCount(updateObj.folderId)
+      updateObj
+    }
   }
 
   def moveToUncategorized(assetId: String)(implicit txId: TransactionId = new TransactionId) = {
-    moveToFolder(assetId, Folder.UNCATEGORIZED.id.get)
+    txManager.withTransaction {
+      moveToFolder(assetId, Folder.UNCATEGORIZED.id.get)
+    }
   }
 
   def moveToTrash(assetId: String)(implicit txId: TransactionId = new TransactionId) = {
-    moveToFolder(assetId, Folder.TRASH.id.get)
+    txManager.withTransaction {
+      moveToFolder(assetId, Folder.TRASH.id.get)
+    }
   }
 }

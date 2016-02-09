@@ -46,9 +46,11 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   implicit val txId: TransactionId = new TransactionId
 
   override def beforeEach() = {
-    // because we use the writable connection to get DB version No
-    IntegrationTestCore.sqliteApp.transactions.COMMITTED = 0
     dbUtilities.migrateDatabase()
+
+    altitude.transactions.COMMITTED = 0
+    altitude.transactions.CREATED = 0
+    altitude.transactions.CLOSED = 0
 
     val dataDirFile = new File(altitude.dataPath)
     FileUtils.deleteDirectory(dataDirFile)
@@ -59,8 +61,16 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
 
   override def afterEach() {
     dbUtilities.cleanupTest()
-    // should not have committed anything for tests
-    require(altitude.transactions.COMMITTED == 0)
+
+    if (datasource.contains("postgres") || datasource.contains("sqlite")) {
+      // should not have committed anything for tests
+      require(altitude.transactions.COMMITTED == 0)
+      // should only have had one transaction - if this fails, implicit transaction semantics are off somewhere
+      if (altitude.transactions.CREATED != 1) {
+        println(s"${altitude.transactions.CREATED} transactions instead of 1!")
+      }
+      require(altitude.transactions.CREATED == 1)
+    }
   }
 
   class InjectionModule extends AbstractModule with ScalaModule  {

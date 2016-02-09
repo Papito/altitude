@@ -38,9 +38,6 @@ abstract class MigrationService(app: Altitude) {
 
       DAO.versionUp()
     }
-
-    // clean slate for commit count
-    app.transactions.COMMITTED = 0
   }
 
   private def v1(implicit txId: TransactionId = new TransactionId): Unit = {

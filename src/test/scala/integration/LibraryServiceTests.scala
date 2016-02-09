@@ -15,7 +15,6 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
     md5 = Util.randomStr(30),
     sizeBytes = 1L)
 
-/*
   test("move asset to a different folder") {
     /*
     folder1
@@ -43,7 +42,6 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
       Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2.id.get))
     ).length should be(1)
   }
-*/
 
   test("folder counts") {
     /*
@@ -98,5 +96,4 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
   test("trash") {
     //systemFolders3(Folder.TRASH.id.get).numOfAssets should be (1)
   }
-
 }
