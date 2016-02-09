@@ -85,12 +85,14 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
     val systemFolders = altitude.service.folder.getSysFolders()
     systemFolders(Folder.UNCATEGORIZED.id.get).numOfAssets should be (2)
 
-    (altitude.service.folder.getById(folder1.id.get): Folder).numOfAssets should be (2)
-    (altitude.service.folder.getById(folder2_2_1.id.get): Folder).numOfAssets should be (2)
-    (altitude.service.folder.getById(folder2_2_2.id.get): Folder).numOfAssets should be (2)
-    (altitude.service.folder.getById(folder2_2.id.get): Folder).numOfAssets should be (6)
-    (altitude.service.folder.getById(folder2_1.id.get): Folder).numOfAssets should be (2)
-    (altitude.service.folder.getById(folder2.id.get): Folder).numOfAssets should be (10)
+    // prefetch all folders for speed
+    val all = altitude.service.folder.getNonSysFolders()
+    (altitude.service.folder.getByIdWithChildAssetCounts(folder1.id.get, all): Folder).numOfAssets should be (2)
+    (altitude.service.folder.getByIdWithChildAssetCounts(folder2_2_1.id.get, all): Folder).numOfAssets should be (2)
+    (altitude.service.folder.getByIdWithChildAssetCounts(folder2_2_2.id.get, all): Folder).numOfAssets should be (2)
+    (altitude.service.folder.getByIdWithChildAssetCounts(folder2_2.id.get, all): Folder).numOfAssets should be (6)
+    (altitude.service.folder.getByIdWithChildAssetCounts(folder2_1.id.get, all): Folder).numOfAssets should be (2)
+    (altitude.service.folder.getByIdWithChildAssetCounts(folder2.id.get, all): Folder).numOfAssets should be (10)
   }
 
   test("trash") {

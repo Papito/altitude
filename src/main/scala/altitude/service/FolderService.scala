@@ -77,13 +77,12 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   def hierarchy(rootId: String = Folder.ROOT.id.get, all: List[JsObject] = List())
                (implicit txId: TransactionId = new TransactionId): List[Folder] = {
     txManager.asReadOnly {
-      val _all = if (all.isEmpty) getAll else all
-      val nonSysFolders = getNonSysFolders(all = _all)
+      val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
 
       val rootEl = nonSysFolders.find(json => (json \ C.Folder.ID).as[String] == rootId)
 
       Folder.IS_ROOT(Some(rootId)) || rootEl.isDefined match {
-        case true => children(nonSysFolders, parentId = rootId)
+        case true => children(rootId, nonSysFolders)
         case false => throw NotFoundException(s"Cannot get hierarchy. Root folder $rootId does not exist")
       }
     }
@@ -101,15 +100,15 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     }
 
     txManager.asReadOnly[List[Folder]] {
-      val all = getAll
+      val nonSysFolders = getNonSysFolders()
 
-      val folderEl = all.find(json => (json \ C.Folder.ID).as[String] == folderId)
+      val folderEl = nonSysFolders.find(json => (json \ C.Folder.ID).as[String] == folderId)
       val folder: Folder = folderEl.isDefined match {
         case true => Folder.fromJson(folderEl.get)
         case false => throw NotFoundException(s"Folder with ID '$folderId' not found")
       }
 
-      val parents = findParents(folderId =folderId, all = all)
+      val parents = findParents(folderId =folderId, all = nonSysFolders)
 
       List(Folder.ROOT) ::: (folder :: parents).reverse
     }
@@ -118,20 +117,19 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   /**
    * Get children for the root given, but only a single level - non-recursive
    */
-  def immediateChildren(rootId: String = Folder.ROOT.id.get, all: List[JsValue] = List())
+  def immediateChildren(rootId: String = Folder.ROOT.id.get, all: List[JsObject] = List())
                        (implicit txId: TransactionId = new TransactionId): List[Folder] = {
 
     txManager.asReadOnly[List[Folder]] {
-      val _all = all.isEmpty match {
+      val nonSysFolders = all.isEmpty match {
         case true =>  {
           val query = Query(Map(C.Folder.PARENT_ID -> rootId))
           DAO.query(q = query)
         }
-        case false => all
+        case false => getNonSysFolders(all)
       }
 
-      _all
-        .filter(json => {
+      nonSysFolders.filter(json => {
           val id = (json \ C.Folder.ID).as[String]
           val parentId = (json \ C.Folder.PARENT_ID).as[String]
           parentId == rootId && !Folder.IS_SYSTEM(Some(id))
@@ -182,16 +180,17 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
    * Returns a nested list of children for a given folder.
    * Not a flat list! Subsequent children are in each folders' "children" element.
     */
-  private def children(all: List[JsValue], parentId: String)
+  private def children(parentId: String, all: List[JsObject])
                       (implicit txId: TransactionId): List[Folder] = {
-    val immediateChildren = this.immediateChildren(parentId, all)
+    val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
+    val immediateChildren = this.immediateChildren(parentId, nonSysFolders)
 
     val folders = for (folder <- immediateChildren) yield  {
       val id: String = (folder \ C.Folder.ID).as[String]
       val name = (folder \ C.Folder.NAME).as[String]
 
       Folder(id = Some(id), name = name,
-        children = this.children(all, id))
+        children = this.children(id, nonSysFolders))
     }
 
     folders.sortBy(_.nameLowercase)
@@ -201,36 +200,36 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
    * Returns a list of parents for a given folder ID.
    * The list goes from closest parent to farthest.
    */
-  private def findParents(folderId: String, all: List[JsValue])
+  private def findParents(folderId: String, all: List[JsObject])
                          (implicit txId: TransactionId):  List[Folder] = {
-    val folderEl = all.find(json => (json \ C.Folder.ID).as[String] == folderId)
+    val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
+    val folderEl = nonSysFolders.find(json => (json \ C.Folder.ID).as[String] == folderId)
 
     val parentId = folderEl.isDefined match {
       case true => (folderEl.get \ C.Folder.PARENT_ID).as[String]
       case false => throw NotFoundException(s"Folder with ID '$folderId' not found")
     }
 
-    val parentElements = all filter (json => (json \ C.Folder.ID).as[String] == parentId)
+    val parentElements = nonSysFolders filter (json => (json \ C.Folder.ID).as[String] == parentId)
 
     parentElements.isEmpty match {
       case true => List()
       case false => {
         val folder = Folder.fromJson(parentElements.head)
-        List(folder) ++ findParents(folderId = folder.id.get, all)
+        List(folder) ++ findParents(folderId = folder.id.get, nonSysFolders)
       }
     }
   }
 
-  /**
-   * Handle special case of the root folder, which does not persist
-   */
   override def getById(id: String)(implicit txId: TransactionId = new TransactionId): JsObject = {
-    if (Folder.IS_ROOT(Some(id))) {
-      return Folder.ROOT
-    }
+    if (Folder.IS_ROOT(Some(id))) Folder.ROOT else super.getById(id)
+  }
+
+  def getByIdWithChildAssetCounts(id: String, all: List[JsObject] = List())(implicit txId: TransactionId = new TransactionId): JsObject = {
+    val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
 
     val json = super.getById(id)
-    val assetCount = getAssetCount(id)
+    val assetCount = getAssetCount(id, nonSysFolders)
 
     // add the asset count to the core folder object (as json)
     json ++ JsObject(Seq(
@@ -240,16 +239,16 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   /**
    * Returns the children for a folder as a flat list.
    */
-  def flatChildrenIdsWithDepths(parentId: String, all: List[JsValue] = List(), depth: Int = 0)
+  def flatChildrenIdsWithDepths(parentId: String, all: List[JsObject] = List(), depth: Int = 0)
                      (implicit txId: TransactionId = new TransactionId): List[(Int, String)] = {
-    val _all = if (all.isEmpty) getNonSysFolders() else all
+    val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
 
-    val childElements = _all.filter(j => (j \ C.Folder.PARENT_ID).asOpt[String].contains(parentId))
+    val childElements = nonSysFolders.filter(j => (j \ C.Folder.PARENT_ID).asOpt[String].contains(parentId))
 
     // recursively combine with the result of deeper child levels + this one (depth-first)
     (depth, parentId) :: childElements.foldLeft(List[(Int, String)]()) { (res, json) =>
       val folderId = (json \ C.Folder.ID).as[String]
-      res ++ flatChildrenIdsWithDepths(folderId, all, depth + 1)}
+      res ++ flatChildrenIdsWithDepths(folderId, nonSysFolders, depth + 1)}
   }
 
   /**
@@ -257,7 +256,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
    * The difference between the other method signature is that folder depths are not returned.
    * It's a "raw" list of folder ids.
    */
-  def flatChildrenIds(parentIds: Set[String], all: List[JsValue])
+  def flatChildrenIds(parentIds: Set[String], all: List[JsObject])
                      (implicit txId: TransactionId = new TransactionId): Set[String]  =
     parentIds.foldLeft(Set[String]()) {(s, id) => {
       s ++ app.service.folder.flatChildrenIdsWithDepths(parentId = id, all = all).map(_._2).toSet
@@ -266,29 +265,29 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   /**
    * Returns flat children as a set of Folder objects
    */
-  def flatChildren(parentId: String, all: List[JsValue] = List(), depth: Int = 0)
+  def flatChildren(parentId: String, all: List[JsObject] = List(), depth: Int = 0)
                   (implicit txId: TransactionId = new TransactionId): Set[Folder]  = {
-    val _all = if (all.isEmpty) getNonSysFolders() else all
+    val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
 
-    val parentElements = _all filter (json => (json \ C.Folder.ID).as[String] == parentId)
+    val parentElements = nonSysFolders filter (json => (json \ C.Folder.ID).as[String] == parentId)
 
     if (parentElements.isEmpty) {
       return Set()
     }
 
     val parentElement: Folder = parentElements.head
-    val childElements = _all.filter(j => (j \ C.Folder.PARENT_ID).asOpt[String].contains(parentId))
+    val childElements = nonSysFolders.filter(j => (j \ C.Folder.PARENT_ID).asOpt[String].contains(parentId))
 
     // recursively combine with the result of deeper child levels + this one (depth-first)
     (parentElement :: childElements.foldLeft(List[Folder]()) {(res, json) =>
       val folder: Folder = json
-      res ++ flatChildren(folder.id.get, _all, depth + 1)}).toSet
+      res ++ flatChildren(folder.id.get, nonSysFolders, depth + 1)}).toSet
   }
 
-  private def getAssetCount(folderId: String, all: List[JsValue] = List())
+  private def getAssetCount(folderId: String, all: List[JsObject] = List())
                            (implicit txId: TransactionId): Int = {
-    val _all = if (all.isEmpty) getNonSysFolders() else all
-    flatChildren(folderId, _all).toSeq.map(_.numOfAssets).sum
+    val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
+    flatChildren(folderId, nonSysFolders).toSeq.map(_.numOfAssets).sum
   }
 
   def move(folderBeingMovedId: String, destFolderId: String)
@@ -385,8 +384,8 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   def getFolderAssetCount(folderId: String, all: List[JsObject] = List())
                     (implicit txId: TransactionId = new TransactionId): Int = {
     txManager.asReadOnly[Int] {
-      val _all = if (all.isEmpty) getAll else all
-      val tree = hierarchy(rootId = folderId, all = _all) 
+      val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
+      val tree = hierarchy(rootId = folderId, all = nonSysFolders)
 
       0
     }
