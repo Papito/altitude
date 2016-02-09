@@ -12,7 +12,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
     "dataDir" -> "data",
     "previewDir" -> "p",
 
-    "datasource" -> "sqlite", // mongo, postgres, sqlite
+    "datasource" -> "mongo", // mongo, postgres, sqlite
 
     "result.box.pixels" -> 200,
 

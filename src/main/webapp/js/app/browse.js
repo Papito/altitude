@@ -10,7 +10,7 @@ BrowseViewModel = SearchViewModel.extend({
     this.uncategorizedFolder = ko.observable(new Folder({name: ''}));
     this.trashFolder = ko.observable(new Folder({name: ''}));
     this.currentFolderPath = ko.observableArray();
-    this.currentFolderId = ko.observable("000000000000000000000000");
+    this.currentFolderId = ko.observable("0");
     this._showAddFolder = ko.observable(false);
 
     this.loadFolders(self.currentFolderId());
@@ -177,9 +177,9 @@ BrowseViewModel = SearchViewModel.extend({
         self.folders(folders);
         self.currentFolderPath(path);
 
-        var uncategorizedFolder = new Folder(json['system']['000000000000000000000001']);
+        var uncategorizedFolder = new Folder(json['system']['1']);
         self.uncategorizedFolder(uncategorizedFolder);
-        var trashFolder = new Folder(json['system']['000000000000000000000002']);
+        var trashFolder = new Folder(json['system']['2']);
         self.trashFolder(trashFolder);
 
         var elFolderTargets = $(".folder-target");

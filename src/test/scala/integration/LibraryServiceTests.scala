@@ -107,8 +107,6 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
 
     // test counts for hierarchy
     val hierarchy = altitude.service.folder.hierarchy()
-    println("!!!!!!!!!!!!!!!!")
-    println(hierarchy)
     hierarchy.head.numOfAssets should be(2)
     hierarchy.last.numOfAssets should be(10)
   }

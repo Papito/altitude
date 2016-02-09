@@ -44,9 +44,9 @@ object Const {
     val IS_SYSTEM = "is_system"
 
     object Ids {
-      val ROOT = "000000000000000000000000"
-      val UNCATEGORIZED = "000000000000000000000001"
-      val TRASH = "000000000000000000000002"
+      val ROOT = "0"
+      val UNCATEGORIZED = "1"
+      val TRASH = "2"
     }
 
     object Names {
