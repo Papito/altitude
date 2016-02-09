@@ -31,6 +31,11 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
   override def add(folder: Folder, queryForDup: Option[Query] = None)
                   (implicit txId: TransactionId = new TransactionId): JsObject = {
+
+    if (Folder.IS_SYSTEM(Some(folder.parentId))) {
+      throw new IllegalOperationException("Cannot add a child to a system folder")
+    }
+
     val dupQuery = Query(Map(
       C.Folder.PARENT_ID -> folder.parentId,
       C.Folder.NAME_LC -> folder.nameLowercase))
@@ -192,7 +197,9 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       val id: String = (folder \ C.Folder.ID).as[String]
       val name = (folder \ C.Folder.NAME).as[String]
 
-      Folder(id = Some(id), name = name,
+      Folder(
+        id = Some(id),
+        name = name,
         children = this.children(id, nonSysFolders))
     }
 

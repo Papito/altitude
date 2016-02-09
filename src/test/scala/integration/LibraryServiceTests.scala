@@ -87,6 +87,8 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
 
     // prefetch all folders for speed
     val all = altitude.service.folder.getNonSysFolders()
+
+    // test counts for individual folders
     (altitude.service.folder.getByIdWithChildAssetCounts(folder1.id.get, all): Folder).numOfAssets should be (2)
     (altitude.service.folder.getByIdWithChildAssetCounts(folder2_2_1.id.get, all): Folder).numOfAssets should be (2)
     (altitude.service.folder.getByIdWithChildAssetCounts(folder2_2_2.id.get, all): Folder).numOfAssets should be (2)

@@ -55,12 +55,12 @@ import altitude.{Const => C}
 
     folder2.id should contain(folder2_2.parentId)
 
-    val folders = altitude.service.folder.hierarchy()
-    folders.length should be(2)
-    folders.head.children.length should be (2)
-    folders(1).children.length should be (2)
-    folders(1).children.head.children.length should be(1)
-    folders(1).children(1).children.length should be(0)
+    val hierarchy = altitude.service.folder.hierarchy()
+    hierarchy.length should be(2)
+    hierarchy.head.children.length should be (2)
+    hierarchy(1).children.length should be (2)
+    hierarchy(1).children.head.children.length should be(1)
+    hierarchy(1).children(1).children.length should be(0)
 
     // check immediate children of the second folder
     val immediateChildren = altitude.app.service.folder.immediateChildren(rootId = folder2_1.id.get)
@@ -192,12 +192,22 @@ import altitude.{Const => C}
   }
 
   test("delete sys folder") {
-    Folder.SYSTEM_FOLDERS.foreach { folder =>
+    Folder.SYSTEM_FOLDERS.foreach { sysFolder =>
       intercept[IllegalOperationException] {
-        altitude.service.folder.deleteById(folder.id.get)
+        altitude.service.folder.deleteById(sysFolder.id.get)
       }
     }
   }
+
+  test("add a child to a sys folder") {
+    Folder.SYSTEM_FOLDERS.foreach { sysFolder =>
+      intercept[IllegalOperationException] {
+        altitude.service.folder.add(
+          Folder(name = "folder1", parentId = sysFolder.id.get))
+        }
+    }
+  }
+
 
   test("move folder") {
     /*
