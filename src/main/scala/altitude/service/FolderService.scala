@@ -10,7 +10,7 @@ import altitude.transactions.TransactionId
 
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsNumber, Json, JsObject, JsValue}
+import play.api.libs.json._
 
 object FolderService {
   class FolderValidator
@@ -56,7 +56,18 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
    */
   override def getAll(implicit txId: TransactionId = new TransactionId): List[JsObject] = {
     txManager.asReadOnly[List[JsObject]] {
-      DAO.getAll
+      addAssetCount(DAO.getAll)
+    }
+  }
+
+  private def addAssetCount(folders: List[JsObject])
+                           (implicit txId: TransactionId): List[JsObject] = {
+    folders.map{ json =>
+      val id = (json \ C.Folder.ID).as[String]
+      val assetCount = flatChildren(id, folders).toSeq.map(_.numOfAssets).sum
+
+      json ++ JsObject(Seq(
+        C.Folder.NUM_OF_ASSETS -> JsNumber(assetCount)))
     }
   }
 
@@ -125,13 +136,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
                        (implicit txId: TransactionId = new TransactionId): List[Folder] = {
 
     txManager.asReadOnly[List[Folder]] {
-      val nonSysFolders = all.isEmpty match {
-        case true =>  {
-          val query = Query(Map(C.Folder.PARENT_ID -> rootId))
-          DAO.query(q = query)
-        }
-        case false => getNonSysFolders(all)
-      }
+      val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
 
       nonSysFolders.filter(json => {
           val id = (json \ C.Folder.ID).as[String]
@@ -196,11 +201,13 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     val folders = for (folder <- immediateChildren) yield  {
       val id: String = (folder \ C.Folder.ID).as[String]
       val name = (folder \ C.Folder.NAME).as[String]
+      val assetCount = (folder \ C.Folder.NUM_OF_ASSETS).as[Int]
 
       Folder(
         id = Some(id),
         name = name,
-        children = this.children(id, nonSysFolders))
+        children = this.children(id, nonSysFolders),
+        numOfAssets = assetCount)
     }
 
     folders.sortBy(_.nameLowercase)
@@ -235,15 +242,16 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     if (Folder.IS_ROOT(Some(id))) Folder.ROOT else super.getById(id)
   }
 
-  def getByIdWithChildAssetCounts(id: String, all: List[JsObject] = List())(implicit txId: TransactionId = new TransactionId): JsObject = {
+  def getByIdWithChildAssetCounts(id: String, all: List[JsObject] = List())
+                                 (implicit txId: TransactionId = new TransactionId): JsObject = {
     val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
+    val matching = nonSysFolders.filter(j => (j \ C.Folder.ID).asOpt[String].contains(id))
 
-    val json = super.getById(id)
-    val assetCount = getAssetCount(id, nonSysFolders)
+    if (matching.isEmpty) {
+      throw NotFoundException(s"Folder ID $id not found")
+    }
 
-    // add the asset count to the core folder object (as json)
-    json ++ JsObject(Seq(
-      C.Folder.NUM_OF_ASSETS -> JsNumber(assetCount)))
+    matching.head
   }
 
   /**
@@ -275,29 +283,21 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   /**
    * Returns flat children as a set of Folder objects
    */
-  def flatChildren(parentId: String, all: List[JsObject] = List(), depth: Int = 0)
+  def flatChildren(parentId: String, all: List[JsObject], depth: Int = 0)
                   (implicit txId: TransactionId = new TransactionId): Set[Folder]  = {
-    val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
-
-    val parentElements = nonSysFolders filter (json => (json \ C.Folder.ID).as[String] == parentId)
+    val parentElements = all filter (json => (json \ C.Folder.ID).as[String] == parentId)
 
     if (parentElements.isEmpty) {
       return Set()
     }
 
     val parentElement: Folder = parentElements.head
-    val childElements = nonSysFolders.filter(j => (j \ C.Folder.PARENT_ID).asOpt[String].contains(parentId))
+    val childElements = all.filter(j => (j \ C.Folder.PARENT_ID).asOpt[String].contains(parentId))
 
     // recursively combine with the result of deeper child levels + this one (depth-first)
     (parentElement :: childElements.foldLeft(List[Folder]()) {(res, json) =>
       val folder: Folder = json
-      res ++ flatChildren(folder.id.get, nonSysFolders, depth + 1)}).toSet
-  }
-
-  private def getAssetCount(folderId: String, all: List[JsObject] = List())
-                           (implicit txId: TransactionId): Int = {
-    val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
-    flatChildren(folderId, nonSysFolders).toSeq.map(_.numOfAssets).sum
+      res ++ flatChildren(folder.id.get, all, depth + 1)}).toSet
   }
 
   def move(folderBeingMovedId: String, destFolderId: String)
@@ -391,16 +391,6 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     }
   }
 
-  def getFolderAssetCount(folderId: String, all: List[JsObject] = List())
-                    (implicit txId: TransactionId = new TransactionId): Int = {
-    txManager.asReadOnly[Int] {
-      val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
-      val tree = hierarchy(rootId = folderId, all = nonSysFolders)
-
-      0
-    }
-  }
-  
   def getSysFolders(all: List[JsObject] = List())
                    (implicit txId: TransactionId = new TransactionId): Map[String, Folder] = {
     txManager.asReadOnly[Map[String, Folder]] {

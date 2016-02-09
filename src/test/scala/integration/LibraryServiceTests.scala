@@ -95,6 +95,22 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
     (altitude.service.folder.getByIdWithChildAssetCounts(folder2_2.id.get, all): Folder).numOfAssets should be (6)
     (altitude.service.folder.getByIdWithChildAssetCounts(folder2_1.id.get, all): Folder).numOfAssets should be (2)
     (altitude.service.folder.getByIdWithChildAssetCounts(folder2.id.get, all): Folder).numOfAssets should be (10)
+
+    // test counts for immediate children
+    val rootChildren = altitude.service.folder.immediateChildren(Folder.ROOT.id.get, all)
+    rootChildren.head.numOfAssets should be(2)
+    rootChildren.last.numOfAssets should be(10)
+
+    val rootChildren2 = altitude.service.folder.immediateChildren(Folder.ROOT.id.get)
+    rootChildren2.head.numOfAssets should be(2)
+    rootChildren2.last.numOfAssets should be(10)
+
+    // test counts for hierarchy
+    val hierarchy = altitude.service.folder.hierarchy()
+    println("!!!!!!!!!!!!!!!!")
+    println(hierarchy)
+    hierarchy.head.numOfAssets should be(2)
+    hierarchy.last.numOfAssets should be(10)
   }
 
   test("trash") {
