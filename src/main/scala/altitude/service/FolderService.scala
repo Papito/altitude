@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsNumber, Json, JsObject, JsValue}
 
 object FolderService {
-
   class FolderValidator
     extends Validator(
       required = Some(List(C.Folder.NAME, C.Folder.PARENT_ID)))
@@ -48,7 +47,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   }
 
   /**
-   * Return all folders.
+   * Return ALL folders - system and non-system
    */
   override def getAll(implicit txId: TransactionId = new TransactionId): List[JsObject] = {
     txManager.asReadOnly[List[JsObject]] {
@@ -143,6 +142,10 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
                          (implicit txId: TransactionId = new TransactionId): Int = {
     if (Folder.IS_ROOT(Some(id))) {
       throw new IllegalOperationException("Cannot delete the root folder")
+    }
+
+    if (Folder.IS_SYSTEM(Some(id))) {
+      throw new IllegalOperationException("Cannot delete system folder")
     }
 
     txManager.withTransaction[Int] {

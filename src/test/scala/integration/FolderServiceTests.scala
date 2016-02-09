@@ -7,7 +7,7 @@ import org.scalatest.Matchers._
 import integration.util.Text
 import altitude.{Const => C}
 
-@DoNotDiscover class FolderTests (val config: Map[String, String]) extends IntegrationTestCore {
+@DoNotDiscover class FolderServiceTests (val config: Map[String, String]) extends IntegrationTestCore {
   test("hierarchy") {
     /*
       folder1
@@ -188,6 +188,14 @@ import altitude.{Const => C}
   test("delete root folder") {
     intercept[IllegalOperationException] {
       altitude.service.folder.deleteById(Folder.ROOT.id.get)
+    }
+  }
+
+  test("delete sys folder") {
+    Folder.SYSTEM_FOLDERS.foreach { folder =>
+      intercept[IllegalOperationException] {
+        altitude.service.folder.deleteById(folder.id.get)
+      }
     }
   }
 
