@@ -111,6 +111,41 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
     hierarchy.last.numOfAssets should be(10)
   }
 
+  test("Folder filtering") {
+      /*
+  folder1
+  folder2
+    folder2_1
+  */
+    val folder1: Folder = altitude.service.folder.add(
+      Folder(name = "folder1"))
+
+    val folder2: Folder = altitude.service.folder.add(
+      Folder(name = "folder2"))
+
+    val folder2_1: Folder = altitude.service.folder.add(
+      Folder(name = "folder2_1", parentId = folder2.id.get))
+
+    // fill up the hierarchy with assets x times over
+    1 to 2 foreach {n =>
+      altitude.service.library.add(makeAsset(folder1))
+      altitude.service.library.add(makeAsset(folder2))
+      altitude.service.library.add(makeAsset(folder2_1))
+    }
+
+    altitude.service.library.search(
+      Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
+    ).length should be (2)
+
+    altitude.service.library.search(
+      Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2_1.id.get))
+    ).length should be (2)
+
+    altitude.service.library.search(
+      Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2.id.get))
+    ).length should be (4)
+  }
+
   test("trash") {
     //systemFolders3(Folder.TRASH.id.get).numOfAssets should be (1)
   }

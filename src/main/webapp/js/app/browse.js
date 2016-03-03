@@ -161,6 +161,16 @@ BrowseViewModel = SearchViewModel.extend({
     this.post('/api/v1/folders', opts);
   },
 
+  goIntoFolder: function(folderId) {
+    var self = this;
+
+    self.loadFolders(folderId);
+    this.searchResults([]);
+
+    var queryString = folderId != 0 ? 'folders=' + folderId : '';
+    self.search(1, 1, queryString);
+  },
+
   loadFolders: function(folderId) {
     var self = this;
     var opts = {

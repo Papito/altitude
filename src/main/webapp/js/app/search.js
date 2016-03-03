@@ -18,7 +18,7 @@ SearchViewModel = BaseViewModel.extend({
     this.getResultBoxSize();
   },
 
-  search: function(append, page) {
+  search: function(append, page, queryString) {
     var self = this;
     var content = $("#searchResults");
 
@@ -39,7 +39,8 @@ SearchViewModel = BaseViewModel.extend({
     var approxRowsPerPage = parseInt(gridAdjustment.containerHeight / gridAdjustment.boxHeight, 10);
     var rpp = (approxRowsPerPage * gridAdjustment.fitsHorizontally) * 3;
 
-    var queryString = window.location.search;
+
+    queryString = queryString || '';
     console.log('q', queryString);
 
     var opts = {
@@ -63,16 +64,16 @@ SearchViewModel = BaseViewModel.extend({
 
         if (assets.length) {
           $("#searchResults").endlessScroll({
-            loader: '<div class="loading"><div>',
+            loader: '<div class="lo:${C.Api.Search.RESULTS_PER_PAGE}"ading"><div>',
             callback: function(){
-              self.search(/*append=*/true, /*page=*/page + 1);
+              self.search(/*append=*/true, /*page=*/page + 1, queryString);
             }
           });
         }
       }
     };
 
-    this.get('/api/v1/search/p/' +  page + '/rpp/' + rpp, opts);
+    this.get('/api/v1/search/p/' +  page + '/rpp/' + rpp + '?' + queryString, opts);
   },
 
   getResultBoxSize: function() {

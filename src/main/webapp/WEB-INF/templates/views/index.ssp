@@ -10,7 +10,7 @@
 
 <div class="row">
   <ol class="breadcrumb" data-bind="visible: currentFolderPath().length > 1, foreach: currentFolderPath" style="display: none">
-    <li><a href="#" data-bind="text: $data.name, click: function() {$root.loadFolders($data.id)}"></a></li>
+    <li><a href="#" data-bind="text: $data.name, click: function() {$root.goIntoFolder($data.id)}"></a></li>
   </ol>
 
   <div class="col-md-2" id="left">
@@ -45,7 +45,7 @@
               <span class="context-menu" data-bind="attr: {'folder_id': $data.id}">
                 <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
                 &nbsp;
-                <a href="#" data-bind="text: name, click: function() {$root.loadFolders($data.id)}"></a>
+                <a href="#" data-bind="text: name, click: function() {$root.goIntoFolder($data.id)}"></a>
                 <span data-bind="html: '<span class=folder-count>(' + numOfAssets + ')</span>'"></span>
               </span>
             </li>

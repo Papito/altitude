@@ -10,7 +10,12 @@ class SearchController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
   get("/") {
-    val q = Query(rpp = 20, page = 1)
+    val foldersQuery = this.params.getOrElse(C.Api.Search.FOLDERS, "")
+
+    val q = Query(
+      params = Map(C.Api.Folder.QUERY_ARG_NAME -> foldersQuery),
+      rpp = 20, page = 1)
+
     val assets = app.service.library.search(q)
     val jsonAssets = for (asset <- assets) yield asset.toJson
 
