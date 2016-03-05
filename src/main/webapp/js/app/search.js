@@ -64,7 +64,7 @@ SearchViewModel = BaseViewModel.extend({
 
         if (assets.length) {
           $("#searchResults").endlessScroll({
-            loader: '<div class="lo:${C.Api.Search.RESULTS_PER_PAGE}"ading"><div>',
+            loader: '<div class="lo:${C.Api.Search.RESULTS_PER_PAGE}">Adding><div>',
             callback: function(){
               self.search(/*append=*/true, /*page=*/page + 1, queryString);
             }
