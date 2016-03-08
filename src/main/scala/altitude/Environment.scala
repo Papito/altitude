@@ -10,7 +10,7 @@ object Environment extends Enumeration {
     case PROD => {
       val url = Environment.getClass.getProtectionDomain.getCodeSource.getLocation
       val path = new File(url.toURI).getParentFile.getPath
-      File.separator + path
+      File.separator + path + File.separator
     }
     case _ => ""
   }
