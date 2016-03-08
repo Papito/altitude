@@ -13,10 +13,11 @@ class ScalatraBootstrap extends LifeCycle with SingleApplication {
   override def init(context: ServletContext) {
     context.mount(new LibraryController, "/api/v1/library/*")
     context.mount(new web.IndexController, "/")
-    context.mount(new web.ImportController, "/cl/import/*")
-    context.mount(new web.SearchController, "/cl/search/*")
-    context.mount(new web.UncategorizedController, "/cl/uncategorized")
-    context.mount(new web.TrashController, "/cl/trash")
+    context.mount(new web.ClientController, "/client/*")
+//    context.mount(new web.ImportController, "/cl/import/*")
+//    context.mount(new web.SearchController, "/cl/search/*")
+//    context.mount(new web.UncategorizedController, "/cl/uncategorized")
+//    context.mount(new web.TrashController, "/cl/trash")
 
     context.mount(new AssetController, "/assets/*")
     context.mount(new ImportController, "/import/*")

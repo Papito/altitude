@@ -34,6 +34,7 @@ object AltitudeBuild extends Build {
       "org.scalatra"                %% "scalatra"              % ScalatraVersion,
       "org.scalatra"                %% "scalatra-scalate"      % ScalatraVersion,
       "org.scalatra"                %% "scalatra-atmosphere"   % ScalatraVersion,
+      "com.github.spullara.mustache.java" % "compiler"         % "0.9.1",
       "org.scalatra"                %% "scalatra-scalatest"    % ScalatraVersion % "test",
       "org.json4s"                  %% "json4s-jackson"        % json4sversion,
       "org.json4s"                  %% "json4s-mongo"          % json4sversion,
