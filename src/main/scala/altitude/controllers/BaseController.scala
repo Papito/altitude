@@ -33,7 +33,7 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
       log.debug(s"Request START: ${request.getRequestURI}")
     }
 
-    if (isApiUri) {
+    if (isApiUri || isClientUri) {
       request.setAttribute("startTime", Platform.currentTime)
     }
   }
@@ -43,7 +43,7 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
       log.debug(s"Request END: ${request.getRequestURI}")
     }
 
-    if (isApiUri) {
+    if (isApiUri || isClientUri) {
       val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
       log.debug(s"Request END: ${request.getRequestURI} in ${Platform.currentTime - startTime}ms")
     }
@@ -60,4 +60,5 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
   }
 
   private def isApiUri = request.getRequestURI.startsWith("/api/")
+  private def isClientUri = request.getRequestURI.startsWith("/client/")
 }
