@@ -1,9 +1,10 @@
 package altitude.controllers.web
 
-import java.io.{StringWriter, PrintWriter, File}
+import java.io.{Writer, StringWriter, PrintWriter, File}
 
 import altitude.Environment
-import com.github.mustachejava.{Mustache, DefaultMustacheFactory}
+import com.mitchellbosecke.pebble.PebbleEngine
+import com.mitchellbosecke.pebble.template.PebbleTemplate
 import org.slf4j.LoggerFactory
 
 class ClientController  extends BaseWebController {
@@ -19,17 +20,21 @@ class ClientController  extends BaseWebController {
     }
   }
 
-  private lazy val mustacheFactory = new DefaultMustacheFactory(templateRoot)
+  private val engine: PebbleEngine = new PebbleEngine.Builder().build()
 
   get("/*") {
     val templateFile = this.params("splat")
     log.debug(s"Client file request: $templateFile")
-    val mustache: Mustache = mustacheFactory.compile(templateFile + ".mustache")
     val sw: StringWriter = new StringWriter()
     val pw: PrintWriter = new PrintWriter(sw)
-    mustache.execute(new PrintWriter(pw), List()).flush()
+    val templateFilePath = s"${templateRoot.getAbsolutePath}/$templateFile.html"
+    log.debug(s"Template file path: $templateFilePath")
+    val compiledTemplate: PebbleTemplate = engine.getTemplate(templateFilePath)
 
-    sw.toString
+    val writer: Writer = new StringWriter()
+    compiledTemplate.evaluate(writer)
+
+    writer.toString
   }
 
 

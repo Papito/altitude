@@ -9,7 +9,7 @@ import org.scalatra.scalate.ScalateSupport
 
 import scala.collection.mutable
 
-trait AltitudeStack extends ScalatraServlet with ScalateSupport {
+trait AltitudeStack extends ScalatraServlet with ScalateSupport { // FIXME: remove ScalateSupport
 
   /* wire up the precompiled templates */
   override protected def defaultTemplatePath: List[String] = List("/WEB-INF/templates/views")
