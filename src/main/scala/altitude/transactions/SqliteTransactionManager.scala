@@ -1,9 +1,9 @@
 package altitude.transactions
 
-import java.sql.{DriverManager, Connection}
-import java.util.concurrent.locks.{ReentrantLock, Lock}
+import java.sql.{Connection, DriverManager}
+import java.util.concurrent.locks.ReentrantLock
 
-import altitude.{Configuration, Altitude}
+import altitude.{Altitude, Configuration}
 import org.slf4j.LoggerFactory
 import org.sqlite.SQLiteConfig
 

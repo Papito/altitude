@@ -2,7 +2,7 @@ package integration
 
 import java.io.File
 
-import altitude.transactions.{Transaction, TransactionId}
+import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Environment}
 import com.google.inject.{AbstractModule, Guice}
 import integration.util.dao

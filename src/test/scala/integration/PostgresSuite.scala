@@ -3,8 +3,7 @@ package integration
 import java.sql.DriverManager
 import java.util.Properties
 
-import altitude.transactions.{JdbcTransactionManager, Transaction, TransactionId}
-import altitude.{Configuration, Altitude, Environment}
+import altitude.{Configuration, Environment}
 import org.scalatest.BeforeAndAfterAll
 import org.slf4j.LoggerFactory
 

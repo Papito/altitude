@@ -1,7 +1,7 @@
 package integration.util.dao.mongo
 
 import altitude.Altitude
-import altitude.dao.mongo.{BaseMongoDao}
+import altitude.dao.mongo.BaseMongoDao
 import altitude.transactions.TransactionId
 import integration.IntegrationTestCore
 

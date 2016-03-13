@@ -3,8 +3,8 @@ package altitude.service.migration
 import altitude.Altitude
 import altitude.dao.MigrationDao
 import altitude.models.Folder
-import net.codingwell.scalaguice.InjectorExtensions._
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
+import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 
 import scala.io.Source

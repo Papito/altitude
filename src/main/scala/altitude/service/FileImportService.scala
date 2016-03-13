@@ -4,16 +4,15 @@ import java.io.{File, FileInputStream, InputStream}
 
 import altitude.dao.FileSystemImportDao
 import altitude.exceptions.MetadataExtractorException
-import altitude.models.{Folder, Asset, FileImportAsset, MediaType}
+import altitude.models.{Asset, FileImportAsset, Folder, MediaType}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
 import org.apache.commons.codec.digest.DigestUtils
-import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json.{JsValue, Json}
 
 class FileImportService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)

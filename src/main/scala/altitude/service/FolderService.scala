@@ -1,13 +1,12 @@
 package altitude.service
 
 import altitude.Validators.Validator
-import altitude.{Const => C, Cleaners, Altitude}
 import altitude.dao.FolderDao
-import altitude.exceptions.{IllegalOperationException, ValidationException, DuplicateException, NotFoundException}
+import altitude.exceptions.{DuplicateException, IllegalOperationException, NotFoundException, ValidationException}
 import altitude.models.Folder
 import altitude.models.search.Query
 import altitude.transactions.TransactionId
-
+import altitude.{Altitude, Cleaners, Const => C}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json._

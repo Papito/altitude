@@ -1,11 +1,8 @@
 package integration
 
-import altitude.{Const => C, Util}
 import altitude.exceptions.NotFoundException
-import altitude.models.search.Query
-import altitude.models.{Asset, MediaType, Folder}
+import altitude.{Const => C}
 import org.scalatest.DoNotDiscover
-import org.scalatest.Matchers._
 
 @DoNotDiscover class AssetServiceTests (val config: Map[String, String]) extends IntegrationTestCore {
   test("get asset by invalid id") {

@@ -3,7 +3,6 @@ package altitude.dao.postgres
 import altitude.models.BaseModel
 import altitude.{Const => C}
 import org.joda.time.DateTime
-import play.api.libs.json.JsValue
 
 
 trait Postgres {

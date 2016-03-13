@@ -1,16 +1,16 @@
 package altitude.service
 
+import altitude.Altitude
+import altitude.Cleaners.Cleaner
+import altitude.Validators.Validator
 import altitude.dao.BaseDao
 import altitude.exceptions.{DuplicateException, NotFoundException}
 import altitude.models.BaseModel
 import altitude.models.search.Query
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
-import altitude.Altitude
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
-import altitude.Validators.Validator
-import altitude.Cleaners.Cleaner
 
 import scala.language.implicitConversions
 

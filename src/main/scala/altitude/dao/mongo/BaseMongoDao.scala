@@ -1,11 +1,10 @@
 package altitude.dao.mongo
 
 import altitude.dao.BaseDao
-import altitude.dao.jdbc.SqlQueryBuilder
 import altitude.models.BaseModel
 import altitude.models.search.Query
 import altitude.transactions.TransactionId
-import altitude.{Const => C, Environment, Util, Configuration}
+import altitude.{Configuration, Const => C, Environment, Util}
 import com.mongodb.casbah.Imports._
 import com.mongodb.casbah.MongoClient
 import org.slf4j.LoggerFactory

@@ -1,9 +1,9 @@
 import javax.servlet.ServletContext
 
-import altitude.{SingleApplication, Environment}
 import altitude.controllers._
-import altitude.controllers.api.{LibraryController, TagConfigController, SearchController, ImportProfileController}
-import altitude.controllers.web.{StaticAssetController, IndexController, AssetController, SearchController}
+import altitude.controllers.api.LibraryController
+import altitude.controllers.web.{AssetController, StaticAssetController}
+import altitude.{Environment, SingleApplication}
 import org.scalatra._
 import org.slf4j.LoggerFactory
 

@@ -1,8 +1,6 @@
 package altitude.controllers.api
 
 import altitude.{Const => C}
-
-
 import org.slf4j.LoggerFactory
 
 class LibraryController extends BaseApiController {

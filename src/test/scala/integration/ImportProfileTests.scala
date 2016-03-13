@@ -1,13 +1,12 @@
 package integration
 
-import altitude.{Const => C}
 import altitude.exceptions.ValidationException
 import altitude.models.ImportProfile
 import altitude.service.TagConfigService
-import org.scalatest.DoNotDiscover
-import org.scalatest.Matchers._
+import altitude.{Const => C}
 import integration.util.Text
-import play.api.libs.json.{Json, JsArray, JsNull}
+import org.scalatest.DoNotDiscover
+import play.api.libs.json.{JsArray, JsNull, Json}
 
 @DoNotDiscover class ImportProfileTests(val config: Map[String, String]) extends IntegrationTestCore {
   private val VALID_TAG_DATA = JsArray(Seq(

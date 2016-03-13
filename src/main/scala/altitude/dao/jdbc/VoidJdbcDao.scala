@@ -2,7 +2,7 @@ package altitude.dao.jdbc
 
 import altitude.Altitude
 import altitude.models.BaseModel
-import play.api.libs.json.{Json, JsObject}
+import play.api.libs.json.{JsObject, Json}
 
 class VoidJdbcDao (val app: Altitude) extends BaseJdbcDao("") {
   protected def CORE_SQL_VALS_FOR_INSERT = ""

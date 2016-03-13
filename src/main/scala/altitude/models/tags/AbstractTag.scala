@@ -1,8 +1,8 @@
 package altitude.models.tags
 
 import altitude.models.BaseModel
-import play.api.libs.json.{JsString, JsArray, Json, JsObject}
 import altitude.{Const => C}
+import play.api.libs.json.{JsArray, JsObject, JsString, Json}
 
 abstract class AbstractTag extends BaseModel {
   val name: String

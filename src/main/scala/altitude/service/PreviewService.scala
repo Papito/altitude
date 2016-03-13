@@ -2,12 +2,11 @@ package altitude.service
 
 import java.io._
 
-import altitude.Altitude
 import altitude.exceptions.NotFoundException
-import altitude.models.{MediaType, Preview}
-import org.slf4j.LoggerFactory
-import altitude.{Const => C}
+import altitude.models.Preview
+import altitude.{Altitude, Const => C}
 import org.apache.commons.io.{FileUtils, FilenameUtils}
+import org.slf4j.LoggerFactory
 
 class PreviewService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)

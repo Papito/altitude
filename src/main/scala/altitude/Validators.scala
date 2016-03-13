@@ -1,9 +1,9 @@
 package altitude
 
 import altitude.exceptions.ValidationException
-import org.scalatra.Params
-import play.api.libs.json.{JsObject}
 import altitude.{Const => C}
+import org.scalatra.Params
+import play.api.libs.json.JsObject
 
 object Validators {
 

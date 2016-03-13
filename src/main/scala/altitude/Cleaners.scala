@@ -1,7 +1,7 @@
 package altitude
 
-import play.api.libs.json.{JsObject, Json}
 import altitude.{Const => C}
+import play.api.libs.json.{JsObject, Json}
 
 object Cleaners {
   case class Cleaner(trim: Option[List[String]] = None,

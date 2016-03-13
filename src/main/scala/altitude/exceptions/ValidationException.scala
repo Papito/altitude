@@ -1,7 +1,8 @@
 package altitude.exceptions
 
-import scala.collection.mutable
 import altitude.{Const => C}
+
+import scala.collection.mutable
 
 case class ValidationException(msg: String = "") extends Exception {
   val errors: mutable.Map[String, String] = mutable.Map()

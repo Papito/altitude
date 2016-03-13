@@ -7,6 +7,7 @@ import altitude.models.BaseModel
 import altitude.models.search.Query
 import altitude.transactions.{JdbcTransactionManager, TransactionId}
 import altitude.{Const => C, Util}
+import net.codingwell.scalaguice.InjectorExtensions._
 import org.apache.commons.dbutils.QueryRunner
 import org.apache.commons.dbutils.handlers.MapListHandler
 import org.joda.time.DateTime
@@ -14,7 +15,6 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json._
 
 import scala.collection.JavaConversions._
-import net.codingwell.scalaguice.InjectorExtensions._
 
 abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   private final val log = LoggerFactory.getLogger(getClass)

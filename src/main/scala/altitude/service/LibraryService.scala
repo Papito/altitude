@@ -5,9 +5,9 @@ import java.awt.{AlphaComposite, Graphics2D}
 import java.io._
 import javax.imageio.ImageIO
 
-import altitude.exceptions.{ValidationException, DuplicateException}
+import altitude.exceptions.DuplicateException
 import altitude.models.search.Query
-import altitude.models.{Folder, Asset, Preview}
+import altitude.models.{Asset, Folder, Preview}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import altitude.{Altitude, Const => C}
 import net.codingwell.scalaguice.InjectorExtensions._

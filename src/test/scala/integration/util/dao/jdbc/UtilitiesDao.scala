@@ -1,11 +1,8 @@
 package integration.util.dao.jdbc
 
 import altitude.Altitude
-import altitude.dao.jdbc.{VoidJdbcDao, BaseJdbcDao}
-import altitude.models.BaseModel
-import altitude.transactions.{JdbcTransactionManager, TransactionId}
-import play.api.libs.json.{JsObject, Json}
-import net.codingwell.scalaguice.InjectorExtensions._
+import altitude.dao.jdbc.VoidJdbcDao
+import altitude.transactions.TransactionId
 
 class UtilitiesDao(app: Altitude) extends VoidJdbcDao(app) with integration.util.dao.UtilitiesDao {
 

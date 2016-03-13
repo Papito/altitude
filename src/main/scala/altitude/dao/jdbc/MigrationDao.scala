@@ -1,7 +1,7 @@
 package altitude.dao.jdbc
 
+import altitude.Altitude
 import altitude.transactions.TransactionId
-import altitude.{Const, Altitude}
 import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 

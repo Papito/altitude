@@ -1,12 +1,12 @@
 package altitude.controllers
 
-import java.io.{PrintWriter, StringWriter, File}
+import java.io.{File, PrintWriter, StringWriter}
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
 import altitude.controllers.web.BaseWebController
-import altitude.exceptions.{MetadataExtractorException, DuplicateException, AllDone}
-import altitude.models.{FileImportAsset, Asset}
+import altitude.exceptions.{AllDone, DuplicateException, MetadataExtractorException}
+import altitude.models.{Asset, FileImportAsset}
 import altitude.{Const => C}
 import org.json4s.JsonAST.JObject
 import org.json4s._
@@ -16,11 +16,9 @@ import org.scalatra.json.{JValueResult, JacksonJsonSupport}
 import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintExceededException}
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
-import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{Success, Failure}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
 class ImportController extends BaseWebController  with JValueResult
 with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUploadSupport  {

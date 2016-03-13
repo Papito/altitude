@@ -1,11 +1,10 @@
 package integration
 
-import altitude.exceptions.{IllegalOperationException, ValidationException, DuplicateException, NotFoundException}
+import altitude.exceptions.{IllegalOperationException, NotFoundException, ValidationException}
 import altitude.models.Folder
+import altitude.{Const => C}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
-import integration.util.Text
-import altitude.{Const => C}
 
 @DoNotDiscover class FolderServiceTests (val config: Map[String, String]) extends IntegrationTestCore {
   test("hierarchy") {

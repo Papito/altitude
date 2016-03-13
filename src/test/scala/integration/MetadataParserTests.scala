@@ -2,10 +2,9 @@ package integration
 
 import java.io.File
 
-import altitude.models.{FileImportAsset}
+import altitude.models.FileImportAsset
 import org.scalatest.DoNotDiscover
-import org.scalatest.Matchers._
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json.JsValue
 
 @DoNotDiscover class MetadataParserTests(val config: Map[String, String]) extends IntegrationTestCore {
 

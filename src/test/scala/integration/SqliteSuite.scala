@@ -2,9 +2,8 @@ package integration
 
 import java.sql.DriverManager
 
-import altitude.transactions.{JdbcTransactionManager, TransactionId}
-import altitude.{Configuration, Altitude, Environment}
-import org.scalatest.{DoNotDiscover, BeforeAndAfterAll}
+import altitude.{Configuration, Environment}
+import org.scalatest.BeforeAndAfterAll
 import org.slf4j.LoggerFactory
 
 class SqliteSuite extends AllTests(config = Map("datasource" -> "sqlite")) with BeforeAndAfterAll {

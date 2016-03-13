@@ -1,11 +1,9 @@
 package altitude.dao
 
-import altitude.Altitude
-import altitude.exceptions.NotFoundException
 import altitude.models.search.Query
 import altitude.transactions.TransactionId
+import altitude.{Altitude, Const => C}
 import play.api.libs.json.JsObject
-import altitude.{Const => C}
 
 trait BaseDao {
   val app: Altitude

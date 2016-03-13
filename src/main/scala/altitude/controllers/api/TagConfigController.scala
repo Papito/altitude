@@ -1,9 +1,9 @@
 package altitude.controllers.api
 
-import org.slf4j.LoggerFactory
-import org.scalatra.Ok
-import play.api.libs.json.{JsArray, Json}
 import altitude.{Const => C}
+import org.scalatra.Ok
+import org.slf4j.LoggerFactory
+import play.api.libs.json.{JsArray, Json}
 
 class TagConfigController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)

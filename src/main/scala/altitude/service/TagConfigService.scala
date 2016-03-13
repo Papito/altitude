@@ -1,7 +1,7 @@
 package altitude.service
 
 import altitude.Altitude
-import altitude.models.tags.{StringTag, AbstractTag}
+import altitude.models.tags.{AbstractTag, StringTag}
 
 object TagConfigService {
   val KEYWORDS_TAG_ID = "1" // system tag

@@ -2,14 +2,13 @@ package altitude
 
 import java.sql.DriverManager
 
-import altitude.dao.mongo.BaseMongoDao
 import altitude.dao._
+import altitude.dao.mongo.BaseMongoDao
 import altitude.service._
-import altitude.service.migration.{SqliteMigrationService, MongoMigrationService, PostgresMigrationService}
+import altitude.service.migration.{MongoMigrationService, PostgresMigrationService, SqliteMigrationService}
 import altitude.transactions._
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
-import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
 import org.slf4j.LoggerFactory
 

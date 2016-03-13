@@ -1,10 +1,10 @@
 package altitude.dao.jdbc
 
+import altitude.models.Folder
 import altitude.transactions.TransactionId
-import altitude.{Const => C, Altitude}
-import altitude.models.{BaseModel, Folder}
+import altitude.{Altitude, Const => C}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsValue, JsString, JsObject}
+import play.api.libs.json.JsObject
 
 abstract class FolderDao(val app: Altitude) extends BaseJdbcDao("folder") with altitude.dao.FolderDao {
   private final val log = LoggerFactory.getLogger(getClass)

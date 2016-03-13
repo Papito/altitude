@@ -2,10 +2,10 @@ package altitude.controllers.api
 
 import altitude.Validators.ApiValidator
 import altitude.models.Folder
+import altitude.{Const => C}
 import org.scalatra.Ok
 import org.slf4j.LoggerFactory
-import altitude.{Const => C}
-import play.api.libs.json.{JsValue, JsString, JsObject, Json}
+import play.api.libs.json.{JsObject, Json}
 
 class FolderController  extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)

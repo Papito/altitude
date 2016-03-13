@@ -1,6 +1,6 @@
 package altitude.controllers.web
 
-import java.io.{Writer, StringWriter, PrintWriter, File}
+import java.io.{File, StringWriter, Writer}
 
 import altitude.Environment
 import com.mitchellbosecke.pebble.PebbleEngine
