@@ -13,14 +13,16 @@ class ClientController  extends BaseWebController {
   private lazy val templateRoot: File = Environment.ENV match {
     case Environment.DEV => {
       val webAppPath = servletContext.getResource("/").getPath
-      new File(webAppPath + "/WEB-INF/client/templates")
+      new File(webAppPath + "../../src/main/webapp/WEB-INF/client/templates")
     }
     case _ => {
       new File(Environment.root + "/client/templates")
     }
   }
 
-  private val engine: PebbleEngine = new PebbleEngine.Builder().build()
+  private val builder = new PebbleEngine.Builder()
+  builder.cacheActive(false) // TODO: this should be a setting in prod
+  private val engine: PebbleEngine = builder.build()
 
   get("/*") {
     val templateFile = this.params("splat")
