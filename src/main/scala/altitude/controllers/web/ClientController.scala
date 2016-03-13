@@ -24,6 +24,10 @@ class ClientController  extends BaseWebController {
   builder.cacheActive(false) // TODO: this should be a setting in prod
   private val engine: PebbleEngine = builder.build()
 
+  before() {
+    contentType = "text/html; charset=UTF-8"
+  }
+
   get("/*") {
     val templateFile = this.params("splat")
     log.debug(s"Client file request: $templateFile")

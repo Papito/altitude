@@ -1,3 +1,99 @@
-This is base template in WEB-INF
+<html>
+<head>
+  <title>{% block title %} {% endblock %}</title>
 
-{% block title %} Home {% endblock %}
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/bootstrap.min.css">
+  <!--link rel="stylesheet" type="text/css" href="/static/css/lib/select2.css"-->
+  <link rel="stylesheet" type="text/css" href="/static/css/app.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery.contextMenu.min.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery.contextMenu.min.css.map">
+
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.min.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.structure.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.structure.min.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.theme.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.theme.min.css">
+
+
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jstree/themes/default/style.min.css">
+
+  <script src="/static/js/lib/jquery-2.1.1.min.js"></script>
+  <script src="/static/js/lib/jquery-ui.min.js"></script>
+  <script src="/static/js/lib/bootstrap.min.js"></script>
+  <script src="/static/js/lib/knockout-3.2.0.js"></script>
+  <script src="/static/js/lib/knockout-custom-bindings.js"></script>
+  <!--script src="/static/js/lib/modernizr.custom.js"></script-->
+  <!--script src="/static/js/lib/select2.min.js"></script-->
+  <script src="/static/js/lib/context-menu/jquery.contextMenu.min.js"></script>
+  <script src="/static/js/lib/context-menu/jquery.ui.position.min.js"></script>
+  <script src="/static/js/lib/Base.js"></script>
+  <script src="/static/js/app/utils.js?"></script>
+  <script src="/static/js/app/core.js?"></script>
+  <script src="/static/js/app/models.js"></script>
+
+</head>
+<body>
+<header>
+  <div class="row" id="navigation">
+    <div id="brand" class="col-md-2">
+      <h4>
+        <a href="/">[ APP NAME ]</a>
+      </h4>
+    </div>
+    <div class="col-md-4">
+      <div id="menulist">
+        <div class="row">
+          <div class="col-md-12">
+            <a href="/cl/import">Import</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="screenTitle" class="col-md-3">
+      <h5>
+        {% block screenTitle %} {% endblock %}
+      </h5>
+    </div>
+    <div class="col-md-3">
+      <form method="GET" action="/cl/search">
+        <input type="text" name="${C.Api.Search.QUERY_TEXT}" class="form-control" placeholder="Search..." maxlength="200">
+      </form>
+    </div>
+  </div>
+  <div id="hud">
+    <div id="successMessage" class="alert alert-success" style="display: none" role="alert" data-bind="text: successMessage">
+    </div>
+    <div id="infoMessage" class="alert alert-info" style="display: none" role="alert" data-bind="text: infoMessage">
+    </div>
+    <div id="warningMessage" class="alert alert-warning" style="display: none" role="alert" data-bind="text: warningMessage">
+    </div>
+  </div>
+</header>
+
+<div id="content" class="container-fluid">
+  <div id="errorContainer" class="alert alert-danger alert-dismissible fade in" role="alert" style="display: none">
+    <button type="button" class="close" aria-label=Close data-bind="click: dismissError"><span aria-hidden=true>&times;</span></button>
+    <h4 data-bind="visible: errorMessage">
+      Error. <span data-bind="text: errorMessage, visible: errorMessage"></span>
+    </h4>
+    <div data-bind="visible: errorStacktrace" style="margin-top: 2em">
+      <p>
+        <button type="button" class="btn btn-info" data-bind="click: reportError">Send anonymous error report (pretty please?)</button>
+        <button type="button" class="btn btn-default" data-bind="click: dismissError">Dismiss</button>
+      </p>
+      <h4 style="margin-top: 2em">Detail</h4>
+      <p data-bind="text: errorStacktrace"></p>
+    </div>
+  </div>
+
+  {% block body %}
+  {% endblock %}
+</div>
+
+<footer></footer>
+
+{% block assets %}
+{% endblock %}
+</body>
+</html>

@@ -8,6 +8,10 @@ import org.slf4j.LoggerFactory
 class StaticAssetController extends BaseWebController {
   private final val log = LoggerFactory.getLogger(getClass)
 
+  before() {
+    contentType = "application/octet-stream"
+  }
+
   get("/i/*") {
     serveFile("/i/")
   }
@@ -18,6 +22,7 @@ class StaticAssetController extends BaseWebController {
   }
 
   get("/js/*") {
+    contentType = "application/javascript"
     serveFile("/js/")
   }
 

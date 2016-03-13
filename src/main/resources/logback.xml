@@ -15,7 +15,7 @@
   <logger name="altitude.transactions" level="INFO" />
   <logger name="org.fusesource.scalate" level="WARN" />
   <logger name="org.atmosphere" level="WARN" />
-  <logger name="org.scalatra.servlet.ScalatraListener" level="INFO" />
+  <logger name="org.scalatra.servlet" level="INFO" />
   <logger name="org.eclipse.jetty" level="INFO" />
   <logger name="com.mongodb" level="INFO" />
 </configuration>
