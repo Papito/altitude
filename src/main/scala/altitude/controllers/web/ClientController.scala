@@ -25,15 +25,11 @@ class ClientController  extends BaseWebController {
   get("/*") {
     val templateFile = this.params("splat")
     log.debug(s"Client file request: $templateFile")
-    val sw: StringWriter = new StringWriter()
-    val pw: PrintWriter = new PrintWriter(sw)
     val templateFilePath = s"${templateRoot.getAbsolutePath}/$templateFile.html"
     log.debug(s"Template file path: $templateFilePath")
     val compiledTemplate: PebbleTemplate = engine.getTemplate(templateFilePath)
-
     val writer: Writer = new StringWriter()
     compiledTemplate.evaluate(writer)
-
     writer.toString
   }
 
