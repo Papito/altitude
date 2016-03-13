@@ -2,123 +2,84 @@ package altitude
 
 
 object Const {
-  /*---------------------------------------------------------------------------
-  MODELS
-  ---------------------------------------------------------------------------*/
-  trait Common {
-    val ID = "id"
-    val VALUES = "values"
-    val DATA = "data"
-    val CREATED_AT = "created_at"
-    val UPDATED_AT = "updated_at"
-    val IS_CLEAN = "is_clean"
+
+  def apply(key: String, default: String = ""): String = {
+    data.getOrElse(key, default)
   }
 
-  object Base extends Common
+  private val data: Map[String, String] = Map(
+    "Base.ID" -> "id",
+    "Base.VALUES" -> "values",
+    "Base.DATA" -> "data",
+    "Base.CREATED_AT" -> "created_at",
+    "Base.UPDATED_AT" -> "updated_at",
+    "Base.IS_CLEAN" -> "is_clean",
+    "System.UNCATEGORIZED_COUNT" ->  "uncategorized_count",
+    "System.TRASH_COUNT" -> "trash_count",
 
-  object System {
-    val UNCATEGORIZED_COUNT = "uncategorized_count"
-    val TRASH_COUNT = "trash_count"
-  }
+    /*---------------------------------------------------------------------------
+    MODELS
+    ---------------------------------------------------------------------------*/
+    "Asset.MEDIA_TYPE" -> "media_type",
+    "Asset.PATH" -> "path",
+    "Asset.FOLDER_ID" -> "folder_id",
+    "Asset.MD5" -> "md5",
+    "Asset.SIZE_BYTES" -> "size_bytes",
+    "Asset.FILENAME" -> "filename",
+    "Asset.MEDIA_SUBTYPE" -> "media_subtype",
+    "Asset.MIME_TYPE" -> "mime_type",
+    "Asset.METADATA" -> "metadata",
+    "Folder.NAME" -> "name",
+    "Folder.NAME_LC" -> "name_lc",
+    "Folder.PARENT_ID" -> "parent_id",
+    "Folder.NUM_OF_ASSETS" -> "num_of_assets",
+    "Folder.CHILDREN" -> "children",
+    "Folder.IS_ROOT" -> "is_root",
+    "Folder.IS_UNCATEGORIZED" -> "is_uncategorized",
+    "Folder.IS_SYSTEM" -> "is_system",
+    "Folder.Ids.ROOT" -> "0",
+    "Folder.Ids.UNCATEGORIZED" -> "1",
+    "Folder.Ids.TRASH" -> "2",
+    "Folder.Names.ROOT" -> "Home", //TODO: not i18n
+    "Folder.Names.UNCATEGORIZED" -> "Uncategorized",  //TODO: not i18n
+    "Folder.Names.TRASH" ->  "Trash",  //TODO: not i18n
+    "Preview.ASSET_ID" -> "asset_id",
+    "Preview.MIME_TYPE" -> "mime_type",
 
-  object Asset extends Common {
-    val MEDIA_TYPE = "media_type"
-    val PATH = "path"
-    val FOLDER_ID = "folder_id"
-    val MD5 = "md5"
-    val SIZE_BYTES = "size_bytes"
-    val FILENAME = "filename"
-    val MEDIA_SUBTYPE = "media_subtype"
-    val MIME_TYPE = "mime_type"
-    val METADATA = "metadata"
-  }
 
-  object Folder extends Common {
-    val NAME = "name"
-    val NAME_LC = "name_lc"
-    val PARENT_ID = "parent_id"
-    val NUM_OF_ASSETS = "num_of_assets"
-    val CHILDREN = "children"
-    val IS_ROOT = "is_root"
-    val IS_UNCATEGORIZED = "is_uncategorized"
-    val IS_SYSTEM = "is_system"
+    /*---------------------------------------------------------------------------
+    API
+    ---------------------------------------------------------------------------*/
+    "Api.ERROR" -> "error",
+    "Api.STACKTRACE" -> "stacktrace",
+    "Api.WARNING" -> "warning",
+    "Api.CRITICAL" -> "critical",
+    "Api.VALIDATION_ERRORS" -> "validation_errors",
+    "Api.MULTI_VALUE_DELIM" -> "+",
 
-    object Ids {
-      val ROOT = "0"
-      val UNCATEGORIZED = "1"
-      val TRASH = "2"
-    }
-
-    object Names {
-      val ROOT = "Home" //TODO: not i18n
-      val UNCATEGORIZED = "Uncategorized"  //TODO: not i18n
-      val TRASH = "Trash"  //TODO: not i18n
-    }
-  }
-
-  object Preview extends Common {
-    val ASSET_ID =  "asset_id"
-    val MIME_TYPE = "mime_type"
-  }
-
-  object ImportProfile extends Common {
-    val NAME = "name"
-    val TAG_DATA = "tag_data"
-  }
-
-  object Tag extends Common {
-    val NAME = "name"
-    val TYPE = "type"
-    val MAX_LENGTH = "max_length"
-    val ALLOWS_MULTI = "allows_multi"
-    val RESTRICTED_VALUE_LIST = "restricted_value_list"
-  }
+    "Api.ID" -> "id",
+    "Api.DATA" -> "data",
+    "Api.PATH" -> "path",
+    "Api.DIRECTORY_NAMES" -> "directory_names",
+    "Api.CURRENT_PATH" -> "current_path",
+    "Api.Import.IMPORTED" -> "imported",
+    "Api.ImportAsset.IMPORT_ASSET" -> "import_asset".
+  "Api.Asset.ASSET = "asset"
+  "Api.Asset.FOLDER_ID = "folder_id"
+  "Api.Asset.ASSETS = "assets"
+  "Api.Search.ASSETS = "assets"
+  "Api.Search.RESULT_BOX_SIZE = "result_box_size"
+  "Api.Search.QUERY_TEXT = "query_txt"
+  "Api.Search.RESULTS_PER_PAGE = "rpp"
+  "Api.Search.PAGE = "p"
+  "Api.Search.FOLDERS = "folders"
+  "Api.Folder."
+  )
 
   /*---------------------------------------------------------------------------
   API
   ---------------------------------------------------------------------------*/
   object Api {
-    val ERROR = "error"
-    val STACKTRACE = "stacktrace"
-    val WARNING = "warning"
-    val CRITICAL = "critical"
-    val VALIDATION_ERRORS = "validation_errors"
-    val MULTI_VALUE_DELIM = "+"
-
-    val ID = "id"
-    val DATA = "data"
-    val PATH = "path"
-    val DIRECTORY_NAMES = "directory_names"
-    val CURRENT_PATH = "current_path"
-
-    object Import {
-      val IMPORTED = "imported"
-    }
-
-    object ImportAsset {
-      val IMPORT_ASSET = "import_asset"
-    }
-
-    object Asset {
-      val ASSET = "asset"
-      val FOLDER_ID = "folder_id"
-      val ASSETS = "assets"
-    }
-
-    object ImportProfile {
-      val IMPORT_PROFILES = "import_profiles"
-      val NAME = "name"
-      val KEYWORDS = "keywords"
-    }
-
-    object Search {
-      val ASSETS = "assets"
-      val RESULT_BOX_SIZE = "result_box_size"
-      val QUERY_TEXT = "query_txt"
-      val RESULTS_PER_PAGE = "rpp"
-      val PAGE = "p"
-      val FOLDERS = "folders"
-    }
 
     object Folder {
       val QUERY_ARG_NAME = "__FOLDERS__"
@@ -133,9 +94,6 @@ object Const {
       val PARENT_ID = "parent_id"
     }
 
-    object TagConfig {
-      val TAG_CONFIG = "tag_config"
-    }
   }
 
   /*---------------------------------------------------------------------------

@@ -112,7 +112,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
     val recordJson = jsonIn ++ JsObject(Seq(
       C.Base.ID -> JsString(id),
-      C.Base.CREATED_AT -> dtAsJsString{createdAt}))
+      C("Base.CREATED_AT") -> dtAsJsString{createdAt}))
 
     log.debug(s"Added: $recordJson")
     recordJson
