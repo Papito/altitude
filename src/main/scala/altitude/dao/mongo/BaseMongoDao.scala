@@ -46,7 +46,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     log.debug(s"Starting database INSERT for: $jsonIn")
 
     // create id UNLESS specified
-    val id: String = (jsonIn \ C.Base.ID).asOpt[String] match {
+    val id: String = (jsonIn \ C("Base.ID")).asOpt[String] match {
       case Some(id: String) => id
       case _ => BaseModel.genId
     }
@@ -54,14 +54,14 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     val createdAt = Util.utcNow
     val origObj: DBObject =  com.mongodb.util.JSON.parse(
       jsonIn.toString()).asInstanceOf[DBObject]
-    val coreAttrObj = MongoDBObject("_id" -> id, C.Base.CREATED_AT -> createdAt)
+    val coreAttrObj = MongoDBObject("_id" -> id, C("Base.CREATED_AT") -> createdAt)
     val obj: DBObject = origObj ++ coreAttrObj
 
     COLLECTION.insert(obj)
 
     jsonIn ++ Json.obj(
-      C.Base.ID -> JsString(id),
-      C.Base.CREATED_AT -> Util.isoDateTime(Some(Util.utcNow))
+      C("Base.ID") -> JsString(id),
+      C("Base.CREATED_AT") -> Util.isoDateTime(Some(Util.utcNow))
     )
   }
 
@@ -104,9 +104,9 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   Return a JSON record with timestamp and ID fields translated from Mongo's "extended" format
    */
   protected final def fixMongoFields(json: JsObject): JsObject = json ++ Json.obj(
-    C.Base.ID -> (json \ "_id").as[String],
-    C.Base.CREATED_AT ->  (json \ C.Base.CREATED_AT \ "$date").asOpt[String],
-    C.Base.UPDATED_AT -> (json \ C.Base.UPDATED_AT \ "$date").asOpt[String]
+    C("Base.ID") -> (json \ "_id").as[String],
+    C("Base.CREATED_AT") ->  (json \ C("Base.CREATED_AT") \ "$date").asOpt[String],
+    C("Base.UPDATED_AT") -> (json \ C("Base.UPDATED_AT") \ "$date").asOpt[String]
   )
 
   protected final def fixMongoQuery(q: Query): Query = {
@@ -144,7 +144,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     // combine the selected fields we want to update from the JSON repr of the mode, with updated_at
     val updateJson = JsObject(
       json.fieldSet.filter {v: (String, JsValue) => fields.contains(v._1)}.toSeq) ++ Json.obj(
-      C.Base.UPDATED_AT -> Util.isoDateTime(Some(Util.utcNow))
+      C("Base.UPDATED_AT") -> Util.isoDateTime(Some(Util.utcNow))
     )
 
     val o: DBObject =  MongoDBObject(

@@ -34,14 +34,14 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
   }
 
   get("/source/local/navigate") {
-    val path: String = this.params.getOrElse(C.Api.PATH, "/")
+    val path: String = this.params.getOrElse(C("Api.PATH"), "/")
     log.debug(s"Getting directory name list for $path")
     val files: Seq[File] = new File(path).listFiles().toSeq
     val directoryList: Seq[String] = files.filter(_.isDirectory == true).map(_.getName)
     contentType = "application/json"
     Json.obj(
-      C.Api.DIRECTORY_NAMES -> directoryList,
-      C.Api.CURRENT_PATH -> path).toString()
+      C("Api.DIRECTORY_NAMES") -> directoryList,
+      C("Api.CURRENT_PATH") -> path).toString()
   }
 
   atmosphere("/ws") {
@@ -153,8 +153,8 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
             if (asset.isEmpty) throw NotImportable()
 
             val resp = JsObject(Seq(
-              C.Api.Asset.ASSET -> asset.get.toJson,
-              C.Api.Import.IMPORTED -> JsBoolean(true)
+              C("Api.Asset.ASSET") -> asset.get.toJson,
+              C("Api.Import.IMPORTED") -> JsBoolean(true)
             ))
             this.writeToYou(resp)
           }
@@ -162,27 +162,27 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
             case ex: NotImportable => {/* next */}
             case ex: DuplicateException => {
               val resp = JsObject(Seq(
-                C.Api.WARNING -> JsString(C.MSG("warn.duplicate")),
-                C.Api.Asset.ASSET -> ex.objJson,
-                C.Api.Import.IMPORTED -> JsBoolean(false)
+                C("Api.WARNING") -> JsString(C("msg.warn.duplicate")),
+                C("Api.Asset.ASSET") -> ex.objJson,
+                C("Api.Import.IMPORTED") -> JsBoolean(false)
               ))
               this.writeToYou(resp)
             }
             case ex: MetadataExtractorException => {
               val resp =JsObject(Seq(
-                C.Api.WARNING -> JsString(
+                C("Api.WARNING") -> JsString(
                   s"Metadata parser(s) failed. Asset still imported"),
-                C.Api.Asset.ASSET -> ex.asset.toJson,
-                C.Api.Import.IMPORTED -> JsBoolean(true)))
+                C("Api.Asset.ASSET") -> ex.asset.toJson,
+                C("Api.Import.IMPORTED") -> JsBoolean(true)))
               this.writeToYou(resp)
             }
             case ex: Exception => {
               ex.printStackTrace()
 
               val resp = JsObject(Seq(
-                C.Api.ERROR -> JsString(ex.toString),
-                C.Api.Import.IMPORTED -> JsBoolean(false),
-                C.Api.ImportAsset.IMPORT_ASSET -> importAsset.toJson
+                C("Api.ERROR") -> JsString(ex.toString),
+                C("Api.Import.IMPORTED") -> JsBoolean(false),
+                C("Api.ImportAsset.IMPORT_ASSET") -> importAsset.toJson
               ))
               this.writeToYou(resp)
             }

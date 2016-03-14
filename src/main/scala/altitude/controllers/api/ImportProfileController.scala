@@ -1,7 +1,7 @@
 package altitude.controllers.api
 
 import altitude.Validators.ApiValidator
-import altitude.models.ImportProfile
+//import altitude.models.ImportProfile
 import altitude.models.search.Query
 import altitude.service.TagConfigService
 import altitude.{Const => C, Util}
@@ -12,6 +12,7 @@ import play.api.libs.json.{JsArray, JsValue, Json}
 class ImportProfileController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
+/*
   override val HTTP_POST_VALIDATOR = Some(ApiValidator(List(
     C.Api.ImportProfile.NAME, C.Api.ImportProfile.KEYWORDS
   )))
@@ -44,4 +45,5 @@ class ImportProfileController extends BaseApiController {
 
     Ok(Json.obj(C.Api.ID -> newImportProfile.id))
   }
+*/
 }

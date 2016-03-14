@@ -79,7 +79,7 @@ import org.scalatest.Matchers._
   }
 
   test("root path") {
-    val path: List[Folder] = altitude.app.service.folder.path(folderId = C.Folder.Ids.ROOT)
+    val path: List[Folder] = altitude.app.service.folder.path(folderId = C("Folder.Ids.ROOT"))
     path.length should equal(0)
   }
 

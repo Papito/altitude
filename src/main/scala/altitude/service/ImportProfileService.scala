@@ -3,12 +3,13 @@ package altitude.service
 import altitude.Validators.Validator
 import altitude.dao.ImportProfileDao
 import altitude.exceptions.ValidationException
-import altitude.models.ImportProfile
+//import altitude.models.ImportProfile
 import altitude.{Altitude, Cleaners, Const => C}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsArray, JsObject}
 
+/*
 object ImportProfileService {
   class ImportProfileValidator
     extends Validator(
@@ -39,3 +40,4 @@ class ImportProfileService(app: Altitude) extends BaseService[ImportProfile](app
   override val VALIDATOR = Some(new ImportProfileService.ImportProfileValidator)
   override val CLEANER = Some(Cleaners.Cleaner(trim = Some(List(C.ImportProfile.NAME))))
 }
+*/

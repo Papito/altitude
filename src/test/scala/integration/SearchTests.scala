@@ -36,7 +36,7 @@ import org.scalatest.Matchers._
       sizeBytes = 1L)
     altitude.service.asset.add(asset)
 
-    val query = Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> Folder.UNCATEGORIZED.id.get))
+    val query = Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> Folder.UNCATEGORIZED.id.get))
     val assets: List[Asset] = altitude.service.library.search(query)
     assets.length should be(1)
   }
@@ -70,15 +70,15 @@ import org.scalatest.Matchers._
       mediaType = mediaType, path = Util.randomStr(30), md5 = Util.randomStr(30), sizeBytes = 1L))
 
     altitude.service.library.search(
-      Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1_2.id.get))
+      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1_2.id.get))
     ).length should be(1)
 
     altitude.service.library.search(
-      Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1_1.id.get))
+      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1_1.id.get))
     ).length should be(1)
 
     altitude.service.library.search(
-      Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
+      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
     ).length should be(3)
   }
 }

@@ -9,7 +9,7 @@ object Cleaners {
                      defaults:  Option[Map[String, String]] = None) {
 
     def clean(json: JsObject): JsObject = {
-      doLower(doDefaults(doTrim(json))) ++ Json.obj(C.Base.IS_CLEAN -> true)
+      doLower(doDefaults(doTrim(json))) ++ Json.obj(C("Base.IS_CLEAN") -> true)
     }
 
     protected def doTrim(json: JsObject): JsObject = {

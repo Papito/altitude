@@ -4,6 +4,7 @@ import altitude.models.BaseModel
 import altitude.{Const => C}
 import play.api.libs.json.{JsArray, JsObject, JsString, Json}
 
+/*
 abstract class AbstractTag extends BaseModel {
   val name: String
   val tagType: TagType.Value
@@ -19,3 +20,4 @@ abstract class AbstractTag extends BaseModel {
     C.Tag.RESTRICTED_VALUE_LIST -> JsArray( restrictedValueList.map(JsString) )
   ) ++ coreJsonAttrs
 }
+*/

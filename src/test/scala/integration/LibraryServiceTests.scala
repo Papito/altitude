@@ -29,17 +29,17 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
     val asset: Asset = altitude.service.library.add(makeAsset(folder1))
 
     altitude.service.library.search(
-      Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
+      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
     ).length should be(1)
 
     altitude.service.library.moveToFolder(asset.id.get, folder2.id.get)
 
     altitude.service.library.search(
-      Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
+      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
     ).length should be(0)
 
     altitude.service.library.search(
-      Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2.id.get))
+      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder2.id.get))
     ).length should be(1)
   }
 
@@ -134,15 +134,15 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
     }
 
     altitude.service.library.search(
-      Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
+      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
     ).length should be (2)
 
     altitude.service.library.search(
-      Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2_1.id.get))
+      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder2_1.id.get))
     ).length should be (2)
 
     altitude.service.library.search(
-      Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2.id.get))
+      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder2.id.get))
     ).length should be (4)
   }
 

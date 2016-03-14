@@ -17,12 +17,12 @@ trait BaseDao {
   def query(q: Query)(implicit txId: TransactionId): List[JsObject]
 
   def deleteById(id: String)(implicit txId: TransactionId): Int = {
-    val q: Query = Query(Map(C.Base.ID -> id))
+    val q: Query = Query(Map(C("Base.ID") -> id))
     deleteByQuery(q)
   }
 
   def updateById(id: String, data: JsObject, fields: List[String])(implicit txId: TransactionId): Int = {
-    val q: Query = Query(Map(C.Base.ID -> id))
+    val q: Query = Query(Map(C("Base.ID") -> id))
     updateByQuery(q, data, fields)
   }
 

@@ -9,10 +9,10 @@ case class ValidationException(msg: String = "") extends Exception {
 
   def message = {
     errors.isEmpty match {
-      case true => if (msg.isEmpty) C.MSG("err.validation_error") else msg
+      case true => if (msg.isEmpty) C("msg.err.validation_error") else msg
       case false => {
         val fieldList = errors.keys.mkString(", ")
-        C.MSG("err.validation_errors").format(fieldList)
+        C("msg.err.validation_errors").format(fieldList)
       }
     }
   }

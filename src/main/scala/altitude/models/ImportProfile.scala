@@ -5,6 +5,7 @@ import play.api.libs.json._
 
 import scala.language.implicitConversions
 
+/*
 object ImportProfile {
   implicit def fromJson(json: JsValue): ImportProfile = ImportProfile(
       id = (json \ C.ImportProfile.ID).asOpt[String],
@@ -21,3 +22,4 @@ case class ImportProfile(id: Option[String] = None,
     C.ImportProfile.TAG_DATA -> tagData
   ) ++ coreJsonAttrs
 }
+*/

@@ -1,7 +1,6 @@
 package integration
 
 import altitude.exceptions.ValidationException
-import altitude.models.ImportProfile
 import altitude.service.TagConfigService
 import altitude.{Const => C}
 import integration.util.Text
@@ -9,6 +8,7 @@ import org.scalatest.DoNotDiscover
 import play.api.libs.json.{JsArray, JsNull, Json}
 
 @DoNotDiscover class ImportProfileTests(val config: Map[String, String]) extends IntegrationTestCore {
+/*
   private val VALID_TAG_DATA = JsArray(Seq(
     Json.obj(C.Tag.ID -> TagConfigService.KEYWORDS_TAG_ID, C.ImportProfile.VALUES -> List("k1", "k2"))
   ))
@@ -54,4 +54,5 @@ import play.api.libs.json.{JsArray, JsNull, Json}
 
     altitude.service.importProfile.add(importProfile)
   }
+*/
 }

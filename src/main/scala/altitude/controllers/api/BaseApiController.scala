@@ -8,7 +8,7 @@ import altitude.exceptions.ValidationException
 import altitude.{Const => C}
 import org.scalatra.{BadRequest, GZipSupport, InternalServerError, NotFound}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsNull, Json}
+import play.api.libs.json.{JsString, JsNull, Json}
 
 class BaseApiController extends BaseController with GZipSupport {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -59,8 +59,8 @@ class BaseApiController extends BaseController with GZipSupport {
       }
 
       BadRequest(Json.obj(
-        C.Api.ERROR -> ex.message,
-        C.Api.VALIDATION_ERRORS -> (if (ex.errors.isEmpty) JsNull else jsonErrors)
+        C("Api.ERROR") -> ex.message,
+        C("Api.VALIDATION_ERRORS") -> (if (ex.errors.isEmpty) JsNull else jsonErrors)
       ))
     }
     case ex: Exception => {
@@ -72,8 +72,8 @@ class BaseApiController extends BaseController with GZipSupport {
       log.error(s"${ex.getClass.getName} exception: ${sw.toString}")
 
       InternalServerError(Json.obj(
-        C.Api.ERROR -> (if (ex.getMessage!= null) ex.getMessage else ex.getClass.getName),
-        C.Api.STACKTRACE -> sw.toString))
+        C("Api.ERROR") -> (if (ex.getMessage!= null) ex.getMessage else ex.getClass.getName),
+        C("Api.STACKTRACE") -> sw.toString))
     }
   }
 }

@@ -11,37 +11,37 @@ class FolderController  extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override val HTTP_POST_VALIDATOR = Some(ApiValidator(List(
-    C.Api.Folder.NAME, C.Api.Folder.PARENT_ID
+    C("Api.Folder.NAME"), C("Api.Folder.PARENT_ID")
   )))
 
   get() {
     val folders = app.service.folder.hierarchy()
 
     Ok(Json.obj(
-      C.Api.Folder.HIERARCHY -> folders.map(_.toJson)
+      C("Api.Folder.HIERARCHY") -> folders.map(_.toJson)
     ))
   }
 
   get("/:id") {
-    val id = params.get(C.Api.ID).get
+    val id = params.get(C("Api.ID")).get
     val folder: Folder = app.service.folder.getById(id)
 
     Ok(Json.obj(
-      C.Api.Folder.FOLDER -> folder.toJson
+      C("Api.Folder.FOLDER") -> folder.toJson
     ))
   }
 
-  get(s"/:${C.Api.Folder.PARENT_ID}/children") {
-    val parentId = params.getAs[String](C.Api.Folder.PARENT_ID).get
+  get(s"/:${C("Api.Folder.PARENT_ID")}/children") {
+    val parentId = params.getAs[String](C("Api.Folder.PARENT_ID")).get
     val all = app.service.folder.getAll
     val folders = app.service.folder.immediateChildren(parentId, all = all)
     val sysFolders = app.service.folder.getSysFolders(all = all)
     val path = app.service.folder.path(parentId)
 
     Ok(Json.obj(
-      C.Api.Folder.PATH -> path.map(_.toJson),
-      C.Api.Folder.FOLDERS -> folders.map(_.toJson),
-      C.Api.Folder.SYSTEM -> JsObject(
+      C("Api.Folder.PATH") -> path.map(_.toJson),
+      C("Api.Folder.FOLDERS") -> folders.map(_.toJson),
+      C("Api.Folder.SYSTEM") -> JsObject(
         sysFolders.map { case (folderId, folder) =>
           folderId -> folder.toJson
         }.toSeq
@@ -50,26 +50,26 @@ class FolderController  extends BaseApiController {
   }
 
   post("/") {
-    val name = params.get(C.Api.Folder.NAME)
-    val parentId = params.get(C.Api.Folder.PARENT_ID)
+    val name = params.get(C("Api.Folder.NAME"))
+    val parentId = params.get(C("Api.Folder.PARENT_ID"))
 
     val newFolder: Folder = app.service.folder.add(Folder(name = name.get, parentId = parentId.get))
     log.debug(s"New folder: $newFolder")
 
-    Ok(Json.obj(C.Api.Folder.FOLDER -> newFolder.toJson))
+    Ok(Json.obj(C("Api.Folder.FOLDER") -> newFolder.toJson))
   }
 
   delete("/:id") {
-    val id = params.get(C.Api.ID)
+    val id = params.get(C("Api.ID"))
     log.info(s"Deleting folder $id")
     app.service.folder.deleteById(id.get)
     Ok("{}")
   }
 
   put("/:id") {
-    val id = params.get(C.Api.ID).get
-    val newName = params.get(C.Api.Folder.NAME)
-    val newParentId = params.get(C.Api.Folder.PARENT_ID)
+    val id = params.get(C("Api.ID")).get
+    val newName = params.get(C("Api.Folder.NAME"))
+    val newParentId = params.get(C("Api.Folder.PARENT_ID"))
 
     if (newName.isDefined) {
       app.service.folder.rename(id, newName.get)

@@ -3,8 +3,9 @@ package altitude
 
 object Const {
 
-  def apply(key: String, default: String = ""): String = {
-    data.getOrElse(key, default)
+  def apply(key: String): String = {
+    val v = data.get(key)
+    if (v.isDefined) v.get else throw new RuntimeException(s"No constant value for: $key")
   }
 
   private val data: Map[String, String] = Map(
@@ -63,48 +64,35 @@ object Const {
     "Api.DIRECTORY_NAMES" -> "directory_names",
     "Api.CURRENT_PATH" -> "current_path",
     "Api.Import.IMPORTED" -> "imported",
-    "Api.ImportAsset.IMPORT_ASSET" -> "import_asset".
-  "Api.Asset.ASSET = "asset"
-  "Api.Asset.FOLDER_ID = "folder_id"
-  "Api.Asset.ASSETS = "assets"
-  "Api.Search.ASSETS = "assets"
-  "Api.Search.RESULT_BOX_SIZE = "result_box_size"
-  "Api.Search.QUERY_TEXT = "query_txt"
-  "Api.Search.RESULTS_PER_PAGE = "rpp"
-  "Api.Search.PAGE = "p"
-  "Api.Search.FOLDERS = "folders"
-  "Api.Folder."
-  )
+    "Api.ImportAsset.IMPORT_ASSET" -> "import_asset",
+    "Api.Asset.ASSET" -> "asset",
+    "Api.Asset.FOLDER_ID" -> "folder_id",
+    "Api.Asset.ASSETS" -> "assets",
+    "Api.Search.ASSETS" -> "assets",
+    "Api.Search.RESULT_BOX_SIZE" -> "result_box_size",
+    "Api.Search.QUERY_TEXT" -> "query_txt",
+    "Api.Search.RESULTS_PER_PAGE" -> "rpp",
+    "Api.Search.PAGE" -> "p",
+    "Api.Search.FOLDERS" -> "folders",
+    "Api.Folder.QUERY_ARG_NAME" -> "__FOLDERS__",
+    "Api.Folder.HIERARCHY" -> "hierarchy",
+    "Api.Folder.val SYSTEM" -> "system",
+    "Api.Folder.UNCATEGORIZED" -> "uncategorized",
+    "Api.Folder.TRASH" -> "trash",
+    "Api.Folder.FOLDERS" -> "folders",
+    "Api.Folder.FOLDER" -> "folder",
+    "Api.Folder.PATH" -> "path",
+    "Api.Folder.NAME" -> "name",
+    "Api.Folder.PARENT_ID" -> "parent_id",
 
-  /*---------------------------------------------------------------------------
-  API
-  ---------------------------------------------------------------------------*/
-  object Api {
-
-    object Folder {
-      val QUERY_ARG_NAME = "__FOLDERS__"
-      val HIERARCHY = "hierarchy"
-      val SYSTEM = "system"
-      val UNCATEGORIZED = "uncategorized"
-      val TRASH = "trash"
-      val FOLDERS = "folders"
-      val FOLDER = "folder"
-      val PATH = "path"
-      val NAME = "name"
-      val PARENT_ID = "parent_id"
-    }
-
-  }
-
-  /*---------------------------------------------------------------------------
-  MESSAGES
-  ---------------------------------------------------------------------------*/
-  val MSG: Map[String, String] = Map(
-    "warn.duplicate" -> "Duplicate",
-    "err.required" -> "This field is required",
-    "err.validation_error" -> "Validation error",
-    "err.validation_errors" -> "There are validation errors in: %s",
-    "err.wrong_type" -> "This field does not match the required type (%s)"
+    /*---------------------------------------------------------------------------
+    MESSAGES
+    ---------------------------------------------------------------------------*/
+    "msg.warn.duplicate" -> "Duplicate",
+    "msg.err.required" -> "This field is required",
+    "msg.err.validation_error" -> "Validation error",
+    "msg.err.validation_errors" -> "There are validation errors in: %s",
+    "msg.err.wrong_type" -> "This field does not match the required type (%s)"
   )
 
   /*---------------------------------------------------------------------------

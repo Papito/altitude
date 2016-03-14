@@ -1,5 +1,6 @@
 package altitude.models.tags
 
+/*
 case class StringTag(id: Option[String] = None,
                      name: String,
                      allowsMulti: Boolean,
@@ -7,4 +8,5 @@ case class StringTag(id: Option[String] = None,
   override val tagType = TagType.STRING
   override val maxLength = 255
 }
+*/
 

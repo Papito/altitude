@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsArray, Json}
 
 class TagConfigController extends BaseApiController {
+/*
   private final val log = LoggerFactory.getLogger(getClass)
 
   get("/") {
@@ -15,4 +16,5 @@ class TagConfigController extends BaseApiController {
       C.Api.TagConfig.TAG_CONFIG -> JsArray(tagConfig.map(_.toJson))
     ))
   }
+*/
 }

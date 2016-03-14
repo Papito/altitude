@@ -58,7 +58,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
 
           bind[MigrationDao].toInstance(new postgres.MigrationDao(app))
           bind[AssetDao].toInstance(new postgres.AssetDao(app))
-          bind[ImportProfileDao].toInstance(new postgres.ImportProfileDao(app))
+          //bind[ImportProfileDao].toInstance(new postgres.ImportProfileDao(app))
           bind[FolderDao].toInstance(new postgres.FolderDao(app))
         }
         case "sqlite" => {
@@ -71,7 +71,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
 
           bind[MigrationDao].toInstance(new sqlite.MigrationDao(app))
           bind[AssetDao].toInstance(new sqlite.AssetDao(app))
-          bind[ImportProfileDao].toInstance(new sqlite.ImportProfileDao(app))
+          //bind[ImportProfileDao].toInstance(new sqlite.ImportProfileDao(app))
           bind[FolderDao].toInstance(new sqlite.FolderDao(app))
         }
         case _ => {
@@ -91,7 +91,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
     val asset = new AssetService(app)
     val preview = new PreviewService(app)
     val folder = new FolderService(app)
-    val importProfile = new ImportProfileService(app)
+//    val importProfile = new ImportProfileService(app)
     val tagConfig = new TagConfigService(app)
 
     val migration = dataSourceType match {

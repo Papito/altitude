@@ -7,30 +7,30 @@ import scala.language.implicitConversions
 
 object Folder {
   implicit def fromJson(json: JsValue): Folder = {
-    val childrenJson = (json \ C.Folder.CHILDREN).as[List[JsValue]]
+    val childrenJson = (json \ C("Folder.CHILDREN")).as[List[JsValue]]
 
     Folder(
-      id = (json \ C.Folder.ID).asOpt[String],
-      name = (json \ C.Folder.NAME).as[String],
+      id = (json \ C("Base.ID")).asOpt[String],
+      name = (json \ C("Folder.NAME")).as[String],
       children = childrenJson.map(Folder.fromJson),
-      parentId = (json \ C.Folder.PARENT_ID).as[String],
-      numOfAssets = (json \ C.Folder.NUM_OF_ASSETS).as[Int]
+      parentId = (json \ C("Folder.PARENT_ID")).as[String],
+      numOfAssets = (json \ C("Folder.NUM_OF_ASSETS")).as[Int]
     ).withCoreAttr(json)
   }
 
   val ROOT = Folder(
-    id = Some(C.Folder.Ids.ROOT),
-    name = C.Folder.Names.ROOT
+    id = Some(C("Folder.Ids.ROOT")),
+    name = C("Folder.Names.ROOT")
   )
 
   val UNCATEGORIZED = Folder(
-    id = Some(C.Folder.Ids.UNCATEGORIZED),
-    name = C.Folder.Names.UNCATEGORIZED
+    id = Some(C("Folder.Ids.UNCATEGORIZED")),
+    name = C("Folder.Names.UNCATEGORIZED")
   )
 
   val TRASH = Folder(
-    id = Some(C.Folder.Ids.TRASH),
-    name = C.Folder.Names.TRASH
+    id = Some(C("Folder.Ids.TRASH")),
+    name = C("Folder.Names.TRASH")
   )
 
   val SYSTEM_FOLDERS: List[Folder] = List(UNCATEGORIZED, TRASH)
@@ -40,7 +40,7 @@ object Folder {
 }
 
 case class Folder(id: Option[String] = None,
-                  parentId: String = C.Folder.Ids.ROOT,
+                  parentId: String = C("Folder.Ids.ROOT"),
                   name: String,
                   children: List[Folder] = List(),
                   numOfAssets: Int = 0) extends BaseModel {
@@ -50,11 +50,11 @@ case class Folder(id: Option[String] = None,
   override def toJson = {
     val childrenJson: List[JsValue] = children.map(_.toJson)
     Json.obj(
-      C.Folder.NAME -> name,
-      C.Folder.NAME_LC -> nameLowercase,
-      C.Folder.PARENT_ID -> parentId,
-      C.Folder.CHILDREN ->  JsArray(childrenJson),
-      C.Folder.NUM_OF_ASSETS -> numOfAssets
+      C("Folder.NAME") -> name,
+      C("Folder.NAME_LC") -> nameLowercase,
+      C("Folder.PARENT_ID") -> parentId,
+      C("Folder.CHILDREN") ->  JsArray(childrenJson),
+      C("Folder.NUM_OF_ASSETS") -> numOfAssets
     ) ++ coreJsonAttrs
   }
 }

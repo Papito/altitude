@@ -57,17 +57,17 @@ abstract class BaseModel {
   Returns core JSON attributes that every model should have
    */
   protected def coreJsonAttrs = JsObject(Map(
-    C.Base.ID -> {id match {
+    C("Base.ID") -> {id match {
       case None => JsNull
       case _ => JsString(id.get)
     }},
 
-    C.Base.CREATED_AT -> {createdAt match {
+    C("Base.CREATED_AT") -> {createdAt match {
         case None => JsNull
         case _ => JsString(Util.isoDateTime(createdAt))
     }},
 
-    C.Base.UPDATED_AT -> {updatedAt match {
+    C("Base.UPDATED_AT") -> {updatedAt match {
         case None => JsNull
         case _ => JsString(Util.isoDateTime(updatedAt))
     }}
@@ -79,11 +79,11 @@ abstract class BaseModel {
     (if the values are present)
    */
   protected def withCoreAttr(json: JsValue): this.type  = {
-    val isoCreatedAt = (json \ C.Base.CREATED_AT).asOpt[String]
+    val isoCreatedAt = (json \ C("Base.CREATED_AT")).asOpt[String]
     if (isoCreatedAt.isDefined) {
       createdAt = ISODateTimeFormat.dateTime().parseDateTime(isoCreatedAt.get)
     }
-    val isoUpdatedAt = (json \ C.Base.UPDATED_AT).asOpt[String]
+    val isoUpdatedAt = (json \ C("Base.UPDATED_AT")).asOpt[String]
 
     if (isoUpdatedAt.isDefined) {
       updatedAt = ISODateTimeFormat.dateTime().parseDateTime(isoUpdatedAt.get)

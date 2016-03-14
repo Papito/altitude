@@ -10,42 +10,42 @@ class SearchController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
   get("/") {
-    val foldersQuery = this.params.getOrElse(C.Api.Search.FOLDERS, "")
+    val foldersQuery = this.params.getOrElse(C("Api.Search.FOLDERS"), "")
 
     val q = Query(
-      params = Map(C.Api.Folder.QUERY_ARG_NAME -> foldersQuery),
+      params = Map(C("Api.Folder.QUERY_ARG_NAME") -> foldersQuery),
       rpp = 20, page = 1)
 
     val assets = app.service.library.search(q)
     val jsonAssets = for (asset <- assets) yield asset.toJson
 
     Ok(Json.obj(
-      C.Api.Search.RESULT_BOX_SIZE -> app.config.getInt("result.box.pixels"),
-      C.Api.Search.ASSETS -> jsonAssets
+      C("Api.Search.RESULT_BOX_SIZE") -> app.config.getInt("result.box.pixels"),
+      C("Api.Search.ASSETS") -> jsonAssets
     ))
   }
 
-  get(s"/p/:${C.Api.Search.PAGE}/rpp/:${C.Api.Search.RESULTS_PER_PAGE}") {
-    val rpp = this.params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, "20").toInt
-    val page = this.params.getOrElse(C.Api.Search.PAGE, "1").toInt
-    val foldersQuery = this.params.getOrElse(C.Api.Search.FOLDERS, "")
+  get(s"/p/:${C("Api.Search.PAGE")}/rpp/:${C("Api.Search.RESULTS_PER_PAGE")}") {
+    val rpp = this.params.getOrElse(C("Api.Search.RESULTS_PER_PAGE"), "20").toInt
+    val page = this.params.getOrElse(C("Api.Search.PAGE"), "1").toInt
+    val foldersQuery = this.params.getOrElse(C("Api.Search.FOLDERS"), "")
     
     val q = Query(
-      params = Map(C.Api.Folder.QUERY_ARG_NAME -> foldersQuery),
+      params = Map(C("Api.Folder.QUERY_ARG_NAME") -> foldersQuery),
       rpp = rpp, page = page)
 
     val assets = app.service.library.search(q)
     val jsonAssets = for (asset <- assets) yield asset.toJson
 
     Ok(Json.obj(
-      C.Api.Search.RESULT_BOX_SIZE -> app.config.getInt("result.box.pixels"),
-      C.Api.Search.ASSETS -> jsonAssets
+      C("Api.Search.RESULT_BOX_SIZE") -> app.config.getInt("result.box.pixels"),
+      C("Api.Search.ASSETS") -> jsonAssets
     ))
   }
 
   get("/meta/box") {
     Ok(Json.obj(
-      C.Api.Search.RESULT_BOX_SIZE -> app.config.getInt("result.box.pixels")
+      C("Api.Search.RESULT_BOX_SIZE") -> app.config.getInt("result.box.pixels")
     ))
   }
 }

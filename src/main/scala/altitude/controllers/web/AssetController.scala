@@ -9,7 +9,7 @@ class AssetController extends BaseWebController {
   private final val log = LoggerFactory.getLogger(getClass)
 
   get("/:id/preview") {
-    val id = params(C.Api.ID)
+    val id = params(C("Api.ID"))
 
     try {
       val preview: Preview = app.service.library.getPreview(id)
