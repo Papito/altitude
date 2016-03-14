@@ -2,10 +2,11 @@ package altitude.controllers.web
 
 import java.io.{File, StringWriter, Writer}
 
-import altitude.Environment
+import altitude.{Const, Environment}
 import com.mitchellbosecke.pebble.PebbleEngine
 import com.mitchellbosecke.pebble.template.PebbleTemplate
 import org.slf4j.LoggerFactory
+import scala.collection.JavaConversions._
 
 class ClientController  extends BaseWebController {
   private val log = LoggerFactory.getLogger(getClass)
@@ -28,6 +29,10 @@ class ClientController  extends BaseWebController {
     contentType = "text/html; charset=UTF-8"
   }
 
+  private lazy val CONTEXT = Map[String, AnyRef](
+      "C" -> mapAsJavaMap(Const.data)
+    )
+
   get("/*") {
     val templateFile = this.params("splat")
     log.debug(s"Client file request: $templateFile")
@@ -35,7 +40,8 @@ class ClientController  extends BaseWebController {
     log.debug(s"Template file path: $templateFilePath")
     val compiledTemplate: PebbleTemplate = engine.getTemplate(templateFilePath)
     val writer: Writer = new StringWriter()
-    compiledTemplate.evaluate(writer)
+
+    compiledTemplate.evaluate(writer, CONTEXT)
     writer.toString
   }
 

@@ -8,7 +8,7 @@ object Const {
     if (v.isDefined) v.get else throw new RuntimeException(s"No constant value for: $key")
   }
 
-  private val data: Map[String, String] = Map(
+  val data = Map(
     "Base.ID" -> "id",
     "Base.VALUES" -> "values",
     "Base.DATA" -> "data",
