@@ -76,7 +76,7 @@ object Const {
     "Api.Search.FOLDERS" -> "folders",
     "Api.Folder.QUERY_ARG_NAME" -> "__FOLDERS__",
     "Api.Folder.HIERARCHY" -> "hierarchy",
-    "Api.Folder.val SYSTEM" -> "system",
+    "Api.Folder.SYSTEM" -> "system",
     "Api.Folder.UNCATEGORIZED" -> "uncategorized",
     "Api.Folder.TRASH" -> "trash",
     "Api.Folder.FOLDERS" -> "folders",

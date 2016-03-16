@@ -3,11 +3,11 @@ package altitude
 import scala.collection.immutable.HashMap
 
 class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
-  def getString(key: String) = config.getOrElse(key, "").asInstanceOf[String]
-  def getFlag(key: String) = config.getOrElse(key, false).asInstanceOf[Boolean]
-  def getInt(key: String) = config.getOrElse(key, 0).asInstanceOf[Int]
+  def getString(key: String) = data.getOrElse(key, "").asInstanceOf[String]
+  def getFlag(key: String) = data.getOrElse(key, false).asInstanceOf[Boolean]
+  def getInt(key: String) = data.getOrElse(key, 0).asInstanceOf[Int]
 
-  val default = HashMap(
+  private val default = HashMap(
     "app.name" -> "Altitude",
     "dataDir" -> "data",
     "previewDir" -> "p",
@@ -30,7 +30,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
     "migrationsEnabled" -> true
   )
 
-  val test = default ++ HashMap(
+  private val test = default ++ HashMap(
     "dataDir" -> "tmp/test/data",
 
     "db.postgres.url" -> "jdbc:postgresql://localhost/altitude-test",
@@ -45,9 +45,9 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
 
   )
 
-  val prod = default ++ HashMap()
+  private val prod = default ++ HashMap()
 
-  private val config: Map[String, Any] = Environment.ENV match {
+  val data: Map[String, Any] = Environment.ENV match {
     case Environment.TEST => test ++ additionalConfiguration
     case Environment.DEV => default ++ additionalConfiguration
     case Environment.PROD => prod ++ additionalConfiguration

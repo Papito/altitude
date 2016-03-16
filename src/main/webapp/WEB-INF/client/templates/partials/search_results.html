@@ -1,0 +1,7 @@
+<div id="searchResults">
+  <div data-bind="foreach: searchResults">
+    <div class="result-box" data-bind="attr: {'asset_id': $data.id}, style: {'margin-right': $root.resultBoxDblSideMargin, 'margin-bottom': $root.resultBoxMargin, padding: $root.resultBoxPadding, 'border-width': $root.resultBoxBorder}">
+      <img src="#" data-bind="attr: {src: '/assets/'+ $data.id +'/preview'}" class="img-responsive">
+    </div>
+  </div>
+</div>

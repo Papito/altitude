@@ -38,14 +38,14 @@
   <div class="row" id="navigation">
     <div id="brand" class="col-md-2">
       <h4>
-        <a href="/">{{ C["Base.ID"] }}</a>
+        <a href="/">{{ Config["app.name"] }}</a>
       </h4>
     </div>
     <div class="col-md-4">
       <div id="menulist">
         <div class="row">
           <div class="col-md-12">
-            <a href="/cl/import">Import</a>
+            <a href="/client/import">Import</a>
           </div>
         </div>
       </div>
@@ -56,7 +56,7 @@
       </h5>
     </div>
     <div class="col-md-3">
-      <form method="GET" action="/cl/search">
+      <form method="GET" action="/client/search">
         <input type="text" name="${C.Api.Search.QUERY_TEXT}" class="form-control" placeholder="Search..." maxlength="200">
       </form>
     </div>
