@@ -1,0 +1,39 @@
+{% extends "./base.html" %}
+
+{% block title %} Search {% endblock %}
+
+{% block assets %}
+<script src="/static/js/app/search.js"></script>
+<script src="/static/js/lib/jquery.endless-scroll.js"></script>
+{% endblock%}
+
+{% block body %}
+<div class="row">
+  <div class="col-md-2" id="left">
+
+    <div class="row">
+      <div class="col-md-12" style="height: 40%">
+        {% include "./partials/preview.html" %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-10">
+    <div class="row" data-bind="visible: searchResults" style="display: none">
+      <div class="col-md-12">
+        {% include "./partials/search_results.html" %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+{% include "./partials/modals.html" %}
+
+<script>
+  $(document).ready(function() {
+    var searchViewModel = new SearchViewModel();
+    ko.applyBindings(searchViewModel);
+  });
+</script>
+{% endblock%}
