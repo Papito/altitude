@@ -30,7 +30,6 @@ object AltitudeBuild extends Build {
     resolvers += "Akka Repo" at "http://repo.akka.io/repository",
     libraryDependencies ++= Seq(
       "org.scalatra"                %% "scalatra"              % ScalatraVersion,
-      "org.scalatra"                %% "scalatra-scalate"      % ScalatraVersion,
       "org.scalatra"                %% "scalatra-atmosphere"   % ScalatraVersion,
       "com.mitchellbosecke"          % "pebble"                % "2.2.0",
       "org.scalatra"                %% "scalatra-scalatest"    % ScalatraVersion % "test",

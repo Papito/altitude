@@ -13,10 +13,6 @@ import scala.compat.Platform
 abstract class BaseController extends AltitudeStack with SingleApplication {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override protected def templateAttributes(implicit request: HttpServletRequest): mutable.Map[String, Any] = {
-    super.templateAttributes ++ Map("config" -> app.config)
-  }
-
   error {
     case ex: Exception => {
       ex.printStackTrace()
