@@ -6,14 +6,7 @@ SearchViewModel = BaseViewModel.extend({
     console.log('Initializing search view model');
 
     this.searchResults = ko.observableArray();
-
-    this.resultBoxBorder = 2; //pixels
-    this.resultBoxMargin = ko.observable();
-    this.resultBoxSideMargin = ko.observable();
-    this.resultBoxDblSideMargin = ko.observable();
-    this.resultBoxPadding = ko.observable();
-    this.resultBoxWidth = ko.observable();
-    this.resultBoxSize = null;
+    this.resultsPerPage = 6;
 
     this.getResultBoxSize();
   },
@@ -21,24 +14,6 @@ SearchViewModel = BaseViewModel.extend({
   search: function(append, page, queryString) {
     var self = this;
     var content = $("#searchResults");
-
-    if (page == 1) {
-      content.attr("tabindex", -1).focus();
-    }
-
-    var gridAdjustment = Util.getGridAdjustment(
-        content, self.resultBoxSize, self.resultBoxBorder
-    );
-    //console.log(gridAdjustment);
-    self.resultBoxMargin(gridAdjustment.boxMargin);
-    self.resultBoxPadding(gridAdjustment.boxPadding);
-    self.resultBoxWidth(gridAdjustment.boxWidth);
-    self.resultBoxSideMargin(gridAdjustment.boxSideMargin);
-    self.resultBoxDblSideMargin(self.resultBoxSideMargin() * 2);
-
-    var approxRowsPerPage = parseInt(gridAdjustment.containerHeight / gridAdjustment.boxHeight, 10);
-    var rpp = (approxRowsPerPage * gridAdjustment.fitsHorizontally) * 3;
-
 
     queryString = queryString || '';
     console.log('q', queryString);
@@ -73,7 +48,7 @@ SearchViewModel = BaseViewModel.extend({
       }
     };
 
-    this.get('/api/v1/search/p/' +  page + '/rpp/' + rpp + '?' + queryString, opts);
+    this.get('/api/v1/search/p/' +  page + '/rpp/' + self.resultsPerPage + '?' + queryString, opts);
   },
 
   getResultBoxSize: function() {

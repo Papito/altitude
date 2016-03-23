@@ -227,17 +227,13 @@ footer {
 
 #searchResults {
     height: 100%;
-    display: block;
+    text-align: center;
     overflow: auto;
 }
 
-#searchResults:focus {
-    outline: 0;
-}
-
 #searchResults .result-box {
-    float: left;
     border: solid 1px #212223;
+    display: inline-block;
 }
 
 #addFolderForm input, #renameFolderForm input {
@@ -246,6 +242,16 @@ footer {
 
 #addFolder {
     margin-top: 1em;
+}
+
+.pager-button {
+    height: 100%;
+}
+
+.pager-button:hover {
+    background: #232628;
+    text-decoration: none;
+    color: #2980b9;
 }
 
 /* FOLDERS */

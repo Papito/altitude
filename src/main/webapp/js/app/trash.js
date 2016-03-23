@@ -11,23 +11,6 @@ TrashViewModel = SearchViewModel.extend({
     var self = this;
     var content = $("#searchResults");
 
-    if (page == 1) {
-      content.attr("tabindex", -1).focus();
-    }
-
-    var gridAdjustment = Util.getGridAdjustment(
-        content, self.resultBoxSize, self.resultBoxBorder
-    );
-    //console.log(gridAdjustment);
-    self.resultBoxMargin(gridAdjustment.boxMargin);
-    self.resultBoxPadding(gridAdjustment.boxPadding);
-    self.resultBoxWidth(gridAdjustment.boxWidth);
-    self.resultBoxSideMargin(gridAdjustment.boxSideMargin);
-    self.resultBoxDblSideMargin(self.resultBoxSideMargin() * 2);
-
-    var approxRowsPerPage = parseInt(gridAdjustment.containerHeight / gridAdjustment.boxHeight, 10);
-    var rpp = (approxRowsPerPage * gridAdjustment.fitsHorizontally) * 3;
-
     var queryString = window.location.search;
     console.log('q', queryString);
 
@@ -55,6 +38,6 @@ TrashViewModel = SearchViewModel.extend({
       }
     };
 
-    this.get('/api/v1/search/p/' +  page + '/rpp/' + rpp + '?folders=2', opts);
+    this.get('/api/v1/search/p/' +  page + '/rpp/' + this.resultsPerPage + '?folders=2', opts);
   }
 });
