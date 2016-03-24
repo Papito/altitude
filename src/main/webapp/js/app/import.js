@@ -263,7 +263,7 @@ ImportViewModel = BaseViewModel.extend({
 
   addSuccess: function(asset) {
     $("#importedAssets").html(
-        '<div class="asset"' +
+        '<div class="asset">' +
         '<img src="/assets/' + asset.id + '/preview">' +
         '</div>');
     this.statsImported(this.statsImported() + 1);
