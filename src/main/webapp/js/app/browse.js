@@ -167,8 +167,9 @@ BrowseViewModel = SearchViewModel.extend({
     self.loadFolders(folderId);
     this.searchResults([]);
 
-    var queryString = folderId != 0 ? 'folders=' + folderId : '';
-    self.search(1, 1, queryString);
+    self.queryString = folderId != 0 ? 'folders=' + folderId : '';
+    self.page = 1;
+    self.search();
   },
 
   loadFolders: function(folderId) {

@@ -14,7 +14,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
 
     "datasource" -> "sqlite", // mongo, postgres, sqlite
 
-    "result.box.pixels" -> 200,
+    "preview.box.pixels" -> 200,
 
     // safeguard for maximum records allowed at once without pagination
     "db.max_records" -> 1000,

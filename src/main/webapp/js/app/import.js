@@ -187,8 +187,6 @@ ImportViewModel = BaseViewModel.extend({
     var socket = $.atmosphere;
     this.protocol = new ImportProtocolHandler(socket, self);
     console.log('Import protocol handler attached');
-
-    self.getResultBoxSize();
   },
 
   cancelImport: function() {
@@ -246,7 +244,6 @@ ImportViewModel = BaseViewModel.extend({
     $("#warnings").prepend(
         '<div><strong>' +  message + '</strong>: ' + asset.path + '</div>');
     this.statsWarnings(this.statsWarnings() + 1);
-    this.trimMessages();
   },
 
   addError: function(importAsset, message) {
@@ -255,7 +252,6 @@ ImportViewModel = BaseViewModel.extend({
     $("#errors").prepend(
         '<div><strong>' +  message + '</strong>: ' + path + '</div>');
     this.statsErrors(this.statsErrors() + 1);
-    this.trimMessages();
   },
 
   //FIXME: should display global error banner message and bail
@@ -263,57 +259,18 @@ ImportViewModel = BaseViewModel.extend({
     $("#importedAssets").prepend(
         '<div class="asset"><button type="button" class="btn btn-danger">' +
         message + '</button>&nbsp;&nbsp;</div>');
-    this.trimMessages();
   },
 
   addSuccess: function(asset) {
-    var self = this;
-    var style = 'margin-left:' + self.gridAdjustment.boxSideMargin +
-        '; margin-right:' +  self.gridAdjustment.boxSideMargin +
-        '; margin-bottom:' +  self.gridAdjustment.boxMargin +
-        '; padding:' +  self.gridAdjustment.boxPadding +
-        '; border-width: ' + self.boxBorder;
-
-    $("#importedAssets").prepend(
-        '<div class="asset" style="' + style +'">' +
+    $("#importedAssets").html(
+        '<div class="asset"' +
         '<img src="/assets/' + asset.id + '/preview">' +
         '</div>');
     this.statsImported(this.statsImported() + 1);
-    this.trimMessages();
-  },
-
-  trimMessages: function() {
-    var self = this;
-
-    var assetSel = $('#importedAssets').find('.asset');
-    var messageCount = assetSel.length;
-
-    if (messageCount > self.gridAdjustment.fitsHorizontally) {
-      var el = assetSel.last();
-      $(el).remove();
-    }
   },
 
   importAssets: function() {
     this.reset();
     this.protocol.getTotal();
-  },
-
-  getResultBoxSize: function() {
-    var self = this;
-    var opts = {
-      'successCallback': function (json) {
-        var boxSize = json['result_box_size'];
-
-        self.gridAdjustment = Util.getGridAdjustment($('#importedAssets'), boxSize, self.boxBorder);;
-        self.resultBoxMargin = self.gridAdjustment.boxMargin;
-        self.resultBoxPadding = self.gridAdjustment.boxPadding;
-        self.resultBoxWidth = self.gridAdjustment.boxWidth;
-        self.resultBoxSideMargin = self.gridAdjustment.boxSideMargin;
-        console.log(self.gridAdjustment);
-      }
-    };
-
-    this.get('/api/v1/search/meta/box', opts);
   }
 });

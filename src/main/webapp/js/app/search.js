@@ -7,16 +7,16 @@ SearchViewModel = BaseViewModel.extend({
 
     this.searchResults = ko.observableArray();
     this.resultsPerPage = 6;
+    this.currentPage = 1;
+    this.totalPages = 0;
+    this.queryString = this.queryString || '';
+    console.log('Q = ', this.queryString);
 
-    this.getResultBoxSize();
+    this.search();
   },
 
-  search: function(append, page, queryString) {
+  search: function() {
     var self = this;
-    var content = $("#searchResults");
-
-    queryString = queryString || '';
-    console.log('q', queryString);
 
     var opts = {
       'successCallback': function (json) {
@@ -24,42 +24,10 @@ SearchViewModel = BaseViewModel.extend({
           return new Asset(data);
         });
 
-        if (!append) {
-          self.searchResults([]);
-        }
-        for (var idx in assets) {
-          var asset = assets[idx];
-          self.searchResults.push(asset);
-        }
-        $('.result-box').draggable({
-          helper: "clone",
-          appendTo: "body",
-          opacity: 0.4
-        });
-
-        if (assets.length) {
-          $("#searchResults").endlessScroll({
-            loader: '<div class="lo:${C.Api.Search.RESULTS_PER_PAGE}">Adding><div>',
-            callback: function(){
-              self.search(/*append=*/true, /*page=*/page + 1, queryString);
-            }
-          });
-        }
+        self.searchResults(assets);
       }
     };
 
-    this.get('/api/v1/search/p/' +  page + '/rpp/' + self.resultsPerPage + '?' + queryString, opts);
-  },
-
-  getResultBoxSize: function() {
-    var self = this;
-    var opts = {
-      'successCallback': function (json) {
-        self.resultBoxSize = json['result_box_size'];
-        self.search(/*append=*/true, /*page=*/1);
-      }
-    };
-
-    this.get('/api/v1/search/meta/box', opts);
+    this.get('/api/v1/search/p/' +  self.currentPage + '/rpp/' + self.resultsPerPage + '?' + self.queryString, opts);
   }
 });

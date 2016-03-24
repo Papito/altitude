@@ -69,7 +69,6 @@ object Const {
     "Api.Asset.FOLDER_ID" -> "folder_id",
     "Api.Asset.ASSETS" -> "assets",
     "Api.Search.ASSETS" -> "assets",
-    "Api.Search.RESULT_BOX_SIZE" -> "result_box_size",
     "Api.Search.QUERY_TEXT" -> "query_txt",
     "Api.Search.RESULTS_PER_PAGE" -> "rpp",
     "Api.Search.PAGE" -> "p",

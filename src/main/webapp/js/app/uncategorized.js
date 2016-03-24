@@ -2,11 +2,9 @@ UncategorizedViewModel = BrowseViewModel.extend({
   constructor : function() {
     "use strict";
 
+    this.queryString = 'folders=1';
+
     this.base();
     console.log('Initializing uncategorized view model');
-  },
-
-  search: function(append, page) {
-    this.base(append, page, "folders=1");
   }
 });
