@@ -154,4 +154,8 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
       Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> Folder.TRASH.id.get))
     ).length should be (1)
   }
+
+  test("pagination") {
+
+  }
 }
