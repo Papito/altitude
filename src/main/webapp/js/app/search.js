@@ -6,9 +6,10 @@ SearchViewModel = BaseViewModel.extend({
     console.log('Initializing search view model');
 
     this.searchResults = ko.observableArray();
-    this.resultsPerPage = 6;
-    this.currentPage = 1;
-    this.totalPages = 0;
+    this.resultsPerPage = ko.observable(6);
+    this.currentPage = ko.observable(1);
+    this.totalPages = ko.observable(0);
+    this.totalResults = ko.observable(0);
     this.queryString = this.queryString || '';
     console.log('Q = ', this.queryString);
 
@@ -28,6 +29,6 @@ SearchViewModel = BaseViewModel.extend({
       }
     };
 
-    this.get('/api/v1/search/p/' +  self.currentPage + '/rpp/' + self.resultsPerPage + '?' + self.queryString, opts);
+    this.get('/api/v1/search/p/' +  self.currentPage() + '/rpp/' + self.resultsPerPage() + '?' + self.queryString, opts);
   }
 });

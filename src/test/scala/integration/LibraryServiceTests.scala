@@ -6,8 +6,8 @@ import altitude.{Const => C, Util}
 import org.scalatest.Matchers._
 
 class LibraryServiceTests (val config: Map[String, String]) extends IntegrationTestCore {
-
   private val MEDIA_TYPE = new MediaType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
+
   private def makeAsset(folder: Folder) = new Asset(
     folderId = folder.id.get,
     mediaType = MEDIA_TYPE,
@@ -147,6 +147,11 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
   }
 
   test("trash") {
-    //systemFolders3(Folder.TRASH.id.get).numOfAssets should be (1)
+    val asset: Asset = altitude.service.library.add(makeAsset(Folder.TRASH))
+    altitude.service.library.moveToTrash(asset.id.get)
+
+    altitude.service.library.search(
+      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> Folder.TRASH.id.get))
+    ).length should be (1)
   }
 }
