@@ -2,7 +2,7 @@ package altitude.dao.mongo
 
 import altitude.dao.BaseDao
 import altitude.models.BaseModel
-import altitude.models.search.Query
+import altitude.models.search.{QueryResult, Query}
 import altitude.transactions.TransactionId
 import altitude.{Configuration, Const => C, Environment, Util}
 import com.mongodb.casbah.Imports._
@@ -88,16 +88,18 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     }
   }
 
-  override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {
+  override def query(query: Query)(implicit txId: TransactionId): QueryResult = {
     val cursor: MongoCursor = MONGO_QUERY_BUILDER.toSelectCursor(query)
 
     log.debug(s"Found ${cursor.length} records")
 
     // iterate through results and "fix" mongo fields
-    cursor.map(o => {
+    val records = cursor.map(o => {
       val json: JsObject = Json.parse(o.toString).as[JsObject]
       fixMongoFields(json)
     }).toList
+
+    QueryResult(records = records, total = cursor.count(), query = query)
   }
 
   /*

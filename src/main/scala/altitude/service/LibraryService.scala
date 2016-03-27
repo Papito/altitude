@@ -6,7 +6,7 @@ import java.io._
 import javax.imageio.ImageIO
 
 import altitude.exceptions.DuplicateException
-import altitude.models.search.Query
+import altitude.models.search.{QueryResult, Query}
 import altitude.models.{Asset, Folder, Preview}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import altitude.{Altitude, Const => C}
@@ -51,7 +51,7 @@ class LibraryService(app: Altitude) {
     app.service.preview.getById(asset_id)
   }
 
-  def search(query: Query)(implicit txId: TransactionId = new TransactionId): List[Asset] = {
+  def search(query: Query)(implicit txId: TransactionId = new TransactionId): QueryResult = {
     log.debug(s"Asset query $query")
 
     // parse out folder ids as a set
@@ -60,26 +60,26 @@ class LibraryService(app: Altitude) {
 
     log.debug(s"${folderIds.size} folder ids: $folderIds")
 
-    txManager.asReadOnly[List[Asset]] {
+    txManager.asReadOnly[QueryResult] {
       val _query: Query = folderIds.isEmpty match {
+        // no folder filtering, query as is
+        case true => query
+        // create a new query that includes folder children, since we are searching the hierarchy
         case false => {
-          val allFolders = app.service.folder.getAll
-          val allFolderIds = app.service.folder.flatChildrenIds(parentIds = folderIds, all = allFolders)
+          val allFolderIds = app.service.folder.flatChildrenIds(parentIds = folderIds)
           log.debug(s"Expanded folder ids: $allFolderIds")
 
-          // repackage the query to include all folders (they will have to reparsed again)
+          // repackage the query to include all folders (they will have to be re-parsed again)
           Query(
             params = query.params
               ++ Map(C("Api.Folder.QUERY_ARG_NAME") -> allFolderIds.mkString(C("Api.MULTI_VALUE_DELIM"))),
             page = query.page, rpp = query.rpp)
         }
-        case true => query
       }
 
       log.info("SEARCH QUERY: " + _query)
 
-      val searchResultData: List[JsObject] = app.service.asset.query(_query)
-      for (data <- searchResultData) yield Asset.fromJson(data)
+      app.service.asset.query(_query)
     }
   }
 

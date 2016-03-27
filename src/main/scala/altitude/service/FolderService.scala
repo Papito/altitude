@@ -273,7 +273,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
    * The difference between the other method signature is that folder depths are not returned.
    * It's a "raw" list of folder ids.
    */
-  def flatChildrenIds(parentIds: Set[String], all: List[JsObject])
+  def flatChildrenIds(parentIds: Set[String], all: List[JsObject] = List())
                      (implicit txId: TransactionId = new TransactionId): Set[String]  =
     parentIds.foldLeft(Set[String]()) {(s, id) => {
       s ++ app.service.folder.flatChildrenIdsWithDepths(parentId = id, all = all).map(_._2).toSet

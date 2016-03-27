@@ -4,12 +4,12 @@ import java.sql.Connection
 
 import altitude.dao.BaseDao
 import altitude.models.BaseModel
-import altitude.models.search.Query
+import altitude.models.search.{QueryResult, Query}
 import altitude.transactions.{JdbcTransactionManager, TransactionId}
 import altitude.{Const => C, Util}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.apache.commons.dbutils.QueryRunner
-import org.apache.commons.dbutils.handlers.MapListHandler
+import org.apache.commons.dbutils.handlers.{ScalarHandler, MapListHandler}
 import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
@@ -85,12 +85,27 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     numDeleted
   }
 
-  override def query(query: Query)(implicit txId: TransactionId): List[JsObject] = {
+  override def query(query: Query)(implicit txId: TransactionId): QueryResult = {
     val sqlQuery: SqlQuery = SQL_QUERY_BUILDER.toSelectQuery(query)
     val recs = manyBySqlQuery(sqlQuery.queryString, sqlQuery.selectBindValues)
-    log.debug(s"Found: ${recs.length}")
+
+    // do not perform a count query if we got zero results in the first place
+    val count: Int =  getQueryResultCount(query, sqlQuery.selectBindValues)
+
+    log.debug(s"Found [$count] records. Retrieved [${recs.length}] records")
     log.debug(recs.map(_.toString()).mkString("\n"))
-    recs.map{makeModel}
+    QueryResult(records = recs.map{makeModel}, total = count, query = query)
+  }
+
+  protected def getQueryResultCount(query: Query, values: List[Object] = List())(implicit txId: TransactionId): Int = {
+    val sqlCountQuery: SqlQuery = SQL_QUERY_BUILDER.toSelectQuery(query, countOnly = true)
+    val runner: QueryRunner = new QueryRunner()
+
+    // We are defensive with different JDBC drivers operating with either java.lang.Int or java.lang.Long
+    runner.query(conn, sqlCountQuery.queryString, new ScalarHandler[AnyRef]("count"),  values: _*) match {
+      case v: java.lang.Integer => v.intValue
+      case v: java.lang.Long => v.asInstanceOf[Long].toInt
+    }
   }
 
   protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object])
@@ -118,14 +133,16 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     recordJson
   }
 
-  protected def manyBySqlQuery(sql: String, vals: List[Object] = List())(implicit txId: TransactionId): List[Map[String, AnyRef]] = {
+  protected def manyBySqlQuery(sql: String, values: List[Object] = List())
+                              (implicit txId: TransactionId): List[Map[String, AnyRef]] = {
     val runner: QueryRunner = new QueryRunner()
-    val res = runner.query(conn, sql, new MapListHandler(), vals: _*)
+    val res = runner.query(conn, sql, new MapListHandler(), values: _*)
     log.debug(s"Found ${res.size()} records", C.LogTag.DB)
     res.map{_.toMap[String, AnyRef]}.toList
   }
 
-  protected def oneBySqlQuery(sql: String, vals: List[Object] = List())(implicit txId: TransactionId): Option[Map[String, AnyRef]] = {
+  protected def oneBySqlQuery(sql: String, vals: List[Object] = List())
+                             (implicit txId: TransactionId): Option[Map[String, AnyRef]] = {
     log.debug(s"SQL: $sql")
 
     val runner: QueryRunner = new QueryRunner()

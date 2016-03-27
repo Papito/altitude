@@ -16,11 +16,14 @@ class SearchController extends BaseApiController {
       params = Map(C("Api.Folder.QUERY_ARG_NAME") -> foldersQuery),
       rpp = 20, page = 1)
 
-    val assets = app.service.library.search(q)
-    val jsonAssets = for (asset <- assets) yield asset.toJson
+    val results = app.service.library.search(q)
 
     Ok(Json.obj(
-      C("Api.Search.ASSETS") -> jsonAssets
+      C("Api.Search.ASSETS") -> results.records,
+      C("Api.TOTAL_RECORDS") -> results.total,
+      C("Api.CURRENT_PAGE") -> q.page,
+      C("Api.TOTAL_PAGES") -> results.totalPages,
+      C("Api.RESULTS_PER_PAGE") -> results.query.rpp
     ))
   }
 
@@ -33,11 +36,14 @@ class SearchController extends BaseApiController {
       params = Map(C("Api.Folder.QUERY_ARG_NAME") -> foldersQuery),
       rpp = rpp, page = page)
 
-    val assets = app.service.library.search(q)
-    val jsonAssets = for (asset <- assets) yield asset.toJson
+    val results = app.service.library.search(q)
 
     Ok(Json.obj(
-      C("Api.Search.ASSETS") -> jsonAssets
+      C("Api.Search.ASSETS") -> results.records,
+      C("Api.TOTAL_RECORDS") -> results.total,
+      C("Api.CURRENT_PAGE") -> q.page,
+      C("Api.TOTAL_PAGES") -> results.totalPages,
+      C("Api.RESULTS_PER_PAGE") -> results.query.rpp
     ))
   }
 }

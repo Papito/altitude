@@ -58,6 +58,11 @@ object Const {
     "Api.VALIDATION_ERRORS" -> "validation_errors",
     "Api.MULTI_VALUE_DELIM" -> "+",
 
+    "Api.TOTAL_RECORDS" -> "totalRecords",
+    "Api.TOTAL_PAGES" -> "totalPages",
+    "Api.CURRENT_PAGE" -> "currentPages",
+    "Api.RESULTS_PER_PAGE" -> "resultsPerPage",
+
     "Api.ID" -> "id",
     "Api.DATA" -> "data",
     "Api.PATH" -> "path",

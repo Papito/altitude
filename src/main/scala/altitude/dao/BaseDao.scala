@@ -1,6 +1,6 @@
 package altitude.dao
 
-import altitude.models.search.Query
+import altitude.models.search.{QueryResult, Query}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
 import play.api.libs.json.JsObject
@@ -13,8 +13,8 @@ trait BaseDao {
   def deleteByQuery(q: Query)(implicit txId: TransactionId): Int
   def getById(id: String)(implicit txId: TransactionId): Option[JsObject]
   def getByIds(id: Set[String])(implicit txId: TransactionId): List[JsObject]
-  def getAll(implicit txId: TransactionId): List[JsObject] = query(Query())
-  def query(q: Query)(implicit txId: TransactionId): List[JsObject]
+  def getAll(implicit txId: TransactionId): List[JsObject] = query(Query()).records
+  def query(q: Query)(implicit txId: TransactionId): QueryResult
 
   def deleteById(id: String)(implicit txId: TransactionId): Int = {
     val q: Query = Query(Map(C("Base.ID") -> id))

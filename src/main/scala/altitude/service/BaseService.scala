@@ -6,7 +6,7 @@ import altitude.Validators.Validator
 import altitude.dao.BaseDao
 import altitude.exceptions.{DuplicateException, NotFoundException}
 import altitude.models.BaseModel
-import altitude.models.search.Query
+import altitude.models.search.{QueryResult, Query}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
@@ -81,8 +81,8 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
     }
   }
 
-  def query(query: Query)(implicit txId: TransactionId = new TransactionId): List[JsObject] = {
-    txManager.asReadOnly[List[JsObject]] {
+  def query(query: Query)(implicit txId: TransactionId = new TransactionId): QueryResult = {
+    txManager.asReadOnly[QueryResult] {
       DAO.query(query)
     }
   }

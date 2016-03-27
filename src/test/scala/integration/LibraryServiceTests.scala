@@ -6,14 +6,6 @@ import altitude.{Const => C, Util}
 import org.scalatest.Matchers._
 
 class LibraryServiceTests (val config: Map[String, String]) extends IntegrationTestCore {
-  private val MEDIA_TYPE = new MediaType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
-
-  private def makeAsset(folder: Folder) = new Asset(
-    folderId = folder.id.get,
-    mediaType = MEDIA_TYPE,
-    path = Util.randomStr(30),
-    md5 = Util.randomStr(30),
-    sizeBytes = 1L)
 
   test("move asset to a different folder") {
     /*
@@ -30,17 +22,17 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
 
     altitude.service.library.search(
       Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
-    ).length should be(1)
+    ).records.length should be(1)
 
     altitude.service.library.moveToFolder(asset.id.get, folder2.id.get)
 
     altitude.service.library.search(
       Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
-    ).length should be(0)
+    ).records.length should be(0)
 
     altitude.service.library.search(
       Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder2.id.get))
-    ).length should be(1)
+    ).records.length should be(1)
   }
 
   test("folder counts") {
@@ -109,53 +101,5 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
     val hierarchy = altitude.service.folder.hierarchy()
     hierarchy.head.numOfAssets should be(2)
     hierarchy.last.numOfAssets should be(10)
-  }
-
-  test("Folder filtering") {
-      /*
-  folder1
-  folder2
-    folder2_1
-  */
-    val folder1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1"))
-
-    val folder2: Folder = altitude.service.folder.add(
-      Folder(name = "folder2"))
-
-    val folder2_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder2_1", parentId = folder2.id.get))
-
-    // fill up the hierarchy with assets x times over
-    1 to 2 foreach {n =>
-      altitude.service.library.add(makeAsset(folder1))
-      altitude.service.library.add(makeAsset(folder2))
-      altitude.service.library.add(makeAsset(folder2_1))
-    }
-
-    altitude.service.library.search(
-      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
-    ).length should be (2)
-
-    altitude.service.library.search(
-      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder2_1.id.get))
-    ).length should be (2)
-
-    altitude.service.library.search(
-      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder2.id.get))
-    ).length should be (4)
-  }
-
-  test("trash") {
-    val asset: Asset = altitude.service.library.add(makeAsset(Folder.TRASH))
-    altitude.service.library.moveToTrash(asset.id.get)
-
-    altitude.service.library.search(
-      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> Folder.TRASH.id.get))
-    ).length should be (1)
-  }
-
-  test("pagination") {
-
   }
 }
