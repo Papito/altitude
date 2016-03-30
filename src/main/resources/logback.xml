@@ -18,4 +18,5 @@
   <logger name="org.scalatra.servlet" level="INFO" />
   <logger name="org.eclipse.jetty" level="INFO" />
   <logger name="com.mongodb" level="INFO" />
+  <logger name="com.mitchellbosecke.pebble" level="INFO" />
 </configuration>
