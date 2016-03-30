@@ -160,11 +160,6 @@ footer {
     padding-top: .05em;
 }
 
-#importControls #asset-count-text {
-    padding-right: 0.5em;
-    padding-top: .5em;
-}
-
 #importControls #startStop{
     text-align: center;
     margin: 2em;
