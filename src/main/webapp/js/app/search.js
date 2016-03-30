@@ -36,6 +36,19 @@ SearchViewModel = BaseViewModel.extend({
         self.searchResults(assets);
         self.totalPages(json.totalPages);
         self.totalRecords(json.totalRecords);
+
+        // configure the slider
+        $("#slider").slider({
+          min: 1,
+          max: self.totalPages(),
+          value: self.currentPage(),
+          slide: function( event, ui ) {
+            self.currentPage(ui.value);
+            self.search()
+          }
+        });
+
+
       }
     };
 

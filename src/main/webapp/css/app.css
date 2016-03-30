@@ -254,6 +254,19 @@ footer {
     color: #2980b9;
 }
 
+#slider {
+    margin-bottom: 1em;
+}
+
+#slider  {
+    background: #363d42;
+}
+
+#slider .ui-slider-handle {
+    background: #363d42;
+    border-color: #212223;
+}
+
 /* FOLDERS */
 
 #folders {
