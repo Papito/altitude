@@ -255,7 +255,7 @@ footer {
 }
 
 #slider {
-    margin-bottom: 1em;
+    margin-bottom: 0.8em;
 }
 
 #slider  {
@@ -263,8 +263,15 @@ footer {
 }
 
 #slider .ui-slider-handle {
-    background: #363d42;
+    background: #677076;
     border-color: #212223;
+}
+
+#pageCounter {
+    text-align: center;
+    padding-bottom: 0.8em;
+    font-weight: bold;
+    color: #677076;
 }
 
 /* FOLDERS */

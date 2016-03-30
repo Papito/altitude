@@ -8,6 +8,12 @@
     </div>
 
     <div class="row">
+      <div id="pageCounter" class="col-md-12">
+      <span data-bind="text: currentPage"></span> of <span data-bind="text: totalPages"></span> pages
+      </div>
+    </div>
+
+    <div class="row">
 
       <div class="col-md-1">
         <button type="button" data-bind="visible: prevPageVisible, click: gotoPrevPage" class="btn btn-link btn-block pager-button"><h2>&#10096;</h2></button>

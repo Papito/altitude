@@ -50,7 +50,7 @@ SearchViewModel = BaseViewModel.extend({
           value: self.currentPage(),
           slide: function( event, ui ) {
             self.currentPage(ui.value);
-            self.search()
+            self.search();
           }
         });
 
