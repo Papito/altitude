@@ -1,7 +1,7 @@
 <div class="row" data-bind="visible: searchResults" style="display: none">
 
   <div class="col-md-1">
-    <button type="button" class="btn btn-link btn-block pager-button"><h2>&#10096;</h2></button>
+    <button type="button" data-bind="visible: prevPageVisible, click: gotoPrevPage" class="btn btn-link btn-block pager-button"><h2>&#10096;</h2></button>
   </div>
 
   <div class="col-md-10">
@@ -13,7 +13,7 @@
   </div>
 
   <div class="col-md-1">
-    <button type="button" class="btn btn-link btn-block pager-button"><h2>&#10097;</h2></button>
+    <button type="button" data-bind="visible: nextPageVisible, click: gotoNextPage" class="btn btn-link btn-block pager-button"><h2>&#10097;</h2></button>
   </div>
 
 </div>

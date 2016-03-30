@@ -60,7 +60,7 @@ object Const {
 
     "Api.TOTAL_RECORDS" -> "totalRecords",
     "Api.TOTAL_PAGES" -> "totalPages",
-    "Api.CURRENT_PAGE" -> "currentPages",
+    "Api.CURRENT_PAGE" -> "currentPage",
     "Api.RESULTS_PER_PAGE" -> "resultsPerPage",
 
     "Api.ID" -> "id",

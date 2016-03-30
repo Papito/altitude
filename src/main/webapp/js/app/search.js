@@ -9,9 +9,17 @@ SearchViewModel = BaseViewModel.extend({
     this.resultsPerPage = ko.observable(6);
     this.currentPage = ko.observable(1);
     this.totalPages = ko.observable(0);
-    this.totalResults = ko.observable(0);
+    this.totalRecords = ko.observable(0);
     this.queryString = this.queryString || '';
     console.log('Q = ', this.queryString);
+
+    this.prevPageVisible = ko.computed(function() {
+      return this.currentPage() > 1;
+    }, this);
+
+    this.nextPageVisible = ko.computed(function() {
+      return this.currentPage() < this.totalPages();
+    }, this);
 
     this.search();
   },
@@ -26,9 +34,22 @@ SearchViewModel = BaseViewModel.extend({
         });
 
         self.searchResults(assets);
+        self.totalPages(json.totalPages);
+        self.totalRecords(json.totalRecords);
       }
     };
 
     this.get('/api/v1/search/p/' +  self.currentPage() + '/rpp/' + self.resultsPerPage() + '?' + self.queryString, opts);
+  },
+
+  gotoPrevPage: function() {
+    this.currentPage(this.currentPage() - 1);
+    this.search();
+  },
+
+  gotoNextPage: function() {
+    this.currentPage(this.currentPage() + 1);
+    this.search();
   }
+
 });
