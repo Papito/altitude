@@ -37,6 +37,12 @@ SearchViewModel = BaseViewModel.extend({
         self.totalPages(json.totalPages);
         self.totalRecords(json.totalRecords);
 
+        $('.result-box').draggable({
+          helper: "clone",
+          appendTo: "body",
+          opacity: 0.4
+        });
+
         // configure the slider
         $("#slider").slider({
           min: 1,
