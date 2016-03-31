@@ -6,7 +6,7 @@ SearchViewModel = BaseViewModel.extend({
     console.log('Initializing search view model');
 
     this.searchResults = ko.observableArray();
-    this.resultsPerPage = ko.observable(6);
+    this.resultsPerPage = ko.observable(21);
     this.currentPage = ko.observable(1);
     this.totalPages = ko.observable(0);
     this.totalRecords = ko.observable(0);

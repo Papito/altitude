@@ -24,7 +24,8 @@ case class Asset(id: Option[String] = None,
                  md5: String,
                  sizeBytes: Long,
                  folderId: String,
-                 metadata: JsValue = JsNull) extends BaseModel {
+                 metadata: JsValue = JsNull,
+                 previewData: Array[Byte] = new Array[Byte](0)) extends BaseModel {
 
   val fileName: String = FilenameUtils.getName(path)
 

@@ -34,9 +34,18 @@ class LibraryService(app: Altitude) {
       }
 
       val assetJson: JsObject = app.service.asset.add(obj)
+      val asset: Asset = assetJson
       app.service.folder.incrAssetCount(obj.folderId)
 
-      addPreview(assetJson)
+      // make and add preview, UNLESS we already have the data
+      obj.previewData.length match {
+        case 0 => addPreview(asset)
+        case _ => {
+          log.debug("Asset preview data already given")
+          addPreviewData(asset, obj.previewData)
+        }
+      }
+
       assetJson
     }
   }
@@ -83,14 +92,18 @@ class LibraryService(app: Altitude) {
     }
   }
 
-  private def addPreview(asset: Asset): Option[Preview] = {
-    require(asset.id.nonEmpty)
-
-    val previewData: Array[Byte] = asset.mediaType.mediaType match {
+  def genPreviewData(asset: Asset): Array[Byte] = {
+    asset.mediaType.mediaType match {
       case "image" =>
         makeImageThumbnail(asset)
       case _ => new Array[Byte](0)
     }
+  }
+
+  private def addPreview(asset: Asset): Option[Preview] = {
+    require(asset.id.nonEmpty)
+
+    val previewData: Array[Byte] = genPreviewData(asset)
 
     previewData.length match {
       case size if size > 0 =>
@@ -106,6 +119,18 @@ class LibraryService(app: Altitude) {
         Some(preview)
       case _ => None
     }
+  }
+
+  private def addPreviewData(asset: Asset, previewData: Array[Byte]): Preview = {
+    require(asset.id.nonEmpty)
+
+    val preview: Preview = Preview(
+      assetId = asset.id.get,
+      mimeType = asset.mediaType.mime,
+      data = previewData)
+
+    app.service.preview.add(preview)
+    preview
   }
 
   private def makeImageThumbnail(asset: Asset): Array[Byte] = {

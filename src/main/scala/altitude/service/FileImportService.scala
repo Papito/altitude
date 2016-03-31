@@ -43,7 +43,8 @@ class FileImportService(app: Altitude) {
     }
   }
 
-  def importAsset(fileAsset: FileImportAsset)(implicit txId: TransactionId = new TransactionId) : Option[Asset]  = {
+  def importAsset(fileAsset: FileImportAsset)
+                 (implicit txId: TransactionId = new TransactionId) : Option[Asset]  = {
     log.info(s"Importing file asset '$fileAsset'", C.LogTag.SERVICE)
     val mediaType = detectAssetMediaType(fileAsset)
 
@@ -65,15 +66,25 @@ class FileImportService(app: Altitude) {
 
     val fileSizeInBytes: Long = new File(fileAsset.absolutePath).length()
 
-    val asset = Asset(
+    val asset: Asset = Asset(
       path = fileAsset.absolutePath,
       md5 = getChecksum(fileAsset.absolutePath),
       mediaType = mediaType,
       sizeBytes = fileSizeInBytes,
-      folderId = Folder.UNCATEGORIZED.id.get,
-      metadata = metadata)
+      folderId = Folder.UNCATEGORIZED.id.get)
 
-    val res = app.service.library.add(asset)
+    val previewData = app.service.library.genPreviewData(asset)
+
+    val assetWithPreview = Asset(
+      path = asset.path,
+      md5 = asset.md5,
+      mediaType = asset.mediaType,
+      sizeBytes = asset.sizeBytes,
+      folderId = asset.folderId,
+      metadata = metadata,
+      previewData = previewData)
+
+    val res = app.service.library.add(assetWithPreview)
 
     // if there was a parser error, throw exception, the caller needs to know there was an error
     if (metadataParserException.isDefined) {
