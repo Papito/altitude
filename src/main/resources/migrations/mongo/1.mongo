@@ -1,0 +1,8 @@
+db.system.createIndex({ "version" : 1 }, { unique: true })
+
+db.assets.createIndex({ "md5" : 1 }, { unique: true })
+db.assets.createIndex({ "path" : 1 }, { unique: true })
+db.assets.createIndex({ "folder_id" : 1 })
+
+db.folders.createIndex({ "parent_id" : 1 })
+db.folders.createIndex({ "parent_id" : 1, "name": 1 }, { unique: true } )

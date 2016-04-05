@@ -34,6 +34,6 @@ class MigrationDao(app: Altitude) extends altitude.dao.MigrationDao(app) {
     )
 
     val system = BaseMongoDao.DB.get("system")
-    system.update(MongoDBObject(), o)
+    system.update(MongoDBObject(), o, upsert = true)
   }
 }
