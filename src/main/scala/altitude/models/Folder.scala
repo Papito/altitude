@@ -57,4 +57,16 @@ case class Folder(id: Option[String] = None,
       C("Folder.NUM_OF_ASSETS") -> numOfAssets
     ) ++ coreJsonAttrs
   }
+
+  def canEqual(other: Any) = other.isInstanceOf[Folder]
+
+  override def equals( that: Any): Boolean = that match {
+    case that: Folder if !that.canEqual( this) => false
+    case that: Folder => {
+      val thisStringRepr = this.id.getOrElse("") + this.parentId + this.name
+      val thatStringRepr = that.id.getOrElse("") + that.parentId + that.name
+      thisStringRepr == thatStringRepr
+    }
+    case _ => false
+  }
 }
