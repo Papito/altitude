@@ -109,7 +109,9 @@ class TikaMetadataService extends AbstractMetadataService {
     if (raw.isEmpty)
       return None
 
-    raw
+    val normalized = new TikaMetadata
+
+    Some(normalized)
   }
 
   def detectMediaTypeFromStream(is: InputStream): MediaType = {
