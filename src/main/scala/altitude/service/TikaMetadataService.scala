@@ -30,24 +30,46 @@ class TikaMetadataService extends AbstractMetadataService {
 
   final private val TIKA_HANDLER = new DefaultHandler
 
-  override def extract(importAsset: FileImportAsset, mediaType: MediaType): JsValue = mediaType match {
-    case mt: MediaType if mt.mediaType == "image" =>
-      extractMetadata(importAsset, List(new JpegParser, new TiffParser))
-/*
-    case mt: MediaType if mt.mediaType == "audio" && mt.mediaSubtype == "mpeg" =>
-      extractMetadata(importAsset, List(PARSERS.MPEG_AUDIO))
-    case mt: MediaType if mt.mediaType == "audio" =>
-      extractMetadata(importAsset, List(PARSERS.ANY_AUDIO))
-*/
-    case _ =>
-      log.warn(s"No metadata extractor found for $importAsset of type '$mediaType'", C.LogTag.SERVICE)
-      JsNull
+  override def extract(importAsset: FileImportAsset, mediaType: MediaType): JsValue = {
+    val raw: Option[TikaMetadata]  = mediaType match {
+      case mt: MediaType if mt.mediaType == "image" =>
+        extractMetadata(importAsset, List(new JpegParser, new TiffParser))
+      /*
+          case mt: MediaType if mt.mediaType == "audio" && mt.mediaSubtype == "mpeg" =>
+            extractMetadata(importAsset, List(PARSERS.MPEG_AUDIO))
+          case mt: MediaType if mt.mediaType == "audio" =>
+            extractMetadata(importAsset, List(PARSERS.ANY_AUDIO))
+      */
+      case _ =>
+        log.warn(s"No metadata extractor found for $importAsset of type '$mediaType'", C.LogTag.SERVICE)
+        None
+    }
+
+    // make it nice and neat out the horrible mess that this probably is
+    val normalized: Option[TikaMetadata] = normalize(raw)
+
+    // return as JSON
+    val writer = new StringWriter()
+
+    try {
+      normalized match {
+        case None => {
+          JsNull
+        }
+        case _ => {
+          JsonMetadata.toJson(normalized.get, writer)
+          val jsonData = writer.toString
+          Json.parse(jsonData)
+        }
+      }
+    }
+    finally {
+      writer.close()
+    }
   }
 
-  private def extractMetadata(importAsset: FileImportAsset, parsers: List[AbstractParser]): JsValue = {
+  private def extractMetadata(importAsset: FileImportAsset, parsers: List[AbstractParser]): Option[TikaMetadata]  = {
     var inputStream: Option[InputStream] = None
-    var writer: Option[StringWriter] = None
-
     var metadata: Option[TikaMetadata] = None
 
     try {
@@ -59,7 +81,6 @@ class TikaMetadataService extends AbstractMetadataService {
           val url: java.net.URL = importAsset.file.toURI.toURL
           metadata = Some(new TikaMetadata)
           inputStream = Some(TikaInputStream.get(url, metadata.get))
-          writer = Some(new StringWriter())
           parser.parse(inputStream.get, TIKA_HANDLER, metadata.get, null)
           throw AllDone()
         }
@@ -72,8 +93,6 @@ class TikaMetadataService extends AbstractMetadataService {
           }
         }
         finally {
-          if (writer.isDefined)
-            writer.get.close()
           if (inputStream.isDefined)
             inputStream.get.close()
         }
@@ -83,16 +102,14 @@ class TikaMetadataService extends AbstractMetadataService {
       case ex: AllDone =>
     }
 
-    metadata match {
-      case None => {
-        throw new Exception(s"All matching metadata parsers failed for $importAsset")
-      }
-      case _ => {
-        JsonMetadata.toJson(metadata.get, writer.get)
-        val jsonData = writer.get.toString
-        Json.parse(jsonData)
-      }
-    }
+    metadata
+  }
+
+  private def normalize(raw: Option[TikaMetadata]): Option[TikaMetadata] = {
+    if (raw.isEmpty)
+      return None
+
+    raw
   }
 
   def detectMediaTypeFromStream(is: InputStream): MediaType = {
