@@ -6,9 +6,9 @@ import altitude.models.{FileImportAsset, MediaType}
 import play.api.libs.json.JsValue
 
 abstract class AbstractMetadataService {
-  val FIELD_BIBLE = Map(
-    "X Resolution" -> Set("X Resolution"),
-    "Y Resolution" -> Set("Y Resolution")
+  val FIELD_BIBLE: Map[String, List[String]] = Map(
+    "X Resolution" -> List("X Resolution"),
+    "Y Resolution" -> List("Y Resolution")
   )
 
   def extract(importAsset: FileImportAsset, mediaType: MediaType): JsValue
