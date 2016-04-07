@@ -38,8 +38,8 @@ object AltitudeBuild extends Build {
       "com.typesafe.play"           %% "play-json"             % "2.3.10",
 
 
-      "org.apache.tika"              % "tika-parsers"          % "1.7",
-      "org.apache.tika"              % "tika-serialization"    % "1.7",
+      "org.apache.tika"              % "tika-parsers"          % "1.12",
+      "org.apache.tika"              % "tika-serialization"    % "1.12",
       "commons-io"                   % "commons-io"            % "2.4",
       "commons-dbutils"              % "commons-dbutils"       % "1.6",
 
