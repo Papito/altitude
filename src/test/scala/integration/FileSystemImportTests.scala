@@ -10,7 +10,7 @@ import org.scalatest.Matchers._
 @DoNotDiscover class FileSystemImportTests(val config: Map[String, String]) extends IntegrationTestCore {
 
   test("import image (JPEG)") {
-    val asset = importFile("images/basic/1.jpg")
+    val asset = importFile("images/1.jpg")
     val preview: Preview = altitude.service.library.getPreview(asset.id.get)
     preview.mimeType should equal("application/octet-stream")
     preview.data.length should not be 0
@@ -18,8 +18,8 @@ import org.scalatest.Matchers._
 
 
   test("import duplicate") {
-    importFile("images/basic/1.jpg")
-    val path = getClass.getResource(s"../import/images/basic/1.jpg").getPath
+    importFile("images/1.jpg")
+    val path = getClass.getResource(s"../import/images/1.jpg").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
 
     intercept[DuplicateException] {
