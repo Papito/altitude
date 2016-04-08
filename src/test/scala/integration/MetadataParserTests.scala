@@ -5,17 +5,33 @@ import java.io.File
 import altitude.models.FileImportAsset
 import org.scalatest.DoNotDiscover
 import play.api.libs.json.{Json, JsValue}
+import org.scalatest.Matchers._
 
 @DoNotDiscover class MetadataParserTests(val config: Map[String, String]) extends IntegrationTestCore {
 
-  test("get metadata") {
-    // just make sure there is no exception
-    getMetadata("images/6.jpg")
-  }
-
   test("normalize metadata") {
     val metadata = getMetadata("images/6.jpg")
-    println(Json.prettyPrint(metadata))
+
+    val verify = Map(
+      "Exposure Mode" -> "Auto exposure",
+      "Exposure Program" -> "Landscape mode",
+      "Image Height" -> "8 pixels",
+      "Image Width" -> "10 pixels",
+      "X Resolution" -> "72 dots per inch",
+      "Y Resolution" -> "72 dots per inch",
+      "exif:ExposureTime" -> "0.0025",
+      "exif:FNumber" -> "8.0",
+      "exif:Flash" -> "false",
+      "exif:FocalLength" -> "16.3",
+      "exif:IsoSpeedRatings" -> "100",
+      "tiff:Make" -> "FUJIFILM",
+      "tiff:Model" -> "FinePix F50fd",
+      "tiff:Orientation" -> "1",
+      "tiff:Software" -> "GIMP 2.8.10")
+
+    verify.foreach { case (k, v) =>
+      (metadata \ k).asOpt[String] should contain(v)
+    }
   }
 
   private def getMetadata(p: String): JsValue = {

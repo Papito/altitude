@@ -30,7 +30,7 @@ class TikaMetadataService extends AbstractMetadataService {
 
   final private val TIKA_HANDLER = new DefaultHandler
 
-  override def extract(importAsset: FileImportAsset, mediaType: MediaType): JsValue = {
+  override def extract(importAsset: FileImportAsset, mediaType: MediaType, asRaw: Boolean = false): JsValue = {
     val raw: Option[TikaMetadata]  = mediaType match {
       case mt: MediaType if mt.mediaType == "image" =>
         extractMetadata(importAsset, List(new JpegParser, new TiffParser))
@@ -46,7 +46,7 @@ class TikaMetadataService extends AbstractMetadataService {
     }
 
     // make it nice and neat out the horrible mess that this probably is
-    val normalized: Option[TikaMetadata] = normalize(raw)
+    val normalized: Option[TikaMetadata] = if (asRaw) raw else normalize(raw)
 
     // return as JSON
     val writer = new StringWriter()
@@ -110,6 +110,24 @@ class TikaMetadataService extends AbstractMetadataService {
       return None
 
     val normalized = new TikaMetadata
+
+    FIELD_BIBLE.foreach { case (destField, srcFields) =>
+      srcFields.isEmpty match {
+        // if the single destination field is the same as the source
+        case true if raw.get.names().contains(destField) => {
+          normalized.add(destField, raw.get.get(destField).trim)
+        }
+        case _ => {
+          // find all the fields that exist in metadata
+          val existingSrcFields = srcFields.filter(raw.get.names().contains)
+          // the field on TOP is it
+          if (existingSrcFields.nonEmpty) {
+            normalized.add(destField, raw.get.get(existingSrcFields.head).trim)
+          }
+        }
+      }
+
+    }
 
     Some(normalized)
   }
