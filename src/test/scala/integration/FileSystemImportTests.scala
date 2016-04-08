@@ -27,7 +27,6 @@ import org.scalatest.Matchers._
     }
   }
 
-
   test("import file list") {
     val incomingPath = getClass.getResource("../import").getPath
     val assets = altitude.service.fileImport.getFilesToImport(path=incomingPath)

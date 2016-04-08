@@ -4,18 +4,18 @@ import java.io.File
 
 import altitude.models.FileImportAsset
 import org.scalatest.DoNotDiscover
-import play.api.libs.json.JsValue
+import play.api.libs.json.{Json, JsValue}
 
 @DoNotDiscover class MetadataParserTests(val config: Map[String, String]) extends IntegrationTestCore {
 
-  test("EXIF NIKON 1") {
-    val metadata = getMetadata("images/exif/nikon_1.jpg")
-    //println(Json.prettyPrint(metadata))
+  test("get metadata") {
+    // just make sure there is no exception
+    getMetadata("images/6.jpg")
   }
 
-  test("EXIF CANON 1") {
-    val metadata = getMetadata("images/exif/canon_1.jpg")
-    //println(Json.prettyPrint(metadata))
+  test("normalize metadata") {
+    val metadata = getMetadata("images/6.jpg")
+    println(Json.prettyPrint(metadata))
   }
 
   private def getMetadata(p: String): JsValue = {
