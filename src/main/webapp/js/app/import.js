@@ -172,9 +172,6 @@ ImportViewModel = BaseViewModel.extend({
     this.statsErrors = ko.observable(0);
     this.disableDoubleClick = false;
 
-    this.boxBorder = 2; //pixels
-    this.gridAdjustment = null;
-
     this.percentComplete = ko.computed(function() {
       var percent = 0;
       if (self.assetsProcessedCnt() > 0) {
@@ -195,6 +192,8 @@ ImportViewModel = BaseViewModel.extend({
 
   reset: function() {
     console.log('Resetting');
+    this.isImporting(false);
+    this.isStopping(false);
     this.totalAssetsCnt(0);
     this.assetsProcessedCnt(0);
     this.statsImported(0);
