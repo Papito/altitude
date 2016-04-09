@@ -22,8 +22,7 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
       md5 = rec.get(C("Asset.MD5")).get.asInstanceOf[String],
       mediaType = mediaType,
       sizeBytes = rec.get(C("Asset.SIZE_BYTES")).get.asInstanceOf[Int],
-      folderId = rec.get(C("Asset.FOLDER_ID")).get.asInstanceOf[String],
-      metadata = Json.parse(rec.get(C("Asset.METADATA")).get.toString))
+      folderId = rec.get(C("Asset.FOLDER_ID")).get.asInstanceOf[String])
 
     addCoreAttrs(model, rec)
     model
