@@ -157,7 +157,7 @@ ImportViewModel = BaseViewModel.extend({
     };
 
     this.base();
-    console.log('Initializing import view-model');
+    console.log('Initializing import view model');
 
     this.isImporting = ko.observable(false);
     this.isStopping = ko.observable(false);
@@ -222,21 +222,29 @@ ImportViewModel = BaseViewModel.extend({
 
     // some browsers can fire the doubleclick event when populating the list
     this.disableDoubleClick = true;
-    this.get('/import/source/local/navigate', opts);
+    this.get('/import/source/local/listing', opts);
   },
 
   dropIntoDirectory: function(directoryName) {
     if (this.disableDoubleClick == true) {
       return;
     }
-    this.getDirectoryNames(this.currentPath() + "/" + directoryName);
+
+    var dirSeparator = this.currentPath() == "/" ? '': '/';
+    this.getDirectoryNames(this.currentPath() + dirSeparator + directoryName);
   },
 
   selectImportDirectory: function() {
     this.importMode(this.IMPORT_MODE.DIRECTORY);
-    var directoryName = $('#directoryList').val();
-    this.importDirectory(this.currentPath() + "/" + directoryName);
+    var directoryName = $('#directoryList').val() || '';
+
+    var dirSeparator = this.currentPath() == "/" ? '': '/';
+    this.importDirectory(this.currentPath() + dirSeparator + directoryName);
     $('#selectImportDirectory').modal('hide');
+  },
+
+  gotoPreviousDirectory: function() {
+
   },
 
   addWarning: function(asset, message) {
