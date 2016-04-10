@@ -108,9 +108,19 @@
       <form>
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="selectImportDirectoryModalLabel">Select a folder (all files will be scanned)</h4>
+          <h4 class="modal-title" id="selectImportDirectoryModalLabel">Select location to import from</h4>
         </div>
         <div class="modal-body">
+          <!-- back button -->
+          <button type="button" class="btn btn-sm btn-default go-back" data-bind="click: gotoPreviousDirectory">
+            <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+            Back
+          </button>
+
+          <div>
+            <span data-bind="text: currentPath"></span>
+          </div>
+
           <select id="directoryList" size="20" data-bind="foreach: directoryNames" name="selectedDirectory" multiple="no" >
             <option data-bind="attr: {'value': $data}, text: $data, event : { dblclick: $parent.dropIntoDirectory($data) }"></option>
           </select>

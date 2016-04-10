@@ -225,6 +225,25 @@ ImportViewModel = BaseViewModel.extend({
     this.get('/import/source/local/listing', opts);
   },
 
+  gotoPreviousDirectory: function() {
+    var self = this;
+    var opts = {
+      'successCallback': function (json) {
+        self.directoryNames(json.directory_names);
+        self.currentPath(json.current_path);
+      },
+      'finally': function() {
+        self.disableDoubleClick = false;
+      },
+      'data': {
+        'path': self.currentPath()}
+    };
+
+    // some browsers can fire the doubleclick event when populating the list
+    this.disableDoubleClick = true;
+    this.get('/import/source/local/listing/parent', opts);
+  },
+
   dropIntoDirectory: function(directoryName) {
     if (this.disableDoubleClick == true) {
       return;
@@ -241,10 +260,6 @@ ImportViewModel = BaseViewModel.extend({
     var dirSeparator = this.currentPath() == "/" ? '': '/';
     this.importDirectory(this.currentPath() + dirSeparator + directoryName);
     $('#selectImportDirectory').modal('hide');
-  },
-
-  gotoPreviousDirectory: function() {
-
   },
 
   addWarning: function(asset, message) {

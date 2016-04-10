@@ -218,6 +218,12 @@ footer {
     background-color: #1c1e22;
 }
 
+#selectImportDirectory .go-back {
+    margin-bottom: 1em;
+    padding-left: 4em;
+    padding-right: 4em;
+}
+
 /* SEARCH */
 
 #searchResults {

@@ -1,6 +1,7 @@
 package altitude.controllers
 
 import java.io.{File, PrintWriter, StringWriter}
+import java.nio.file.Path
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -33,15 +34,29 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
     //val files: Seq[FileItem] = fileMultiParams("files[]")
   }
 
-  get("/source/local/navigate") {
-    val path: String = this.params.getOrElse(C("Api.PATH"), "/")
-    log.debug(s"Getting directory name list for $path")
-    val files: Seq[File] = new File(path).listFiles().toSeq
+  private val userHomeDir = System.getProperty("user.home")
+
+  get("/source/local/listing") {
+    val file: File = new File(this.params.getOrElse(C("Api.PATH"), userHomeDir))
+    log.debug(s"Getting directory name list for $file")
+    val files: Seq[File] = file.listFiles().toSeq
     val directoryList: Seq[String] = files.filter(_.isDirectory == true).map(_.getName)
     contentType = "application/json"
     Json.obj(
       C("Api.DIRECTORY_NAMES") -> directoryList,
-      C("Api.CURRENT_PATH") -> path).toString()
+      C("Api.CURRENT_PATH") -> file.getAbsolutePath).toString()
+  }
+
+  get("/source/local/listing/parent") {
+    val file: File = new File(this.params.getOrElse(C("Api.PATH"), userHomeDir))
+    val parentFile = new File(file.getParent)
+    log.debug(s"Getting directory name list for $file")
+    val files: Seq[File] = parentFile.listFiles().toSeq
+    val directoryList: Seq[String] = files.filter(_.isDirectory == true).map(_.getName)
+    contentType = "application/json"
+    Json.obj(
+      C("Api.DIRECTORY_NAMES") -> directoryList,
+      C("Api.CURRENT_PATH") -> parentFile.getAbsolutePath).toString()
   }
 
   atmosphere("/ws") {
