@@ -22,6 +22,14 @@ BaseViewModel = Base.extend({
 
     this.errorMessage = ko.observable();
     this.errorStacktrace = ko.observable();
+
+    /*
+     Shared folder browser functionality
+     */
+    this.directoryNames = ko.observableArray();
+    this.currentPath = ko.observable();
+    this.disableDoubleClick = false;
+
   },
   // ----------------------------------------------------------------
 
@@ -179,5 +187,66 @@ BaseViewModel = Base.extend({
 
   dismissError: function() {
     $('#errorContainer').hide();
+  },
+
+  /*
+    Shared folder browser functionality
+   */
+
+  getDirectoryNames: function(path) {
+    var self = this;
+    var opts = {
+      'successCallback': function (json) {
+        self.directoryNames(json.directory_names);
+        self.currentPath(json.current_path);
+      },
+      'finally': function() {
+        self.disableDoubleClick = false;
+      }
+    };
+
+    if (path) {
+      opts.data = {'path': path}
+    }
+
+    // some browsers can fire the doubleclick event when populating the list
+    this.disableDoubleClick = true;
+    this.get('/import/source/local/listing', opts);
+  },
+
+  gotoPreviousDirectory: function() {
+    var self = this;
+    var opts = {
+      'successCallback': function (json) {
+        self.directoryNames(json.directory_names);
+        self.currentPath(json.current_path);
+      },
+      'finally': function() {
+        self.disableDoubleClick = false;
+      },
+      'data': {
+        'path': self.currentPath()}
+    };
+
+    // some browsers can fire the doubleclick event when populating the list
+    this.disableDoubleClick = true;
+    this.get('/import/source/local/listing/parent', opts);
+  },
+
+  dropIntoDirectory: function(directoryName) {
+    if (this.disableDoubleClick == true) {
+      return;
+    }
+
+    var dirSeparator = this.currentPath() == "/" ? '': '/';
+    this.getDirectoryNames(this.currentPath() + dirSeparator + directoryName);
+  },
+
+  selectImportDirectory: function() {
+    var directoryName = $('#directoryList').val() || '';
+    var dirSeparator = this.currentPath() == "/" ? '': '/';
+    var importDirectoryPath = this.currentPath() + dirSeparator + directoryName;
+    window.location = "/client/import?importDirectoryPath=" + importDirectoryPath;
   }
+
 });

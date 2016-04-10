@@ -114,7 +114,7 @@ ImportProtocolHandler = ProtocolHandler.extend({
 
     var message = {
       'action': "getFileCount",
-      'path': self.viewModel.importDirectory()
+      'path': self.viewModel.importDirectoryPath()
     };
     self.sendCommand(message);
   },
@@ -159,18 +159,21 @@ ImportViewModel = BaseViewModel.extend({
     this.base();
     console.log('Initializing import view model');
 
+    this.importDirectoryPath = ko.observable();
     this.isImporting = ko.observable(false);
     this.isStopping = ko.observable(false);
     this.totalAssetsCnt = ko.observable(0);
     this.assetsProcessedCnt = ko.observable(0);
-    this.importMode = ko.observable();
-    this.directoryNames = ko.observableArray();
-    this.currentPath = ko.observable();
-    this.importDirectory = ko.observable();
     this.statsImported = ko.observable(0);
     this.statsWarnings = ko.observable(0);
     this.statsErrors = ko.observable(0);
-    this.disableDoubleClick = false;
+    this.importMode = ko.observable();
+
+    var args = Util.parseQuery(location.search);
+    if (args.importDirectoryPath) {
+      this.importMode(this.IMPORT_MODE.DIRECTORY);
+      this.importDirectoryPath(args.importDirectoryPath);
+    }
 
     this.percentComplete = ko.computed(function() {
       var percent = 0;
@@ -202,64 +205,6 @@ ImportViewModel = BaseViewModel.extend({
     $("#importedAssets").html("");
     $("#errors").html("");
     $("#warnings").html("");
-  },
-
-  getDirectoryNames: function(path) {
-    var self = this;
-    var opts = {
-      'successCallback': function (json) {
-        self.directoryNames(json.directory_names);
-        self.currentPath(json.current_path);
-      },
-      'finally': function() {
-        self.disableDoubleClick = false;
-      }
-    };
-
-    if (path) {
-      opts.data = {'path': path}
-    }
-
-    // some browsers can fire the doubleclick event when populating the list
-    this.disableDoubleClick = true;
-    this.get('/import/source/local/listing', opts);
-  },
-
-  gotoPreviousDirectory: function() {
-    var self = this;
-    var opts = {
-      'successCallback': function (json) {
-        self.directoryNames(json.directory_names);
-        self.currentPath(json.current_path);
-      },
-      'finally': function() {
-        self.disableDoubleClick = false;
-      },
-      'data': {
-        'path': self.currentPath()}
-    };
-
-    // some browsers can fire the doubleclick event when populating the list
-    this.disableDoubleClick = true;
-    this.get('/import/source/local/listing/parent', opts);
-  },
-
-  dropIntoDirectory: function(directoryName) {
-    if (this.disableDoubleClick == true) {
-      return;
-    }
-
-    var dirSeparator = this.currentPath() == "/" ? '': '/';
-    this.getDirectoryNames(this.currentPath() + dirSeparator + directoryName);
-  },
-
-  selectImportDirectory: function() {
-    this.importMode(this.IMPORT_MODE.DIRECTORY);
-    var directoryName = $('#directoryList').val() || '';
-
-    var dirSeparator = this.currentPath() == "/" ? '': '/';
-    this.importDirectory(this.currentPath() + dirSeparator + directoryName);
-    $('#selectImportDirectory').modal('hide');
   },
 
   addWarning: function(asset, message) {
