@@ -41,16 +41,28 @@
         <a href="/">{{ Config["app.name"] }}</a>
       </h4>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-5">
       <div id="menulist">
         <div class="row">
-          <div class="col-md-12">
-            <a href="/client/import">Import</a>
+          <div class="col-md-3">
+            <div class="btn-group">
+              <a href="#" data-toggle="dropdown">
+                Import <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a href="#">From folder</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#">Upload</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <a href="#">Settings</a>
           </div>
         </div>
       </div>
     </div>
-    <div id="screenTitle" class="col-md-3">
+    <div id="screenTitle" class="col-md-2">
       <h5>
         {% block title %} {% endblock %}
       </h5>

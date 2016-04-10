@@ -102,11 +102,14 @@ footer {
 }
 
 #menulist {
-    background-color: #4b5257;
-    border-radius: 0.2em;
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
+    border-radius: 0.3em;
+    border: 1px solid #272b30;
+    padding: 0.5em 0 0.5em 0;
     text-align: center;
+}
+
+#menulist a {
+    color: #bebebe;
 }
 
 #navigation .form-control {
@@ -127,7 +130,9 @@ footer {
 }
 
 #screenTitle {
+    background-color: #272b30;
     text-align: center;
+    padding-top: 0.7em;
 }
 
 #screenTitle, #brand {
