@@ -2,6 +2,8 @@ SearchViewModel = BaseViewModel.extend({
   constructor : function() {
     "use strict";
 
+    var self = this;
+
     this.base();
     console.log('Initializing search view model');
 
@@ -22,6 +24,14 @@ SearchViewModel = BaseViewModel.extend({
     }, this);
 
     this.search();
+
+    // set up shortcuts
+    Mousetrap.bind(['right', 'down'], function() {
+      self.gotoNextPage();
+    });
+    Mousetrap.bind(['left', 'up'], function() {
+      self.gotoPrevPage();
+    });
   },
 
   search: function() {
@@ -62,11 +72,17 @@ SearchViewModel = BaseViewModel.extend({
   },
 
   gotoPrevPage: function() {
+    if (this.currentPage() < 2) {
+      return;
+    }
     this.currentPage(this.currentPage() - 1);
     this.search();
   },
 
   gotoNextPage: function() {
+    if (this.currentPage() == this.totalPages()) {
+      return;
+    }
     this.currentPage(this.currentPage() + 1);
     this.search();
   }
