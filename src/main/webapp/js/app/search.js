@@ -12,6 +12,10 @@ SearchViewModel = BaseViewModel.extend({
     this.currentPage = ko.observable(1);
     this.totalPages = ko.observable(0);
     this.totalRecords = ko.observable(0);
+
+    this.selectedAssets = ko.observableArray();
+    this.focusedAsset = ko.observable();
+
     this.queryString = this.queryString || '';
     console.log('Q = ', this.queryString);
 
@@ -29,9 +33,15 @@ SearchViewModel = BaseViewModel.extend({
     Mousetrap.bind(['right', 'down'], function() {
       self.gotoNextPage();
     });
+
     Mousetrap.bind(['left', 'up'], function() {
       self.gotoPrevPage();
     });
+
+    Mousetrap.bind('s', function() {
+      self.selectAsset();
+    });
+
   },
 
   search: function() {
@@ -85,6 +95,58 @@ SearchViewModel = BaseViewModel.extend({
     }
     this.currentPage(this.currentPage() + 1);
     this.search();
+  },
+
+  focusAsset: function() {
+    console.log("focusing");
+    var self = this;
+
+    if (!self.searchResults()) {
+      console.log("no assets");
+      return;
+    }
+
+    if (!self.focusedAsset()) {
+      console.log("no focused asset");
+      self.focusedAsset(self.searchResults()[0]);
+    }
+
+    console.log("focused asset", self.focusedAsset());
+
+    // highlight
+    $("[asset_id='" + self.focusedAsset().id + "']").addClass('focused');
+  },
+
+  selectAsset: function() {
+    console.log("selecting asset");
+    var self = this;
+
+    if (!self.focusedAsset()) {
+      self.focusAsset();
+    }
+
+
+    var focusedAsset = self.getFocusedAsset();
+    self.selectedAssets().push(focusedAsset);
+
+    // highlight
+    self.selectedAssets().forEach(function(asset) {
+      $("[asset_id='" + asset.id + "']").addClass('selected');
+    });
+  },
+
+  getFocusedAsset: function() {
+    var self = this;
+
+    if (!self.focusedAsset()) {
+      return null;
+    }
+
+    return ko.utils.arrayFirst(self.searchResults(), function(asset) {
+      return asset.id ===  self.focusedAsset().id;
+    });
   }
+
+
 
 });

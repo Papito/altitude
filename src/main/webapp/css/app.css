@@ -241,6 +241,15 @@ footer {
     display: inline-block;
 }
 
+#searchResults .result-box.focused {
+    border: 1px solid darkred;
+}
+
+#searchResults .result-box.selected {
+    border: solid 1px #212223;
+    background: #363d42;
+}
+
 #addFolderForm input, #renameFolderForm input {
     width: 100%;
 }
