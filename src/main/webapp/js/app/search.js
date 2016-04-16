@@ -38,9 +38,18 @@ SearchViewModel = BaseViewModel.extend({
       self.gotoPrevPage();
     });
 
+    Mousetrap.bind('f', function() {
+     self.focusAsset();
+    });
+
+    Mousetrap.bind('esc', function() {
+      self.clearFocusing();
+    });
+    /*
     Mousetrap.bind('s', function() {
       self.selectAsset();
     });
+*/
 
   },
 
@@ -52,6 +61,8 @@ SearchViewModel = BaseViewModel.extend({
         var assets = $.map(json['assets'], function(data) {
           return new Asset(data);
         });
+
+        self.clearFocusing();
 
         self.searchResults(assets);
         self.totalPages(json.totalPages);
@@ -73,8 +84,6 @@ SearchViewModel = BaseViewModel.extend({
             self.search();
           }
         });
-
-
       }
     };
 
@@ -117,6 +126,19 @@ SearchViewModel = BaseViewModel.extend({
     $("[asset_id='" + self.focusedAsset().id + "']").addClass('focused');
   },
 
+  clearFocusing: function() {
+    var self = this;
+
+    if (!self.focusedAsset()) {
+      return;
+    }
+
+    console.log('Clearing focusing');
+
+    $("[asset_id='" + self.focusedAsset().id + "']").removeClass('focused');
+    self.focusedAsset(null);
+  },
+/*
   selectAsset: function() {
     console.log("selecting asset");
     var self = this;
@@ -134,6 +156,7 @@ SearchViewModel = BaseViewModel.extend({
       $("[asset_id='" + asset.id + "']").addClass('selected');
     });
   },
+*/
 
   getFocusedAsset: function() {
     var self = this;
