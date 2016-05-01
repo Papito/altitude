@@ -8,13 +8,13 @@ SearchViewModel = BaseViewModel.extend({
     console.log('Initializing search view model');
 
     this.searchResults = ko.observableArray();
-    this.resultsPerPage = ko.observable(21);
+    this.resultsPerPage = ko.observable(15);
     this.currentPage = ko.observable(1);
     this.totalPages = ko.observable(0);
     this.totalRecords = ko.observable(0);
 
-    this.selectedAssets = ko.observableArray();
-    this.focusedAsset = ko.observable();
+    this.selectedAssetIndexes = ko.observableArray();
+    this.focusedAssetIndex = ko.observable();
 
     this.queryString = this.queryString || '';
     console.log('Q = ', this.queryString);
@@ -30,26 +30,53 @@ SearchViewModel = BaseViewModel.extend({
     this.search();
 
     // set up shortcuts
-    Mousetrap.bind(['right', 'down'], function() {
+    Mousetrap.bind(['.', 'pagedown'], function() {
       self.gotoNextPage();
-    });
+    }, 'keyup');
 
-    Mousetrap.bind(['left', 'up'], function() {
+    Mousetrap.bind([',', 'pageup'], function() {
       self.gotoPrevPage();
+    }, 'keyup');
+
+    Mousetrap.bind('right', function() {
+      self.focusRight();
+    }, 'keyup');
+
+    Mousetrap.bind('left', function() {
+      self.focusLeft();
+    }, 'keyup');
+
+    Mousetrap.bind('up', function() {
+      self.focusUp();
+    }, 'keyup');
+
+    Mousetrap.bind('down', function() {
+      self.focusDown();
+    }, 'keyup');
+
+    Mousetrap.bind('shift+right', function() {
+      self.selectRight();
     });
 
-    Mousetrap.bind('f', function() {
-     self.focusAsset();
+    Mousetrap.bind('shift+left', function() {
+      self.selectLeft();
+    });
+
+    Mousetrap.bind('shift+up', function() {
+      self.selectUp();
+    });
+
+    Mousetrap.bind('shift+down', function() {
+      self.selectDown();
     });
 
     Mousetrap.bind('esc', function() {
       self.clearFocusing();
     });
-    /*
+
     Mousetrap.bind('s', function() {
-      self.selectAsset();
+      self.selectFocused();
     });
-*/
 
   },
 
@@ -106,6 +133,62 @@ SearchViewModel = BaseViewModel.extend({
     this.search();
   },
 
+  focusRight: function() {
+    var self = this;
+    console.log('focusing right');
+  },
+
+  focusLeft: function() {
+    var self = this;
+    console.log('focusing left');
+
+    if (self.focusedAssetIndex() == null) {
+      return;
+    }
+  },
+
+  focusUp: function() {
+    var self = this;
+    console.log('focusing up');
+
+    if (self.focusedAssetIndex() == null) {
+      return;
+    }
+  },
+
+  focusDown: function() {
+    var self = this;
+    console.log('focusing down');
+
+    if (self.focusedAssetIndex() == null) {
+      self.focusAsset();
+    }
+  },
+
+  selectRight: function() {
+    var self = this;
+    console.log('selecting right');
+
+    if (self.focusedAssetIndex() == null) {
+      self.focusAsset();
+    }
+  },
+
+  selectLeft: function() {
+    var self = this;
+    console.log('selecting left');
+  },
+
+  selectUp: function() {
+    var self = this;
+    console.log('selecting up');
+  },
+
+  selectDown: function() {
+    var self = this;
+    console.log('selecting down');
+  },
+
   focusAsset: function() {
     console.log("focusing");
     var self = this;
@@ -115,28 +198,32 @@ SearchViewModel = BaseViewModel.extend({
       return;
     }
 
-    if (!self.focusedAsset()) {
+    if (self.focusedAssetIndex() == null) {
       console.log("no focused asset");
-      self.focusedAsset(self.searchResults()[0]);
+      self.focusedAssetIndex(0);
     }
 
-    console.log("focused asset", self.focusedAsset());
+    console.log("focused asset index", self.focusedAssetIndex());
 
     // highlight
-    $("[asset_id='" + self.focusedAsset().id + "']").addClass('focused');
+    $("[asset_id='" + self.searchResults()[self.focusedAssetIndex()].id + "']").addClass('focused');
   },
 
   clearFocusing: function() {
     var self = this;
 
-    if (!self.focusedAsset()) {
+    if (self.focusedAssetIndex() === null || !self.searchResults().length) {
       return;
     }
 
     console.log('Clearing focusing');
 
-    $("[asset_id='" + self.focusedAsset().id + "']").removeClass('focused');
-    self.focusedAsset(null);
+    $("[asset_id='" + self.searchResults()[self.focusedAssetIndex()].id + "']").removeClass('focused');
+    self.focusedAssetIndex(null);
+  },
+
+  selectFocused: function() {
+    console.log('selecting focused');
   },
 /*
   selectAsset: function() {
@@ -161,7 +248,7 @@ SearchViewModel = BaseViewModel.extend({
   getFocusedAsset: function() {
     var self = this;
 
-    if (!self.focusedAsset()) {
+    if (self.focusedAssetIndex() == null) {
       return null;
     }
 
