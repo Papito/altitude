@@ -133,36 +133,131 @@ SearchViewModel = BaseViewModel.extend({
     this.search();
   },
 
+  focusDown: function() {
+    var self = this;
+    console.log('focusing down');
+
+    var el = self.getFocusedEl();
+    if (!el) {
+      self.focusFirst();
+      return;
+    }
+
+    self.moveFocus(el, 'down')
+  },
+
   focusRight: function() {
     var self = this;
     console.log('focusing right');
+
+    var el = self.getFocusedEl();
+    if (!el) {
+      self.focusFirst();
+      return;
+    }
+
+    self.moveFocus(el, 'right')
   },
 
   focusLeft: function() {
     var self = this;
     console.log('focusing left');
 
-    if (self.focusedAssetIndex() == null) {
+    var el = self.getFocusedEl();
+    if (!el) {
+      self.focusFirst();
       return;
     }
+
+    self.moveFocus(el, 'left')
   },
 
   focusUp: function() {
     var self = this;
     console.log('focusing up');
 
-    if (self.focusedAssetIndex() == null) {
+    var el = self.getFocusedEl();
+    if (!el) {
+      self.focusFirst();
       return;
     }
+
+    self.moveFocus(el, 'up')
   },
 
-  focusDown: function() {
-    var self = this;
-    console.log('focusing down');
+  getFocusedEl: function() {
+    var focusedSel = $('.result-box.focused');
+    return focusedSel.length ? $(focusedSel[0]) : null;
+  },
 
-    if (self.focusedAssetIndex() == null) {
-      self.focusAsset();
+  focusFirst: function() {
+    console.log('focusing first');
+    var self = this;
+    var el = $("[asset_id='" + self.searchResults()[0].id + "']");
+    el.addClass('focused');
+    el.focus();
+  },
+
+  moveFocus: function(curEl, direction) {
+    var currentPos = curEl.position();
+    var height = curEl.height();
+    var offset = $('#searchResults').offset();
+
+    var newPos = {};
+    var elem = null;
+    var assetId = null;
+
+    switch (direction) {
+      case 'down':
+        newPos.left = offset.left + currentPos.left + 10;
+        newPos.top  = offset.top + currentPos.top + height + 10;
+        elem = document.elementFromPoint(newPos.left, newPos.top);
+        assetId = $(elem).parent().attr('asset_id');
+        break;
+
+      case 'up':
+        newPos.left = offset.left + currentPos.left + 10;
+        newPos.top  = offset.top + currentPos.top - height + 10;
+        elem = document.elementFromPoint(newPos.left, newPos.top);
+        assetId = $(elem).parent().attr('asset_id');
+        break;
+
+      case 'right':
+        elem = curEl.next();
+        assetId = $(elem).attr('asset_id');
+        break;
+
+      case 'left':
+        elem = curEl.prev();
+        assetId = $(elem).attr('asset_id');
     }
+
+    console.log('offset', offset);
+    console.log('current pos', currentPos);
+    console.log('new pos', newPos);
+    console.log('new elem', elem);
+
+    if (!elem) {
+      return;
+    }
+
+
+    var newFocusedEl = $("[asset_id='" + assetId + "']");
+    newFocusedEl.addClass('focused');
+    newFocusedEl.focus();
+    curEl.removeClass('focused');
+  },
+
+  defocusAssetById: function(id) {
+    var el = $("[asset_id='" + id + "']");
+    el.removeClass('focused');
+    el.focus();
+  },
+
+  focusAssetById: function(id) {
+    var el = $("[asset_id='" + id + "']");
+    el.addClass('focused');
+    el.focus();
   },
 
   selectRight: function() {
@@ -192,16 +287,6 @@ SearchViewModel = BaseViewModel.extend({
   focusAsset: function() {
     console.log("focusing");
     var self = this;
-
-    if (!self.searchResults()) {
-      console.log("no assets");
-      return;
-    }
-
-    if (self.focusedAssetIndex() == null) {
-      console.log("no focused asset");
-      self.focusedAssetIndex(0);
-    }
 
     console.log("focused asset index", self.focusedAssetIndex());
 
