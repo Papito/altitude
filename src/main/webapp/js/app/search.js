@@ -298,7 +298,7 @@ SearchViewModel = BaseViewModel.extend({
   clearFocusing: function() {
     var self = this;
 
-    if (self.focusedAssetIndex() === null || !self.searchResults().length) {
+    if (!self.focusedAssetIndex()  || !self.searchResults().length) {
       return;
     }
 
