@@ -13,7 +13,6 @@ SearchViewModel = BaseViewModel.extend({
     this.totalPages = ko.observable(0);
     this.totalRecords = ko.observable(0);
 
-    this.selectedAssetIndexes = ko.observableArray();
     this.focusedAssetIndex = ko.observable();
 
     this.queryString = this.queryString || '';
@@ -80,7 +79,7 @@ SearchViewModel = BaseViewModel.extend({
 
   },
 
-  search: function() {
+  search: function(callback) {
     var self = this;
 
     var opts = {
@@ -111,26 +110,30 @@ SearchViewModel = BaseViewModel.extend({
             self.search();
           }
         });
+
+        if (callback && typeof callback === 'function') {
+          callback.bind(self).call();
+        }
       }
     };
 
     this.get('/api/v1/search/p/' +  self.currentPage() + '/rpp/' + self.resultsPerPage() + '?' + self.queryString, opts);
   },
 
-  gotoPrevPage: function() {
+  gotoPrevPage: function(callback) {
     if (this.currentPage() < 2) {
       return;
     }
     this.currentPage(this.currentPage() - 1);
-    this.search();
+    this.search(callback);
   },
 
-  gotoNextPage: function() {
+  gotoNextPage: function(callback) {
     if (this.currentPage() == this.totalPages()) {
       return;
     }
     this.currentPage(this.currentPage() + 1);
-    this.search();
+    this.search(callback);
   },
 
   focusDown: function() {
@@ -191,14 +194,44 @@ SearchViewModel = BaseViewModel.extend({
   },
 
   focusFirst: function() {
-    console.log('focusing first');
     var self = this;
-    var el = $("[asset_id='" + self.searchResults()[0].id + "']");
+    console.log('focusing first');
+    var el = $("[asset_id='" + self.firstAsset().id + "']");
     el.addClass('focused');
     el.focus();
   },
 
+  focusLast: function() {
+    var self = this;
+    console.log('focusing last');
+    var el = $("[asset_id='" + self.lastAsset().id + "']");
+    el.addClass('focused');
+    el.focus();
+  },
+
+  firstAsset: function() {
+    var self = this;
+
+    if (!self.searchResults().length) {
+      return null;
+    }
+
+    return self.searchResults()[0];
+  },
+
+  lastAsset: function() {
+    var self = this;
+
+    if (!self.searchResults().length) {
+      return null;
+    }
+
+    return self.searchResults()[self.searchResults().length -1];
+  },
+
   moveFocus: function(curEl, direction) {
+    var self = this;
+
     var currentPos = curEl.position();
     var height = curEl.height();
     var offset = $('#searchResults').offset();
@@ -232,17 +265,47 @@ SearchViewModel = BaseViewModel.extend({
         assetId = $(elem).attr('asset_id');
     }
 
-    console.log('offset', offset);
-    console.log('current pos', currentPos);
-    console.log('new pos', newPos);
-    console.log('new elem', elem);
+    /*
+      Paginate once we hit a boundary
+     */
+    if (!assetId && direction === 'right') {
+      if (self.currentPage() === self.totalPages()) {
+        return;
+      }
 
-    // out of bounds - do nothing
-    if (!assetId) {
+      self.gotoNextPage(self.focusFirst);
+    }
+
+    if (!assetId && direction === 'left') {
+      if (self.currentPage() === 1) {
+        return;
+      }
+
+      self.gotoPrevPage(self.focusLast);
+    }
+
+    // if down or up is hit on last/first element - also paginate
+    if (!assetId && direction === 'down' && curEl.attr('asset_id') === self.lastAsset().id) {
+      if (self.currentPage() === self.totalPages()) {
+        return;
+      }
+
+      self.gotoNextPage(self.focusFirst);
+    }
+
+    if (!assetId && direction === 'up' && curEl.attr('asset_id') === self.firstAsset().id) {
+      if (self.currentPage() === 1) {
+        return;
+      }
+
+      self.gotoPrevPage(self.focusLast);
+    }
+
+    if (!assetId && (direction === 'up' || direction === 'down')) {
       return;
     }
 
-    // deslect old and select new
+    // deselect old and select new
     var newFocusedEl = $("[asset_id='" + assetId + "']");
     newFocusedEl.addClass('focused');
     newFocusedEl.focus();
@@ -264,10 +327,6 @@ SearchViewModel = BaseViewModel.extend({
   selectRight: function() {
     var self = this;
     console.log('selecting right');
-
-    if (self.focusedAssetIndex() === undefined) {
-      self.focusAsset();
-    }
   },
 
   selectLeft: function() {
@@ -283,16 +342,6 @@ SearchViewModel = BaseViewModel.extend({
   selectDown: function() {
     var self = this;
     console.log('selecting down');
-  },
-
-  focusAsset: function() {
-    console.log("focusing");
-    var self = this;
-
-    console.log("focused asset index", self.focusedAssetIndex());
-
-    // highlight
-    $("[asset_id='" + self.searchResults()[self.focusedAssetIndex()].id + "']").addClass('focused');
   },
 
   clearFocusing: function() {
@@ -311,38 +360,4 @@ SearchViewModel = BaseViewModel.extend({
   selectFocused: function() {
     console.log('selecting focused');
   },
-/*
-  selectAsset: function() {
-    console.log("selecting asset");
-    var self = this;
-
-    if (!self.focusedAsset()) {
-      self.focusAsset();
-    }
-
-
-    var focusedAsset = self.getFocusedAsset();
-    self.selectedAssets().push(focusedAsset);
-
-    // highlight
-    self.selectedAssets().forEach(function(asset) {
-      $("[asset_id='" + asset.id + "']").addClass('selected');
-    });
-  },
-*/
-
-  getFocusedAsset: function() {
-    var self = this;
-
-    if (self.focusedAssetIndex() == null) {
-      return null;
-    }
-
-    return ko.utils.arrayFirst(self.searchResults(), function(asset) {
-      return asset.id ===  self.focusedAsset().id;
-    });
-  }
-
-
-
 });
