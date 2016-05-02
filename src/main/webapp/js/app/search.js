@@ -209,14 +209,14 @@ SearchViewModel = BaseViewModel.extend({
 
     switch (direction) {
       case 'down':
-        newPos.left = offset.left + currentPos.left + 10;
+        newPos.left = offset.left + currentPos.left;
         newPos.top  = offset.top + currentPos.top + height + 10;
         elem = document.elementFromPoint(newPos.left, newPos.top);
         assetId = $(elem).parent().attr('asset_id');
         break;
 
       case 'up':
-        newPos.left = offset.left + currentPos.left + 10;
+        newPos.left = offset.left + currentPos.left;
         newPos.top  = offset.top + currentPos.top - height + 10;
         elem = document.elementFromPoint(newPos.left, newPos.top);
         assetId = $(elem).parent().attr('asset_id');
@@ -237,11 +237,12 @@ SearchViewModel = BaseViewModel.extend({
     console.log('new pos', newPos);
     console.log('new elem', elem);
 
-    if (!elem) {
+    // out of bounds - do nothing
+    if (!assetId) {
       return;
     }
 
-
+    // deslect old and select new
     var newFocusedEl = $("[asset_id='" + assetId + "']");
     newFocusedEl.addClass('focused');
     newFocusedEl.focus();
