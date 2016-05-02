@@ -265,7 +265,7 @@ SearchViewModel = BaseViewModel.extend({
     var self = this;
     console.log('selecting right');
 
-    if (self.focusedAssetIndex() == null) {
+    if (self.focusedAssetIndex() === undefined) {
       self.focusAsset();
     }
   },
@@ -298,14 +298,14 @@ SearchViewModel = BaseViewModel.extend({
   clearFocusing: function() {
     var self = this;
 
-    if (!self.focusedAssetIndex()  || !self.searchResults().length) {
+    if (self.focusedAssetIndex() === undefined  || !self.searchResults().length) {
       return;
     }
 
     console.log('Clearing focusing');
 
     $("[asset_id='" + self.searchResults()[self.focusedAssetIndex()].id + "']").removeClass('focused');
-    self.focusedAssetIndex(null);
+    self.focusedAssetIndex(undefined);
   },
 
   selectFocused: function() {
