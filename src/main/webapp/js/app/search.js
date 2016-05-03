@@ -121,18 +121,15 @@ SearchViewModel = BaseViewModel.extend({
         }
 
         // restore selection
-        var selectedIds = Object.keys(self.selectedAssets);
+        for (var i = 0; i < self.searchResults().length; i++) {
+          var asset = self.searchResults()[i];
 
-        for (var i = 0; i < selectedIds.length; i++) {
-          var assetId = selectedIds[i];
-          var asset = ko.utils.arrayFirst(self.searchResults(), function(asset) {
-            return asset.id === assetId;
-          });
-
-          if (asset) {
+          if (asset.id in self.selectedAssets) {
             asset.selected(true);
-          }
         }
+      }
+
+
       }
     };
 
