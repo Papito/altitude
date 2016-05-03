@@ -13,8 +13,6 @@ SearchViewModel = BaseViewModel.extend({
     this.totalPages = ko.observable(0);
     this.totalRecords = ko.observable(0);
 
-    this.focusedAssetIndex = ko.observable();
-
     this.queryString = this.queryString || '';
     console.log('Q = ', this.queryString);
 
@@ -345,19 +343,11 @@ SearchViewModel = BaseViewModel.extend({
   },
 
   clearFocusing: function() {
-    var self = this;
-
-    if (self.focusedAssetIndex() === undefined  || !self.searchResults().length) {
-      return;
-    }
-
     console.log('Clearing focusing');
-
-    $("[asset_id='" + self.searchResults()[self.focusedAssetIndex()].id + "']").removeClass('focused');
-    self.focusedAssetIndex(undefined);
+    $(".focused").removeClass('focused');
   },
 
   selectFocused: function() {
     console.log('selecting focused');
-  },
+  }
 });
