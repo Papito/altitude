@@ -81,8 +81,12 @@ SearchViewModel = BaseViewModel.extend({
       self.deselectFocused();
     });
 
-    Mousetrap.bind('shift+a', function() {
+    Mousetrap.bind('shift+s', function() {
       self.selectAll();
+    });
+
+    Mousetrap.bind('shift+d', function() {
+      self.deselectAll();
     });
   },
 
@@ -399,6 +403,16 @@ SearchViewModel = BaseViewModel.extend({
     self.searchResults().forEach(function(asset) {
       self.selectedAssets[asset.id] = asset;
       asset.selected(true);
+    })
+  },
+
+  deselectAll: function() {
+    var self = this;
+    console.log('deselect all');
+
+    self.searchResults().forEach(function(asset) {
+      self.selectedAssets[asset.id] = asset;
+      asset.selected(false);
     })
   },
 
