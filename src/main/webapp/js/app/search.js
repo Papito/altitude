@@ -13,6 +13,8 @@ SearchViewModel = BaseViewModel.extend({
     this.totalPages = ko.observable(0);
     this.totalRecords = ko.observable(0);
 
+    this.selectedAssets = {};
+
     this.queryString = this.queryString || '';
     console.log('Q = ', this.queryString);
 
@@ -75,6 +77,9 @@ SearchViewModel = BaseViewModel.extend({
       self.selectFocused();
     });
 
+    Mousetrap.bind('d', function() {
+      self.deselectFocused();
+    });
   },
 
   search: function(callback) {
@@ -85,8 +90,6 @@ SearchViewModel = BaseViewModel.extend({
         var assets = $.map(json['assets'], function(data) {
           return new Asset(data);
         });
-
-        self.clearFocusing();
 
         self.searchResults(assets);
         self.totalPages(json.totalPages);
@@ -111,6 +114,20 @@ SearchViewModel = BaseViewModel.extend({
 
         if (callback && typeof callback === 'function') {
           callback.bind(self).call();
+        }
+
+        // restore selection
+        var selectedIds = Object.keys(self.selectedAssets);
+
+        for (var i = 0; i < selectedIds.length; i++) {
+          var assetId = selectedIds[i];
+          var asset = ko.utils.arrayFirst(self.searchResults(), function(asset) {
+            return asset.id === assetId;
+          });
+
+          if (asset) {
+            asset.selected(true);
+          }
         }
       }
     };
@@ -189,6 +206,20 @@ SearchViewModel = BaseViewModel.extend({
   getFocusedEl: function() {
     var focusedSel = $('.result-box.focused');
     return focusedSel.length ? $(focusedSel[0]) : null;
+  },
+
+  getFocusedAsset: function() {
+    var self = this;
+
+    var el = self.getFocusedEl();
+    if (!el) {
+      return null;
+    }
+
+    var assetId = el.attr('asset_id');
+    return ko.utils.arrayFirst(self.searchResults(), function(asset) {
+      return asset.id === assetId;
+    });
   },
 
   focusFirst: function() {
@@ -348,6 +379,29 @@ SearchViewModel = BaseViewModel.extend({
   },
 
   selectFocused: function() {
+    var self = this;
     console.log('selecting focused');
+    var focusedAsset = self.getFocusedAsset();
+
+    if (!focusedAsset) {
+      return;
+    }
+
+    self.selectedAssets[focusedAsset.id] = focusedAsset;
+    focusedAsset.selected(true);
+  },
+
+  deselectFocused: function() {
+    var self = this;
+    console.log('deselecting focused');
+    var focusedAsset = self.getFocusedAsset();
+
+    if (!focusedAsset) {
+      return;
+    }
+
+    delete self.selectedAssets[focusedAsset.id];
+    focusedAsset.selected(false);
   }
+
 });

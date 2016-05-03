@@ -246,8 +246,7 @@ footer {
 }
 
 #searchResults .result-box.selected {
-    border: solid 1px #212223;
-    background: #363d42;
+    background: #182660;
 }
 
 #addFolderForm input, #renameFolderForm input {

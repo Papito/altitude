@@ -15,7 +15,7 @@
 
       <div class="col-md-10">
         <div id="searchResults" data-bind="foreach: searchResults">
-          <div class="result-box" data-bind="attr: {'asset_id': $data.id}">
+          <div class="result-box" data-bind="attr: {'asset_id': $data.id}, css: {'selected': selected}">
             <img src="#" data-bind="attr: {src: '/assets/'+ $data.id +'/preview'}" class="img-responsive">
           </div>
         </div>
