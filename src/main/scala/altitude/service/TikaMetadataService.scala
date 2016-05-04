@@ -102,7 +102,6 @@ class TikaMetadataService extends AbstractMetadataService {
       case ex: AllDone =>
     }
 
-    log.info(metadata.toString)
     metadata
   }
 

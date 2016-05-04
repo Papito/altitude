@@ -1,6 +1,6 @@
 package altitude.dao
 
-import altitude.models.search.{QueryResult, Query}
+import altitude.models.search.{Query, QueryResult}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
 import play.api.libs.json.JsObject

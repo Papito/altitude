@@ -2,9 +2,9 @@ package integration
 
 import java.io.File
 
-import altitude.models.{MediaType, Asset, Folder}
+import altitude.models.{Asset, Folder, MediaType}
 import altitude.transactions.TransactionId
-import altitude.{Const => C, Util, Altitude, Environment}
+import altitude.{Altitude, Const => C, Environment, Util}
 import com.google.inject.{AbstractModule, Guice}
 import integration.util.dao
 import integration.util.dao.UtilitiesDao

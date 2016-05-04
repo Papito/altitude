@@ -6,7 +6,7 @@ import java.io._
 import javax.imageio.ImageIO
 
 import altitude.exceptions.DuplicateException
-import altitude.models.search.{QueryResult, Query}
+import altitude.models.search.{Query, QueryResult}
 import altitude.models.{Asset, Folder, Preview}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import altitude.{Altitude, Const => C}

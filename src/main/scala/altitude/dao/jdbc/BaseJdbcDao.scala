@@ -4,12 +4,12 @@ import java.sql.Connection
 
 import altitude.dao.BaseDao
 import altitude.models.BaseModel
-import altitude.models.search.{QueryResult, Query}
+import altitude.models.search.{Query, QueryResult}
 import altitude.transactions.{JdbcTransactionManager, TransactionId}
 import altitude.{Const => C, Util}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.apache.commons.dbutils.QueryRunner
-import org.apache.commons.dbutils.handlers.{ScalarHandler, MapListHandler}
+import org.apache.commons.dbutils.handlers.{MapListHandler, ScalarHandler}
 import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 import play.api.libs.json._

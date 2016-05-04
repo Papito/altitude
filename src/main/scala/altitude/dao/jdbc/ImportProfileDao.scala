@@ -1,10 +1,7 @@
 package altitude.dao.jdbc
 
 //import altitude.models.ImportProfile
-import altitude.transactions.TransactionId
-import altitude.{Altitude, Const => C}
-import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsObject, Json}
+import altitude.{Const => C}
 
 /*
 abstract class ImportProfileDao(val app: Altitude) extends BaseJdbcDao("import_profile") with altitude.dao.ImportProfileDao {

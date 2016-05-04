@@ -1,7 +1,6 @@
 package altitude.controllers
 
 import java.io.{File, PrintWriter, StringWriter}
-import java.nio.file.Path
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 

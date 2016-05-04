@@ -1,8 +1,6 @@
 package altitude.models.tags
 
-import altitude.models.BaseModel
 import altitude.{Const => C}
-import play.api.libs.json.{JsArray, JsObject, JsString, Json}
 
 /*
 abstract class AbstractTag extends BaseModel {

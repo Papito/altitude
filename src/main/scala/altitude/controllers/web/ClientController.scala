@@ -6,6 +6,7 @@ import altitude.{Const, Environment}
 import com.mitchellbosecke.pebble.PebbleEngine
 import com.mitchellbosecke.pebble.template.PebbleTemplate
 import org.slf4j.LoggerFactory
+
 import scala.collection.JavaConversions._
 
 class ClientController  extends BaseWebController {

@@ -1,13 +1,11 @@
 package altitude.controllers
 
 import java.io.{PrintWriter, StringWriter}
-import javax.servlet.http.HttpServletRequest
 
 import altitude.SingleApplication
 import org.scalatra.InternalServerError
 import org.slf4j.LoggerFactory
 
-import scala.collection.mutable
 import scala.compat.Platform
 
 abstract class BaseController extends AltitudeStack with SingleApplication {

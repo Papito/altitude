@@ -1,6 +1,6 @@
 import altitude.{Environment, SingleApplication}
-import org.eclipse.jetty.server.{Server, _}
 import org.eclipse.jetty.server.handler.ContextHandlerCollection
+import org.eclipse.jetty.server.{Server, _}
 import org.eclipse.jetty.servlet.DefaultServlet
 import org.eclipse.jetty.webapp.WebAppContext
 import org.scalatra.servlet.ScalatraListener

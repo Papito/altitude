@@ -5,7 +5,6 @@ import altitude.models.{Asset, Folder, MediaType}
 import altitude.{Const => C, Util}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
-import play.api.libs.json.JsObject
 
 @DoNotDiscover class SearchTests(val config: Map[String, String]) extends IntegrationTestCore {
   test("empty search") {

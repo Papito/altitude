@@ -8,7 +8,7 @@ import altitude.exceptions.ValidationException
 import altitude.{Const => C}
 import org.scalatra.{BadRequest, GZipSupport, InternalServerError, NotFound}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsString, JsNull, Json}
+import play.api.libs.json.{JsNull, Json}
 
 class BaseApiController extends BaseController with GZipSupport {
   private final val log = LoggerFactory.getLogger(getClass)

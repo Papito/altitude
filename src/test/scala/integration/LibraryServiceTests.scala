@@ -1,8 +1,8 @@
 package integration
 
 import altitude.models.search.Query
-import altitude.models.{Asset, Folder, MediaType}
-import altitude.{Const => C, Util}
+import altitude.models.{Asset, Folder}
+import altitude.{Const => C}
 import org.scalatest.Matchers._
 
 class LibraryServiceTests (val config: Map[String, String]) extends IntegrationTestCore {

@@ -4,10 +4,8 @@ import java.io.File
 
 import altitude.models.FileImportAsset
 import org.scalatest.DoNotDiscover
-import play.api.libs.json.{Json, JsValue}
 import org.scalatest.Matchers._
-
-import scala.None
+import play.api.libs.json.JsValue
 
 @DoNotDiscover class MetadataParserTests(val config: Map[String, String]) extends IntegrationTestCore {
 

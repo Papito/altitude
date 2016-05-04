@@ -1,13 +1,6 @@
 package altitude.service
-
-import altitude.Validators.Validator
-import altitude.dao.ImportProfileDao
-import altitude.exceptions.ValidationException
 //import altitude.models.ImportProfile
-import altitude.{Altitude, Cleaners, Const => C}
-import net.codingwell.scalaguice.InjectorExtensions._
-import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsArray, JsObject}
+import altitude.{Const => C}
 
 /*
 object ImportProfileService {

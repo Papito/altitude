@@ -1,13 +1,7 @@
 package altitude.controllers.api
-
-import altitude.Validators.ApiValidator
 //import altitude.models.ImportProfile
-import altitude.models.search.Query
-import altitude.service.TagConfigService
-import altitude.{Const => C, Util}
-import org.scalatra.Ok
+import altitude.{Const => C}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsArray, JsValue, Json}
 
 class ImportProfileController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
