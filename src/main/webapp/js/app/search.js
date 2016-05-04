@@ -1,3 +1,5 @@
+
+
 SearchViewModel = BaseViewModel.extend({
   constructor : function() {
     "use strict";
@@ -13,7 +15,12 @@ SearchViewModel = BaseViewModel.extend({
     this.totalPages = ko.observable(0);
     this.totalRecords = ko.observable(0);
 
-    this.selectedAssets = {};
+    this.selectedAssetsMap = {};
+    this.selectedIds = ko.observableArray();
+
+    this.selectedCount = ko.computed(function() {
+      return this.selectedIds().length;
+    }, this);
 
     this.queryString = this.queryString || '';
     console.log('Q = ', this.queryString);
@@ -128,7 +135,7 @@ SearchViewModel = BaseViewModel.extend({
         for (var i = 0; i < self.searchResults().length; i++) {
           var asset = self.searchResults()[i];
 
-          if (asset.id in self.selectedAssets) {
+          if (asset.id in self.selectedAssetsMap) {
             asset.selected(true);
         }
       }
@@ -392,7 +399,8 @@ SearchViewModel = BaseViewModel.extend({
       return;
     }
 
-    self.selectedAssets[focusedAsset.id] = focusedAsset;
+    self.selectedAssetsMap[focusedAsset.id] = focusedAsset;
+    self.selectedIds.push(focusedAsset.id);
     focusedAsset.selected(true);
   },
 
@@ -401,7 +409,8 @@ SearchViewModel = BaseViewModel.extend({
     console.log('select all');
 
     self.searchResults().forEach(function(asset) {
-      self.selectedAssets[asset.id] = asset;
+      self.selectedAssetsMap[asset.id] = asset;
+      self.selectedIds.push(asset.id);
       asset.selected(true);
     })
   },
@@ -411,7 +420,10 @@ SearchViewModel = BaseViewModel.extend({
     console.log('deselect all');
 
     self.searchResults().forEach(function(asset) {
-      delete self.selectedAssets[asset.id];
+      delete self.selectedAssetsMap[asset.id];
+      self.selectedIds.remove(function (id) {
+        return id === asset.id;
+      });
       asset.selected(false);
     })
   },
@@ -425,7 +437,10 @@ SearchViewModel = BaseViewModel.extend({
       return;
     }
 
-    delete self.selectedAssets[focusedAsset.id];
+    delete self.selectedAssetsMap[focusedAsset.id];
+    self.selectedIds.remove(function (id) {
+      return id === focusedAsset.id;
+    });
     focusedAsset.selected(false);
   }
 
