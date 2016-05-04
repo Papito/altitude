@@ -7,6 +7,8 @@ import org.scalatest.DoNotDiscover
 import play.api.libs.json.{Json, JsValue}
 import org.scalatest.Matchers._
 
+import scala.None
+
 @DoNotDiscover class MetadataParserTests(val config: Map[String, String]) extends IntegrationTestCore {
 
   test("normalize metadata") {
@@ -17,8 +19,6 @@ import org.scalatest.Matchers._
       "Exposure Program" -> "Landscape mode",
       "Image Height" -> "8 pixels",
       "Image Width" -> "10 pixels",
-      "X Resolution" -> "72 dots per inch",
-      "Y Resolution" -> "72 dots per inch",
       "exif:ExposureTime" -> "0.0025",
       "exif:FNumber" -> "8.0",
       "exif:Flash" -> "false",
@@ -32,6 +32,11 @@ import org.scalatest.Matchers._
     verify.foreach { case (k, v) =>
       (metadata \ k).asOpt[String] should contain(v)
     }
+
+    (metadata \ "X Resolution").asOpt[String] shouldNot be(None)
+    (metadata \ "X Resolution").as[String].startsWith("72 dots") shouldBe true
+    (metadata \ "Y Resolution").asOpt[String] shouldNot be(None)
+    (metadata \ "Y Resolution").as[String].startsWith("72 dots") shouldBe true
   }
 
   private def getMetadata(p: String): JsValue = {

@@ -45,7 +45,7 @@ class TikaMetadataService extends AbstractMetadataService {
         None
     }
 
-    // make it nice and neat out the horrible mess that this probably is
+    // make it nice and neat out of the horrible mess that this probably is
     val normalized: Option[TikaMetadata] = if (asRaw) raw else normalize(raw)
 
     // return as JSON
@@ -102,6 +102,7 @@ class TikaMetadataService extends AbstractMetadataService {
       case ex: AllDone =>
     }
 
+    log.info(metadata.toString)
     metadata
   }
 
