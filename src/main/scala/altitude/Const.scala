@@ -41,7 +41,7 @@ object Const {
     "Folder.Ids.ROOT" -> "0",
     "Folder.Ids.UNCATEGORIZED" -> "1",
     "Folder.Ids.TRASH" -> "2",
-    "Folder.Names.ROOT" -> "Home", //TODO: not i18n
+    "Folder.Names.ROOT" -> "All", //TODO: not i18n
     "Folder.Names.UNCATEGORIZED" -> "Uncategorized",  //TODO: not i18n
     "Folder.Names.TRASH" ->  "Trash",  //TODO: not i18n
     "Preview.ASSET_ID" -> "asset_id",

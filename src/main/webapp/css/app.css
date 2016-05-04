@@ -230,6 +230,10 @@ footer {
 
 /* SEARCH */
 
+#search {
+    margin-top: .1em;
+}
+
 #searchResults {
     height: 100%;
     text-align: center;
@@ -290,7 +294,7 @@ footer {
 /* FOLDERS */
 
 #folders {
-    margin-top: .5em;
+    margin-top: -.3em;
     padding-left: .4em;
 }
 

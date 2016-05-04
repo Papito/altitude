@@ -261,7 +261,7 @@ BrowseViewModel = SearchViewModel.extend({
 
         var hierarchy = [{
           'id': '0',
-          'name': 'Home',
+          'name': 'All',
           'children': allFolders
         }];
 
