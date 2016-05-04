@@ -411,7 +411,7 @@ SearchViewModel = BaseViewModel.extend({
     console.log('deselect all');
 
     self.searchResults().forEach(function(asset) {
-      self.selectedAssets[asset.id] = asset;
+      delete self.selectedAssets[asset.id];
       asset.selected(false);
     })
   },
