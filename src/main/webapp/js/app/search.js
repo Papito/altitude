@@ -399,8 +399,10 @@ SearchViewModel = BaseViewModel.extend({
       return;
     }
 
-    self.selectedAssetsMap[focusedAsset.id] = focusedAsset;
-    self.selectedIds.push(focusedAsset.id);
+    if (!(focusedAsset.id in self.selectedAssetsMap)) {
+      self.selectedAssetsMap[focusedAsset.id] = focusedAsset;
+      self.selectedIds.push(focusedAsset.id);
+    }
     focusedAsset.selected(true);
   },
 
@@ -409,8 +411,10 @@ SearchViewModel = BaseViewModel.extend({
     console.log('select all');
 
     self.searchResults().forEach(function(asset) {
-      self.selectedAssetsMap[asset.id] = asset;
-      self.selectedIds.push(asset.id);
+      if (!(asset.id in self.selectedAssetsMap)) {
+        self.selectedAssetsMap[asset.id] = asset;
+        self.selectedIds.push(asset.id);
+      }
       asset.selected(true);
     })
   },
@@ -442,6 +446,14 @@ SearchViewModel = BaseViewModel.extend({
       return id === focusedAsset.id;
     });
     focusedAsset.selected(false);
-  }
+  },
 
+  deleteSelected: function() {
+    console.log('deleting selected');
+  },
+
+
+  moveSelected: function() {
+    console.log('move selected');
+  }
 });

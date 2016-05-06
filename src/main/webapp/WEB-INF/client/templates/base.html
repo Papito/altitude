@@ -110,17 +110,8 @@
 </div>
 
 <footer>
-  <div class="container-fluid">
-    <div id="selectionTools" class="row" data-bind="visible: selectedCount()" style="display: none;">
-      <div class="col-md-2 col-md-offset-1">
-        <button class="btn btn-success" type="button">
-          <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Selected <span class="badge" data-bind="text: selectedCount()"></span>
-        </button>
-      </div>
-      <div class="col-md-9 ">
-      </div>
-    </div>
-  </div>
+  {% block footer %}
+  {% endblock %}
 </footer>
 
 <!-- MODALS -->

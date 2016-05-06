@@ -1,0 +1,27 @@
+<div class="container-fluid" data-bind="visible: selectedCount() > 1" style="display: none;">
+  <div id="selectionTools" class="row">
+
+    <div class="col-md-1">
+      <div class="btn-group">
+        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Selected <span class="badge" data-bind="html: selectedCount()"></span>
+          <span class="caret caret-up"></span>
+        </button>
+        <ul class="dropdown-menu drop-up">
+          <li><a href="#"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>&nbsp;&nbsp;Clear selection</a></li>
+          <li role="separator" class="divider"></li>
+          <li><a href="#"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>&nbsp;&nbsp;View</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-5">
+      <button type="button" class="btn btn-default" data-bind="click: moveSelected"><span class="glyphicon glyphicon-move" aria-hidden="true"></span> Move</button>
+    </div>
+
+    <div class="col-md-5">
+      <button type="button" class="btn btn-danger" data-bind="click: deleteSelected"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Delete</button>
+    </div>
+
+  </div>
+</div>

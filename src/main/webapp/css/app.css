@@ -361,3 +361,32 @@ footer {
     padding-left: 0.5em;
     padding-right: 0.5em;
 }
+
+
+/* SELECTION TOOLS */
+
+.caret-up {
+    /* Safari */
+    -webkit-transform: rotate(-180deg);
+
+    /* Firefox */
+    -moz-transform: rotate(-180deg);
+
+    /* IE */
+    -ms-transform: rotate(-180deg);
+
+    /* Opera */
+    -o-transform: rotate(-180deg);
+
+    /* Internet Explorer */
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=6);
+}
+
+.drop-up {
+    top: auto;
+    bottom: 100% !important;
+}
+
+#selectionTools {
+ text-align: center;
+}
