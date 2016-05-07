@@ -59,7 +59,7 @@ class BaseApiController extends BaseController with GZipSupport {
       }
 
       BadRequest(Json.obj(
-        C("Api.ERROR") -> ex.message,
+        C("Api.VALIDATION_ERROR") -> ex.message,
         C("Api.VALIDATION_ERRORS") -> (if (ex.errors.isEmpty) JsNull else jsonErrors)
       ))
     }

@@ -55,6 +55,7 @@ object Const {
     "Api.STACKTRACE" -> "stacktrace",
     "Api.WARNING" -> "warning",
     "Api.CRITICAL" -> "critical",
+    "Api.VALIDATION_ERROR" -> "validation_error",
     "Api.VALIDATION_ERRORS" -> "validation_errors",
     "Api.MULTI_VALUE_DELIM" -> "+",
 
@@ -97,7 +98,8 @@ object Const {
     "msg.err.required" -> "This field is required",
     "msg.err.validation_error" -> "Validation error",
     "msg.err.validation_errors" -> "There are validation errors in: %s",
-    "msg.err.wrong_type" -> "This field does not match the required type (%s)"
+    "msg.err.wrong_type" -> "This field does not match the required type (%s)",
+    "msg.err.empty_request_body" -> "Empty request body"
   )
 
   /*---------------------------------------------------------------------------

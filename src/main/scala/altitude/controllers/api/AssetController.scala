@@ -1,6 +1,7 @@
 package altitude.controllers.api
 
 import altitude.Validators.Validator
+import altitude.exceptions.ValidationException
 import altitude.{Const => C}
 import org.scalatra.{ResponseStatus, BadRequest}
 import org.slf4j.LoggerFactory
@@ -22,8 +23,7 @@ class AssetController extends BaseApiController {
     log.info(s"Moving assets to $folderId")
 
     if (request.body.isEmpty) {
-      // FIXME: should not be generic and explain what happened
-      halt(400)
+      throw ValidationException(C("msg.err.empty_request_body"))
     }
 
     val json: JsObject = Json.parse(request.body).as[JsObject]

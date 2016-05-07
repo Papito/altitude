@@ -93,7 +93,7 @@
   <div id="errorContainer" class="alert alert-danger alert-dismissible fade in" role="alert" style="display: none">
     <button type="button" class="close" aria-label=Close data-bind="click: dismissError"><span aria-hidden=true>&times;</span></button>
     <h4 data-bind="visible: errorMessage">
-      Error. <span data-bind="text: errorMessage, visible: errorMessage"></span>
+      <span data-bind="text: errorMessage, visible: errorMessage"></span>
     </h4>
     <div data-bind="visible: errorStacktrace" style="margin-top: 2em">
       <p>

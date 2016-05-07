@@ -138,6 +138,10 @@ BaseViewModel = Base.extend({
                   .find('.error').text(errz[field]);
             }
           }
+          else if (json.validation_error) {
+            self.showError();
+            self.errorMessage(json.validation_error);
+          }
           else if (json.error) {
             self.showError();
             self.errorMessage(json.error);
