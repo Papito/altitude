@@ -24,7 +24,7 @@ class LibraryServiceTests (val config: Map[String, String]) extends IntegrationT
       Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
     ).records.length should be(1)
 
-    altitude.service.library.moveToFolder(asset.id.get, folder2.id.get)
+    altitude.service.library.moveAssetToFolder(asset.id.get, folder2.id.get)
 
     altitude.service.library.search(
       Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))

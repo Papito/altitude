@@ -210,22 +210,12 @@ footer {
     font-size: 1em;
 }
 
-#selectImportDirectory select, #importProfiles select {
-    width: 100%;
-    color: #000000;
-}
-
 #importProfiles select {
     width: 100%;
     color: #f9f2f4;
     background-color: #1c1e22;
 }
 
-#selectImportDirectory .go-back {
-    margin-bottom: 1em;
-    padding-left: 4em;
-    padding-right: 4em;
-}
 
 /* SEARCH */
 
@@ -389,4 +379,16 @@ footer {
 
 #selectionTools {
  text-align: center;
+}
+
+/* MISC */
+#selectImportDirectoryModal select, #importProfiles select, #selectAssetMoveDirectoryModal select {
+    width: 100%;
+    color: #000000;
+}
+
+#selectImportDirectoryModal .go-back, #selectAssetMoveDirectoryModal .go-back {
+    margin-bottom: 1em;
+    padding-left: 4em;
+    padding-right: 4em;
 }

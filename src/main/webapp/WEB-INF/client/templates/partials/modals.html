@@ -1,4 +1,35 @@
-<script src="/static/js/lib/jstree/jstree.min.js"></script>
+<!-- Import directory browser modal -->
+<div class="modal fade" id="selectImportDirectoryModal" tabindex="-1" role="dialog" aria-labelledby="selectImportDirectoryLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form>
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="selectImportDirectoryModalLabel">Select location to import from...</h4>
+        </div>
+        <div class="modal-body">
+          <!-- back button -->
+          <button type="button" class="btn btn-sm btn-default go-back" data-bind="click: gotoPreviousDirectory">
+            <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+            Back
+          </button>
+
+          <div>
+            <span data-bind="text: currentPath"></span>
+          </div>
+
+          <select id="importDirectoryList" size="20" data-bind="foreach: directoryNames" name="selectedDirectory" multiple="no" >
+            <option data-bind="attr: {'value': $data}, text: $data, event : { dblclick: $parent.dropIntoDirectory($data) }"></option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" data-bind="click: selectImportDirectory">Select</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <!-- Folder rename modal -->
 <div class="modal fade" id="renameFolderModal" tabindex="-1" role="dialog" aria-labelledby="renameFolderLabel">
@@ -29,14 +60,16 @@
   </div>
 </div>
 
-<!-- Folder browser modal -->
-<div class="modal fade" id="selectFolderToMoveToModal" tabindex="-1" role="dialog" aria-labelledby="selectFolderToMoveToLabel">
+<script src="/static/js/lib/jstree/jstree.min.js"></script>
+
+<!-- Move folder -->
+<div class="modal fade" id="selectFolderMoveModal" tabindex="-1" role="dialog" aria-labelledby="selectFolderMoveLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <form>
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="selectFolderToMoveToLabel">Select folder to move to</h4>
+          <h4 class="modal-title" id="selectFolderMoveLabel">Select folder to move to</h4>
         </div>
         <div class="modal-body">
           <div id="moveToFolderTree"></div>
@@ -45,6 +78,27 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
           <button id="moveFolder" type="button" class="btn btn-primary" data-bind="click: moveFolder">Move</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Move assets -->
+<div class="modal fade" id="selectAssetMoveModal" tabindex="-1" role="dialog" aria-labelledby="selectAssetMoveLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form>
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="selectAssetMoveLabel">Select folder to move to</h4>
+        </div>
+        <div class="modal-body">
+          <div id="moveAssetsToFolderTree"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button id="moveAssets"  type="button" class="btn btn-primary" data-bind="click: moveSelectedAssets">Move</button>
         </div>
       </form>
     </div>

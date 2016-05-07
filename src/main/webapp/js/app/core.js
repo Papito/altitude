@@ -243,7 +243,7 @@ BaseViewModel = Base.extend({
   },
 
   selectImportDirectory: function() {
-    var directoryName = $('#directoryList').val() || '';
+    var directoryName = $('#importDirectoryList').val() || '';
     var dirSeparator = this.currentPath() == "/" ? '': '/';
     var importDirectoryPath = this.currentPath() + dirSeparator + directoryName;
     window.location = "/client/import?importDirectoryPath=" + importDirectoryPath;

@@ -261,7 +261,7 @@ BrowseViewModel = SearchViewModel.extend({
 
         var hierarchy = [{
           'id': '0',
-          'name': 'All',
+          'name': 'Root',
           'children': allFolders
         }];
 
@@ -293,7 +293,7 @@ BrowseViewModel = SearchViewModel.extend({
 
         self.moveToFolderTreeEl.jstree(true).settings.core.data = hierarchy;
         self.moveToFolderTreeEl.jstree(true).refresh();
-        $('#selectFolderToMoveToModal').modal();
+        $('#selectFolderMoveModal').modal();
       }
     };
 
@@ -337,8 +337,8 @@ BrowseViewModel = SearchViewModel.extend({
   moveFolder: function() {
     var self = this;
     var moveFolderId = $('#moveFolderId').val();
-    var moveToFofolderId = this.moveToFolderTreeEl.jstree('get_selected')[0];
-    console.log('Moving', moveFolderId, 'to', moveToFofolderId);
+    var moveToFolderId = this.moveToFolderTreeEl.jstree('get_selected')[0];
+    console.log('Moving', moveFolderId, 'to', moveToFolderId);
 
     var opts = {
       'successCallback': function() {
@@ -346,10 +346,10 @@ BrowseViewModel = SearchViewModel.extend({
         self.blinkSuccess("Folder moved");
       },
       'finally': function() {
-        $('#selectFolderToMoveToModal').modal('hide');
+        $('#selectFolderMoveModal').modal('hide');
       },
       'data': {
-        'parent_id': moveToFofolderId
+        'parent_id': moveToFolderId
       }
     };
 

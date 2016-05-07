@@ -163,37 +163,52 @@ class LibraryService(app: Altitude) {
     byteArray.toByteArray
   }
 
-  def moveToFolder(assetId: String, folderId: String)(implicit txId: TransactionId = new TransactionId): Asset = {
+  def moveAssetToFolder(assetId: String, folderId: String)(implicit txId: TransactionId = new TransactionId): Asset = {
     txManager.withTransaction[Asset] {
       val asset: Asset = this.getById(assetId)
-      // we can go straight to DB, but we need to do a check on folder validity
+      // this checks folder validity
+      val folder: Folder = app.service.folder.getById(folderId)
+      updateAssetFolder(asset, folder)
+    }
+  }
+
+  def moveAssetsToFolder(assetIds: Set[String], folderId: String)(implicit txId: TransactionId = new TransactionId): Unit = {
+    txManager.withTransaction[Unit] {
+      // this checks folder validity
       val folder: Folder = app.service.folder.getById(folderId)
 
-      val updateObj: Asset = new Asset(
-        id = asset.id,
-        path = asset.path,
-        md5 = asset.md5,
-        mediaType = asset.mediaType,
-        sizeBytes = asset.sizeBytes,
-        folderId = folder.id.get,
-        metadata = asset.metadata)
-
-      app.service.asset.updateById(assetId, updateObj, fields = List(C("Asset.FOLDER_ID")))
-      app.service.folder.decrAssetCount(asset.folderId)
-      app.service.folder.incrAssetCount(updateObj.folderId)
-      updateObj
+      assetIds.foreach{  assetId: String =>
+        val asset: Asset = this.getById(assetId)
+        updateAssetFolder(asset, folder)
+      }
     }
+  }
+
+  private def updateAssetFolder(asset: Asset, folder: Folder)(implicit txId: TransactionId): Asset = {
+    val updateObj: Asset = new Asset(
+      id = asset.id,
+      path = asset.path,
+      md5 = asset.md5,
+      mediaType = asset.mediaType,
+      sizeBytes = asset.sizeBytes,
+      folderId = folder.id.get,
+      metadata = asset.metadata)
+
+    app.service.asset.updateById(asset.id.get, updateObj, fields = List(C("Asset.FOLDER_ID")))
+    app.service.folder.decrAssetCount(asset.folderId)
+    app.service.folder.incrAssetCount(updateObj.folderId)
+    updateObj
   }
 
   def moveToUncategorized(assetId: String)(implicit txId: TransactionId = new TransactionId) = {
     txManager.withTransaction {
-      moveToFolder(assetId, Folder.UNCATEGORIZED.id.get)
+      moveAssetToFolder(assetId, Folder.UNCATEGORIZED.id.get)
     }
   }
 
   def moveToTrash(assetId: String)(implicit txId: TransactionId = new TransactionId) = {
     txManager.withTransaction {
-      moveToFolder(assetId, Folder.TRASH.id.get)
+      moveAssetToFolder(assetId, Folder.TRASH.id.get)
     }
   }
 }

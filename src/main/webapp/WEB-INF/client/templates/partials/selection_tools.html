@@ -16,11 +16,14 @@
     </div>
 
     <div class="col-md-5">
-      <button type="button" class="btn btn-default" data-bind="click: moveSelected"><span class="glyphicon glyphicon-move" aria-hidden="true"></span> Move</button>
+      <button type="button" class="btn btn-default"
+              data-bind="click: showMoveSelectedAssets">
+        <span class="glyphicon glyphicon-move" aria-hidden="true"></span> Move</button>
     </div>
 
     <div class="col-md-5">
-      <button type="button" class="btn btn-danger" data-bind="click: deleteSelected"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Delete</button>
+      <button type="button" class="btn btn-danger" data-bind="click: deleteSelectedAssets">
+        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Delete</button>
     </div>
 
   </div>

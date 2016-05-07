@@ -33,6 +33,17 @@ SearchViewModel = BaseViewModel.extend({
       return this.currentPage() < this.totalPages();
     }, this);
 
+
+    this.moveAssetsToFolderTreeEl = $('#moveAssetsToFolderTree');
+    this.moveAssetsEl = $('#moveAssets');
+
+    // when a folder is selected, enable the "move" button
+    this.moveAssetsToFolderTreeEl.bind(
+        "select_node.jstree", function(){
+          self.moveAssetsEl.removeAttr('disabled');
+        }
+    );
+
     this.search();
 
     // set up shortcuts
@@ -448,12 +459,93 @@ SearchViewModel = BaseViewModel.extend({
     focusedAsset.selected(false);
   },
 
-  deleteSelected: function() {
+  deleteSelectedAssets: function() {
     console.log('deleting selected');
   },
 
+  clearSelection: function() {
+    this.deselectAll();
+    this.selectedAssetsMap = {};
+    this.selectedIds();
+  },
 
-  moveSelected: function() {
-    console.log('move selected');
+  showMoveSelectedAssets: function() {
+    var self = this;
+    console.log('Moving assets');
+
+    var targetSelected = typeof $('#moveAssetsToFolderTree').jstree('get_selected')[0] === "string";
+
+    if (targetSelected) {
+      self.moveAssetsEl.removeAttr('disabled');
+    } else {
+      self.moveAssetsEl.attr('disabled','disabled');
+    }
+
+    var opts = {
+      'successCallback': function (json) {
+        var allFolders = json.hierarchy;
+
+        if (allFolders.length === 0) {
+          self.blinkWarning("No possible folders to move to");
+          return;
+        }
+
+        var hierarchy = [{
+          'id': '0',
+          'name': 'Root',
+          'children': allFolders
+        }];
+
+        console.log(hierarchy);
+
+        // traverse the hierarchy and "massage" the tree. name -> text
+        function _processFolderNode(node) {
+          node.text = node.name;
+          for (var i = 0; i < node.children.length; ++i) {
+            var child = node.children[i];
+            _processFolderNode(child);
+          }
+        }
+
+        for (var i = 0; i < hierarchy.length; ++i) {
+          var node = hierarchy[i];
+          _processFolderNode(node);
+        }
+
+        $.jstree.defaults.core.themes.variant = "large";
+
+        self.moveAssetsToFolderTreeEl.jstree({
+          'core' : {
+            "multiple" : false,
+            "animation" : 0,
+            "check_callback": true},
+          "plugins" : ["search"]
+        });
+
+        self.moveAssetsToFolderTreeEl.jstree(true).settings.core.data = hierarchy;
+        self.moveAssetsToFolderTreeEl.jstree(true).refresh();
+        $('#selectAssetMoveModal').modal();
+      }
+    };
+
+    this.get('/api/v1/folders', opts);
+  },
+
+  moveSelectedAssets: function() {
+    var self = this;
+    var moveToFolderId = this.moveAssetsToFolderTreeEl.jstree('get_selected')[0];
+    console.log('move selected assets to ' + moveToFolderId);
+
+    var opts = {
+      'successCallback': function() {
+        self.clearSelection();
+        self.blinkSuccess("Assets moved");
+      },
+      'finally': function() {
+        $('#selectAssetMoveModal').modal('hide');
+      }
+    };
+
+    this.post('/api/v1/assets/move/to/' + moveToFolderId, opts);
   }
 });

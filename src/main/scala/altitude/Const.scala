@@ -85,6 +85,7 @@ object Const {
     "Api.Folder.TRASH" -> "trash",
     "Api.Folder.FOLDERS" -> "folders",
     "Api.Folder.FOLDER" -> "folder",
+    "Api.Folder.ASSET_IDS" -> "asset_ids",
     "Api.Folder.PATH" -> "path",
     "Api.Folder.NAME" -> "name",
     "Api.Folder.PARENT_ID" -> "parent_id",
