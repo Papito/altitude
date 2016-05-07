@@ -26,21 +26,21 @@ class BaseApiController extends BaseController with GZipSupport {
     Process all validators that may be set for this request, per method.
      */
     HTTP_POST_VALIDATOR match {
-      case Some(ApiValidator(required)) if request.getMethod.toLowerCase == "post" => HTTP_POST_VALIDATOR.get.validate(params)
+      case Some(ApiValidator(required)) if request.getMethod.toLowerCase == "post" => HTTP_POST_VALIDATOR.get.validateForm(params)
       case _ if request.getMethod.toLowerCase == "post" =>
         log.warn(s"No POST validator specified for ${this.getClass.getName}")
       case _ =>
     }
 
     HTTP_DELETE_VALIDATOR match {
-      case Some(ApiValidator(fields)) if request.getMethod.toLowerCase == "delete" => HTTP_DELETE_VALIDATOR.get.validate(params)
+      case Some(ApiValidator(fields)) if request.getMethod.toLowerCase == "delete" => HTTP_DELETE_VALIDATOR.get.validateForm(params)
       case _ if request.getMethod.toLowerCase == "delete" =>
         log.warn(s"No DELETE validator specified for ${this.getClass.getName}")
       case _ =>
     }
 
     HTTP_UPDATE_VALIDATOR match {
-      case Some(ApiValidator(required)) if request.getMethod.toLowerCase == "upodate" => HTTP_UPDATE_VALIDATOR.get.validate(params)
+      case Some(ApiValidator(required)) if request.getMethod.toLowerCase == "upodate" => HTTP_UPDATE_VALIDATOR.get.validateForm(params)
       case _ if request.getMethod.toLowerCase == "update"  =>
         log.warn(s"No UPDATE validator specified for ${this.getClass.getName}")
       case _ =>

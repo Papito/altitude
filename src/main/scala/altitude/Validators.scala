@@ -47,7 +47,7 @@ object Validators {
   API VALIDATOR
    */
   case class ApiValidator(required: List[String]) {
-    def validate(params: Params): Unit = {
+    def validateForm(params: Params): Unit = {
       val ex: ValidationException = ValidationException()
 
       required foreach { field =>
@@ -59,6 +59,9 @@ object Validators {
 
       if (ex.errors.nonEmpty) throw ex
     }
-  }
 
+    def validate(json: JsObject): Unit = {
+      // FIXME: yeah, need this
+    }
+  }
 }

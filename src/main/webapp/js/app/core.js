@@ -107,7 +107,9 @@ BaseViewModel = Base.extend({
       type : method,
       url : url,
       crossDomain : true,
-      data : data,
+      dataType: 'json',
+      contentType: "application/json",
+      data : JSON.stringify(data),
       cache : false,
       error : function(jqXHR, textStatus, errorThrown) {
         // unhandled exceptions

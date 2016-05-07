@@ -533,15 +533,18 @@ SearchViewModel = BaseViewModel.extend({
 
   moveSelectedAssets: function() {
     var self = this;
-    var moveToFolderId = this.moveAssetsToFolderTreeEl.jstree('get_selected')[0];
+    var moveToFolderId = self.moveAssetsToFolderTreeEl.jstree('get_selected')[0];
     console.log('move selected assets to ' + moveToFolderId);
 
     var opts = {
       'successCallback': function() {
-        self.clearSelection();
         self.blinkSuccess("Assets moved");
       },
+      'data': {
+        'asset_ids': self.selectedIds()
+      },
       'finally': function() {
+        self.clearSelection();
         $('#selectAssetMoveModal').modal('hide');
       }
     };

@@ -1,6 +1,6 @@
 package altitude.controllers.api
 
-import altitude.Validators.Validator
+import altitude.Validators.{ApiValidator, Validator}
 import altitude.exceptions.ValidationException
 import altitude.{Const => C}
 import org.scalatra.{ResponseStatus, BadRequest}
@@ -27,9 +27,14 @@ class AssetController extends BaseApiController {
     }
 
     val json: JsObject = Json.parse(request.body).as[JsObject]
-    val validator = Validator(Some(List(C("Api.Folder.ASSET_IDS"))))
+
+    val validator = ApiValidator(List(C("Api.Folder.ASSET_IDS")))
     validator.validate(json)
+
     val assetIds = (json \ C("Api.Folder.ASSET_IDS")).as[Set[String]]
+
+    log.debug(s"Assets to move $assetIds")
+
     app.service.library.moveAssetsToFolder(assetIds, folderId)
   }
 
