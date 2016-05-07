@@ -3,7 +3,7 @@ package altitude.controllers.api
 import altitude.Validators.{ApiValidator, Validator}
 import altitude.exceptions.ValidationException
 import altitude.{Const => C}
-import org.scalatra.{ResponseStatus, BadRequest}
+import org.scalatra.{Ok, ResponseStatus, BadRequest}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, Json}
 
@@ -16,6 +16,7 @@ class AssetController extends BaseApiController {
     log.info(s"Moving $id to $folderId")
 
     app.service.library.moveAssetToFolder(id, folderId)
+    Ok("{}")
   }
 
   post(s"/move/to/:${C("Api.Asset.FOLDER_ID")}") {
@@ -36,16 +37,19 @@ class AssetController extends BaseApiController {
     log.debug(s"Assets to move $assetIds")
 
     app.service.library.moveAssetsToFolder(assetIds, folderId)
+    Ok("{}")
   }
 
   post(s"/:id/move/to/uncategorized") {
     val id = params.get(C("Api.ID")).get
     log.info(s"Moving $id to UNCATEGORIZED")
     app.service.library.moveToUncategorized(id)
+    Ok("{}")
   }
 
   post(s"/:id/move/to/trash") {
     val id = params.get(C("Api.ID")).get
     log.info(s"Moving $id to TRASH")
     app.service.library.moveToTrash(id)
+    Ok("{}")
   }}

@@ -528,7 +528,11 @@ SearchViewModel = BaseViewModel.extend({
       }
     };
 
-    this.get('/api/v1/folders', opts);
+    self.get('/api/v1/folders', opts);
+  },
+
+  loadFolders: function() {
+    var self = this;
   },
 
   moveSelectedAssets: function() {
@@ -537,11 +541,12 @@ SearchViewModel = BaseViewModel.extend({
     console.log('move selected assets to ' + moveToFolderId);
 
     var opts = {
-      'successCallback': function() {
-        self.blinkSuccess("Assets moved");
-      },
       'data': {
         'asset_ids': self.selectedIds()
+      },
+      'successCallback': function() {
+        self.loadFolders();
+        self.blinkSuccess("Assets moved");
       },
       'finally': function() {
         self.clearSelection();
@@ -549,6 +554,6 @@ SearchViewModel = BaseViewModel.extend({
       }
     };
 
-    this.post('/api/v1/assets/move/to/' + moveToFolderId, opts);
+    self.post('/api/v1/assets/move/to/' + moveToFolderId, opts);
   }
 });

@@ -174,6 +174,9 @@ BrowseViewModel = SearchViewModel.extend({
 
   loadFolders: function(folderId) {
     var self = this;
+
+    folderId = folderId || self.currentFolderId();
+    
     var opts = {
       'successCallback': function (json) {
         var folders = $.map(json['folders'], function(data) {

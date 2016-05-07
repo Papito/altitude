@@ -172,11 +172,15 @@ BaseViewModel = Base.extend({
           console.log(json);
         }
 
+        console.log(typeof  opts.successCallback);
         if (opts.successCallback) {
+          console.log(opts.successCallback);
           opts.successCallback(json, textStatus, jqXHR);
         }
 
+        console.log(opts);
         if (opts.finally) {
+          console.log('here');
           opts.finally();
         }
       }
