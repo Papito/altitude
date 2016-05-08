@@ -134,7 +134,7 @@ BaseViewModel = Base.extend({
             for(var field in errz) {
               var errSelector = '[name=' + field + ']';
               var selector = errElId ? errElId + ' ' + errSelector : errSelector;
-              console.log("eror selector:", selector);
+              console.log("error selector:", selector);
               $(selector)
                   .parent().addClass('has-error').parent()
                   .find('.error').text(errz[field]);

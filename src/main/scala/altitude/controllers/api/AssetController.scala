@@ -23,10 +23,6 @@ class AssetController extends BaseApiController {
     val folderId = params.get(C("Api.Asset.FOLDER_ID")).get
     log.info(s"Moving assets to $folderId")
 
-    if (request.body.isEmpty) {
-      throw ValidationException(C("msg.err.empty_request_body"))
-    }
-
     val json: JsObject = Json.parse(request.body).as[JsObject]
 
     val validator = ApiValidator(List(C("Api.Folder.ASSET_IDS")))
