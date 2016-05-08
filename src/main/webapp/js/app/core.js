@@ -103,13 +103,19 @@ BaseViewModel = Base.extend({
 
     data = opts.data || {};
 
+    var contentType = 'application/x-www-form-urlencoded; charset=UTF-8';
+    if (method === 'POST' || method === 'PUT') {
+      contentType = "application/json";
+      data = JSON.stringify(data);
+    }
+
     $.ajax({
       type : method,
       url : url,
       crossDomain : true,
-      dataType: 'json',
-      contentType: "application/json",
-      data : JSON.stringify(data),
+      dataType: 'json', // expected
+      contentType: contentType, // sent
+      data : data,
       cache : false,
       error : function(jqXHR, textStatus, errorThrown) {
         // unhandled exceptions
@@ -172,15 +178,11 @@ BaseViewModel = Base.extend({
           console.log(json);
         }
 
-        console.log(typeof  opts.successCallback);
         if (opts.successCallback) {
-          console.log(opts.successCallback);
           opts.successCallback(json, textStatus, jqXHR);
         }
 
-        console.log(opts);
         if (opts.finally) {
-          console.log('here');
           opts.finally();
         }
       }
@@ -202,7 +204,6 @@ BaseViewModel = Base.extend({
   /*
     Shared folder browser functionality
    */
-
   getDirectoryNames: function(path) {
     var self = this;
     var opts = {
