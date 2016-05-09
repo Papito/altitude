@@ -51,26 +51,27 @@ class FolderController  extends BaseApiController {
   }
 
   post("/") {
-    val name = params.get(C("Api.Folder.NAME"))
-    val parentId = params.get(C("Api.Folder.PARENT_ID"))
+    val name = (requestJson.get \ C("Api.Folder.NAME")).as[String]
+    val parentId = (requestJson.get \ C("Api.Folder.PARENT_ID")).as[String]
 
-    val newFolder: Folder = app.service.folder.add(Folder(name = name.get, parentId = parentId.get))
+    val newFolder: Folder = app.service.folder.add(Folder(name = name, parentId = parentId))
     log.debug(s"New folder: $newFolder")
 
     Ok(Json.obj(C("Api.Folder.FOLDER") -> newFolder.toJson))
   }
 
   delete("/:id") {
-    val id = params.get(C("Api.ID"))
+    val id = params.get(C("Api.ID")).get
     log.info(s"Deleting folder $id")
-    app.service.folder.deleteById(id.get)
-    Ok("{}")
+    app.service.folder.deleteById(id)
+
+    OK
   }
 
   put("/:id") {
     val id = params.get(C("Api.ID")).get
-    val newName = params.get(C("Api.Folder.NAME"))
-    val newParentId = params.get(C("Api.Folder.PARENT_ID"))
+    val newName = (requestJson.get \ C("Api.Folder.NAME")).asOpt[String]
+    val newParentId = (requestJson.get \ C("Api.Folder.PARENT_ID")).asOpt[String]
 
     if (newName.isDefined) {
       app.service.folder.rename(id, newName.get)
@@ -80,6 +81,6 @@ class FolderController  extends BaseApiController {
       app.service.folder.move(id, newParentId.get)
     }
 
-    Ok("{}")
+    OK
   }
 }

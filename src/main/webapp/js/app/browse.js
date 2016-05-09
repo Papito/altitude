@@ -110,7 +110,7 @@ BrowseViewModel = SearchViewModel.extend({
       }
     };
 
-    this.post('/api/v1/library/assets/move/' + assetId + '/uncategorized', opts);
+    this.post('/api/v1/assets/' + assetId + '/move/to/uncategorized', opts);
   },
 
   moveToTrash: function(assetId) {
@@ -124,7 +124,7 @@ BrowseViewModel = SearchViewModel.extend({
       }
     };
 
-    this.post('/api/v1/library/assets/move/' + assetId + '/trash', opts);
+    this.post('/api/v1/assets/' + assetId + '/move/to/trash', opts);
   },
 
   showAddFolder: function() {
@@ -224,7 +224,7 @@ BrowseViewModel = SearchViewModel.extend({
       }
     };
 
-    this.post('/api/v1/library/assets/move/' + assetId + '/' + folderId, opts);
+    this.post('/api/v1/assets/' + assetId + '/move/' + folderId, opts);
   },
 
   showRenameFolder: function(folderId) {

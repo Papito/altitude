@@ -47,21 +47,17 @@ object Validators {
   API VALIDATOR
    */
   case class ApiValidator(required: List[String]) {
-    def validateForm(params: Params): Unit = {
+    def validate(json: JsObject): Unit = {
       val ex: ValidationException = ValidationException()
 
       required foreach { field =>
-        params.contains(field) match {
+        json.keys.contains(field) match {
           case false => ex.errors += (field -> C("msg.err.required"))
           case _ =>
         }
       }
 
       if (ex.errors.nonEmpty) throw ex
-    }
-
-    def validate(json: JsObject): Unit = {
-      // FIXME: yeah, need this
     }
   }
 }

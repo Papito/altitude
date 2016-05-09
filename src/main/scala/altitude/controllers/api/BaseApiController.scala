@@ -6,52 +6,65 @@ import altitude.Validators.ApiValidator
 import altitude.controllers.BaseController
 import altitude.exceptions.ValidationException
 import altitude.{Const => C}
-import org.scalatra.{BadRequest, GZipSupport, InternalServerError, NotFound}
+import org.scalatra._
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsNull, Json}
+import play.api.libs.json.{JsObject, JsNull, Json}
 
 class BaseApiController extends BaseController with GZipSupport {
   private final val log = LoggerFactory.getLogger(getClass)
+
+  val OK = Ok("{}")
+
   val HTTP_POST_VALIDATOR: Option[ApiValidator] = None
   val HTTP_DELETE_VALIDATOR: Option[ApiValidator] = None
   val HTTP_UPDATE_VALIDATOR: Option[ApiValidator] = None
 
+  var requestJson: Option[JsObject] = None
+
+  def requestMethod = request.getMethod.toLowerCase
+
   before() {
     log.info(
-      s"API ${request.getRequestURI} ${request.getMethod.toUpperCase} request with parameters ${request.getParameterMap}")
+      s"API ${request.getRequestURI} ${requestMethod.toUpperCase} request with ${request.body}")
 
+    // verify that requests with request body are not empty
     checkPayload()
 
-    contentType = "application/json; charset=UTF-8"
+    requestJson = Some(
+      if (request.body.isEmpty) Json.obj() else Json.parse(request.body).as[JsObject]
+    )
 
     /*
-    Process all validators that may be set for this request, per method.
+    Process all validators that may be set for this controller/method.
      */
     HTTP_POST_VALIDATOR match {
-      case Some(ApiValidator(required)) if request.getMethod.toLowerCase == "post" => HTTP_POST_VALIDATOR.get.validateForm(params)
-      case _ if request.getMethod.toLowerCase == "post" =>
+      case Some(ApiValidator(required)) if requestMethod == "post" => HTTP_POST_VALIDATOR.get.validate(requestJson.get)
+      case _ if requestMethod == "post" =>
         log.debug(s"No POST validator specified for ${this.getClass.getName}")
       case _ =>
     }
 
     HTTP_DELETE_VALIDATOR match {
-      case Some(ApiValidator(fields)) if request.getMethod.toLowerCase == "delete" => HTTP_DELETE_VALIDATOR.get.validateForm(params)
-      case _ if request.getMethod.toLowerCase == "delete" =>
+      case Some(ApiValidator(fields)) if requestMethod == "delete" => HTTP_DELETE_VALIDATOR.get.validate(requestJson.get)
+      case _ if requestMethod == "delete" =>
         log.debug(s"No DELETE validator specified for ${this.getClass.getName}")
       case _ =>
     }
 
     HTTP_UPDATE_VALIDATOR match {
-      case Some(ApiValidator(required)) if request.getMethod.toLowerCase == "upodate" => HTTP_UPDATE_VALIDATOR.get.validateForm(params)
-      case _ if request.getMethod.toLowerCase == "update"  =>
-        log.debug(s"No UPDATE validator specified for ${this.getClass.getName}")
+      case Some(ApiValidator(required)) if requestMethod == "put" => HTTP_UPDATE_VALIDATOR.get.validate(requestJson.get)
+      case _ if requestMethod == "update"  =>
+        log.debug(s"No PUT validator specified for ${this.getClass.getName}")
       case _ =>
     }
+
+    // all responses are of type:
+    contentType = "application/json; charset=UTF-8"
   }
 
   // override to disable this check in controllers that do not require a JSON payload for post and put
   private def checkPayload(): Unit = {
-    if (List("post", "put").contains(request.getMethod.toLowerCase) && request.body.isEmpty) {
+    if (List("post", "put").contains(requestMethod) && request.body.isEmpty) {
       throw ValidationException(C("msg.err.empty_request_body"))
     }
   }
