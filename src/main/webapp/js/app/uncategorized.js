@@ -1,4 +1,4 @@
-UncategorizedViewModel = BrowseViewModel.extend({
+UncategorizedViewModel = AssetsViewModel.extend({
   constructor : function() {
     "use strict";
 

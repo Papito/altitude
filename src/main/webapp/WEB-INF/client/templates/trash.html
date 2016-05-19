@@ -3,9 +3,8 @@
 {% block title %} Trash {% endblock %}
 
 {% block assets %}
-<script src="/static/js/app/search.js"></script>
+<script src="/static/js/app/assets.js"></script>
 <script src="/static/js/app/trash.js"></script>
-<script src="/static/js/lib/jquery.endless-scroll.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -22,3 +21,7 @@
   });
 </script>
 {% endblock %}
+
+{% block footer %}
+  {% include "./partials/selection_tools.html" %}
+{% endblock%}

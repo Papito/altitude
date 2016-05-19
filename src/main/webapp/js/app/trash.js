@@ -1,4 +1,4 @@
-TrashViewModel = SearchViewModel.extend({
+TrashViewModel = AssetsViewModel.extend({
   constructor : function() {
     "use strict";
 

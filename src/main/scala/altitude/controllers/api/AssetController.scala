@@ -10,7 +10,7 @@ import play.api.libs.json.{JsObject, Json}
 class AssetController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  post(s"/:id/move/to/folder/:${C("Api.Asset.FOLDER_ID")}") {
+  post(s"/:id/move/:${C("Api.Asset.FOLDER_ID")}") {
     val id = params.get(C("Api.ID")).get
     val folderId = params.get(C("Api.Asset.FOLDER_ID")).get
     log.info(s"Moving $id to $folderId")

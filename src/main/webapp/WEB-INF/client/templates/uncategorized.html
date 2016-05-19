@@ -3,10 +3,8 @@
 {% block title %} Uncategorized {% endblock %}
 
 {% block assets %}
-<script src="/static/js/app/search.js"></script>
-<script src="/static/js/app/browse.js"></script>
+<script src="/static/js/app/assets.js"></script>
 <script src="/static/js/app/uncategorized.js"></script>
-<script src="/static/js/lib/jquery.endless-scroll.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -56,6 +54,20 @@
     </div><!-- /row -->
 
     <!--
+    system folders
+    -->
+    <div class="row">
+      <div id="systemFolders">
+        <div id="trash" class="system-folder">
+          <span class="header">
+            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+              <a data-bind="text: trashFolder().name" href="/client/trash"></a>
+              <span data-bind="html: '<span class=folder-count>(' + trashFolder().numOfAssets + ')</span>'"></span>
+          </span>
+        </div>
+      </div>    </div>
+
+    <!--
     preview
     -->
     <div class="row">
@@ -80,4 +92,8 @@
     ko.applyBindings(uncategorizedViewModel);
   });
 </script>
+{% endblock%}
+
+{% block footer %}
+  {% include "./partials/selection_tools.html" %}
 {% endblock%}
