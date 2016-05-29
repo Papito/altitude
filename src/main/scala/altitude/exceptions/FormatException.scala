@@ -1,3 +1,5 @@
 package altitude.exceptions
 
-case class FormatException(msg: String) extends RuntimeException(msg)
+import altitude.models.Asset
+
+case class FormatException(asset: Asset) extends RuntimeException()

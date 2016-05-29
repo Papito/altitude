@@ -86,16 +86,11 @@ class BaseApiController extends BaseController with GZipSupport {
       ))
     }
     case ex: Exception => {
-      ex.printStackTrace()
-      val sw: StringWriter = new StringWriter()
-      val pw: PrintWriter = new PrintWriter(sw)
-      ex.printStackTrace(pw)
-
-      log.error(s"${ex.getClass.getName} exception: ${sw.toString}")
+      val strStacktrace = altitude.Util.logStacktrace(ex)
 
       InternalServerError(Json.obj(
         C("Api.ERROR") -> (if (ex.getMessage!= null) ex.getMessage else ex.getClass.getName),
-        C("Api.STACKTRACE") -> sw.toString))
+        C("Api.STACKTRACE") -> strStacktrace))
     }
   }
 }

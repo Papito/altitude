@@ -58,6 +58,7 @@ object Const {
     "Api.VALIDATION_ERROR" -> "validation_error",
     "Api.VALIDATION_ERRORS" -> "validation_errors",
     "Api.MULTI_VALUE_DELIM" -> "+",
+    "Api.DUPLICATE_OF" -> "duplicate_of",
 
     "Api.TOTAL_RECORDS" -> "totalRecords",
     "Api.TOTAL_PAGES" -> "totalPages",

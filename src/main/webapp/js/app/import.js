@@ -83,11 +83,12 @@ ImportProtocolHandler = ProtocolHandler.extend({
 
       if (json.imported != null) {
         self.viewModel.assetsProcessedCnt(self.viewModel.assetsProcessedCnt() + 1);
+
         if (json.warning) {
           self.viewModel.addWarning(json.asset, json.warning);
         }
         else if (json.error) {
-          self.viewModel.addError(json.importAsset, json.error);
+          self.viewModel.addError(json.import_asset, json.error);
         }
         else if (json.critical) {
           //FIXME: banner error and exit
@@ -214,7 +215,7 @@ ImportViewModel = BaseViewModel.extend({
   },
 
   addError: function(importAsset, message) {
-    var path = importAsset ? importAsset['absolutePath'] : 'Did not create import asset';
+    var path = importAsset ? importAsset['absolutePath'] : 'Error. See log for details.';
 
     $("#errors").prepend(
         '<div><strong>' +  message + '</strong>: ' + path + '</div>');

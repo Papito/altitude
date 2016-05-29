@@ -160,7 +160,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
 
         while (assetsIt.get.hasNext && !stopImport) {
           val importAsset: FileImportAsset = Some(assetsIt.get.next()).get
-          log.info(s"Processing import assset $importAsset")
+          log.info(s"Processing import asset $importAsset")
 
           try {
             val asset: Option[Asset] = app.service.fileImport.importAsset(importAsset)
@@ -175,14 +175,18 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
           catch {
             case ex: NotImportable => {/* next */}
             case ex: DuplicateException => {
+              log.warn(s"Duplicate for $importAsset")
+              val duplicateOf: Asset = ex.duplicateOf
               val resp = JsObject(Seq(
-                C("Api.WARNING") -> JsString(C("msg.warn.duplicate")),
+                C("Api.WARNING") -> JsString(C("msg.warn.duplicate") + " of " + duplicateOf.path),
                 C("Api.Asset.ASSET") -> ex.objJson,
+                C("Api.DUPLICATE_OF") -> ex.duplicateOf,
                 C("Api.Import.IMPORTED") -> JsBoolean(false)
               ))
               this.writeToYou(resp)
             }
             case ex: MetadataExtractorException => {
+              log.warn(s"Metadata extraction error for $importAsset")
               val resp =JsObject(Seq(
                 C("Api.WARNING") -> JsString(
                   s"Metadata parser(s) failed. Asset still imported"),
@@ -191,7 +195,12 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUplo
               this.writeToYou(resp)
             }
             case ex: Exception => {
-              ex.printStackTrace()
+              log.error(s"Import error for $importAsset")
+              val sw: StringWriter = new StringWriter()
+              val pw: PrintWriter = new PrintWriter(sw)
+              ex.printStackTrace(pw)
+
+              log.error(s"${ex.getClass.getName} exception: ${sw.toString}")
 
               val resp = JsObject(Seq(
                 C("Api.ERROR") -> JsString(ex.toString),

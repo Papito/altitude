@@ -37,4 +37,6 @@ case class Asset(id: Option[String] = None,
     C("Asset.SIZE_BYTES") -> sizeBytes,
     C("Asset.MEDIA_TYPE") -> (mediaType: JsValue),
     C("Asset.METADATA") -> metadata) ++ coreJsonAttrs
+
+  override def toString = s"${this.path} ${this.mediaType.mediaType} ${this.mediaType.mediaSubtype}"
 }

@@ -24,9 +24,11 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
   def add(objIn: Model, queryForDup: Option[Query] = None)(implicit txId: TransactionId = new TransactionId): JsObject = {
     val cleaned = cleanAndValidate(objIn)
 
-    if (queryForDup.isDefined && query(queryForDup.get).nonEmpty) {
+    val existing = if (queryForDup.isDefined) query(queryForDup.get) else QueryResult.EMPTY
+
+    if (existing.nonEmpty) {
       log.debug(s"Duplicate found for $objIn and query: ${queryForDup.get.params}")
-      throw DuplicateException(objIn)
+      throw DuplicateException(objIn, existing.records.head)
     }
 
     txManager.withTransaction[JsObject] {
@@ -38,9 +40,11 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
                 (implicit txId: TransactionId): Int = {
     val cleaned = cleanAndValidate(objIn)
 
-    if (queryForDup.isDefined && query(queryForDup.get).nonEmpty) {
+    val existing = if (queryForDup.isDefined) query(queryForDup.get) else QueryResult.EMPTY
+
+    if (existing.nonEmpty) {
       log.debug(s"Duplicate found for $objIn and query: ${queryForDup.get.params}")
-      throw DuplicateException(objIn)
+      throw DuplicateException(objIn, existing.records.head)
     }
 
     txManager.withTransaction[Int] {

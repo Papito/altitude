@@ -3,7 +3,7 @@ package altitude.service
 import java.io.{File, FileInputStream, InputStream}
 
 import altitude.dao.FileSystemImportDao
-import altitude.exceptions.MetadataExtractorException
+import altitude.exceptions.{FormatException, MetadataExtractorException}
 import altitude.models.{Asset, FileImportAsset, Folder, MediaType}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
@@ -73,7 +73,19 @@ class FileImportService(app: Altitude) {
       sizeBytes = fileSizeInBytes,
       folderId = Folder.UNCATEGORIZED.id.get)
 
-    val previewData = app.service.library.genPreviewData(asset)
+
+    var previewData: Option[Array[Byte]] = None
+
+    try {
+      val data = app.service.library.genPreviewData(asset)
+      previewData = Some(data)
+    }
+    catch {
+      case ex: FormatException => {
+        return None
+      }
+    }
+
 
     val assetWithPreview = Asset(
       path = asset.path,
@@ -82,7 +94,7 @@ class FileImportService(app: Altitude) {
       sizeBytes = asset.sizeBytes,
       folderId = asset.folderId,
       metadata = metadata,
-      previewData = previewData)
+      previewData = previewData.get)
 
     val res = app.service.library.add(assetWithPreview)
 

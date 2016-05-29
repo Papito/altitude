@@ -5,7 +5,7 @@ import java.awt.{AlphaComposite, Graphics2D}
 import java.io._
 import javax.imageio.ImageIO
 
-import altitude.exceptions.DuplicateException
+import altitude.exceptions.{FormatException, DuplicateException}
 import altitude.models.search.{Query, QueryResult}
 import altitude.models.{Asset, Folder, Preview}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
@@ -30,7 +30,7 @@ class LibraryService(app: Altitude) {
 
       if (existing.nonEmpty) {
         log.warn(s"Asset already exists for ${obj.path}")
-        throw DuplicateException(obj.toJson)
+        throw DuplicateException(obj.toJson, existing.records.head)
       }
 
       val assetJson: JsObject = app.service.asset.add(obj)
@@ -134,33 +134,41 @@ class LibraryService(app: Altitude) {
   }
 
   private def makeImageThumbnail(asset: Asset): Array[Byte] = {
-    val inFile = new File(asset.path)
-    val srcImage: BufferedImage = ImageIO.read(inFile)
-    val scaledImage: BufferedImage = Scalr.resize(srcImage, Scalr.Method.ULTRA_QUALITY, PREVIEW_BOX_SIZE)
-    val height: Int = scaledImage.getHeight
-    val width: Int = scaledImage.getWidth
+    try {
+      val inFile = new File(asset.path)
+      val srcImage: BufferedImage = ImageIO.read(inFile)
+      val scaledImage: BufferedImage = Scalr.resize(srcImage, Scalr.Method.ULTRA_QUALITY, PREVIEW_BOX_SIZE)
+      val height: Int = scaledImage.getHeight
+      val width: Int = scaledImage.getWidth
 
-    val x: Int = height > width match {
-      case true => (PREVIEW_BOX_SIZE - width) / 2
-      case false => 0
+      val x: Int = height > width match {
+        case true => (PREVIEW_BOX_SIZE - width) / 2
+        case false => 0
+      }
+
+      val y: Int = height < width match {
+        case true => (PREVIEW_BOX_SIZE - height) / 2
+        case false => 0
+      }
+
+      val COMPOSITE_IMAGE: BufferedImage = new BufferedImage(PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE, BufferedImage.TYPE_INT_ARGB)
+      val G2D: Graphics2D = COMPOSITE_IMAGE.createGraphics
+
+      G2D.setComposite(AlphaComposite.Clear)
+      G2D.fillRect(0, 0, PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE)
+      G2D.setComposite(AlphaComposite.Src)
+      G2D.drawImage(scaledImage, x, y, null)
+      val byteArray: ByteArrayOutputStream = new ByteArrayOutputStream
+      ImageIO.write(COMPOSITE_IMAGE, "png", byteArray)
+
+      byteArray.toByteArray
+    } catch {
+      case ex: Exception => {
+        log.error(s"Error generating preview for $asset")
+        altitude.Util.logStacktrace(ex)
+        throw FormatException(asset)
+      }
     }
-
-    val y: Int = height < width match {
-      case true => (PREVIEW_BOX_SIZE - height) / 2
-      case false => 0
-    }
-
-    val COMPOSITE_IMAGE: BufferedImage = new BufferedImage(PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE, BufferedImage.TYPE_INT_ARGB)
-    val G2D: Graphics2D = COMPOSITE_IMAGE.createGraphics
-
-    G2D.setComposite(AlphaComposite.Clear)
-    G2D.fillRect(0, 0, PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE)
-    G2D.setComposite(AlphaComposite.Src)
-    G2D.drawImage(scaledImage, x, y, null)
-    val byteArray: ByteArrayOutputStream = new ByteArrayOutputStream
-    ImageIO.write(COMPOSITE_IMAGE, "png", byteArray)
-
-    byteArray.toByteArray
   }
 
   def moveAssetToFolder(assetId: String, folderId: String)(implicit txId: TransactionId = new TransactionId): Asset = {
