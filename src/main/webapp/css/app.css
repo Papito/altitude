@@ -230,16 +230,16 @@ footer {
 }
 
 #searchResults .result-box {
-    border: solid 1px #212223;
+    border: solid 2px #212223;
     display: inline-block;
 }
 
 #searchResults .result-box.focused {
-    border: 1px solid darkred;
+    border: 2px solid darkred;
 }
 
 #searchResults .result-box.selected {
-    background: #182660;
+    border: 2px solid #00c5f4;
 }
 
 #addFolderForm input, #renameFolderForm input {

@@ -375,8 +375,10 @@ AssetsViewModel = BaseViewModel.extend({
     var self = this;
 
     var currentPos = curEl.position();
+    console.log('current');
+    console.log(currentPos);
     var height = curEl.height();
-    var offset = $('#searchResults').offset();
+    var offset = curEl.offset();
 
     var newPos = {};
     var elem = null;
@@ -384,15 +386,19 @@ AssetsViewModel = BaseViewModel.extend({
 
     switch (direction) {
       case 'down':
-        newPos.left = offset.left + currentPos.left;
-        newPos.top  = offset.top + currentPos.top + height + 10;
+        newPos.left = offset.left + 10;
+        newPos.top  = offset.top  + height + 20;
         elem = document.elementFromPoint(newPos.left, newPos.top);
+        console.log('element');
+        console.log(elem);
         assetId = $(elem).parent().attr('asset_id');
+        console.log('asset id');
+        console.log(assetId);
         break;
 
       case 'up':
-        newPos.left = offset.left + currentPos.left;
-        newPos.top  = offset.top + currentPos.top - height + 10;
+        newPos.left = offset.left + 10;
+        newPos.top  = offset.top - height + 20;
         elem = document.elementFromPoint(newPos.left, newPos.top);
         assetId = $(elem).parent().attr('asset_id');
         break;
@@ -406,6 +412,9 @@ AssetsViewModel = BaseViewModel.extend({
         elem = curEl.prev();
         assetId = $(elem).attr('asset_id');
     }
+
+    console.log('new');
+    console.log(newPos);
 
     /*
      Paginate once we hit a boundary
