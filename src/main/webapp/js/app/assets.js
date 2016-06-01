@@ -534,12 +534,12 @@ AssetsViewModel = BaseViewModel.extend({
     console.log('deselect all');
 
     self.searchResults().forEach(function(asset) {
-      delete self.selectedAssetsMap[asset.id];
-      self.selectedIds.remove(function (id) {
-        return id === asset.id;
-      });
       asset.selected(false);
-    })
+    });
+
+    this.selectedAssetsMap = {};
+    this.selectedIds([]);
+    console.log(this.selectedCount());
   },
 
   deselectFocused: function() {
@@ -558,14 +558,8 @@ AssetsViewModel = BaseViewModel.extend({
     focusedAsset.selected(false);
   },
 
-  deleteSelectedAssets: function() {
-    console.log('deleting selected');
-  },
-
-  clearSelection: function() {
-    this.deselectAll();
-    this.selectedAssetsMap = {};
-    this.selectedIds();
+  showDeleteSelectedAssets: function() {
+    console.log('show deleting selected');
   },
 
   showMoveSelectedAssets: function() {
@@ -644,7 +638,7 @@ AssetsViewModel = BaseViewModel.extend({
         self.blinkSuccess("Assets moved");
       },
       'finally': function() {
-        self.clearSelection();
+        self.deselectAll();
         $('#selectAssetMoveModal').modal('hide');
       }
     };
@@ -909,6 +903,10 @@ AssetsViewModel = BaseViewModel.extend({
     };
 
     this.put('/api/v1/folders/' + moveFolderId, opts);
+  },
+
+  showQuickSelectionView: function() {
+
   },
 
   _removeFolder: function(id, hierarchy) {
