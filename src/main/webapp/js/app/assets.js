@@ -386,8 +386,8 @@ AssetsViewModel = BaseViewModel.extend({
 
     switch (direction) {
       case 'down':
-        newPos.left = offset.left + 10;
-        newPos.top  = offset.top  + height + 20;
+        newPos.left = offset.left + 30;
+        newPos.top  = offset.top  + height + 30;
         elem = document.elementFromPoint(newPos.left, newPos.top);
         console.log('element');
         console.log(elem);
@@ -397,8 +397,8 @@ AssetsViewModel = BaseViewModel.extend({
         break;
 
       case 'up':
-        newPos.left = offset.left + 10;
-        newPos.top  = offset.top - height + 20;
+        newPos.left = offset.left + 30;
+        newPos.top  = offset.top - height + 30;
         elem = document.elementFromPoint(newPos.left, newPos.top);
         assetId = $(elem).parent().attr('asset_id');
         break;

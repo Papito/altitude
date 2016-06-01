@@ -232,6 +232,7 @@ footer {
 #searchResults .result-box {
     border: solid 2px #212223;
     display: inline-block;
+    padding: 5px;
 }
 
 #searchResults .result-box.focused {
@@ -240,6 +241,10 @@ footer {
 
 #searchResults .result-box.selected {
     border: 2px solid #00c5f4;
+}
+
+#searchResults .result-box.selected.focused {
+    border: 2px solid #cf38f4;
 }
 
 #addFolderForm input, #renameFolderForm input {
