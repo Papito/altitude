@@ -98,7 +98,28 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button id="moveAssets"  type="button" class="btn btn-primary" data-bind="click: moveSelectedAssets">Move</button>
+          <button id="moveAssets"  type="button" class="btn btn-warning" data-bind="click: moveSelectedAssets">Move</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Delete assets -->
+<div class="modal fade" id="selectAssetDeleteModal" tabindex="-1" role="dialog" aria-labelledby="selectAssetDeleteLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form>
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="selectAssetDelteteLabel">Confirm</h4>
+        </div>
+        <div class="modal-body">
+          Delete <span data-bind="text: selectedCount"></span> selected assets?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button id="deleteAssets"  type="button" class="btn btn-danger" data-bind="click: deleteSelectedAssets">Delete</button>
         </div>
       </form>
     </div>

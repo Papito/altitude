@@ -559,12 +559,32 @@ AssetsViewModel = BaseViewModel.extend({
   },
 
   showDeleteSelectedAssets: function() {
-    console.log('show deleting selected');
+    var self = this;
+    $('#selectAssetDeleteModal').modal();
+  },
+
+  deleteSelectedAssets: function() {
+    var self = this;
+
+    var opts = {
+      'data': {
+        'asset_ids': self.selectedIds()
+      },
+      'successCallback': function() {
+        self.loadFolders();
+        self.blinkWarning("Assets moved to trash");
+      },
+      'finally': function() {
+        self.deselectAll();
+        $('#selectAssetDeleteModal').modal('hide');
+      }
+    };
+
+    self.post('/api/v1/assets/move/to/trash', opts);
   },
 
   showMoveSelectedAssets: function() {
     var self = this;
-    console.log('Moving assets');
 
     var targetSelected = typeof $('#moveAssetsToFolderTree').jstree('get_selected')[0] === "string";
 

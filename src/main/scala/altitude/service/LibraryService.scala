@@ -171,6 +171,23 @@ class LibraryService(app: Altitude) {
     }
   }
 
+  private def updateAssetFolder(asset: Asset, folder: Folder)(implicit txId: TransactionId): Asset = {
+    val updateObj: Asset = new Asset(
+      id = asset.id,
+      path = asset.path,
+      md5 = asset.md5,
+      mediaType = asset.mediaType,
+      sizeBytes = asset.sizeBytes,
+      folderId = folder.id.get,
+      metadata = asset.metadata)
+
+    app.service.asset.updateById(asset.id.get, updateObj, fields = List(C("Asset.FOLDER_ID")))
+    app.service.folder.decrAssetCount(asset.folderId)
+    app.service.folder.incrAssetCount(updateObj.folderId)
+    updateObj
+  }
+
+
   def moveAssetToFolder(assetId: String, folderId: String)(implicit txId: TransactionId = new TransactionId): Asset = {
     txManager.withTransaction[Asset] {
       val asset: Asset = this.getById(assetId)
@@ -192,31 +209,27 @@ class LibraryService(app: Altitude) {
     }
   }
 
-  private def updateAssetFolder(asset: Asset, folder: Folder)(implicit txId: TransactionId): Asset = {
-    val updateObj: Asset = new Asset(
-      id = asset.id,
-      path = asset.path,
-      md5 = asset.md5,
-      mediaType = asset.mediaType,
-      sizeBytes = asset.sizeBytes,
-      folderId = folder.id.get,
-      metadata = asset.metadata)
-
-    app.service.asset.updateById(asset.id.get, updateObj, fields = List(C("Asset.FOLDER_ID")))
-    app.service.folder.decrAssetCount(asset.folderId)
-    app.service.folder.incrAssetCount(updateObj.folderId)
-    updateObj
-  }
-
   def moveToUncategorized(assetId: String)(implicit txId: TransactionId = new TransactionId) = {
     txManager.withTransaction {
       moveAssetToFolder(assetId, Folder.UNCATEGORIZED.id.get)
     }
   }
 
+  def moveAssetsToUncategorized(assetIds: Set[String])(implicit txId: TransactionId = new TransactionId): Unit = {
+    txManager.withTransaction[Unit] {
+      moveAssetsToFolder(assetIds, Folder.UNCATEGORIZED.id.get)
+    }
+  }
+
   def moveToTrash(assetId: String)(implicit txId: TransactionId = new TransactionId) = {
     txManager.withTransaction {
       moveAssetToFolder(assetId, Folder.TRASH.id.get)
+    }
+  }
+
+  def moveAssetsToTrash(assetIds: Set[String])(implicit txId: TransactionId = new TransactionId): Unit = {
+    txManager.withTransaction[Unit] {
+      moveAssetsToFolder(assetIds, Folder.TRASH.id.get)
     }
   }
 }

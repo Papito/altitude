@@ -30,10 +30,34 @@ class AssetController extends BaseApiController {
 
     val assetIds = (requestJson.get \ C("Api.Folder.ASSET_IDS")).as[Set[String]]
 
-    log.debug(s"Assets to move $assetIds")
+    log.debug(s"Assets to move: $assetIds")
 
     app.service.library.moveAssetsToFolder(assetIds, folderId)
-    Ok("{}")
+
+    OK
+  }
+
+  post(s"/:id/move/to/trash") {
+    val id = params.get(C("Api.ID")).get
+    log.info(s"Moving $id to TRASH")
+    app.service.library.moveToTrash(id)
+
+    OK
+  }
+
+  post(s"/move/to/trash") {
+    log.info(s"Deleting assets")
+
+    val validator = ApiValidator(List(C("Api.Folder.ASSET_IDS")))
+    validator.validate(requestJson.get)
+
+    val assetIds = (requestJson.get \ C("Api.Folder.ASSET_IDS")).as[Set[String]]
+
+    log.debug(s"Assets to move to trash: $assetIds")
+
+    app.service.library.moveAssetsToTrash(assetIds)
+
+    OK
   }
 
   post(s"/:id/move/to/uncategorized") {
@@ -44,10 +68,18 @@ class AssetController extends BaseApiController {
     OK
   }
 
-  post(s"/:id/move/to/trash") {
-    val id = params.get(C("Api.ID")).get
-    log.info(s"Moving $id to TRASH")
-    app.service.library.moveToTrash(id)
+
+  post(s"/move/to/uncategorized") {
+    log.info(s"Clearing category")
+
+    val validator = ApiValidator(List(C("Api.Folder.ASSET_IDS")))
+    validator.validate(requestJson.get)
+
+    val assetIds = (requestJson.get \ C("Api.Folder.ASSET_IDS")).as[Set[String]]
+
+    log.debug(s"Assets to move to uncategorized: $assetIds")
+
+    app.service.library.moveAssetsToUncategorized(assetIds)
 
     OK
   }
