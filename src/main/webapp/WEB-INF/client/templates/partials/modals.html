@@ -63,21 +63,25 @@
 <script src="/static/js/lib/jstree/jstree.min.js"></script>
 
 <!-- Move folder -->
-<div class="modal fade" id="selectFolderMoveModal" tabindex="-1" role="dialog" aria-labelledby="selectFolderMoveLabel">
+<div class="modal fade"
+     id="folderSelModal-moveFolder"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="folderSelModal-moveFolder-lbl">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <form>
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="selectFolderMoveLabel">Select folder to move to</h4>
+          <h4 class="modal-title" id="folderSelModal-moveFolder-lbl">Select folder to move to</h4>
         </div>
         <div class="modal-body">
-          <div id="moveToFolderTree"></div>
+          <div id="folderSelModal-moveFolder-tree"></div>
           <input type="hidden" id="moveFolderId">
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button id="moveFolder" type="button" class="btn btn-primary" data-bind="click: moveFolder">Move</button>
+          <button id="folderSelModal-moveFolder-actionBtn" type="button" class="btn btn-primary" data-bind="click: moveFolder">Move</button>
         </div>
       </form>
     </div>
@@ -85,20 +89,24 @@
 </div>
 
 <!-- Move assets -->
-<div class="modal fade" id="selectAssetMoveModal" tabindex="-1" role="dialog" aria-labelledby="selectAssetMoveLabel">
+<div class="modal fade"
+     id="folderSelModal-moveSelectedAssets"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="folderSelModal-moveSelectedAssets-lbl">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <form>
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="selectAssetMoveLabel">Select folder to move to</h4>
+          <h4 class="modal-title" id="folderSelModal-moveSelectedAssets-lbl">Select folder to move to</h4>
         </div>
         <div class="modal-body">
-          <div id="moveAssetsToFolderTree"></div>
+          <div id="folderSelModal-moveSelectedAssets-tree"></div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button id="moveAssets"  type="button" class="btn btn-warning" data-bind="click: moveSelectedAssets">Move</button>
+          <button id="folderSelModal-moveSelectedAssets-actionBtn"  type="button" class="btn btn-warning" data-bind="click: moveSelectedAssets">Move</button>
         </div>
       </form>
     </div>
@@ -106,20 +114,20 @@
 </div>
 
 <!-- Delete assets -->
-<div class="modal fade" id="selectAssetDeleteModal" tabindex="-1" role="dialog" aria-labelledby="selectAssetDeleteLabel">
+<div class="modal fade" id="delSelectedAssetsModal" tabindex="-1" role="dialog" aria-labelledby="delSelectedAssetsModal-lbl">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <form>
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="selectAssetDelteteLabel">Confirm</h4>
+          <h4 class="modal-title" id="delSelectedAssetsModal-lbl">Confirm</h4>
         </div>
         <div class="modal-body">
           Delete <span data-bind="text: selectedCount"></span> selected assets?
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button id="deleteAssets"  type="button" class="btn btn-danger" data-bind="click: deleteSelectedAssets">Delete</button>
+          <button id="delSelectedAssetsModal-actionBtn"  type="button" class="btn btn-danger" data-bind="click: deleteSelectedAssets">Delete</button>
         </div>
       </form>
     </div>

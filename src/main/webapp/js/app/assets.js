@@ -164,10 +164,11 @@ AssetsViewModel = BaseViewModel.extend({
 
 
     // initialize commonly used elements
-    this.moveToFolderTreeEl = $('#moveToFolderTree');
-    this.moveFolderEl = $('#moveFolder');
-    this.moveAssetsToFolderTreeEl = $('#moveAssetsToFolderTree');
-    this.moveAssetsEl = $('#moveAssets');
+    this.moveToFolderTreeEl = $('#folderSelModal-moveFolder-tree');
+    this.moveFolderEl = $('#folderSelModal-moveFolder-actionBtn');
+    this.moveAssetsToFolderTreeEl = $('#folderSelModal-moveSelectedAssets-tree');
+    this.moveAssetsEl = $('#folderSelModal-moveSelectedAssets-actionBtn');
+
     this.uncategorizedEl = $('#uncategorized');
     this.trashEl = $('#trash');
 
@@ -580,7 +581,7 @@ AssetsViewModel = BaseViewModel.extend({
 
   showDeleteSelectedAssets: function() {
     var self = this;
-    $('#selectAssetDeleteModal').modal();
+    $('#delSelectedAssetsModal').modal();
   },
 
   deleteSelectedAssets: function() {
@@ -596,7 +597,7 @@ AssetsViewModel = BaseViewModel.extend({
       },
       'finally': function() {
         self.deselectAll();
-        $('#selectAssetDeleteModal').modal('hide');
+        $('#delSelectedAssetsModal').modal('hide');
       }
     };
 
@@ -671,7 +672,7 @@ AssetsViewModel = BaseViewModel.extend({
     var self = this;
 
     var successCallback = function() {
-      $('#selectAssetMoveModal').modal();
+      $('#folderSelModal-moveSelectedAssets').modal();
     };
 
     self._showFolderModal(
@@ -700,7 +701,7 @@ AssetsViewModel = BaseViewModel.extend({
     $('#moveFolderId').val(folderId);
 
     var successCallback = function() {
-      $('#selectFolderMoveModal').modal();
+      $('#folderSelModal-moveFolder').modal();
     };
 
     var folderFilterFn = function(allFolders) {
@@ -729,7 +730,7 @@ AssetsViewModel = BaseViewModel.extend({
       },
       'finally': function() {
         self.deselectAll();
-        $('#selectAssetMoveModal').modal('hide');
+        $('#folderSelModal-moveSelectedAssets').modal('hide');
       }
     };
 
@@ -920,7 +921,7 @@ AssetsViewModel = BaseViewModel.extend({
         self.blinkSuccess("Folder moved");
       },
       'finally': function() {
-        $('#selectFolderMoveModal').modal('hide');
+        $('#folderSelModal-moveFolder').modal('hide');
       },
       'data': {
         'parent_id': moveToFolderId
