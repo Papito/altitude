@@ -38,17 +38,6 @@ AssetsViewModel = BaseViewModel.extend({
       return this.currentPage() < this.totalPages();
     }, this);
 
-
-    this.moveAssetsToFolderTreeEl = $('#moveAssetsToFolderTree');
-    this.moveAssetsEl = $('#moveAssets');
-
-    // when a folder is selected, enable the "move" button
-    this.moveAssetsToFolderTreeEl.bind(
-        "select_node.jstree", function(){
-          self.moveAssetsEl.removeAttr('disabled');
-        }
-    );
-
     // set up shortcuts
     Mousetrap.bind(['.', 'pagedown'], function() {
       self.gotoNextPage();
@@ -124,9 +113,9 @@ AssetsViewModel = BaseViewModel.extend({
       $('#renameFolderInput').focus().select();
     });
 
-    // register the context menu
+    // register the folder context menu
     $.contextMenu({
-      selector: 'span.context-menu',
+      selector: 'li.folder',
       items: {
         rename: {
           name: "Rename",
@@ -152,9 +141,33 @@ AssetsViewModel = BaseViewModel.extend({
       }
     });
 
+    // register the asset context menu
+    $.contextMenu({
+      selector: 'div.result-box',
+      items: {
+        move: {
+          name: "Move",
+          callback: function(key, opt){
+            var assetId = opt.$trigger.context.attributes.getNamedItem('asset_id').nodeValue;
+            self.showMoveAsset(assetId);
+          }
+        },
+        delete: {
+          name: "Move to trash",
+          callback: function(key, opt){
+            var assetId = opt.$trigger.context.attributes.getNamedItem('asset_id').nodeValue;
+            self.moveToTrash(assetId);
+          }
+        }
+      }
+    });
+
+
     // initialize commonly used elements
     this.moveToFolderTreeEl = $('#moveToFolderTree');
     this.moveFolderEl = $('#moveFolder');
+    this.moveAssetsToFolderTreeEl = $('#moveAssetsToFolderTree');
+    this.moveAssetsEl = $('#moveAssets');
     this.uncategorizedEl = $('#uncategorized');
     this.trashEl = $('#trash');
 
@@ -165,6 +178,13 @@ AssetsViewModel = BaseViewModel.extend({
         }
     );
 
+
+    // when a folder is selected, enable the "move" button
+    this.moveAssetsToFolderTreeEl.bind(
+        "select_node.jstree", function(){
+          self.moveAssetsEl.removeAttr('disabled');
+        }
+    );
     /*
      system folders
      */
@@ -583,20 +603,24 @@ AssetsViewModel = BaseViewModel.extend({
     self.post('/api/v1/assets/move/to/trash', opts);
   },
 
-  showMoveSelectedAssets: function() {
+  _showFolderModal: function(treeEl, actionEl, successFn, folderFilterFn) {
     var self = this;
 
-    var targetSelected = typeof $('#moveAssetsToFolderTree').jstree('get_selected')[0] === "string";
+    var targetFolderSelected = typeof treeEl.jstree('get_selected')[0] === "string";
 
-    if (targetSelected) {
-      self.moveAssetsEl.removeAttr('disabled');
+    if (targetFolderSelected) {
+      actionEl.removeAttr('disabled');
     } else {
-      self.moveAssetsEl.attr('disabled','disabled');
+      actionEl.attr('disabled','disabled');
     }
 
     var opts = {
       'successCallback': function (json) {
         var allFolders = json.hierarchy;
+
+        if (folderFilterFn) {
+          folderFilterFn(allFolders);
+        }
 
         if (allFolders.length === 0) {
           self.blinkWarning("No possible folders to move to");
@@ -608,8 +632,6 @@ AssetsViewModel = BaseViewModel.extend({
           'name': 'Root',
           'children': allFolders
         }];
-
-        console.log(hierarchy);
 
         // traverse the hierarchy and "massage" the tree. name -> text
         function _processFolderNode(node) {
@@ -627,7 +649,7 @@ AssetsViewModel = BaseViewModel.extend({
 
         $.jstree.defaults.core.themes.variant = "large";
 
-        self.moveAssetsToFolderTreeEl.jstree({
+        treeEl.jstree({
           'core' : {
             "multiple" : false,
             "animation" : 0,
@@ -635,13 +657,61 @@ AssetsViewModel = BaseViewModel.extend({
           "plugins" : ["search"]
         });
 
-        self.moveAssetsToFolderTreeEl.jstree(true).settings.core.data = hierarchy;
-        self.moveAssetsToFolderTreeEl.jstree(true).refresh();
-        $('#selectAssetMoveModal').modal();
+        treeEl.jstree(true).settings.core.data = hierarchy;
+        treeEl.jstree(true).refresh();
+
+        successFn(json);
       }
     };
 
     self.get('/api/v1/folders', opts);
+  },
+
+  showMoveSelectedAssets: function() {
+    var self = this;
+
+    var successCallback = function() {
+      $('#selectAssetMoveModal').modal();
+    };
+
+    self._showFolderModal(
+        self.moveAssetsToFolderTreeEl,
+        self.moveAssetsEl,
+        successCallback);
+  },
+
+  showMoveAsset: function(asset_id) {
+    var self = this;
+
+    var successCallback = function() {
+      self.moveAssetToFolder(asset_id);
+    };
+
+    self._showFolderModal(
+        self.moveAssetsToFolderTreeEl,
+        self.moveAssetsEl,
+        successCallback);
+  },
+
+
+  showMoveFolder: function(folderId) {
+    var self = this;
+
+    $('#moveFolderId').val(folderId);
+
+    var successCallback = function() {
+      $('#selectFolderMoveModal').modal();
+    };
+
+    var folderFilterFn = function(allFolders) {
+      self._removeFolder(folderId, allFolders);
+    };
+
+    self._showFolderModal(
+        self.moveToFolderTreeEl,
+        self.moveFolderEl,
+        successCallback,
+        folderFilterFn);
   },
 
   moveSelectedAssets: function() {
@@ -763,7 +833,7 @@ AssetsViewModel = BaseViewModel.extend({
         var trashFolder = new Folder(json['system']['2']);
         self.trashFolder(trashFolder);
 
-        var elFolderTargets = $(".folder-target");
+        var elFolderTargets = $(".folder");
         elFolderTargets.droppable({
           accept: ".result-box",
           hoverClass: "highlight",
@@ -781,7 +851,7 @@ AssetsViewModel = BaseViewModel.extend({
     this.get('/api/v1/folders/' + folderId + "/children", opts);
   },
 
-  moveToFolder: function(assetId, folderId) {
+  moveAssetToFolder: function(assetId, folderId) {
     var self = this;
     var opts = {
       'successCallback': function() {
@@ -802,71 +872,6 @@ AssetsViewModel = BaseViewModel.extend({
     $('#renameFolderId').val(folderId);
     modal.modal();
     self.resetFormErrors('#renameFolderForm');
-  },
-
-  showMoveFolder: function(folderId) {
-    var self = this;
-    $('#moveFolderId').val(folderId);
-    console.log('Moving', folderId);
-
-    var targetSelected = typeof $('#moveToFolderTree').jstree('get_selected')[0] === "string";
-
-    if (targetSelected) {
-      self.moveFolderEl.removeAttr('disabled');
-    } else {
-      self.moveFolderEl.attr('disabled','disabled');
-    }
-
-    var opts = {
-      'successCallback': function (json) {
-        var allFolders = json.hierarchy;
-
-        self._removeFolder(folderId, allFolders);
-
-        if (allFolders.length === 0) {
-          self.blinkWarning("No possible folders to move to");
-          return;
-        }
-
-        var hierarchy = [{
-          'id': '0',
-          'name': 'Root',
-          'children': allFolders
-        }];
-
-        console.log(hierarchy);
-
-        // traverse the hierarchy and "massage" the tree. name -> text
-        function _processFolderNode(node) {
-          node.text = node.name;
-          for (var i = 0; i < node.children.length; ++i) {
-            var child = node.children[i];
-            _processFolderNode(child);
-          }
-        }
-
-        for (var i = 0; i < hierarchy.length; ++i) {
-          var node = hierarchy[i];
-          _processFolderNode(node);
-        }
-
-        $.jstree.defaults.core.themes.variant = "large";
-
-        self.moveToFolderTreeEl.jstree({
-          'core' : {
-            "multiple" : false,
-            "animation" : 0,
-            "check_callback": true},
-          "plugins" : ["search"]
-        });
-
-        self.moveToFolderTreeEl.jstree(true).settings.core.data = hierarchy;
-        self.moveToFolderTreeEl.jstree(true).refresh();
-        $('#selectFolderMoveModal').modal();
-      }
-    };
-
-    this.get('/api/v1/folders', opts);
   },
 
   deleteFolder: function(folderId) {

@@ -41,13 +41,11 @@
         </div>
 
         <ul data-bind="foreach: folders">
-          <li class="folder-target">
-          <span class="context-menu" data-bind="attr: {'folder_id': $data.id}">
+          <li class="folder" data-bind="attr: {'folder_id': $data.id}">
             <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
             &nbsp;
             <a href="#" data-bind="text: name, click: function() {$root.loadFolders($data.id)}"></a>
             <span data-bind="html: '<span class=folder-count>(' + numOfAssets + ')</span>'"></span>
-          </span>
           </li>
         </ul>
       </div><!-- /folders -->
