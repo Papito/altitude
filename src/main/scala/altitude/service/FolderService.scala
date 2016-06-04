@@ -313,9 +313,9 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       throw IllegalOperationException(s"Cannot move a folder into itself. ID: $folderBeingMovedId")
     }
 
-    txManager.asReadOnly {
+    txManager.withTransaction {
       // cannot move into own child
-      if (flatChildrenIdsWithDepths(folderBeingMovedId, getNonSysFolders()).map (_._2).contains(destFolderId)) {
+      if (flatChildrenIdsWithDepths(folderBeingMovedId, getNonSysFolders()).map(_._2).contains(destFolderId)) {
         throw IllegalOperationException(s"Cannot move a folder into own child. $destFolderId ID in $folderBeingMovedId path")
       }
 
