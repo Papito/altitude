@@ -41,10 +41,10 @@
         </div>
 
         <ul data-bind="foreach: folders">
-          <li class="folder" data-bind="attr: {'folder_id': $data.id}">
+          <li class="folder" data-bind="attr: {'folder_id': $data.id}, click: function() {$root.goIntoFolder($data.id)}">
               <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
               &nbsp;
-              <a href="#" data-bind="text: name, click: function() {$root.goIntoFolder($data.id)}"></a>
+              <a href="#" data-bind="text: name"></a>
               <span data-bind="html: '<span class=folder-count>(' + numOfAssets + ')</span>'"></span>
           </li>
         </ul>

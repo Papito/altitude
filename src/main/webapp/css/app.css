@@ -322,6 +322,11 @@ footer {
     padding-left: 0.7em;
 }
 
+li.folder {
+    cursor: pointer;
+    cursor: hand;
+}
+
 #systemFolders {
     padding-left: .4em;
     padding-top: .6em;
