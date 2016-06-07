@@ -45,13 +45,15 @@ select {
 }
 
 .breadcrumb {
-    background-color: #363d42;
     border-radius: 0.2em;
     margin-bottom: 1em;
-    border-color: #3b3b3b;
+    border-width: 2px;
     border-left: None;
     border-right: None;
+    border-top: 1px solid #3b3b3b;
+    border-bottom: 1px solid #3b3b3b;
     padding: .4em;
+    background-image: none;
 }
 
 /* GLOBAL */
@@ -388,8 +390,8 @@ li.folder {
 }
 
 #selectionTools {
- text-align: center;
- margin-top: 1em;
+    margin-top: 1em;
+    margin-left: .5em;
 }
 
 /* MISC */

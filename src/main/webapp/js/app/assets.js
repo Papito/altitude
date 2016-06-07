@@ -870,8 +870,8 @@ AssetsViewModel = BaseViewModel.extend({
 
         elFolderTargets.on("drop", function( event, ui ) {
           var assetId = $(ui.draggable.context).attr('asset_id');
-          var folderId = $(event.target).find('span').attr('folder_id');
-          self.moveToFolder(assetId, folderId);
+          var folderId = $(event.target).attr('folder_id');
+          self.moveAssetToFolder(assetId, folderId);
         });
       }
     };

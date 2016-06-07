@@ -12,7 +12,9 @@
   <ol class="breadcrumb" data-bind="visible: currentFolderPath().length > 1, foreach: currentFolderPath" style="display: none">
     <li><a href="#" data-bind="text: $data.name, click: function() {$root.goIntoFolder($data.id)}"></a></li>
   </ol>
+</div>
 
+<div class="row">
   <div class="col-md-2" id="left">
     <div class="row">
       <div id="folders">
@@ -55,13 +57,11 @@
     system folders
     -->
     <div class="row">
-      {% include "./partials/system_folders.html" %}
+        {% include "./partials/system_folders.html" %}
     </div>
 
     <div class="row">
-      <div class="col-md-12">
         {% include "./partials/selection_tools.html" %}
-      </div>
     </div>
 
   </div>
