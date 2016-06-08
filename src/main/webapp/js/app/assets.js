@@ -101,11 +101,11 @@ AssetsViewModel = BaseViewModel.extend({
     });
 
     Mousetrap.bind('shift+s', function() {
-      self.selectAll();
+      self.selectAllOnPage();
     });
 
     Mousetrap.bind('shift+d', function() {
-      self.deselectAll();
+      self.deselectAllOnPage();
     });
 
     $('#renameFolderForm').on('submit', function(e) {
@@ -554,9 +554,9 @@ AssetsViewModel = BaseViewModel.extend({
     focusedAsset.selected(true);
   },
 
-  selectAll: function() {
+  selectAllOnPage: function() {
     var self = this;
-    console.log('select all');
+    console.log('select all on page');
 
     self.searchResults().forEach(function(asset) {
       if (!(asset.id in self.selectedAssetsMap)) {
@@ -567,9 +567,9 @@ AssetsViewModel = BaseViewModel.extend({
     })
   },
 
-  deselectAll: function() {
+  clearSelection: function() {
     var self = this;
-    console.log('deselect all');
+    console.log('clearSelection');
 
     self.searchResults().forEach(function(asset) {
       asset.selected(false);
@@ -577,6 +577,21 @@ AssetsViewModel = BaseViewModel.extend({
 
     this.selectedAssetsMap = {};
     this.selectedIds([]);
+    console.log(this.selectedCount());
+  },
+
+  deselectAllOnPage: function() {
+    var self = this;
+    console.log('deselect all on page');
+
+    self.searchResults().forEach(function(asset) {
+      delete self.selectedAssetsMap[asset.id];
+      self.selectedIds.remove(function (id) {
+        return id === asset.id;
+      });
+      asset.selected(false);
+    });
+
     console.log(this.selectedCount());
   },
 
@@ -613,7 +628,7 @@ AssetsViewModel = BaseViewModel.extend({
         self.blinkWarning("Assets moved to trash");
       },
       'finally': function() {
-        self.deselectAll();
+        self.clearSelection();
         $('#delSelectedAssetsModal').modal('hide');
       }
     };
@@ -756,7 +771,7 @@ AssetsViewModel = BaseViewModel.extend({
         self.blinkSuccess("Assets moved");
       },
       'finally': function() {
-        self.deselectAll();
+        self.clearSelection();
         $('#folderSelModal-moveSelectedAssets').modal('hide');
       }
     };
