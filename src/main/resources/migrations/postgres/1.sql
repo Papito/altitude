@@ -26,6 +26,18 @@ CREATE UNIQUE INDEX asset_md5 ON asset(md5);
 CREATE UNIQUE INDEX asset_path ON asset(path);
 CREATE INDEX asset_folder ON asset(folder_id);
 
+CREATE TABLE trash (
+  id varchar(24) PRIMARY KEY,
+  md5 varchar(32) NOT NULL,
+  media_type varchar(64) NOT NULL,
+  media_subtype varchar(64) NOT NULL,
+  mime_type varchar(64) NOT NULL,
+  metadata jsonb,
+  path TEXT NOT NULL,
+  folder_id varchar(24) NOT NULL DEFAULT '1',
+  filename TEXT NOT NULL,
+  size_bytes INT NOT NULL,
+) INHERITS (_core);
 
 --CREATE TABLE import_profile (
 --  id varchar(24) PRIMARY KEY,

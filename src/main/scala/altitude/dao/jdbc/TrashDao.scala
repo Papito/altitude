@@ -1,13 +1,12 @@
 package altitude.dao.jdbc
 
-import altitude.models.{Trash, MediaType}
 import altitude.transactions.TransactionId
-import altitude.{Altitude, Const => C}
+import altitude.{Const => C, Altitude}
+import altitude.models.{Trash, Asset, MediaType}
 import org.slf4j.LoggerFactory
-import play.api.libs.json._
+import play.api.libs.json.JsObject
 
-
-abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with altitude.dao.AssetDao {
+abstract class TrashDao (val app: Altitude) extends BaseJdbcDao("trash") with altitude.dao.TrashDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
@@ -16,7 +15,7 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
       mediaSubtype = rec.get(C("Asset.MEDIA_SUBTYPE")).get.asInstanceOf[String],
       mime = rec.get(C("Asset.MIME_TYPE")).get.asInstanceOf[String])
 
-    val model = new Trash(
+    val model = Asset(
       id = Some(rec.get(C("Base.ID")).get.asInstanceOf[String]),
       path = rec.get(C("Asset.PATH")).get.asInstanceOf[String],
       md5 = rec.get(C("Asset.MD5")).get.asInstanceOf[String],
@@ -31,10 +30,10 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
     println(jsonIn.toString())
 
-    val trash = jsonIn: Trash
+    val asset = jsonIn: Trash
 
     // Postgres will reject this sequence with jsonb
-    val metadata: String = trash.metadata.toString().replaceAll("\\\\u0000", "")
+    val metadata: String = asset.metadata.toString().replaceAll("\\\\u0000", "")
 
     /*
     Add the asset
@@ -49,14 +48,14 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
     """
 
     val sqlVals: List[Object] = List(
-      trash.path,
-      trash.md5,
-      trash.fileName,
-      trash.sizeBytes.asInstanceOf[Object],
-      trash.mediaType.mediaType,
-      trash.mediaType.mediaSubtype,
-      trash.mediaType.mime,
-      trash.folderId,
+      asset.path,
+      asset.md5,
+      asset.fileName,
+      asset.sizeBytes.asInstanceOf[Object],
+      asset.mediaType.mediaType,
+      asset.mediaType.mediaSubtype,
+      asset.mediaType.mime,
+      asset.folderId,
       metadata)
 
     addRecord(jsonIn, sql, sqlVals)
