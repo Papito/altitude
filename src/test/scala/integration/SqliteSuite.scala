@@ -2,11 +2,16 @@ package integration
 
 import java.sql.DriverManager
 
-import altitude.{Configuration, Environment}
+import altitude.{Altitude, Configuration, Environment}
 import org.scalatest.BeforeAndAfterAll
 import org.slf4j.LoggerFactory
 
+object SqliteSuite {
+  val app = new Altitude(Map("datasource" -> "sqlite"))
+}
+
 class SqliteSuite extends AllTests(config = Map("datasource" -> "sqlite")) with BeforeAndAfterAll {
+
   Environment.ENV = Environment.TEST
   val log =  LoggerFactory.getLogger(getClass)
 
@@ -36,7 +41,7 @@ class SqliteSuite extends AllTests(config = Map("datasource" -> "sqlite")) with 
       if (conn != null) conn.close()
     }
 
-    IntegrationTestCore.sqliteApp.service.migration.migrate()
+    SqliteSuite.app.service.migration.migrate()
     log.info("END SETUP")
   }
 }

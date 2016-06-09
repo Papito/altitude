@@ -3,12 +3,12 @@ package integration.util.dao.mongo
 import altitude.Altitude
 import altitude.dao.mongo.BaseMongoDao
 import altitude.transactions.TransactionId
-import integration.IntegrationTestCore
+import integration.{MongoSuite, IntegrationTestCore}
 
 class UtilitiesDao(val app: Altitude) extends BaseMongoDao("") with integration.util.dao.UtilitiesDao {
   override def migrateDatabase(): Unit = {
     BaseMongoDao.DB.get.dropDatabase()
-    IntegrationTestCore.mongoDbApp.service.migration.migrate()
+    MongoSuite.app.service.migration.migrate()
   }
 
   override def close() = Unit

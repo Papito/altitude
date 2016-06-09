@@ -3,9 +3,13 @@ package integration
 import java.sql.DriverManager
 import java.util.Properties
 
-import altitude.{Configuration, Environment}
+import altitude.{Altitude, Configuration, Environment}
 import org.scalatest.BeforeAndAfterAll
 import org.slf4j.LoggerFactory
+
+object PostgresSuite {
+  val app = new Altitude(Map("datasource" -> "postgres"))
+}
 
 class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres"))
   with BeforeAndAfterAll {
@@ -39,7 +43,7 @@ class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres"))
       if (conn != null) conn.close()
     }
 
-    IntegrationTestCore.postgresApp.service.migration.migrate()
+    PostgresSuite.app.service.migration.migrate()
     log.info("END SETUP")
  }
 }

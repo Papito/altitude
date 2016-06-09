@@ -14,17 +14,6 @@ import org.apache.commons.io.FileUtils
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach, FunSuite}
 import org.slf4j.LoggerFactory
 
-object IntegrationTestCore {
-  /*
-   initialize app instances for all known datasources to avoid creating
-   this for every test class.
-
-  */
-  val sqliteApp = new Altitude(Map("datasource" -> "sqlite"))
-  val postgresApp = new Altitude(Map("datasource" -> "postgres"))
-  val mongoDbApp = new Altitude(Map("datasource" -> "mongo"))
-}
-
 abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with BeforeAndAfterEach {
   val log =  LoggerFactory.getLogger(getClass)
   Environment.ENV = Environment.TEST
@@ -36,9 +25,9 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   // force environment to always be TEST
   val datasource = config.get("datasource")
   protected def altitude: Altitude = datasource match {
-    case Some("mongo") => IntegrationTestCore.mongoDbApp
-    case Some("postgres") => IntegrationTestCore.postgresApp
-    case Some("sqlite") => IntegrationTestCore.sqliteApp
+    case Some("mongo") => MongoSuite.app
+    case Some("postgres") => PostgresSuite.app
+    case Some("sqlite") => SqliteSuite.app
     case _ => throw new IllegalArgumentException(s"Do not know of datasource: $datasource")
   }
 
