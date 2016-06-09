@@ -42,7 +42,6 @@ abstract class MigrationService(app: Altitude) {
 
   private def v1(implicit txId: TransactionId = new TransactionId): Unit = {
     app.service.folder.add(Folder.UNCATEGORIZED)
-    app.service.folder.add(Folder.TRASH)
   }
 
   def existingVersion(implicit txId: TransactionId = new TransactionId): Int = {

@@ -7,6 +7,7 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
 @DoNotDiscover class FolderServiceTests (val config: Map[String, String]) extends IntegrationTestCore {
+
   test("hierarchy") {
     /*
       folder1
@@ -206,7 +207,6 @@ import org.scalatest.Matchers._
         }
     }
   }
-
 
   test("move folder") {
     /*

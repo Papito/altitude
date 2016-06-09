@@ -28,12 +28,7 @@ object Folder {
     name = C("Folder.Names.UNCATEGORIZED")
   )
 
-  val TRASH = Folder(
-    id = Some(C("Folder.Ids.TRASH")),
-    name = C("Folder.Names.TRASH")
-  )
-
-  val SYSTEM_FOLDERS: List[Folder] = List(UNCATEGORIZED, TRASH)
+  val SYSTEM_FOLDERS: List[Folder] = List(UNCATEGORIZED)
 
   def IS_ROOT(id:  Option[String]) = id == ROOT.id
   def IS_SYSTEM(id:  Option[String]) = SYSTEM_FOLDERS.exists(_.id == id)

@@ -26,16 +26,6 @@ import org.scalatest.Matchers._
     assets.length should be(1)
   }
 
-
-  test("search trash folder") {
-    val asset: Asset = altitude.service.library.add(makeAsset(Folder.TRASH))
-    altitude.service.library.moveToTrash(asset.id.get)
-
-    altitude.service.library.search(
-      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> Folder.TRASH.id.get))
-    ).records.length should be (1)
-  }
-
   test("search uncategorized folder") {
     val mediaType = new MediaType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
     val asset = new Asset(

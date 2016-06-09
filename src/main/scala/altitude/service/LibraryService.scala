@@ -223,13 +223,11 @@ class LibraryService(app: Altitude) {
 
   def moveToTrash(assetId: String)(implicit txId: TransactionId = new TransactionId) = {
     txManager.withTransaction {
-      moveAssetToFolder(assetId, Folder.TRASH.id.get)
     }
   }
 
   def moveAssetsToTrash(assetIds: Set[String])(implicit txId: TransactionId = new TransactionId): Unit = {
     txManager.withTransaction[Unit] {
-      moveAssetsToFolder(assetIds, Folder.TRASH.id.get)
     }
   }
 }
