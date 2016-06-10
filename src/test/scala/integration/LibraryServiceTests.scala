@@ -3,9 +3,10 @@ package integration
 import altitude.models.search.Query
 import altitude.models.{Asset, Folder}
 import altitude.{Const => C}
+import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
-class LibraryServiceTests (val config: Map[String, String]) extends IntegrationTestCore {
+@DoNotDiscover class LibraryServiceTests (val config: Map[String, String]) extends IntegrationTestCore {
 
   test("move asset to a different folder") {
     /*

@@ -1,10 +1,19 @@
 package altitude.models
 
+import altitude.{Const => C}
 import play.api.libs.json._
 import scala.language.implicitConversions
 
 object Trash {
-  implicit def fromJson(json: JsValue): Trash = Asset.fromJson(json).asInstanceOf[Trash]
+  implicit def fromJson(json: JsValue): Trash = new Trash(
+    id = (json \ C("Base.ID")).asOpt[String],
+    mediaType = json \ C("Asset.MEDIA_TYPE"),
+    path = (json \ C("Asset.PATH")).as[String],
+    folderId = (json \ C("Asset.FOLDER_ID")).as[String],
+    md5 = (json \ C("Asset.MD5")).as[String],
+    sizeBytes = (json \ C("Asset.SIZE_BYTES")).as[Long],
+    metadata = json \ C("Asset.METADATA")
+  ).withCoreAttr(json)
 }
 
 class Trash(override val id: Option[String] = None,

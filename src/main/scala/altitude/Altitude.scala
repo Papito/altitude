@@ -45,7 +45,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
 
           bind[MigrationDao].toInstance(new mongo.MigrationDao(app))
           bind[AssetDao].toInstance(new mongo.AssetDao(app))
-          bind[TrashDao].toInstance(new mongo.TrashDao(app))
+          bind[altitude.dao.TrashDao].toInstance(new mongo.TrashDao(app))
           bind[ImportProfileDao].toInstance(new mongo.ImportProfileDao(app))
           bind[FolderDao].toInstance(new mongo.FolderDao(app))
         }
@@ -59,7 +59,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
 
           bind[MigrationDao].toInstance(new postgres.MigrationDao(app))
           bind[AssetDao].toInstance(new postgres.AssetDao(app))
-          bind[TrashDao].toInstance(new postgres.TrashDao(app))
+          bind[altitude.dao.TrashDao].toInstance(new postgres.TrashDao(app))
           //bind[ImportProfileDao].toInstance(new postgres.ImportProfileDao(app))
           bind[FolderDao].toInstance(new postgres.FolderDao(app))
         }
@@ -73,7 +73,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
 
           bind[MigrationDao].toInstance(new sqlite.MigrationDao(app))
           bind[AssetDao].toInstance(new sqlite.AssetDao(app))
-          bind[TrashDao].toInstance(new sqlite.TrashDao(app))
+          bind[altitude.dao.TrashDao].toInstance(new sqlite.TrashDao(app))
           //bind[ImportProfileDao].toInstance(new sqlite.ImportProfileDao(app))
           bind[FolderDao].toInstance(new sqlite.FolderDao(app))
         }

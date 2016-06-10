@@ -36,7 +36,7 @@ CREATE TABLE trash (
   path TEXT NOT NULL,
   folder_id varchar(24) NOT NULL DEFAULT '1',
   filename TEXT NOT NULL,
-  size_bytes INT NOT NULL,
+  size_bytes INT NOT NULL
 ) INHERITS (_core);
 
 --CREATE TABLE import_profile (
