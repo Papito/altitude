@@ -236,6 +236,11 @@ AssetsViewModel = BaseViewModel.extend({
     this.loadFolders(self.currentFolderId());
   },
 
+  getUrl: function() {
+    var self = this;
+    return '/api/v1/search/p/' +  self.currentPage() + '/rpp/' + self.resultsPerPage() + '?' + self.queryString
+  },
+
   search: function(callback) {
     var self = this;
 
@@ -283,7 +288,7 @@ AssetsViewModel = BaseViewModel.extend({
       }
     };
 
-    this.get('/api/v1/search/p/' +  self.currentPage() + '/rpp/' + self.resultsPerPage() + '?' + self.queryString, opts);
+    this.get(self.getUrl(), opts);
   },
 
   gotoPrevPage: function(callback) {
@@ -633,7 +638,7 @@ AssetsViewModel = BaseViewModel.extend({
       }
     };
 
-    self.post('/api/v1/assets/move/to/trash', opts);
+    self.post('/api/v1/trash/recycle', opts);
   },
 
   _showFolderModal: function(treeEl, actionEl, successFn, folderFilterFn) {
@@ -804,7 +809,7 @@ AssetsViewModel = BaseViewModel.extend({
       }
     };
 
-    this.post('/api/v1/assets/' + assetId + '/move/to/trash', opts);
+    this.post('/api/v1/trash/recycle/' + assetId, opts);
   },
 
   showAddFolder: function() {

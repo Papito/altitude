@@ -8,7 +8,7 @@ import org.scalatra.Ok
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, Json}
 
-class FolderController  extends BaseApiController {
+class FolderController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override val HTTP_POST_VALIDATOR = Some(ApiValidator(List(
