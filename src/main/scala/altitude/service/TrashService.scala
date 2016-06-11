@@ -12,7 +12,7 @@ class TrashService(app: Altitude) extends BaseService[Trash](app) {
   private final val log = LoggerFactory.getLogger(getClass)
   override protected val DAO = app.injector.instance[TrashDao]
 
-  def moveAsset(assetId: String)(implicit txId: TransactionId = new TransactionId): Trash = {
+  def recycle(assetId: String)(implicit txId: TransactionId = new TransactionId): Trash = {
     val asset: JsValue = app.service.asset.getById(assetId)
     txManager.withTransaction[Trash] {
       // since the models are essentially the same, we can pull shit like this

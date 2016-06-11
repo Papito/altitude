@@ -10,6 +10,15 @@ CREATE TABLE system (
 CREATE UNIQUE INDEX system_record ON system(id);
 INSERT INTO system(id, version) VALUES(0, 0);
 
+CREATE TABLE stats (
+  dimension varchar(24) PRIMARY KEY,
+  dim_val INT NOT NULL DEFAULT 0
+);
+INSERT INTO stats(dimension) VALUES('total_assets');
+INSERT INTO stats(dimension) VALUES('total_asset_bytes');
+INSERT INTO stats(dimension) VALUES('recycled_assets');
+INSERT INTO stats(dimension) VALUES('recycled_bytes');
+
 CREATE TABLE asset (
   id varchar(24) PRIMARY KEY,
   md5 varchar(32) NOT NULL,
