@@ -10,13 +10,14 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
 class AssetService(app: Altitude) extends BaseService[Asset](app) {
+  /*
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  This is a "dumb" service. If there is anything special to be done with an asset, it's under
+  the jurisdiction of the Library service - it does all the counter decrementin' and wrist slappin'
+   */
+
   private final val log = LoggerFactory.getLogger(getClass)
   override protected val DAO = app.injector.instance[AssetDao]
 
-  override def add(asset: Asset, queryForDup: Option[Query] = None)(implicit txId: TransactionId = new TransactionId): JsObject = {
-    txManager.withTransaction[JsObject] {
-      app.service.stats.incrementStat(Stats.TOTAL_ASSETS)
-      super.add(asset, queryForDup)
-    }
-  }
 }

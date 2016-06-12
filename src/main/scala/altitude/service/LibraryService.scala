@@ -7,7 +7,7 @@ import javax.imageio.ImageIO
 
 import altitude.exceptions.{FormatException, DuplicateException}
 import altitude.models.search.{Query, QueryResult}
-import altitude.models.{Asset, Folder, Preview}
+import altitude.models.{Stats, Asset, Folder, Preview}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import altitude.{Altitude, Const => C}
 import net.codingwell.scalaguice.InjectorExtensions._
@@ -35,7 +35,14 @@ class LibraryService(app: Altitude) {
 
       val assetJson: JsObject = app.service.asset.add(obj)
       val asset: Asset = assetJson
+
+      // counters
       app.service.folder.incrAssetCount(obj.folderId)
+      app.service.stats.incrementStat(Stats.TOTAL_ASSETS)
+      // if there is no folder, increment the uncategorized counter
+      if (Folder.UNCATEGORIZED.id.contains(obj.folderId)) {
+        app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS)
+      }
 
       // make and add preview, UNLESS we already have the data
       obj.previewData.length match {
@@ -47,6 +54,17 @@ class LibraryService(app: Altitude) {
       }
 
       assetJson
+    }
+  }
+
+  def deleteById(id: String)(implicit txId: TransactionId = new TransactionId) = {
+    txManager.withTransaction {
+      app.service.stats.decrementStat(Stats.TOTAL_ASSETS)
+      val asset: Asset = getById(id)
+      if (Folder.UNCATEGORIZED.id.contains(asset.folderId)) {
+        app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
+      }
+      app.service.asset.deleteById(id)
     }
   }
 
@@ -212,11 +230,13 @@ class LibraryService(app: Altitude) {
   def moveToUncategorized(assetId: String)(implicit txId: TransactionId = new TransactionId) = {
     txManager.withTransaction {
       moveAssetToFolder(assetId, Folder.UNCATEGORIZED.id.get)
+      app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS)
     }
   }
 
-  def moveAssetsToUncategorized(assetIds: Set[String])(implicit txId: TransactionId = new TransactionId): Unit = {
+  def moveAssetsToUncategorized(assetIds: Set[String])(implicit txId: TransactionId = new TransactionId) = {
     txManager.withTransaction[Unit] {
+      app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS, assetIds.size)
       moveAssetsToFolder(assetIds, Folder.UNCATEGORIZED.id.get)
     }
   }
