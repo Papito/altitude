@@ -105,11 +105,17 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   /*
   Return a JSON record with timestamp and ID fields translated from Mongo's "extended" format
    */
-  protected final def fixMongoFields(json: JsObject): JsObject = json ++ Json.obj(
-    C("Base.ID") -> (json \ "_id").as[String],
-    C("Base.CREATED_AT") ->  (json \ C("Base.CREATED_AT") \ "$date").asOpt[String],
-    C("Base.UPDATED_AT") -> (json \ C("Base.UPDATED_AT") \ "$date").asOpt[String]
-  )
+  protected final def fixMongoFields(json: JsObject): JsObject = {
+    val out = json ++ Json.obj(
+      C("Base.CREATED_AT") ->  (json \ C("Base.CREATED_AT") \ "$date").asOpt[String],
+      C("Base.UPDATED_AT") -> (json \ C("Base.UPDATED_AT") \ "$date").asOpt[String]
+    )
+
+    json.keys.contains(C("Base.ID")) match  {
+      case true => out ++ Json.obj(C("Base.ID") -> (json \ "_id").as[String])
+      case false => out
+    }
+  }
 
   protected final def fixMongoQuery(q: Query): Query = {
     // _id -> id

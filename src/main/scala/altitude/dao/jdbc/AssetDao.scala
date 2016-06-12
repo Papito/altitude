@@ -29,8 +29,6 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
   }
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
-    println(jsonIn.toString())
-
     val trash = jsonIn: Trash
 
     // Postgres will reject this sequence with jsonb

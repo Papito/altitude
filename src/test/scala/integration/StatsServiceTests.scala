@@ -1,7 +1,6 @@
 package integration
 
-import altitude.{Const => C}
-import altitude.models.{Asset, Folder}
+import altitude.models.{Stats, Asset, Folder}
 import org.scalatest.Matchers._
 import org.scalatest.DoNotDiscover
 
@@ -23,6 +22,6 @@ import org.scalatest.DoNotDiscover
 
     val stats = altitude.service.stats.getStats
 
-    stats.getStat(C("Stats.TOTAL_ASSETS")).dimVal should be (2)
+    stats.getStatValue(Stats.TOTAL_ASSETS) should be (2)
   }
 }
