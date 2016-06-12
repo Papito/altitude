@@ -15,6 +15,7 @@ abstract class AllTests(val config: Map[String, String]) extends Suites(
   new AssetServiceTests(config),
   new LibraryServiceTests(config),
   new SearchTests(config),
+  new TrashServiceTests(config),
 */
-  new TrashTests(config)
+  new StatsServiceTests(config)
 )

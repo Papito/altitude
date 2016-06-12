@@ -48,7 +48,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           bind[TrashDao].toInstance(new mongo.TrashDao(app))
           bind[ImportProfileDao].toInstance(new mongo.ImportProfileDao(app))
           bind[FolderDao].toInstance(new mongo.FolderDao(app))
-          bind[StatsDao].toInstance(new mongo.StatsDao(app))
+          bind[StatDao].toInstance(new mongo.StatDao(app))
         }
         case "postgres" => {
           DriverManager.registerDriver(new org.postgresql.Driver)
@@ -63,7 +63,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           bind[TrashDao].toInstance(new postgres.TrashDao(app))
           //bind[ImportProfileDao].toInstance(new postgres.ImportProfileDao(app))
           bind[FolderDao].toInstance(new postgres.FolderDao(app))
-          bind[StatsDao].toInstance(new postgres.StatsDao(app))
+          bind[StatDao].toInstance(new postgres.StatDao(app))
         }
         case "sqlite" => {
           DriverManager.registerDriver(new org.sqlite.JDBC)
@@ -78,7 +78,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           bind[TrashDao].toInstance(new sqlite.TrashDao(app))
           //bind[ImportProfileDao].toInstance(new sqlite.ImportProfileDao(app))
           bind[FolderDao].toInstance(new sqlite.FolderDao(app))
-          bind[StatsDao].toInstance(new sqlite.StatsDao(app))
+          bind[StatDao].toInstance(new sqlite.StatDao(app))
         }
         case _ => {
           throw new IllegalArgumentException(s"Do not know of datasource $dataSourceType")
@@ -98,6 +98,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
     val trash = new TrashService(app)
     val preview = new PreviewService(app)
     val folder = new FolderService(app)
+    val stats = new StatsService(app)
 //    val importProfile = new ImportProfileService(app)
     val tagConfig = new TagConfigService(app)
 

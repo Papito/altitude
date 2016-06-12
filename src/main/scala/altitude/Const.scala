@@ -46,8 +46,8 @@ object Const {
     "Folder.Names.TRASH" ->  "Trash",  //TODO: not i18n
     "Preview.ASSET_ID" -> "asset_id",
     "Preview.MIME_TYPE" -> "mime_type",
-    "Stats.ALL_ASSETS" -> "all_assets",
-    "Stats.ALL_ASSET_BYTES" -> "all_asset_bytes",
+    "Stats.TOTAL_ASSETS" -> "total_assets",
+    "Stats.TOTAL_BYTES" -> "total_bytes",
     "Stats.UNCATEGORIZED_ASSETS" -> "uncategorized_assets",
     "Stats.RECYCLED_ASSETS" -> "recycled_assets",
     "Stats.RECYCLED_BYTES" -> "recycled_bytes",
