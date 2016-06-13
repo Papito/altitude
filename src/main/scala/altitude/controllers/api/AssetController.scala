@@ -40,7 +40,7 @@ class AssetController extends BaseApiController {
   post(s"/:id/move/to/uncategorized") {
     val id = params.get(C("Api.ID")).get
     log.info(s"Moving $id to UNCATEGORIZED")
-    app.service.library.moveToUncategorized(id)
+    app.service.library.moveAssetToUncategorized(id)
 
     OK
   }

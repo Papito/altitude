@@ -18,7 +18,7 @@ import org.scalatest.DoNotDiscover
 
     // create an asset and delete it
     val assetToDelete: Asset = altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
-    altitude.service.trash.recycle(assetToDelete.id.get)
+    altitude.service.library.recycleAsset(assetToDelete.id.get)
 
     val stats = altitude.service.stats.getStats
 

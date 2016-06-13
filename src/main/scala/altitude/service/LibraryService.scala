@@ -59,11 +59,14 @@ class LibraryService(app: Altitude) {
 
   def deleteById(id: String)(implicit txId: TransactionId = new TransactionId) = {
     txManager.withTransaction {
-      app.service.stats.decrementStat(Stats.TOTAL_ASSETS)
       val asset: Asset = getById(id)
+
+      // of this asset is still uncategorized, update the stat
       if (Folder.UNCATEGORIZED.id.contains(asset.folderId)) {
         app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
       }
+      app.service.stats.decrementStat(Stats.TOTAL_ASSETS)
+
       app.service.asset.deleteById(id)
     }
   }
@@ -227,7 +230,7 @@ class LibraryService(app: Altitude) {
     }
   }
 
-  def moveToUncategorized(assetId: String)(implicit txId: TransactionId = new TransactionId) = {
+  def moveAssetToUncategorized(assetId: String)(implicit txId: TransactionId = new TransactionId) = {
     txManager.withTransaction {
       moveAssetToFolder(assetId, Folder.UNCATEGORIZED.id.get)
       app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS)
@@ -241,13 +244,17 @@ class LibraryService(app: Altitude) {
     }
   }
 
-  def moveToTrash(assetId: String)(implicit txId: TransactionId = new TransactionId) = {
+  def recycleAsset(assetId: String)(implicit txId: TransactionId = new TransactionId) = {
     txManager.withTransaction {
+      app.service.trash.recycleAsset(assetId)
+      app.service.stats.incrementStat(Stats.RECYCLED_ASSETS)
     }
   }
 
-  def moveAssetsToTrash(assetIds: Set[String])(implicit txId: TransactionId = new TransactionId): Unit = {
+  def recycleAssets(assetIds: Set[String])(implicit txId: TransactionId = new TransactionId): Unit = {
     txManager.withTransaction[Unit] {
+      app.service.trash.recycleAssets(assetIds)
+      app.service.stats.incrementStat(Stats.RECYCLED_ASSETS, assetIds.size)
     }
   }
 }

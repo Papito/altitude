@@ -14,7 +14,7 @@ class TrashController extends BaseApiController {
   post(s"/recycle/:id") {
     val id = params.get(C("Api.ID")).get
     log.info(s"Moving $id to TRASH")
-    app.service.library.moveToTrash(id)
+    app.service.library.recycleAsset(id)
 
     OK
   }
@@ -29,7 +29,7 @@ class TrashController extends BaseApiController {
 
     log.debug(s"Assets to move to trash: $assetIds")
 
-    app.service.library.moveAssetsToTrash(assetIds)
+    app.service.library.recycleAssets(assetIds)
 
     OK
   }
