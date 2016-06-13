@@ -13,7 +13,7 @@ class StatsService(app: Altitude){
   protected val DAO = app.injector.instance[StatDao]
   protected val txManager = app.injector.instance[AbstractTransactionManager]
 
-  def getStats(implicit txId: TransactionId): Stats = {
+  def getStats(implicit txId: TransactionId = new TransactionId): Stats = {
     txManager.asReadOnly[Stats] {
       val allStats: List[Stat]  = DAO.getAll.map(Stat.fromJson)
       Stats(allStats)

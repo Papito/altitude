@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 
 class TrashController extends BaseApiController {
-
   private final val log = LoggerFactory.getLogger(getClass)
 
   post(s"/recycle/:id") {
@@ -36,9 +35,9 @@ class TrashController extends BaseApiController {
 
   get(s"/p/:${C("Api.Search.PAGE")}/rpp/:${C("Api.Search.RESULTS_PER_PAGE")}") {
     // FIXME: magic constants
-    val rpp = this.params.getOrElse(C("Api.Search.RESULTS_PER_PAGE"), "20").toInt
+    val rpp = params.getOrElse(C("Api.Search.RESULTS_PER_PAGE"), "20").toInt
     // FIXME: magic constants
-    val page = this.params.getOrElse(C("Api.Search.PAGE"), "1").toInt
+    val page = params.getOrElse(C("Api.Search.PAGE"), "1").toInt
 
     val q = Query(rpp = rpp, page = page)
 

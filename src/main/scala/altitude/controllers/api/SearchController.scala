@@ -10,7 +10,7 @@ class SearchController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
   get("/") {
-    val foldersQuery = this.params.getOrElse(C("Api.Search.FOLDERS"), "")
+    val foldersQuery = params.getOrElse(C("Api.Search.FOLDERS"), "")
 
     val q = Query(
       params = Map(C("Api.Folder.QUERY_ARG_NAME") -> foldersQuery),
@@ -29,9 +29,9 @@ class SearchController extends BaseApiController {
 
   get(s"/p/:${C("Api.Search.PAGE")}/rpp/:${C("Api.Search.RESULTS_PER_PAGE")}") {
     // FIXME: magic constants
-    val rpp = this.params.getOrElse(C("Api.Search.RESULTS_PER_PAGE"), "20").toInt
+    val rpp = params.getOrElse(C("Api.Search.RESULTS_PER_PAGE"), "20").toInt
     // FIXME: magic constants
-    val page = this.params.getOrElse(C("Api.Search.PAGE"), "1").toInt
+    val page = params.getOrElse(C("Api.Search.PAGE"), "1").toInt
     val foldersQuery = this.params.getOrElse(C("Api.Search.FOLDERS"), "")
     
     val q = Query(

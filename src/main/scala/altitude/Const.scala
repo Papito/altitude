@@ -85,6 +85,7 @@ object Const {
     "Api.Folder.HIERARCHY" -> "hierarchy",
     "Api.Folder.SYSTEM" -> "system",
     "Api.Folder.UNCATEGORIZED" -> "uncategorized",
+    // FIXME: need this?
     "Api.Folder.TRASH" -> "trash",
     "Api.Folder.FOLDERS" -> "folders",
     "Api.Folder.FOLDER" -> "folder",
@@ -92,6 +93,7 @@ object Const {
     "Api.Folder.PATH" -> "path",
     "Api.Folder.NAME" -> "name",
     "Api.Folder.PARENT_ID" -> "parent_id",
+    "Api.Stats.STATS" -> "stats",
 
     /*---------------------------------------------------------------------------
     MESSAGES
