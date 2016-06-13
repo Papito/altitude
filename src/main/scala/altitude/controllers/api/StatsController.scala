@@ -16,7 +16,7 @@ class StatsController extends BaseApiController {
   }
 
   get(s"/:${C("Stat.DIMENSION")}") {
-    val dimension = params.get(C("Stat.DIMENSION")).toString.toLowerCase
+    val dimension = params.get(C("Stat.DIMENSION")).get.toLowerCase
     val dimVal = app.service.stats.getStats.getStatValue(dimension)
 
     Ok(Json.obj(
