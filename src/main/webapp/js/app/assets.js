@@ -14,11 +14,14 @@ AssetsViewModel = BaseViewModel.extend({
     this.totalRecords = ko.observable(0);
 
     this.folders = ko.observableArray();
-    this.uncategorizedFolder = ko.observable(new Folder({name: ''}));
-    this.trashFolder = ko.observable(new Folder({name: ''}));
     this.currentFolderPath = ko.observableArray();
     this.currentFolderId = ko.observable("0");
     this._showAddFolder = ko.observable(false);
+
+    this.stats = {};
+    this.stats.totalAssets = ko.observable(0);
+    this.stats.uncategorizedAssets = ko.observable(0);
+    this.stats.recycledAssets = ko.observable(0);
 
     this.selectedAssetsMap = {};
     this.selectedIds = ko.observableArray();
@@ -862,7 +865,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     folderId = folderId || self.currentFolderId();
 
-    var opts = {
+    var folderCallOpts = {
       'successCallback': function (json) {
         var folders = $.map(json['folders'], function(data) {
           return new Folder(data);
@@ -875,11 +878,6 @@ AssetsViewModel = BaseViewModel.extend({
         self.currentFolderId(folderId);
         self.folders(folders);
         self.currentFolderPath(path);
-
-        var uncategorizedFolder = new Folder(json['system']['1']);
-        self.uncategorizedFolder(uncategorizedFolder);
-        var trashFolder = new Folder(json['system']['2']);
-        self.trashFolder(trashFolder);
 
         var elFolderTargets = $(".folder");
         elFolderTargets.droppable({
@@ -896,7 +894,18 @@ AssetsViewModel = BaseViewModel.extend({
       }
     };
 
-    this.get('/api/v1/folders/' + folderId + "/children", opts);
+    self.get('/api/v1/folders/' + folderId + "/children", folderCallOpts);
+
+    var statsCallOpts = {
+      'successCallback': function (json) {
+        var stats = json['stats'];
+        self.stats.totalAssets(stats.total_assets);
+        self.stats.uncategorizedAssets(stats.uncategorized_assets);
+        self.stats.recycledAssets(stats.recycled_assets);
+      }
+    };
+
+    self.get('/api/v1/stats', statsCallOpts);
   },
 
   moveAssetToFolder: function(assetId, folderId) {

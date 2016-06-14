@@ -4,15 +4,17 @@ import org.scalatra.Ok
 import org.slf4j.LoggerFactory
 
 import altitude.{Const => C}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsNumber, JsObject, JsArray, Json}
 
 class StatsController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
   get(s"/") {
     Ok(Json.obj(
-      C("Api.Stats.STATS") -> app.service.stats.getStats.stats.map(_.toJson)
-    ))
+      C("Api.Stats.STATS") -> JsObject(
+        app.service.stats.getStats.stats.map(stat =>
+          stat.dimension -> JsNumber(stat.dimVal)).toSeq
+      )))
   }
 
   get(s"/:${C("Stat.DIMENSION")}") {
