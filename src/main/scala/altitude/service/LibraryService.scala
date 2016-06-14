@@ -258,15 +258,16 @@ class LibraryService(app: Altitude) {
 
   def recycleAsset(assetId: String)(implicit txId: TransactionId = new TransactionId) = {
     txManager.withTransaction {
+      val asset: Asset = this.getById(assetId)
       app.service.trash.recycleAsset(assetId)
       app.service.stats.incrementStat(Stats.RECYCLED_ASSETS)
+      app.service.folder.decrAssetCount(asset.folderId)
     }
   }
 
   def recycleAssets(assetIds: Set[String])(implicit txId: TransactionId = new TransactionId): Unit = {
     txManager.withTransaction[Unit] {
-      app.service.trash.recycleAssets(assetIds)
-      app.service.stats.incrementStat(Stats.RECYCLED_ASSETS, assetIds.size)
+      assetIds.foreach(recycleAsset)
     }
   }
 }
