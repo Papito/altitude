@@ -14,16 +14,22 @@ import org.scalatest.DoNotDiscover
     altitude.service.library.add(makeAsset(folder1))
 
     // create an uncategorized asset
-    altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+    val uncategorizedAsset: Asset = altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
 
     // create an asset and delete it
     val assetToDelete: Asset = altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
     altitude.service.library.recycleAsset(assetToDelete.id.get)
 
     val stats = altitude.service.stats.getStats
-
     stats.getStatValue(Stats.TOTAL_ASSETS) should be (2)
     stats.getStatValue(Stats.RECYCLED_ASSETS) should be (1)
     stats.getStatValue(Stats.UNCATEGORIZED_ASSETS) should be (1)
+
+    altitude.service.library.moveAssetToFolder(uncategorizedAsset.id.get, folder1.id.get)
+
+    val stats2 = altitude.service.stats.getStats
+    stats2.getStatValue(Stats.TOTAL_ASSETS) should be (2)
+    stats2.getStatValue(Stats.RECYCLED_ASSETS) should be (1)
+    stats2.getStatValue(Stats.UNCATEGORIZED_ASSETS) should be (0)
   }
 }

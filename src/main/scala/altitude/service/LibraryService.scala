@@ -214,8 +214,14 @@ class LibraryService(app: Altitude) {
       val asset: Asset = this.getById(assetId)
       // this checks folder validity
       val folder: Folder = app.service.folder.getById(folderId)
+
+      // if moving from uncategorized, decrement that stat
+      if (Folder.UNCATEGORIZED.id.contains(asset.folderId)) {
+        app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
+      }
+
       updateAssetFolder(asset, folder)
-    }
+     }
   }
 
   def moveAssetsToFolder(assetIds: Set[String], folderId: String)(implicit txId: TransactionId = new TransactionId): Unit = {
@@ -225,6 +231,12 @@ class LibraryService(app: Altitude) {
 
       assetIds.foreach{  assetId: String =>
         val asset: Asset = this.getById(assetId)
+
+        // if moving from uncategorized, decrement that stat
+        if (Folder.UNCATEGORIZED.id.contains(asset.folderId)) {
+          app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
+        }
+
         updateAssetFolder(asset, folder)
       }
     }
