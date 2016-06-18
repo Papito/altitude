@@ -364,6 +364,7 @@ AssetsViewModel = BaseViewModel.extend({
 
   getFocusedEl: function() {
     var focusedSel = $('.result-box.focused');
+    console.log('Focused element', focusedSel);
     return focusedSel.length ? $(focusedSel[0]) : null;
   },
 
@@ -385,6 +386,7 @@ AssetsViewModel = BaseViewModel.extend({
     var self = this;
     console.log('focusing first');
     var el = $("[asset_id='" + self.firstAsset().id + "']");
+    console.log('first element', el);
     el.addClass('focused');
     el.focus();
   },
@@ -435,11 +437,9 @@ AssetsViewModel = BaseViewModel.extend({
         newPos.left = offset.left + 30;
         newPos.top  = offset.top  + height + 30;
         elem = document.elementFromPoint(newPos.left, newPos.top);
-        console.log('element');
-        console.log(elem);
+        console.log('element', elem);
         assetId = $(elem).parent().attr('asset_id');
-        console.log('asset id');
-        console.log(assetId);
+        console.log('asset id', assetId);
         break;
 
       case 'up':
@@ -635,9 +635,10 @@ AssetsViewModel = BaseViewModel.extend({
       'successCallback': function() {
         // remove from grid or any selection state
         for(var i=0; i < assetIds.length; ++i) {
-          console.log('i', i);
           var assetId = assetIds[i];
-          self.removeFromGrid(assetId);
+          self.searchResults.remove(function(asset) {
+            return asset.id === assetId;
+          });
         }
 
         self.loadFolders();
@@ -809,20 +810,17 @@ AssetsViewModel = BaseViewModel.extend({
     this.post('/api/v1/assets/' + assetId + '/move/to/uncategorized', opts);
   },
 
-  removeFromGrid: function(assetId) {
-    var el = $("#searchResults").find("[asset_id='" + assetId + "']");
-    el.remove();
-  },
-
   moveToTrash: function(assetId) {
     console.log(assetId, 'to trash');
 
     var self = this;
     var opts = {
       'successCallback': function() {
-        self.removeFromGrid(assetId);
         delete self.selectedAssetsMap[assetId];
         self.selectedIds.remove(assetId);
+        self.searchResults.remove(function(asset) {
+          return asset.id === assetId;
+        });
         self.loadFolders(self.currentFolderId());
         self.blinkWarning("Asset moved to trash");
       }
