@@ -144,7 +144,7 @@ AssetsViewModel = BaseViewModel.extend({
           }
         },
         delete: {
-          name: "Delete",
+          name: "Move to Trash",
           callback: function(key, opt){
             var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
             self.deleteFolder(folderId);
@@ -165,7 +165,7 @@ AssetsViewModel = BaseViewModel.extend({
           }
         },
         delete: {
-          name: "Delete",
+          name: "Move to Trash",
           callback: function(key, opt){
             var assetId = opt.$trigger.context.attributes.getNamedItem('asset_id').nodeValue;
             self.moveToTrash(assetId);
@@ -613,25 +613,33 @@ AssetsViewModel = BaseViewModel.extend({
     }
 
     delete self.selectedAssetsMap[focusedAsset.id];
-    self.selectedIds.remove(function (id) {
-      return id === focusedAsset.id;
-    });
+    self.selectedIds.remove(focusedAsset.id);
     focusedAsset.selected(false);
   },
 
-  showDeleteSelectedAssets: function() {
+  showMoveSelectedToTrash: function() {
     var self = this;
     $('#delSelectedAssetsModal').modal();
   },
 
-  deleteSelectedAssets: function() {
+  moveSelectedToTrash: function() {
     var self = this;
+
+    var assetIds = self.selectedIds();
+    console.log('selected assets', assetIds.length);
 
     var opts = {
       'data': {
-        'asset_ids': self.selectedIds()
+        'asset_ids': assetIds
       },
       'successCallback': function() {
+        // remove from grid or any selection state
+        for(var i=0; i < assetIds.length; ++i) {
+          console.log('i', i);
+          var assetId = assetIds[i];
+          self.removeFromGrid(assetId);
+        }
+
         self.loadFolders();
         self.blinkWarning("Assets moved to trash");
       },
@@ -801,12 +809,20 @@ AssetsViewModel = BaseViewModel.extend({
     this.post('/api/v1/assets/' + assetId + '/move/to/uncategorized', opts);
   },
 
+  removeFromGrid: function(assetId) {
+    var el = $("#searchResults").find("[asset_id='" + assetId + "']");
+    el.remove();
+  },
+
   moveToTrash: function(assetId) {
     console.log(assetId, 'to trash');
 
     var self = this;
     var opts = {
       'successCallback': function() {
+        self.removeFromGrid(assetId);
+        delete self.selectedAssetsMap[assetId];
+        self.selectedIds.remove(assetId);
         self.loadFolders(self.currentFolderId());
         self.blinkWarning("Asset moved to trash");
       }
