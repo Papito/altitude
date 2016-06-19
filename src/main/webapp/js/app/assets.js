@@ -111,6 +111,23 @@ AssetsViewModel = BaseViewModel.extend({
       self.deselectAllOnPage();
     });
 
+    Mousetrap.bind('del', function() {
+      // if there is a selection, show the confirmation dialog
+      if (self.selectedCount()) {
+        self.showMoveSelectedToTrash();
+        return;
+      }
+
+      // else delete currently focused
+      var focusedAsset = self.getFocusedAsset();
+
+      if (!focusedAsset) {
+        self.blinkWarning('No assets focused');
+        return;
+      }
+      self.moveToTrash(focusedAsset.id);
+    });
+
     $('#renameFolderForm').on('submit', function(e) {
       e.preventDefault();
       self.renameFolder();
