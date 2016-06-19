@@ -178,14 +178,14 @@ AssetsViewModel = BaseViewModel.extend({
           name: "Move",
           callback: function(key, opt){
             var assetId = opt.$trigger.context.attributes.getNamedItem('asset_id').nodeValue;
-            self.showMoveAsset(assetId);
+            self.moveAssetOrSelected(assetId)
           }
         },
         delete: {
           name: "Move to Trash",
           callback: function(key, opt){
             var assetId = opt.$trigger.context.attributes.getNamedItem('asset_id').nodeValue;
-            self.moveToTrash(assetId);
+            self.moveAssetOrSelectedToTrash(assetId)
           }
         }
       }
@@ -254,6 +254,28 @@ AssetsViewModel = BaseViewModel.extend({
     // get the data
     this.search();
     this.loadFolders(self.currentFolderId());
+  },
+
+  moveAssetOrSelected: function(assetId) {
+    var self = this;
+
+    if (self.selectedCount()) {
+      self.showMoveSelectedAssets();
+    }
+    else {
+      self.showMoveAsset(assetId);
+    }
+  },
+
+  moveAssetOrSelectedToTrash: function(assetId) {
+    var self = this;
+
+    if (self.selectedCount()) {
+      self.moveSelectedToTrash();
+    }
+    else {
+      self.moveToTrash(assetId);
+    }
   },
 
   getUrl: function() {
