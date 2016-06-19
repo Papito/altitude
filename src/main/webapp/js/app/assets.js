@@ -650,16 +650,12 @@ AssetsViewModel = BaseViewModel.extend({
         'asset_ids': assetIds
       },
       'successCallback': function() {
-        // remove from grid or any selection state
-        for(var i=0; i < assetIds.length; ++i) {
-          var assetId = assetIds[i];
-          self.searchResults.remove(function(asset) {
-            return asset.id === assetId;
-          });
-        }
-
         self.loadFolders();
+        // refresh results
+        self.search();
         self.blinkWarning("Assets moved to trash");
+        self.clearSelection();
+        console.log(self.selectedIds());
       },
       'finally': function() {
         self.clearSelection();
@@ -771,6 +767,8 @@ AssetsViewModel = BaseViewModel.extend({
     self.moveAssetToFolder(assetId, moveToFolderId);
   },
 
+
+
   showMoveFolder: function(folderId) {
     var self = this;
 
@@ -802,6 +800,9 @@ AssetsViewModel = BaseViewModel.extend({
       },
       'successCallback': function() {
         self.loadFolders();
+        self.clearSelection();
+        // refresh results
+        self.search();
         self.blinkSuccess("Assets moved");
       },
       'finally': function() {
@@ -835,9 +836,8 @@ AssetsViewModel = BaseViewModel.extend({
       'successCallback': function() {
         delete self.selectedAssetsMap[assetId];
         self.selectedIds.remove(assetId);
-        self.searchResults.remove(function(asset) {
-          return asset.id === assetId;
-        });
+        // refresh results
+        self.search();
         self.loadFolders(self.currentFolderId());
         self.blinkWarning("Asset moved to trash");
       }
@@ -944,6 +944,8 @@ AssetsViewModel = BaseViewModel.extend({
     var opts = {
       'successCallback': function() {
         self.loadFolders(self.currentFolderId());
+        // refresh results
+        self.search();
         self.blinkSuccess("Asset moved");
       },
       'finally': function() {
