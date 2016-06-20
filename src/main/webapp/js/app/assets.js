@@ -161,7 +161,7 @@ AssetsViewModel = BaseViewModel.extend({
           }
         },
         delete: {
-          name: "Move to Trash",
+          name: "Delete",
           callback: function(key, opt){
             var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
             self.deleteFolder(folderId);
@@ -706,11 +706,6 @@ AssetsViewModel = BaseViewModel.extend({
           folderFilterFn(allFolders);
         }
 
-        if (allFolders.length === 0) {
-          self.blinkWarning("No possible folders to move to");
-          return;
-        }
-
         var hierarchy = [{
           'id': '0',
           'name': 'Root',
@@ -758,10 +753,15 @@ AssetsViewModel = BaseViewModel.extend({
       $('#folderSelModal-moveSelectedAssets').modal();
     };
 
+    var folderFilterFn = function(allFolders) {
+      self._removeFolder(self.currentFolderId(), allFolders);
+    };
+
     self._showFolderModal(
         self.moveSelectedAssetsToFolderTreeEl,
         self.moveSelectedAssetsEl,
-        successCallback);
+        successCallback,
+        folderFilterFn);
   },
 
   showMoveAsset: function(asset_id) {
@@ -772,10 +772,15 @@ AssetsViewModel = BaseViewModel.extend({
       $('#folderSelModal-moveAsset').modal();
     };
 
+    var folderFilterFn = function(allFolders) {
+      self._removeFolder(self.currentFolderId(), allFolders);
+    };
+
     self._showFolderModal(
         self.moveAssetToFolderTreeEl,
         self.moveAssetEl,
-        successCallback);
+        successCallback,
+        folderFilterFn);
   },
 
   moveAsset: function() {
@@ -792,7 +797,6 @@ AssetsViewModel = BaseViewModel.extend({
 
   showMoveFolder: function(folderId) {
     var self = this;
-
 
     var successCallback = function() {
       self.actionState = folderId;
