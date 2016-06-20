@@ -170,27 +170,7 @@ AssetsViewModel = BaseViewModel.extend({
       }
     });
 
-    // register the asset context menu
-    $.contextMenu({
-      selector: 'div.result-box',
-      items: {
-        move: {
-          name: "Move",
-          callback: function(key, opt){
-            var assetId = opt.$trigger.context.attributes.getNamedItem('asset_id').nodeValue;
-            self.moveAssetOrSelected(assetId)
-          }
-        },
-        delete: {
-          name: "Move to Trash",
-          callback: function(key, opt){
-            var assetId = opt.$trigger.context.attributes.getNamedItem('asset_id').nodeValue;
-            self.moveAssetOrSelectedToTrash(assetId)
-          }
-        }
-      }
-    });
-
+    self.setUpRightClickContext();
 
     // initialize commonly used elements
     this.moveToFolderTreeEl = $('#folderSelModal-moveFolder-tree');
@@ -254,6 +234,30 @@ AssetsViewModel = BaseViewModel.extend({
     // get the data
     this.search();
     this.loadFolders(self.currentFolderId());
+  },
+
+  setUpRightClickContext: function() {
+    var self = this;
+
+    $.contextMenu({
+      selector: 'div.result-box',
+      items: {
+        move: {
+          name: "Move",
+          callback: function(key, opt){
+            var assetId = opt.$trigger.context.attributes.getNamedItem('asset_id').nodeValue;
+            self.moveAssetOrSelected(assetId)
+          }
+        },
+        delete: {
+          name: "Move to Trash",
+          callback: function(key, opt){
+            var assetId = opt.$trigger.context.attributes.getNamedItem('asset_id').nodeValue;
+            self.moveAssetOrSelectedToTrash(assetId)
+          }
+        }
+      }
+    });
   },
 
   moveAssetOrSelected: function(assetId) {
