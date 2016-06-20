@@ -34,4 +34,18 @@ import org.scalatest.DoNotDiscover
     stats2.getStatValue(Stats.RECYCLED_ASSETS) should be (2)
     stats2.getStatValue(Stats.UNCATEGORIZED_ASSETS) should be (0)
   }
+
+  test("test uncategorized") {
+    // create an asset in a folder
+    val folder1: Folder = altitude.service.folder.add(
+      Folder(name = "folder1"))
+
+    val asset: Asset = altitude.service.library.add(makeAsset(folder1))
+
+    altitude.service.library.moveAssetToUncategorized(asset.id.get)
+
+    val stats = altitude.service.stats.getStats
+    stats.getStatValue(Stats.TOTAL_ASSETS) should be (1)
+    stats.getStatValue(Stats.UNCATEGORIZED_ASSETS) should be (1)
+  }
 }

@@ -220,6 +220,12 @@ class LibraryService(app: Altitude) {
         app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
       }
 
+      // if moving from root, increment the uncategorized stat
+      // FIXME: in the future - only if no other tags/categories
+      if (Folder.IS_ROOT(Some(folderId))) {
+        app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS)
+      }
+
       updateAssetFolder(asset, folder)
      }
   }
@@ -235,6 +241,12 @@ class LibraryService(app: Altitude) {
         // if moving from uncategorized, decrement that stat
         if (Folder.UNCATEGORIZED.id.contains(asset.folderId)) {
           app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
+        }
+
+        // if moving from root, increment the uncategorized stat
+        // FIXME: in the future - only if no other tags/categories
+        if (Folder.IS_ROOT(Some(folderId))) {
+          app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS)
         }
 
         updateAssetFolder(asset, folder)
