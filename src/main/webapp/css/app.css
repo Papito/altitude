@@ -249,6 +249,11 @@ footer {
     border: 2px solid #cf38f4;
 }
 
+#noResults {
+    margin: 10em;
+    text-align: center;
+}
+
 #addFolderForm input, #renameFolderForm input {
     width: 100%;
 }

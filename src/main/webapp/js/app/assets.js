@@ -673,8 +673,7 @@ AssetsViewModel = BaseViewModel.extend({
       },
       'successCallback': function() {
         self.loadFolders();
-        // refresh results
-        self.search();
+        self.refreshResults();
         self.blinkWarning("Assets moved to trash");
         self.clearSelection();
         console.log(self.selectedIds());
@@ -823,8 +822,7 @@ AssetsViewModel = BaseViewModel.extend({
       'successCallback': function() {
         self.loadFolders();
         self.clearSelection();
-        // refresh results
-        self.search();
+        self.refreshResults();
         self.blinkSuccess("Assets moved");
       },
       'finally': function() {
@@ -858,8 +856,7 @@ AssetsViewModel = BaseViewModel.extend({
       'successCallback': function() {
         delete self.selectedAssetsMap[assetId];
         self.selectedIds.remove(assetId);
-        // refresh results
-        self.search();
+        self.refreshResults();
         self.loadFolders(self.currentFolderId());
         self.blinkWarning("Asset moved to trash");
       }
@@ -966,8 +963,7 @@ AssetsViewModel = BaseViewModel.extend({
     var opts = {
       'successCallback': function() {
         self.loadFolders(self.currentFolderId());
-        // refresh results
-        self.search();
+        self.refreshResults();
         self.blinkSuccess("Asset moved");
       },
       'finally': function() {
@@ -977,6 +973,24 @@ AssetsViewModel = BaseViewModel.extend({
     };
 
     this.post('/api/v1/assets/' + assetId + '/move/' + folderId, opts);
+  },
+
+  refreshResults: function() {
+    /*
+      Redo the search and if there is nothing here, go one page back (if possible)
+     */
+    var self = this;
+
+    console.log('Refreshing results');
+
+    var callback = function() {
+      if (self.currentPage() > 1 && self.searchResults().length === 0) {
+        self.currentPage(self.currentPage() - 1);
+        self.search();
+      }
+    };
+
+    self.search(callback);
   },
 
   showRenameFolder: function(folderId) {

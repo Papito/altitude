@@ -12,12 +12,16 @@
         <button type="button" data-bind="visible: prevPageVisible, click: gotoPrevPage" class="btn btn-link btn-block pager-button"><h2>&#10096;</h2></button>
       </div>
 
-      <div class="col-md-10">
+      <div class="col-md-10" data-bind="visible: searchResults().length > 0">
         <div id="searchResults" data-bind="foreach: searchResults">
           <div class="result-box" data-bind="attr: {'asset_id': $data.id}, css: {'selected': selected}">
             <img src="#" data-bind="attr: {src: '/assets/'+ $data.id +'/preview'}" class="img-responsive">
           </div>
         </div>
+      </div>
+
+      <div id="noResults" class="col-md-10" data-bind="visible: searchResults().length === 0" style="display: none">
+        <h3>No results</h3>
       </div>
 
       <div class="col-md-1">
