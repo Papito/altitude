@@ -1,7 +1,8 @@
 package integration
 
+import altitude.exceptions.NotFoundException
 import altitude.models.search.Query
-import altitude.models.{Asset, Folder}
+import altitude.models.{Trash, Asset, Folder}
 import altitude.{Const => C}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
@@ -102,5 +103,51 @@ import org.scalatest.Matchers._
     val hierarchy = altitude.service.folder.hierarchy()
     hierarchy.head.numOfAssets should be(2)
     hierarchy.last.numOfAssets should be(10)
+  }
+
+  test("recycle asset") {
+    val asset: Asset = altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+    altitude.service.asset.getAll.length should be (1)
+    altitude.service.library.recycleAsset(asset.id.get)
+    altitude.service.asset.getAll.length should be (0)
+    altitude.service.trash.getAll.length should be (1)
+  }
+
+  test("move recyclded asset to folder") {
+    val asset: Asset = altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+    altitude.service.library.recycleAsset(asset.id.get)
+
+    val folder1: Folder = altitude.service.folder.add(
+      Folder(name = "folder1"))
+
+    altitude.service.library.moveRecycledAssetToFolder(asset.id.get, folder1.id.get)
+    altitude.service.trash.getAll.length should be (0)
+    altitude.service.asset.getAll.length should be (1)
+
+    altitude.service.library.search(
+      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
+    ).records.length should be(1)
+
+    val all = altitude.service.folder.getNonSysFolders()
+
+    (altitude.service.folder.getByIdWithChildAssetCounts(folder1.id.get, all): Folder).numOfAssets should be (1)
+
+  }
+
+  test("restore recycled asset") {
+    val asset: Asset = altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+    val trashed: Trash = altitude.service.library.recycleAsset(asset.id.get)
+    altitude.service.library.restoreRecycledAsset(trashed.id.get)
+    altitude.service.trash.getAll.length should be (0)
+    altitude.service.asset.getAll.length should be (1)
+  }
+
+  test("restore recycled asset to non-existing folder") {
+    val asset: Asset = altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+    altitude.service.library.recycleAsset(asset.id.get)
+
+    intercept[NotFoundException] {
+      altitude.service.library.moveRecycledAssetToFolder(asset.id.get, "bad")
+    }
   }
 }

@@ -13,7 +13,7 @@ class AssetController extends BaseApiController {
   post(s"/:id/move/:${C("Api.Asset.FOLDER_ID")}") {
     val id = params.get(C("Api.ID")).get
     val folderId = params.get(C("Api.Asset.FOLDER_ID")).get
-    log.info(s"Moving $id to $folderId")
+    log.info(s"Moving asset $id to $folderId")
 
     app.service.library.moveAssetToFolder(id, folderId)
 

@@ -1,12 +1,14 @@
 package integration
 
-import altitude.models.{Stats, Asset, Folder}
+import altitude.Const
+import altitude.models.search.Query
+import altitude.models.{Trash, Stats, Asset, Folder}
 import org.scalatest.Matchers._
 import org.scalatest.DoNotDiscover
 
 @DoNotDiscover class StatsServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 
-  test("test all stats") {
+  test("test totals") {
     // create an asset in a folder
     val folder1: Folder = altitude.service.folder.add(
       Folder(name = "folder1"))
@@ -47,5 +49,29 @@ import org.scalatest.DoNotDiscover
     val stats = altitude.service.stats.getStats
     stats.getStatValue(Stats.TOTAL_ASSETS) should be (1)
     stats.getStatValue(Stats.UNCATEGORIZED_ASSETS) should be (1)
+  }
+
+  test("test move recycled asset to folder") {
+    val asset: Asset = altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+    altitude.service.library.recycleAsset(asset.id.get)
+
+    val folder1: Folder = altitude.service.folder.add(
+      Folder(name = "folder1"))
+
+    altitude.service.library.moveRecycledAssetToFolder(asset.id.get, folder1.id.get)
+
+    val stats = altitude.service.stats.getStats
+    stats.getStatValue(Stats.TOTAL_ASSETS) should be (1)
+    stats.getStatValue(Stats.RECYCLED_ASSETS) should be (0)
+  }
+
+  test("restore recycled asset") {
+    val asset: Asset = altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+    val trashed: Trash = altitude.service.library.recycleAsset(asset.id.get)
+    altitude.service.library.restoreRecycledAsset(trashed.id.get)
+
+    val stats = altitude.service.stats.getStats
+    stats.getStatValue(Stats.TOTAL_ASSETS) should be (1)
+    stats.getStatValue(Stats.RECYCLED_ASSETS) should be (0)
   }
 }

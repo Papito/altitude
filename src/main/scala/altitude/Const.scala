@@ -93,6 +93,7 @@ object Const {
     "Api.Folder.PATH" -> "path",
     "Api.Folder.NAME" -> "name",
     "Api.Folder.PARENT_ID" -> "parent_id",
+    "Api.Trash.ASSET_IDS" -> "asset_ids",
     "Api.Stats.STATS" -> "stats",
 
     /*---------------------------------------------------------------------------

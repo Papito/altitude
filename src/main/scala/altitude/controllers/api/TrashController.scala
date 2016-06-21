@@ -25,10 +25,48 @@ class TrashController extends BaseApiController {
     validator.validate(requestJson.get)
 
     val assetIds = (requestJson.get \ C("Api.Folder.ASSET_IDS")).as[Set[String]]
-
     log.debug(s"Assets to move to trash: $assetIds")
 
     app.service.library.recycleAssets(assetIds)
+
+    OK
+  }
+
+  post(s"/:id/move/:${C("Api.Asset.FOLDER_ID")}") {
+    val id = params.get(C("Api.ID")).get
+    val folderId = params.get(C("Api.Asset.FOLDER_ID")).get
+    log.info(s"Moving recycled asset $id to $folderId")
+
+    app.service.library.moveRecycledAssetToFolder(id, folderId)
+
+    OK
+  }
+
+  post(s"/move/to/:${C("Api.Asset.FOLDER_ID")}") {
+    val folderId = params.get(C("Api.Asset.FOLDER_ID")).get
+    log.info(s"Moving recycled assets to $folderId")
+
+    val validator = ApiValidator(List(C("Api.Trash.ASSET_IDS")))
+    validator.validate(requestJson.get)
+
+    val assetIds = (requestJson.get \ C("Api.Trash.ASSET_IDS")).as[Set[String]]
+    log.debug(s"Recycled assets to move: $assetIds")
+
+    app.service.library.moveRecycledAssetsToFolder(assetIds, folderId)
+
+    OK
+  }
+
+  post(s"/restore") {
+    log.info("Restoring multiple assets")
+
+    val validator = ApiValidator(List(C("Api.Trash.ASSET_IDS")))
+    validator.validate(requestJson.get)
+
+    val assetIds = (requestJson.get \ C("Api.Trash.ASSET_IDS")).as[Set[String]]
+    log.debug(s"Recycled assets to restore: $assetIds")
+
+    app.service.library.restoreRecycledAssets(assetIds)
 
     OK
   }

@@ -19,10 +19,10 @@ class TrashService(app: Altitude) extends BaseService[Trash](app) {
       app.service.library.deleteById(assetId)
 
       // since the models are essentially the same, we can pull shit like this
-      val trash = Trash.fromJson(asset)
+      val trashed: Trash = Trash.fromJson(asset)
 
       // create the trash record
-      DAO.add(trash)
+      DAO.add(trashed)
     }
   }
 
