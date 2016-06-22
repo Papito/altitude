@@ -13,7 +13,7 @@ import altitude.{Altitude, Const => C}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.imgscalr.Scalr
 import org.slf4j.LoggerFactory
-import play.api.libs.json.JsObject
+import play.api.libs.json.{Json, JsObject}
 
 class LibraryService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -192,112 +192,115 @@ class LibraryService(app: Altitude) {
     }
   }
 
-  private def updateAssetFolder(asset: Asset, folder: Folder)(implicit txId: TransactionId): Asset = {
-    val updateObj: Asset = new Asset(
-      id = asset.id,
-      path = asset.path,
-      md5 = asset.md5,
-      mediaType = asset.mediaType,
-      sizeBytes = asset.sizeBytes,
-      folderId = folder.id.get,
-      metadata = asset.metadata)
-
-    app.service.asset.updateById(asset.id.get, updateObj, fields = List(C("Asset.FOLDER_ID")))
-    app.service.folder.decrAssetCount(asset.folderId)
-    app.service.folder.incrAssetCount(updateObj.folderId)
-    updateObj
-  }
-
-
   def moveAssetToFolder(assetId: String, folderId: String)(implicit txId: TransactionId = new TransactionId): Asset = {
     txManager.withTransaction[Asset] {
-      val asset: Asset = this.getById(assetId)
-      // this checks folder validity
-      val folder: Folder = app.service.folder.getById(folderId)
-
-      // if moving from uncategorized, decrement that stat
-      if (Folder.UNCATEGORIZED.id.contains(asset.folderId)) {
-        app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
-      }
-
-      // if moving from root, increment the uncategorized stat
-      // FIXME: in the future - only if no other tags/categories
-      if (Folder.IS_ROOT(Some(folderId))) {
-        app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS)
-      }
-
-      updateAssetFolder(asset, folder)
-     }
+      moveAssetsToFolder(Set(assetId), folderId)
+      getById(assetId)
+    }
   }
 
   def moveAssetsToFolder(assetIds: Set[String], folderId: String)(implicit txId: TransactionId = new TransactionId): Unit = {
     txManager.withTransaction[Unit] {
       assetIds.foreach {assetId =>
-        moveAssetToFolder(assetId, folderId)
+        // this checks folder validity
+        val folder: Folder = app.service.folder.getById(folderId)
+
+        val asset: Asset = this.getById(assetId)
+
+        // if moving from uncategorized, decrement that stat
+        if (Folder.UNCATEGORIZED.id.contains(asset.folderId)) {
+          app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
+        }
+
+        // if moving from root, increment the uncategorized stat
+        // FIXME: in the future - only if no other tags/categories
+        if (Folder.IS_ROOT(Some(folderId))) {
+          app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS)
+        }
+
+        // point asset to the new folder
+        val updatedAsset: Asset = asset ++ Json.obj(C("Asset.FOLDER_ID") -> folderId)
+
+        app.service.asset.updateById(asset.id.get, updatedAsset, fields = List(C("Asset.FOLDER_ID")))
+        app.service.folder.decrAssetCount(asset.folderId)
       }
+
+      app.service.folder.incrAssetCount(folderId, assetIds.size)
     }
   }
 
   def moveAssetToUncategorized(assetId: String)(implicit txId: TransactionId = new TransactionId) = {
     txManager.withTransaction {
-      moveAssetToFolder(assetId, Folder.UNCATEGORIZED.id.get)
-      app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS)
+      moveAssetsToUncategorized(Set(assetId))
     }
   }
 
   def moveAssetsToUncategorized(assetIds: Set[String])(implicit txId: TransactionId = new TransactionId) = {
     txManager.withTransaction[Unit] {
-      assetIds.foreach(moveAssetToUncategorized)
+      moveAssetsToFolder(assetIds, Folder.UNCATEGORIZED.id.get)
+      app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS, assetIds.size)
     }
   }
 
   def recycleAsset(assetId: String)(implicit txId: TransactionId = new TransactionId): Trash = {
     txManager.withTransaction[Trash] {
-      val asset: Asset = this.getById(assetId)
-      app.service.stats.incrementStat(Stats.RECYCLED_ASSETS)
-      app.service.folder.decrAssetCount(asset.folderId)
-      app.service.trash.recycleAsset(assetId)
+      recycleAssets(Set(assetId))
+      app.service.trash.getById(assetId)
     }
   }
 
   def recycleAssets(assetIds: Set[String])(implicit txId: TransactionId = new TransactionId): Unit = {
     txManager.withTransaction[Unit] {
-      assetIds.foreach(recycleAsset)
+      assetIds.foreach{assetId =>
+        val asset: Asset = this.getById(assetId)
+        app.service.trash.recycleAsset(assetId)
+        app.service.folder.decrAssetCount(asset.folderId)
+      }
+
+      app.service.stats.incrementStat(Stats.RECYCLED_ASSETS, assetIds.size)
     }
   }
 
   def moveRecycledAssetToFolder(assetId: String, folderId: String)
                                (implicit txId: TransactionId = new TransactionId): Asset = {
     txManager.withTransaction[Asset] {
-      val trashed: Asset = app.service.trash.getById(assetId)
-      app.service.trash.deleteById(assetId)
-      app.service.stats.decrementStat(Stats.RECYCLED_ASSETS)
-      val asset: Asset = app.service.library.add(Asset.fromJson(trashed))
-      moveAssetToFolder(asset.id.get, folderId)
-      asset
+      moveRecycledAssetsToFolder(Set(assetId), folderId)
+      getById(assetId)
     }
   }
 
-  def moveRecycledAssetsToFolder(assetIds: Set[String], folderId: String)(implicit txId: TransactionId = new TransactionId) = {
+  def moveRecycledAssetsToFolder(assetIds: Set[String], folderId: String)
+                                (implicit txId: TransactionId = new TransactionId) = {
     txManager.withTransaction[Unit] {
-      assetIds.foreach{assetId: String =>
-        moveRecycledAssetToFolder(assetId, folderId)
+      val restoredAssetIds: Set[String] = assetIds.map{ assetId: String =>
+        val trashed: Asset = app.service.trash.getById(assetId)
+        app.service.trash.deleteById(assetId)
+        val restoredAsset = trashed ++ Json.obj(C("Asset.FOLDER_ID") -> folderId)
+        val asset: Asset = app.service.library.add(restoredAsset)
+        asset.id.get
       }
+
+      moveAssetsToFolder(restoredAssetIds, folderId)
+      app.service.stats.decrementStat(Stats.RECYCLED_ASSETS, assetIds.size)
     }
   }
 
   def restoreRecycledAsset(assetId: String)(implicit txId: TransactionId = new TransactionId): Asset = {
     txManager.withTransaction[Asset] {
-      val trashed: Asset = app.service.trash.getById(assetId)
-      app.service.trash.deleteById(assetId)
-      app.service.stats.decrementStat(Stats.RECYCLED_ASSETS)
-      app.service.library.add(Asset.fromJson(trashed))
+      restoreRecycledAssets(Set(assetId))
+      getById(assetId)
     }
   }
 
   def restoreRecycledAssets(assetIds: Set[String])(implicit txId: TransactionId = new TransactionId) = {
     txManager.withTransaction[Unit] {
-      assetIds.foreach(restoreRecycledAsset)
+      assetIds.foreach { assetId =>
+        val trashed: Asset = app.service.trash.getById(assetId)
+        app.service.trash.deleteById(assetId)
+        app.service.library.add(Asset.fromJson(trashed))
+      }
+
+      app.service.stats.decrementStat(Stats.RECYCLED_ASSETS, assetIds.size)
     }
   }
 }
