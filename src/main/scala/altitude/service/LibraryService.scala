@@ -5,7 +5,7 @@ import java.awt.{AlphaComposite, Graphics2D}
 import java.io._
 import javax.imageio.ImageIO
 
-import altitude.exceptions.{FormatException, DuplicateException}
+import altitude.exceptions.{IllegalOperationException, FormatException, DuplicateException}
 import altitude.models.search.{Query, QueryResult}
 import altitude.models._
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
@@ -23,6 +23,11 @@ class LibraryService(app: Altitude) {
 
   def add(obj: Asset)(implicit txId: TransactionId = new TransactionId): JsObject = {
     log.info(s"\nAdding asset with MD5: ${obj.md5}\n")
+
+    if (Folder.IS_ROOT(Some(obj.folderId))) {
+      throw new IllegalOperationException("Cannot have assets in root folder")
+    }
+
     val query = Query(Map(C("Asset.MD5") -> obj.md5))
 
     txManager.withTransaction[JsObject] {
@@ -202,20 +207,20 @@ class LibraryService(app: Altitude) {
   def moveAssetsToFolder(assetIds: Set[String], folderId: String)(implicit txId: TransactionId = new TransactionId): Unit = {
     txManager.withTransaction[Unit] {
       assetIds.foreach {assetId =>
+
+        // cannot have assets in root folder - just other folders
+        if (Folder.IS_ROOT(Some(folderId))) {
+          throw new IllegalOperationException("Cannot move assets to root folder")
+        }
+
         // this checks folder validity
-        val folder: Folder = app.service.folder.getById(folderId)
+        app.service.folder.getById(folderId)
 
         val asset: Asset = this.getById(assetId)
 
         // if moving from uncategorized, decrement that stat
         if (Folder.UNCATEGORIZED.id.contains(asset.folderId)) {
           app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
-        }
-
-        // if moving from root, increment the uncategorized stat
-        // FIXME: in the future - only if no other tags/categories
-        if (Folder.IS_ROOT(Some(folderId))) {
-          app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS)
         }
 
         // point asset to the new folder

@@ -689,8 +689,10 @@ AssetsViewModel = BaseViewModel.extend({
     self.post('/api/v1/trash/recycle', opts);
   },
 
-  _showFolderModal: function(treeEl, actionEl, successFn, folderFilterFn) {
+  _showFolderModal: function(treeEl, actionEl, successFn, showRoot, folderFilterFn) {
     var self = this;
+
+    showRoot = showRoot || false;
 
     var targetFolderSelected = typeof treeEl.jstree('get_selected')[0] === "string";
 
@@ -708,11 +710,18 @@ AssetsViewModel = BaseViewModel.extend({
           folderFilterFn(allFolders);
         }
 
-        var hierarchy = [{
-          'id': '0',
-          'name': 'Root',
-          'children': allFolders
-        }];
+        var hierarchy = [];
+
+        if (showRoot === true) {
+          hierarchy.push({
+            'id': '0',
+            'name': 'Root',
+            'children': allFolders
+          });
+        }
+        else {
+          hierarchy = allFolders;
+        }
 
         // traverse the hierarchy and "massage" the tree. name -> text
         function _processFolderNode(node) {
@@ -763,6 +772,7 @@ AssetsViewModel = BaseViewModel.extend({
         self.moveSelectedAssetsToFolderTreeEl,
         self.moveSelectedAssetsEl,
         successCallback,
+        false, /* do not show root folder */
         folderFilterFn);
   },
 
@@ -782,6 +792,7 @@ AssetsViewModel = BaseViewModel.extend({
         self.moveAssetToFolderTreeEl,
         self.moveAssetEl,
         successCallback,
+        false, /* do not show root folder */
         folderFilterFn);
   },
 
@@ -812,6 +823,7 @@ AssetsViewModel = BaseViewModel.extend({
         self.moveToFolderTreeEl,
         self.moveFolderEl,
         successCallback,
+        true, /* show root folder */
         folderFilterFn);
   },
 
