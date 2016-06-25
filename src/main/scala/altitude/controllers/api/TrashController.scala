@@ -57,6 +57,15 @@ class TrashController extends BaseApiController {
     OK
   }
 
+  post(s"/:id/restore") {
+    val assetId = params.get("id").get
+    log.info(s"Restoring asset $assetId")
+
+    app.service.library.restoreRecycledAsset(assetId)
+
+    OK
+  }
+
   post(s"/restore") {
     log.info("Restoring multiple assets")
 

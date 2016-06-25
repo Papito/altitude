@@ -968,6 +968,7 @@ AssetsViewModel = BaseViewModel.extend({
 
   moveAssetToFolder: function(assetId, folderId) {
     var self = this;
+
     var opts = {
       'successCallback': function() {
         self.loadFolders(self.currentFolderId());

@@ -103,16 +103,30 @@ TrashViewModel = AssetsViewModel.extend({
     console.log('Moving selected assets from trash');
   },
 
-  moveAssetFromTrash: function() {
+  moveAssetFromTrash: function(assetId) {
     console.log('Moving asset from trash');
   },
 
   restoreSelectedAssets: function() {
-
+    console.log('Restoring selected assets');
   },
 
-  restoreAsset: function() {
+  restoreAsset: function(assetId) {
+    var self = this;
 
+    console.log('Restoring asset');
+
+    var opts = {
+      'successCallback': function() {
+        self.refreshResults();
+        self.blinkSuccess("Asset restored");
+      },
+      'finally': function() {
+        self.actionState = null;
+      }
+    };
+
+    this.post('/api/v1/trash/' + assetId + '/restore', opts);
   },
 
   getUrl: function() {
