@@ -766,11 +766,11 @@ AssetsViewModel = BaseViewModel.extend({
         folderFilterFn);
   },
 
-  showMoveAsset: function(asset_id) {
+  showMoveAsset: function(assetId) {
     var self = this;
 
     var successCallback = function() {
-      self.actionState = asset_id;
+      self.actionState = assetId;
       $('#folderSelModal-moveAsset').modal();
     };
 
@@ -801,7 +801,6 @@ AssetsViewModel = BaseViewModel.extend({
     var self = this;
 
     var successCallback = function() {
-      self.actionState = folderId;
       $('#folderSelModal-moveFolder').modal();
     };
 

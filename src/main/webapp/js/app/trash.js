@@ -1,7 +1,8 @@
 TrashViewModel = AssetsViewModel.extend({
   constructor : function() {
     "use strict";
-
+    var self = this;
+    
     this.base();
     console.log('Initializing trash view model');
 
@@ -85,10 +86,11 @@ TrashViewModel = AssetsViewModel.extend({
         successCallback);
   },
 
-  showMoveAssetFromTrash: function() {
+  showMoveAssetFromTrash: function(assetId) {
     var self = this;
 
     var successCallback = function() {
+      self.actionState = assetId;
       $('#folderSelModal-moveAssetFromTrash').modal();
     };
 
@@ -99,12 +101,52 @@ TrashViewModel = AssetsViewModel.extend({
         successCallback);
   },
 
-  moveSelectedAssetsFromTrash: function() {
-    console.log('Moving selected assets from trash');
+  moveAssetFromTrash: function() {
+    var self = this;
+
+    var assetId = self.actionState;
+    var moveToFolderId = self.moveAssetFromTrashTreeEl.jstree('get_selected')[0];
+    self.moveAssetToFolder(assetId, moveToFolderId);
   },
 
-  moveAssetFromTrash: function(assetId) {
-    console.log('Moving asset from trash');
+  moveAssetToFolder: function(assetId, folderId) {
+    var self = this;
+
+    var opts = {
+      'successCallback': function() {
+        self.refreshResults();
+        self.blinkSuccess("Asset moved");
+      },
+      'finally': function() {
+        self.actionState = null;
+        $('#folderSelModal-moveAssetFromTrash').modal('hide');
+      }
+    };
+
+    this.post('/api/v1/trash/' + assetId + '/move/' + folderId, opts);
+  },
+
+  moveSelectedAssetsFromTrash: function() {
+    var self = this;
+    var moveToFolderId = self.moveSelectedAssetsFromTrashTreeEl.jstree('get_selected')[0];
+    console.log('move selected assets to ' + moveToFolderId);
+
+    var opts = {
+      'data': {
+        'asset_ids': self.selectedIds()
+      },
+      'successCallback': function() {
+        self.clearSelection();
+        self.refreshResults();
+        self.blinkSuccess("Assets moves");
+      },
+      'finally': function() {
+        self.clearSelection();
+        $('#folderSelModal-moveSelectedAssetsFromTrash').modal('hide');
+      }
+    };
+
+    self.post('/api/v1/trash/move/to/' + moveToFolderId, opts);
   },
 
   restoreSelectedAssets: function() {

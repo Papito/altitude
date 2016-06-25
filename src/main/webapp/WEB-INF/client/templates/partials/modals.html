@@ -143,62 +143,6 @@
   </div>
 </div>
 
-
-<!-- Move assets from trash -->
-<div class="modal fade"
-     id="folderSelModal-moveSelectedAssetsFromTrash"
-     tabindex="-1"
-     role="dialog"
-     aria-labelledby="folderSelModal-moveSelectedAssets-lbl">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <form>
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="folderSelModal-moveSelectedAssetsFromTrash-lbl">Select folder to move to</h4>
-        </div>
-        <div class="modal-body">
-          <div id="folderSelModal-moveSelectedAssetsFromTrash-tree"></div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button id="folderSelModal-moveSelectedAssetsFromTrash-actionBtn"
-                  type="button"
-                  class="btn btn-warning"
-                  data-bind="click: moveSelectedAssetsFromTrash">Move</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade"
-     id="folderSelModal-moveAssetFromTrash"
-     tabindex="-1"
-     role="dialog"
-     aria-labelledby="folderSelModal-moveAsset-lbl">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <form>
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="folderSelModal-moveAssetFromTrash-lbl">Select folder to move to</h4>
-        </div>
-        <div class="modal-body">
-          <div id="folderSelModal-moveAssetFromTrash-tree"></div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button id="folderSelModal-moveAssetFromTrash-actionBtn"
-                  type="button"
-                  class="btn btn-warning"
-                  data-bind="click: moveAssetFromTrash">Move</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
 <!-- Delete assets -->
 <div class="modal fade" id="delSelectedAssetsModal" tabindex="-1" role="dialog" aria-labelledby="delSelectedAssetsModal-lbl">
   <div class="modal-dialog" role="document">
@@ -213,7 +157,9 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button id="delSelectedAssetsModal-actionBtn"  type="button" class="btn btn-danger" data-bind="click: moveSelectedToTrash">Move to Trash</button>
+          <button id="delSelectedAssetsModal-actionBtn"
+                  type="button" class="btn btn-danger"
+                  data-bind="click: moveSelectedToTrash">Move to Trash</button>
         </div>
       </form>
     </div>
