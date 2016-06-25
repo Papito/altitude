@@ -108,7 +108,27 @@ TrashViewModel = AssetsViewModel.extend({
   },
 
   restoreSelectedAssets: function() {
+    var self = this;
+
     console.log('Restoring selected assets');
+
+    var assetIds = self.selectedIds();
+
+    var opts = {
+      'data': {
+        'asset_ids': assetIds
+      },
+      'successCallback': function() {
+        self.refreshResults();
+        self.blinkSuccess("Assets restored");
+        self.clearSelection();
+      },
+      'finally': function() {
+        self.clearSelection();
+      }
+    };
+
+    self.post('/api/v1/trash/restore', opts);
   },
 
   restoreAsset: function(assetId) {

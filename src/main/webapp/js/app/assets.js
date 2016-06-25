@@ -669,7 +669,6 @@ AssetsViewModel = BaseViewModel.extend({
     var self = this;
 
     var assetIds = self.selectedIds();
-    console.log('selected assets', assetIds.length);
 
     var opts = {
       'data': {
@@ -680,7 +679,6 @@ AssetsViewModel = BaseViewModel.extend({
         self.refreshResults();
         self.blinkWarning("Assets moved to trash");
         self.clearSelection();
-        console.log(self.selectedIds());
       },
       'finally': function() {
         self.clearSelection();
