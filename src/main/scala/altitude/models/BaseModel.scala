@@ -83,8 +83,8 @@ abstract class BaseModel {
     if (isoCreatedAt.isDefined) {
       createdAt = ISODateTimeFormat.dateTime().parseDateTime(isoCreatedAt.get)
     }
-    val isoUpdatedAt = (json \ C("Base.UPDATED_AT")).asOpt[String]
 
+    val isoUpdatedAt = (json \ C("Base.UPDATED_AT")).asOpt[String]
     if (isoUpdatedAt.isDefined) {
       updatedAt = ISODateTimeFormat.dateTime().parseDateTime(isoUpdatedAt.get)
     }

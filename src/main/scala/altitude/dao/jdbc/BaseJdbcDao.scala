@@ -30,6 +30,8 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   protected def DEFAULT_SQL_COLS_FOR_SELECT: String
   protected def JSON_PLACEHOLDER: String
   protected def CURRENT_TIME_FUNC: String
+  protected def DATETIME_TO_SQL(time: Option[DateTime]): String
+
   protected val CORE_SQL_COLS_FOR_INSERT = s"${C("Base.ID")}"
   protected val SYSTEM_TABLE = "system"
 
@@ -217,7 +219,8 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     runner.update(conn, sql, id)
   }
 
-  override def decrement(id: String,  field: String, count: Int = 1)(implicit txId: TransactionId) = {
+  override def decrement(id: String,  field: String, count: Int = 1)
+                        (implicit txId: TransactionId) = {
     increment(id, field, -count)
   }
 

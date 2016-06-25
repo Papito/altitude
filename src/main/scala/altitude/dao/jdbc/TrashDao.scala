@@ -1,7 +1,7 @@
 package altitude.dao.jdbc
 
 import altitude.transactions.TransactionId
-import altitude.{Const => C, Altitude}
+import altitude.{Const => C, Util, Altitude}
 import altitude.models.{Trash, MediaType}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
@@ -28,23 +28,24 @@ abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with alt
   }
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
-    println(jsonIn.toString())
-
     val trash = jsonIn: Trash
 
     // Postgres will reject this sequence with jsonb
     val metadata: String = trash.metadata.toString().replaceAll("\\\\u0000", "")
 
-    /*
-    Add the asset
-     */
     val sql = s"""
         INSERT INTO $tableName (
              $CORE_SQL_COLS_FOR_INSERT, ${C("Asset.PATH")}, ${C("Asset.MD5")},
              ${C("Asset.FILENAME")}, ${C("Asset.SIZE_BYTES")},
              ${C("Asset.MEDIA_TYPE")}, ${C("Asset.MEDIA_SUBTYPE")}, ${C("Asset.MIME_TYPE")},
-             ${C("Asset.FOLDER_ID")}, ${C("Asset.METADATA")})
-            VALUES($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?, ?, ?, ?, ?, ?, $JSON_PLACEHOLDER)
+             ${C("Asset.FOLDER_ID")}, ${C("Base.CREATED_AT")},
+             ${C("Base.UPDATED_AT")}, ${C("Trash.RECYCLED_AT")}, ${C("Asset.METADATA")})
+            VALUES(
+              $CORE_SQL_VALS_FOR_INSERT,
+              ?, ?, ?, ?, ?, ?, ?, ?,
+              ${DATETIME_TO_SQL(trash.createdAt)},
+              ${DATETIME_TO_SQL(trash.updatedAt)},
+              $CURRENT_TIME_FUNC, $JSON_PLACEHOLDER)
     """
 
     val sqlVals: List[Object] = List(

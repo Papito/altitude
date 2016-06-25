@@ -45,8 +45,9 @@ CREATE TABLE trash  (
   folder_id varchar(24) NOT NULL DEFAULT "1",
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
-  created_at DATE DEFAULT (datetime('now', 'localtime')),
-  updated_at DATE DEFAULT NULL
+  created_at DATE NOT NULL,
+  updated_at DATE DEFAULT NULL,
+  recycled_at DATE DEFAULT (datetime('now', 'localtime'))
 );
 
 --CREATE TABLE import_profile (

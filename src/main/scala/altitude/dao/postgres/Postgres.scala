@@ -16,6 +16,13 @@ trait Postgres {
 
   protected def CURRENT_TIME_FUNC = "current_timestamp"
 
+  protected def DATETIME_TO_SQL(time: Option[DateTime]): String = {
+    time.isEmpty match {
+      case true => null
+      case false => s"to_timestamp('${time.get}', 'YYYY-MM-DD HH24:MI:SS-XXXX')"
+    }
+  }
+
   protected def JSON_PLACEHOLDER = "CAST(? as jsonb)"
 
   protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit = {

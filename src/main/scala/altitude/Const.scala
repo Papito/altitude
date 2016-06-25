@@ -30,6 +30,7 @@ object Const {
     "Asset.MEDIA_SUBTYPE" -> "media_subtype",
     "Asset.MIME_TYPE" -> "mime_type",
     "Asset.METADATA" -> "metadata",
+    "Trash.RECYCLED_AT" -> "recycled_at",
     "Folder.NAME" -> "name",
     "Folder.NAME_LC" -> "name_lc",
     "Folder.PARENT_ID" -> "parent_id",

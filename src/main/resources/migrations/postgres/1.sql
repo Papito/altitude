@@ -47,8 +47,11 @@ CREATE TABLE trash (
   path TEXT NOT NULL,
   folder_id varchar(24) NOT NULL DEFAULT '1',
   filename TEXT NOT NULL,
-  size_bytes INT NOT NULL
-) INHERITS (_core);
+  size_bytes INT NOT NULL,
+  created_at timestamp WITHOUT TIME ZONE NOT NULL,
+  updated_at timestamp WITHOUT TIME ZONE DEFAULT NULL,
+  recycled_at timestamp WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 
 --CREATE TABLE import_profile (
 --  id varchar(24) PRIMARY KEY,

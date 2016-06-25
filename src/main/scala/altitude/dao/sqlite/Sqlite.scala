@@ -15,6 +15,13 @@ trait Sqlite {
 
   protected def CURRENT_TIME_FUNC = "datetime('now', 'localtime')"
 
+  protected def DATETIME_TO_SQL(time: Option[DateTime]): String = {
+    time.isEmpty match {
+      case true => null
+      case false => s"datetime('${time.get}', 'localtime')"
+    }
+  }
+
   protected def JSON_PLACEHOLDER = "?"
 
   protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit = {
