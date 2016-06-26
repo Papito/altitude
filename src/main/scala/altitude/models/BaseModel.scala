@@ -1,5 +1,7 @@
 package altitude.models
 
+import java.text.SimpleDateFormat
+
 import altitude.{Const => C, Util}
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
@@ -24,7 +26,7 @@ abstract class BaseModel {
 
   def createdAt_= (arg: DateTime): Unit = {
     if (_createdAt.isDefined)
-      throw new RuntimeException("Cannot set 'created_at' twice")
+      throw new RuntimeException("Cannot set 'created at' twice")
     _createdAt = Some(arg)
   }
 
@@ -35,7 +37,7 @@ abstract class BaseModel {
 
   def updatedAt_= (arg: DateTime): Unit = {
     if (_updatedAt.isDefined)
-      throw new RuntimeException("Cannot set 'updated_at' twice")
+      throw new RuntimeException("Cannot set 'updated at' twice")
     _updatedAt = Some(arg)
   }
 

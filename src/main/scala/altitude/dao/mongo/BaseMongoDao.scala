@@ -60,9 +60,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     COLLECTION.insert(obj)
 
     jsonIn ++ Json.obj(
-      C("Base.ID") -> JsString(id),
-      C("Base.CREATED_AT") -> Util.isoDateTime(Some(Util.utcNow))
-    )
+      C("Base.ID") -> JsString(id))
   }
 
   override def deleteByQuery(q: Query)(implicit txId: TransactionId): Int = {

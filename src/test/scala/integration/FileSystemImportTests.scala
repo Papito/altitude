@@ -37,7 +37,6 @@ import org.scalatest.Matchers._
     val path = getClass.getResource(s"../import/$p").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
     val importedAsset = altitude.service.fileImport.importAsset(fileImportAsset).get
-    importedAsset.createdAt should not be None
     importedAsset.mediaType should equal(importedAsset.mediaType)
     importedAsset.path should not be empty
     importedAsset.md5 should not be empty
@@ -46,7 +45,6 @@ import org.scalatest.Matchers._
     asset.mediaType should equal(importedAsset.mediaType)
     asset.path should not be empty
     asset.md5 should not be empty
-    asset.createdAt should not be None
     asset.sizeBytes should not be 0
     asset
   }

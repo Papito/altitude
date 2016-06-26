@@ -16,14 +16,7 @@ trait Postgres {
 
   protected def CURRENT_TIME_FUNC = "current_timestamp"
 
-  protected def DATETIME_TO_SQL(time: Option[DateTime]): String = {
-    time.isEmpty match {
-      case true => null
-      case false => s"to_timestamp('${time.get}', 'YYYY-MM-DD HH24:MI:SS-XXXX')"
-    }
-  }
-
-  protected def JSON_PLACEHOLDER = "CAST(? as jsonb)"
+  protected def JSON_FUNC = "CAST(? as jsonb)"
 
   protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit = {
     val createdAtMilis = rec.getOrElse(C("Base.CREATED_AT"), 0d).asInstanceOf[Double].toLong
@@ -36,4 +29,18 @@ trait Postgres {
       model.updatedAt = new DateTime(createdAtMilis * 1000)
     }
   }
+
+  protected def GET_DATETIME_FROM_REC(field: String, rec: Map[String, AnyRef]): Option[DateTime] = {
+    val milis = rec.getOrElse(field, 0d).asInstanceOf[Double].toLong
+    if (milis != 0d) Some(new DateTime(milis * 1000)) else None
+  }
+
+  protected def DATETIME_TO_DB_FUNC(datetime: Option[DateTime]): String = {
+    datetime match {
+      case None => null
+      case _ => s"to_timestamp(${datetime.get.getMillis} / 1000)"
+    }
+  }
+
 }
+

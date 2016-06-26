@@ -1,8 +1,12 @@
 package altitude.dao.jdbc
 
+import java.text.SimpleDateFormat
+
 import altitude.transactions.TransactionId
 import altitude.{Const => C, Util, Altitude}
 import altitude.models.{Trash, MediaType}
+import org.joda.time.LocalDateTime
+import org.joda.time.format.DateTimeFormat
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
@@ -24,6 +28,10 @@ abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with alt
       folderId = rec.get(C("Asset.FOLDER_ID")).get.asInstanceOf[String])
 
     addCoreAttrs(model, rec)
+
+    //val recycledAt: Option[DateTime] = GET_DATETIME_FROM_REC(C("Trash.RECYCLED_AT"), rec)
+    //if (recycledAt.isDefined) model.recycledAt = recycledAt.get
+
     model
   }
 
@@ -38,15 +46,17 @@ abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with alt
              $CORE_SQL_COLS_FOR_INSERT, ${C("Asset.PATH")}, ${C("Asset.MD5")},
              ${C("Asset.FILENAME")}, ${C("Asset.SIZE_BYTES")},
              ${C("Asset.MEDIA_TYPE")}, ${C("Asset.MEDIA_SUBTYPE")}, ${C("Asset.MIME_TYPE")},
-             ${C("Asset.FOLDER_ID")}, ${C("Base.CREATED_AT")},
-             ${C("Base.UPDATED_AT")}, ${C("Trash.RECYCLED_AT")}, ${C("Asset.METADATA")})
+             ${C("Asset.FOLDER_ID")}, ${C("Base.CREATED_AT")}, ${C("Base.UPDATED_AT")},
+             ${C("Asset.METADATA")})
             VALUES(
               $CORE_SQL_VALS_FOR_INSERT,
               ?, ?, ?, ?, ?, ?, ?, ?,
-              ${DATETIME_TO_SQL(trash.createdAt)},
-              ${DATETIME_TO_SQL(trash.updatedAt)},
-              $CURRENT_TIME_FUNC, $JSON_PLACEHOLDER)
+              ${DATETIME_TO_DB_FUNC(trash.createdAt)},
+              ${DATETIME_TO_DB_FUNC(trash.updatedAt)},
+              $JSON_FUNC)
     """
+
+    val df = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
 
     val sqlVals: List[Object] = List(
       trash.path,

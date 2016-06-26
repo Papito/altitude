@@ -1,6 +1,6 @@
 CREATE TABLE _core (
-  created_at timestamp WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at timestamp WITHOUT TIME ZONE DEFAULT NULL
+  created_at timestamp WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'utc'),
+  updated_at timestamp WITH TIME ZONE DEFAULT NULL
 );
 
 CREATE TABLE system (
@@ -48,9 +48,9 @@ CREATE TABLE trash (
   folder_id varchar(24) NOT NULL DEFAULT '1',
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
-  created_at timestamp WITHOUT TIME ZONE NOT NULL,
-  updated_at timestamp WITHOUT TIME ZONE DEFAULT NULL,
-  recycled_at timestamp WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+  created_at timestamp WITH TIME ZONE NOT NULL,
+  updated_at timestamp WITH TIME ZONE DEFAULT NULL,
+  recycled_at timestamp WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'utc')
 );
 
 --CREATE TABLE import_profile (

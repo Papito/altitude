@@ -9,6 +9,21 @@ import org.scalatest.Matchers._
 
 @DoNotDiscover class LibraryServiceTests (val config: Map[String, String]) extends IntegrationTestCore {
 
+  test("recycle asset") {
+    altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+    altitude.service.asset.getAll.length should be (1)
+
+    val asset: Asset = altitude.service.asset.getAll.head
+    altitude.service.library.recycleAsset(asset.id.get)
+
+    altitude.service.asset.getAll.length should be (0)
+    altitude.service.trash.getAll.length should be (1)
+
+    val trashed: Trash = altitude.service.trash.getAll.head
+    trashed.createdAt should not be None
+    trashed.createdAt.get.getMillis should equal(asset.createdAt.get.getMillis)
+  }
+
   test("move asset to a different folder") {
     /*
     folder1
@@ -103,14 +118,6 @@ import org.scalatest.Matchers._
     val hierarchy = altitude.service.folder.hierarchy()
     hierarchy.head.numOfAssets should be(2)
     hierarchy.last.numOfAssets should be(10)
-  }
-
-  test("recycle asset") {
-    val asset: Asset = altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
-    altitude.service.asset.getAll.length should be (1)
-    altitude.service.library.recycleAsset(asset.id.get)
-    altitude.service.asset.getAll.length should be (0)
-    altitude.service.trash.getAll.length should be (1)
   }
 
   test("move recyclded asset to folder") {

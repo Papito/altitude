@@ -43,7 +43,7 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
              ${C("Asset.FILENAME")}, ${C("Asset.SIZE_BYTES")},
              ${C("Asset.MEDIA_TYPE")}, ${C("Asset.MEDIA_SUBTYPE")}, ${C("Asset.MIME_TYPE")},
              ${C("Asset.FOLDER_ID")}, ${C("Asset.METADATA")})
-            VALUES($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?, ?, ?, ?, ?, ?, $JSON_PLACEHOLDER)
+            VALUES($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?, ?, ?, ?, ?, ?, $JSON_FUNC)
     """
 
     val sqlVals: List[Object] = List(

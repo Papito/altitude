@@ -28,9 +28,11 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
   protected def CORE_SQL_VALS_FOR_INSERT: String
   protected def DEFAULT_SQL_COLS_FOR_SELECT: String
-  protected def JSON_PLACEHOLDER: String
+  protected def JSON_FUNC: String
   protected def CURRENT_TIME_FUNC: String
-  protected def DATETIME_TO_SQL(time: Option[DateTime]): String
+  protected def DATETIME_TO_DB_FUNC(datetime: Option[DateTime]): String
+
+  protected def GET_DATETIME_FROM_REC(field: String, rec: Map[String, AnyRef]): Option[DateTime]
 
   protected val CORE_SQL_COLS_FOR_INSERT = s"${C("Base.ID")}"
   protected val SYSTEM_TABLE = "system"
@@ -128,8 +130,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     runner.update(conn, q, values:_*)
 
     val recordJson = jsonIn ++ JsObject(Seq(
-      C("Base.ID") -> JsString(id),
-      C("Base.CREATED_AT") -> dtAsJsString{createdAt}))
+      C("Base.ID") -> JsString(id)))
 
     log.debug(s"Added: $recordJson")
     recordJson

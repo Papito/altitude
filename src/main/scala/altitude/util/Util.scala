@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 package object Util {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  def utcNow: DateTime = new DateTime().withZoneRetainFields(DateTimeZone.forID("UTC"))
+  def utcNow: DateTime = new DateTime().withZoneRetainFields(DateTimeZone.forID("UTC")).withMillisOfSecond(0)
 
   def logStacktrace(e: Exception): String  = {
     e.printStackTrace()

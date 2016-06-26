@@ -15,14 +15,7 @@ trait Sqlite {
 
   protected def CURRENT_TIME_FUNC = "datetime('now', 'localtime')"
 
-  protected def DATETIME_TO_SQL(time: Option[DateTime]): String = {
-    time.isEmpty match {
-      case true => null
-      case false => s"datetime('${time.get}', 'localtime')"
-    }
-  }
-
-  protected def JSON_PLACEHOLDER = "?"
+  protected def JSON_FUNC = "?"
 
   protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit = {
     val createdAtSeconds = rec.getOrElse(C("Base.CREATED_AT"), 0).asInstanceOf[Int]
@@ -35,4 +28,17 @@ trait Sqlite {
       model.updatedAt = new DateTime(updatedAtSeconds.toLong * 1000)
     }
   }
+
+  protected def GET_DATETIME_FROM_REC(field: String, rec: Map[String, AnyRef]): Option[DateTime] = {
+    val seconds = rec.getOrElse(field, 0).asInstanceOf[Int]
+    if (seconds != 0) Some(new DateTime(seconds.toLong * 1000)) else None
+  }
+
+  protected def DATETIME_TO_DB_FUNC(datetime: Option[DateTime]): String = {
+    datetime match {
+      case None => null
+      case _ => s"strftime('%Y-%m-%d %H:%M:%S Z', ${datetime.get.getMillis} / 1000, 'unixepoch')"
+    }
+  }
+
 }

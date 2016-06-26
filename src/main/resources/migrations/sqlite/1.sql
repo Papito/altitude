@@ -27,7 +27,7 @@ CREATE TABLE asset  (
   folder_id varchar(24) NOT NULL DEFAULT "1",
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
-  created_at DATE DEFAULT (datetime('now', 'localtime')),
+  created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );
 CREATE UNIQUE INDEX asset_md5 ON asset(md5);
@@ -47,7 +47,7 @@ CREATE TABLE trash  (
   size_bytes INT NOT NULL,
   created_at DATE NOT NULL,
   updated_at DATE DEFAULT NULL,
-  recycled_at DATE DEFAULT (datetime('now', 'localtime'))
+  recycled_at DATE DEFAULT (datetime('now', 'utc'))
 );
 
 --CREATE TABLE import_profile (
@@ -66,7 +66,7 @@ CREATE TABLE folder (
   name_lc varchar(255) NOT NULL,
   parent_id varchar(24) NOT NULL DEFAULT "0",
   num_of_assets INTEGER NOT NULL DEFAULT 0,
-  created_at DATE DEFAULT (datetime('now', 'localtime')),
+  created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );
 CREATE INDEX folder_parent_id ON folder(parent_id);
