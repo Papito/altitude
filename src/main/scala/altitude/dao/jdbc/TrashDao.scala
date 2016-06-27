@@ -1,11 +1,12 @@
 package altitude.dao.jdbc
 
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
 import altitude.transactions.TransactionId
 import altitude.{Const => C, Util, Altitude}
-import altitude.models.{Trash, MediaType}
-import org.joda.time.LocalDateTime
+import altitude.models.{BaseModel, Trash, MediaType}
+import org.joda.time.{DateTime, LocalDateTime}
 import org.joda.time.format.DateTimeFormat
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
@@ -29,8 +30,8 @@ abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with alt
 
     addCoreAttrs(model, rec)
 
-    //val recycledAt: Option[DateTime] = GET_DATETIME_FROM_REC(C("Trash.RECYCLED_AT"), rec)
-    //if (recycledAt.isDefined) model.recycledAt = recycledAt.get
+    val recycledAt: Option[DateTime] = GET_DATETIME_FROM_REC(C("Trash.RECYCLED_AT"), rec)
+    if (recycledAt.isDefined) model.recycledAt = recycledAt.get
 
     model
   }

@@ -1,8 +1,11 @@
 package altitude.dao.postgres
 
+import java.sql.Timestamp
+
 import altitude.models.BaseModel
 import altitude.{Const => C}
-import org.joda.time.DateTime
+import org.joda.time.{DateTimeZone, DateTime}
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 
 
 trait Postgres {
@@ -31,8 +34,9 @@ trait Postgres {
   }
 
   protected def GET_DATETIME_FROM_REC(field: String, rec: Map[String, AnyRef]): Option[DateTime] = {
-    val milis = rec.getOrElse(field, 0d).asInstanceOf[Double].toLong
-    if (milis != 0d) Some(new DateTime(milis * 1000)) else None
+    val timestamp: Timestamp = rec.get(field).get.asInstanceOf[Timestamp]
+    val dt = new DateTime(timestamp.getTime).withMillisOfSecond(0)
+    Some(dt)
   }
 
   protected def DATETIME_TO_DB_FUNC(datetime: Option[DateTime]): String = {

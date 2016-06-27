@@ -28,6 +28,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
   protected def CORE_SQL_VALS_FOR_INSERT: String
   protected def DEFAULT_SQL_COLS_FOR_SELECT: String
+  // used instead of DEFAULT_SQL_COLS_FOR_SELECT if needed in a separate DAO
   protected def JSON_FUNC: String
   protected def CURRENT_TIME_FUNC: String
   protected def DATETIME_TO_DB_FUNC(datetime: Option[DateTime]): String

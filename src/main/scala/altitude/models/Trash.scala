@@ -1,6 +1,6 @@
 package altitude.models
 
-import altitude.{Const => C}
+import altitude.{Const => C, Util}
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json._
@@ -20,6 +20,7 @@ object Trash {
     ).withCoreAttr(json)
 
     val isoRecycledAt = (json \ C("Trash.RECYCLED_AT")).asOpt[String]
+
     if (isoRecycledAt.isDefined) {
       trash.recycledAt = ISODateTimeFormat.dateTime().parseDateTime(isoRecycledAt.get)
     }
@@ -54,4 +55,9 @@ class Trash(override val id: Option[String] = None,
     _recycledAt = Some(arg)
   }
 
+  override def toJson = super.toJson ++ Json.obj(
+    C("Trash.RECYCLED_AT") -> {recycledAt match {
+      case None => JsNull
+      case _ => JsString(Util.isoDateTime(recycledAt))
+  }})
 }

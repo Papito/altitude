@@ -3,9 +3,10 @@ package integration
 import altitude.exceptions.NotFoundException
 import altitude.models.search.Query
 import altitude.models.{Trash, Asset, Folder}
-import altitude.{Const => C}
+import altitude.{Const => C, Util}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
+import play.api.libs.json.JsObject
 
 @DoNotDiscover class LibraryServiceTests (val config: Map[String, String]) extends IntegrationTestCore {
 
@@ -22,6 +23,11 @@ import org.scalatest.Matchers._
     val trashed: Trash = altitude.service.trash.getAll.head
     trashed.createdAt should not be None
     trashed.createdAt.get.getMillis should equal(asset.createdAt.get.getMillis)
+    trashed.recycledAt should not be None
+    println("!!!!!!!!!!!!!!!!!!!!!!")
+    println(asset.createdAt)
+    println(trashed.createdAt)
+    println(trashed.recycledAt)
   }
 
   test("move asset to a different folder") {

@@ -1,8 +1,10 @@
 package altitude.dao.sqlite
 
+
 import altitude.models.BaseModel
 import altitude.{Const => C}
-import org.joda.time.DateTime
+import org.joda.time.{DateTimeZone, DateTime}
+import org.joda.time.format.{DateTimeFormatter, DateTimeFormat}
 
 trait Sqlite {
   protected def CORE_SQL_VALS_FOR_INSERT = "?"
@@ -30,8 +32,10 @@ trait Sqlite {
   }
 
   protected def GET_DATETIME_FROM_REC(field: String, rec: Map[String, AnyRef]): Option[DateTime] = {
-    val seconds = rec.getOrElse(field, 0).asInstanceOf[Int]
-    if (seconds != 0) Some(new DateTime(seconds.toLong * 1000)) else None
+    val timestamp: String = rec.get(field).get.asInstanceOf[String]
+    val formatter: DateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+    val dt: DateTime = formatter.withZone(DateTimeZone.forID("UTC")).parseDateTime(timestamp)
+    Some(dt)
   }
 
   protected def DATETIME_TO_DB_FUNC(datetime: Option[DateTime]): String = {
