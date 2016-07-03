@@ -25,24 +25,18 @@ BaseViewModel = Base.extend({
   },
   // ----------------------------------------------------------------
 
-  blinkSuccess: function(msg) {
-    this.successEl.show();
+  success: function(msg) {
     this.successMessage(msg);
-    this.successEl.fadeOut(1500);
   },
   // ----------------------------------------------------------------
 
-  blinkInfo: function(msg) {
-    this.infoEl.show();
+  info: function(msg) {
     this.infoMessage(msg);
-    this.infoEl.fadeOut(1800);
   },
   // ----------------------------------------------------------------
 
-  blinkWarning: function(msg) {
-    this.warningEl.show();
+  warning: function(msg) {
     this.warningMessage(msg);
-    this.warningEl.fadeOut(1800);
   },
   // ----------------------------------------------------------------
 

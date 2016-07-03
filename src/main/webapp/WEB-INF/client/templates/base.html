@@ -80,11 +80,14 @@
     </div>
   </div>
   <div id="hud">
-    <div id="successMessage" class="alert alert-success" style="display: none" role="alert" data-bind="text: successMessage">
+    <div id="successMessage" class="alert alert-success" style="display: none" role="alert"
+         data-bind="text: successMessage, visible: successMessage">
     </div>
-    <div id="infoMessage" class="alert alert-info" style="display: none" role="alert" data-bind="text: infoMessage">
+    <div id="infoMessage" class="alert alert-info" style="display: none" role="alert"
+         data-bind="text: infoMessage, visible: infoMessage">
     </div>
-    <div id="warningMessage" class="alert alert-warning" style="display: none" role="alert" data-bind="text: warningMessage">
+    <div id="warningMessage" class="alert alert-warning" style="display: none" role="alert"
+         data-bind="text: warningMessage, visible: warningMessage">
     </div>
   </div>
 </header>

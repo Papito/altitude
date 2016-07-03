@@ -57,66 +57,83 @@ AssetsViewModel = BaseViewModel.extend({
 
     // set up shortcuts
     Mousetrap.bind(['.', 'pagedown'], function() {
+      self.resetAllMessages();
       self.gotoNextPage();
     }, 'keyup');
 
     Mousetrap.bind([',', 'pageup'], function() {
+      self.resetAllMessages();
       self.gotoPrevPage();
     }, 'keyup');
 
     Mousetrap.bind('right', function() {
+      self.resetAllMessages();
       self.focusRight();
     }, 'keyup');
 
     Mousetrap.bind('left', function() {
+      self.resetAllMessages();
       self.focusLeft();
     }, 'keyup');
 
     Mousetrap.bind('up', function() {
+      self.resetAllMessages();
       self.focusUp();
     }, 'keyup');
 
     Mousetrap.bind('down', function() {
+      self.resetAllMessages();
       self.focusDown();
     }, 'keyup');
 
     Mousetrap.bind('shift+right', function() {
+      self.resetAllMessages();
       self.selectRight();
     });
 
     Mousetrap.bind('shift+left', function() {
+      self.resetAllMessages();
       self.selectLeft();
     });
 
     Mousetrap.bind('shift+up', function() {
+      self.resetAllMessages();
       self.selectUp();
     });
 
     Mousetrap.bind('shift+down', function() {
+      self.resetAllMessages();
       self.selectDown();
     });
 
     Mousetrap.bind('esc', function() {
+      self.resetAllMessages();
       self.clearFocusing();
     });
 
     Mousetrap.bind('s', function() {
+      self.resetAllMessages();
       self.selectFocused();
     });
 
     Mousetrap.bind('d', function() {
+      self.resetAllMessages();
       self.deselectFocused();
     });
 
     Mousetrap.bind('shift+s', function() {
+      self.resetAllMessages();
       self.selectAllOnPage();
     });
 
     Mousetrap.bind('shift+d', function() {
+      self.resetAllMessages();
       self.deselectAllOnPage();
     });
 
     Mousetrap.bind('del', function() {
+      self.resetAllMessages();
+
       // if there is a selection, show the confirmation dialog
       if (self.selectedCount()) {
         self.showMoveSelectedToTrash();
@@ -127,23 +144,26 @@ AssetsViewModel = BaseViewModel.extend({
       var focusedAsset = self.getFocusedAsset();
 
       if (!focusedAsset) {
-        self.blinkWarning('No assets focused');
+        self.warning('No assets focused');
         return;
       }
       self.moveToTrash(focusedAsset.id);
     });
 
     $('#renameFolderForm').on('submit', function(e) {
+      self.resetAllMessages();
       e.preventDefault();
       self.renameFolder();
     });
 
     $('#addFolderForm').on('submit', function(e) {
+      self.resetAllMessages();
       e.preventDefault();
       self.addFolder();
     });
 
     $('#renameFolderModal').on('shown.bs.modal', function () {
+      self.resetAllMessages();
       $('#renameFolderInput').focus().select();
     });
 
@@ -154,6 +174,7 @@ AssetsViewModel = BaseViewModel.extend({
         rename: {
           name: "Rename",
           callback: function(key, opt){
+            self.resetAllMessages();
             var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
             self.showRenameFolder(folderId);
           }
@@ -161,6 +182,7 @@ AssetsViewModel = BaseViewModel.extend({
         move: {
           name: "Move",
           callback: function(key, opt){
+            self.resetAllMessages();
             var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
             self.showMoveFolder(folderId);
           }
@@ -220,6 +242,7 @@ AssetsViewModel = BaseViewModel.extend({
     });
 
     this.uncategorizedEl.on("drop", function( event, ui ) {
+      self.resetAllMessages();
       var assetId = $(ui.draggable.context).attr('asset_id');
       self.moveToUncategorized(assetId);
     });
@@ -232,6 +255,7 @@ AssetsViewModel = BaseViewModel.extend({
     });
 
     this.trashEl.on("drop", function( event, ui ) {
+      self.resetAllMessages();
       var assetId = $(ui.draggable.context).attr('asset_id');
       self.moveToTrash(assetId);
     });
@@ -682,7 +706,7 @@ AssetsViewModel = BaseViewModel.extend({
       'successCallback': function() {
         self.loadFolders();
         self.refreshResults();
-        self.blinkWarning("Assets moved to trash");
+        self.warning("Assets moved to trash");
         self.clearSelection();
       },
       'finally': function() {
@@ -845,7 +869,7 @@ AssetsViewModel = BaseViewModel.extend({
         self.loadFolders();
         self.clearSelection();
         self.refreshResults();
-        self.blinkSuccess("Assets moved");
+        self.success("Assets moved");
       },
       'finally': function() {
         self.clearSelection();
@@ -863,7 +887,7 @@ AssetsViewModel = BaseViewModel.extend({
     var opts = {
       'successCallback': function() {
         self.loadFolders(self.currentFolderId());
-        self.blinkSuccess("Asset folder cleared");
+        self.success("Asset folder cleared");
       }
     };
 
@@ -880,7 +904,7 @@ AssetsViewModel = BaseViewModel.extend({
         self.selectedIds.remove(assetId);
         self.refreshResults();
         self.loadFolders(self.currentFolderId());
-        self.blinkWarning("Asset moved to trash");
+        self.warning("Asset moved to trash");
       }
     };
 
@@ -888,6 +912,8 @@ AssetsViewModel = BaseViewModel.extend({
   },
 
   showAddFolder: function() {
+    var self = this;
+    self.resetAllMessages();
     this._showAddFolder(true);
     $('#addFolder').find('input').attr("tabindex",-1).focus();
   },
@@ -959,6 +985,7 @@ AssetsViewModel = BaseViewModel.extend({
         });
 
         elFolderTargets.on("drop", function( event, ui ) {
+          self.resetAllMessages();
           var assetId = $(ui.draggable.context).attr('asset_id');
           var folderId = $(event.target).attr('folder_id');
           self.moveAssetToFolder(assetId, folderId);
@@ -987,7 +1014,7 @@ AssetsViewModel = BaseViewModel.extend({
       'successCallback': function() {
         self.loadFolders(self.currentFolderId());
         self.refreshResults();
-        self.blinkSuccess("Asset moved");
+        self.success("Asset moved");
       },
       'finally': function() {
         self.actionState = null;
@@ -1018,7 +1045,7 @@ AssetsViewModel = BaseViewModel.extend({
 
   showRenameFolder: function(folderId) {
     var self = this;
-    console.log('Renaming', folderId);
+    self.resetAllMessages();
     var modal = $('#renameFolderModal');
     var folderToRename = $.grep(this.folders(), function(f){ return f.id == folderId; })[0];
     $('#renameFolderInput').val(folderToRename.name);
@@ -1029,12 +1056,11 @@ AssetsViewModel = BaseViewModel.extend({
 
   deleteFolder: function(folderId) {
     var self = this;
-    console.log('Deleting', folderId);
 
     var opts = {
       'successCallback': function() {
         self.loadFolders(self.currentFolderId());
-        self.blinkWarning("Folder deleted");
+        self.warning("Folder deleted");
       },
       'finally': function() {
         self.actionState = null;
@@ -1073,7 +1099,7 @@ AssetsViewModel = BaseViewModel.extend({
     var opts = {
       'successCallback': function() {
         self.loadFolders(self.currentFolderId());
-        self.blinkSuccess("Folder moved");
+        self.success("Folder moved");
       },
       'finally': function() {
         self.actionState = null;

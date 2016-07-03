@@ -115,7 +115,7 @@ TrashViewModel = AssetsViewModel.extend({
     var opts = {
       'successCallback': function() {
         self.refreshResults();
-        self.blinkSuccess("Asset moved");
+        self.success("Asset moved");
       },
       'finally': function() {
         self.actionState = null;
@@ -138,7 +138,7 @@ TrashViewModel = AssetsViewModel.extend({
       'successCallback': function() {
         self.clearSelection();
         self.refreshResults();
-        self.blinkSuccess("Assets moves");
+        self.success("Assets moves");
       },
       'finally': function() {
         self.clearSelection();
@@ -162,7 +162,7 @@ TrashViewModel = AssetsViewModel.extend({
       },
       'successCallback': function() {
         self.refreshResults();
-        self.blinkSuccess("Assets restored");
+        self.success("Assets restored");
         self.clearSelection();
       },
       'finally': function() {
@@ -181,7 +181,7 @@ TrashViewModel = AssetsViewModel.extend({
     var opts = {
       'successCallback': function() {
         self.refreshResults();
-        self.blinkSuccess("Asset restored");
+        self.success("Asset restored");
       },
       'finally': function() {
         self.actionState = null;
