@@ -1,8 +1,13 @@
 package altitude.controllers
 
 import java.io.{File, PrintWriter, StringWriter}
-import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
+
+import java.util.concurrent.Executors
+
+import org.json4s.JsonAST.{JField, JString}
+import org.json4s.{JValue, DefaultFormats, Formats}
+import org.scalatra.SessionSupport
 
 import altitude.controllers.web.BaseWebController
 import altitude.exceptions.{AllDone, DuplicateException, MetadataExtractorException}
@@ -20,8 +25,8 @@ import play.api.libs.json._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class ImportController extends BaseWebController  with JValueResult
-with JacksonJsonSupport with SessionSupport with AtmosphereSupport with FileUploadSupport  {
+class ImportController extends BaseWebController with JValueResult
+with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUploadSupport  {
   private final val log = LoggerFactory.getLogger(getClass)
 
   val ONE_HUNDRED_MEGABYTES = 1024 * 1024 * 100

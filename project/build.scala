@@ -11,9 +11,9 @@ object AltitudeBuild extends Build {
   val Organization = "altitude"
   val Name = "Altitude"
   val Version = "0.1.0-SNAPSHOT"
-  val ScalaVersion = "2.11.6"
-  val ScalatraVersion = "2.3.0"
-  val json4sversion = "3.2.9"
+  val ScalaVersion = "2.11.7"
+  val ScalatraVersion = "2.4.0"
+  val json4sversion = "3.3.0"
   val jettyVersion = "9.1.3.v20140225"
 
   val projectSettings = ScalatraPlugin.scalatraSettings ++ Seq(
@@ -38,8 +38,8 @@ object AltitudeBuild extends Build {
       "com.typesafe.play"           %% "play-json"             % "2.3.10",
 
 
-      "org.apache.tika"              % "tika-parsers"          % "1.12",
-      "org.apache.tika"              % "tika-serialization"    % "1.12",
+      "org.apache.tika"              % "tika-parsers"          % "1.13",
+      "org.apache.tika"              % "tika-serialization"    % "1.13",
       "commons-io"                   % "commons-io"            % "2.4",
       "commons-dbutils"              % "commons-dbutils"       % "1.6",
 
