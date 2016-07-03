@@ -869,7 +869,12 @@ AssetsViewModel = BaseViewModel.extend({
         self.loadFolders();
         self.clearSelection();
         self.refreshResults();
-        self.success("Assets moved");
+        if (self.currentFolderId() === '0') {
+          self.warning("Assets moved. They may still be visible since you are viewing all assets.");
+
+        } else {
+          self.success("Assets moved");
+        }
       },
       'finally': function() {
         self.clearSelection();
