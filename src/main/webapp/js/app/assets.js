@@ -588,6 +588,8 @@ AssetsViewModel = BaseViewModel.extend({
   },
 
   focusAssetById: function(id) {
+    var self = this;
+    self.clearFocusing();
     var el = $("[asset_id='" + id + "']");
     el.addClass('focused');
     el.focus();
@@ -666,9 +668,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     self.searchResults().forEach(function(asset) {
       delete self.selectedAssetsMap[asset.id];
-      self.selectedIds.remove(function (id) {
-        return id === asset.id;
-      });
+      self.selectedIds.remove(asset.id);
       asset.selected(false);
     });
 
@@ -1203,6 +1203,27 @@ AssetsViewModel = BaseViewModel.extend({
     var dirSeparator = this.currentPath() == "/" ? '': '/';
     var importDirectoryPath = this.currentPath() + dirSeparator + directoryName;
     window.location = "/client/import?importDirectoryPath=" + importDirectoryPath;
+  },
+
+  focusOrSelectAsset: function(view, asset, event) {
+    var self = view;
+
+    if (event.shiftKey) {
+      if (asset.selected()) {
+        // deselect
+        delete self.selectedAssetsMap[asset.id];
+        self.selectedIds.remove(asset.id);
+        asset.selected(false);
+      }
+      else {
+        self.selectedAssetsMap[asset.id] = asset;
+        self.selectedIds.push(asset.id);
+        asset.selected(true);
+      }
+    }
+    else {
+      self.focusAssetById(asset.id);
+    }
   }
 
 });

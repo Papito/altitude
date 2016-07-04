@@ -8,6 +8,7 @@ if (!window.console) {
 
 BaseViewModel = Base.extend({
   constructor : function() {
+    var self = this;
     console.log('Initializing base view model');
     this.base();
 
@@ -22,6 +23,14 @@ BaseViewModel = Base.extend({
 
     this.errorMessage = ko.observable();
     this.errorStacktrace = ko.observable();
+
+    this.keys = [];
+    window.onkeyup = function(e) {self.keys[e.keyCode]=false;};
+    window.onkeydown = function(e) {self.keys[e.keyCode]=true;}
+  },
+
+  isKeyPressed: function(key) {
+    return this.keys.has(key);
   },
   // ----------------------------------------------------------------
 
