@@ -15,7 +15,7 @@
       <div class="col-md-10" data-bind="visible: searchResults().length > 0">
         <div id="searchResults" data-bind="foreach: searchResults">
           <div class="result-box"
-               data-bind="attr: {'asset_id': $data.id}, css: {'selected': selected}, click: function(asset, event){$root.focusOrSelectAsset($root, asset, event)}">
+               data-bind="attr: {'asset_id': $data.id}, css: {'selected': selected}, singleClick: function(asset, event){$root.focusOrSelectAsset($root, asset, event)}, event: {dblclick: $root.openAsset}">
             <img src="#" data-bind="attr: {src: '/assets/'+ $data.id +'/preview'}" class="img-responsive">
           </div>
         </div>

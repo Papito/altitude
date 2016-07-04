@@ -1224,6 +1224,10 @@ AssetsViewModel = BaseViewModel.extend({
     else {
       self.focusAssetById(asset.id);
     }
+  },
+
+  openAsset: function(asset) {
+    console.log('viewing', asset);
   }
 
 });
