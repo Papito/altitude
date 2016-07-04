@@ -789,6 +789,11 @@ AssetsViewModel = BaseViewModel.extend({
   showMoveSelectedAssets: function() {
     var self = this;
 
+    if (!self.folders().length) {
+      self.warning('No folders created yet');
+      return;
+    }
+
     var successCallback = function() {
       $('#folderSelModal-moveSelectedAssets').modal();
     };
@@ -807,6 +812,11 @@ AssetsViewModel = BaseViewModel.extend({
 
   showMoveAsset: function(assetId) {
     var self = this;
+
+    if (!self.folders().length) {
+      self.warning('No folders created yet');
+      return;
+    }
 
     var successCallback = function() {
       self.actionState = assetId;
