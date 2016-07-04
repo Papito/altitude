@@ -266,6 +266,11 @@ AssetsViewModel = BaseViewModel.extend({
       self.moveToTrash(assetId);
     });
 
+    // when asset modal is closed
+    $('#assetModal').on('hidden.bs.modal', function () {
+      self.viewedAsset(null);
+    });
+
     // get the data
     this.search();
     this.loadFolders(self.currentFolderId());
@@ -1233,10 +1238,13 @@ AssetsViewModel = BaseViewModel.extend({
   viewAsset: function(view, asset) {
     var self = view;
 
+    if (!asset) {
+      return;
+    }
+
     var opts = {
       'successCallback': function (json) {
         self.viewedAsset(new Asset(json.asset));
-        console.log(self.viewedAsset());
         $('#assetModal').modal();
       }
     };
