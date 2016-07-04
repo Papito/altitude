@@ -47,6 +47,10 @@ object Const {
     "Folder.Names.TRASH" ->  "Trash",  //TODO: not i18n
     "Preview.ASSET_ID" -> "asset_id",
     "Preview.MIME_TYPE" -> "mime_type",
+    "Preview.DATA" -> "data",
+    "Data.ASSET_ID" -> "asset_id",
+    "Data.MIME_TYPE" -> "mime_type",
+    "Data.DATA" -> "data",
     "Stat.DIMENSION" -> "dimension",
     "Stat.DIM_VAL" -> "dim_val",
 
@@ -86,7 +90,6 @@ object Const {
     "Api.Folder.HIERARCHY" -> "hierarchy",
     "Api.Folder.SYSTEM" -> "system",
     "Api.Folder.UNCATEGORIZED" -> "uncategorized",
-    // FIXME: need this?
     "Api.Folder.TRASH" -> "trash",
     "Api.Folder.FOLDERS" -> "folders",
     "Api.Folder.FOLDER" -> "folder",

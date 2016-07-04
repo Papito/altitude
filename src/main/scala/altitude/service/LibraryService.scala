@@ -82,8 +82,12 @@ class LibraryService(app: Altitude) {
     }
   }
 
-  def getPreview(asset_id: String): Preview = {
-    app.service.preview.getById(asset_id)
+  def getPreview(assetId: String): Preview = {
+    app.service.preview.getById(assetId)
+  }
+
+  def getData(assetId: String): Data = {
+    app.service.data.getById(assetId)
   }
 
   def search(query: Query)(implicit txId: TransactionId = new TransactionId): QueryResult = {

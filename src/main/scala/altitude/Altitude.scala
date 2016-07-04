@@ -97,6 +97,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
     val asset = new AssetService(app)
     val trash = new TrashService(app)
     val preview = new PreviewService(app)
+    val data = new DataService(app)
     val folder = new FolderService(app)
     val stats = new StatsService(app)
 //    val importProfile = new ImportProfileService(app)

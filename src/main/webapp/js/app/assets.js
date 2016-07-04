@@ -18,6 +18,8 @@ AssetsViewModel = BaseViewModel.extend({
     this.currentFolderId = ko.observable("0");
     this._showAddFolder = ko.observable(false);
 
+    this.viewedAsset = ko.observable();
+
     this.stats = {};
     this.stats.totalAssets = ko.observable(0);
     this.stats.uncategorizedAssets = ko.observable(0);
@@ -53,6 +55,10 @@ AssetsViewModel = BaseViewModel.extend({
 
     this.nextPageVisible = ko.computed(function() {
       return this.currentPage() < this.totalPages();
+    }, this);
+
+    this.viewedAssetDataUrl = ko.computed(function() {
+      return self.viewedAsset() ? '/api/v1/assets/' + self.viewedAsset().id + '/data' : null;
     }, this);
 
     // set up shortcuts
@@ -358,8 +364,6 @@ AssetsViewModel = BaseViewModel.extend({
             asset.selected(true);
           }
         }
-
-
       }
     };
 
@@ -1226,8 +1230,18 @@ AssetsViewModel = BaseViewModel.extend({
     }
   },
 
-  openAsset: function(asset) {
-    console.log('viewing', asset);
+  viewAsset: function(view, asset) {
+    var self = view;
+
+    var opts = {
+      'successCallback': function (json) {
+        self.viewedAsset(new Asset(json.asset));
+        console.log(self.viewedAsset());
+        $('#assetModal').modal();
+      }
+    };
+
+    this.get('/api/v1/assets/' + asset.id, opts);
   }
 
 });

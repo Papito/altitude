@@ -1,7 +1,8 @@
 package altitude.controllers.api
 
 import altitude.Validators.{ApiValidator, Validator}
-import altitude.exceptions.ValidationException
+import altitude.exceptions.{NotFoundException, ValidationException}
+import altitude.models.{Preview, Data, Asset}
 import altitude.{Const => C}
 import org.scalatra.{Ok, ResponseStatus, BadRequest}
 import org.slf4j.LoggerFactory
@@ -10,7 +11,28 @@ import play.api.libs.json.{JsObject, Json}
 class AssetController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  post(s"/:id/move/:${C("Api.Asset.FOLDER_ID")}") {
+  get(s"/:${C("Api.ID")}") {
+    val id = params.get(C("Api.ID")).get
+
+    Ok(Json.obj(
+      C("Api.Asset.ASSET") -> app.service.library.getById(id)
+    ))
+  }
+
+  get(s"/:${C("Api.ID")}/data") {
+    val id = params.get(C("Api.ID")).get
+
+    try {
+      val data: Data = app.service.data.getById(id)
+      this.contentType = data.mimeType
+      data.data
+    }
+    catch {
+      case ex: NotFoundException => redirect("/i/1x1.png") //FIXME: preload and return binary data
+    }
+  }
+
+  post(s"/:${C("Api.ID")}/move/:${C("Api.Asset.FOLDER_ID")}") {
     val id = params.get(C("Api.ID")).get
     val folderId = params.get(C("Api.Asset.FOLDER_ID")).get
     log.info(s"Moving asset $id to $folderId")
@@ -37,14 +59,13 @@ class AssetController extends BaseApiController {
     OK
   }
 
-  post(s"/:id/move/to/uncategorized") {
+  post(s"/:${C("Api.ID")}/move/to/uncategorized") {
     val id = params.get(C("Api.ID")).get
     log.info(s"Moving $id to UNCATEGORIZED")
     app.service.library.moveAssetToUncategorized(id)
 
     OK
   }
-
 
   post(s"/move/to/uncategorized") {
     log.info(s"Clearing category")
