@@ -61,101 +61,6 @@ AssetsViewModel = BaseViewModel.extend({
       return self.detailAsset() ? '/api/v1/assets/' + self.detailAsset().id + '/data' : null;
     }, this);
 
-    // set up shortcuts
-    Mousetrap.bind(['.', 'pagedown'], function() {
-      self.resetAllMessages();
-      self.gotoNextPage();
-    }, 'keyup');
-
-    Mousetrap.bind([',', 'pageup'], function() {
-      self.resetAllMessages();
-      self.gotoPrevPage();
-    }, 'keyup');
-
-    Mousetrap.bind('right', function() {
-      self.resetAllMessages();
-      self.focusRight();
-    }, 'keyup');
-
-    Mousetrap.bind('left', function() {
-      self.resetAllMessages();
-      self.focusLeft();
-    }, 'keyup');
-
-    Mousetrap.bind('up', function() {
-      self.resetAllMessages();
-      self.focusUp();
-    }, 'keyup');
-
-    Mousetrap.bind('down', function() {
-      self.resetAllMessages();
-      self.focusDown();
-    }, 'keyup');
-
-    Mousetrap.bind('shift+right', function() {
-      self.resetAllMessages();
-      self.selectRight();
-    });
-
-    Mousetrap.bind('shift+left', function() {
-      self.resetAllMessages();
-      self.selectLeft();
-    });
-
-    Mousetrap.bind('shift+up', function() {
-      self.resetAllMessages();
-      self.selectUp();
-    });
-
-    Mousetrap.bind('shift+down', function() {
-      self.resetAllMessages();
-      self.selectDown();
-    });
-
-    Mousetrap.bind('esc', function() {
-      self.resetAllMessages();
-      self.clearFocusing();
-    });
-
-    Mousetrap.bind('s', function() {
-      self.resetAllMessages();
-      self.selectFocused();
-    });
-
-    Mousetrap.bind('d', function() {
-      self.resetAllMessages();
-      self.deselectFocused();
-    });
-
-    Mousetrap.bind('shift+s', function() {
-      self.resetAllMessages();
-      self.selectAllOnPage();
-    });
-
-    Mousetrap.bind('shift+d', function() {
-      self.resetAllMessages();
-      self.deselectAllOnPage();
-    });
-
-    Mousetrap.bind('del', function() {
-      self.resetAllMessages();
-
-      // if there is a selection, show the confirmation dialog
-      if (self.selectedCount()) {
-        self.showMoveSelectedToTrash();
-        return;
-      }
-
-      // else delete currently focused
-      var focusedAsset = self.getFocusedAsset();
-
-      if (!focusedAsset) {
-        self.warning('No assets focused');
-        return;
-      }
-      self.moveToTrash(focusedAsset.id);
-    });
-
     $('#renameFolderForm').on('submit', function(e) {
       self.resetAllMessages();
       e.preventDefault();
@@ -269,11 +174,118 @@ AssetsViewModel = BaseViewModel.extend({
     // when asset modal is closed
     $('#assetModal').on('hidden.bs.modal', function () {
       self.detailAsset(null);
+      self.setupResultsHotkeys();
     });
 
     // get the data
     this.search();
     this.loadFolders(self.currentFolderId());
+  },
+
+  setupResultsHotkeys: function() {
+    var self = this;
+
+    Mousetrap.reset();
+
+    Mousetrap.bind(['.', 'pagedown'], function() {
+      self.resetAllMessages();
+      self.gotoNextPage();
+    }, 'keyup');
+
+    Mousetrap.bind([',', 'pageup'], function() {
+      self.resetAllMessages();
+      self.gotoPrevPage();
+    }, 'keyup');
+
+    Mousetrap.bind('right', function() {
+      self.resetAllMessages();
+      self.focusRight();
+    }, 'keyup');
+
+    Mousetrap.bind('left', function() {
+      self.resetAllMessages();
+      self.focusLeft();
+    }, 'keyup');
+
+    Mousetrap.bind('up', function() {
+      self.resetAllMessages();
+      self.focusUp();
+    }, 'keyup');
+
+    Mousetrap.bind('down', function() {
+      self.resetAllMessages();
+      self.focusDown();
+    }, 'keyup');
+
+    Mousetrap.bind('shift+right', function() {
+      self.resetAllMessages();
+      self.selectRight();
+    });
+
+    Mousetrap.bind('shift+left', function() {
+      self.resetAllMessages();
+      self.selectLeft();
+    });
+
+    Mousetrap.bind('shift+up', function() {
+      self.resetAllMessages();
+      self.selectUp();
+    });
+
+    Mousetrap.bind('shift+down', function() {
+      self.resetAllMessages();
+      self.selectDown();
+    });
+
+    Mousetrap.bind('esc', function() {
+      self.resetAllMessages();
+      self.clearFocusing();
+    });
+
+    Mousetrap.bind('s', function() {
+      self.resetAllMessages();
+      self.selectFocused();
+    });
+
+    Mousetrap.bind('d', function() {
+      self.resetAllMessages();
+      self.deselectFocused();
+    });
+
+    Mousetrap.bind('shift+s', function() {
+      self.resetAllMessages();
+      self.selectAllOnPage();
+    });
+
+    Mousetrap.bind('shift+d', function() {
+      self.resetAllMessages();
+      self.deselectAllOnPage();
+    });
+
+    Mousetrap.bind('del', function() {
+      self.resetAllMessages();
+
+      // if there is a selection, show the confirmation dialog
+      if (self.selectedCount()) {
+        self.showMoveSelectedToTrash();
+        return;
+      }
+
+      // else delete currently focused
+      var focusedAsset = self.getFocusedAsset();
+
+      if (!focusedAsset) {
+        self.warning('No assets focused');
+        return;
+      }
+      self.moveToTrash(focusedAsset.id);
+    });
+
+  },
+
+  setupAssetDetailHotkeys: function() {
+    var self = this;
+    Mousetrap.reset();
   },
 
   setUpRightClickContext: function() {
@@ -369,10 +381,12 @@ AssetsViewModel = BaseViewModel.extend({
             asset.selected(true);
           }
         }
+
+        self.setupResultsHotkeys();
       }
     };
 
-    this.get(self.getUrl(), opts);
+    self.get(self.getUrl(), opts);
   },
 
   gotoPrevPage: function(callback) {
@@ -1246,6 +1260,7 @@ AssetsViewModel = BaseViewModel.extend({
       'successCallback': function (json) {
         self.detailAsset(new Asset(json.asset));
         $('#assetModal').modal();
+        self.setupAssetDetailHotkeys();
       }
     };
 
