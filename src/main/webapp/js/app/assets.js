@@ -18,7 +18,7 @@ AssetsViewModel = BaseViewModel.extend({
     this.currentFolderId = ko.observable("0");
     this._showAddFolder = ko.observable(false);
 
-    this.viewedAsset = ko.observable();
+    this.detailAsset = ko.observable();
 
     this.stats = {};
     this.stats.totalAssets = ko.observable(0);
@@ -57,8 +57,8 @@ AssetsViewModel = BaseViewModel.extend({
       return this.currentPage() < this.totalPages();
     }, this);
 
-    this.viewedAssetDataUrl = ko.computed(function() {
-      return self.viewedAsset() ? '/api/v1/assets/' + self.viewedAsset().id + '/data' : null;
+    this.detailAssetDataUrl = ko.computed(function() {
+      return self.detailAsset() ? '/api/v1/assets/' + self.detailAsset().id + '/data' : null;
     }, this);
 
     // set up shortcuts
@@ -268,7 +268,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     // when asset modal is closed
     $('#assetModal').on('hidden.bs.modal', function () {
-      self.viewedAsset(null);
+      self.detailAsset(null);
     });
 
     // get the data
@@ -1235,7 +1235,7 @@ AssetsViewModel = BaseViewModel.extend({
     }
   },
 
-  viewAsset: function(view, asset) {
+  assetDetail: function(view, asset) {
     var self = view;
 
     if (!asset) {
@@ -1244,7 +1244,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     var opts = {
       'successCallback': function (json) {
-        self.viewedAsset(new Asset(json.asset));
+        self.detailAsset(new Asset(json.asset));
         $('#assetModal').modal();
       }
     };
