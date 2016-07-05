@@ -237,9 +237,13 @@ AssetsViewModel = BaseViewModel.extend({
       self.selectDown();
     });
 
+    Mousetrap.bind('return', function() {
+      var asset = self.getFocusedAsset();
+      self.assetDetail(self, asset);
+    });
+
     Mousetrap.bind('esc', function() {
       self.resetAllMessages();
-      self.clearFocusing();
     });
 
     Mousetrap.bind('s', function() {
@@ -553,9 +557,6 @@ AssetsViewModel = BaseViewModel.extend({
         elem = curEl.prev();
         assetId = $(elem).attr('asset_id');
     }
-
-    console.log('new');
-    console.log(newPos);
 
     /*
      Paginate once we hit a boundary
