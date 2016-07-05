@@ -239,7 +239,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     Mousetrap.bind('return', function() {
       var asset = self.getFocusedAsset();
-      self.assetDetail(self, asset);
+      self.showAssetDetail(self, asset);
     });
 
     Mousetrap.bind('esc', function() {
@@ -289,7 +289,38 @@ AssetsViewModel = BaseViewModel.extend({
 
   setupAssetDetailHotkeys: function() {
     var self = this;
+
     Mousetrap.reset();
+
+    Mousetrap.bind(['.', 'pagedown'], function() {
+      self.resetAllMessages();
+      self.gotoNextAssetDetail();
+    }, 'keyup');
+
+    Mousetrap.bind([',', 'pageup'], function() {
+      self.resetAllMessages();
+      self.gotoPrevAssetDetail();
+    }, 'keyup');
+
+    Mousetrap.bind('right', function() {
+      self.resetAllMessages();
+      self.gotoNextAssetDetail();
+    }, 'keyup');
+
+    Mousetrap.bind('left', function() {
+      self.resetAllMessages();
+      self.gotoPrevAssetDetail();
+    }, 'keyup');
+
+    Mousetrap.bind('up', function() {
+      self.resetAllMessages();
+      self.gotoPrevAssetDetail();
+    }, 'keyup');
+
+    Mousetrap.bind('down', function() {
+      self.resetAllMessages();
+      self.gotoNextAssetDetail();
+    }, 'keyup');
   },
 
   setUpRightClickContext: function() {
@@ -352,6 +383,10 @@ AssetsViewModel = BaseViewModel.extend({
           return new Asset(data);
         });
 
+        // remember the focused asset
+        var focusedAsset = self.getFocusedAsset();
+        var focusedAssetId = focusedAsset ? focusedAsset.id : null;
+
         self.searchResults(assets);
         self.totalPages(json.totalPages);
         self.totalRecords(json.totalRecords);
@@ -373,10 +408,6 @@ AssetsViewModel = BaseViewModel.extend({
           }
         });
 
-        if (callback && typeof callback === 'function') {
-          callback.bind(self).call();
-        }
-
         // restore selection
         for (var i = 0; i < self.searchResults().length; i++) {
           var asset = self.searchResults()[i];
@@ -386,7 +417,14 @@ AssetsViewModel = BaseViewModel.extend({
           }
         }
 
+        // restore focus
+        self.focusAssetById(focusedAssetId);
+
         self.setupResultsHotkeys();
+
+        if (callback && typeof callback === 'function') {
+          callback.bind(self).call();
+        }
       }
     };
 
@@ -613,7 +651,13 @@ AssetsViewModel = BaseViewModel.extend({
 
   focusAssetById: function(id) {
     var self = this;
+
+    if (!id) {
+      return;
+    }
+
     self.clearFocusing();
+
     var el = $("[asset_id='" + id + "']");
     el.addClass('focused');
     el.focus();
@@ -1250,7 +1294,7 @@ AssetsViewModel = BaseViewModel.extend({
     }
   },
 
-  assetDetail: function(view, asset) {
+  showAssetDetail: function(view, asset) {
     var self = view;
 
     if (!asset) {
@@ -1261,11 +1305,83 @@ AssetsViewModel = BaseViewModel.extend({
       'successCallback': function (json) {
         self.detailAsset(new Asset(json.asset));
         $('#assetModal').modal();
+        self.focusAssetById(self.detailAsset().id);
         self.setupAssetDetailHotkeys();
       }
     };
 
     this.get('/api/v1/assets/' + asset.id, opts);
-  }
+  },
 
+  getAssetIndex: function(asset) {
+    var self = this;
+
+    for (var idx = 0; idx < self.searchResults().length; idx++) {
+      var a = self.searchResults()[idx];
+
+      if (a.id === asset.id) {
+        return idx;
+      }
+    }
+  },
+
+  gotoNextAssetDetail: function() {
+    var self = this;
+
+    var lastAsset = self.lastAsset();
+
+    if (lastAsset && lastAsset.id === self.detailAsset().id) {
+      // no more results
+      if (self.currentPage() === self.totalPages()) {
+        return;
+      }
+
+      self.currentPage(self.currentPage() + 1);
+
+      var showNextAssetDetail = function() {
+        var firstAsset = self.firstAsset();
+        if (firstAsset) {
+          self.showAssetDetail(self, firstAsset);
+        }
+      };
+
+      self.search(showNextAssetDetail);
+
+      return;
+    }
+
+    var idx = self.getAssetIndex(self.detailAsset());
+    var nextAsset = self.searchResults()[idx + 1];
+    self.showAssetDetail(self, nextAsset);
+  },
+
+  gotoPrevAssetDetail: function() {
+    var self = this;
+
+    var firstAsset = self.firstAsset();
+
+    if (firstAsset && firstAsset.id === self.detailAsset().id) {
+      // no more results
+      if (self.currentPage() < 2) {
+        return;
+      }
+
+      self.currentPage(self.currentPage() - 1);
+
+      var showPrevAssetDetail = function() {
+        var lastAsset = self.lastAsset();
+        if (lastAsset) {
+          self.showAssetDetail(self, lastAsset);
+        }
+      };
+
+      self.search(showPrevAssetDetail);
+
+      return;
+    }
+
+    var idx = self.getAssetIndex(self.detailAsset());
+    var prevAsset = self.searchResults()[idx - 1];
+    self.showAssetDetail(self, prevAsset);
+  }
 });
