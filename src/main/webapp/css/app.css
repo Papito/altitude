@@ -417,6 +417,10 @@ li.folder {
     vertical-align: middle;
 }
 
+#assetModal .selected {
+    border: 3px solid #00c5f4;
+}
+
 #assetModal .helper {
     display: inline-block;
     height: 100%;

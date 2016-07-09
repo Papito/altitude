@@ -61,6 +61,10 @@ AssetsViewModel = BaseViewModel.extend({
       return self.detailAsset() ? '/api/v1/assets/' + self.detailAsset().id + '/data' : null;
     }, this);
 
+    this.detailAssetSelected = ko.computed(function() {
+      return self.detailAsset() ? self.detailAsset().selected() : false;
+    }, this);
+
     $('#renameFolderForm').on('submit', function(e) {
       self.resetAllMessages();
       e.preventDefault();
@@ -321,6 +325,23 @@ AssetsViewModel = BaseViewModel.extend({
       self.resetAllMessages();
       self.gotoNextAssetDetail();
     }, 'keyup');
+
+    Mousetrap.bind('s', function() {
+      self.resetAllMessages();
+      self.selectFocused();
+      self.detailAsset().selected(true);
+    });
+
+    Mousetrap.bind('d', function() {
+      self.resetAllMessages();
+      self.deselectFocused();
+      self.detailAsset().selected(false);
+    });
+
+    Mousetrap.bind('del', function() {
+      self.resetAllMessages();
+      self.moveToTrash(self.detailAsset().id);
+    });
   },
 
   setUpRightClickContext: function() {
@@ -514,9 +535,14 @@ AssetsViewModel = BaseViewModel.extend({
     }
 
     var assetId = el.attr('asset_id');
+    return self.getAssetOnPageById(assetId);
+  },
+
+  getAssetOnPageById: function(assetId) {
+    var self = this;
     return ko.utils.arrayFirst(self.searchResults(), function(asset) {
       return asset.id === assetId;
-    });
+    })
   },
 
   focusFirst: function() {
@@ -1307,6 +1333,10 @@ AssetsViewModel = BaseViewModel.extend({
         $('#assetModal').modal();
         self.focusAssetById(self.detailAsset().id);
         self.setupAssetDetailHotkeys();
+
+        // restore state
+        var asset = self.getAssetOnPageById(self.detailAsset().id);
+        self.detailAsset().selected(asset.selected());
       }
     };
 
