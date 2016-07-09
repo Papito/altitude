@@ -340,7 +340,14 @@ AssetsViewModel = BaseViewModel.extend({
 
     Mousetrap.bind('del', function() {
       self.resetAllMessages();
-      self.moveToTrash(self.detailAsset().id);
+
+      // after we delete the asset, display the one focused in its place
+      var cb = function() {
+        self.showAssetDetail(self, self.getFocusedAsset());
+      };
+
+      self.moveToTrash(self.detailAsset().id, cb);
+
     });
   },
 
@@ -1003,16 +1010,42 @@ AssetsViewModel = BaseViewModel.extend({
     this.post('/api/v1/assets/' + assetId + '/move/to/uncategorized', opts);
   },
 
-  moveToTrash: function(assetId) {
+  moveToTrash: function(assetId, callback) {
+    var self = this;
+
     console.log(assetId, 'to trash');
 
-    var self = this;
+    var assetIdx = self.getAssetIndex(assetId);
+
     var opts = {
       'successCallback': function() {
         delete self.selectedAssetsMap[assetId];
         self.selectedIds.remove(assetId);
-        self.refreshResults();
+
+        self.searchResults.remove(function(asset) {
+          return asset.id === assetId;
+        });
+
+        var cb = function() {
+          if (callback) callback();
+        };
+
+        if (self.searchResults().length) {
+          // focus on asset in place of deleted one
+          var assetInPlace = assetIdx + 1 > self.searchResults().length ? self.lastAsset() : self.searchResults()[assetIdx];
+          self.focusAssetById(assetInPlace.id)
+        }
+        else {
+          // focus the last asset of reloaded results for seamless focusing
+          cb = function() {
+            self.focusLast();
+            if (callback) callback();
+          };
+        }
+
+        self.refreshResults(cb);
         self.loadFolders(self.currentFolderId());
+
         self.warning("Asset moved to trash");
       }
     };
@@ -1134,7 +1167,7 @@ AssetsViewModel = BaseViewModel.extend({
     this.post('/api/v1/assets/' + assetId + '/move/' + folderId, opts);
   },
 
-  refreshResults: function() {
+  refreshResults: function(cb) {
     /*
       Redo the search and if there is nothing here, go one page back (if possible)
      */
@@ -1145,7 +1178,11 @@ AssetsViewModel = BaseViewModel.extend({
     var callback = function() {
       if (self.currentPage() > 1 && self.searchResults().length === 0) {
         self.currentPage(self.currentPage() - 1);
-        self.search();
+        self.search(cb);
+      } else {
+        if (cb && typeof cb === 'function') {
+          cb.bind(self).call();
+        }
       }
     };
 
@@ -1343,13 +1380,13 @@ AssetsViewModel = BaseViewModel.extend({
     this.get('/api/v1/assets/' + asset.id, opts);
   },
 
-  getAssetIndex: function(asset) {
+  getAssetIndex: function(assetId) {
     var self = this;
 
     for (var idx = 0; idx < self.searchResults().length; idx++) {
       var a = self.searchResults()[idx];
 
-      if (a.id === asset.id) {
+      if (a.id === assetId) {
         return idx;
       }
     }
@@ -1380,7 +1417,7 @@ AssetsViewModel = BaseViewModel.extend({
       return;
     }
 
-    var idx = self.getAssetIndex(self.detailAsset());
+    var idx = self.getAssetIndex(self.detailAsset().id);
     var nextAsset = self.searchResults()[idx + 1];
     self.showAssetDetail(self, nextAsset);
   },
@@ -1410,7 +1447,7 @@ AssetsViewModel = BaseViewModel.extend({
       return;
     }
 
-    var idx = self.getAssetIndex(self.detailAsset());
+    var idx = self.getAssetIndex(self.detailAsset().id);
     var prevAsset = self.searchResults()[idx - 1];
     self.showAssetDetail(self, prevAsset);
   }
