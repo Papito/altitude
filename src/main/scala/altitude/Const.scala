@@ -21,15 +21,16 @@ object Const {
     /*---------------------------------------------------------------------------
     MODELS
     ---------------------------------------------------------------------------*/
-    "Asset.MEDIA_TYPE" -> "media_type",
+    "Asset.ASSET_TYPE" -> "asset_type",
     "Asset.PATH" -> "path",
     "Asset.FOLDER_ID" -> "folder_id",
     "Asset.MD5" -> "md5",
     "Asset.SIZE_BYTES" -> "size_bytes",
     "Asset.FILENAME" -> "filename",
-    "Asset.MEDIA_SUBTYPE" -> "media_subtype",
-    "Asset.MIME_TYPE" -> "mime_type",
     "Asset.METADATA" -> "metadata",
+    "AssetType.MIME_TYPE" -> "mime_type",
+    "AssetType.MEDIA_TYPE" -> "media_type",
+    "AssetType.MEDIA_SUBTYPE" -> "media_subtype",
     "Trash.RECYCLED_AT" -> "recycled_at",
     "Folder.NAME" -> "name",
     "Folder.NAME_LC" -> "name_lc",

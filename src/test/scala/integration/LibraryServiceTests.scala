@@ -24,10 +24,6 @@ import play.api.libs.json.JsObject
     trashed.createdAt should not be None
     trashed.createdAt.get.getMillis should equal(asset.createdAt.get.getMillis)
     trashed.recycledAt should not be None
-    println("!!!!!!!!!!!!!!!!!!!!!!")
-    println(asset.createdAt)
-    println(trashed.createdAt)
-    println(trashed.recycledAt)
   }
 
   test("move asset to a different folder") {

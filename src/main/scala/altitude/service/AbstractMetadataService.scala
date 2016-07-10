@@ -2,7 +2,7 @@ package altitude.service
 
 import java.io.InputStream
 
-import altitude.models.{FileImportAsset, MediaType}
+import altitude.models.{AssetType, FileImportAsset, AssetType$}
 import play.api.libs.json.JsValue
 
 abstract class AbstractMetadataService {
@@ -92,6 +92,6 @@ abstract class AbstractMetadataService {
   )
 
 
-  def extract(importAsset: FileImportAsset, mediaType: MediaType, asRaw: Boolean): JsValue
-  def detectMediaTypeFromStream(is: InputStream): MediaType
+  def extract(importAsset: FileImportAsset, assetType: AssetType, asRaw: Boolean): JsValue
+  def detectAssetTypeFromStream(is: InputStream): AssetType
 }

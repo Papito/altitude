@@ -123,7 +123,7 @@ class LibraryService(app: Altitude) {
   }
 
   def genPreviewData(asset: Asset): Array[Byte] = {
-    asset.mediaType.mediaType match {
+    asset.assetType.mediaType match {
       case "image" =>
         makeImageThumbnail(asset)
       case _ => new Array[Byte](0)
@@ -141,7 +141,7 @@ class LibraryService(app: Altitude) {
 
         val preview: Preview = Preview(
           assetId=asset.id.get,
-          mimeType=asset.mediaType.mime,
+          mimeType=asset.assetType.mime,
           data=previewData)
 
         app.service.preview.add(preview)
@@ -156,7 +156,7 @@ class LibraryService(app: Altitude) {
 
     val preview: Preview = Preview(
       assetId = asset.id.get,
-      mimeType = asset.mediaType.mime,
+      mimeType = asset.assetType.mime,
       data = previewData)
 
     app.service.preview.add(preview)

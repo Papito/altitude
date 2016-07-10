@@ -4,13 +4,12 @@ import java.io.{File, FileInputStream, InputStream}
 
 import altitude.dao.FileSystemImportDao
 import altitude.exceptions.{FormatException, MetadataExtractorException}
-import altitude.models.{Asset, FileImportAsset, Folder, MediaType}
+import altitude.models._
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
-import org.apache.tika.mime.{MediaType => TikaMediaType}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsValue, Json}
 
@@ -27,7 +26,7 @@ class FileImportService(app: Altitude) {
     assets
   }
 
-  def detectAssetMediaType(importAsset: FileImportAsset): MediaType = {
+  def detectAssetType(importAsset: FileImportAsset): AssetType = {
     log.debug(s"Detecting media type for: '$importAsset'", C.LogTag.SERVICE)
 
     var inputStream: Option[InputStream] = None
@@ -36,7 +35,7 @@ class FileImportService(app: Altitude) {
       val url: java.net.URL = importAsset.file.toURI.toURL
       val metadata: TikaMetadata = new TikaMetadata
       inputStream = Some(TikaInputStream.get(url, metadata))
-      app.service.metadata.detectMediaTypeFromStream(inputStream.get)
+      app.service.metadata.detectAssetTypeFromStream(inputStream.get)
     }
     finally {
       if (inputStream.isDefined) inputStream.get.close()
@@ -46,16 +45,16 @@ class FileImportService(app: Altitude) {
   def importAsset(fileAsset: FileImportAsset)
                  (implicit txId: TransactionId = new TransactionId) : Option[Asset]  = {
     log.info(s"Importing file asset '$fileAsset'", C.LogTag.SERVICE)
-    val mediaType = detectAssetMediaType(fileAsset)
+    val assetType = detectAssetType(fileAsset)
 
-    if (!SUPPORTED_MEDIA_TYPES.contains(mediaType.mediaType)) {
-      log.warn(s"Ignoring ${fileAsset.absolutePath} of type ${mediaType.mediaType}")
+    if (!SUPPORTED_MEDIA_TYPES.contains(assetType.mediaType)) {
+      log.warn(s"Ignoring ${fileAsset.absolutePath} of type ${assetType.mediaType}")
       return None
     }
 
     var metadataParserException: Option[Exception] = None
     val metadata: JsValue = try {
-      app.service.metadata.extract(fileAsset, mediaType)
+      app.service.metadata.extract(fileAsset, assetType)
     }
     catch {
       case ex: Exception => {
@@ -69,7 +68,7 @@ class FileImportService(app: Altitude) {
     val asset: Asset = Asset(
       path = fileAsset.absolutePath,
       md5 = getChecksum(fileAsset.absolutePath),
-      mediaType = mediaType,
+      assetType = assetType,
       sizeBytes = fileSizeInBytes,
       folderId = Folder.UNCATEGORIZED.id.get)
 
@@ -90,7 +89,7 @@ class FileImportService(app: Altitude) {
     val assetWithPreview = Asset(
       path = asset.path,
       md5 = asset.md5,
-      mediaType = asset.mediaType,
+      assetType = asset.assetType,
       sizeBytes = asset.sizeBytes,
       folderId = asset.folderId,
       metadata = metadata,

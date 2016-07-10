@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat
 
 import altitude.transactions.TransactionId
 import altitude.{Const => C, Util, Altitude}
-import altitude.models.{BaseModel, Trash, MediaType}
+import altitude.models.{AssetType, BaseModel, Trash, AssetType$}
 import org.joda.time.{DateTime, LocalDateTime}
 import org.joda.time.format.DateTimeFormat
 import org.slf4j.LoggerFactory
@@ -15,16 +15,16 @@ abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with alt
   private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
-    val mediaType = new MediaType(
-      mediaType = rec.get(C("Asset.MEDIA_TYPE")).get.asInstanceOf[String],
-      mediaSubtype = rec.get(C("Asset.MEDIA_SUBTYPE")).get.asInstanceOf[String],
-      mime = rec.get(C("Asset.MIME_TYPE")).get.asInstanceOf[String])
+    val mediaType = new AssetType(
+      mediaType = rec.get(C("AssetType.MEDIA_TYPE")).get.asInstanceOf[String],
+      mediaSubtype = rec.get(C("AssetType.MEDIA_SUBTYPE")).get.asInstanceOf[String],
+      mime = rec.get(C("AssetType.MIME_TYPE")).get.asInstanceOf[String])
 
     val model = new Trash(
       id = Some(rec.get(C("Base.ID")).get.asInstanceOf[String]),
       path = rec.get(C("Asset.PATH")).get.asInstanceOf[String],
       md5 = rec.get(C("Asset.MD5")).get.asInstanceOf[String],
-      mediaType = mediaType,
+      assetType = mediaType,
       sizeBytes = rec.get(C("Asset.SIZE_BYTES")).get.asInstanceOf[Int],
       folderId = rec.get(C("Asset.FOLDER_ID")).get.asInstanceOf[String])
 
@@ -46,7 +46,7 @@ abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with alt
         INSERT INTO $tableName (
              $CORE_SQL_COLS_FOR_INSERT, ${C("Asset.PATH")}, ${C("Asset.MD5")},
              ${C("Asset.FILENAME")}, ${C("Asset.SIZE_BYTES")},
-             ${C("Asset.MEDIA_TYPE")}, ${C("Asset.MEDIA_SUBTYPE")}, ${C("Asset.MIME_TYPE")},
+             ${C("AssetType.MEDIA_TYPE")}, ${C("AssetType.MEDIA_SUBTYPE")}, ${C("AssetType.MIME_TYPE")},
              ${C("Asset.FOLDER_ID")}, ${C("Base.CREATED_AT")}, ${C("Base.UPDATED_AT")},
              ${C("Asset.METADATA")})
             VALUES(
@@ -64,9 +64,9 @@ abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with alt
       trash.md5,
       trash.fileName,
       trash.sizeBytes.asInstanceOf[Object],
-      trash.mediaType.mediaType,
-      trash.mediaType.mediaSubtype,
-      trash.mediaType.mime,
+      trash.assetType.mediaType,
+      trash.assetType.mediaSubtype,
+      trash.assetType.mime,
       trash.folderId,
       metadata)
 

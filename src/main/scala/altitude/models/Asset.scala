@@ -9,7 +9,7 @@ import scala.language.implicitConversions
 object Asset {
   implicit def fromJson(json: JsValue): Asset = Asset(
     id = (json \ C("Base.ID")).asOpt[String],
-    mediaType = json \ C("Asset.MEDIA_TYPE"),
+    assetType = json \ C("Asset.ASSET_TYPE"),
     path = (json \ C("Asset.PATH")).as[String],
     folderId = (json \ C("Asset.FOLDER_ID")).as[String],
     md5 = (json \ C("Asset.MD5")).as[String],
@@ -19,7 +19,7 @@ object Asset {
 }
 
 case class Asset(id: Option[String] = None,
-                 mediaType: MediaType,
+                 assetType: AssetType,
                  path: String,
                  md5: String,
                  sizeBytes: Long,
@@ -35,8 +35,8 @@ case class Asset(id: Option[String] = None,
     C("Asset.MD5") -> md5,
     C("Asset.FILENAME") -> fileName,
     C("Asset.SIZE_BYTES") -> sizeBytes,
-    C("Asset.MEDIA_TYPE") -> (mediaType: JsValue),
+    C("Asset.ASSET_TYPE") -> (assetType: JsValue),
     C("Asset.METADATA") -> metadata) ++ coreJsonAttrs
 
-  override def toString = s"${this.path} ${this.mediaType.mediaType} ${this.mediaType.mediaSubtype}"
+  override def toString = s"${this.path} ${this.assetType.mediaType} ${this.assetType.mediaSubtype}"
 }

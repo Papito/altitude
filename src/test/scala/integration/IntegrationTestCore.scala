@@ -2,7 +2,7 @@ package integration
 
 import java.io.File
 
-import altitude.models.{Asset, Folder, MediaType}
+import altitude.models.{AssetType, Asset, Folder}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Environment, Util}
 import com.google.inject.{AbstractModule, Guice}
@@ -78,11 +78,11 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   }
 
   /* INTEGRATION UTILITIES*/
-  private val MEDIA_TYPE = new MediaType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
+  private val ASSET_TYPE = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
 
   protected  def makeAsset(folder: Folder) = Asset(
     folderId = folder.id.get,
-    mediaType = MEDIA_TYPE,
+    assetType = ASSET_TYPE,
     path = Util.randomStr(30),
     md5 = Util.randomStr(30),
     sizeBytes = 1L)

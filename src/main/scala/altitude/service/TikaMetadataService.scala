@@ -3,7 +3,7 @@ package altitude.service
 import java.io.{InputStream, StringWriter}
 
 import altitude.exceptions.AllDone
-import altitude.models.{FileImportAsset, MediaType}
+import altitude.models.{AssetType, FileImportAsset, AssetType$}
 import altitude.{Const => C}
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
@@ -30,9 +30,9 @@ class TikaMetadataService extends AbstractMetadataService {
 
   final private val TIKA_HANDLER = new DefaultHandler
 
-  override def extract(importAsset: FileImportAsset, mediaType: MediaType, asRaw: Boolean = false): JsValue = {
+  override def extract(importAsset: FileImportAsset, mediaType: AssetType, asRaw: Boolean = false): JsValue = {
     val raw: Option[TikaMetadata]  = mediaType match {
-      case mt: MediaType if mt.mediaType == "image" =>
+      case mt: AssetType if mt.mediaType == "image" =>
         extractMetadata(importAsset, List(new JpegParser, new TiffParser))
       /*
           case mt: MediaType if mt.mediaType == "audio" && mt.mediaSubtype == "mpeg" =>
@@ -132,17 +132,17 @@ class TikaMetadataService extends AbstractMetadataService {
     Some(normalized)
   }
 
-  def detectMediaTypeFromStream(is: InputStream): MediaType = {
+  def detectAssetTypeFromStream(is: InputStream): AssetType = {
     val metadata: TikaMetadata = new TikaMetadata
 
     val detector: Detector = new DefaultDetector
     val tikaMediaType: TikaMediaType = detector.detect(is, metadata)
 
-    val assetMediaType = MediaType(
+    val assetType = AssetType(
       mediaType = tikaMediaType.getType,
       mediaSubtype = tikaMediaType.getSubtype,
       mime = tikaMediaType.getBaseType.toString)
 
-    assetMediaType
+    assetType
   }
 }

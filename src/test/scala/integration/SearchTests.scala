@@ -1,7 +1,7 @@
 package integration
 
 import altitude.models.search.Query
-import altitude.models.{Asset, Folder, MediaType}
+import altitude.models.{AssetType, Asset, Folder, AssetType$}
 import altitude.{Const => C, Util}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
@@ -13,9 +13,9 @@ import org.scalatest.Matchers._
   }
 
   test("search root folder") {
-    val mediaType = new MediaType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
+    val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
     val asset = new Asset(
-      mediaType = mediaType,
+      assetType = mediaType,
       path = "path",
       md5 = "md5",
       folderId = Folder.UNCATEGORIZED.id.get,
@@ -27,9 +27,9 @@ import org.scalatest.Matchers._
   }
 
   test("search uncategorized folder") {
-    val mediaType = new MediaType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
+    val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
     val asset = new Asset(
-      mediaType = mediaType,
+      assetType = mediaType,
       path = "path",
       md5 = "md5",
       folderId = Folder.UNCATEGORIZED.id.get,
@@ -58,16 +58,16 @@ import org.scalatest.Matchers._
     val folder1_2: Folder = altitude.service.folder.add(
       Folder(name = "folder1_2", parentId = folder1.id.get))
 
-    val mediaType = new MediaType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
+    val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
 
     altitude.service.asset.add(new Asset(folderId = folder1_1.id.get.toString,
-      mediaType = mediaType, path = Util.randomStr(30), md5 = Util.randomStr(30), sizeBytes = 1L))
+      assetType = mediaType, path = Util.randomStr(30), md5 = Util.randomStr(30), sizeBytes = 1L))
 
     altitude.service.asset.add(new Asset(folderId = folder1_2.id.get.toString,
-      mediaType = mediaType, path = Util.randomStr(30), md5 = Util.randomStr(30), sizeBytes = 1L))
+      assetType = mediaType, path = Util.randomStr(30), md5 = Util.randomStr(30), sizeBytes = 1L))
 
     altitude.service.asset.add(new Asset(folderId = folder1.id.get.toString,
-      mediaType = mediaType, path = Util.randomStr(30), md5 = Util.randomStr(30), sizeBytes = 1L))
+      assetType = mediaType, path = Util.randomStr(30), md5 = Util.randomStr(30), sizeBytes = 1L))
 
     altitude.service.library.search(
       Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1_2.id.get))
