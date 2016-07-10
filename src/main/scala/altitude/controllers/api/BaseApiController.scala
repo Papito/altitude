@@ -1,10 +1,8 @@
 package altitude.controllers.api
 
-import java.io.{PrintWriter, StringWriter}
-
 import altitude.Validators.ApiValidator
 import altitude.controllers.BaseController
-import altitude.exceptions.ValidationException
+import altitude.exceptions.{NotFoundException, ValidationException}
 import altitude.{Const => C}
 import org.scalatra._
 import org.slf4j.LoggerFactory
@@ -69,10 +67,6 @@ class BaseApiController extends BaseController with GZipSupport {
     }
   }
 
-  notFound {
-    NotFound()
-  }
-
   error {
     case ex: ValidationException => {
       val jsonErrors = ex.errors.keys.foldLeft(Json.obj()){(res, field) => {
@@ -84,6 +78,9 @@ class BaseApiController extends BaseController with GZipSupport {
         C("Api.VALIDATION_ERROR") -> ex.message,
         C("Api.VALIDATION_ERRORS") -> (if (ex.errors.isEmpty) JsNull else jsonErrors)
       ))
+    }
+    case ex: NotFoundException => {
+      NotFound(Json.obj())
     }
     case ex: Exception => {
       val strStacktrace = altitude.Util.logStacktrace(ex)
