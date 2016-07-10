@@ -1026,14 +1026,15 @@ AssetsViewModel = BaseViewModel.extend({
           return asset.id === assetId;
         });
 
-        var cb = function() {
-          if (callback) callback();
-        };
+        var cb = null;
 
         if (self.searchResults().length) {
-          // focus on asset in place of deleted one
-          var assetInPlace = assetIdx + 1 > self.searchResults().length ? self.lastAsset() : self.searchResults()[assetIdx];
-          self.focusAssetById(assetInPlace.id)
+          cb = function() {
+            // focus on asset in place of deleted one
+            var assetInPlace = assetIdx + 1 > self.searchResults().length ? self.lastAsset() : self.searchResults()[assetIdx];
+            self.focusAssetById(assetInPlace.id);
+            if (callback) callback();
+          };
         }
         else {
           // focus the last asset of reloaded results for seamless focusing
