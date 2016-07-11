@@ -69,6 +69,6 @@ CREATE TABLE folder (
   num_of_assets INTEGER NOT NULL DEFAULT 0
 ) INHERITS (_core);
 CREATE INDEX folder_parent_id ON folder(parent_id);
-CREATE UNIQUE INDEX folder_parent_id_and_name ON folder(parent_id, name);
+CREATE UNIQUE INDEX folder_parent_id_and_name ON folder(parent_id, name_lc);
 
 
