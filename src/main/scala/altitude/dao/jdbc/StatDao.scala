@@ -14,7 +14,7 @@ abstract class StatDao (val app: Altitude) extends BaseJdbcDao("stats") with alt
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = Stat(
     rec.get("dimension").get.asInstanceOf[String], rec.get("dim_val").get.asInstanceOf[Int])
 
-  def incrementStat(statName: String, count: Int = 1)(implicit txId: TransactionId): Unit = {
+  def incrementStat(statName: String, count: Long = 1)(implicit txId: TransactionId): Unit = {
     val sql = s"""
       UPDATE $tableName
          SET ${C("Stat.DIM_VAL")} = ${C("Stat.DIM_VAL")} + $count

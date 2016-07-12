@@ -44,6 +44,7 @@ class LibraryService(app: Altitude) {
       // counters
       app.service.folder.incrAssetCount(obj.folderId)
       app.service.stats.incrementStat(Stats.TOTAL_ASSETS)
+      app.service.stats.incrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
       // if there is no folder, increment the uncategorized counter
       if (Folder.UNCATEGORIZED.id.contains(obj.folderId)) {
         app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS)
@@ -71,6 +72,7 @@ class LibraryService(app: Altitude) {
         app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
       }
       app.service.stats.decrementStat(Stats.TOTAL_ASSETS)
+      app.service.stats.decrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
 
       app.service.asset.deleteById(id)
     }
@@ -259,15 +261,20 @@ class LibraryService(app: Altitude) {
   }
 
   def recycleAssets(assetIds: Set[String])(implicit txId: TransactionId = new TransactionId): Unit = {
+    var totalBytes = 0L
+
     txManager.withTransaction[Unit] {
       assetIds.foreach{assetId =>
         val asset: Asset = this.getById(assetId)
         app.service.trash.recycleAsset(assetId)
         app.service.folder.decrAssetCount(asset.folderId)
+        totalBytes += asset.sizeBytes
       }
 
       app.service.stats.incrementStat(Stats.RECYCLED_ASSETS, assetIds.size)
-    }
+      app.service.stats.decrementStat(Stats.TOTAL_BYTES, totalBytes)
+      app.service.stats.incrementStat(Stats.RECYCLED_BYTES, totalBytes)
+   }
   }
 
   def moveRecycledAssetToFolder(assetId: String, folderId: String)
@@ -280,18 +287,23 @@ class LibraryService(app: Altitude) {
 
   def moveRecycledAssetsToFolder(assetIds: Set[String], folderId: String)
                                 (implicit txId: TransactionId = new TransactionId) = {
+    var totalBytes = 0L
+
     txManager.withTransaction[Unit] {
-      val restoredAssetIds: Set[String] = assetIds.map{ assetId: String =>
+      val restoredAssetIds: Set[String] = assetIds.map { assetId: String =>
         val trashed: Asset = app.service.trash.getById(assetId)
         app.service.trash.deleteById(assetId)
         val restoredAsset = trashed ++ Json.obj(C("Asset.FOLDER_ID") -> folderId)
         val asset: Asset = app.service.library.add(restoredAsset)
+        totalBytes += trashed.sizeBytes
         asset.id.get
       }
 
       moveAssetsToFolder(restoredAssetIds, folderId)
       app.service.stats.decrementStat(Stats.RECYCLED_ASSETS, assetIds.size)
-    }
+      app.service.stats.incrementStat(Stats.TOTAL_BYTES, totalBytes)
+      app.service.stats.decrementStat(Stats.RECYCLED_BYTES, totalBytes)
+   }
   }
 
   def restoreRecycledAsset(assetId: String)(implicit txId: TransactionId = new TransactionId): Asset = {
@@ -301,15 +313,21 @@ class LibraryService(app: Altitude) {
     }
   }
 
-  def restoreRecycledAssets(assetIds: Set[String])(implicit txId: TransactionId = new TransactionId) = {
+  def restoreRecycledAssets(assetIds: Set[String])
+                           (implicit txId: TransactionId = new TransactionId) = {
+    var totalBytes = 0L
+
     txManager.withTransaction[Unit] {
       assetIds.foreach { assetId =>
         val trashed: Asset = app.service.trash.getById(assetId)
         app.service.trash.deleteById(assetId)
         app.service.library.add(Asset.fromJson(trashed))
+        totalBytes += trashed.sizeBytes
       }
 
       app.service.stats.decrementStat(Stats.RECYCLED_ASSETS, assetIds.size)
+      app.service.stats.incrementStat(Stats.TOTAL_BYTES, totalBytes)
+      app.service.stats.decrementStat(Stats.RECYCLED_BYTES, totalBytes)
     }
   }
 }

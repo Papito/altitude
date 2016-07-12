@@ -16,8 +16,7 @@ CREATE TABLE stats (
 );
 INSERT INTO stats(dimension) VALUES('total_assets');
 INSERT INTO stats(dimension) VALUES('total_asset_bytes');
--- this is included in totals
-INSERT INTO stats(dimension) VALUES('uncategorized_assets');
+INSERT INTO stats(dimension) VALUES('uncategorized_assets'); -- this is included in totals
 INSERT INTO stats(dimension) VALUES('recycled_assets');
 INSERT INTO stats(dimension) VALUES('recycled_bytes');
 

@@ -20,11 +20,11 @@ class StatsService(app: Altitude){
     }
   }
 
-  def incrementStat(statName: String, count: Int = 1)(implicit txId: TransactionId): Unit = {
+  def incrementStat(statName: String, count: Long = 1)(implicit txId: TransactionId): Unit = {
     DAO.incrementStat(statName, count)
   }
 
-  def decrementStat(statName: String, count: Int = 1)(implicit txId: TransactionId): Unit = {
+  def decrementStat(statName: String, count: Long = 1)(implicit txId: TransactionId): Unit = {
     DAO.decrementStat(statName, count)
   }
 }
