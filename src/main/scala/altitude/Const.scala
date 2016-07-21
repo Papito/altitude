@@ -10,6 +10,7 @@ object Const {
 
   val data = Map(
     "Base.ID" -> "id",
+    "Base.USER_ID" -> "user_id",
     "Base.VALUES" -> "values",
     "Base.DATA" -> "data",
     "Base.CREATED_AT" -> "created_at",

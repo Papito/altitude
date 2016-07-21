@@ -1,6 +1,6 @@
 package altitude.dao.jdbc
 
-import altitude.models.{AssetType, Trash, AssetType$}
+import altitude.models.{Asset, AssetType, Trash}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
 import org.slf4j.LoggerFactory
@@ -16,8 +16,9 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
       mediaSubtype = rec.get(C("AssetType.MEDIA_SUBTYPE")).get.asInstanceOf[String],
       mime = rec.get(C("AssetType.MIME_TYPE")).get.asInstanceOf[String])
 
-    val model = new Trash(
+    val model = new Asset(
       id = Some(rec.get(C("Base.ID")).get.asInstanceOf[String]),
+      userId = rec.get(C("Base.USER_ID")).get.asInstanceOf[String],
       path = rec.get(C("Asset.PATH")).get.asInstanceOf[String],
       md5 = rec.get(C("Asset.MD5")).get.asInstanceOf[String],
       assetType = assetType,
@@ -29,32 +30,36 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
   }
 
   override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
-    val trash = jsonIn: Trash
+    val asset = jsonIn: Asset
 
     // Postgres will reject this sequence with jsonb
-    val metadata: String = trash.metadata.toString().replaceAll("\\\\u0000", "")
+    val metadata: String = asset.metadata.toString().replaceAll("\\\\u0000", "")
 
     /*
     Add the asset
      */
     val sql = s"""
         INSERT INTO $tableName (
-             $CORE_SQL_COLS_FOR_INSERT, ${C("Asset.PATH")}, ${C("Asset.MD5")},
+             $CORE_SQL_COLS_FOR_INSERT, ${C("Base.USER_ID")}, ${C("Asset.PATH")}, ${C("Asset.MD5")},
              ${C("Asset.FILENAME")}, ${C("Asset.SIZE_BYTES")},
              ${C("AssetType.MEDIA_TYPE")}, ${C("AssetType.MEDIA_SUBTYPE")}, ${C("AssetType.MIME_TYPE")},
              ${C("Asset.FOLDER_ID")}, ${C("Asset.METADATA")})
-            VALUES($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?, ?, ?, ?, ?, ?, $JSON_FUNC)
+            VALUES(
+              $CORE_SQL_VALS_FOR_INSERT,
+              ?, ?, ?, ?, ?, ?, ?, ?, ?,
+      $JSON_FUNC)
     """
 
     val sqlVals: List[Object] = List(
-      trash.path,
-      trash.md5,
-      trash.fileName,
-      trash.sizeBytes.asInstanceOf[Object],
-      trash.assetType.mediaType,
-      trash.assetType.mediaSubtype,
-      trash.assetType.mime,
-      trash.folderId,
+      asset.userId,
+      asset.path,
+      asset.md5,
+      asset.fileName,
+      asset.sizeBytes.asInstanceOf[Object],
+      asset.assetType.mediaType,
+      asset.assetType.mediaSubtype,
+      asset.assetType.mime,
+      asset.folderId,
       metadata)
 
     addRecord(jsonIn, sql, sqlVals)

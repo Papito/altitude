@@ -80,7 +80,10 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   /* INTEGRATION UTILITIES*/
   private val ASSET_TYPE = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
 
+  final val USER_ID = "1"
+
   protected  def makeAsset(folder: Folder) = Asset(
+    userId = USER_ID,
     folderId = folder.id.get,
     assetType = ASSET_TYPE,
     path = Util.randomStr(30),

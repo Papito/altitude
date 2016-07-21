@@ -53,7 +53,7 @@ case class Folder(id: Option[String] = None,
     ) ++ coreJsonAttrs
   }
 
-  def canEqual(other: Any) = other.isInstanceOf[Folder]
+  override def canEqual(other: Any): Boolean = other.isInstanceOf[Folder]
 
   override def equals( that: Any): Boolean = that match {
     case that: Folder if !that.canEqual( this) => false

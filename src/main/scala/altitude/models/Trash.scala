@@ -11,6 +11,7 @@ object Trash {
 
     val trash = new Trash(
       id = (json \ C("Base.ID")).asOpt[String],
+      userId = (json \ C("Base.USER_ID")).as[String],
       assetType = json \ C("Asset.ASSET_TYPE"),
       path = (json \ C("Asset.PATH")).as[String],
       folderId = (json \ C("Asset.FOLDER_ID")).as[String],
@@ -30,6 +31,7 @@ object Trash {
 }
 
 class Trash(override val id: Option[String] = None,
+            override val userId: String,
             override val assetType: AssetType,
             override val path: String,
             override val md5: String,
@@ -37,6 +39,7 @@ class Trash(override val id: Option[String] = None,
             override val folderId: String,
             override val metadata: JsValue = JsNull,
             override val previewData: Array[Byte] = new Array[Byte](0)) extends Asset(id = id,
+                                                                                      userId,
                                                                                       assetType = assetType,
                                                                                       path = path,
                                                                                       md5 = md5,
