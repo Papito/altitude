@@ -59,6 +59,7 @@ object Const {
     /*---------------------------------------------------------------------------
     API
     ---------------------------------------------------------------------------*/
+    "Api.USER_ID" -> "user_id",
     "Api.ERROR" -> "error",
     "Api.STACKTRACE" -> "stacktrace",
     "Api.WARNING" -> "warning",
@@ -68,6 +69,7 @@ object Const {
     "Api.MULTI_VALUE_DELIM" -> "+",
     "Api.DUPLICATE_OF" -> "duplicate_of",
 
+    // FIXME: wrong naming convention
     "Api.TOTAL_RECORDS" -> "totalRecords",
     "Api.TOTAL_PAGES" -> "totalPages",
     "Api.CURRENT_PAGE" -> "currentPage",

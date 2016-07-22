@@ -42,7 +42,7 @@ class FileImportService(app: Altitude) {
     }
   }
 
-  def importAsset(userId: String, fileAsset: FileImportAsset)
+  def importAsset(user: User, fileAsset: FileImportAsset)
                  (implicit txId: TransactionId = new TransactionId) : Option[Asset]  = {
     log.info(s"Importing file asset '$fileAsset'", C.LogTag.SERVICE)
     val assetType = detectAssetType(fileAsset)
@@ -66,7 +66,7 @@ class FileImportService(app: Altitude) {
     val fileSizeInBytes: Long = new File(fileAsset.absolutePath).length()
 
     val asset: Asset = Asset(
-      userId = userId,
+      userId = user.id.get,
       path = fileAsset.absolutePath,
       md5 = getChecksum(fileAsset.absolutePath),
       assetType = assetType,
@@ -88,7 +88,7 @@ class FileImportService(app: Altitude) {
 
 
     val assetWithPreview = Asset(
-      userId = userId,
+      userId = user.id.get,
       path = asset.path,
       md5 = asset.md5,
       assetType = asset.assetType,
