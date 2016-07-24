@@ -23,8 +23,11 @@ class BaseApiController extends BaseController with GZipSupport {
   /*
   User plumbing - can only be set once per request
    */
+  // FIXME: USER
   private var _user: Option[User] = Some(User(id = Some("1")))
-  def user = _user
+
+  def user = _user.get
+
   def user_= (arg: User): Unit = {
     if (_user.isDefined)
       throw new RuntimeException("Cannot set user twice")
@@ -93,7 +96,7 @@ class BaseApiController extends BaseController with GZipSupport {
       }
     }
 
-    if (this.user.isEmpty) {
+    if (this._user.isEmpty) {
       throw new ValidationException("User must be defined")
     }
   }
