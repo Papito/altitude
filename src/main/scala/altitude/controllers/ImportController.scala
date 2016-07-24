@@ -75,7 +75,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
       var path: Option[String] = None
 
       // FIXME: USER
-      var user = User(id = Some("1"))
+      implicit var user = User(id = Some("1"))
 
       private def writeToYou(jsonMessage: JsValue): Unit = {
         log.info(s"YOU -> $jsonMessage")
@@ -171,7 +171,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
           log.info(s"Processing import asset $importAsset")
 
           try {
-            val asset: Option[Asset] = app.service.fileImport.importAsset(user, importAsset)
+            val asset: Option[Asset] = app.service.fileImport.importAsset(importAsset)
             if (asset.isEmpty) throw NotImportable()
 
             val resp = JsObject(Seq(

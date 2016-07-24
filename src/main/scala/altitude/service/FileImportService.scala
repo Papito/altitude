@@ -42,8 +42,8 @@ class FileImportService(app: Altitude) {
     }
   }
 
-  def importAsset(user: User, fileAsset: FileImportAsset)
-                 (implicit txId: TransactionId = new TransactionId) : Option[Asset]  = {
+  def importAsset(fileAsset: FileImportAsset)
+                 (implicit user: User, txId: TransactionId = new TransactionId) : Option[Asset]  = {
     log.info(s"Importing file asset '$fileAsset'", C.LogTag.SERVICE)
     val assetType = detectAssetType(fileAsset)
 

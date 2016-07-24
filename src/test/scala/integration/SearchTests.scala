@@ -1,7 +1,7 @@
 package integration
 
 import altitude.models.search.Query
-import altitude.models.{AssetType, Asset, Folder, AssetType$}
+import altitude.models.{AssetType, Asset, Folder}
 import altitude.{Const => C, Util}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
@@ -15,6 +15,7 @@ import org.scalatest.Matchers._
   test("search root folder") {
     val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
     val asset = new Asset(
+      userId = USER_ID,
       assetType = mediaType,
       path = "path",
       md5 = "md5",
@@ -29,6 +30,7 @@ import org.scalatest.Matchers._
   test("search uncategorized folder") {
     val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
     val asset = new Asset(
+      userId = USER_ID,
       assetType = mediaType,
       path = "path",
       md5 = "md5",
@@ -61,13 +63,13 @@ import org.scalatest.Matchers._
     val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
 
     altitude.service.asset.add(new Asset(folderId = folder1_1.id.get.toString,
-      assetType = mediaType, path = Util.randomStr(30), md5 = Util.randomStr(30), sizeBytes = 1L))
+      userId = USER_ID, assetType = mediaType, path = Util.randomStr(30), md5 = Util.randomStr(30), sizeBytes = 1L))
 
     altitude.service.asset.add(new Asset(folderId = folder1_2.id.get.toString,
-      assetType = mediaType, path = Util.randomStr(30), md5 = Util.randomStr(30), sizeBytes = 1L))
+      userId = USER_ID, assetType = mediaType, path = Util.randomStr(30), md5 = Util.randomStr(30), sizeBytes = 1L))
 
     altitude.service.asset.add(new Asset(folderId = folder1.id.get.toString,
-      assetType = mediaType, path = Util.randomStr(30), md5 = Util.randomStr(30), sizeBytes = 1L))
+      userId = USER_ID, assetType = mediaType, path = Util.randomStr(30), md5 = Util.randomStr(30), sizeBytes = 1L))
 
     altitude.service.library.search(
       Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1_2.id.get))
