@@ -10,7 +10,6 @@ CREATE TABLE stats (
   dimension varchar(24) PRIMARY KEY,
   dim_val INT NOT NULL DEFAULT 0
 );
-
 CREATE UNIQUE INDEX stats_user_dimension ON stats(user_id, dimension);
 
 CREATE TABLE asset  (

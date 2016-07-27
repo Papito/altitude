@@ -103,7 +103,8 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     QueryResult(records = recs.map{makeModel}, total = count, query = Some(query))
   }
 
-  protected def getQueryResultCount(query: Query, values: List[Object] = List())(implicit txId: TransactionId): Int = {
+  protected def getQueryResultCount(query: Query, values: List[Object] = List())
+                                   (implicit  user: User, txId: TransactionId): Int = {
     val sqlCountQuery: SqlQuery = SQL_QUERY_BUILDER.toSelectQuery(query, countOnly = true)
     val runner: QueryRunner = new QueryRunner()
 
@@ -115,16 +116,15 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   }
 
   protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object])
-                         (implicit txId: TransactionId): JsObject = {
+                         (implicit  user: User, txId: TransactionId): JsObject = {
     log.info(s"JDBC INSERT: $jsonIn")
 
     val existingObjId: Option[String] = (jsonIn \ C("Base.ID")).asOpt[String]
 
     // create ID unless there is an override
     val id = if (existingObjId.isDefined) existingObjId.get else BaseModel.genId
-    val createdAt = utcNow
 
-    // prepend ID and CREATED AT to the values, as those are required for any record
+    // prepend ID, as it is required for any record (in base implementation)
     val values: List[Object] = id :: vals
     log.debug(s"INSERT SQL: $q. ARGS: ${values.toString()}")
 
@@ -167,7 +167,8 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     Some(rec.toMap[String, AnyRef])
   }
 
-  override def getByIds(ids: Set[String])(implicit user: User, txId: TransactionId): List[JsObject] = {
+  override def getByIds(ids: Set[String])
+                       (implicit user: User, txId: TransactionId): List[JsObject] = {
     val placeholders = ids.toSeq.map(x => "?")
     val sql = s"""
       SELECT $DEFAULT_SQL_COLS_FOR_SELECT
