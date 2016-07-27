@@ -26,7 +26,7 @@ class BaseApiController extends BaseController with GZipSupport {
   // FIXME: USER
   private var _user: Option[User] = Some(User(id = Some("1")))
 
-  def user = _user.get
+  implicit def user: User = _user.get
 
   def user_= (arg: User): Unit = {
     if (_user.isDefined)

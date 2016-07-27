@@ -2,7 +2,7 @@ package altitude.service
 
 import altitude.Altitude
 import altitude.dao.StatDao
-import altitude.models.{Stat, Stats}
+import altitude.models.{User, Stat, Stats}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import org.slf4j.LoggerFactory
 import net.codingwell.scalaguice.InjectorExtensions._
@@ -13,19 +13,26 @@ class StatsService(app: Altitude){
   protected val DAO = app.injector.instance[StatDao]
   protected val txManager = app.injector.instance[AbstractTransactionManager]
 
-  def getStats(implicit txId: TransactionId = new TransactionId): Stats = {
+  def getStats(implicit user: User, txId: TransactionId = new TransactionId): Stats = {
     txManager.asReadOnly[Stats] {
       val allStats: List[Stat]  = DAO.getAll.map(Stat.fromJson)
       Stats(allStats)
     }
   }
 
-  def incrementStat(statName: String, count: Long = 1)(implicit txId: TransactionId): Unit = {
+  def incrementStat(statName: String, count: Long = 1)(implicit user: User, txId: TransactionId): Unit = {
     DAO.incrementStat(statName, count)
   }
 
-  def decrementStat(statName: String, count: Long = 1)(implicit txId: TransactionId): Unit = {
+  def decrementStat(statName: String, count: Long = 1)(implicit user: User, txId: TransactionId): Unit = {
     DAO.decrementStat(statName, count)
+  }
+
+  def createStat(dimension: String)(implicit user: User, txId: TransactionId = new TransactionId()) = {
+    txManager.withTransaction {
+      val stat = Stat(user.id.get, dimension, 0)
+      DAO.add(stat)
+    }
   }
 }
 

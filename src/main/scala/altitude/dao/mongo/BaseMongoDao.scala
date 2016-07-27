@@ -1,7 +1,7 @@
 package altitude.dao.mongo
 
 import altitude.dao.BaseDao
-import altitude.models.BaseModel
+import altitude.models.{User, BaseModel}
 import altitude.models.search.{Query, QueryResult}
 import altitude.transactions.TransactionId
 import altitude.{Configuration, Const => C, Environment, Util}
@@ -42,7 +42,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
 
   protected lazy val MONGO_QUERY_BUILDER = new MongoQueryBuilder(COLLECTION)
 
-  override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
+  override def add(jsonIn: JsObject)(implicit user: User, txId: TransactionId): JsObject = {
     log.debug(s"Starting database INSERT for: $jsonIn")
 
     val o = makeObjectForInsert(jsonIn)
@@ -71,7 +71,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
       origObj ++ coreAttrObj
   }
 
-  override def deleteByQuery(q: Query)(implicit txId: TransactionId): Int = {
+  override def deleteByQuery(q: Query)(implicit user: User, txId: TransactionId): Int = {
     val query = fixMongoQuery(q)
     val mongoQuery: DBObject = query.params
     log.info(mongoQuery.toString)
@@ -81,7 +81,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     numDeleted
   }
 
-  override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = {
+  override def getById(id: String)(implicit user: User, txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting by ID '$id'", C.LogTag.DB)
 
     val o: Option[DBObject] = COLLECTION.findOneByID(id)
@@ -94,7 +94,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     }
   }
 
-  override def query(query: Query)(implicit txId: TransactionId): QueryResult = {
+  override def query(query: Query)(implicit user: User, txId: TransactionId): QueryResult = {
     val cursor: MongoCursor = MONGO_QUERY_BUILDER.toSelectCursor(query)
 
     log.debug(s"Found ${cursor.length} records")
@@ -105,7 +105,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
       fixMongoFields(json)
     }).toList
 
-    QueryResult(records = records, total = cursor.count(), query = query)
+    QueryResult(records = records, total = cursor.count(), query = Some(query))
   }
 
   /*
@@ -123,19 +123,20 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     }
   }
 
-  protected final def fixMongoQuery(q: Query): Query = {
+  protected final def fixMongoQuery(q: Query)(implicit user: User): Query = {
     // _id -> id
     q.params.contains("id")  match {
       case false => q
       case true => {
         val id = q.params.get("id").get
         val params = (q.params - "id") ++ Map("_id" -> id)
-        Query(params = params, rpp = q.rpp, page = q.page)
+        Query(user, params = params, rpp = q.rpp, page = q.page)
       }
     }
   }
 
-  override def getByIds(ids: Set[String])(implicit txId: TransactionId): List[JsObject] = {
+  override def getByIds(ids: Set[String])
+                       (implicit user: User, txId: TransactionId): List[JsObject] = {
     val query: DBObject =  MongoDBObject(
       "_id" -> MongoDBObject("$in" -> ids)
     )
@@ -149,7 +150,8 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     }).toList
   }
 
-  override def updateByQuery(q: Query, json: JsObject, fields: List[String])(implicit txId: TransactionId): Int = {
+  override def updateByQuery(q: Query, json: JsObject, fields: List[String])
+                            (implicit user: User, txId: TransactionId): Int = {
     log.debug(s"Updating with data $json for $q")
 
     val query  = fixMongoQuery(q)
@@ -173,7 +175,8 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     updated
   }
 
-  override def increment(id: String, field: String, count: Int = 1)(implicit txId: TransactionId) = {
+  override def increment(id: String, field: String, count: Int = 1)
+                        (implicit user: User, txId: TransactionId) = {
     val query: DBObject =  MongoDBObject(
       "_id" -> id
     )
@@ -184,7 +187,8 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     COLLECTION.update(query, o)
   }
 
-  override def decrement(id: String,  field: String, count: Int = 1)(implicit txId: TransactionId) = {
+  override def decrement(id: String,  field: String, count: Int = 1)
+                        (implicit user: User, txId: TransactionId) = {
     increment(id, field, -count)
   }
 }

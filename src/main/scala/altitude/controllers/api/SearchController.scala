@@ -13,6 +13,7 @@ class SearchController extends BaseApiController {
     val foldersQuery = params.getOrElse(C("Api.Search.FOLDERS"), "")
 
     val q = Query(
+      user,
       params = Map(C("Api.Folder.QUERY_ARG_NAME") -> foldersQuery),
       rpp = 20, page = 1)
 
@@ -23,7 +24,7 @@ class SearchController extends BaseApiController {
       C("Api.TOTAL_RECORDS") -> results.total,
       C("Api.CURRENT_PAGE") -> q.page,
       C("Api.TOTAL_PAGES") -> results.totalPages,
-      C("Api.RESULTS_PER_PAGE") -> results.query.rpp
+      C("Api.RESULTS_PER_PAGE") -> q.rpp
     ))
   }
 
@@ -35,6 +36,7 @@ class SearchController extends BaseApiController {
     val foldersQuery = this.params.getOrElse(C("Api.Search.FOLDERS"), "")
     
     val q = Query(
+      user,
       params = Map(C("Api.Folder.QUERY_ARG_NAME") -> foldersQuery),
       rpp = rpp, page = page)
 
@@ -45,7 +47,7 @@ class SearchController extends BaseApiController {
       C("Api.TOTAL_RECORDS") -> results.total,
       C("Api.CURRENT_PAGE") -> q.page,
       C("Api.TOTAL_PAGES") -> results.totalPages,
-      C("Api.RESULTS_PER_PAGE") -> results.query.rpp
+      C("Api.RESULTS_PER_PAGE") -> q.rpp
     ))
   }
 }

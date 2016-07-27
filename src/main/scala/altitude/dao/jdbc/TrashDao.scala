@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat
 
 import altitude.transactions.TransactionId
 import altitude.{Const => C, Util, Altitude}
-import altitude.models.{AssetType, BaseModel, Trash}
+import altitude.models.{User, AssetType, BaseModel, Trash}
 import org.joda.time.{DateTime, LocalDateTime}
 import org.joda.time.format.DateTimeFormat
 import org.slf4j.LoggerFactory
@@ -37,7 +37,7 @@ abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with alt
     model
   }
 
-  override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
+  override def add(jsonIn: JsObject)(implicit user: User, txId: TransactionId): JsObject = {
     val trash = jsonIn: Trash
 
     // Postgres will reject this sequence with jsonb

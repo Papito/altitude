@@ -2,7 +2,7 @@ package altitude.service.migration
 
 import altitude.Altitude
 import altitude.dao.MigrationDao
-import altitude.models.Folder
+import altitude.models.{User, Folder}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
@@ -41,7 +41,16 @@ abstract class MigrationService(app: Altitude) {
   }
 
   private def v1(implicit txId: TransactionId = new TransactionId): Unit = {
+    implicit val user = User(Some("1"))
+
     app.service.folder.add(Folder.UNCATEGORIZED)
+
+    app.service.stats.createStat("total_assets")
+    app.service.stats.createStat("total_asset_bytes")
+    app.service.stats.createStat("uncategorized_assets")
+    app.service.stats.createStat("recycled_assets")
+    app.service.stats.createStat("recycled_bytes")
+
   }
 
   def existingVersion(implicit txId: TransactionId = new TransactionId): Int = {

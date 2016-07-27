@@ -40,17 +40,17 @@ import play.api.libs.json.JsObject
     val asset: Asset = altitude.service.library.add(makeAsset(folder1))
 
     altitude.service.library.search(
-      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
+      Query(USER, params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
     ).records.length should be(1)
 
     altitude.service.library.moveAssetToFolder(asset.id.get, folder2.id.get)
 
     altitude.service.library.search(
-      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
+      Query(USER, params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
     ).records.length should be(0)
 
     altitude.service.library.search(
-      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder2.id.get))
+      Query(USER, params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder2.id.get))
     ).records.length should be(1)
   }
 
@@ -134,7 +134,7 @@ import play.api.libs.json.JsObject
     altitude.service.asset.getAll.length should be (1)
 
     altitude.service.library.search(
-      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
+      Query(USER, params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
     ).records.length should be(1)
 
     val all = altitude.service.folder.getNonSysFolders()

@@ -1,6 +1,6 @@
 package altitude.dao.jdbc
 
-import altitude.models.{Asset, AssetType, Trash}
+import altitude.models.{User, Asset, AssetType, Trash}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
 import org.slf4j.LoggerFactory
@@ -29,7 +29,7 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
     model
   }
 
-  override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
+  override def add(jsonIn: JsObject)(implicit user: User, txId: TransactionId): JsObject = {
     val asset = jsonIn: Asset
 
     // Postgres will reject this sequence with jsonb
