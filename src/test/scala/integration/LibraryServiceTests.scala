@@ -2,7 +2,7 @@ package integration
 
 import altitude.exceptions.NotFoundException
 import altitude.models.search.Query
-import altitude.models.{Trash, Asset, Folder}
+import altitude.models.{User, Trash, Asset, Folder}
 import altitude.{Const => C, Util}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
@@ -12,6 +12,11 @@ import play.api.libs.json.JsObject
 
   test("recycle asset") {
     altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+
+    CURRENT_USER = ANOTHER_USER
+    altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+
+    CURRENT_USER = USER
     altitude.service.asset.getAll.length should be (1)
 
     val asset: Asset = altitude.service.asset.getAll.head
