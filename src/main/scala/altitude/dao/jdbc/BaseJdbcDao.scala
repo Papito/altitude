@@ -176,7 +176,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
        WHERE id IN (${placeholders.mkString(",")})
       """
 
-    log.debug(s"SQL: $sql")
+    log.debug(s"SQL: $sql with values: ${ids.toList}")
 
     val runner: QueryRunner = new QueryRunner()
     val res = runner.query(conn, sql, new MapListHandler(), ids.toList: _*)

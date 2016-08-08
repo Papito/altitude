@@ -75,7 +75,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
       var path: Option[String] = None
 
       // FIXME: USER
-      implicit var user = User(id = Some("1"))
+      implicit var user = User(id = Some("1"), rootFolderId = "0", uncatFolderId = "1")
 
       private def writeToYou(jsonMessage: JsValue): Unit = {
         log.info(s"YOU -> $jsonMessage")

@@ -47,6 +47,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     FileUtils.forceMkdir(dataDirFile)
     dbUtilities.createTransaction(txId)
     //log.debug(s"Test transaction ID is ${txId.id}")
+    SET_USER_1()
   }
 
   override def afterEach() {
@@ -80,16 +81,26 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   /* INTEGRATION UTILITIES*/
   private val ASSET_TYPE = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
 
-  final val USER: User = User(id = Some("1"))
-  final val USER_ID = USER.id.get
+  private final val USER: User = User(
+    id = Some(Util.randomStr()),
+    rootFolderId = "0",
+    uncatFolderId = "1")
 
-  final val ANOTHER_USER: User = User(id = Some("2"))
-  final val ANOTHER_USER_ID = ANOTHER_USER.id.get
+  private final val ANOTHER_USER: User = User(
+    id = Some(Util.randomStr()),
+    rootFolderId = "10",
+    uncatFolderId = "11")
 
   implicit var CURRENT_USER: User = USER
+  implicit def CURRENT_USER_ID: String = CURRENT_USER.id.get
+
+  def SET_USER_1() =
+    CURRENT_USER = USER
+  def SET_USER_2() =
+    CURRENT_USER = ANOTHER_USER
 
   protected def makeAsset(folder: Folder) = Asset(
-    userId = USER_ID,
+    userId = CURRENT_USER_ID,
     folderId = folder.id.get,
     assetType = ASSET_TYPE,
     path = Util.randomStr(30),

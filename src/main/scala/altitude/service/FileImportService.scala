@@ -72,7 +72,7 @@ class FileImportService(app: Altitude) {
       md5 = getChecksum(fileAsset.absolutePath),
       assetType = assetType,
       sizeBytes = fileSizeInBytes,
-      folderId = Folder.UNCATEGORIZED.id.get)
+      folderId = user.uncatFolderId)
 
 
     var previewData: Option[Array[Byte]] = None

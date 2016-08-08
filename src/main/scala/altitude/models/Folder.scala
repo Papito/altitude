@@ -11,31 +11,18 @@ object Folder {
 
     Folder(
       id = (json \ C("Base.ID")).asOpt[String],
+      userId = (json \ C("Base.USER_ID")).as[String],
       name = (json \ C("Folder.NAME")).as[String],
       children = childrenJson.map(Folder.fromJson),
       parentId = (json \ C("Folder.PARENT_ID")).as[String],
       numOfAssets = (json \ C("Folder.NUM_OF_ASSETS")).as[Int]
     ).withCoreAttr(json)
   }
-
-  val ROOT = Folder(
-    id = Some(C("Folder.Ids.ROOT")),
-    name = C("Folder.Names.ROOT")
-  )
-
-  val UNCATEGORIZED = Folder(
-    id = Some(C("Folder.Ids.UNCATEGORIZED")),
-    name = C("Folder.Names.UNCATEGORIZED")
-  )
-
-  val SYSTEM_FOLDERS: List[Folder] = List(UNCATEGORIZED)
-
-  def IS_ROOT(id:  Option[String]) = id == ROOT.id
-  def IS_SYSTEM(id:  Option[String]) = SYSTEM_FOLDERS.exists(_.id == id)
 }
 
 case class Folder(id: Option[String] = None,
-                  parentId: String = C("Folder.Ids.ROOT"),
+                  userId: String,
+                  parentId: String,
                   name: String,
                   children: List[Folder] = List(),
                   numOfAssets: Int = 0) extends BaseModel {
@@ -45,6 +32,7 @@ case class Folder(id: Option[String] = None,
   override def toJson = {
     val childrenJson: List[JsValue] = children.map(_.toJson)
     Json.obj(
+      C("Base.USER_ID") -> userId,
       C("Folder.NAME") -> name,
       C("Folder.NAME_LC") -> nameLowercase,
       C("Folder.PARENT_ID") -> parentId,

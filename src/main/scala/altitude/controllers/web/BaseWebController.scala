@@ -5,7 +5,7 @@ import altitude.models.User
 
 class BaseWebController extends BaseController {
   // FIXME: USER
-  private var _user: Option[User] = Some(User(id = Some("1")))
+  private var _user: Option[User] = Some(User(id = Some("1"), rootFolderId = "0", uncatFolderId = "1"))
 
   implicit def user: User = _user.get
 

@@ -21,7 +21,7 @@ CREATE TABLE asset  (
   mime_type varchar(64) NOT NULL,
   metadata TEXT,
   path TEXT NOT NULL,
-  folder_id varchar(24) NOT NULL DEFAULT "1",
+  folder_id varchar(24) NOT NULL,
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
   created_at DATE DEFAULT (datetime('now', 'utc')),
@@ -40,7 +40,7 @@ CREATE TABLE trash  (
   mime_type varchar(64) NOT NULL,
   metadata TEXT,
   path TEXT NOT NULL,
-  folder_id varchar(24) NOT NULL DEFAULT "1",
+  folder_id varchar(24) NOT NULL,
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
   created_at DATE NOT NULL,
@@ -60,9 +60,10 @@ CREATE TABLE trash  (
 
 CREATE TABLE folder (
   id varchar(24) PRIMARY KEY,
+  user_id varchar(24) NOT NULL,
   name varchar(255) NOT NULL,
   name_lc varchar(255) NOT NULL,
-  parent_id varchar(24) NOT NULL DEFAULT "0",
+  parent_id varchar(24) NOT NULL,
   num_of_assets INTEGER NOT NULL DEFAULT 0,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL

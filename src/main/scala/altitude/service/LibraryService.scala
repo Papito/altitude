@@ -24,7 +24,7 @@ class LibraryService(app: Altitude) {
   def add(obj: Asset)(implicit user: User, txId: TransactionId = new TransactionId): JsObject = {
     log.info(s"\nAdding asset with MD5: ${obj.md5}\n")
 
-    if (Folder.IS_ROOT(Some(obj.folderId))) {
+    if (app.service.folder.isRootFolder(Some(obj.folderId))) {
       throw new IllegalOperationException("Cannot have assets in root folder")
     }
 
@@ -46,7 +46,7 @@ class LibraryService(app: Altitude) {
       app.service.stats.incrementStat(Stats.TOTAL_ASSETS)
       app.service.stats.incrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
       // if there is no folder, increment the uncategorized counter
-      if (Folder.UNCATEGORIZED.id.contains(obj.folderId)) {
+      if (user.uncatFolderId == obj.folderId) {
         app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS)
       }
 
@@ -68,7 +68,7 @@ class LibraryService(app: Altitude) {
       val asset: Asset = getById(id)
 
       // of this asset is still uncategorized, update the stat
-      if (Folder.UNCATEGORIZED.id.contains(asset.folderId)) {
+      if (user.uncatFolderId == asset.folderId) {
         app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
       }
       app.service.stats.decrementStat(Stats.TOTAL_ASSETS)
@@ -222,7 +222,7 @@ class LibraryService(app: Altitude) {
       assetIds.foreach {assetId =>
 
         // cannot have assets in root folder - just other folders
-        if (Folder.IS_ROOT(Some(folderId))) {
+        if (app.service.folder.isRootFolder(Some(folderId))) {
           throw new IllegalOperationException("Cannot move assets to root folder")
         }
 
@@ -232,7 +232,7 @@ class LibraryService(app: Altitude) {
         val asset: Asset = this.getById(assetId)
 
         // if moving from uncategorized, decrement that stat
-        if (Folder.UNCATEGORIZED.id.contains(asset.folderId)) {
+        if (user.uncatFolderId == asset.folderId) {
           app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
         }
 
@@ -257,7 +257,7 @@ class LibraryService(app: Altitude) {
   def moveAssetsToUncategorized(assetIds: Set[String])
                                (implicit user: User, txId: TransactionId = new TransactionId) = {
     txManager.withTransaction[Unit] {
-      moveAssetsToFolder(assetIds, Folder.UNCATEGORIZED.id.get)
+      moveAssetsToFolder(assetIds, user.uncatFolderId)
       app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS, assetIds.size)
     }
   }

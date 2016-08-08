@@ -24,7 +24,7 @@ class BaseApiController extends BaseController with GZipSupport {
   User plumbing - can only be set once per request
    */
   // FIXME: USER
-  private var _user: Option[User] = Some(User(id = Some("1")))
+  private var _user: Option[User] = Some(User(id = Some("1"), rootFolderId = "0", uncatFolderId = "1"))
 
   implicit def user: User = _user.get
 
@@ -88,11 +88,11 @@ class BaseApiController extends BaseController with GZipSupport {
     user = requestJson.isDefined match {
       case true => {
         val id = (requestJson.get \ C("Api.USER_ID")).as[String]
-        User(id = Some(id))
+        User(id = Some(id), rootFolderId = "0", uncatFolderId = "1")
       }
       case false => {
         val id = request.get(C("Api.USER_ID")).toString
-        User(id = Some(id))
+        User(id = Some(id), rootFolderId = "0", uncatFolderId = "1")
       }
     }
 

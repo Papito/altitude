@@ -41,9 +41,11 @@ abstract class MigrationService(app: Altitude) {
   }
 
   private def v1(implicit txId: TransactionId = new TransactionId): Unit = {
-    implicit val user = User(Some("1"))
+    implicit val user = User(Some("1"), rootFolderId = "0", uncatFolderId = "1")
 
-    app.service.folder.add(Folder.UNCATEGORIZED)
+    // user "uncategorized" folder node
+    val uncatFolder = app.service.folder.getUserUncatFolder()
+    app.service.folder.add(uncatFolder)
 
     app.service.stats.createStat("total_assets")
     app.service.stats.createStat("total_asset_bytes")

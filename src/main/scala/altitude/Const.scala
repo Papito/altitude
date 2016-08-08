@@ -22,6 +22,8 @@ object Const {
     /*---------------------------------------------------------------------------
     MODELS
     ---------------------------------------------------------------------------*/
+    "User.ROOT_FOLDER_ID" -> "root_folder_id",
+    "User.UNCAT_FOLDER_ID" -> "uncat_folder_id",
     "Asset.ASSET_TYPE" -> "asset_type",
     "Asset.PATH" -> "path",
     "Asset.FOLDER_ID" -> "folder_id",
@@ -39,14 +41,8 @@ object Const {
     "Folder.NUM_OF_ASSETS" -> "num_of_assets",
     "Folder.CHILDREN" -> "children",
     "Folder.IS_ROOT" -> "is_root",
-    "Folder.IS_UNCATEGORIZED" -> "is_uncategorized",
-    "Folder.IS_SYSTEM" -> "is_system",
-    "Folder.Ids.ROOT" -> "0",
-    "Folder.Ids.UNCATEGORIZED" -> "1",
-    "Folder.Ids.TRASH" -> "2",
     "Folder.Names.ROOT" -> "All", //TODO: not i18n
     "Folder.Names.UNCATEGORIZED" -> "Uncategorized",  //TODO: not i18n
-    "Folder.Names.TRASH" ->  "Trash",  //TODO: not i18n
     "Preview.ASSET_ID" -> "asset_id",
     "Preview.MIME_TYPE" -> "mime_type",
     "Preview.DATA" -> "data",
