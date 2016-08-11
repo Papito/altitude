@@ -17,6 +17,8 @@ class MongoQueryBuilder(collection: MongoCollection) extends QueryParser {
     val builder = MongoDBObject.newBuilder
     builder ++= params
 
+    builder += ("user_id" -> query.user.id.get)
+
     if (folderIds.nonEmpty) {
       builder += ("folder_id" -> MongoDBObject("$in" -> folderIds))
     }

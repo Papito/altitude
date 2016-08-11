@@ -11,7 +11,7 @@ import org.scalatra.SessionSupport
 
 import altitude.controllers.web.BaseWebController
 import altitude.exceptions.{AllDone, DuplicateException, MetadataExtractorException}
-import altitude.models.{Asset, FileImportAsset}
+import altitude.models.{User, Asset, FileImportAsset}
 import altitude.{Const => C}
 import org.json4s.JsonAST.JObject
 import org.json4s._
@@ -73,6 +73,9 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
       var assets: Option[List[FileImportAsset]] = None
       @volatile var assetsIt: Option[Iterator[FileImportAsset]] = None
       var path: Option[String] = None
+
+      // FIXME: USER
+      implicit var user = User(id = Some("1"), rootFolderId = "0", uncatFolderId = "1")
 
       private def writeToYou(jsonMessage: JsValue): Unit = {
         log.info(s"YOU -> $jsonMessage")

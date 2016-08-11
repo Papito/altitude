@@ -1,14 +1,8 @@
 db.system.createIndex({ "version" : 1 }, { unique: true })
 
-db.assets.createIndex({ "md5" : 1 }, { unique: true })
-db.assets.createIndex({ "path" : 1 }, { unique: true })
+db.assets.createIndex({ "user_id" : 1, "md5" : 1 }, { unique: true })
+db.assets.createIndex({ "user_id" : 1, "path" : 1 }, { unique: true })
 db.assets.createIndex({ "folder_id" : 1 })
 
 db.folders.createIndex({ "parent_id" : 1 })
 db.folders.createIndex({ "parent_id" : 1, "name_lc": 1 }, { unique: true } )
-
-db.altitude_stats.insertOne({ dimension: "total_assets", dim_val: NumberInt(0) });
-db.altitude_stats.insertOne({ dimension: "total_asset_bytes", dim_val: NumberInt(0) });
-db.altitude_stats.insertOne({ dimension: "uncategorized_assets", dim_val: NumberInt(0) });
-db.altitude_stats.insertOne({ dimension: "recycled_assets", dim_val: NumberInt(0) });
-db.altitude_stats.insertOne({ dimension: "recycled_bytes", dim_val: NumberInt(0) });

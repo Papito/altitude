@@ -3,7 +3,7 @@ package altitude.dao.jdbc
 import java.sql.Connection
 
 import altitude.dao.BaseDao
-import altitude.models.BaseModel
+import altitude.models.{User, BaseModel}
 import altitude.models.search.{Query, QueryResult}
 import altitude.transactions.{JdbcTransactionManager, TransactionId}
 import altitude.{Const => C, Util}
@@ -51,7 +51,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
         FROM $tableName
        WHERE ${C("Base.ID")} = ?"""
 
-  override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
+  override def add(jsonIn: JsObject)(implicit user: User, txId: TransactionId): JsObject = {
     val sql: String =s"""
       INSERT INTO $tableName ($CORE_SQL_COLS_FOR_INSERT)
            VALUES ($CORE_SQL_VALS_FOR_INSERT)"""
@@ -59,7 +59,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     addRecord(jsonIn, sql, List[Object]())
   }
 
-  override def getById(id: String)(implicit txId: TransactionId): Option[JsObject] = {
+  override def getById(id: String)(implicit user: User, txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
     val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(ONE_SQL, List(id))
 
@@ -69,7 +69,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     }
   }
 
-  override def deleteByQuery(q: Query)(implicit txId: TransactionId): Int = {
+  override def deleteByQuery(q: Query)(implicit user: User, txId: TransactionId): Int = {
     if (q.params.isEmpty) {
       return 0
     }
@@ -90,7 +90,8 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     numDeleted
   }
 
-  override def query(query: Query)(implicit txId: TransactionId): QueryResult = {
+  override def query(query: Query)
+                    (implicit user: User, txId: TransactionId): QueryResult = {
     val sqlQuery: SqlQuery = SQL_QUERY_BUILDER.toSelectQuery(query)
     val recs = manyBySqlQuery(sqlQuery.queryString, sqlQuery.selectBindValues)
 
@@ -99,10 +100,11 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
     log.debug(s"Found [$count] records. Retrieved [${recs.length}] records")
     log.debug(recs.map(_.toString()).mkString("\n"))
-    QueryResult(records = recs.map{makeModel}, total = count, query = query)
+    QueryResult(records = recs.map{makeModel}, total = count, query = Some(query))
   }
 
-  protected def getQueryResultCount(query: Query, values: List[Object] = List())(implicit txId: TransactionId): Int = {
+  protected def getQueryResultCount(query: Query, values: List[Object] = List())
+                                   (implicit  user: User, txId: TransactionId): Int = {
     val sqlCountQuery: SqlQuery = SQL_QUERY_BUILDER.toSelectQuery(query, countOnly = true)
     val runner: QueryRunner = new QueryRunner()
 
@@ -114,16 +116,15 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   }
 
   protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object])
-                         (implicit txId: TransactionId): JsObject = {
+                         (implicit  user: User, txId: TransactionId): JsObject = {
     log.info(s"JDBC INSERT: $jsonIn")
 
     val existingObjId: Option[String] = (jsonIn \ C("Base.ID")).asOpt[String]
 
     // create ID unless there is an override
     val id = if (existingObjId.isDefined) existingObjId.get else BaseModel.genId
-    val createdAt = utcNow
 
-    // prepend ID and CREATED AT to the values, as those are required for any record
+    // prepend ID, as it is required for any record (in base implementation)
     val values: List[Object] = id :: vals
     log.debug(s"INSERT SQL: $q. ARGS: ${values.toString()}")
 
@@ -166,7 +167,8 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     Some(rec.toMap[String, AnyRef])
   }
 
-  override def getByIds(ids: Set[String])(implicit txId: TransactionId): List[JsObject] = {
+  override def getByIds(ids: Set[String])
+                       (implicit user: User, txId: TransactionId): List[JsObject] = {
     val placeholders = ids.toSeq.map(x => "?")
     val sql = s"""
       SELECT $DEFAULT_SQL_COLS_FOR_SELECT
@@ -174,7 +176,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
        WHERE id IN (${placeholders.mkString(",")})
       """
 
-    log.debug(s"SQL: $sql")
+    log.debug(s"SQL: $sql with values: ${ids.toList}")
 
     val runner: QueryRunner = new QueryRunner()
     val res = runner.query(conn, sql, new MapListHandler(), ids.toList: _*)
@@ -183,7 +185,8 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     recs.map{makeModel}
   }
 
-  override def updateByQuery(q: Query, json: JsObject, fields: List[String])(implicit txId: TransactionId): Int = {
+  override def updateByQuery(q: Query, json: JsObject, fields: List[String])
+                            (implicit user: User, txId: TransactionId): Int = {
     log.debug(s"Updating record by query $q with data $json for fields: $fields")
 
     val queryFieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
@@ -209,7 +212,8 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     numUpdated
   }
 
-  override def increment(id: String, field: String, count: Int = 1)(implicit txId: TransactionId) = {
+  override def increment(id: String, field: String, count: Int = 1)
+                        (implicit user: User, txId: TransactionId) = {
     val sql = s"""
       UPDATE $tableName
          SET $field = $field + $count
@@ -222,7 +226,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   }
 
   override def decrement(id: String,  field: String, count: Int = 1)
-                        (implicit txId: TransactionId) = {
+                        (implicit user: User, txId: TransactionId) = {
     increment(id, field, -count)
   }
 

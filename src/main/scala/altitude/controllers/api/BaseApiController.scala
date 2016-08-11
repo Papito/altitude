@@ -3,7 +3,9 @@ package altitude.controllers.api
 import altitude.Validators.ApiValidator
 import altitude.controllers.BaseController
 import altitude.exceptions.{NotFoundException, ValidationException}
+import altitude.models.User
 import altitude.{Const => C}
+import org.joda.time.DateTime
 import org.scalatra._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, JsNull, Json}
@@ -11,14 +13,28 @@ import play.api.libs.json.{JsObject, JsNull, Json}
 class BaseApiController extends BaseController with GZipSupport {
   private final val log = LoggerFactory.getLogger(getClass)
 
+  //FIXME: look into making these static
   val OK = Ok("{}")
 
   val HTTP_POST_VALIDATOR: Option[ApiValidator] = None
   val HTTP_DELETE_VALIDATOR: Option[ApiValidator] = None
   val HTTP_UPDATE_VALIDATOR: Option[ApiValidator] = None
 
-  var requestJson: Option[JsObject] = None
+  /*
+  User plumbing - can only be set once per request
+   */
+  // FIXME: USER
+  private var _user: Option[User] = Some(User(id = Some("1"), rootFolderId = "0", uncatFolderId = "1"))
 
+  implicit def user: User = _user.get
+
+  def user_= (arg: User): Unit = {
+    if (_user.isDefined)
+      throw new RuntimeException("Cannot set user twice")
+    _user = Some(arg)
+  }
+
+  var requestJson: Option[JsObject] = None
   def requestMethod = request.getMethod.toLowerCase
 
   before() {
@@ -27,6 +43,7 @@ class BaseApiController extends BaseController with GZipSupport {
 
     // verify that requests with request body are not empty
     checkPayload()
+    setUser()
 
     requestJson = Some(
       if (request.body.isEmpty) Json.obj() else Json.parse(request.body).as[JsObject]
@@ -64,6 +81,23 @@ class BaseApiController extends BaseController with GZipSupport {
   private def checkPayload(): Unit = {
     if (List("post", "put").contains(requestMethod) && request.body.isEmpty) {
       throw ValidationException(C("msg.err.empty_request_body"))
+    }
+  }
+
+  private def setUser(): Unit = {
+    user = requestJson.isDefined match {
+      case true => {
+        val id = (requestJson.get \ C("Api.USER_ID")).as[String]
+        User(id = Some(id), rootFolderId = "0", uncatFolderId = "1")
+      }
+      case false => {
+        val id = request.get(C("Api.USER_ID")).toString
+        User(id = Some(id), rootFolderId = "0", uncatFolderId = "1")
+      }
+    }
+
+    if (this._user.isEmpty) {
+      throw new ValidationException("User must be defined")
     }
   }
 

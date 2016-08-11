@@ -6,42 +6,41 @@ CREATE UNIQUE INDEX system_record ON system(id);
 INSERT INTO system(id, version) VALUES(0, 0);
 
 CREATE TABLE stats (
+  user_id varchar(24) NOT NULL,
   dimension varchar(24) PRIMARY KEY,
   dim_val INT NOT NULL DEFAULT 0
 );
-INSERT INTO stats(dimension) VALUES('total_assets');
-INSERT INTO stats(dimension) VALUES('total_asset_bytes');
-INSERT INTO stats(dimension) VALUES('uncategorized_assets'); -- this is included in totals
-INSERT INTO stats(dimension) VALUES('recycled_assets');
-INSERT INTO stats(dimension) VALUES('recycled_bytes');
+CREATE UNIQUE INDEX stats_user_dimension ON stats(user_id, dimension);
 
 CREATE TABLE asset  (
   id varchar(24) PRIMARY KEY,
+  user_id varchar(24) NOT NULL,
   md5 varchar(32) NOT NULL,
   media_type varchar(64) NOT NULL,
   media_subtype varchar(64) NOT NULL,
   mime_type varchar(64) NOT NULL,
   metadata TEXT,
   path TEXT NOT NULL,
-  folder_id varchar(24) NOT NULL DEFAULT "1",
+  folder_id varchar(24) NOT NULL,
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );
-CREATE UNIQUE INDEX asset_md5 ON asset(md5);
-CREATE UNIQUE INDEX asset_path ON asset(path);
+CREATE UNIQUE INDEX asset_md5 ON asset(user_id, md5);
+CREATE UNIQUE INDEX asset_path ON asset(user_id, path);
 CREATE INDEX asset_folder ON asset(folder_id);
 
 CREATE TABLE trash  (
   id varchar(24) PRIMARY KEY,
+  user_id varchar(24) NOT NULL,
   md5 varchar(32) NOT NULL,
   media_type varchar(64) NOT NULL,
   media_subtype varchar(64) NOT NULL,
   mime_type varchar(64) NOT NULL,
   metadata TEXT,
   path TEXT NOT NULL,
-  folder_id varchar(24) NOT NULL DEFAULT "1",
+  folder_id varchar(24) NOT NULL,
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
   created_at DATE NOT NULL,
@@ -61,9 +60,10 @@ CREATE TABLE trash  (
 
 CREATE TABLE folder (
   id varchar(24) PRIMARY KEY,
+  user_id varchar(24) NOT NULL,
   name varchar(255) NOT NULL,
   name_lc varchar(255) NOT NULL,
-  parent_id varchar(24) NOT NULL DEFAULT "0",
+  parent_id varchar(24) NOT NULL,
   num_of_assets INTEGER NOT NULL DEFAULT 0,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL

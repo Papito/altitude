@@ -10,18 +10,19 @@ import org.scalatest.DoNotDiscover
 
   test("test totals") {
     // create an asset in a folder
-    val folder1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1"))
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
     altitude.service.library.add(makeAsset(folder1))
 
     // create an uncategorized asset
-    val uncategorizedAsset: Asset = altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+    val uncategorizedAsset: Asset = altitude.service.library.add(makeAsset(
+      altitude.service.folder.getUserUncatFolder()))
 
     // create an asset and delete it
     val assetToDelete1: Asset = altitude.service.library.add(makeAsset(folder1))
     altitude.service.library.recycleAsset(assetToDelete1.id.get)
-    val assetToDelete2: Asset = altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+    val assetToDelete2: Asset = altitude.service.library.add(makeAsset(
+      altitude.service.folder.getUserUncatFolder()))
     altitude.service.library.recycleAsset(assetToDelete2.id.get)
 
     val stats = altitude.service.stats.getStats
@@ -39,8 +40,7 @@ import org.scalatest.DoNotDiscover
 
   test("test uncategorized") {
     // create an asset in a folder
-    val folder1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1"))
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
     val asset: Asset = altitude.service.library.add(makeAsset(folder1))
 
@@ -52,11 +52,11 @@ import org.scalatest.DoNotDiscover
   }
 
   test("test move recycled asset to folder") {
-    val asset: Asset = altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+    val asset: Asset = altitude.service.library.add(makeAsset(
+      altitude.service.folder.getUserUncatFolder()))
     altitude.service.library.recycleAsset(asset.id.get)
 
-    val folder1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1"))
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
     altitude.service.library.moveRecycledAssetToFolder(asset.id.get, folder1.id.get)
 
@@ -66,11 +66,19 @@ import org.scalatest.DoNotDiscover
   }
 
   test("restore recycled asset") {
-    val asset: Asset = altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+    val asset: Asset = altitude.service.library.add(makeAsset(
+      altitude.service.folder.getUserUncatFolder()))
     val trashed: Trash = altitude.service.library.recycleAsset(asset.id.get)
     altitude.service.library.restoreRecycledAsset(trashed.id.get)
 
+    SET_USER_2()
+    altitude.service.library.add(makeAsset(
+      altitude.service.folder.getUserUncatFolder()))
+
+    SET_USER_1()
+
     val stats = altitude.service.stats.getStats
+    println(stats)
     stats.getStatValue(Stats.TOTAL_ASSETS) should be (1)
     stats.getStatValue(Stats.RECYCLED_ASSETS) should be (0)
   }

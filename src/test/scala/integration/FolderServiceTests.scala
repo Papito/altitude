@@ -14,18 +14,18 @@ import org.scalatest.Matchers._
         folder1_1
         folder1_2
       */
-    val folder1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1"))
 
-    folder1.parentId should be(Folder.ROOT.id.get)
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
-    val folder1_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_1", parentId = folder1.id.get))
+    folder1.parentId should be(CURRENT_USER.rootFolderId)
+
+    val folder1_1: Folder = altitude.service.folder.addFolder(
+      name = "folder1_1", parentId = folder1.id)
 
     folder1_1.parentId should not be None
 
-    val folder1_2: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_2", parentId = folder1.id.get))
+    val folder1_2: Folder = altitude.service.folder.addFolder(
+      name = "folder1_2", parentId = folder1.id)
 
     folder1.id should contain(folder1_2.parentId)
 
@@ -35,23 +35,23 @@ import org.scalatest.Matchers._
           folder2_1_1
         folder2_2
       */
-    val folder2: Folder = altitude.service.folder.add(
-      Folder(name = "folder2"))
+    val folder2: Folder = altitude.service.folder.addFolder(
+      name = "folder2")
 
-    folder2.parentId should be(Folder.ROOT.id.get)
+    folder2.parentId should be(CURRENT_USER.rootFolderId)
 
-    val folder2_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder2_1", parentId = folder2.id.get))
+    val folder2_1: Folder = altitude.service.folder.addFolder(
+      name = "folder2_1", parentId = folder2.id)
 
     folder2.id should contain(folder2_1.parentId)
 
-    val folder2_1_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder2_1_1", parentId = folder2_1.id.get))
+    val folder2_1_1: Folder = altitude.service.folder.addFolder(
+      name = "folder2_1_1", parentId = folder2_1.id)
 
     folder2_1.id should contain(folder2_1_1.parentId)
 
-    val folder2_2: Folder = altitude.service.folder.add(
-      Folder(name = "folder2_2", parentId = folder2.id.get))
+    val folder2_2: Folder = altitude.service.folder.addFolder(
+      name = "folder2_2", parentId = folder2.id)
 
     folder2.id should contain(folder2_2.parentId)
 
@@ -75,12 +75,12 @@ import org.scalatest.Matchers._
 
   test("bad hierarchy root") {
     intercept[NotFoundException] {
-      altitude.service.folder.hierarchy(rootId = "bogus")
+      altitude.service.folder.hierarchy(rootId = Some("bogus"))
     }
   }
 
   test("root path") {
-    val path: List[Folder] = altitude.app.service.folder.path(folderId = C("Folder.Ids.ROOT"))
+    val path: List[Folder] = altitude.app.service.folder.path(folderId = CURRENT_USER.rootFolderId)
     path.length should equal(0)
   }
 
@@ -91,10 +91,10 @@ import org.scalatest.Matchers._
   }
 
   test("duplicate") {
-    val folder: Folder = altitude.service.folder.add(Folder(name = "folder1"))
+    val folder: Folder = altitude.service.folder.addFolder("folder1")
 
     intercept[ValidationException] {
-      altitude.service.folder.add(Folder(name = folder.name))
+      altitude.service.folder.addFolder(folder.name)
     }
 
     val folders = altitude.service.folder.hierarchy()
@@ -103,24 +103,24 @@ import org.scalatest.Matchers._
 
   test("validate") {
     intercept[ValidationException] {
-      altitude.service.folder.add(Folder(name = ""))
+      altitude.service.folder.addFolder("")
     }
     intercept[ValidationException] {
-      altitude.service.folder.add(Folder(name = " "))
+      altitude.service.folder.addFolder(" ")
     }
     intercept[ValidationException] {
-      altitude.service.folder.add(Folder(name = " "))
+      altitude.service.folder.addFolder(" ")
     }
     intercept[ValidationException] {
-      altitude.service.folder.add(Folder(name = "\t \t   "))
+      altitude.service.folder.addFolder("\t \t   ")
     }
   }
 
   test("sanitize") {
-    val folder1: Folder = altitude.service.folder.add(Folder(name = " folder  "))
+    val folder1: Folder = altitude.service.folder.addFolder(" folder  ")
     folder1.name should be("folder")
 
-    val folder2:Folder = altitude.service.folder.add(Folder(name = " Folder one \n"))
+    val folder2:Folder = altitude.service.folder.addFolder(" Folder one \n")
     folder2.name should be("Folder one")
   }
 
@@ -133,23 +133,22 @@ import org.scalatest.Matchers._
         folder1_1_1_2
     folder1_2
   */
-    val folder1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1"))
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
-    val folder1_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_1", parentId = folder1.id.get))
+    val folder1_1: Folder = altitude.service.folder.addFolder(
+      name = "folder1_1", parentId = folder1.id)
 
-    val folder1_1_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_1_1", parentId = folder1_1.id.get))
+    val folder1_1_1: Folder = altitude.service.folder.addFolder(
+      name = "folder1_1_1", parentId = folder1_1.id)
 
-    val folder1_1_1_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_1_1_1", parentId = folder1_1_1.id.get))
+    val folder1_1_1_1: Folder = altitude.service.folder.addFolder(
+      name = "folder1_1_1_1", parentId = folder1_1_1.id)
 
-    val folder1_1_1_2: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_1_1_2", parentId = folder1_1_1.id.get))
+    val folder1_1_1_2: Folder = altitude.service.folder.addFolder(
+      name = "folder1_1_1_2", parentId = folder1_1_1.id)
 
-    val folder1_2: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_2", parentId = folder1.id.get))
+    val folder1_2: Folder = altitude.service.folder.addFolder(
+      name = "folder1_2", parentId = folder1.id)
 
     val deleted = altitude.service.folder.deleteById(folder1.id.get)
     deleted should be(6)
@@ -187,12 +186,12 @@ import org.scalatest.Matchers._
 
   test("delete root folder") {
     intercept[IllegalOperationException] {
-      altitude.service.folder.deleteById(Folder.ROOT.id.get)
+      altitude.service.folder.deleteById(CURRENT_USER.rootFolderId)
     }
   }
 
   test("delete sys folder") {
-    Folder.SYSTEM_FOLDERS.foreach { sysFolder =>
+    altitude.service.folder.getUserSystemFolders().foreach { sysFolder =>
       intercept[IllegalOperationException] {
         altitude.service.folder.deleteById(sysFolder.id.get)
       }
@@ -200,10 +199,9 @@ import org.scalatest.Matchers._
   }
 
   test("add a child to a sys folder") {
-    Folder.SYSTEM_FOLDERS.foreach { sysFolder =>
+    altitude.service.folder.getUserSystemFolders().foreach { sysFolder =>
       intercept[IllegalOperationException] {
-        altitude.service.folder.add(
-          Folder(name = "folder1", parentId = sysFolder.id.get))
+        altitude.service.folder.addFolder(name = "folder1", parentId = sysFolder.id)
         }
     }
   }
@@ -216,20 +214,18 @@ import org.scalatest.Matchers._
     folder1_2
   folder2
   */
-    val folder1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1"))
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
-    val folder1_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_1", parentId = folder1.id.get))
+    val folder1_1: Folder = altitude.service.folder.addFolder(
+      name = "folder1_1", parentId = folder1.id)
 
-    val folder1_1_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_1_1", parentId = folder1_1.id.get))
+    val folder1_1_1: Folder = altitude.service.folder.addFolder(
+      name = "folder1_1_1", parentId = folder1_1.id)
 
-    val folder1_2: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_2", parentId = folder1.id.get))
+    val folder1_2: Folder = altitude.service.folder.addFolder(
+      name = "folder1_2", parentId = folder1.id)
 
-    val folder2: Folder = altitude.service.folder.add(
-      Folder(name = "folder2"))
+    val folder2: Folder = altitude.service.folder.addFolder("folder2")
 
     // assert initial state
     // target
@@ -252,26 +248,24 @@ import org.scalatest.Matchers._
       folder1_1_1
   folder2
   */
-    val folder1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1"))
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
-    val folder1_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_1", parentId = folder1.id.get))
+    val folder1_1: Folder = altitude.service.folder.addFolder(
+      name = "folder1_1", parentId = folder1.id)
 
-    val folder1_1_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_1_1", parentId = folder1_1.id.get))
+    val folder1_1_1: Folder = altitude.service.folder.addFolder(
+      name = "folder1_1_1", parentId = folder1_1.id)
 
-    val folder2: Folder = altitude.service.folder.add(
-      Folder(name = "folder2"))
+    val folder2: Folder = altitude.service.folder.addFolder("folder2")
 
     // assert initial state
-    altitude.app.service.folder.immediateChildren(rootId = Folder.ROOT.id.get).length should be (2)
+    altitude.app.service.folder.immediateChildren(rootId = CURRENT_USER.rootFolderId).length should be (2)
 
-    altitude.service.folder.move(folder1_1_1.id.get, Folder.ROOT.id.get)
-    altitude.app.service.folder.immediateChildren(rootId = Folder.ROOT.id.get).length should be (3)
+    altitude.service.folder.move(folder1_1_1.id.get, CURRENT_USER.rootFolderId)
+    altitude.app.service.folder.immediateChildren(rootId = CURRENT_USER.rootFolderId).length should be (3)
 
-    altitude.service.folder.move(folder1_1.id.get, Folder.ROOT.id.get)
-    altitude.app.service.folder.immediateChildren(rootId = Folder.ROOT.id.get).length should be (4)
+    altitude.service.folder.move(folder1_1.id.get, CURRENT_USER.rootFolderId)
+    altitude.app.service.folder.immediateChildren(rootId = CURRENT_USER.rootFolderId).length should be (4)
   }
 
   test("illegal move") {
@@ -284,28 +278,25 @@ import org.scalatest.Matchers._
     folder3
         FOLDER1_1_1
     */
-    val folder1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1"))
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
-    val folder1_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_1", parentId = folder1.id.get))
+    val folder1_1: Folder = altitude.service.folder.addFolder(
+      name = "folder1_1", parentId = folder1.id)
 
-    val folder1_1_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1_1_1", parentId = folder1_1.id.get))
+    val folder1_1_1: Folder = altitude.service.folder.addFolder(
+      name = "folder1_1_1", parentId = folder1_1.id)
 
-    val folder2: Folder = altitude.service.folder.add(
-      Folder(name = "folder2"))
+    val folder2: Folder = altitude.service.folder.addFolder("folder2")
 
     // create folder1_1_1 as a duplicate under a different parent
-    altitude.service.folder.add(
-      Folder(name = "folder1_1_1", parentId = folder2.id.get))
+    altitude.service.folder.addFolder(
+      name = "folder1_1_1", parentId = folder2.id)
 
-    val folder3: Folder = altitude.service.folder.add(
-      Folder(name = "folder3"))
+    val folder3: Folder = altitude.service.folder.addFolder("folder3")
 
     // create folder1_1_1 as a duplicate under a different parent
-    altitude.service.folder.add(
-      Folder(name = "FOLDER1_1_1", parentId = folder3.id.get))
+    altitude.service.folder.addFolder(
+      name = "FOLDER1_1_1", parentId = folder3.id)
 
     // move into itself
     intercept[IllegalOperationException] {
@@ -334,8 +325,7 @@ import org.scalatest.Matchers._
   }
 
   test("rename") {
-    val folder1: Folder = altitude.service.folder.add(
-      Folder(name = "folder"))
+    val folder1: Folder = altitude.service.folder.addFolder("folder")
 
     altitude.service.folder.rename(folder1.id.get, "newName")
 
@@ -344,8 +334,7 @@ import org.scalatest.Matchers._
   }
 
   test("illegal rename") {
-    val folder1: Folder = altitude.service.folder.add(
-      Folder(name = "folder"))
+    val folder1: Folder = altitude.service.folder.addFolder("folder")
 
     intercept[ValidationException] {
       altitude.service.folder.rename(folder1.id.get, folder1.name)
@@ -358,7 +347,7 @@ import org.scalatest.Matchers._
 
     // rename a system folder
     intercept[IllegalOperationException] {
-      altitude.service.folder.rename(Folder.ROOT.id.get, folder1.name)
+      altitude.service.folder.rename(CURRENT_USER.rootFolderId, folder1.name)
     }
   }
 

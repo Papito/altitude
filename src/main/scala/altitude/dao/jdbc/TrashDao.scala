@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat
 
 import altitude.transactions.TransactionId
 import altitude.{Const => C, Util, Altitude}
-import altitude.models.{AssetType, BaseModel, Trash, AssetType$}
+import altitude.models.{User, AssetType, BaseModel, Trash}
 import org.joda.time.{DateTime, LocalDateTime}
 import org.joda.time.format.DateTimeFormat
 import org.slf4j.LoggerFactory
@@ -22,6 +22,7 @@ abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with alt
 
     val model = new Trash(
       id = Some(rec.get(C("Base.ID")).get.asInstanceOf[String]),
+      userId = rec.get(C("Base.USER_ID")).get.asInstanceOf[String],
       path = rec.get(C("Asset.PATH")).get.asInstanceOf[String],
       md5 = rec.get(C("Asset.MD5")).get.asInstanceOf[String],
       assetType = mediaType,
@@ -36,7 +37,7 @@ abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with alt
     model
   }
 
-  override def add(jsonIn: JsObject)(implicit txId: TransactionId): JsObject = {
+  override def add(jsonIn: JsObject)(implicit user: User, txId: TransactionId): JsObject = {
     val trash = jsonIn: Trash
 
     // Postgres will reject this sequence with jsonb
@@ -44,14 +45,14 @@ abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with alt
 
     val sql = s"""
         INSERT INTO $tableName (
-             $CORE_SQL_COLS_FOR_INSERT, ${C("Asset.PATH")}, ${C("Asset.MD5")},
+             $CORE_SQL_COLS_FOR_INSERT, ${C("Base.USER_ID")}, ${C("Asset.PATH")}, ${C("Asset.MD5")},
              ${C("Asset.FILENAME")}, ${C("Asset.SIZE_BYTES")},
              ${C("AssetType.MEDIA_TYPE")}, ${C("AssetType.MEDIA_SUBTYPE")}, ${C("AssetType.MIME_TYPE")},
              ${C("Asset.FOLDER_ID")}, ${C("Base.CREATED_AT")}, ${C("Base.UPDATED_AT")},
              ${C("Asset.METADATA")})
             VALUES(
               $CORE_SQL_VALS_FOR_INSERT,
-              ?, ?, ?, ?, ?, ?, ?, ?,
+              ?, ?, ?, ?, ?, ?, ?, ?, ?,
               ${DATETIME_TO_DB_FUNC(trash.createdAt)},
               ${DATETIME_TO_DB_FUNC(trash.updatedAt)},
               $JSON_FUNC)
@@ -60,6 +61,7 @@ abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with alt
     val df = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
 
     val sqlVals: List[Object] = List(
+      trash.userId,
       trash.path,
       trash.md5,
       trash.fileName,

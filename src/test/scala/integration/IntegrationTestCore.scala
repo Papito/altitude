@@ -2,7 +2,7 @@ package integration
 
 import java.io.File
 
-import altitude.models.{AssetType, Asset, Folder}
+import altitude.models.{User, AssetType, Asset, Folder}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Environment, Util}
 import com.google.inject.{AbstractModule, Guice}
@@ -47,6 +47,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     FileUtils.forceMkdir(dataDirFile)
     dbUtilities.createTransaction(txId)
     //log.debug(s"Test transaction ID is ${txId.id}")
+    SET_USER_1()
   }
 
   override def afterEach() {
@@ -80,7 +81,26 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   /* INTEGRATION UTILITIES*/
   private val ASSET_TYPE = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
 
-  protected  def makeAsset(folder: Folder) = Asset(
+  private final val USER: User = User(
+    id = Some("1"),
+    rootFolderId = "0",
+    uncatFolderId = "1")
+
+  private final val ANOTHER_USER: User = User(
+    id = Some("2"),
+    rootFolderId = "10",
+    uncatFolderId = "11")
+
+  implicit var CURRENT_USER: User = USER
+  implicit def CURRENT_USER_ID: String = CURRENT_USER.id.get
+
+  def SET_USER_1() =
+    CURRENT_USER = USER
+  def SET_USER_2() =
+    CURRENT_USER = ANOTHER_USER
+
+  protected def makeAsset(folder: Folder) = Asset(
+    userId = CURRENT_USER_ID,
     folderId = folder.id.get,
     assetType = ASSET_TYPE,
     path = Util.randomStr(30),

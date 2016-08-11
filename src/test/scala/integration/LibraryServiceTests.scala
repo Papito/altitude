@@ -2,7 +2,7 @@ package integration
 
 import altitude.exceptions.NotFoundException
 import altitude.models.search.Query
-import altitude.models.{Trash, Asset, Folder}
+import altitude.models.{User, Trash, Asset, Folder}
 import altitude.{Const => C, Util}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
@@ -11,7 +11,12 @@ import play.api.libs.json.JsObject
 @DoNotDiscover class LibraryServiceTests (val config: Map[String, String]) extends IntegrationTestCore {
 
   test("recycle asset") {
-    altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+    altitude.service.library.add(makeAsset(altitude.service.folder.getUserUncatFolder()))
+
+    SET_USER_2()
+    altitude.service.library.add(makeAsset(altitude.service.folder.getUserUncatFolder()))
+
+    SET_USER_1()
     altitude.service.asset.getAll.length should be (1)
 
     val asset: Asset = altitude.service.asset.getAll.head
@@ -31,26 +36,24 @@ import play.api.libs.json.JsObject
     folder1
     folder2
     */
-    val folder1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1"))
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
-    val folder2: Folder = altitude.service.folder.add(
-      Folder(name = "folder2"))
+    val folder2: Folder = altitude.service.folder.addFolder("folder2")
 
     val asset: Asset = altitude.service.library.add(makeAsset(folder1))
 
     altitude.service.library.search(
-      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
+      Query(CURRENT_USER, params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
     ).records.length should be(1)
 
     altitude.service.library.moveAssetToFolder(asset.id.get, folder2.id.get)
 
     altitude.service.library.search(
-      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
+      Query(CURRENT_USER, params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
     ).records.length should be(0)
 
     altitude.service.library.search(
-      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder2.id.get))
+      Query(CURRENT_USER, params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder2.id.get))
     ).records.length should be(1)
   }
 
@@ -63,27 +66,25 @@ import play.api.libs.json.JsObject
         folder2_2_1
         folder2_2_2
     */
-    val folder1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1"))
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
-    val folder2: Folder = altitude.service.folder.add(
-      Folder(name = "folder2"))
+    val folder2: Folder = altitude.service.folder.addFolder("folder2")
 
-    val folder2_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder2_1", parentId = folder2.id.get))
+    val folder2_1: Folder = altitude.service.folder.addFolder(
+      name = "folder2_1", parentId = folder2.id)
 
-    val folder2_2: Folder = altitude.service.folder.add(
-      Folder(name = "folder2_2", parentId = folder2.id.get))
+    val folder2_2: Folder = altitude.service.folder.addFolder(
+      name = "folder2_2", parentId = folder2.id)
 
-    val folder2_2_1: Folder = altitude.service.folder.add(
-      Folder(name = "folder2_2_1", parentId = folder2_2.id.get))
+    val folder2_2_1: Folder = altitude.service.folder.addFolder(
+      name = "folder2_2_1", parentId = folder2_2.id)
 
-    val folder2_2_2: Folder = altitude.service.folder.add(
-      Folder(name = "folder2_2_2", parentId = folder2_2.id.get))
+    val folder2_2_2: Folder = altitude.service.folder.addFolder(
+      name = "folder2_2_2", parentId = folder2_2.id)
 
     // fill up the hierarchy with assets x times over
     1 to 2 foreach {n =>
-      altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+      altitude.service.library.add(makeAsset(altitude.service.folder.getUserUncatFolder()))
       altitude.service.library.add(makeAsset(folder1))
       altitude.service.library.add(makeAsset(folder2))
       altitude.service.library.add(makeAsset(folder2_1))
@@ -94,7 +95,7 @@ import play.api.libs.json.JsObject
 
     // check counts
     val systemFolders = altitude.service.folder.getSysFolders()
-    systemFolders(Folder.UNCATEGORIZED.id.get).numOfAssets should be (2)
+    systemFolders(CURRENT_USER.uncatFolderId).numOfAssets should be (2)
 
     // prefetch all folders for speed
     val all = altitude.service.folder.getNonSysFolders()
@@ -108,11 +109,11 @@ import play.api.libs.json.JsObject
     (altitude.service.folder.getByIdWithChildAssetCounts(folder2.id.get, all): Folder).numOfAssets should be (10)
 
     // test counts for immediate children
-    val rootChildren = altitude.service.folder.immediateChildren(Folder.ROOT.id.get, all)
+    val rootChildren = altitude.service.folder.immediateChildren(CURRENT_USER.rootFolderId, all)
     rootChildren.head.numOfAssets should be(2)
     rootChildren.last.numOfAssets should be(10)
 
-    val rootChildren2 = altitude.service.folder.immediateChildren(Folder.ROOT.id.get)
+    val rootChildren2 = altitude.service.folder.immediateChildren(CURRENT_USER.rootFolderId)
     rootChildren2.head.numOfAssets should be(2)
     rootChildren2.last.numOfAssets should be(10)
 
@@ -123,18 +124,17 @@ import play.api.libs.json.JsObject
   }
 
   test("move recyclded asset to folder") {
-    val asset: Asset = altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUserUncatFolder()))
     altitude.service.library.recycleAsset(asset.id.get)
 
-    val folder1: Folder = altitude.service.folder.add(
-      Folder(name = "folder1"))
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
     altitude.service.library.moveRecycledAssetToFolder(asset.id.get, folder1.id.get)
     altitude.service.trash.getAll.length should be (0)
     altitude.service.asset.getAll.length should be (1)
 
     altitude.service.library.search(
-      Query(params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
+      Query(CURRENT_USER, params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
     ).records.length should be(1)
 
     val all = altitude.service.folder.getNonSysFolders()
@@ -144,7 +144,7 @@ import play.api.libs.json.JsObject
   }
 
   test("restore recycled asset") {
-    val asset: Asset = altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUserUncatFolder()))
     val trashed: Trash = altitude.service.library.recycleAsset(asset.id.get)
     altitude.service.library.restoreRecycledAsset(trashed.id.get)
     altitude.service.trash.getAll.length should be (0)
@@ -152,7 +152,7 @@ import play.api.libs.json.JsObject
   }
 
   test("restore recycled asset to non-existing folder") {
-    val asset: Asset = altitude.service.library.add(makeAsset(Folder.UNCATEGORIZED))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUserUncatFolder()))
     altitude.service.library.recycleAsset(asset.id.get)
 
     intercept[NotFoundException] {

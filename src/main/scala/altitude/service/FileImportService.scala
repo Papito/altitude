@@ -19,7 +19,8 @@ class FileImportService(app: Altitude) {
   protected val DAO = new FileSystemImportDao(app)
   protected val SUPPORTED_MEDIA_TYPES = List("audio", "image")
 
-  def getFilesToImport(path: String): List[FileImportAsset] = {
+  def getFilesToImport(path: String)
+                      (implicit user: User, txId: TransactionId = new TransactionId): List[FileImportAsset] = {
     log.info(s"Finding assets to import @ '$path'", C.LogTag.SERVICE)
     val assets = DAO.iterateAssets(path = path).toList
     log.info(s"Found ${assets.size}", C.LogTag.SERVICE)
@@ -43,7 +44,7 @@ class FileImportService(app: Altitude) {
   }
 
   def importAsset(fileAsset: FileImportAsset)
-                 (implicit txId: TransactionId = new TransactionId) : Option[Asset]  = {
+                 (implicit user: User, txId: TransactionId = new TransactionId) : Option[Asset]  = {
     log.info(s"Importing file asset '$fileAsset'", C.LogTag.SERVICE)
     val assetType = detectAssetType(fileAsset)
 
@@ -66,11 +67,12 @@ class FileImportService(app: Altitude) {
     val fileSizeInBytes: Long = new File(fileAsset.absolutePath).length()
 
     val asset: Asset = Asset(
+      userId = user.id.get,
       path = fileAsset.absolutePath,
       md5 = getChecksum(fileAsset.absolutePath),
       assetType = assetType,
       sizeBytes = fileSizeInBytes,
-      folderId = Folder.UNCATEGORIZED.id.get)
+      folderId = user.uncatFolderId)
 
 
     var previewData: Option[Array[Byte]] = None
@@ -87,6 +89,7 @@ class FileImportService(app: Altitude) {
 
 
     val assetWithPreview = Asset(
+      userId = user.id.get,
       path = asset.path,
       md5 = asset.md5,
       assetType = asset.assetType,
