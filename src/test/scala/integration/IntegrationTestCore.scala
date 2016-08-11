@@ -82,12 +82,12 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   private val ASSET_TYPE = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
 
   private final val USER: User = User(
-    id = Some(Util.randomStr()),
+    id = Some("1"),
     rootFolderId = "0",
     uncatFolderId = "1")
 
   private final val ANOTHER_USER: User = User(
-    id = Some(Util.randomStr()),
+    id = Some("2"),
     rootFolderId = "10",
     uncatFolderId = "11")
 

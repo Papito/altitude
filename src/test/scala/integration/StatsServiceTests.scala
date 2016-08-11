@@ -71,7 +71,14 @@ import org.scalatest.DoNotDiscover
     val trashed: Trash = altitude.service.library.recycleAsset(asset.id.get)
     altitude.service.library.restoreRecycledAsset(trashed.id.get)
 
+    SET_USER_2()
+    altitude.service.library.add(makeAsset(
+      altitude.service.folder.getUserUncatFolder()))
+
+    SET_USER_1()
+
     val stats = altitude.service.stats.getStats
+    println(stats)
     stats.getStatValue(Stats.TOTAL_ASSETS) should be (1)
     stats.getStatValue(Stats.RECYCLED_ASSETS) should be (0)
   }
