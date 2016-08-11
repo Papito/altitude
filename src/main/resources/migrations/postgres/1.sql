@@ -62,6 +62,7 @@ CREATE TABLE trash (
 
 CREATE TABLE folder (
   id varchar(24) PRIMARY KEY,
+  user_id varchar(24) NOT NULL,
   name varchar(255) NOT NULL,
   name_lc varchar(255) NOT NULL,
   parent_id varchar(24) NOT NULL DEFAULT '0',
