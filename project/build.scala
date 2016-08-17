@@ -6,6 +6,7 @@ import sbt.Keys._
 import sbt._
 import sbtassembly.AssemblyKeys._
 import sbtassembly.AssemblyPlugin._
+import sbtassembly.{PathList, MergeStrategy}
 
 object AltitudeBuild extends Build {
   val Organization = "altitude"
@@ -40,7 +41,7 @@ object AltitudeBuild extends Build {
 
       "org.apache.tika"              % "tika-parsers"          % "1.13",
       "org.apache.tika"              % "tika-serialization"    % "1.13",
-      "commons-io"                   % "commons-io"            % "2.4",
+      "commons-io"                   % "commons-io"            % "2.5",
       "commons-dbutils"              % "commons-dbutils"       % "1.6",
 
       "ch.qos.logback"               % "logback-classic"       % "1.1.2" % "runtime",
@@ -73,6 +74,16 @@ object AltitudeBuild extends Build {
         )
       }
     )
+
+  assemblyMergeStrategy in assembly := {
+    case x if x.startsWith("META-INF") => MergeStrategy.discard
+    case x if x.endsWith(".html") => MergeStrategy.discard
+    case PathList("commons-logging", "commons-logging", xs@_ *) => MergeStrategy.first
+    case PathList("commons-logging", "commons-logging-api", xs@_ *) => MergeStrategy.first
+    case x =>
+      val oldStrategy = (assemblyMergeStrategy in assembly).value
+      oldStrategy(x)
+  }
 
   // settings for sbt-assembly plugin
   val deployAssemblySettings = assemblySettings ++ Seq(
