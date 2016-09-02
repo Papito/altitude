@@ -20,22 +20,16 @@ class BaseApiController extends BaseController with GZipSupport {
   val HTTP_DELETE_VALIDATOR: Option[ApiValidator] = None
   val HTTP_UPDATE_VALIDATOR: Option[ApiValidator] = None
 
-  /*
-  User plumbing - can only be set once per request
-   */
-  // FIXME: USER
-  private var _user: Option[User] = Some(User(id = Some("1"), rootFolderId = "0", uncatFolderId = "1"))
+  def requestJson: Option[JsObject] = Some(
+    if (request.body.isEmpty) Json.obj() else Json.parse(request.body).as[JsObject]
+  )
 
-  implicit def user: User = _user.get
-
-  def user_= (arg: User): Unit = {
-    if (_user.isDefined)
-      throw new RuntimeException("Cannot set user twice")
-    _user = Some(arg)
-  }
-
-  var requestJson: Option[JsObject] = None
   def requestMethod = request.getMethod.toLowerCase
+
+  implicit def user = if (request.contains("user"))
+      request.getAttribute("user").asInstanceOf[User]
+    else
+      throw new RuntimeException("User was not set for this request")
 
   before() {
     log.info(
@@ -44,10 +38,6 @@ class BaseApiController extends BaseController with GZipSupport {
     // verify that requests with request body are not empty
     checkPayload()
     setUser()
-
-    requestJson = Some(
-      if (request.body.isEmpty) Json.obj() else Json.parse(request.body).as[JsObject]
-    )
 
     /*
     Process all validators that may be set for this controller/method.
@@ -85,6 +75,10 @@ class BaseApiController extends BaseController with GZipSupport {
   }
 
   private def setUser(): Unit = {
+    val user = User(id = Some("1"), rootFolderId = "0", uncatFolderId = "1")
+    log.info(s"User for this request $user")
+    request.setAttribute("user", user)
+    /*
     user = requestJson.isDefined match {
       case true => {
         val id = (requestJson.get \ C("Api.USER_ID")).as[String]
@@ -95,10 +89,7 @@ class BaseApiController extends BaseController with GZipSupport {
         User(id = Some(id), rootFolderId = "0", uncatFolderId = "1")
       }
     }
-
-    if (this._user.isEmpty) {
-      throw new ValidationException("User must be defined")
-    }
+  */
   }
 
   error {
