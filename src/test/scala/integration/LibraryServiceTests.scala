@@ -123,7 +123,7 @@ import play.api.libs.json.JsObject
     hierarchy.last.numOfAssets should be(10)
   }
 
-  test("move recyclded asset to folder") {
+  test("move recycled asset to folder") {
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUserUncatFolder()))
     altitude.service.library.recycleAsset(asset.id.get)
 
@@ -140,8 +140,15 @@ import play.api.libs.json.JsObject
     val all = altitude.service.folder.getNonSysFolders()
 
     (altitude.service.folder.getByIdWithChildAssetCounts(folder1.id.get, all): Folder).numOfAssets should be (1)
-
   }
+
+/*
+  test("get recycled asset") {
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUserUncatFolder()))
+    altitude.service.library.recycleAsset(asset.id.get)
+    val trashed: Trash = altitude.service.library.recycleAsset(asset.id.get)
+  }
+*/
 
   test("restore recycled asset") {
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUserUncatFolder()))

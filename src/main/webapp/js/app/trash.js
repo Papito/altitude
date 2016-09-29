@@ -50,6 +50,10 @@ TrashViewModel = AssetsViewModel.extend({
     });
   },
 
+  showAssetDetail: function(view, asset) {
+    console.log('Trash asset view not implemented');
+  },
+
   moveAssetOrSelectedFromTrash: function(assetId) {
     var self = this;
 

@@ -13,7 +13,6 @@ import play.api.libs.json.{JsObject, JsNull, Json}
 class BaseApiController extends BaseController with GZipSupport {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  //FIXME: look into making these static
   val OK = Ok("{}")
 
   val HTTP_POST_VALIDATOR: Option[ApiValidator] = None
@@ -21,6 +20,7 @@ class BaseApiController extends BaseController with GZipSupport {
   val HTTP_UPDATE_VALIDATOR: Option[ApiValidator] = None
 
   def requestJson: Option[JsObject] = Some(
+    // FIXME: cache this in the request itself
     if (request.body.isEmpty) Json.obj() else Json.parse(request.body).as[JsObject]
   )
 
