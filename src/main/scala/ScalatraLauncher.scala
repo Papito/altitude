@@ -7,10 +7,8 @@ import org.scalatra.servlet.ScalatraListener
 import org.slf4j.LoggerFactory
 
 object ScalatraLauncher extends App  with SingleApplication {
-  private final val log = LoggerFactory.getLogger(getClass)
-
   val host = "localhost"
-  val port = 8080
+  val port = 9010
 
   val server = new Server
   server.setStopTimeout(5000)
