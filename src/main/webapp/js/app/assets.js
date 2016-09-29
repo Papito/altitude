@@ -30,6 +30,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     this.directoryNames = ko.observableArray();
     this.currentPath = ko.observable();
+    this.osDirSeparator = ko.observable();
     this.disableDoubleClick = false;
 
 
@@ -1287,6 +1288,7 @@ AssetsViewModel = BaseViewModel.extend({
       'successCallback': function (json) {
         self.directoryNames(json.directory_names);
         self.currentPath(json.current_path);
+        self.osDirSeparator(json.os_dir_separator);
       },
       'finally': function() {
         self.disableDoubleClick = false;
@@ -1326,14 +1328,14 @@ AssetsViewModel = BaseViewModel.extend({
       return;
     }
 
-    var dirSeparator = this.currentPath() == "/" ? '': '/';
-    this.getDirectoryNames(this.currentPath() + dirSeparator + directoryName);
+    this.getDirectoryNames(this.currentPath() + this.osDirSeparator() + directoryName);
   },
 
   selectImportDirectory: function() {
     var directoryName = $('#importDirectoryList').val() || '';
-    var dirSeparator = this.currentPath() == "/" ? '': '/';
-    var importDirectoryPath = this.currentPath() + dirSeparator + directoryName;
+    var importDirectoryPath = this.currentPath() == this.osDirSeparator()
+        ? this.currentPath()
+        : this.currentPath() + this.osDirSeparator() + directoryName;
     window.location = "/client/import?importDirectoryPath=" + importDirectoryPath;
   },
 

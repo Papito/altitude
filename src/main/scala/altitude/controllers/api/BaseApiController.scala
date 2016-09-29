@@ -33,7 +33,7 @@ class BaseApiController extends BaseController with GZipSupport {
 
   before() {
     log.info(
-      s"API ${request.getRequestURI} ${requestMethod.toUpperCase} request with ${request.body}")
+      s"API ${request.getRequestURI} ${requestMethod.toUpperCase} request with {${request.body}} and ${request.getParameterMap}")
 
     // verify that requests with request body are not empty
     checkPayload()

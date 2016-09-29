@@ -24,7 +24,7 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
 
   before() {
     if (!isAssetUri && !isApiUri) {
-      log.debug(s"Request START: ${request.getRequestURI}")
+      log.debug(s"Request START: ${request.getRequestURI} args: {${request.getParameterMap}}")
     }
 
     if (isApiUri || isClientUri) {

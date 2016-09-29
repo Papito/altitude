@@ -75,6 +75,7 @@ object Const {
     "Api.DATA" -> "data",
     "Api.PATH" -> "path",
     "Api.DIRECTORY_NAMES" -> "directory_names",
+    "Api.OS_DIR_SEPARATOR" -> "os_dir_separator",
     "Api.CURRENT_PATH" -> "current_path",
     "Api.Import.IMPORTED" -> "imported",
     "Api.ImportAsset.IMPORT_ASSET" -> "import_asset",

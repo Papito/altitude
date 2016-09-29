@@ -48,12 +48,19 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
     contentType = "application/json"
     Json.obj(
       C("Api.DIRECTORY_NAMES") -> directoryList,
-      C("Api.CURRENT_PATH") -> file.getAbsolutePath).toString()
+      C("Api.CURRENT_PATH") -> file.getAbsolutePath,
+      C("Api.OS_DIR_SEPARATOR") -> File.separator).toString()
   }
 
   get("/source/local/listing/parent") {
+    val path = this.params.getOrElse(C("Api.PATH"), userHomeDir)
+    log.debug(s"Path: $path")
     val file: File = new File(this.params.getOrElse(C("Api.PATH"), userHomeDir))
-    val parentFile = new File(file.getParent)
+    val parentPath: String = file.getParent
+    log.debug(s"Parent path: $parentPath")
+
+    val parentFile = if (parentPath != null) new File(parentPath) else file
+
     log.debug(s"Getting directory name list for $file")
     val files: Seq[File] = parentFile.listFiles().toSeq
     val directoryList: Seq[String] = files.filter(_.isDirectory == true).map(_.getName)
