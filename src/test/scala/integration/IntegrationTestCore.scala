@@ -18,7 +18,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   val log =  LoggerFactory.getLogger(getClass)
   Environment.ENV = Environment.TEST
 
-  /* Stores test app config overrides, since we run same tests with different app setup.
+  /* Stores test app config overrides, since we run same tests with a different app setup.
    */
   val config: Map[String, String]
 

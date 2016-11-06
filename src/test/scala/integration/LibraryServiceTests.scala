@@ -8,7 +8,7 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 import play.api.libs.json.JsObject
 
-@DoNotDiscover class LibraryServiceTests (val config: Map[String, String]) extends IntegrationTestCore {
+@DoNotDiscover class LibraryServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 
   test("recycle asset") {
     altitude.service.library.add(makeAsset(altitude.service.folder.getUserUncatFolder()))
