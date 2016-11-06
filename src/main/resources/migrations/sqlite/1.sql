@@ -48,6 +48,31 @@ CREATE TABLE trash  (
   recycled_at DATE DEFAULT (datetime('now', 'utc'))
 );
 
+CREATE TABLE metadata_field (
+  id varchar(24) PRIMARY KEY,
+  user_id varchar(24) NOT NULL,
+  name varchar(255) NOT NULL,
+  field_type varchar(255) NOT NULL,
+  is_fixed_value INT DEFAULT 0,
+  max_length INT,
+  created_at DATE NOT NULL,
+  updated_at DATE DEFAULT NULL
+);
+
+CREATE TABLE metadata_field_fixed_values (
+  field_id varchar(24) NOT NULL,
+  field_value TEXT NOT NULL,
+  created_at DATE NOT NULL,
+  updated_at DATE DEFAULT NULL
+);
+
+CREATE TABLE metadata_field_values (
+  field_id varchar(24) NOT NULL,
+  field_value TEXT NOT NULL,
+  created_at DATE NOT NULL,
+  updated_at DATE DEFAULT NULL
+);
+
 --CREATE TABLE import_profile (
 --  id varchar(24) PRIMARY KEY,
 --  name varchar(255) NOT NULL,
