@@ -6,7 +6,8 @@ import altitude.models.{MetadataField, User}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
-abstract class MetadataFieldDao (val app: Altitude) extends BaseJdbcDao("metadata_field") with altitude.dao.MetadataFieldDao {
+abstract class UserMetadataFieldDao (val app: Altitude)
+  extends BaseJdbcDao("metadata_field") with altitude.dao.UserMetadataFieldDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
@@ -16,7 +17,7 @@ abstract class MetadataFieldDao (val app: Altitude) extends BaseJdbcDao("metadat
       name = rec.get(C("MetadataField.NAME")).get.asInstanceOf[String],
       fieldType = rec.get(C("MetadataField.FIELD_TYPE")).get.asInstanceOf[String],
       isFixedList = rec.get(C("MetadataField.IS_FIXED_LIST")).get.asInstanceOf[Boolean],
-      maxLength = rec.get(C("MetadataField.IS_FIXED_LIST")).get.asInstanceOf[Int]
+      maxLength = Some(rec.get(C("MetadataField.IS_FIXED_LIST")).get.asInstanceOf[Int])
     )
     addCoreAttrs(model, rec)
     model

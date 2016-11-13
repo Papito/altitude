@@ -49,6 +49,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           bind[ImportProfileDao].toInstance(new mongo.ImportProfileDao(app))
           bind[FolderDao].toInstance(new mongo.FolderDao(app))
           bind[StatDao].toInstance(new mongo.StatDao(app))
+          bind[UserMetadataFieldDao].toInstance(new mongo.UserMetadataFieldDao(app))
         }
         case "postgres" => {
           DriverManager.registerDriver(new org.postgresql.Driver)
@@ -93,6 +94,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
   object service {
     val fileImport = new FileImportService(app)
     val metadata = new TikaMetadataService
+    val userMetadata = new UserMetadataService(app)
     val library = new LibraryService(app)
     val asset = new AssetService(app)
     val trash = new TrashService(app)

@@ -51,6 +51,11 @@ object Const {
     "Data.DATA" -> "data",
     "Stat.DIMENSION" -> "dimension",
     "Stat.DIM_VAL" -> "dim_val",
+    "MetadataField.NAME" -> "name",
+    "MetadataField.NAME_LC" -> "name_lc",
+    "MetadataField.FIELD_TYPE" -> "field_type",
+    "MetadataField.IS_FIXED_LIST" -> "is_fixed_list",
+    "MetadataField.MAX_LENGTH" -> "max_length",
 
     /*---------------------------------------------------------------------------
     API

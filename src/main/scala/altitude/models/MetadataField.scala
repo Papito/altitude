@@ -12,7 +12,7 @@ object MetadataField {
       name = (json \ C("MetadataField.NAME")).as[String],
       fieldType = (json \ C("MetadataField.FIELD_TYPE")).as[String],
       isFixedList = (json \ C("MetadataField.IS_FIXED_LIST")).as[Boolean],
-      maxLength = (json \ C("MetadataField.MAX_LENGTH")).as[Int]
+      maxLength = (json \ C("MetadataField.MAX_LENGTH")).asOpt[Int]
     ).withCoreAttr(json)
 }
 
@@ -21,8 +21,8 @@ case class MetadataField(
                   userId: String,
                   name: String,
                   fieldType: String,
-                  isFixedList: Boolean,
-                  maxLength: Int) extends BaseModel {
+                  isFixedList: Boolean = false,
+                  maxLength: Option[Int] = None) extends BaseModel {
 
   val nameLowercase = name.toLowerCase
 
