@@ -1,6 +1,6 @@
 package altitude.models
 
-import play.api.libs.json.{JsArray, Json, JsValue}
+import play.api.libs.json.{Json, JsValue}
 import altitude.{Const => C}
 
 import scala.language.implicitConversions
@@ -16,7 +16,8 @@ object MetadataField {
     ).withCoreAttr(json)
 }
 
-case class MetadataField(id: Option[String] = None,
+case class MetadataField(
+                  id: Option[String] = None,
                   userId: String,
                   name: String,
                   fieldType: String,

@@ -38,8 +38,8 @@ abstract class MetadataFieldDao (val app: Altitude) extends BaseJdbcDao("metadat
       metadataField.name,
       metadataField.nameLowercase,
       metadataField.fieldType,
-      metadataField.isFixedList,
-      metadataField.maxLength)
+      metadataField.isFixedList.asInstanceOf[Object],
+      metadataField.maxLength.asInstanceOf[Object])
 
     addRecord(jsonIn, sql, sqlVals)
   }
