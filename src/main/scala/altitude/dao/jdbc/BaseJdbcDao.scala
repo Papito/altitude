@@ -161,7 +161,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     if (res.size() > 1)
       throw new Exception("getById should return only a single result")
 
-    val rec = res.get(0)
+    val rec = res.head
 
     log.debug(s"RECORD: $rec")
     Some(rec.toMap[String, AnyRef])

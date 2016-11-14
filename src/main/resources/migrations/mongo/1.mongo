@@ -6,3 +6,5 @@ db.assets.createIndex({ "folder_id" : 1 })
 
 db.folders.createIndex({ "parent_id" : 1 })
 db.folders.createIndex({ "parent_id" : 1, "name_lc": 1 }, { unique: true } )
+
+db.metadata_fields.createIndex({ "user_id" : 1, "name_lc" : 1 }, { unique: true })
