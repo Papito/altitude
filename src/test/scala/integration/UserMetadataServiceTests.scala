@@ -13,9 +13,7 @@ import org.scalatest.Matchers._
     val metadataField = altitude.service.userMetadata.addField(
       MetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = "type"))
 
-    val storedMetadataField = altitude.service.userMetadata.getFieldByName(metadataField.name)
-
-    storedMetadataField should not be None
-    storedMetadataField.get.id should equal(metadataField.id)
+    altitude.service.userMetadata.getFieldByName(metadataField.name) should not be None
+    altitude.service.userMetadata.getFieldById(metadataField.id.get) should not be None
   }
 }
