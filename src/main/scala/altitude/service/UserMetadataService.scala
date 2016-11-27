@@ -34,4 +34,8 @@ class UserMetadataService(app: Altitude) extends BaseService[MetadataField](app)
   def getFieldById(id: String)(implicit user: User, txId: TransactionId = new TransactionId): Option[JsObject] = {
     METADATA_FIELD_DAO.getById(id)
   }
+
+  def getAllFields()(implicit user: User, txId: TransactionId = new TransactionId): List[JsObject] = {
+    METADATA_FIELD_DAO.getAll
+  }
 }
