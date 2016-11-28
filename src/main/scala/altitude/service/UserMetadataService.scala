@@ -2,7 +2,7 @@ package altitude.service
 
 import altitude.dao.{FolderDao, UserMetadataFieldDao}
 import altitude.models.search.{QueryResult, Query}
-import altitude.models.{User, MetadataField, Folder}
+import altitude.models.{User, UserMetadataField, Folder}
 import altitude.transactions.TransactionId
 import org.slf4j.LoggerFactory
 import altitude.{Altitude, Cleaners, Const => C}
@@ -10,18 +10,18 @@ import net.codingwell.scalaguice.InjectorExtensions._
 import play.api.libs.json.JsObject
 
 
-class UserMetadataService(app: Altitude) extends BaseService[MetadataField](app){
+class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](app){
   private final val log = LoggerFactory.getLogger(getClass)
   protected val METADATA_FIELD_DAO = app.injector.instance[UserMetadataFieldDao]
   override protected val DAO = null
 
-  def addField(metadataField: MetadataField)
-              (implicit user: User, txId: TransactionId = new TransactionId): MetadataField = {
+  def addField(metadataField: UserMetadataField)
+              (implicit user: User, txId: TransactionId = new TransactionId): UserMetadataField = {
     METADATA_FIELD_DAO.add(metadataField)
   }
 
   def getFieldByName(name: String)
-                    (implicit user: User, txId: TransactionId = new TransactionId): Option[MetadataField] = {
+                    (implicit user: User, txId: TransactionId = new TransactionId): Option[UserMetadataField] = {
     val q = Query(user, params = Map(C("MetadataField.NAME_LC") -> name.toLowerCase))
     val res: QueryResult = METADATA_FIELD_DAO.query(q)
 

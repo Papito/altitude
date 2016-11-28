@@ -5,8 +5,8 @@ import altitude.{Const => C}
 
 import scala.language.implicitConversions
 
-object MetadataField {
-  implicit def fromJson(json: JsValue): MetadataField = MetadataField(
+object UserMetadataField {
+  implicit def fromJson(json: JsValue): UserMetadataField = UserMetadataField(
       id = (json \ C("Base.ID")).asOpt[String],
       userId = (json \ C("Base.USER_ID")).as[String],
       name = (json \ C("MetadataField.NAME")).as[String],
@@ -16,7 +16,7 @@ object MetadataField {
     ).withCoreAttr(json)
 }
 
-case class MetadataField(
+case class UserMetadataField(
                   id: Option[String] = None,
                   userId: String,
                   name: String,

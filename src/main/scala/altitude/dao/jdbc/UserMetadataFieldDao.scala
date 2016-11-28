@@ -2,7 +2,7 @@ package altitude.dao.jdbc
 
 import altitude.transactions.TransactionId
 import altitude.{Const => C, Altitude}
-import altitude.models.{MetadataField, User}
+import altitude.models.{UserMetadataField, User}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
@@ -11,7 +11,7 @@ abstract class UserMetadataFieldDao (val app: Altitude)
   private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
-    val model = MetadataField(
+    val model = UserMetadataField(
       id = Some(rec.get(C("Base.ID")).get.asInstanceOf[String]),
       userId = rec.get(C("Base.USER_ID")).get.asInstanceOf[String],
       name = rec.get(C("MetadataField.NAME")).get.asInstanceOf[String],
@@ -24,7 +24,7 @@ abstract class UserMetadataFieldDao (val app: Altitude)
   }
 
   override def add(jsonIn: JsObject)(implicit user: User,  txId: TransactionId): JsObject = {
-    val metadataField = jsonIn: MetadataField
+    val metadataField = jsonIn: UserMetadataField
 
     val sql = s"""
         INSERT INTO $tableName (
