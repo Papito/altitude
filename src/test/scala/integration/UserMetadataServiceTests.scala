@@ -19,7 +19,8 @@ import org.scalatest.Matchers._
       MetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = "type"))
 
     SET_USER_1()
-    altitude.service.userMetadata.getFieldByName(metadataField.name) should not be None
+    altitude.service.userMetadata.getFieldByName(metadataField.name.toLowerCase) should not be None
+    altitude.service.userMetadata.getFieldByName(metadataField.name.toUpperCase) should not be None
     altitude.service.userMetadata.getFieldById(metadataField.id.get) should not be None
   }
 
@@ -38,5 +39,14 @@ import org.scalatest.Matchers._
 
     SET_USER_2()
     altitude.service.userMetadata.getAllFields.length should be(1)
+  }
+
+  test("delete user metadata field") {
+    val metadataField = altitude.service.userMetadata.addField(
+      MetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = "type"))
+
+    altitude.service.userMetadata.getAllFields.length should be(1)
+    altitude.service.userMetadata.deleteFieldById(metadataField.id.get)
+    altitude.service.userMetadata.getAllFields shouldBe empty
   }
 }

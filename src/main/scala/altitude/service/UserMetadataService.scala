@@ -31,11 +31,14 @@ class UserMetadataService(app: Altitude) extends BaseService[MetadataField](app)
     if (!res.nonEmpty) None else Some(res.records.head)
   }
 
-  def getFieldById(id: String)(implicit user: User, txId: TransactionId = new TransactionId): Option[JsObject] = {
+  def getFieldById(id: String)(implicit user: User, txId: TransactionId = new TransactionId): Option[JsObject] =
     METADATA_FIELD_DAO.getById(id)
-  }
 
-  def getAllFields()(implicit user: User, txId: TransactionId = new TransactionId): List[JsObject] = {
+
+  def getAllFields()(implicit user: User, txId: TransactionId = new TransactionId): List[JsObject] =
     METADATA_FIELD_DAO.getAll
-  }
+
+
+  def deleteFieldById(id: String)(implicit user: User, txId: TransactionId = new TransactionId): Int =
+    METADATA_FIELD_DAO.deleteById(id)
 }
