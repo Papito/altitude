@@ -1,8 +1,9 @@
 package altitude.service
 
 import altitude.dao.{FolderDao, UserMetadataFieldDao}
+import altitude.exceptions.ValidationException
 import altitude.models.search.{QueryResult, Query}
-import altitude.models.{User, UserMetadataField, Folder}
+import altitude.models.{FieldType, User, UserMetadataField, Folder}
 import altitude.transactions.TransactionId
 import org.slf4j.LoggerFactory
 import altitude.{Altitude, Cleaners, Const => C}
@@ -17,6 +18,14 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
 
   def addField(metadataField: UserMetadataField)
               (implicit user: User, txId: TransactionId = new TransactionId): UserMetadataField = {
+
+    if (!FieldType.values.exists(v => v.toString == metadataField.fieldType.toUpperCase)) {
+      val ex = ValidationException()
+      ex.errors += (C("MetadataField.FIELD_TYPE") ->
+        C("msg.err.wrong_value").format(FieldType.values.mkString(", ")))
+      throw ex
+    }
+
     METADATA_FIELD_DAO.add(metadataField)
   }
 

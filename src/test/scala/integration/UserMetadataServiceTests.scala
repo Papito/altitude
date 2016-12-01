@@ -1,5 +1,6 @@
 package integration
 
+import altitude.exceptions.ValidationException
 import altitude.models._
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
@@ -12,11 +13,11 @@ import org.scalatest.Matchers._
     //altitude.service.library.add(makeAsset(altitude.service.folder.getUserUncatFolder()))
     SET_USER_1()
     val metadataField = altitude.service.userMetadata.addField(
-      UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = "type"))
+      UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = FieldType.STRING.toString))
 
     SET_USER_2()
     altitude.service.userMetadata.addField(
-      UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = "type"))
+      UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = FieldType.NUMBER.toString))
 
     SET_USER_1()
     altitude.service.userMetadata.getFieldByName(metadataField.name.toLowerCase) should not be None
@@ -26,13 +27,13 @@ import org.scalatest.Matchers._
 
   test("get all user metadata fields") {
     altitude.service.userMetadata.addField(
-      UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName1", fieldType = "typ1"))
+      UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName1", fieldType = FieldType.STRING.toString))
     altitude.service.userMetadata.addField(
-      UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName2", fieldType = "type2"))
+      UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName2", fieldType = FieldType.STRING.toString))
 
     SET_USER_2()
     altitude.service.userMetadata.addField(
-      UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = "type"))
+      UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = FieldType.STRING.toString))
 
     SET_USER_1()
     altitude.service.userMetadata.getAllFields.length should be(2)
@@ -43,10 +44,18 @@ import org.scalatest.Matchers._
 
   test("delete user metadata field") {
     val metadataField = altitude.service.userMetadata.addField(
-      UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = "type"))
+      UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = FieldType.FLAG.toString))
 
     altitude.service.userMetadata.getAllFields.length should be(1)
     altitude.service.userMetadata.deleteFieldById(metadataField.id.get)
     altitude.service.userMetadata.getAllFields shouldBe empty
+  }
+
+  test("add invalid field type") {
+
+    intercept[ValidationException] {
+      altitude.service.userMetadata.addField(
+        UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = "SO_INVALID"))
+    }
   }
 }

@@ -5,6 +5,13 @@ import altitude.{Const => C}
 
 import scala.language.implicitConversions
 
+object FieldType extends Enumeration {
+  val STRING = Value("STRING")
+  val NUMBER = Value("NUMBER")
+  val DATE = Value("DATE")
+  val FLAG = Value("FLAG")
+}
+
 object UserMetadataField {
   implicit def fromJson(json: JsValue): UserMetadataField = UserMetadataField(
       id = (json \ C("Base.ID")).asOpt[String],
