@@ -138,6 +138,12 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     recordJson
   }
 
+  protected def addRecords(q: String, vals: List[Object])
+                         (implicit  user: User, txId: TransactionId) = {
+    log.debug(s"INSERT MULTIPLE SQL: $q. ARGS: ${vals.toString()}")
+    new QueryRunner().update(conn, q, vals:_*)
+  }
+
   protected def manyBySqlQuery(sql: String, values: List[Object] = List())
                               (implicit txId: TransactionId): List[Map[String, AnyRef]] = {
     val runner: QueryRunner = new QueryRunner()

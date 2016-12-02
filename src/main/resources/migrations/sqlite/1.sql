@@ -54,23 +54,22 @@ CREATE TABLE metadata_field (
   name varchar(255) NOT NULL,
   name_lc varchar(255) NOT NULL,
   field_type varchar(255) NOT NULL,
-  is_fixed_list INT DEFAULT 0,
-  max_length INT,
-  created_at DATE NOT NULL,
+  max_length INT DEFAULT NULL,
+  created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );
 
 CREATE TABLE metadata_field_fixed_list (
   field_id varchar(24) NOT NULL,
   list_value TEXT NOT NULL,
-  created_at DATE NOT NULL,
+  created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );
 
 CREATE TABLE metadata_field_values (
   field_id varchar(24) NOT NULL,
   field_value TEXT NOT NULL,
-  created_at DATE NOT NULL,
+  created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );
 

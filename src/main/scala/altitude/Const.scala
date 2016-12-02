@@ -56,6 +56,8 @@ object Const {
     "MetadataField.FIELD_TYPE" -> "field_type",
     "MetadataField.FIXED_LIST" -> "fixed_list",
     "MetadataField.MAX_LENGTH" -> "max_length",
+    "MetadataFixedList.FIELD_ID" -> "field_id",
+    "MetadataFixedList.LIST_VALUE" -> "list_value",
 
     /*---------------------------------------------------------------------------
     API

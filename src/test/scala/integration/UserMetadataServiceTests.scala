@@ -7,6 +7,22 @@ import org.scalatest.Matchers._
 
 @DoNotDiscover class UserMetadataServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 
+  test("add/get user fixed list field") {
+    val metadataField = altitude.service.userMetadata.addField(
+      UserMetadataField(
+        userId = CURRENT_USER_ID,
+        name = "field name",
+        fieldType = FieldType.STRING.toString,
+        fixedList = Some(List("one", "two", "three"))))
+
+    val storedFieldOpt = altitude.service.userMetadata.getFieldById(metadataField.id.get)
+    storedFieldOpt should not be None
+    val storedField: UserMetadataField = storedFieldOpt.get
+    storedField.fixedList should not be None
+    storedField.fixedList.get.length should be(metadataField.fixedList.get.length)
+  }
+
+/*
   test("add/get user metadata fields") {
     SET_USER_1()
     val metadataField = altitude.service.userMetadata.addField(
@@ -39,21 +55,6 @@ import org.scalatest.Matchers._
     altitude.service.userMetadata.getAllFields.length should be(1)
   }
 
-  test("add/get user fixed list field") {
-    val metadataField = altitude.service.userMetadata.addField(
-      UserMetadataField(
-        userId = CURRENT_USER_ID,
-        name = "field name",
-        fieldType = FieldType.STRING.toString,
-        fixedList = Some(List("one", "two", "three"))))
-
-    val storedFieldOpt = altitude.service.userMetadata.getFieldById(metadataField.id.get)
-    storedFieldOpt should not be None
-    val storedField: UserMetadataField = storedFieldOpt.get
-    storedField.fixedList should not be None
-    storedField.fixedList.get.length should be(metadataField.fixedList.get.length)
-  }
-
   test("delete user metadata field") {
     val metadataField = altitude.service.userMetadata.addField(
       UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = FieldType.FLAG.toString))
@@ -70,4 +71,5 @@ import org.scalatest.Matchers._
         UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = "SO_INVALID"))
     }
   }
+*/
 }

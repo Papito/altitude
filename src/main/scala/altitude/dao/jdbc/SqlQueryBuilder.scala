@@ -26,12 +26,12 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) extends Query
       case _ => s"""WHERE ${whereClauses.mkString(" AND ")}"""
     }
 
-    val folderClause = folderIds.isEmpty match {
-      case true => ""
-      case false => whereClause.isEmpty match {
+    val folderClause = folderIds.nonEmpty match {
+      case true => whereClause.isEmpty match {
         case false => s" AND ${C("Asset.FOLDER_ID")} in (" + folderIds.toSeq.map(x => "?").mkString(",") + ")"
         case true => s"WHERE ${C("Asset.FOLDER_ID")} in (" + folderIds.toSeq.map(x => "?").mkString(",") + ")"
       }
+      case false => ""
     }
 
     val whereSegment = s"$whereClause $folderClause"
