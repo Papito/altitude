@@ -19,6 +19,7 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
   def addField(metadataField: UserMetadataField)
               (implicit user: User, txId: TransactionId = new TransactionId): UserMetadataField = {
 
+    // verify that the field type is allowed
     if (!FieldType.values.exists(v => v.toString == metadataField.fieldType.toUpperCase)) {
       val ex = ValidationException()
       ex.errors += (C("MetadataField.FIELD_TYPE") ->

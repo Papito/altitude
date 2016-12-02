@@ -54,7 +54,7 @@ object Const {
     "MetadataField.NAME" -> "name",
     "MetadataField.NAME_LC" -> "name_lc",
     "MetadataField.FIELD_TYPE" -> "field_type",
-    "MetadataField.IS_FIXED_LIST" -> "is_fixed_list",
+    "MetadataField.FIXED_LIST" -> "fixed_list",
     "MetadataField.MAX_LENGTH" -> "max_length",
 
     /*---------------------------------------------------------------------------

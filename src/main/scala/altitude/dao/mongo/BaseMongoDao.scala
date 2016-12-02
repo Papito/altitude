@@ -86,6 +86,8 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
 
     val o: Option[DBObject] = COLLECTION.findOneByID(id)
 
+    log.debug(s"RETRIEVED object: $o", C.LogTag.DB)
+
     o.isDefined match {
       case false => None
       case true =>

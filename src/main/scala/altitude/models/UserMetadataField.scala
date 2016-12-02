@@ -1,6 +1,6 @@
 package altitude.models
 
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json._
 import altitude.{Const => C}
 
 import scala.language.implicitConversions
@@ -8,17 +8,17 @@ import scala.language.implicitConversions
 object FieldType extends Enumeration {
   val STRING = Value("STRING")
   val NUMBER = Value("NUMBER")
-  val DATE = Value("DATE")
   val FLAG = Value("FLAG")
 }
 
 object UserMetadataField {
-  implicit def fromJson(json: JsValue): UserMetadataField = UserMetadataField(
+  implicit def fromJson(json: JsValue): UserMetadataField =
+    UserMetadataField(
       id = (json \ C("Base.ID")).asOpt[String],
       userId = (json \ C("Base.USER_ID")).as[String],
       name = (json \ C("MetadataField.NAME")).as[String],
       fieldType = (json \ C("MetadataField.FIELD_TYPE")).as[String],
-      isFixedList = (json \ C("MetadataField.IS_FIXED_LIST")).as[Boolean],
+      fixedList = (json \ C("MetadataField.FIXED_LIST")).asOpt[List[String]],
       maxLength = (json \ C("MetadataField.MAX_LENGTH")).asOpt[Int]
     ).withCoreAttr(json)
 }
@@ -28,7 +28,7 @@ case class UserMetadataField(
                   userId: String,
                   name: String,
                   fieldType: String,
-                  isFixedList: Boolean = false,
+                  fixedList: Option[List[String]] = None,
                   maxLength: Option[Int] = None) extends BaseModel {
 
   val nameLowercase = name.toLowerCase
@@ -38,7 +38,9 @@ case class UserMetadataField(
       C("MetadataField.NAME") -> name,
       C("MetadataField.NAME_LC") -> nameLowercase,
       C("MetadataField.FIELD_TYPE") -> fieldType,
-      C("MetadataField.IS_FIXED_LIST") -> isFixedList,
+      C("MetadataField.FIXED_LIST") -> {
+        if (fixedList.isEmpty) JsNull else Json.toJson(fixedList.get)
+      },
       C("MetadataField.MAX_LENGTH") -> maxLength
     ) ++ coreJsonAttrs
 

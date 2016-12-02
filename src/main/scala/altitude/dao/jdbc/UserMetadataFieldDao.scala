@@ -16,7 +16,6 @@ abstract class UserMetadataFieldDao (val app: Altitude)
       userId = rec.get(C("Base.USER_ID")).get.asInstanceOf[String],
       name = rec.get(C("MetadataField.NAME")).get.asInstanceOf[String],
       fieldType = rec.get(C("MetadataField.FIELD_TYPE")).get.asInstanceOf[String],
-      isFixedList = rec.get(C("MetadataField.IS_FIXED_LIST")).get.asInstanceOf[Boolean],
       maxLength = Some(rec.get(C("MetadataField.IS_FIXED_LIST")).get.asInstanceOf[Int])
     )
     addCoreAttrs(model, rec)
@@ -30,8 +29,8 @@ abstract class UserMetadataFieldDao (val app: Altitude)
         INSERT INTO $tableName (
              $CORE_SQL_COLS_FOR_INSERT, ${C("Base.USER_ID")},
              ${C("MetadataField.NAME")}, ${C("MetadataField.NAME_LC")}, ${C("MetadataField.FIELD_TYPE")},
-             ${C("MetadataField.IS_FIXED_LIST")}, ${C("IS_FIXED_LIST.NAME")})
-            VALUES ($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?, ?, ?, ?)
+             ${C("MetadataField.IS_FIXED_LIST")})
+            VALUES ($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?, ?, ?)
     """
 
     val sqlVals: List[Object] = List(
@@ -39,7 +38,6 @@ abstract class UserMetadataFieldDao (val app: Altitude)
       metadataField.name,
       metadataField.nameLowercase,
       metadataField.fieldType,
-      metadataField.isFixedList.asInstanceOf[Object],
       metadataField.maxLength.asInstanceOf[Object])
 
     addRecord(jsonIn, sql, sqlVals)
