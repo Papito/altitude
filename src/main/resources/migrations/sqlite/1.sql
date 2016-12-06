@@ -65,6 +65,8 @@ CREATE TABLE metadata_field_fixed_list (
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );
+CREATE INDEX fixed_list_field_id ON metadata_field_fixed_list(field_id);
+CREATE UNIQUE INDEX fixed_list_field_and_value ON metadata_field_fixed_list(field_id, list_value);
 
 CREATE TABLE metadata_field_values (
   field_id varchar(24) NOT NULL,
@@ -72,6 +74,8 @@ CREATE TABLE metadata_field_values (
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );
+CREATE INDEX field_values_field_id ON metadata_field_values(field_id);
+CREATE UNIQUE INDEX field_values_field_and_value ON metadata_field_values(field_id, field_value);
 
 --CREATE TABLE import_profile (
 --  id varchar(24) PRIMARY KEY,

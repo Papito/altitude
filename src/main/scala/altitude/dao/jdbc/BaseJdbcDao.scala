@@ -86,9 +86,12 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     numDeleted
   }
 
-  override def query(query: Query)
+  override def query(q: Query)(implicit user: User, txId: TransactionId): QueryResult =
+    this.query(q, SQL_QUERY_BUILDER)
+
+  def query(query: Query, sqlQueryBuilder: SqlQueryBuilder)
                     (implicit user: User, txId: TransactionId): QueryResult = {
-    val sqlQuery: SqlQuery = SQL_QUERY_BUILDER.toSelectQuery(query)
+    val sqlQuery: SqlQuery = sqlQueryBuilder.toSelectQuery(query)
     val recs = manyBySqlQuery(sqlQuery.queryString, sqlQuery.selectBindValues)
 
     // do not perform a count query if we got zero results in the first place
@@ -232,6 +235,8 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     increment(id, field, -count)
   }
 
+  // Make a string of SQL placeholders for a list - such as "? , ? ,?, ?"
+  protected def makeSqlPlacaholders(s: Seq[AnyRef]): String = s.map(x => "?").mkString(",")
 
   /*
     Implementations should define this method, which returns an optional

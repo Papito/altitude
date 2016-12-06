@@ -65,6 +65,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           //bind[ImportProfileDao].toInstance(new postgres.ImportProfileDao(app))
           bind[FolderDao].toInstance(new postgres.FolderDao(app))
           bind[StatDao].toInstance(new postgres.StatDao(app))
+          bind[UserMetadataFieldDao].toInstance(new postgres.UserMetadataFieldDao(app))
         }
         case "sqlite" => {
           DriverManager.registerDriver(new org.sqlite.JDBC)

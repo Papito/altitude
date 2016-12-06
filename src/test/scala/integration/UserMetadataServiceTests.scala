@@ -17,12 +17,18 @@ import org.scalatest.Matchers._
 
     val storedFieldOpt = altitude.service.userMetadata.getFieldById(metadataField.id.get)
     storedFieldOpt should not be None
-    val storedField: UserMetadataField = storedFieldOpt.get
+    var storedField: UserMetadataField = storedFieldOpt.get
+    storedField.fixedList should not be None
+    storedField.fixedList.get.length should be(metadataField.fixedList.get.length)
+
+    // get the same field by name (which triggers a multi-record query)
+    val storedFieldOpt2 = altitude.service.userMetadata.getFieldByName(metadataField.name)
+    storedFieldOpt2 should not be None
+    storedField = storedFieldOpt2.get
     storedField.fixedList should not be None
     storedField.fixedList.get.length should be(metadataField.fixedList.get.length)
   }
 
-/*
   test("add/get user metadata fields") {
     SET_USER_1()
     val metadataField = altitude.service.userMetadata.addField(
@@ -71,5 +77,4 @@ import org.scalatest.Matchers._
         UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = "SO_INVALID"))
     }
   }
-*/
 }
