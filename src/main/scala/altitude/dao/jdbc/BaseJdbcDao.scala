@@ -62,11 +62,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   override def getById(id: String)(implicit user: User, txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
     val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(ONE_SQL, List(id))
-
-    rec match {
-      case None => None
-      case _ => Some(makeModel(rec.get))
-    }
+    if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
 
   override def deleteByQuery(q: Query)(implicit user: User, txId: TransactionId): Int = {
@@ -239,13 +235,13 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
   /*
     Implementations should define this method, which returns an optional
-    JSON object which is guaranteed to serialize into a valid model of interest.
+    JSON object which is guaranteed to serialize into a valid model backing this class.
     JSON can be constructed directly, but best to create a model instance first
     and return it, triggering implicit conversion.
    */
   protected def makeModel(rec: Map[String, AnyRef]): JsObject
 
-  /* Given a model and an SQL record, decipher and set certain core properties
+  /* Given a model and an SQL record, calculate and set properties common to most models
    */
   protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit
 }
