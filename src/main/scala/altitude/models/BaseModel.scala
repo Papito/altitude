@@ -1,7 +1,5 @@
 package altitude.models
 
-import java.text.SimpleDateFormat
-
 import altitude.{Const => C, Util}
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat

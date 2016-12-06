@@ -1,6 +1,6 @@
 package altitude.dao.jdbc
 
-import altitude.models.{User, Folder}
+import altitude.models.{Folder, User}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
 import org.slf4j.LoggerFactory

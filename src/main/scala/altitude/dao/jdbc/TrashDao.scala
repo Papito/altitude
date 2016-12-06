@@ -1,10 +1,9 @@
 package altitude.dao.jdbc
 
+import altitude.models.{AssetType, Trash, User}
 import altitude.transactions.TransactionId
-import altitude.{Const => C, Util, Altitude}
-import altitude.models.{User, AssetType, BaseModel, Trash}
-import org.joda.time.{DateTime, LocalDateTime}
-import org.joda.time.format.DateTimeFormat
+import altitude.{Altitude, Const => C}
+import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 

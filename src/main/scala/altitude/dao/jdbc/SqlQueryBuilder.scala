@@ -2,8 +2,8 @@ package altitude.dao.jdbc
 
 import altitude.dao.QueryParser
 import altitude.models.search.Query
-import org.slf4j.LoggerFactory
 import altitude.{Const => C}
+import org.slf4j.LoggerFactory
 
 class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) extends QueryParser {
   private final val log = LoggerFactory.getLogger(getClass)

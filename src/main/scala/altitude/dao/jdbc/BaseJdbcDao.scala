@@ -3,8 +3,8 @@ package altitude.dao.jdbc
 import java.sql.Connection
 
 import altitude.dao.BaseDao
-import altitude.models.{User, BaseModel}
 import altitude.models.search.{Query, QueryResult}
+import altitude.models.{BaseModel, User}
 import altitude.transactions.{JdbcTransactionManager, TransactionId}
 import altitude.{Const => C, Util}
 import net.codingwell.scalaguice.InjectorExtensions._

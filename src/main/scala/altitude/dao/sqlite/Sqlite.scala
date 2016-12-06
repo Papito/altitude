@@ -3,8 +3,8 @@ package altitude.dao.sqlite
 
 import altitude.models.BaseModel
 import altitude.{Const => C}
-import org.joda.time.{DateTimeZone, DateTime}
-import org.joda.time.format.{DateTimeFormatter, DateTimeFormat}
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
+import org.joda.time.{DateTime, DateTimeZone}
 
 trait Sqlite {
   protected def CORE_SQL_VALS_FOR_INSERT = "?"

@@ -1,8 +1,8 @@
 package altitude.dao.mongo
 
 import altitude.models.User
-import altitude.{Const => C, Altitude}
 import altitude.transactions.TransactionId
+import altitude.{Altitude, Const => C}
 import com.mongodb.casbah.Imports._
 
 class StatDao(val app: Altitude) extends BaseMongoDao("altitude_stats") with altitude.dao.StatDao {

@@ -1,12 +1,11 @@
 package altitude.dao.jdbc
 
+import altitude.models.{Stat, User}
 import altitude.transactions.TransactionId
-import altitude.Altitude
-import altitude.models.{BaseModel, User, Stat}
-import altitude.{Const => C}
+import altitude.{Altitude, Const => C}
 import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsString, JsObject}
+import play.api.libs.json.JsObject
 
 abstract class StatDao (val app: Altitude) extends BaseJdbcDao("stats") with altitude.dao.StatDao {
   private final val log = LoggerFactory.getLogger(getClass)

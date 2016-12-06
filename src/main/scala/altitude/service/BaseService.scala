@@ -5,8 +5,8 @@ import altitude.Cleaners.Cleaner
 import altitude.Validators.Validator
 import altitude.dao.BaseDao
 import altitude.exceptions.{DuplicateException, NotFoundException}
-import altitude.models.{User, BaseModel}
 import altitude.models.search.{Query, QueryResult}
+import altitude.models.{BaseModel, User}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory

@@ -1,12 +1,12 @@
 package altitude.controllers.api
 
-import altitude.Validators.{ApiValidator, Validator}
-import altitude.exceptions.{NotFoundException, ValidationException}
-import altitude.models.{Preview, Data, Asset}
+import altitude.Validators.ApiValidator
+import altitude.exceptions.NotFoundException
+import altitude.models.Data
 import altitude.{Const => C}
-import org.scalatra.{Ok, ResponseStatus, BadRequest}
+import org.scalatra.Ok
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.Json
 
 class AssetController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)

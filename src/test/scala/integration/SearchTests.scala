@@ -1,7 +1,7 @@
 package integration
 
 import altitude.models.search.Query
-import altitude.models.{AssetType, Asset, Folder}
+import altitude.models.{Asset, AssetType, Folder}
 import altitude.{Const => C, Util}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._

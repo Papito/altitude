@@ -1,21 +1,16 @@
 package altitude.controllers
 
 import java.io.{File, PrintWriter, StringWriter}
-import java.util.concurrent.atomic.AtomicInteger
-
 import java.util.concurrent.Executors
-
-import org.json4s.JsonAST.{JField, JString}
-import org.json4s.{JValue, DefaultFormats, Formats}
-import org.scalatra.SessionSupport
+import java.util.concurrent.atomic.AtomicInteger
 
 import altitude.controllers.web.BaseWebController
 import altitude.exceptions.{AllDone, DuplicateException, MetadataExtractorException}
-import altitude.models.{User, Asset, FileImportAsset}
+import altitude.models.{Asset, FileImportAsset, User}
 import altitude.{Const => C}
-import org.json4s.JsonAST.JObject
-import org.json4s._
-import org.scalatra._
+import org.json4s.JsonAST.{JField, JObject, JString}
+import org.json4s.{DefaultFormats, Formats, JValue, _}
+import org.scalatra.{SessionSupport, _}
 import org.scalatra.atmosphere._
 import org.scalatra.json.{JValueResult, JacksonJsonSupport}
 import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintExceededException}

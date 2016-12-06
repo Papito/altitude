@@ -1,12 +1,11 @@
 package altitude.dao.jdbc
 
-import altitude.models.search.{QueryResult, Query}
+import altitude.models.search.{Query, QueryResult}
+import altitude.models.{User, UserMetadataField}
 import altitude.transactions.TransactionId
-import altitude.{Const => C, Altitude}
-import altitude.models.{UserMetadataField, User}
+import altitude.{Altitude, Const => C}
 import org.slf4j.LoggerFactory
-import play.api.libs.json
-import play.api.libs.json.{Json, JsString, JsArray, JsObject}
+import play.api.libs.json.{JsObject, Json}
 
 abstract class UserMetadataFieldDao (val app: Altitude)
   extends BaseJdbcDao("metadata_field") with altitude.dao.UserMetadataFieldDao {

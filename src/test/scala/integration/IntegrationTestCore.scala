@@ -2,7 +2,7 @@ package integration
 
 import java.io.File
 
-import altitude.models.{User, AssetType, Asset, Folder}
+import altitude.models.{Asset, AssetType, Folder, User}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Environment, Util}
 import com.google.inject.{AbstractModule, Guice}

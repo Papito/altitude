@@ -2,10 +2,10 @@ package altitude.service
 
 import altitude.Altitude
 import altitude.dao.TrashDao
-import altitude.models.{User, Stats, Trash}
+import altitude.models.{Trash, User}
 import altitude.transactions.TransactionId
-import org.slf4j.LoggerFactory
 import net.codingwell.scalaguice.InjectorExtensions._
+import org.slf4j.LoggerFactory
 import play.api.libs.json.JsValue
 
 class TrashService(app: Altitude) extends BaseService[Trash](app) {

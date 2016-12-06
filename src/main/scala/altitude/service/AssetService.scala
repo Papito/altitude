@@ -2,12 +2,9 @@ package altitude.service
 
 import altitude.Altitude
 import altitude.dao.AssetDao
-import altitude.models.{Stats, Asset}
-import altitude.models.search.Query
-import altitude.transactions.TransactionId
+import altitude.models.Asset
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
-import play.api.libs.json.JsObject
 
 class AssetService(app: Altitude) extends BaseService[Asset](app) {
   /*

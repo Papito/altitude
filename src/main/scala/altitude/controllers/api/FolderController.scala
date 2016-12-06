@@ -1,7 +1,6 @@
 package altitude.controllers.api
 
 import altitude.Validators.ApiValidator
-import altitude.exceptions.ValidationException
 import altitude.models.Folder
 import altitude.{Const => C}
 import org.scalatra.Ok

@@ -1,13 +1,13 @@
 package altitude.service
 
-import altitude.dao.{FolderDao, UserMetadataFieldDao}
+import altitude.dao.UserMetadataFieldDao
 import altitude.exceptions.ValidationException
-import altitude.models.search.{QueryResult, Query}
-import altitude.models.{FieldType, User, UserMetadataField, Folder}
+import altitude.models.search.{Query, QueryResult}
+import altitude.models.{FieldType, User, UserMetadataField}
 import altitude.transactions.TransactionId
-import org.slf4j.LoggerFactory
-import altitude.{Altitude, Cleaners, Const => C}
+import altitude.{Altitude, Const => C}
 import net.codingwell.scalaguice.InjectorExtensions._
+import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
 

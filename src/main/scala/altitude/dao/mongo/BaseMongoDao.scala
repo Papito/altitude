@@ -1,8 +1,8 @@
 package altitude.dao.mongo
 
 import altitude.dao.BaseDao
-import altitude.models.{User, BaseModel}
 import altitude.models.search.{Query, QueryResult}
+import altitude.models.{BaseModel, User}
 import altitude.transactions.TransactionId
 import altitude.{Configuration, Const => C, Environment, Util}
 import com.mongodb.casbah.Imports._

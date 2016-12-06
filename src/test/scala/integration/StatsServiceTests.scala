@@ -1,10 +1,8 @@
 package integration
 
-import altitude.Const
-import altitude.models.search.Query
-import altitude.models.{Trash, Stats, Asset, Folder}
-import org.scalatest.Matchers._
+import altitude.models.{Asset, Folder, Stats, Trash}
 import org.scalatest.DoNotDiscover
+import org.scalatest.Matchers._
 
 @DoNotDiscover class StatsServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 
