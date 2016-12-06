@@ -137,8 +137,6 @@ abstract class UserMetadataFieldDao (val app: Altitude)
           (fieldId.toString, valuesAsList.sorted)
     }
 
-    println(fixedListValLookup)
-
     /* We have a clean lookup map of fixed values - as a list, where the key is the field id.
        This is easy and fast to join as the final result.
     */
