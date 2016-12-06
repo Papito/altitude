@@ -89,10 +89,8 @@ abstract class UserMetadataFieldDao (val app: Altitude)
     // set the fixed list values IF ANY to the json object
     fixedListValues.isEmpty match {
       case true => metadataFieldJson
-      case false => {
-        Some(metadataFieldJson.get ++ JsObject(Seq(
+      case false => Some(metadataFieldJson.get ++ JsObject(Seq(
           C("MetadataField.FIXED_LIST") -> Json.toJson(fixedListValues))))
-      }
     }
   }
 
@@ -148,10 +146,8 @@ abstract class UserMetadataFieldDao (val app: Altitude)
       // this is identical to what we do in getById()
       fixedListValues.isEmpty match {
         case true => metadataFieldJson
-        case false => {
-          metadataFieldJson ++ JsObject(Seq(
+        case false => metadataFieldJson ++ JsObject(Seq(
             C("MetadataField.FIXED_LIST") -> Json.toJson(fixedListValues)))
-        }
       }
     }
 
