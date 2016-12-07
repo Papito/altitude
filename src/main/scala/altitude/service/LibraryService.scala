@@ -217,8 +217,8 @@ class LibraryService(app: Altitude) {
   }
 
   def moveAssetsToFolder(assetIds: Set[String], folderId: String)
-                        (implicit user: User, txId: TransactionId = new TransactionId): Unit = {
-    txManager.withTransaction[Unit] {
+                        (implicit user: User, txId: TransactionId = new TransactionId) = {
+    txManager.withTransaction {
       assetIds.foreach {assetId =>
 
         // cannot have assets in root folder - just other folders
@@ -271,10 +271,10 @@ class LibraryService(app: Altitude) {
   }
 
   def recycleAssets(assetIds: Set[String])
-                   (implicit user: User, txId: TransactionId = new TransactionId): Unit = {
+                   (implicit user: User, txId: TransactionId = new TransactionId) = {
     var totalBytes = 0L
 
-    txManager.withTransaction[Unit] {
+    txManager.withTransaction {
       assetIds.foreach{assetId =>
         val asset: Asset = this.getById(assetId)
         app.service.trash.recycleAsset(assetId)
