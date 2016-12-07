@@ -7,6 +7,20 @@ import org.scalatest.Matchers._
 
 @DoNotDiscover class UserMetadataServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 
+  test("delete user field") {
+    val metadataField = altitude.service.userMetadata.addField(
+      UserMetadataField(
+        userId = CURRENT_USER_ID,
+        name = "fieldName",
+        fieldType = FieldType.FLAG.toString,
+        constraintList = Some(List("one", "two", "three"))))
+
+    altitude.service.userMetadata.getAllFields.length should be(1)
+    altitude.service.userMetadata.deleteFieldById(metadataField.id.get)
+    altitude.service.userMetadata.getAllFields shouldBe empty
+  }
+
+/*
   test("add/get user constraint list") {
     val metadataField = altitude.service.userMetadata.addField(
       UserMetadataField(
@@ -61,19 +75,11 @@ import org.scalatest.Matchers._
     altitude.service.userMetadata.getAllFields.length should be(1)
   }
 
-  test("delete user field") {
-    val metadataField = altitude.service.userMetadata.addField(
-      UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = FieldType.FLAG.toString))
-
-    altitude.service.userMetadata.getAllFields.length should be(1)
-    altitude.service.userMetadata.deleteFieldById(metadataField.id.get)
-    altitude.service.userMetadata.getAllFields shouldBe empty
-  }
-
   test("add invalid field type") {
     intercept[ValidationException] {
       altitude.service.userMetadata.addField(
         UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = "SO_INVALID"))
     }
   }
+*/
 }

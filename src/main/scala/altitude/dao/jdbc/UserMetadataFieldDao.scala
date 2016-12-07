@@ -4,6 +4,7 @@ import altitude.models.search.{Query, QueryResult}
 import altitude.models.{User, UserMetadataField}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
+import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, Json}
 
@@ -158,4 +159,23 @@ abstract class UserMetadataFieldDao (val app: Altitude)
       query= fieldResults.query)
   }
 
+  override def deleteById(id: String)(implicit user: User, txId: TransactionId): Int = {
+    // delete the constraint values
+    log.debug(s"Deleting constraint values for field ID [$id]")
+
+    val sql = s"""
+      DELETE
+        FROM constraint_value
+       WHERE ${C("MetadataConstraintValue.FIELD_ID")} = ?
+      """
+
+    log.debug(s"Delete SQL: $sql, with values: ${List(id)}")
+    val runner: QueryRunner = new QueryRunner()
+    val constraintValuesDeleted = runner.update(conn, sql,  List(id):_*)
+    log.debug(s"Deleted records: $constraintValuesDeleted")
+
+    val fieldsDeleted = super.deleteById(id)
+
+    fieldsDeleted + constraintValuesDeleted
+  }
 }
