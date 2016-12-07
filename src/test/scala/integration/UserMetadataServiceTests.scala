@@ -14,7 +14,9 @@ import org.scalatest.Matchers._
         name = "fieldName",
         fieldType = FieldType.NUMBER.toString))
 
-    altitude.service.userMetadata.addConstraintValue(metadataField.id, "one")
+    altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "one")
+    val updatedField: UserMetadataField = altitude.service.userMetadata.getFieldById(metadataField.id.get).get
+    updatedField.constraintList.size should be (1)
   }
 
   /*

@@ -1,7 +1,7 @@
 package altitude.service
 
 import altitude.dao.UserMetadataFieldDao
-import altitude.exceptions.ValidationException
+import altitude.exceptions.{DuplicateException, NotFoundException, ValidationException}
 import altitude.models.search.{Query, QueryResult}
 import altitude.models.{FieldType, User, UserMetadataField}
 import altitude.transactions.TransactionId
@@ -16,9 +16,30 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
   protected val METADATA_FIELD_DAO = app.injector.instance[UserMetadataFieldDao]
   override protected val DAO = null
 
+  override def getById(id: String)(implicit user: User, txId: TransactionId = new TransactionId): JsObject =
+    throw new NotImplementedError
+
+  override def add(objIn: UserMetadataField, queryForDup: Option[Query] = None)(implicit user: User, txId: TransactionId = new TransactionId): JsObject =
+    throw new NotImplementedError
+
+  override def updateById(id: String, objIn: UserMetadataField, fields: List[String], queryForDup: Option[Query] = None)
+                (implicit user: User, txId: TransactionId): Int =
+    throw new NotImplementedError
+
+  override def getAll(implicit user: User, txId: TransactionId = new TransactionId): List[JsObject] =
+    throw new NotImplementedError
+
+  override def query(query: Query)(implicit user: User, txId: TransactionId = new TransactionId): QueryResult =
+    throw new NotImplementedError
+
+  override def deleteById(id: String)(implicit user: User, txId: TransactionId = new TransactionId): Int =
+    throw new NotImplementedError
+
+  override def deleteByQuery(query: Query)(implicit user: User, txId: TransactionId = new TransactionId): Int =
+    throw new NotImplementedError
+
   def addField(metadataField: UserMetadataField)
               (implicit user: User, txId: TransactionId = new TransactionId): UserMetadataField = {
-
     // verify that the field type is allowed
     if (!FieldType.values.exists(v => v.toString == metadataField.fieldType.toUpperCase)) {
       val ex = ValidationException()
@@ -42,13 +63,32 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
   }
 
   def getFieldById(id: String)(implicit user: User, txId: TransactionId = new TransactionId): Option[JsObject] =
-    METADATA_FIELD_DAO.getById(id)
-
+      METADATA_FIELD_DAO.getById(id)
 
   def getAllFields()(implicit user: User, txId: TransactionId = new TransactionId): List[JsObject] =
-    METADATA_FIELD_DAO.getAll
+      METADATA_FIELD_DAO.getAll
 
 
   def deleteFieldById(id: String)(implicit user: User, txId: TransactionId = new TransactionId): Int =
-    METADATA_FIELD_DAO.deleteById(id)
+      METADATA_FIELD_DAO.deleteById(id)
+
+  def addConstraintValue(fieldId: String, constraintValue: String)
+                        (implicit user: User, txId: TransactionId = new TransactionId) = {
+
+    txManager.withTransaction {
+      // get the field we are working with
+      val fieldOpt = getFieldById(fieldId)
+
+      if (fieldOpt.isEmpty) {
+        throw NotFoundException(s"Cannot find field by ID [$fieldId]")
+      }
+
+      val field: UserMetadataField = fieldOpt.get
+      log.info(s"Adding constraint value [$constraintValue] to field ${field.name}")
+
+      // TODO: make sure we don't already have it
+
+      METADATA_FIELD_DAO.addConstraintValue(fieldId, constraintValue)
+    }
+  }
 }

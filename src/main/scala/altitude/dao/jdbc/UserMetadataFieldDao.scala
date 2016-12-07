@@ -178,4 +178,8 @@ abstract class UserMetadataFieldDao (val app: Altitude)
 
     fieldsDeleted + constraintValuesDeleted
   }
+
+  override def addConstraintValue(fieldId: String, constraintValue: String)(implicit user: User, txId: TransactionId) = {
+
+  }
 }
