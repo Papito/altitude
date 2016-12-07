@@ -61,19 +61,19 @@ CREATE TABLE metadata_field (
   max_length INT DEFAULT NULL
 ) INHERITS (_core);
 
-CREATE TABLE metadata_field_fixed_list (
+CREATE TABLE constraint_value (
   field_id varchar(24) NOT NULL,
-  list_value TEXT NOT NULL
+  constraint_value TEXT NOT NULL
 ) INHERITS (_core);
-CREATE INDEX fixed_list_field_id ON metadata_field_fixed_list(field_id);
-CREATE UNIQUE INDEX fixed_list_field_and_value ON metadata_field_fixed_list(field_id, list_value);
+CREATE INDEX constraint_value_field_id ON constraint_value(field_id);
+CREATE UNIQUE INDEX constraint_value_field_and_value ON constraint_value(field_id, constraint_value);
 
-CREATE TABLE metadata_field_values (
+CREATE TABLE metadata_field_value (
   field_id varchar(24) NOT NULL,
   field_value TEXT NOT NULL
 ) INHERITS (_core);
-CREATE INDEX field_values_field_id ON metadata_field_values(field_id);
-CREATE UNIQUE INDEX field_values_field_and_value ON metadata_field_values(field_id, field_value);
+CREATE INDEX field_value_field_id ON metadata_field_value(field_id);
+CREATE UNIQUE INDEX field_value_field_and_value ON metadata_field_value(field_id, field_value);
 
 --CREATE TABLE import_profile (
 --  id varchar(24) PRIMARY KEY,

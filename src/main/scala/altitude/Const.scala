@@ -54,10 +54,10 @@ object Const {
     "MetadataField.NAME" -> "name",
     "MetadataField.NAME_LC" -> "name_lc",
     "MetadataField.FIELD_TYPE" -> "field_type",
-    "MetadataField.FIXED_LIST" -> "fixed_list",
+    "MetadataField.CONSTRAINT_LIST" -> "constraint_list",
     "MetadataField.MAX_LENGTH" -> "max_length",
-    "MetadataFixedList.FIELD_ID" -> "field_id",
-    "MetadataFixedList.LIST_VALUE" -> "list_value",
+    "MetadataConstraintValue.FIELD_ID" -> "field_id",
+    "MetadataConstraintValue.CONSTRAINT_VALUE" -> "constraint_value",
 
     /*---------------------------------------------------------------------------
     API

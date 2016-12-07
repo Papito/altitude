@@ -236,7 +236,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   }
 
   // Make a string of SQL placeholders for a list - such as "? , ? ,?, ?"
-  protected def makeSqlPlacaholders(s: Seq[AnyRef]): String = s.map(x => "?").mkString(",")
+  protected def makeSqlPlaceholders(s: Seq[AnyRef]): String = s.map(x => "?").mkString(",")
 
   /*
     Implementations should define this method, which returns an optional

@@ -13,20 +13,20 @@ import org.scalatest.Matchers._
         userId = CURRENT_USER_ID,
         name = "field name",
         fieldType = FieldType.STRING.toString,
-        fixedList = Some(List("one", "two", "three"))))
+        constraintList = Some(List("one", "two", "three"))))
 
     val storedFieldOpt = altitude.service.userMetadata.getFieldById(metadataField.id.get)
     storedFieldOpt should not be None
     var storedField: UserMetadataField = storedFieldOpt.get
-    storedField.fixedList should not be None
-    storedField.fixedList.get.length should be(metadataField.fixedList.get.length)
+    storedField.constraintList should not be None
+    storedField.constraintList.get.length should be(metadataField.constraintList.get.length)
 
     // get the same field by name (which triggers a multi-record query)
     val storedFieldOpt2 = altitude.service.userMetadata.getFieldByName(metadataField.name)
     storedFieldOpt2 should not be None
     storedField = storedFieldOpt2.get
-    storedField.fixedList should not be None
-    storedField.fixedList.get.length should be(metadataField.fixedList.get.length)
+    storedField.constraintList should not be None
+    storedField.constraintList.get.length should be(metadataField.constraintList.get.length)
   }
 
   test("add/get user metadata fields") {
@@ -71,7 +71,6 @@ import org.scalatest.Matchers._
   }
 
   test("add invalid field type") {
-
     intercept[ValidationException] {
       altitude.service.userMetadata.addField(
         UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = "SO_INVALID"))
