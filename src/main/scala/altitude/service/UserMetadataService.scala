@@ -1,7 +1,7 @@
 package altitude.service
 
-import altitude.dao.UserMetadataFieldDao
-import altitude.exceptions.{DuplicateException, NotFoundException, ValidationException}
+import altitude.dao.{NotImplementedDao, UserMetadataFieldDao}
+import altitude.exceptions.{NotFoundException, ValidationException}
 import altitude.models.search.{Query, QueryResult}
 import altitude.models.{FieldType, User, UserMetadataField}
 import altitude.transactions.TransactionId
@@ -14,29 +14,7 @@ import play.api.libs.json.JsObject
 class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](app){
   private final val log = LoggerFactory.getLogger(getClass)
   protected val METADATA_FIELD_DAO = app.injector.instance[UserMetadataFieldDao]
-  override protected val DAO = null
-
-  override def getById(id: String)(implicit user: User, txId: TransactionId = new TransactionId): JsObject =
-    throw new NotImplementedError
-
-  override def add(objIn: UserMetadataField, queryForDup: Option[Query] = None)(implicit user: User, txId: TransactionId = new TransactionId): JsObject =
-    throw new NotImplementedError
-
-  override def updateById(id: String, objIn: UserMetadataField, fields: List[String], queryForDup: Option[Query] = None)
-                (implicit user: User, txId: TransactionId): Int =
-    throw new NotImplementedError
-
-  override def getAll(implicit user: User, txId: TransactionId = new TransactionId): List[JsObject] =
-    throw new NotImplementedError
-
-  override def query(query: Query)(implicit user: User, txId: TransactionId = new TransactionId): QueryResult =
-    throw new NotImplementedError
-
-  override def deleteById(id: String)(implicit user: User, txId: TransactionId = new TransactionId): Int =
-    throw new NotImplementedError
-
-  override def deleteByQuery(query: Query)(implicit user: User, txId: TransactionId = new TransactionId): Int =
-    throw new NotImplementedError
+  override protected val DAO = new NotImplementedDao(app)
 
   def addField(metadataField: UserMetadataField)
               (implicit user: User, txId: TransactionId = new TransactionId): UserMetadataField = {
