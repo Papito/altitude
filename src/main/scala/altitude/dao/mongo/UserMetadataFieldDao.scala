@@ -1,10 +1,36 @@
 package altitude.dao.mongo
 
-import altitude.Altitude
-import altitude.models.User
+import altitude.exceptions.NotFoundException
+import altitude.{Altitude, Const => C}
+import altitude.models.{UserMetadataField, User}
 import altitude.transactions.TransactionId
+import com.mongodb.casbah.Imports._
+import org.slf4j.LoggerFactory
+import play.api.libs.json.JsObject
+
 
 class UserMetadataFieldDao(val app: Altitude) extends BaseMongoDao("metadata_fields") with altitude.dao.UserMetadataFieldDao {
+  private final val log = LoggerFactory.getLogger(getClass)
+
   def addConstraintValue(fieldId: String, constraintValue: String)(implicit user: User, txId: TransactionId) = {
+    log.info(s"Adding constraint value [$constraintValue] to field [$fieldId]")
+    val query = MongoDBObject("_id" -> fieldId)
+
+    val fieldOpt: Option[JsObject] = getById(fieldId)
+    if (fieldOpt.isEmpty) throw NotFoundException(s"Cannot find user metadata field by ID [$fieldId]")
+
+    val field: UserMetadataField = fieldOpt.get
+
+    // if the constraint list is empty - create it
+    if (field.constraintList.isEmpty) {
+      log.debug(s"User [$user]. Constraint list for [${field.name}] empty - creating it.")
+      COLLECTION.update(query, MongoDBObject("$set" ->
+        MongoDBObject(C("MetadataField.CONSTRAINT_LIST") -> List())))
+    }
+
+    val cmd = MongoDBObject("$addToSet" ->
+      MongoDBObject(C("MetadataField.CONSTRAINT_LIST") -> constraintValue))
+
+    COLLECTION.update(query, cmd)
   }
 }

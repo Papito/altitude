@@ -58,7 +58,7 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
       val fieldOpt = getFieldById(fieldId)
 
       if (fieldOpt.isEmpty) {
-        throw NotFoundException(s"Cannot find field by ID [$fieldId]")
+        throw NotFoundException(s"Cannot find user metadata field by ID [$fieldId]")
       }
 
       val field: UserMetadataField = fieldOpt.get

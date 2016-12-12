@@ -166,7 +166,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     )
 
     val o: DBObject =  MongoDBObject(
-      "$set" -> com.mongodb.util.JSON.parse(updateJson.toString()).asInstanceOf[DBObject]
+      "$set" -> MongoDBObject(updateJson.toString())
     )
 
     log.debug(s"Updating with data $updateJson for $mongoQuery")

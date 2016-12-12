@@ -180,6 +180,12 @@ abstract class UserMetadataFieldDao (val app: Altitude)
   }
 
   override def addConstraintValue(fieldId: String, constraintValue: String)(implicit user: User, txId: TransactionId) = {
+    val sql = s"""
+          INSERT INTO constraint_value
+            (${C("MetadataConstraintValue.FIELD_ID")}, ${C("MetadataConstraintValue.CONSTRAINT_VALUE")})
+          VALUES (?, ?)
+         """
 
+    addRecords(sql, List(fieldId, constraintValue))
   }
 }
