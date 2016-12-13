@@ -33,4 +33,11 @@ class UserMetadataFieldDao(val app: Altitude) extends BaseMongoDao("metadata_fie
 
     COLLECTION.update(query, cmd)
   }
+
+  def deleteConstraintValue(fieldId: String, constraintValue: String)(implicit user: User, txId: TransactionId) = {
+    val cmd = MongoDBObject("$pull" ->
+      MongoDBObject(C("MetadataField.CONSTRAINT_LIST") -> constraintValue))
+
+    COLLECTION.update(MongoDBObject("_id" -> fieldId), cmd)
+  }
 }

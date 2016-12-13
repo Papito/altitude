@@ -5,4 +5,5 @@ import altitude.transactions.TransactionId
 
 trait UserMetadataFieldDao extends BaseDao {
   def addConstraintValue(fieldId: String, constraintValue: String)(implicit user: User, txId: TransactionId)
+  def deleteConstraintValue(fieldId: String, constraintValue: String)(implicit user: User, txId: TransactionId)
 }

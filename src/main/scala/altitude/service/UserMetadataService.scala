@@ -75,9 +75,24 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
       val field: UserMetadataField = fieldOpt.get
       log.info(s"Adding constraint value [$constraintValue] to field ${field.name}")
 
-      // TODO: make sure we don't already have it
+      /* TODO:
+
+          * clean (remove double spaces, tabs, and line breaks)
+          * validate
+          * make sure we don't already have the constraint
+          * lowercase
+       */
 
       METADATA_FIELD_DAO.addConstraintValue(fieldId, constraintValue)
+    }
+  }
+
+  def deleteConstraintValue(fieldId: String, constraintValue: String)
+                           (implicit user: User, txId: TransactionId = new TransactionId) = {
+    log.info(s"User: $user. Deleting constraint value [$constraintValue] for field [$fieldId]")
+
+    txManager.withTransaction {
+      METADATA_FIELD_DAO.deleteConstraintValue(fieldId, constraintValue)
     }
   }
 }

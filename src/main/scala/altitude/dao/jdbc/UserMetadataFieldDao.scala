@@ -11,6 +11,7 @@ import play.api.libs.json.{JsObject, Json}
 abstract class UserMetadataFieldDao (val app: Altitude)
   extends BaseJdbcDao("metadata_field") with altitude.dao.UserMetadataFieldDao {
   private final val log = LoggerFactory.getLogger(getClass)
+  private final val CONSTRAINT_VAL_TBL = "constraint_value"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val maxLength = rec.get(C("MetadataField.MAX_LENGTH"))
@@ -53,7 +54,7 @@ abstract class UserMetadataFieldDao (val app: Altitude)
       val valuePlaceholders = values.map{v => "(?, ?)"}
 
       sql = s"""
-          INSERT INTO constraint_value
+          INSERT INTO $CONSTRAINT_VAL_TBL
             (${C("MetadataConstraintValue.FIELD_ID")}, ${C("MetadataConstraintValue.CONSTRAINT_VALUE")})
           VALUES ${valuePlaceholders.mkString(", ")}
          """
@@ -78,7 +79,7 @@ abstract class UserMetadataFieldDao (val app: Altitude)
 
     val SQL = s"""
       SELECT ${C("MetadataConstraintValue.CONSTRAINT_VALUE")}
-        FROM constraint_value
+        FROM $CONSTRAINT_VAL_TBL
        WHERE field_id = ?"""
     val recs: List[Map[String, AnyRef]] = manyBySqlQuery(SQL, List(id))
 
@@ -95,7 +96,7 @@ abstract class UserMetadataFieldDao (val app: Altitude)
   }
 
   final val CONSTRAINT_VALS_SQL_QUERY_BUILDER =
-    new SqlQueryBuilder(C("MetadataConstraintValue.CONSTRAINT_VALUE"), "constraint_value")
+    new SqlQueryBuilder(C("MetadataConstraintValue.CONSTRAINT_VALUE"), CONSTRAINT_VAL_TBL)
 
   override def query(q: Query)
                     (implicit user: User, txId: TransactionId): QueryResult = {
@@ -110,7 +111,7 @@ abstract class UserMetadataFieldDao (val app: Altitude)
 
     val SQL = s"""
       SELECT ${C("MetadataConstraintValue.FIELD_ID")}, ${C("MetadataConstraintValue.CONSTRAINT_VALUE")}
-        FROM constraint_value
+        FROM $CONSTRAINT_VAL_TBL
        WHERE field_id
        IN (${makeSqlPlaceholders(fieldIds)})"""
     val recs: List[Map[String, AnyRef]] = manyBySqlQuery(SQL, fieldIds)
@@ -165,7 +166,7 @@ abstract class UserMetadataFieldDao (val app: Altitude)
 
     val sql = s"""
       DELETE
-        FROM constraint_value
+        FROM $CONSTRAINT_VAL_TBL
        WHERE ${C("MetadataConstraintValue.FIELD_ID")} = ?
       """
 
@@ -179,11 +180,23 @@ abstract class UserMetadataFieldDao (val app: Altitude)
     fieldsDeleted + constraintValuesDeleted
   }
 
-  override def addConstraintValue(fieldId: String, constraintValue: String)(implicit user: User, txId: TransactionId) = {
+  def addConstraintValue(fieldId: String, constraintValue: String)
+                                 (implicit user: User, txId: TransactionId) = {
     val sql = s"""
-          INSERT INTO constraint_value
+          INSERT INTO $CONSTRAINT_VAL_TBL
             (${C("MetadataConstraintValue.FIELD_ID")}, ${C("MetadataConstraintValue.CONSTRAINT_VALUE")})
           VALUES (?, ?)
+         """
+
+    addRecords(sql, List(fieldId, constraintValue))
+  }
+
+  def deleteConstraintValue(fieldId: String, constraintValue: String)
+                           (implicit user: User, txId: TransactionId) = {
+    val sql = s"""
+          DELETE FROM $CONSTRAINT_VAL_TBL
+                WHERE ${C("MetadataConstraintValue.FIELD_ID")} = ?
+                  AND ${C("MetadataConstraintValue.CONSTRAINT_VALUE")} = ?
          """
 
     addRecords(sql, List(fieldId, constraintValue))

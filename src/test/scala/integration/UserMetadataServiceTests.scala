@@ -7,7 +7,7 @@ import org.scalatest.Matchers._
 
 @DoNotDiscover class UserMetadataServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 
-  test("add constraint value") {
+  test("add/delete constraint value") {
     val metadataField = altitude.service.userMetadata.addField(
       UserMetadataField(
         userId = CURRENT_USER_ID,
@@ -19,9 +19,13 @@ import org.scalatest.Matchers._
     altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "three")
     // test proper value binding
     altitude.service.userMetadata.addConstraintValue(metadataField.id.get, """"LOL"""")
-    val updatedField: UserMetadataField = altitude.service.userMetadata.getFieldById(metadataField.id.get).get
+    var updatedField: UserMetadataField = altitude.service.userMetadata.getFieldById(metadataField.id.get).get
     updatedField.constraintList should not be None
     updatedField.constraintList.get.size should be (4)
+
+    altitude.service.userMetadata.deleteConstraintValue(metadataField.id.get, "two")
+    updatedField = altitude.service.userMetadata.getFieldById(metadataField.id.get).get
+    updatedField.constraintList.get.size should be (3)
   }
 
   /*
