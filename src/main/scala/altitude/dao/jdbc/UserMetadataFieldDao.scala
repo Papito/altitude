@@ -80,7 +80,9 @@ abstract class UserMetadataFieldDao (val app: Altitude)
     val SQL = s"""
       SELECT ${C("MetadataConstraintValue.CONSTRAINT_VALUE")}
         FROM $CONSTRAINT_VAL_TBL
-       WHERE field_id = ?"""
+       WHERE field_id = ?
+    ORDER BY ${C("MetadataConstraintValue.CONSTRAINT_VALUE")}
+    """
     val recs: List[Map[String, AnyRef]] = manyBySqlQuery(SQL, List(id))
 
     val constraintValues: List[String] = recs.map{m =>

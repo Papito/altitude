@@ -38,6 +38,17 @@ class UserMetadataFieldDao(val app: Altitude) extends BaseMongoDao("metadata_fie
     val cmd = MongoDBObject("$pull" ->
       MongoDBObject(C("MetadataField.CONSTRAINT_LIST") -> constraintValue))
 
-    COLLECTION.update(MongoDBObject("_id" -> fieldId), cmd)
+    val query = MongoDBObject("_id" -> fieldId)
+    COLLECTION.update(query, cmd)
+
+    /* if this is the last value in the list -
+       undefine the list so we are always clear about it being empty */
+    val field: UserMetadataField = getById(fieldId).get
+
+    if (field.constraintList.contains(List())) {
+      log.debug(s"User [$user]. Undefining constraint list for [${field.name}].")
+      COLLECTION.update(query, MongoDBObject("$unset" ->
+        MongoDBObject(C("MetadataField.CONSTRAINT_LIST") -> "")))
+    }
   }
 }

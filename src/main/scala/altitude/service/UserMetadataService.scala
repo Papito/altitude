@@ -32,23 +32,30 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
     }
   }
 
-  def getFieldByName(name: String)
-                    (implicit user: User, txId: TransactionId = new TransactionId): Option[UserMetadataField] = {
-    val q = Query(user, params = Map(C("MetadataField.NAME_LC") -> name.toLowerCase))
-
-    txManager.withTransaction[Option[UserMetadataField]] {
-      val res: QueryResult = METADATA_FIELD_DAO.query(q)
-
-      if (res.records.length > 1)
-        throw new Exception("getFieldByName should return only a single result")
-
-      if (!res.nonEmpty) None else Some(res.records.head)
-    }
-  }
-
   def getFieldById(id: String)(implicit user: User, txId: TransactionId = new TransactionId): Option[JsObject] =
     txManager.asReadOnly[Option[JsObject]] {
-        METADATA_FIELD_DAO.getById(id)
+      val fieldOpt = METADATA_FIELD_DAO.getById(id)
+
+      fieldOpt match {
+        case None => None
+        case _ => {
+          val field: UserMetadataField = fieldOpt.get
+
+          val sortedConstraintList = field.constraintList match {
+            case None => None
+            case _ => Some(field.constraintList.get.sorted)
+          }
+
+          val ret = UserMetadataField(
+            userId = user.id.get,
+            name = field.name,
+            fieldType = field.fieldType,
+            maxLength = field.maxLength,
+            constraintList = sortedConstraintList)
+
+          Some(ret)
+        }
+      }
     }
 
   def getAllFields()(implicit user: User, txId: TransactionId = new TransactionId): List[JsObject] =
