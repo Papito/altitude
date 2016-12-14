@@ -1,8 +1,8 @@
 package altitude.controllers.api
 
+import altitude.Validators.ApiValidator
 import altitude.models.search.Query
 import altitude.{Const => C}
-import altitude.Validators.ApiValidator
 import org.scalatra.Ok
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json

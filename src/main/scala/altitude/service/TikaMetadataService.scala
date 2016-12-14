@@ -3,7 +3,7 @@ package altitude.service
 import java.io.{InputStream, StringWriter}
 
 import altitude.exceptions.AllDone
-import altitude.models.{AssetType, FileImportAsset, AssetType$}
+import altitude.models.{AssetType, FileImportAsset}
 import altitude.{Const => C}
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream

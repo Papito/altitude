@@ -3,11 +3,10 @@ package altitude.service
 import altitude.Altitude
 import altitude.dao.StatDao
 import altitude.models.search.Query
-import altitude.models.{User, Stat, Stats}
+import altitude.models.{Stat, Stats, User}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
-import org.slf4j.LoggerFactory
 import net.codingwell.scalaguice.InjectorExtensions._
-import play.api.libs.json.{JsValue, JsObject}
+import org.slf4j.LoggerFactory
 
 class StatsService(app: Altitude){
   private final val log = LoggerFactory.getLogger(getClass)

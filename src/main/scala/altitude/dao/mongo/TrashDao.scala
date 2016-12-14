@@ -1,9 +1,9 @@
 package altitude.dao.mongo
 
 import altitude.models.Trash
-import altitude.{Const => C, Util, Altitude}
+import altitude.{Altitude, Const => C, Util}
 import com.mongodb.casbah.Imports._
-import play.api.libs.json.{Json, JsObject}
+import play.api.libs.json.{JsObject, Json}
 
 class TrashDao(val app: Altitude) extends BaseMongoDao("trash") with altitude.dao.TrashDao {
   override protected def fixMongoFields(json: JsObject): JsObject = super.fixMongoFields(json) ++ Json.obj(

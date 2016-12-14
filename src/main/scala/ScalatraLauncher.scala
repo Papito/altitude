@@ -4,7 +4,6 @@ import org.eclipse.jetty.server.{Server, _}
 import org.eclipse.jetty.servlet.DefaultServlet
 import org.eclipse.jetty.webapp.WebAppContext
 import org.scalatra.servlet.ScalatraListener
-import org.slf4j.LoggerFactory
 
 object ScalatraLauncher extends App  with SingleApplication {
   val host = "localhost"

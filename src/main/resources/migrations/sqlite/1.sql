@@ -48,6 +48,35 @@ CREATE TABLE trash  (
   recycled_at DATE DEFAULT (datetime('now', 'utc'))
 );
 
+CREATE TABLE metadata_field (
+  id varchar(24) PRIMARY KEY,
+  user_id varchar(24) NOT NULL,
+  name varchar(255) NOT NULL,
+  name_lc varchar(255) NOT NULL,
+  field_type varchar(255) NOT NULL,
+  max_length INT DEFAULT NULL,
+  created_at DATE DEFAULT (datetime('now', 'utc')),
+  updated_at DATE DEFAULT NULL
+);
+
+CREATE TABLE constraint_value (
+  field_id varchar(24) NOT NULL,
+  constraint_value TEXT NOT NULL,
+  created_at DATE DEFAULT (datetime('now', 'utc')),
+  updated_at DATE DEFAULT NULL
+);
+CREATE INDEX constraint_value_field_id ON constraint_value(field_id);
+CREATE UNIQUE INDEX constraint_value_field_and_value ON constraint_value(field_id, constraint_value);
+
+CREATE TABLE metadata_field_value (
+  field_id varchar(24) NOT NULL,
+  field_value TEXT NOT NULL,
+  created_at DATE DEFAULT (datetime('now', 'utc')),
+  updated_at DATE DEFAULT NULL
+);
+CREATE INDEX field_value_field_id ON metadata_field_value(field_id);
+CREATE UNIQUE INDEX field_value_field_and_value ON metadata_field_value(field_id, field_value);
+
 --CREATE TABLE import_profile (
 --  id varchar(24) PRIMARY KEY,
 --  name varchar(255) NOT NULL,

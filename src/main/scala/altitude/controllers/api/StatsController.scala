@@ -1,10 +1,9 @@
 package altitude.controllers.api
 
+import altitude.{Const => C}
 import org.scalatra.Ok
 import org.slf4j.LoggerFactory
-
-import altitude.{Const => C}
-import play.api.libs.json.{JsNumber, JsObject, JsArray, Json}
+import play.api.libs.json.{JsNumber, JsObject, Json}
 
 class StatsController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)

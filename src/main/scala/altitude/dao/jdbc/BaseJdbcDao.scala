@@ -3,8 +3,8 @@ package altitude.dao.jdbc
 import java.sql.Connection
 
 import altitude.dao.BaseDao
-import altitude.models.{User, BaseModel}
 import altitude.models.search.{Query, QueryResult}
+import altitude.models.{BaseModel, User}
 import altitude.transactions.{JdbcTransactionManager, TransactionId}
 import altitude.{Const => C, Util}
 import net.codingwell.scalaguice.InjectorExtensions._
@@ -62,11 +62,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   override def getById(id: String)(implicit user: User, txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
     val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(ONE_SQL, List(id))
-
-    rec match {
-      case None => None
-      case _ => Some(makeModel(rec.get))
-    }
+    if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
 
   override def deleteByQuery(q: Query)(implicit user: User, txId: TransactionId): Int = {
@@ -90,9 +86,12 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     numDeleted
   }
 
-  override def query(query: Query)
+  override def query(q: Query)(implicit user: User, txId: TransactionId): QueryResult =
+    this.query(q, SQL_QUERY_BUILDER)
+
+  def query(query: Query, sqlQueryBuilder: SqlQueryBuilder)
                     (implicit user: User, txId: TransactionId): QueryResult = {
-    val sqlQuery: SqlQuery = SQL_QUERY_BUILDER.toSelectQuery(query)
+    val sqlQuery: SqlQuery = sqlQueryBuilder.toSelectQuery(query)
     val recs = manyBySqlQuery(sqlQuery.queryString, sqlQuery.selectBindValues)
 
     // do not perform a count query if we got zero results in the first place
@@ -138,6 +137,12 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     recordJson
   }
 
+  protected def addRecords(q: String, vals: List[Object])
+                         (implicit  user: User, txId: TransactionId) = {
+    log.debug(s"INSERT MULTIPLE SQL: $q. ARGS: ${vals.toString()}")
+    new QueryRunner().update(conn, q, vals:_*)
+  }
+
   protected def manyBySqlQuery(sql: String, values: List[Object] = List())
                               (implicit txId: TransactionId): List[Map[String, AnyRef]] = {
     val runner: QueryRunner = new QueryRunner()
@@ -161,7 +166,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     if (res.size() > 1)
       throw new Exception("getById should return only a single result")
 
-    val rec = res.get(0)
+    val rec = res.head
 
     log.debug(s"RECORD: $rec")
     Some(rec.toMap[String, AnyRef])
@@ -230,16 +235,18 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     increment(id, field, -count)
   }
 
+  // Make a string of SQL placeholders for a list - such as "? , ? ,?, ?"
+  protected def makeSqlPlaceholders(s: Seq[AnyRef]): String = s.map(x => "?").mkString(",")
 
   /*
     Implementations should define this method, which returns an optional
-    JSON object which is guaranteed to serialize into a valid model of interest.
+    JSON object which is guaranteed to serialize into a valid model backing this class.
     JSON can be constructed directly, but best to create a model instance first
     and return it, triggering implicit conversion.
    */
   protected def makeModel(rec: Map[String, AnyRef]): JsObject
 
-  /* Given a model and an SQL record, decipher and set certain core properties
+  /* Given a model and an SQL record, calculate and set properties common to most models
    */
   protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit
 }

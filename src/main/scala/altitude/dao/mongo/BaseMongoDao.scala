@@ -1,8 +1,8 @@
 package altitude.dao.mongo
 
 import altitude.dao.BaseDao
-import altitude.models.{User, BaseModel}
 import altitude.models.search.{Query, QueryResult}
+import altitude.models.{BaseModel, User}
 import altitude.transactions.TransactionId
 import altitude.{Configuration, Const => C, Environment, Util}
 import com.mongodb.casbah.Imports._
@@ -86,6 +86,8 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
 
     val o: Option[DBObject] = COLLECTION.findOneByID(id)
 
+    log.debug(s"RETRIEVED object: $o", C.LogTag.DB)
+
     o.isDefined match {
       case false => None
       case true =>
@@ -164,7 +166,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     )
 
     val o: DBObject =  MongoDBObject(
-      "$set" -> com.mongodb.util.JSON.parse(updateJson.toString()).asInstanceOf[DBObject]
+      "$set" -> MongoDBObject(updateJson.toString())
     )
 
     log.debug(s"Updating with data $updateJson for $mongoQuery")

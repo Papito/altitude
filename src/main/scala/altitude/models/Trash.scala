@@ -4,6 +4,7 @@ import altitude.{Const => C, Util}
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json._
+
 import scala.language.implicitConversions
 
 object Trash {

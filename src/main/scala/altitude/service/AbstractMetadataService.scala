@@ -2,7 +2,7 @@ package altitude.service
 
 import java.io.InputStream
 
-import altitude.models.{AssetType, FileImportAsset, AssetType$}
+import altitude.models.{AssetType, FileImportAsset}
 import play.api.libs.json.JsValue
 
 abstract class AbstractMetadataService {

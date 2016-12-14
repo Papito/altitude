@@ -5,10 +5,9 @@ import altitude.controllers.BaseController
 import altitude.exceptions.{NotFoundException, ValidationException}
 import altitude.models.User
 import altitude.{Const => C}
-import org.joda.time.DateTime
 import org.scalatra._
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsObject, JsNull, Json}
+import play.api.libs.json.{JsNull, JsObject, Json}
 
 class BaseApiController extends BaseController with GZipSupport {
   private final val log = LoggerFactory.getLogger(getClass)

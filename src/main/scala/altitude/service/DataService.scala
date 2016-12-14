@@ -4,7 +4,7 @@ import java.io._
 
 import altitude.Altitude
 import altitude.exceptions.NotFoundException
-import altitude.models.{User, Asset, Data}
+import altitude.models.{Asset, Data, User}
 import altitude.transactions.TransactionId
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory

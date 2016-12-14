@@ -2,7 +2,7 @@ package integration
 
 import java.io.File
 
-import altitude.models.{User, AssetType, Asset, Folder}
+import altitude.models.{Asset, AssetType, Folder, User}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Environment, Util}
 import com.google.inject.{AbstractModule, Guice}
@@ -18,7 +18,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   val log =  LoggerFactory.getLogger(getClass)
   Environment.ENV = Environment.TEST
 
-  /* Stores test app config overrides, since we run same tests with different app setup.
+  /* Stores test app config overrides, since we run same tests with a different app setup.
    */
   val config: Map[String, String]
 

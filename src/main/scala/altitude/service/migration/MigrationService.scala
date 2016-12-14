@@ -2,7 +2,7 @@ package altitude.service.migration
 
 import altitude.Altitude
 import altitude.dao.MigrationDao
-import altitude.models.{Stats, User, Folder}
+import altitude.models.{Stats, User}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory

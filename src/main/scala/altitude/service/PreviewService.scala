@@ -3,7 +3,7 @@ package altitude.service
 import java.io._
 
 import altitude.exceptions.NotFoundException
-import altitude.models.{User, Preview}
+import altitude.models.{Preview, User}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
 import org.apache.commons.io.{FileUtils, FilenameUtils}

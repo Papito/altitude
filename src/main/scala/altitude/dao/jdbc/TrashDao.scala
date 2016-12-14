@@ -1,13 +1,9 @@
 package altitude.dao.jdbc
 
-import java.sql.Timestamp
-import java.text.SimpleDateFormat
-
+import altitude.models.{AssetType, Trash, User}
 import altitude.transactions.TransactionId
-import altitude.{Const => C, Util, Altitude}
-import altitude.models.{User, AssetType, BaseModel, Trash}
-import org.joda.time.{DateTime, LocalDateTime}
-import org.joda.time.format.DateTimeFormat
+import altitude.{Altitude, Const => C}
+import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
@@ -57,8 +53,6 @@ abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with alt
               ${DATETIME_TO_DB_FUNC(trash.updatedAt)},
               $JSON_FUNC)
     """
-
-    val df = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
 
     val sqlVals: List[Object] = List(
       trash.userId,

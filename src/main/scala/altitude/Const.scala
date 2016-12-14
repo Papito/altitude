@@ -51,6 +51,13 @@ object Const {
     "Data.DATA" -> "data",
     "Stat.DIMENSION" -> "dimension",
     "Stat.DIM_VAL" -> "dim_val",
+    "MetadataField.NAME" -> "name",
+    "MetadataField.NAME_LC" -> "name_lc",
+    "MetadataField.FIELD_TYPE" -> "field_type",
+    "MetadataField.CONSTRAINT_LIST" -> "constraint_list",
+    "MetadataField.MAX_LENGTH" -> "max_length",
+    "MetadataConstraintValue.FIELD_ID" -> "field_id",
+    "MetadataConstraintValue.CONSTRAINT_VALUE" -> "constraint_value",
 
     /*---------------------------------------------------------------------------
     API
@@ -109,6 +116,7 @@ object Const {
     "msg.err.validation_error" -> "Validation error",
     "msg.err.validation_errors" -> "There are validation errors in: %s",
     "msg.err.wrong_type" -> "This field does not match the required type (%s)",
+    "msg.err.wrong_value" -> "This is not an allowed value. Allowed values are: %s",
     "msg.err.empty_request_body" -> "Empty request body"
   )
 

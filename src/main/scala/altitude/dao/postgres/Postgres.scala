@@ -4,8 +4,7 @@ import java.sql.Timestamp
 
 import altitude.models.BaseModel
 import altitude.{Const => C}
-import org.joda.time.{DateTimeZone, DateTime}
-import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
+import org.joda.time.DateTime
 
 
 trait Postgres {

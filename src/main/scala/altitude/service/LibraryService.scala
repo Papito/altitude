@@ -5,15 +5,15 @@ import java.awt.{AlphaComposite, Graphics2D}
 import java.io._
 import javax.imageio.ImageIO
 
-import altitude.exceptions.{IllegalOperationException, FormatException, DuplicateException}
-import altitude.models.search.{Query, QueryResult}
+import altitude.exceptions.{DuplicateException, FormatException, IllegalOperationException}
 import altitude.models._
+import altitude.models.search.{Query, QueryResult}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import altitude.{Altitude, Const => C}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.imgscalr.Scalr
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{Json, JsObject}
+import play.api.libs.json.{JsObject, Json}
 
 class LibraryService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -217,8 +217,8 @@ class LibraryService(app: Altitude) {
   }
 
   def moveAssetsToFolder(assetIds: Set[String], folderId: String)
-                        (implicit user: User, txId: TransactionId = new TransactionId): Unit = {
-    txManager.withTransaction[Unit] {
+                        (implicit user: User, txId: TransactionId = new TransactionId) = {
+    txManager.withTransaction {
       assetIds.foreach {assetId =>
 
         // cannot have assets in root folder - just other folders
@@ -271,10 +271,10 @@ class LibraryService(app: Altitude) {
   }
 
   def recycleAssets(assetIds: Set[String])
-                   (implicit user: User, txId: TransactionId = new TransactionId): Unit = {
+                   (implicit user: User, txId: TransactionId = new TransactionId) = {
     var totalBytes = 0L
 
-    txManager.withTransaction[Unit] {
+    txManager.withTransaction {
       assetIds.foreach{assetId =>
         val asset: Asset = this.getById(assetId)
         app.service.trash.recycleAsset(assetId)

@@ -3,8 +3,8 @@ package altitude.service
 import altitude.Validators.Validator
 import altitude.dao.FolderDao
 import altitude.exceptions.{DuplicateException, IllegalOperationException, NotFoundException, ValidationException}
-import altitude.models.{User, Folder}
 import altitude.models.search.Query
+import altitude.models.{Folder, User}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Cleaners, Const => C}
 import net.codingwell.scalaguice.InjectorExtensions._
