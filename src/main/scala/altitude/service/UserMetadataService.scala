@@ -96,7 +96,7 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
 
   def deleteConstraintValue(fieldId: String, constraintValue: String)
                            (implicit user: User, txId: TransactionId = new TransactionId) = {
-    log.info(s"User: $user. Deleting constraint value [$constraintValue] for field [$fieldId]")
+    log.info(s"Deleting constraint value [$constraintValue] for field [$fieldId]")
 
     txManager.withTransaction {
       METADATA_FIELD_DAO.deleteConstraintValue(fieldId, constraintValue)
