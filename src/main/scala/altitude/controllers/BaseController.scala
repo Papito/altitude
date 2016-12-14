@@ -2,9 +2,10 @@ package altitude.controllers
 
 import java.io.{PrintWriter, StringWriter}
 
-import altitude.SingleApplication
+import altitude.{Util, SingleApplication}
+import altitude.models.User
 import org.scalatra.InternalServerError
-import org.slf4j.LoggerFactory
+import org.slf4j.{MDC, LoggerFactory}
 
 import scala.compat.Platform
 
@@ -22,7 +23,17 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
     }
   }
 
+  implicit def user = if (request.contains("user"))
+    request.getAttribute("user").asInstanceOf[User]
+  else
+    throw new RuntimeException("User was not set for this request")
+
   before() {
+    request.setAttribute("request_id", Util.randomStr(size = 6))
+    MDC.put("REQUEST_ID", s"<${request.getAttribute("request_id").toString}>")
+
+    setUser()
+
     if (!isAssetUri && !isApiUri) {
       log.debug(s"Request START: ${request.getRequestURI} args: {${request.getParameterMap}}")
     }
@@ -43,7 +54,13 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
     }
   }
 
-  private def isAssetUri: Boolean = {
+  protected def setUser() = {
+    val user = User(id = Some("1"), rootFolderId = "0", uncatFolderId = "1")
+    request.setAttribute("user", user)
+    MDC.put("USER", s"[U: ${user.toString}]")
+  }
+
+  protected def isAssetUri: Boolean = {
     val uri = request.getRequestURI
     //FIXME: clunky
     uri.startsWith("/js/") ||
@@ -53,6 +70,6 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
       uri.startsWith("/static/")
   }
 
-  private def isApiUri = request.getRequestURI.startsWith("/api/")
-  private def isClientUri = request.getRequestURI.startsWith("/client/")
+  protected def isApiUri = request.getRequestURI.startsWith("/api/")
+  protected def isClientUri = request.getRequestURI.startsWith("/client/")
 }

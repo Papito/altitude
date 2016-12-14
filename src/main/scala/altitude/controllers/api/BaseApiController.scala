@@ -27,19 +27,9 @@ class BaseApiController extends BaseController with GZipSupport {
 
   def requestMethod = request.getMethod.toLowerCase
 
-  implicit def user = if (request.contains("user"))
-      request.getAttribute("user").asInstanceOf[User]
-    else
-      throw new RuntimeException("User was not set for this request")
-
   before() {
-    request.setAttribute("request_id", Util.randomStr(size = 6))
-    MDC.put("REQUEST_ID", s"[REQ:${request.getAttribute("request_id").toString}]")
-
     // verify that requests with request body are not empty
     checkPayload()
-
-    setUser()
 
     log.info(
       s"API ${request.getRequestURI} ${requestMethod.toUpperCase} request with {${request.body}} and ${request.getParameterMap}")
@@ -77,25 +67,6 @@ class BaseApiController extends BaseController with GZipSupport {
     if (List("post", "put").contains(requestMethod) && request.body.isEmpty) {
       throw ValidationException(C.MSG("err.empty_request_body"))
     }
-  }
-
-  private def setUser(): Unit = {
-    val user = User(id = Some("1"), rootFolderId = "0", uncatFolderId = "1")
-    log.info(s"User for this request $user")
-    request.setAttribute("user", user)
-    MDC.put("USER", s"[USR:${user.toString}]")
-    /*
-      user = requestJson.isDefined match {
-        case true => {
-          val id = (requestJson.get \ C.Api.USER_ID).as[String]
-          User(id = Some(id), rootFolderId = "0", uncatFolderId = "1")
-        }
-        case false => {
-          val id = request.get(C.Api.USER_ID).toString
-          User(id = Some(id), rootFolderId = "0", uncatFolderId = "1")
-        }
-      }
-    */
   }
 
   error {
