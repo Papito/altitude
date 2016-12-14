@@ -52,12 +52,12 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     log.debug(s"INSERTING: $o")
 
     jsonIn ++ Json.obj(
-      C("Base.ID") -> JsString(id))
+      C.Base.ID -> JsString(id))
   }
 
   protected def makeObjectForInsert(jsonIn: JsObject): DBObject = {
     // create id UNLESS specified
-    val id: String = (jsonIn \ C("Base.ID")).asOpt[String] match {
+    val id: String = (jsonIn \ C.Base.ID).asOpt[String] match {
     case Some(id: String) => id
     case _ => BaseModel.genId
   }
@@ -67,7 +67,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
 
     val coreAttrObj = MongoDBObject(
         "_id" -> id,
-        C("Base.CREATED_AT") -> createdAt)
+        C.Base.CREATED_AT -> createdAt)
       origObj ++ coreAttrObj
   }
 
@@ -115,12 +115,12 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
    */
   protected def fixMongoFields(json: JsObject): JsObject = {
     val out = json ++ Json.obj(
-      C("Base.CREATED_AT") ->  (json \ C("Base.CREATED_AT") \ "$date").asOpt[String],
-      C("Base.UPDATED_AT") -> (json \ C("Base.UPDATED_AT") \ "$date").asOpt[String]
+      C.Base.CREATED_AT ->  (json \ C.Base.CREATED_AT \ "$date").asOpt[String],
+      C.Base.UPDATED_AT -> (json \ C.Base.UPDATED_AT \ "$date").asOpt[String]
     )
 
-    json.keys.contains(C("Base.ID")) match  {
-      case true => out ++ Json.obj(C("Base.ID") -> (json \ "_id").as[String])
+    json.keys.contains(C.Base.ID) match  {
+      case true => out ++ Json.obj(C.Base.ID -> (json \ "_id").as[String])
       case false => out
     }
   }
@@ -162,7 +162,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     // combine the selected fields we want to update from the JSON repr of the mode, with updated_at
     val updateJson = JsObject(
       json.fieldSet.filter {v: (String, JsValue) => fields.contains(v._1)}.toSeq) ++ Json.obj(
-      C("Base.UPDATED_AT") -> Util.isoDateTime(Some(Util.utcNowNoTZ))
+      C.Base.UPDATED_AT -> Util.isoDateTime(Some(Util.utcNowNoTZ))
     )
 
     val o: DBObject =  MongoDBObject(

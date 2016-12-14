@@ -14,7 +14,7 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) extends Query
     val folderIds: Set[String] = getFolderIds(query)
 
     // get the query params - and add the user
-    val params = getParams(query) + (C("Base.USER_ID") -> query.user.id.get)
+    val params = getParams(query) + (C.Base.USER_ID -> query.user.id.get)
 
     // filter out system parameters
     val (sqlColumns, sqlValues) = params.unzip
@@ -28,8 +28,8 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) extends Query
 
     val folderClause = folderIds.nonEmpty match {
       case true => whereClause.isEmpty match {
-        case false => s" AND ${C("Asset.FOLDER_ID")} in (" + folderIds.toSeq.map(x => "?").mkString(",") + ")"
-        case true => s"WHERE ${C("Asset.FOLDER_ID")} in (" + folderIds.toSeq.map(x => "?").mkString(",") + ")"
+        case false => s" AND ${C.Asset.FOLDER_ID} in (" + folderIds.toSeq.map(x => "?").mkString(",") + ")"
+        case true => s"WHERE ${C.Asset.FOLDER_ID} in (" + folderIds.toSeq.map(x => "?").mkString(",") + ")"
       }
       case false => ""
     }

@@ -18,12 +18,12 @@ trait BaseDao {
   def query(q: Query)(implicit user: User, txId: TransactionId): QueryResult
 
   def deleteById(id: String)(implicit user: User, txId: TransactionId): Int = {
-    val q: Query = Query(user, Map(C("Base.ID") -> id))
+    val q: Query = Query(user, Map(C.Base.ID -> id))
     deleteByQuery(q)
   }
 
   def updateById(id: String, data: JsObject, fields: List[String])(implicit user: User, txId: TransactionId): Int = {
-    val q: Query = Query(user, Map(C("Base.ID") -> id))
+    val q: Query = Query(user, Map(C.Base.ID -> id))
     updateByQuery(q, data, fields)
   }
 

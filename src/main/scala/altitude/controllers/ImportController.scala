@@ -36,21 +36,21 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
   private val userHomeDir = System.getProperty("user.home")
 
   get("/source/local/listing") {
-    val file: File = new File(this.params.getOrElse(C("Api.PATH"), userHomeDir))
+    val file: File = new File(this.params.getOrElse(C.Api.PATH, userHomeDir))
     log.debug(s"Getting directory name list for $file")
     val files: Seq[File] = file.listFiles().toSeq
     val directoryList: Seq[String] = files.filter(_.isDirectory == true).map(_.getName)
     contentType = "application/json"
     Json.obj(
-      C("Api.DIRECTORY_NAMES") -> directoryList,
-      C("Api.CURRENT_PATH") -> file.getAbsolutePath,
-      C("Api.OS_DIR_SEPARATOR") -> File.separator).toString()
+      C.Api.DIRECTORY_NAMES -> directoryList,
+      C.Api.CURRENT_PATH -> file.getAbsolutePath,
+      C.Api.OS_DIR_SEPARATOR -> File.separator).toString()
   }
 
   get("/source/local/listing/parent") {
-    val path = this.params.getOrElse(C("Api.PATH"), userHomeDir)
+    val path = this.params.getOrElse(C.Api.PATH, userHomeDir)
     log.debug(s"Path: $path")
-    val file: File = new File(this.params.getOrElse(C("Api.PATH"), userHomeDir))
+    val file: File = new File(this.params.getOrElse(C.Api.PATH, userHomeDir))
     val parentPath: String = file.getParent
     log.debug(s"Parent path: $parentPath")
 
@@ -61,8 +61,8 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
     val directoryList: Seq[String] = files.filter(_.isDirectory == true).map(_.getName)
     contentType = "application/json"
     Json.obj(
-      C("Api.DIRECTORY_NAMES") -> directoryList,
-      C("Api.CURRENT_PATH") -> parentFile.getAbsolutePath).toString()
+      C.Api.DIRECTORY_NAMES -> directoryList,
+      C.Api.CURRENT_PATH -> parentFile.getAbsolutePath).toString()
   }
 
   atmosphere("/ws") {
@@ -177,8 +177,8 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
             if (asset.isEmpty) throw NotImportable()
 
             val resp = JsObject(Seq(
-              C("Api.Asset.ASSET") -> asset.get.toJson,
-              C("Api.Import.IMPORTED") -> JsBoolean(true)
+              C.Api.Asset.ASSET -> asset.get.toJson,
+              C.Api.Import.IMPORTED -> JsBoolean(true)
             ))
             this.writeToYou(resp)
           }
@@ -188,20 +188,20 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
               log.warn(s"Duplicate for $importAsset")
               val duplicateOf: Asset = ex.duplicateOf
               val resp = JsObject(Seq(
-                C("Api.WARNING") -> JsString(C("msg.warn.duplicate") + " of " + duplicateOf.path),
-                C("Api.Asset.ASSET") -> ex.objJson,
-                C("Api.DUPLICATE_OF") -> ex.duplicateOf,
-                C("Api.Import.IMPORTED") -> JsBoolean(false)
+                C.Api.WARNING -> JsString(C.MSG("warn.duplicate") + " of " + duplicateOf.path),
+                C.Api.Asset.ASSET -> ex.objJson,
+                C.Api.DUPLICATE_OF -> ex.duplicateOf,
+                C.Api.Import.IMPORTED -> JsBoolean(false)
               ))
               this.writeToYou(resp)
             }
             case ex: MetadataExtractorException => {
               log.warn(s"Metadata extraction error for $importAsset")
               val resp =JsObject(Seq(
-                C("Api.WARNING") -> JsString(
+                C.Api.WARNING -> JsString(
                   s"Metadata parser(s) failed. Asset still imported"),
-                C("Api.Asset.ASSET") -> ex.asset.toJson,
-                C("Api.Import.IMPORTED") -> JsBoolean(true)))
+                C.Api.Asset.ASSET -> ex.asset.toJson,
+                C.Api.Import.IMPORTED -> JsBoolean(true)))
               this.writeToYou(resp)
             }
             case ex: Exception => {
@@ -213,9 +213,9 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
               log.error(s"${ex.getClass.getName} exception: ${sw.toString}")
 
               val resp = JsObject(Seq(
-                C("Api.ERROR") -> JsString(ex.toString),
-                C("Api.Import.IMPORTED") -> JsBoolean(false),
-                C("Api.ImportAsset.IMPORT_ASSET") -> importAsset.toJson
+                C.Api.ERROR -> JsString(ex.toString),
+                C.Api.Import.IMPORTED -> JsBoolean(false),
+                C.Api.ImportAsset.IMPORT_ASSET -> importAsset.toJson
               ))
               this.writeToYou(resp)
             }

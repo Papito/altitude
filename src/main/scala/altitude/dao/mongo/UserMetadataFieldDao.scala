@@ -25,18 +25,18 @@ class UserMetadataFieldDao(val app: Altitude) extends BaseMongoDao("metadata_fie
     if (field.constraintList.isEmpty) {
       log.debug(s"User [$user]. Constraint list for [${field.name}] empty - creating it.")
       COLLECTION.update(query, MongoDBObject("$set" ->
-        MongoDBObject(C("MetadataField.CONSTRAINT_LIST") -> List())))
+        MongoDBObject(C.MetadataField.CONSTRAINT_LIST -> List())))
     }
 
     val cmd = MongoDBObject("$addToSet" ->
-      MongoDBObject(C("MetadataField.CONSTRAINT_LIST") -> constraintValue))
+      MongoDBObject(C.MetadataField.CONSTRAINT_LIST -> constraintValue))
 
     COLLECTION.update(query, cmd)
   }
 
   def deleteConstraintValue(fieldId: String, constraintValue: String)(implicit user: User, txId: TransactionId) = {
     val cmd = MongoDBObject("$pull" ->
-      MongoDBObject(C("MetadataField.CONSTRAINT_LIST") -> constraintValue))
+      MongoDBObject(C.MetadataField.CONSTRAINT_LIST -> constraintValue))
 
     val query = MongoDBObject("_id" -> fieldId)
     COLLECTION.update(query, cmd)
@@ -48,7 +48,7 @@ class UserMetadataFieldDao(val app: Altitude) extends BaseMongoDao("metadata_fie
     if (field.constraintList.contains(List())) {
       log.debug(s"User [$user]. Undefining constraint list for [${field.name}].")
       COLLECTION.update(query, MongoDBObject("$unset" ->
-        MongoDBObject(C("MetadataField.CONSTRAINT_LIST") -> "")))
+        MongoDBObject(C.MetadataField.CONSTRAINT_LIST -> "")))
     }
   }
 }

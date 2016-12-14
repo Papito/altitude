@@ -31,7 +31,7 @@ class ClientController  extends BaseWebController {
   }
 
   private lazy val CONTEXT = Map[String, AnyRef](
-      "Const" -> mapAsJavaMap(Const.data),
+      //"Const" -> mapAsJavaMap(Const.data),
       "Config" -> mapAsJavaMap(app.config.data)
     )
 

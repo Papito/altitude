@@ -11,17 +11,17 @@ object Trash {
   implicit def fromJson(json: JsValue): Trash = {
 
     val trash = new Trash(
-      id = (json \ C("Base.ID")).asOpt[String],
-      userId = (json \ C("Base.USER_ID")).as[String],
-      assetType = json \ C("Asset.ASSET_TYPE"),
-      path = (json \ C("Asset.PATH")).as[String],
-      folderId = (json \ C("Asset.FOLDER_ID")).as[String],
-      md5 = (json \ C("Asset.MD5")).as[String],
-      sizeBytes = (json \ C("Asset.SIZE_BYTES")).as[Long],
-      metadata = json \ C("Asset.METADATA")
+      id = (json \ C.Base.ID).asOpt[String],
+      userId = (json \ C.Base.USER_ID).as[String],
+      assetType = json \ C.Asset.ASSET_TYPE,
+      path = (json \ C.Asset.PATH).as[String],
+      folderId = (json \ C.Asset.FOLDER_ID).as[String],
+      md5 = (json \ C.Asset.MD5).as[String],
+      sizeBytes = (json \ C.Asset.SIZE_BYTES).as[Long],
+      metadata = json \ C.Asset.METADATA
     ).withCoreAttr(json)
 
-    val isoRecycledAt = (json \ C("Trash.RECYCLED_AT")).asOpt[String]
+    val isoRecycledAt = (json \ C.Trash.RECYCLED_AT).asOpt[String]
 
     if (isoRecycledAt.isDefined) {
       trash.recycledAt = ISODateTimeFormat.dateTime().parseDateTime(isoRecycledAt.get)
@@ -60,7 +60,7 @@ class Trash(override val id: Option[String] = None,
   }
 
   override def toJson = super.toJson ++ Json.obj(
-    C("Trash.RECYCLED_AT") -> {recycledAt match {
+    C.Trash.RECYCLED_AT -> {recycledAt match {
       case None => JsNull
       case _ => JsString(Util.isoDateTime(recycledAt))
   }})

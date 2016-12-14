@@ -35,7 +35,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
   protected def GET_DATETIME_FROM_REC(field: String, rec: Map[String, AnyRef]): Option[DateTime]
 
-  protected val CORE_SQL_COLS_FOR_INSERT = s"${C("Base.ID")}"
+  protected val CORE_SQL_COLS_FOR_INSERT = s"${C.Base.ID}"
   protected val SYSTEM_TABLE = "system"
 
   protected def utcNow = Util.utcNow
@@ -49,7 +49,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   protected val ONE_SQL = s"""
       SELECT $DEFAULT_SQL_COLS_FOR_SELECT
         FROM $tableName
-       WHERE ${C("Base.ID")} = ?"""
+       WHERE ${C.Base.ID} = ?"""
 
   override def add(jsonIn: JsObject)(implicit user: User, txId: TransactionId): JsObject = {
     val sql: String =s"""
@@ -118,7 +118,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
                          (implicit  user: User, txId: TransactionId): JsObject = {
     log.info(s"JDBC INSERT: $jsonIn")
 
-    val existingObjId: Option[String] = (jsonIn \ C("Base.ID")).asOpt[String]
+    val existingObjId: Option[String] = (jsonIn \ C.Base.ID).asOpt[String]
 
     // create ID unless there is an override
     val id = if (existingObjId.isDefined) existingObjId.get else BaseModel.genId
@@ -131,7 +131,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     runner.update(conn, q, values:_*)
 
     val recordJson = jsonIn ++ JsObject(Seq(
-      C("Base.ID") -> JsString(id)))
+      C.Base.ID -> JsString(id)))
 
     log.debug(s"Added: $recordJson")
     recordJson
@@ -199,7 +199,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
     val sql = s"""
       UPDATE $tableName
-         SET ${C("Base.UPDATED_AT")} = $CURRENT_TIME_FUNC, ${updateFieldPlaceholders.mkString(", ")}
+         SET ${C.Base.UPDATED_AT} = $CURRENT_TIME_FUNC, ${updateFieldPlaceholders.mkString(", ")}
        WHERE ${queryFieldPlaceholders.mkString(",")}
       """
 

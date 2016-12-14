@@ -28,7 +28,7 @@ class LibraryService(app: Altitude) {
       throw new IllegalOperationException("Cannot have assets in root folder")
     }
 
-    val query = Query(user, Map(C("Asset.MD5") -> obj.md5))
+    val query = Query(user, Map(C.Asset.MD5 -> obj.md5))
 
     txManager.withTransaction[JsObject] {
       val existing = app.service.asset.query(query)
@@ -96,8 +96,8 @@ class LibraryService(app: Altitude) {
     log.debug(s"Asset query $query")
 
     // parse out folder ids as a set
-    val folderIds: Set[String] = query.params.getOrElse(C("Api.Folder.QUERY_ARG_NAME"), "")
-      .toString.split(s"\\${C("Api.MULTI_VALUE_DELIM")}").map(_.trim).filter(_.nonEmpty).toSet
+    val folderIds: Set[String] = query.params.getOrElse(C.Api.Folder.QUERY_ARG_NAME, "")
+      .toString.split(s"\\${C.Api.MULTI_VALUE_DELIM}").map(_.trim).filter(_.nonEmpty).toSet
 
     log.debug(s"${folderIds.size} folder ids: $folderIds")
 
@@ -114,7 +114,7 @@ class LibraryService(app: Altitude) {
           Query(
             user,
             params = query.params
-              ++ Map(C("Api.Folder.QUERY_ARG_NAME") -> allFolderIds.mkString(C("Api.MULTI_VALUE_DELIM"))),
+              ++ Map(C.Api.Folder.QUERY_ARG_NAME -> allFolderIds.mkString(C.Api.MULTI_VALUE_DELIM)),
             page = query.page, rpp = query.rpp)
         }
       }
@@ -237,9 +237,9 @@ class LibraryService(app: Altitude) {
         }
 
         // point asset to the new folder
-        val updatedAsset: Asset = asset ++ Json.obj(C("Asset.FOLDER_ID") -> folderId)
+        val updatedAsset: Asset = asset ++ Json.obj(C.Asset.FOLDER_ID -> folderId)
 
-        app.service.asset.updateById(asset.id.get, updatedAsset, fields = List(C("Asset.FOLDER_ID")))
+        app.service.asset.updateById(asset.id.get, updatedAsset, fields = List(C.Asset.FOLDER_ID))
         app.service.folder.decrAssetCount(asset.folderId)
       }
 
@@ -304,7 +304,7 @@ class LibraryService(app: Altitude) {
       val restoredAssetIds: Set[String] = assetIds.map { assetId: String =>
         val trashed: Asset = app.service.trash.getById(assetId)
         app.service.trash.deleteById(assetId)
-        val restoredAsset = trashed ++ Json.obj(C("Asset.FOLDER_ID") -> folderId)
+        val restoredAsset = trashed ++ Json.obj(C.Asset.FOLDER_ID -> folderId)
         val asset: Asset = app.service.library.add(restoredAsset)
         totalBytes += trashed.sizeBytes
         asset.id.get

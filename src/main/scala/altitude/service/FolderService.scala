@@ -14,7 +14,7 @@ import play.api.libs.json._
 object FolderService {
   class FolderValidator
     extends Validator(
-      required = Some(List(C("Folder.NAME"), C("Folder.PARENT_ID"))))
+      required = Some(List(C.Folder.NAME, C.Folder.PARENT_ID)))
 }
 
 class FolderService(app: Altitude) extends BaseService[Folder](app){
@@ -23,7 +23,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
   override val CLEANER = Some(Cleaners.Cleaner(
     trim = Some(
-      List(C("Folder.NAME"), C("Folder.PARENT_ID")))))
+      List(C.Folder.NAME, C.Folder.PARENT_ID))))
 
   override val VALIDATOR = Some(
     new FolderService.FolderValidator)
@@ -36,15 +36,15 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     }
 
     val dupQuery = Query(user, Map(
-      C("Folder.PARENT_ID") -> folder.parentId,
-      C("Folder.NAME_LC") -> folder.nameLowercase))
+      C.Folder.PARENT_ID -> folder.parentId,
+      C.Folder.NAME_LC -> folder.nameLowercase))
 
     try {
       super.add(folder, Some(dupQuery))
     } catch {
       case _: DuplicateException => {
         val ex = ValidationException()
-        ex.errors += (C("Folder.NAME") -> C("msg.warn.duplicate"))
+        ex.errors += (C.Folder.NAME -> C.MSG("warn.duplicate"))
         throw ex
       }
     }
@@ -74,14 +74,14 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     id = Some(user.rootFolderId),
     userId = user.id.get,
     parentId = user.rootFolderId,
-    name = C("Folder.Names.ROOT")
+    name = C.Folder.Names.ROOT
   )
 
   def getUserUncatFolder()(implicit user: User) = Folder(
     id = Some(user.uncatFolderId),
     userId = user.id.get,
     parentId = user.rootFolderId,
-    name = C("Folder.Names.UNCATEGORIZED")
+    name = C.Folder.Names.UNCATEGORIZED
   )
 
   def getUserSystemFolders()(implicit user: User): List[Folder] =
@@ -97,11 +97,11 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   private def addAssetCount(folders: List[JsObject])
                            (implicit user: User, txId: TransactionId): List[JsObject] = {
     folders.map{ json =>
-      val id = (json \ C("Base.ID")).as[String]
+      val id = (json \ C.Base.ID).as[String]
       val assetCount = flatChildren(id, folders).toSeq.map(_.numOfAssets).sum
 
       json ++ JsObject(Seq(
-        C("Folder.NUM_OF_ASSETS") -> JsNumber(assetCount)))
+        C.Folder.NUM_OF_ASSETS -> JsNumber(assetCount)))
     }
   }
 
@@ -113,7 +113,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     txManager.asReadOnly[List[JsObject]] {
       val _all = if (all.isEmpty) getAll else all
       _all.filter(json => {
-        val id = (json \ C("Base.ID")).asOpt[String]
+        val id = (json \ C.Base.ID).asOpt[String]
         !isSystemFolder(id)
       })
     }
@@ -130,7 +130,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     txManager.asReadOnly {
       val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
 
-      val rootEl = nonSysFolders.find(json => (json \ C("Base.ID")).as[String] == _rootId)
+      val rootEl = nonSysFolders.find(json => (json \ C.Base.ID).as[String] == _rootId)
 
       isRootFolder(Some(_rootId)) || rootEl.isDefined match {
         case true => children(_rootId, nonSysFolders)
@@ -153,7 +153,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     txManager.asReadOnly[List[Folder]] {
       val nonSysFolders = getNonSysFolders()
 
-      val folderEl = nonSysFolders.find(json => (json \ C("Base.ID")).as[String] == folderId)
+      val folderEl = nonSysFolders.find(json => (json \ C.Base.ID).as[String] == folderId)
       val folder: Folder = folderEl.isDefined match {
         case true => Folder.fromJson(folderEl.get)
         case false => throw NotFoundException(s"Folder with ID '$folderId' not found")
@@ -175,8 +175,8 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
       val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
 
       nonSysFolders.filter(json => {
-          val id = (json \ C("Base.ID")).as[String]
-          val parentId = (json \ C("Folder.PARENT_ID")).as[String]
+          val id = (json \ C.Base.ID).as[String]
+          val parentId = (json \ C.Folder.PARENT_ID).as[String]
           parentId == rootId && !isSystemFolder(Some(id))
         })
         .map{json => Folder.fromJson(json)}
@@ -235,9 +235,9 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     val immediateChildren = this.immediateChildren(parentId, nonSysFolders)
 
     val folders = for (folder <- immediateChildren) yield  {
-      val id: String = (folder \ C("Base.ID")).as[String]
-      val name = (folder \ C("Folder.NAME")).as[String]
-      val assetCount = (folder \ C("Folder.NUM_OF_ASSETS")).as[Int]
+      val id: String = (folder \ C.Base.ID).as[String]
+      val name = (folder \ C.Folder.NAME).as[String]
+      val assetCount = (folder \ C.Folder.NUM_OF_ASSETS).as[Int]
 
       Folder(
         id = Some(id),
@@ -258,14 +258,14 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   private def findParents(folderId: String, all: List[JsObject])
                          (implicit user: User, txId: TransactionId):  List[Folder] = {
     val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
-    val folderEl = nonSysFolders.find(json => (json \ C("Base.ID")).as[String] == folderId)
+    val folderEl = nonSysFolders.find(json => (json \ C.Base.ID).as[String] == folderId)
 
     val parentId = folderEl.isDefined match {
-      case true => (folderEl.get \ C("Folder.PARENT_ID")).as[String]
+      case true => (folderEl.get \ C.Folder.PARENT_ID).as[String]
       case false => throw NotFoundException(s"Folder with ID '$folderId' not found")
     }
 
-    val parentElements = nonSysFolders filter (json => (json \ C("Base.ID")).as[String] == parentId)
+    val parentElements = nonSysFolders filter (json => (json \ C.Base.ID).as[String] == parentId)
 
     parentElements.isEmpty match {
       case true => List()
@@ -284,7 +284,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   def getByIdWithChildAssetCounts(id: String, all: List[JsObject] = List())
                                  (implicit user: User, txId: TransactionId = new TransactionId): JsObject = {
     val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
-    val matching = nonSysFolders.filter(j => (j \ C("Base.ID")).asOpt[String].contains(id))
+    val matching = nonSysFolders.filter(j => (j \ C.Base.ID).asOpt[String].contains(id))
 
     if (matching.isEmpty) {
       throw NotFoundException(s"Base.ID $id not found")
@@ -300,11 +300,11 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
                      (implicit user: User, txId: TransactionId = new TransactionId): List[(Int, String)] = {
     val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
 
-    val childElements = nonSysFolders.filter(j => (j \ C("Folder.PARENT_ID")).asOpt[String].contains(parentId))
+    val childElements = nonSysFolders.filter(j => (j \ C.Folder.PARENT_ID).asOpt[String].contains(parentId))
 
     // recursively combine with the result of deeper child levels + this one (depth-first)
     (depth, parentId) :: childElements.foldLeft(List[(Int, String)]()) { (res, json) =>
-      val folderId = (json \ C("Base.ID")).as[String]
+      val folderId = (json \ C.Base.ID).as[String]
       res ++ flatChildrenIdsWithDepths(folderId, nonSysFolders, depth + 1)}
   }
 
@@ -324,14 +324,14 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
    */
   def flatChildren(parentId: String, all: List[JsObject], depth: Int = 0)
                   (implicit txId: TransactionId = new TransactionId): Set[Folder]  = {
-    val parentElements = all filter (json => (json \ C("Base.ID")).as[String] == parentId)
+    val parentElements = all filter (json => (json \ C.Base.ID).as[String] == parentId)
 
     if (parentElements.isEmpty) {
       return Set()
     }
 
     val parentElement: Folder = parentElements.head
-    val childElements = all.filter(j => (j \ C("Folder.PARENT_ID")).asOpt[String].contains(parentId))
+    val childElements = all.filter(j => (j \ C.Folder.PARENT_ID).asOpt[String].contains(parentId))
 
     // recursively combine with the result of deeper child levels + this one (depth-first)
     (parentElement :: childElements.foldLeft(List[Folder]()) {(res, json) =>
@@ -371,8 +371,8 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
       // destination parent cannot have folder by the same name
       val dupQuery = Query(user, Map(
-        C("Folder.PARENT_ID") -> destFolderId,
-        C("Folder.NAME_LC") -> folderBeingMoved.nameLowercase))
+        C.Folder.PARENT_ID -> destFolderId,
+        C.Folder.NAME_LC -> folderBeingMoved.nameLowercase))
 
       val folderForUpdate = Folder(
         userId = user.id.get,
@@ -380,7 +380,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
         name = folderBeingMoved.name)
 
       try {
-        updateById(folderBeingMovedId, folderForUpdate, List(C("Folder.PARENT_ID")), Some(dupQuery))
+        updateById(folderBeingMovedId, folderForUpdate, List(C.Folder.PARENT_ID), Some(dupQuery))
       } catch {
         case ex: DuplicateException => throw ValidationException(
           s"Cannot move to '${destFolder.get.name}' as a folder by this name already exists")
@@ -399,8 +399,8 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
 
       // new folder name cannot match the new one
       val dupQuery = Query(user, Map(
-        C("Folder.PARENT_ID") -> folder.parentId,
-        C("Folder.NAME_LC") -> newName.toLowerCase))
+        C.Folder.PARENT_ID -> folder.parentId,
+        C.Folder.NAME_LC -> newName.toLowerCase))
 
       try {
         val folderForUpdate = Folder(
@@ -408,11 +408,11 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
           parentId = folder.parentId,
           name = newName)
 
-        updateById(folderId, folderForUpdate, List(C("Folder.NAME"), C("Folder.NAME_LC")), Some(dupQuery))
+        updateById(folderId, folderForUpdate, List(C.Folder.NAME, C.Folder.NAME_LC), Some(dupQuery))
       } catch {
         case _: DuplicateException => {
           val ex = ValidationException()
-          ex.errors += C("Folder.NAME") -> C("msg.warn.duplicate")
+          ex.errors += C.Folder.NAME -> C.MSG("warn.duplicate")
           throw ex
         }
       }
@@ -424,7 +424,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     log.debug(s"Incrementing folder $folderId count by $count")
 
     txManager.withTransaction {
-      DAO.increment(folderId, C("Folder.NUM_OF_ASSETS"), count)
+      DAO.increment(folderId, C.Folder.NUM_OF_ASSETS, count)
     }
   }
 
@@ -433,7 +433,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
     log.debug(s"Decrementing folder $folderId count by $count")
 
     txManager.withTransaction {
-      DAO.decrement(folderId, C("Folder.NUM_OF_ASSETS"), count)
+      DAO.decrement(folderId, C.Folder.NUM_OF_ASSETS, count)
     }
   }
 
@@ -448,7 +448,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
         }
         case false => {
           val allSysFolders = all.filter(json => {
-            val id = (json \ C("Base.ID")).asOpt[String]
+            val id = (json \ C.Base.ID).asOpt[String]
               isSystemFolder(id)
           })
           getSystemFolderLookup(allSysFolders)
@@ -463,7 +463,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app){
   private def getSystemFolderLookup(allSysFolders: List[JsObject]): Map[String, Folder] = {
     // create the lookup map
     allSysFolders.map(j => {
-      val id = (j \ C("Base.ID")).as[String]
+      val id = (j \ C.Base.ID).as[String]
       val folder = Folder.fromJson(j)
       id -> folder
     }).toMap

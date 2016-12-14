@@ -23,8 +23,8 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
       // verify that the field type is allowed
       if (!FieldType.values.exists(v => v.toString == metadataField.fieldType.toUpperCase)) {
         val ex = ValidationException()
-        ex.errors += (C("MetadataField.FIELD_TYPE") ->
-          C("msg.err.wrong_value").format(FieldType.values.mkString(", ")))
+        ex.errors += (C.MetadataField.FIELD_TYPE ->
+          C.MSG("err.wrong_value").format(FieldType.values.mkString(", ")))
         throw ex
       }
 

@@ -69,7 +69,7 @@ class BaseApiController extends BaseController with GZipSupport {
   // override to disable this check in controllers that do not require a JSON payload for post and put
   private def checkPayload(): Unit = {
     if (List("post", "put").contains(requestMethod) && request.body.isEmpty) {
-      throw ValidationException(C("msg.err.empty_request_body"))
+      throw ValidationException(C.MSG("err.empty_request_body"))
     }
   }
 
@@ -80,11 +80,11 @@ class BaseApiController extends BaseController with GZipSupport {
     /*
     user = requestJson.isDefined match {
       case true => {
-        val id = (requestJson.get \ C("Api.USER_ID")).as[String]
+        val id = (requestJson.get \ C.Api.USER_ID).as[String]
         User(id = Some(id), rootFolderId = "0", uncatFolderId = "1")
       }
       case false => {
-        val id = request.get(C("Api.USER_ID")).toString
+        val id = request.get(C.Api.USER_ID).toString
         User(id = Some(id), rootFolderId = "0", uncatFolderId = "1")
       }
     }
@@ -99,8 +99,8 @@ class BaseApiController extends BaseController with GZipSupport {
       }
 
       BadRequest(Json.obj(
-        C("Api.VALIDATION_ERROR") -> ex.message,
-        C("Api.VALIDATION_ERRORS") -> (if (ex.errors.isEmpty) JsNull else jsonErrors)
+        C.Api.VALIDATION_ERROR -> ex.message,
+        C.Api.VALIDATION_ERRORS -> (if (ex.errors.isEmpty) JsNull else jsonErrors)
       ))
     }
     case ex: NotFoundException => {
@@ -110,8 +110,8 @@ class BaseApiController extends BaseController with GZipSupport {
       val strStacktrace = altitude.Util.logStacktrace(ex)
 
       InternalServerError(Json.obj(
-        C("Api.ERROR") -> (if (ex.getMessage!= null) ex.getMessage else ex.getClass.getName),
-        C("Api.STACKTRACE") -> strStacktrace))
+        C.Api.ERROR -> (if (ex.getMessage!= null) ex.getMessage else ex.getClass.getName),
+        C.Api.STACKTRACE -> strStacktrace))
     }
   }
 }

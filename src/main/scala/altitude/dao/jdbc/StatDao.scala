@@ -38,8 +38,8 @@ abstract class StatDao (val app: Altitude) extends BaseJdbcDao("stats") with alt
                    (implicit user: User, txId: TransactionId): Unit = {
     val sql = s"""
       UPDATE $tableName
-         SET ${C("Stat.DIM_VAL")} = ${C("Stat.DIM_VAL")} + $count
-       WHERE ${C("Base.USER_ID")} = ? and ${C("Stat.DIMENSION")} = ?
+         SET ${C.Stat.DIM_VAL} = ${C.Stat.DIM_VAL} + $count
+       WHERE ${C.Base.USER_ID} = ? and ${C.Stat.DIMENSION} = ?
       """
     log.debug(s"INCR STAT SQL: $sql, for $statName")
 

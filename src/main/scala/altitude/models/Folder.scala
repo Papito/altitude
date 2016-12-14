@@ -7,15 +7,15 @@ import scala.language.implicitConversions
 
 object Folder {
   implicit def fromJson(json: JsValue): Folder = {
-    val childrenJson = (json \ C("Folder.CHILDREN")).as[List[JsValue]]
+    val childrenJson = (json \ C.Folder.CHILDREN).as[List[JsValue]]
 
     Folder(
-      id = (json \ C("Base.ID")).asOpt[String],
-      userId = (json \ C("Base.USER_ID")).as[String],
-      name = (json \ C("Folder.NAME")).as[String],
+      id = (json \ C.Base.ID).asOpt[String],
+      userId = (json \ C.Base.USER_ID).as[String],
+      name = (json \ C.Folder.NAME).as[String],
       children = childrenJson.map(Folder.fromJson),
-      parentId = (json \ C("Folder.PARENT_ID")).as[String],
-      numOfAssets = (json \ C("Folder.NUM_OF_ASSETS")).as[Int]
+      parentId = (json \ C.Folder.PARENT_ID).as[String],
+      numOfAssets = (json \ C.Folder.NUM_OF_ASSETS).as[Int]
     ).withCoreAttr(json)
   }
 }
@@ -32,12 +32,12 @@ case class Folder(id: Option[String] = None,
   override def toJson = {
     val childrenJson: List[JsValue] = children.map(_.toJson)
     Json.obj(
-      C("Base.USER_ID") -> userId,
-      C("Folder.NAME") -> name,
-      C("Folder.NAME_LC") -> nameLowercase,
-      C("Folder.PARENT_ID") -> parentId,
-      C("Folder.CHILDREN") ->  JsArray(childrenJson),
-      C("Folder.NUM_OF_ASSETS") -> numOfAssets
+      C.Base.USER_ID -> userId,
+      C.Folder.NAME -> name,
+      C.Folder.NAME_LC -> nameLowercase,
+      C.Folder.PARENT_ID -> parentId,
+      C.Folder.CHILDREN ->  JsArray(childrenJson),
+      C.Folder.NUM_OF_ASSETS -> numOfAssets
     ) ++ coreJsonAttrs
   }
 

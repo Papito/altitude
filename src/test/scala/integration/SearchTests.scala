@@ -38,7 +38,7 @@ import org.scalatest.Matchers._
       sizeBytes = 1L)
     altitude.service.asset.add(asset)
 
-    val query = Query(CURRENT_USER, params = Map(C("Api.Folder.QUERY_ARG_NAME") -> CURRENT_USER.uncatFolderId))
+    val query = Query(CURRENT_USER, params = Map(C.Api.Folder.QUERY_ARG_NAME -> CURRENT_USER.uncatFolderId))
     val assets = altitude.service.library.search(query).records
     assets.length should be(1)
   }
@@ -71,15 +71,15 @@ import org.scalatest.Matchers._
       userId = CURRENT_USER_ID, assetType = mediaType, path = Util.randomStr(30), md5 = Util.randomStr(30), sizeBytes = 1L))
 
     altitude.service.library.search(
-      Query(CURRENT_USER, params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1_2.id.get))
+      Query(CURRENT_USER, params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1_2.id.get))
     ).records.length should be(1)
 
     altitude.service.library.search(
-      Query(CURRENT_USER, params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1_1.id.get))
+      Query(CURRENT_USER, params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1_1.id.get))
     ).records.length should be(1)
 
     altitude.service.library.search(
-      Query(CURRENT_USER, params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
+      Query(CURRENT_USER, params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
     ).records.length should be(3)
   }
 
@@ -104,15 +104,15 @@ import org.scalatest.Matchers._
     }
 
     altitude.service.library.search(
-      Query(CURRENT_USER, params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder1.id.get))
+      Query(CURRENT_USER, params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
     ).records.length shouldEqual 2
 
     altitude.service.library.search(
-      Query(CURRENT_USER, params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder2_1.id.get))
+      Query(CURRENT_USER, params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2_1.id.get))
     ).records.length shouldEqual 2
 
     altitude.service.library.search(
-      Query(CURRENT_USER, params = Map(C("Api.Folder.QUERY_ARG_NAME") -> folder2.id.get))
+      Query(CURRENT_USER, params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2.id.get))
     ).records.length shouldEqual 4
   }
 

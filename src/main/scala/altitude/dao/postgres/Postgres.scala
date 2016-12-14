@@ -11,7 +11,7 @@ trait Postgres {
   protected def CORE_SQL_VALS_FOR_INSERT = "?"
 
   protected def DEFAULT_SQL_COLS_FOR_SELECT = s"""
-      ${C("Base.ID")}, *,
+      ${C.Base.ID}, *,
       EXTRACT(EPOCH FROM created_at) AS created_at,
       EXTRACT(EPOCH FROM updated_at) AS updated_at
     """
@@ -21,12 +21,12 @@ trait Postgres {
   protected def JSON_FUNC = "CAST(? as jsonb)"
 
   protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit = {
-    val createdAtMilis = rec.getOrElse(C("Base.CREATED_AT"), 0d).asInstanceOf[Double].toLong
+    val createdAtMilis = rec.getOrElse(C.Base.CREATED_AT, 0d).asInstanceOf[Double].toLong
     if (createdAtMilis != 0d) {
       model.createdAt = new DateTime(createdAtMilis * 1000)
     }
 
-    val updatedAtMilis = rec.getOrElse(C("Base.UPDATED_AT"), 0d).asInstanceOf[Double].toLong
+    val updatedAtMilis = rec.getOrElse(C.Base.UPDATED_AT, 0d).asInstanceOf[Double].toLong
     if (updatedAtMilis != 0d) {
       model.updatedAt = new DateTime(createdAtMilis * 1000)
     }

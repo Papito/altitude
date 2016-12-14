@@ -3,122 +3,177 @@ package altitude
 
 object Const {
 
-  def apply(key: String): String = {
-    val v = data.get(key)
-    if (v.isDefined) v.get else throw new RuntimeException(s"No constant value for: $key")
+  trait Common {
+    val ID = "id"
+    val USER_ID = "user_id"
+    val VALUES = "values"
+    val DATA = "data"
+    val CREATED_AT = "created_at"
+    val UPDATED_AT = "updated_at"
+    val IS_CLEAN = "is_clean"
   }
 
-  val data = Map(
-    "Base.ID" -> "id",
-    "Base.USER_ID" -> "user_id",
-    "Base.VALUES" -> "values",
-    "Base.DATA" -> "data",
-    "Base.CREATED_AT" -> "created_at",
-    "Base.UPDATED_AT" -> "updated_at",
-    "Base.IS_CLEAN" -> "is_clean",
-    "System.UNCATEGORIZED_COUNT" ->  "uncategorized_count",
-    "System.TRASH_COUNT" -> "trash_count",
+  object Base extends Common
 
-    /*---------------------------------------------------------------------------
-    MODELS
-    ---------------------------------------------------------------------------*/
-    "User.ROOT_FOLDER_ID" -> "root_folder_id",
-    "User.UNCAT_FOLDER_ID" -> "uncat_folder_id",
-    "Asset.ASSET_TYPE" -> "asset_type",
-    "Asset.PATH" -> "path",
-    "Asset.FOLDER_ID" -> "folder_id",
-    "Asset.MD5" -> "md5",
-    "Asset.SIZE_BYTES" -> "size_bytes",
-    "Asset.FILENAME" -> "filename",
-    "Asset.METADATA" -> "metadata",
-    "AssetType.MIME_TYPE" -> "mime_type",
-    "AssetType.MEDIA_TYPE" -> "media_type",
-    "AssetType.MEDIA_SUBTYPE" -> "media_subtype",
-    "Trash.RECYCLED_AT" -> "recycled_at",
-    "Folder.NAME" -> "name",
-    "Folder.NAME_LC" -> "name_lc",
-    "Folder.PARENT_ID" -> "parent_id",
-    "Folder.NUM_OF_ASSETS" -> "num_of_assets",
-    "Folder.CHILDREN" -> "children",
-    "Folder.IS_ROOT" -> "is_root",
-    "Folder.Names.ROOT" -> "All", //TODO: not i18n
-    "Folder.Names.UNCATEGORIZED" -> "Uncategorized",  //TODO: not i18n
-    "Preview.ASSET_ID" -> "asset_id",
-    "Preview.MIME_TYPE" -> "mime_type",
-    "Preview.DATA" -> "data",
-    "Data.ASSET_ID" -> "asset_id",
-    "Data.MIME_TYPE" -> "mime_type",
-    "Data.DATA" -> "data",
-    "Stat.DIMENSION" -> "dimension",
-    "Stat.DIM_VAL" -> "dim_val",
-    "MetadataField.NAME" -> "name",
-    "MetadataField.NAME_LC" -> "name_lc",
-    "MetadataField.FIELD_TYPE" -> "field_type",
-    "MetadataField.CONSTRAINT_LIST" -> "constraint_list",
-    "MetadataField.MAX_LENGTH" -> "max_length",
-    "MetadataConstraintValue.FIELD_ID" -> "field_id",
-    "MetadataConstraintValue.CONSTRAINT_VALUE" -> "constraint_value",
+  object System {
+    val UNCATEGORIZED_COUNT = "uncategorized_count"
+    val TRASH_COUNT = "trash_count"
+  }
 
-    /*---------------------------------------------------------------------------
-    API
-    ---------------------------------------------------------------------------*/
-    "Api.USER_ID" -> "user_id",
-    "Api.ERROR" -> "error",
-    "Api.STACKTRACE" -> "stacktrace",
-    "Api.WARNING" -> "warning",
-    "Api.CRITICAL" -> "critical",
-    "Api.VALIDATION_ERROR" -> "validation_error",
-    "Api.VALIDATION_ERRORS" -> "validation_errors",
-    "Api.MULTI_VALUE_DELIM" -> "+",
-    "Api.DUPLICATE_OF" -> "duplicate_of",
+  object User extends Common {
+    val ROOT_FOLDER_ID = "root_folder_id"
+    val UNCAT_FOLDER_ID = "uncat_folder_id"
+  }
+
+  object Asset extends Common {
+    val ASSET_TYPE = "asset_type"
+    val PATH = "path"
+    val FOLDER_ID = "folder_id"
+    val MD5 = "md5"
+    val SIZE_BYTES = "size_bytes"
+    val FILENAME = "filename"
+    val METADATA = "metadata"
+  }
+
+  object AssetType extends Common {
+    val MIME_TYPE = "mime_type"
+    val MEDIA_TYPE = "media_type"
+    val MEDIA_SUBTYPE = "media_subtype"
+  }
+
+  object Trash extends Common {
+    val RECYCLED_AT = "recycled_at"
+  }
+
+  object Folder extends Common {
+    val NAME = "name"
+    val NAME_LC = "name_lc"
+    val PARENT_ID = "parent_id"
+    val NUM_OF_ASSETS = "num_of_assets"
+    val CHILDREN = "children"
+    val IS_ROOT = "is_root"
+
+    object Names {
+      val ROOT = "All"
+      val UNCATEGORIZED = "Uncategorized"
+    }
+  }
+
+  object Preview {
+    val ASSET_ID = "asset_id"
+    val MIME_TYPE = "mime_type"
+    val DATA = "data"
+  }
+
+  object Data {
+    val ASSET_ID = "asset_id"
+    val MIME_TYPE = "mime_type"
+    val DATA = "data"
+  }
+
+  object Stat extends Common {
+    val DIMENSION = "dimension"
+    val DIM_VAL = "dim_val"
+  }
+
+  object MetadataField extends Common {
+    val NAME = "name"
+    val NAME_LC = "name_lc"
+    val FIELD_TYPE = "field_type"
+    val CONSTRAINT_LIST = "constraint_list"
+    val MAX_LENGTH = "max_length"
+  }
+
+  object MetadataConstraintValue extends Common {
+    val FIELD_ID = "field_id"
+    val CONSTRAINT_VALUE = "constraint_value"
+  }
+
+  object Api {
+    val USER_ID = "user_id"
+    val ERROR = "error"
+    val STACKTRACE = "stacktrace"
+    val WARNING = "warning"
+    val CRITICAL = "critical"
+    val VALIDATION_ERROR = "validation_error"
+    val VALIDATION_ERRORS = "validation_errors"
+    val MULTI_VALUE_DELIM = "+"
+    val DUPLICATE_OF = "duplicate_of"
 
     // FIXME: wrong naming convention
-    "Api.TOTAL_RECORDS" -> "totalRecords",
-    "Api.TOTAL_PAGES" -> "totalPages",
-    "Api.CURRENT_PAGE" -> "currentPage",
-    "Api.RESULTS_PER_PAGE" -> "resultsPerPage",
+    val TOTAL_RECORDS = "totalRecords"
+    val TOTAL_PAGES = "totalPages"
+    val CURRENT_PAGE = "currentPage"
+    val RESULTS_PER_PAGE = "resultsPerPage"
 
-    "Api.ID" -> "id",
-    "Api.DATA" -> "data",
-    "Api.PATH" -> "path",
-    "Api.DIRECTORY_NAMES" -> "directory_names",
-    "Api.OS_DIR_SEPARATOR" -> "os_dir_separator",
-    "Api.CURRENT_PATH" -> "current_path",
-    "Api.Import.IMPORTED" -> "imported",
-    "Api.ImportAsset.IMPORT_ASSET" -> "import_asset",
-    "Api.Asset.ASSET" -> "asset",
-    "Api.Asset.FOLDER_ID" -> "folder_id",
-    "Api.Asset.ASSETS" -> "assets",
-    "Api.Search.ASSETS" -> "assets",
-    "Api.Search.QUERY_TEXT" -> "query_txt",
-    "Api.Search.RESULTS_PER_PAGE" -> "rpp",
-    "Api.Search.PAGE" -> "p",
-    "Api.Search.FOLDERS" -> "folders",
-    "Api.Folder.QUERY_ARG_NAME" -> "__FOLDERS__",
-    "Api.Folder.HIERARCHY" -> "hierarchy",
-    "Api.Folder.SYSTEM" -> "system",
-    "Api.Folder.UNCATEGORIZED" -> "uncategorized",
-    "Api.Folder.TRASH" -> "trash",
-    "Api.Folder.FOLDERS" -> "folders",
-    "Api.Folder.FOLDER" -> "folder",
-    "Api.Folder.ASSET_IDS" -> "asset_ids",
-    "Api.Folder.PATH" -> "path",
-    "Api.Folder.NAME" -> "name",
-    "Api.Folder.PARENT_ID" -> "parent_id",
-    "Api.Trash.ASSET_IDS" -> "asset_ids",
-    "Api.Stats.STATS" -> "stats",
+    val ID = "id"
+    val DATA = "data"
+    val PATH = "path"
+    val DIRECTORY_NAMES = "directory_names"
+    val OS_DIR_SEPARATOR = "os_dir_separator"
+    val CURRENT_PATH = "current_path"
 
-    /*---------------------------------------------------------------------------
-    MESSAGES
-    ---------------------------------------------------------------------------*/
-    "msg.warn.duplicate" -> "Duplicate",
-    "msg.err.required" -> "This field is required",
-    "msg.err.validation_error" -> "Validation error",
-    "msg.err.validation_errors" -> "There are validation errors in: %s",
-    "msg.err.wrong_type" -> "This field does not match the required type (%s)",
-    "msg.err.wrong_value" -> "This is not an allowed value. Allowed values are: %s",
-    "msg.err.empty_request_body" -> "Empty request body"
-  )
+    object Import {
+      val IMPORTED = "imported"
+    }
+
+    object ImportAsset {
+      val IMPORT_ASSET = "import_asset"
+    }
+
+    object Asset {
+      val ASSET = "asset"
+      val FOLDER_ID = "folder_id"
+      val ASSETS = "assets"
+    }
+
+    object Search {
+      val ASSETS = "assets"
+      val QUERY_TEXT = "query_txt"
+      val RESULTS_PER_PAGE = "rpp"
+      val PAGE = "p"
+      val FOLDERS = "folders"
+    }
+
+    object Folder {
+      val QUERY_ARG_NAME = "__FOLDERS__"
+      val HIERARCHY = "hierarchy"
+      val SYSTEM = "system"
+      val UNCATEGORIZED = "uncategorized"
+      val TRASH = "trash"
+      val FOLDERS = "folders"
+      val FOLDER = "folder"
+      val ASSET_IDS = "asset_ids"
+      val PATH = "path"
+      val NAME = "name"
+      val PARENT_ID = "parent_id"
+    }
+
+    object Trash {
+      val ASSET_IDS = "asset_ids"
+    }
+
+    object Stats {
+      val STATS = "stats"
+    }
+  }
+
+  object MSG {
+    def apply(key: String): String = {
+      val v = data.get(key)
+      if (v.isDefined) v.get else throw new RuntimeException(s"No message value for: $key")
+    }
+
+    val data: Map[String, String] = Map(
+      "warn.duplicate" -> "Duplicate",
+      "err.required" -> "This field is required",
+      "err.validation_error" -> "Validation error",
+      "err.validation_errors" -> "There are validation errors in: %s",
+      "err.wrong_type" -> "This field does not match the required type (%s)",
+      "err.wrong_value" -> "This is not an allowed value. Allowed values are: %s",
+      "err.empty_request_body" -> "Empty request body"
+    )
+  }
 
   /*---------------------------------------------------------------------------
   LOG TAGS
@@ -126,6 +181,7 @@ object Const {
   object LogTag {
     val APP     = "APP"
     val API     = "API"
+    val DAO     = "DAO"
     val WEB     = "WEB"
     val SERVICE = "SERVICE"
     val DB = "DB"

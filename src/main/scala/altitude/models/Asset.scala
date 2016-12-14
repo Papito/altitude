@@ -8,14 +8,14 @@ import scala.language.implicitConversions
 
 object Asset {
   implicit def fromJson(json: JsValue): Asset = Asset(
-    id = (json \ C("Base.ID")).asOpt[String],
-    userId = (json \ C("Base.USER_ID")).as[String],
-    assetType = json \ C("Asset.ASSET_TYPE"),
-    path = (json \ C("Asset.PATH")).as[String],
-    folderId = (json \ C("Asset.FOLDER_ID")).as[String],
-    md5 = (json \ C("Asset.MD5")).as[String],
-    sizeBytes = (json \ C("Asset.SIZE_BYTES")).as[Long],
-    metadata = json \ C("Asset.METADATA")
+    id = (json \ C.Base.ID).asOpt[String],
+    userId = (json \ C.Base.USER_ID).as[String],
+    assetType = json \ C.Asset.ASSET_TYPE,
+    path = (json \ C.Asset.PATH).as[String],
+    folderId = (json \ C.Asset.FOLDER_ID).as[String],
+    md5 = (json \ C.Asset.MD5).as[String],
+    sizeBytes = (json \ C.Asset.SIZE_BYTES).as[Long],
+    metadata = json \ C.Asset.METADATA
   ).withCoreAttr(json)
 }
 
@@ -32,14 +32,14 @@ case class Asset(id: Option[String] = None,
   val fileName: String = FilenameUtils.getName(path)
 
   override def toJson = Json.obj(
-    C("Base.USER_ID") -> userId,
-    C("Asset.PATH") -> path,
-    C("Asset.FOLDER_ID") -> folderId,
-    C("Asset.MD5") -> md5,
-    C("Asset.FILENAME") -> fileName,
-    C("Asset.SIZE_BYTES") -> sizeBytes,
-    C("Asset.ASSET_TYPE") -> (assetType: JsValue),
-    C("Asset.METADATA") -> metadata) ++ coreJsonAttrs
+    C.Base.USER_ID -> userId,
+    C.Asset.PATH -> path,
+    C.Asset.FOLDER_ID -> folderId,
+    C.Asset.MD5 -> md5,
+    C.Asset.FILENAME -> fileName,
+    C.Asset.SIZE_BYTES -> sizeBytes,
+    C.Asset.ASSET_TYPE -> (assetType: JsValue),
+    C.Asset.METADATA -> metadata) ++ coreJsonAttrs
 
   override def toString = s"${this.path} ${this.assetType.mediaType} ${this.assetType.mediaSubtype}"
 }
