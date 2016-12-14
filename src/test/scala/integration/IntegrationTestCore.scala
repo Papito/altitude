@@ -13,6 +13,7 @@ import net.codingwell.scalaguice.ScalaModule
 import org.apache.commons.io.FileUtils
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach, FunSuite}
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 
 abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with BeforeAndAfterEach {
   val log =  LoggerFactory.getLogger(getClass)
@@ -35,7 +36,13 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   protected val dbUtilities = injector.instance[UtilitiesDao]
   implicit val txId: TransactionId = new TransactionId
 
+  private var count = 0
+
   override def beforeEach() = {
+    MDC.put("USER", s"[USR:$CURRENT_USER]")
+    count = count + 1
+    MDC.put("REQUEST_ID", s"[TEST: $count]")
+
     dbUtilities.migrateDatabase()
 
     altitude.transactions.COMMITTED = 0

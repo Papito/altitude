@@ -20,4 +20,6 @@ case class User(id: Option[String] = None,
   override def toJson = Json.obj(
     C.Base.ID -> id
   )
+
+  override def toString = s"<username> ${id.getOrElse("NO ID")}"
 }

@@ -4,10 +4,12 @@ import altitude.Validators.ApiValidator
 import altitude.controllers.BaseController
 import altitude.exceptions.{NotFoundException, ValidationException}
 import altitude.models.User
+import altitude.Util
 import altitude.{Const => C}
 import org.scalatra._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsNull, JsObject, Json}
+import org.slf4j.MDC
 
 class BaseApiController extends BaseController with GZipSupport {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -31,12 +33,16 @@ class BaseApiController extends BaseController with GZipSupport {
       throw new RuntimeException("User was not set for this request")
 
   before() {
-    log.info(
-      s"API ${request.getRequestURI} ${requestMethod.toUpperCase} request with {${request.body}} and ${request.getParameterMap}")
+    request.setAttribute("request_id", Util.randomStr(size = 6))
+    MDC.put("REQUEST_ID", s"[REQ:${request.getAttribute("request_id").toString}]")
 
     // verify that requests with request body are not empty
     checkPayload()
+
     setUser()
+
+    log.info(
+      s"API ${request.getRequestURI} ${requestMethod.toUpperCase} request with {${request.body}} and ${request.getParameterMap}")
 
     /*
     Process all validators that may be set for this controller/method.
@@ -77,18 +83,19 @@ class BaseApiController extends BaseController with GZipSupport {
     val user = User(id = Some("1"), rootFolderId = "0", uncatFolderId = "1")
     log.info(s"User for this request $user")
     request.setAttribute("user", user)
+    MDC.put("USER", s"[USR:${user.toString}]")
     /*
-    user = requestJson.isDefined match {
-      case true => {
-        val id = (requestJson.get \ C.Api.USER_ID).as[String]
-        User(id = Some(id), rootFolderId = "0", uncatFolderId = "1")
+      user = requestJson.isDefined match {
+        case true => {
+          val id = (requestJson.get \ C.Api.USER_ID).as[String]
+          User(id = Some(id), rootFolderId = "0", uncatFolderId = "1")
+        }
+        case false => {
+          val id = request.get(C.Api.USER_ID).toString
+          User(id = Some(id), rootFolderId = "0", uncatFolderId = "1")
+        }
       }
-      case false => {
-        val id = request.get(C.Api.USER_ID).toString
-        User(id = Some(id), rootFolderId = "0", uncatFolderId = "1")
-      }
-    }
-  */
+    */
   }
 
   error {
