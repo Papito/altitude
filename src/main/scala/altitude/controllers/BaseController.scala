@@ -13,6 +13,7 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
   private final val log = LoggerFactory.getLogger(getClass)
 
   error {
+    // TODO: Handling of errors is different from outside of development
     case ex: Exception => {
       ex.printStackTrace()
       val sw: StringWriter = new StringWriter()
@@ -29,8 +30,9 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
     throw new RuntimeException("User was not set for this request")
 
   before() {
-    request.setAttribute("request_id", Util.randomStr(size = 6))
-    MDC.put("REQUEST_ID", s"[${request.getAttribute("request_id").toString}]")
+    val requestId = Util.randomStr(size = 6)
+    request.setAttribute("request_id", requestId)
+    MDC.put("REQUEST_ID", s"[$requestId]")
     request.setAttribute("startTime", Platform.currentTime)
     setUser()
     logRequestStart()
