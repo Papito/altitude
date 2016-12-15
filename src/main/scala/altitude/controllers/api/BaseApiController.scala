@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsNull, JsObject, Json}
 import org.slf4j.MDC
 
+import scala.compat.Platform
+
 class BaseApiController extends BaseController with GZipSupport {
   private final val log = LoggerFactory.getLogger(getClass)
 
@@ -30,9 +32,6 @@ class BaseApiController extends BaseController with GZipSupport {
   before() {
     // verify that requests with request body are not empty
     checkPayload()
-
-    log.info(
-      s"API ${request.getRequestURI} ${requestMethod.toUpperCase} request with {${request.body}} and ${request.getParameterMap}")
 
     /*
     Process all validators that may be set for this controller/method.
@@ -60,6 +59,16 @@ class BaseApiController extends BaseController with GZipSupport {
 
     // all responses are of type:
     contentType = "application/json; charset=UTF-8"
+  }
+
+  override def logRequestStart() = {
+    log.info(
+      s"API ${request.getRequestURI} ${requestMethod.toUpperCase} request with {${request.body}} and ${request.getParameterMap}")
+  }
+
+  override def logRequestEnd() = {
+    val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
+    log.debug(s"API request END: ${request.getRequestURI} in ${Platform.currentTime - startTime}ms")
   }
 
   // override to disable this check in controllers that do not require a JSON payload for post and put

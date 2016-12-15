@@ -3,13 +3,10 @@ package altitude.controllers.web
 import java.io.File
 
 import altitude.Environment
-import altitude.models.User
 import org.slf4j.{MDC, LoggerFactory}
 
 class StaticAssetController extends BaseWebController {
   private final val log = LoggerFactory.getLogger(getClass)
-
-  override def setUser() = {}
 
   before() {
     contentType = "application/octet-stream"
@@ -43,4 +40,8 @@ class StaticAssetController extends BaseWebController {
       }
     }
   }
+
+  override def setUser() = Unit
+  override def logRequestStart() = Unit
+  override def logRequestEnd() = Unit
 }

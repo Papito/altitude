@@ -31,27 +31,23 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
   before() {
     request.setAttribute("request_id", Util.randomStr(size = 6))
     MDC.put("REQUEST_ID", s"<${request.getAttribute("request_id").toString}>")
-
+    request.setAttribute("startTime", Platform.currentTime)
     setUser()
-
-    if (!isAssetUri && !isApiUri) {
-      log.debug(s"Request START: ${request.getRequestURI} args: {${request.getParameterMap}}")
-    }
-
-    if (isApiUri || isClientUri) {
-      request.setAttribute("startTime", Platform.currentTime)
-    }
+    logRequestStart()
   }
 
   after() {
-    if (!isAssetUri && !isApiUri && !isClientUri) {
-      log.debug(s"Request END: ${request.getRequestURI}")
-    }
+    logRequestEnd()
+    MDC.clear()
+  }
 
-    if (isApiUri || isClientUri) {
-      val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
-      log.debug(s"Request END: ${request.getRequestURI} in ${Platform.currentTime - startTime}ms")
-    }
+  protected def logRequestStart() = {
+    log.debug(s"Request START: ${request.getRequestURI} args: {${request.getParameterMap}}")
+  }
+
+  protected def logRequestEnd() = {
+    val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
+    log.debug(s"Request END: ${request.getRequestURI} in ${Platform.currentTime - startTime}ms")
   }
 
   protected def setUser() = {
@@ -59,17 +55,4 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
     request.setAttribute("user", user)
     MDC.put("USER", s"[U: ${user.toString}]")
   }
-
-  protected def isAssetUri: Boolean = {
-    val uri = request.getRequestURI
-    //FIXME: clunky
-    uri.startsWith("/js/") ||
-      uri.startsWith("/css/") ||
-      uri.startsWith("/i/") ||
-      uri.startsWith("/assets/") ||
-      uri.startsWith("/static/")
-  }
-
-  protected def isApiUri = request.getRequestURI.startsWith("/api/")
-  protected def isClientUri = request.getRequestURI.startsWith("/client/")
 }

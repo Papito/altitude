@@ -20,4 +20,8 @@ class AssetController extends BaseWebController {
       case ex: NotFoundException => redirect("/i/1x1.png") //FIXME: preload and return binary data
     }
   }
+
+  override def logRequestStart() = Unit
+  override def logRequestEnd() = Unit
+
 }
