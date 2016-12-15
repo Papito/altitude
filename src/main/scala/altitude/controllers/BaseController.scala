@@ -30,7 +30,7 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
 
   before() {
     request.setAttribute("request_id", Util.randomStr(size = 6))
-    MDC.put("REQUEST_ID", s"<${request.getAttribute("request_id").toString}>")
+    MDC.put("REQUEST_ID", s"[${request.getAttribute("request_id").toString}]")
     request.setAttribute("startTime", Platform.currentTime)
     setUser()
     logRequestStart()
@@ -42,17 +42,17 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
   }
 
   protected def logRequestStart() = {
-    log.debug(s"Request START: ${request.getRequestURI} args: {${request.getParameterMap}}")
+    log.info(s"Request START: ${request.getRequestURI} args: {${request.getParameterMap}}")
   }
 
   protected def logRequestEnd() = {
     val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
-    log.debug(s"Request END: ${request.getRequestURI} in ${Platform.currentTime - startTime}ms")
+    log.info(s"Request END: ${request.getRequestURI} in ${Platform.currentTime - startTime}ms")
   }
 
   protected def setUser() = {
     val user = User(id = Some("1"), rootFolderId = "0", uncatFolderId = "1")
     request.setAttribute("user", user)
-    MDC.put("USER", s"[U: ${user.toString}]")
+    MDC.put("USER", s"[${user.toString}]")
   }
 }

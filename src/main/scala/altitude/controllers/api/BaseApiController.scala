@@ -68,7 +68,7 @@ class BaseApiController extends BaseController with GZipSupport {
 
   override def logRequestEnd() = {
     val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
-    log.debug(s"API request END: ${request.getRequestURI} in ${Platform.currentTime - startTime}ms")
+    log.info(s"API request END: ${request.getRequestURI} in ${Platform.currentTime - startTime}ms")
   }
 
   // override to disable this check in controllers that do not require a JSON payload for post and put
