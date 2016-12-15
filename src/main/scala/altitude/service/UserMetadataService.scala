@@ -24,7 +24,7 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
       if (!FieldType.values.exists(v => v.toString == metadataField.fieldType.toUpperCase)) {
         val ex = ValidationException()
         ex.errors += (C.MetadataField.FIELD_TYPE ->
-          C.MSG("err.wrong_value").format(FieldType.values.mkString(", ")))
+          C.Msg.Err.WRONG_VALUE.format(FieldType.values.mkString(", ")))
         throw ex
       }
 

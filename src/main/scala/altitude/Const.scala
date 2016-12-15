@@ -158,21 +158,20 @@ object Const {
     }
   }
 
-  object MSG {
-    def apply(key: String): String = {
-      val v = data.get(key)
-      if (v.isDefined) v.get else throw new RuntimeException(s"No message value for: $key")
+  object Msg {
+
+    object Warn {
+      val DUPLICATE = "Duplicate"
+      val REQUIRED = "This field is required"
     }
 
-    val data: Map[String, String] = Map(
-      "warn.duplicate" -> "Duplicate",
-      "err.required" -> "This field is required",
-      "err.validation_error" -> "Validation error",
-      "err.validation_errors" -> "There are validation errors in: %s",
-      "err.wrong_type" -> "This field does not match the required type (%s)",
-      "err.wrong_value" -> "This is not an allowed value. Allowed values are: %s",
-      "err.empty_request_body" -> "Empty request body"
-    )
+    object Err {
+      val VALIDATION_ERROR = "Validation error"
+      val VALIDATION_ERRORS = "There are validation errors in: %s"
+      val WRONG_TYPE = "This field does not match the required type (%s)"
+      val WRONG_VALUE = "This is not an allowed value. Allowed values are: %s"
+      val EMPTY_REQUEST_BODY = "Empty request body"
+    }
   }
 
   /*---------------------------------------------------------------------------

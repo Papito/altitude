@@ -63,7 +63,7 @@ class BaseApiController extends BaseController with GZipSupport {
 
   override def logRequestStart() = {
     log.info(
-      s"API ${request.getRequestURI} ${requestMethod.toUpperCase} request with {${request.body}} and ${request.getParameterMap}")
+      s"API ${request.getRequestURI} ${requestMethod.toUpperCase} with {${request.body}} and ${request.getParameterMap}")
   }
 
   override def logRequestEnd() = {
@@ -74,7 +74,7 @@ class BaseApiController extends BaseController with GZipSupport {
   // override to disable this check in controllers that do not require a JSON payload for post and put
   private def checkPayload(): Unit = {
     if (List("post", "put").contains(requestMethod) && request.body.isEmpty) {
-      throw ValidationException(C.MSG("err.empty_request_body"))
+      throw ValidationException(C.Msg.Err.EMPTY_REQUEST_BODY)
     }
   }
 

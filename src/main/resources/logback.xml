@@ -3,7 +3,7 @@
     <!-- encoders are assigned the type
          ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
     <encoder>
-      <pattern>%boldWhite(%d{HH:mm:ss.SSS}) %cyan(%X{REQUEST_ID} %X{USER}) %highlight(%-5level) %logger{36}:%M:%L - %highlight(%msg) %n</pattern>
+      <pattern>%boldWhite(%d{HH:mm:ss.SSS}) %cyan(%X{REQUEST_ID}) %gray(%X{USER}) %highlight(%-5level) %logger{36}:%M:%L - %highlight(%msg) %n</pattern>
     </encoder>
   </appender>
 

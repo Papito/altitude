@@ -188,7 +188,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
               log.warn(s"Duplicate for $importAsset")
               val duplicateOf: Asset = ex.duplicateOf
               val resp = JsObject(Seq(
-                C.Api.WARNING -> JsString(C.MSG("warn.duplicate") + " of " + duplicateOf.path),
+                C.Api.WARNING -> JsString(C.Msg.Warn.DUPLICATE + " of " + duplicateOf.path),
                 C.Api.Asset.ASSET -> ex.objJson,
                 C.Api.DUPLICATE_OF -> ex.duplicateOf,
                 C.Api.Import.IMPORTED -> JsBoolean(false)

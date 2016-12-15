@@ -98,7 +98,9 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     val count: Int =  getQueryResultCount(query, sqlQuery.selectBindValues)
 
     log.debug(s"Found [$count] records. Retrieved [${recs.length}] records")
-    log.debug(recs.map(_.toString()).mkString("\n"))
+    if (recs.nonEmpty) {
+      log.debug(recs.map(_.toString()).mkString("\n"))
+    }
     QueryResult(records = recs.map{makeModel}, total = count, query = Some(query))
   }
 
