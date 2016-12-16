@@ -1,6 +1,5 @@
 package integration
 
-import altitude.exceptions.ValidationException
 import altitude.models._
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._

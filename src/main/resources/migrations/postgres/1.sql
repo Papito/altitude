@@ -10,6 +10,13 @@ CREATE TABLE system (
 CREATE UNIQUE INDEX system_record ON system(id);
 INSERT INTO system(id, version) VALUES(0, 0);
 
+CREATE TABLE repository(
+  id char(24) PRIMARY KEY,
+  name varchar(255) NOT NULL,
+  root_folder_id char(24) NOT NULL,
+  uncat_folder_id char(24) NOT NULL
+) INHERITS (_core);
+
 CREATE TABLE stats (
   user_id varchar(24) NOT NULL,
   dimension varchar(24) PRIMARY KEY,
@@ -44,7 +51,7 @@ CREATE TABLE trash (
   mime_type varchar(64) NOT NULL,
   metadata jsonb,
   path TEXT NOT NULL,
-  folder_id varchar(24) NOT NULL DEFAULT '1',
+  folder_id varchar(24) NOT NULL,
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
   created_at timestamp WITH TIME ZONE NOT NULL,
@@ -88,7 +95,7 @@ CREATE TABLE folder (
   user_id varchar(24) NOT NULL,
   name varchar(255) NOT NULL,
   name_lc varchar(255) NOT NULL,
-  parent_id varchar(24) NOT NULL DEFAULT '0',
+  parent_id varchar(24) NOT NULL,
   num_of_assets INTEGER NOT NULL DEFAULT 0
 ) INHERITS (_core);
 CREATE INDEX folder_parent_id ON folder(parent_id);

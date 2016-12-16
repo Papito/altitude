@@ -41,6 +41,6 @@ class ScalatraBootstrap extends LifeCycle with SingleApplication {
     log.info("Cleaning up after ourselves...")
     app.freeResources()
     super.destroy(context)
-    log.info("All done. Come back soon.")
+    log.info("All done.")
   }
 }

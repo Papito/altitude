@@ -5,6 +5,7 @@ object Const {
 
   trait Common {
     val ID = "id"
+    val DB_ID = "db_id"
     val USER_ID = "user_id"
     val VALUES = "values"
     val DATA = "data"
@@ -16,12 +17,22 @@ object Const {
   object Base extends Common
 
   object System {
+    // TODO: belong to stats
     val UNCATEGORIZED_COUNT = "uncategorized_count"
+    // TODO: belong to stats
     val TRASH_COUNT = "trash_count"
   }
 
-  object User extends Common {
+  object Repository extends Common {
+    val NAME = "name"
     val ROOT_FOLDER_ID = "root_folder_id"
+    val UNCAT_FOLDER_ID = "uncat_folder_id"
+  }
+
+  object User extends Common {
+    // TODO: belong to Repository
+    val ROOT_FOLDER_ID = "root_folder_id"
+    // TODO: belong to Repository
     val UNCAT_FOLDER_ID = "uncat_folder_id"
   }
 

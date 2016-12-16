@@ -5,6 +5,15 @@ CREATE TABLE system (
 CREATE UNIQUE INDEX system_record ON system(id);
 INSERT INTO system(id, version) VALUES(0, 0);
 
+CREATE TABLE repository(
+  id char(24) PRIMARY KEY,
+  name varchar(255) NOT NULL,
+  root_folder_id char(24) NOT NULL,
+  uncat_folder_id char(24) NOT NULL,
+  created_at DATE DEFAULT (datetime('now', 'utc')),
+  updated_at DATE DEFAULT NULL
+);
+
 CREATE TABLE stats (
   user_id varchar(24) NOT NULL,
   dimension varchar(24) PRIMARY KEY,

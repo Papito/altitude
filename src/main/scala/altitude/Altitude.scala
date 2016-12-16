@@ -44,6 +44,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.VoidTransactionManager(app))
 
           bind[MigrationDao].toInstance(new mongo.MigrationDao(app))
+          bind[RepositoryDao].toInstance(new mongo.RepositoryDao(app))
           bind[AssetDao].toInstance(new mongo.AssetDao(app))
           bind[TrashDao].toInstance(new mongo.TrashDao(app))
           bind[ImportProfileDao].toInstance(new mongo.ImportProfileDao(app))
@@ -60,6 +61,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           bind[JdbcTransactionManager].toInstance(jdbcTxManager)
 
           bind[MigrationDao].toInstance(new postgres.MigrationDao(app))
+          bind[RepositoryDao].toInstance(new postgres.RepositoryDao(app))
           bind[AssetDao].toInstance(new postgres.AssetDao(app))
           bind[TrashDao].toInstance(new postgres.TrashDao(app))
           //bind[ImportProfileDao].toInstance(new postgres.ImportProfileDao(app))
@@ -76,6 +78,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           bind[JdbcTransactionManager].toInstance(jdbcTxManager)
 
           bind[MigrationDao].toInstance(new sqlite.MigrationDao(app))
+          bind[RepositoryDao].toInstance(new sqlite.RepositoryDao(app))
           bind[AssetDao].toInstance(new sqlite.AssetDao(app))
           bind[TrashDao].toInstance(new sqlite.TrashDao(app))
           //bind[ImportProfileDao].toInstance(new sqlite.ImportProfileDao(app))
@@ -93,6 +96,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
 
   // create all services
   object service {
+    val repository = new RepositoryService(app)
     val fileImport = new FileImportService(app)
     val metadata = new TikaMetadataService
     val userMetadata = new UserMetadataService(app)
@@ -140,6 +144,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
     log.info("Freeing transaction list")
   }
 
+  // TODO: this will be part of data acces
   val workPath = System.getProperty("user.dir")
   val dataDir = config.getString("dataDir")
   val dataPath = workPath + "/" + dataDir + "/"
