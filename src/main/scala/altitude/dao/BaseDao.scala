@@ -1,6 +1,8 @@
 package altitude.dao
 
-import altitude.models.User
+import java.util.regex.Pattern
+
+import altitude.models.{BaseModel, User}
 import altitude.models.search.{Query, QueryResult}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C}
@@ -9,6 +11,21 @@ import play.api.libs.json.JsObject
 trait BaseDao {
   val app: Altitude
   protected val MAX_RECORDS = app.config.getInt("db.max_records")
+
+  private val VALID_ID_PATTERN = Pattern.compile("[a-z0-9]+")
+  protected def verifyId(id: String) = {
+    if (id == null) {
+      throw new IllegalArgumentException("ID is not defined")
+    }
+
+    if (id.length != BaseModel.ID_LEN) {
+      throw new IllegalArgumentException(s"ID length should be ${BaseModel.ID_LEN}. Was: [${id.length}]")
+    }
+
+    if (!VALID_ID_PATTERN.matcher(id).find()) {
+      throw new IllegalArgumentException(s"ID [$id] is not alphanumeric")
+    }
+  }
 
   def add(json: JsObject)(implicit user: User, txId: TransactionId): JsObject
   def deleteByQuery(q: Query)(implicit user: User, txId: TransactionId): Int

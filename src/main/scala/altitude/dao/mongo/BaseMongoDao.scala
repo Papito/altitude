@@ -58,9 +58,11 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   protected def makeObjectForInsert(jsonIn: JsObject): DBObject = {
     // create id UNLESS specified
     val id: String = (jsonIn \ C.Base.ID).asOpt[String] match {
-    case Some(id: String) => id
-    case _ => BaseModel.genId
-  }
+      case Some(id: String) => id
+      case _ => BaseModel.genId
+    }
+
+    verifyId(id)
 
     val createdAt = Util.utcNowNoTZ
     val origObj: DBObject =  com.mongodb.util.JSON.parse(jsonIn.toString()).asInstanceOf[DBObject]

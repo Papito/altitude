@@ -8,7 +8,8 @@ import play.api.libs.json._
 import scala.language.implicitConversions
 
 object BaseModel {
-  final def genId: String = scala.util.Random.alphanumeric.take(24).mkString.toLowerCase
+  final val ID_LEN = 24
+  final def genId: String = scala.util.Random.alphanumeric.take(ID_LEN).mkString.toLowerCase
   implicit def toJson(obj: BaseModel): JsObject = obj.toJson
 }
 

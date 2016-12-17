@@ -124,6 +124,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
     // create ID unless there is an override
     val id = if (existingObjId.isDefined) existingObjId.get else BaseModel.genId
+    verifyId(id)
 
     // prepend ID, as it is required for any record (in base implementation)
     val values: List[Object] = id :: vals

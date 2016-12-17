@@ -41,7 +41,11 @@ abstract class MigrationService(app: Altitude) {
   }
 
   private def v1(implicit txId: TransactionId = new TransactionId): Unit = {
-    implicit val user = User(Some("1"), rootFolderId = "0", uncatFolderId = "1")
+    // FIXME: User should be created with migrations but during on-boarding. This is a hack
+    implicit val user = User(
+      Some("a11111111111111111111111"),
+      rootFolderId  = "a11111111111111111111111",
+      uncatFolderId = "a22222222222222222222222")
 
     // user "uncategorized" folder node
     val uncatFolder = app.service.folder.getUserUncatFolder()
