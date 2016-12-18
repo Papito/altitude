@@ -110,8 +110,8 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     userId = CURRENT_USER_ID,
     folderId = folder.id.get,
     assetType = ASSET_TYPE,
-    path = Util.randomStr(30),
-    md5 = Util.randomStr(30),
+    path = Util.randomStr(50),
+    md5 = Util.randomStr(32),
     sizeBytes = 1L)
 
 }

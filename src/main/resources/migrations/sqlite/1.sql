@@ -15,22 +15,22 @@ CREATE TABLE repository(
 );
 
 CREATE TABLE stats (
-  user_id varchar(24) NOT NULL,
-  dimension varchar(24) PRIMARY KEY,
+  user_id char(24) NOT NULL,
+  dimension varchar(60) PRIMARY KEY,
   dim_val INT NOT NULL DEFAULT 0
 );
 CREATE UNIQUE INDEX stats_user_dimension ON stats(user_id, dimension);
 
 CREATE TABLE asset  (
-  id varchar(24) PRIMARY KEY,
-  user_id varchar(24) NOT NULL,
+  id char(24) PRIMARY KEY,
+  user_id char(24) NOT NULL,
   md5 varchar(32) NOT NULL,
   media_type varchar(64) NOT NULL,
   media_subtype varchar(64) NOT NULL,
   mime_type varchar(64) NOT NULL,
   metadata TEXT,
   path TEXT NOT NULL,
-  folder_id varchar(24) NOT NULL,
+  folder_id char(24) NOT NULL,
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
   created_at DATE DEFAULT (datetime('now', 'utc')),
@@ -41,15 +41,15 @@ CREATE UNIQUE INDEX asset_path ON asset(user_id, path);
 CREATE INDEX asset_folder ON asset(folder_id);
 
 CREATE TABLE trash  (
-  id varchar(24) PRIMARY KEY,
-  user_id varchar(24) NOT NULL,
+  id char(24) PRIMARY KEY,
+  user_id char(24) NOT NULL,
   md5 varchar(32) NOT NULL,
   media_type varchar(64) NOT NULL,
   media_subtype varchar(64) NOT NULL,
   mime_type varchar(64) NOT NULL,
   metadata TEXT,
   path TEXT NOT NULL,
-  folder_id varchar(24) NOT NULL,
+  folder_id char(24) NOT NULL,
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
   created_at DATE NOT NULL,
@@ -58,8 +58,8 @@ CREATE TABLE trash  (
 );
 
 CREATE TABLE metadata_field (
-  id varchar(24) PRIMARY KEY,
-  user_id varchar(24) NOT NULL,
+  id char(24) PRIMARY KEY,
+  user_id char(24) NOT NULL,
   name varchar(255) NOT NULL,
   name_lc varchar(255) NOT NULL,
   field_type varchar(255) NOT NULL,
@@ -69,7 +69,7 @@ CREATE TABLE metadata_field (
 );
 
 CREATE TABLE constraint_value (
-  field_id varchar(24) NOT NULL,
+  field_id char(24) NOT NULL,
   constraint_value TEXT NOT NULL,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
@@ -78,7 +78,7 @@ CREATE INDEX constraint_value_field_id ON constraint_value(field_id);
 CREATE UNIQUE INDEX constraint_value_field_and_value ON constraint_value(field_id, constraint_value);
 
 CREATE TABLE metadata_field_value (
-  field_id varchar(24) NOT NULL,
+  field_id char(24) NOT NULL,
   field_value TEXT NOT NULL,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
@@ -87,7 +87,7 @@ CREATE INDEX field_value_field_id ON metadata_field_value(field_id);
 CREATE UNIQUE INDEX field_value_field_and_value ON metadata_field_value(field_id, field_value);
 
 --CREATE TABLE import_profile (
---  id varchar(24) PRIMARY KEY,
+--  id char(24) PRIMARY KEY,
 --  name varchar(255) NOT NULL,
 --  tag_data TEXT NOT NULL,
 --  created_at DATE DEFAULT (datetime('now', 'localtime')),
@@ -97,11 +97,11 @@ CREATE UNIQUE INDEX field_value_field_and_value ON metadata_field_value(field_id
 
 
 CREATE TABLE folder (
-  id varchar(24) PRIMARY KEY,
-  user_id varchar(24) NOT NULL,
+  id char(24) PRIMARY KEY,
+  user_id char(24) NOT NULL,
   name varchar(255) NOT NULL,
   name_lc varchar(255) NOT NULL,
-  parent_id varchar(24) NOT NULL,
+  parent_id char(24) NOT NULL,
   num_of_assets INTEGER NOT NULL DEFAULT 0,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL

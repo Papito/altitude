@@ -1,7 +1,7 @@
 package integration
 
 import org.scalatest.Matchers._
-import altitude.models.Repository
+import altitude.models.{BaseModel, Repository}
 import org.scalatest.DoNotDiscover
 import altitude.Util
 
@@ -10,8 +10,8 @@ import altitude.Util
   test("create repository") {
     val r = Repository(
       name = Util.randomStr(),
-      rootFolderId = Util.randomStr(),
-      uncatFolderId = Util.randomStr()
+      rootFolderId = BaseModel.genId,
+      uncatFolderId = BaseModel.genId
     )
 
     val r1: Repository = altitude.service.repository.add(r)
