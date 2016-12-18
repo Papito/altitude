@@ -21,7 +21,8 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
   protected val VALIDATOR: Option[Validator] = None
   protected val CLEANER: Option[Cleaner] = None
 
-  def add(objIn: Model, queryForDup: Option[Query] = None)(implicit user: User, txId: TransactionId = new TransactionId): JsObject = {
+  def add(objIn: Model, queryForDup: Option[Query] = None)
+         (implicit user: User, txId: TransactionId = new TransactionId): JsObject = {
     val cleaned = cleanAndValidate(objIn)
 
     val existing = if (queryForDup.isDefined) query(queryForDup.get) else QueryResult.EMPTY

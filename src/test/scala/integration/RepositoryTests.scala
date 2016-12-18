@@ -10,8 +10,9 @@ import altitude.Util
   test("create repository") {
     val r = Repository(
       name = Util.randomStr(),
-      rootFolderId = BaseModel.genId,
-      uncatFolderId = BaseModel.genId
+      // FIXME: these will be done by the service
+      rootFolderId = Some(BaseModel.genId),
+      uncatFolderId = Some(BaseModel.genId)
     )
 
     val r1: Repository = altitude.service.repository.add(r)

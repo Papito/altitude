@@ -13,8 +13,9 @@ abstract class RepositoryDao(val app: Altitude) extends BaseJdbcDao("repository"
     val model = Repository(
       id = Some(rec.get(C.Base.ID).get.asInstanceOf[String]),
       name = rec.get(C.Repository.NAME).get.asInstanceOf[String],
-      rootFolderId = rec.get(C.Repository.ROOT_FOLDER_ID).get.asInstanceOf[String],
-      uncatFolderId = rec.get(C.Repository.UNCAT_FOLDER_ID).get.asInstanceOf[String])
+      rootFolderId = Some(rec.get(C.Repository.ROOT_FOLDER_ID).get.asInstanceOf[String]),
+      uncatFolderId = Some(rec.get(C.Repository.UNCAT_FOLDER_ID).get.asInstanceOf[String])
+    )
 
     addCoreAttrs(model, rec)
     model
@@ -32,8 +33,8 @@ abstract class RepositoryDao(val app: Altitude) extends BaseJdbcDao("repository"
 
     val sqlVals: List[Object] = List(
       repo.name,
-      repo.rootFolderId,
-      repo.uncatFolderId)
+      repo.rootFolderId.get,
+      repo.uncatFolderId.get)
 
     addRecord(jsonIn, sql, sqlVals)
   }

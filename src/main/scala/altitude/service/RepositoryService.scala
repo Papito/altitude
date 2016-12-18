@@ -2,10 +2,13 @@ package altitude.service
 
 import altitude.Altitude
 import altitude.dao.RepositoryDao
-import altitude.models.Repository
-import altitude.transactions.AbstractTransactionManager
+import altitude.exceptions.DuplicateException
+import altitude.models.{User, Repository}
+import altitude.models.search.{QueryResult, Query}
+import altitude.transactions.{TransactionId, AbstractTransactionManager}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
+import play.api.libs.json.JsObject
 
 class RepositoryService(app: Altitude) extends BaseService[Repository](app) {
   private final val log = LoggerFactory.getLogger(getClass)
