@@ -78,7 +78,7 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
 
       if (!tx.isNested) {
         log.debug(s"End: ${tx.id}", C.LogTag.DB)
-        log.warn("COMMITTING")
+        log.info(s"COMMITTING ${tx.id}", C.LogTag.DB)
         tx.commit()
         app.transactions.COMMITTED += 1
       }

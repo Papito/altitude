@@ -22,7 +22,6 @@ class JdbcTransaction(private val conn: Connection) extends Transaction {
   override def commit() {
     if (!isNested) {
       // FIXME: try/catch/log to avoid hanging lock on error
-      log.debug(s"Committing transaction $id", C.LogTag.DB)
       conn.commit()
     }
   }
