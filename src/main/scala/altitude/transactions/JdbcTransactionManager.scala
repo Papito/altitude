@@ -66,7 +66,7 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
   protected def lock(tx: Transaction): Unit = {}
   protected def unlock(tx: Transaction): Unit = {}
 
-  override def withTransaction[A](f: => A)(implicit ctx: Context = new Context) = {
+  override def withTransaction[A](f: => A)(implicit ctx: Context) = {
     log.debug("WRITE transaction")
     val tx = transaction(ctx, readOnly = false)
 
@@ -104,7 +104,7 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
     }
   }
 
-  override def asReadOnly[A](f: => A)(implicit ctx: Context = new Context) = {
+  override def asReadOnly[A](f: => A)(implicit ctx: Context) = {
     log.debug("READ transaction")
     val tx = transaction(ctx, readOnly = true)
 

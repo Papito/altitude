@@ -12,7 +12,7 @@ class SqliteMigrationService(app: Altitude) extends JdbcMigrationService(app) {
 
   log.info("SQLITE migration service initialized")
 
-  override def existingVersion(implicit ctx: Context = new Context): Int = {
+  override def existingVersion(implicit ctx: Context): Int = {
     // cannot open a readonly connection for a non-existing DB
     txManager.withTransaction[Int] {
       DAO.currentVersion

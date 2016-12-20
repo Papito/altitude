@@ -12,7 +12,7 @@ class PreviewService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
 
   def add(preview: Preview)
-         (implicit ctx: Context = new Context): Unit = {
+         (implicit ctx: Context): Unit = {
     log.info(s"Adding preview for asset ${preview.assetId}")
 
     // get the full path to our preview file
@@ -34,7 +34,7 @@ class PreviewService(app: Altitude) {
   }
 
   def getById(assetId: String)
-             (implicit ctx: Context = new Context): Preview = {
+             (implicit ctx: Context): Preview = {
     val f: File = new File(previewFilePath(assetId))
 
     if (!f.isFile) {

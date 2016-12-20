@@ -24,9 +24,6 @@ class BaseApiController extends BaseController with GZipSupport {
     if (request.body.isEmpty) Json.obj() else Json.parse(request.body).as[JsObject]
   )
 
-  // FIXME: cache in the request
-  implicit def context: Context = new Context
-
   def requestMethod = request.getMethod.toLowerCase
 
   before() {

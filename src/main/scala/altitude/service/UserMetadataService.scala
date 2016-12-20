@@ -15,7 +15,7 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
   override protected val DAO = new NotImplementedDao(app)
 
   def addField(metadataField: UserMetadataField)
-              (implicit ctx: Context = new Context): UserMetadataField = {
+              (implicit ctx: Context): UserMetadataField = {
 
     txManager.withTransaction[UserMetadataField] {
       // verify that the field type is allowed
@@ -30,7 +30,7 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
     }
   }
 
-  def getFieldById(id: String)(implicit ctx: Context = new Context): Option[JsObject] =
+  def getFieldById(id: String)(implicit ctx: Context): Option[JsObject] =
     txManager.asReadOnly[Option[JsObject]] {
       val fieldOpt = METADATA_FIELD_DAO.getById(id)
 
@@ -56,18 +56,18 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
       }
     }
 
-  def getAllFields()(implicit ctx: Context = new Context): List[JsObject] =
+  def getAllFields()(implicit ctx: Context): List[JsObject] =
     txManager.asReadOnly[List[JsObject]] {
       METADATA_FIELD_DAO.getAll
     }
 
-  def deleteFieldById(id: String)(implicit ctx: Context = new Context): Int =
+  def deleteFieldById(id: String)(implicit ctx: Context): Int =
     txManager.withTransaction[Int] {
       METADATA_FIELD_DAO.deleteById(id)
     }
 
   def addConstraintValue(fieldId: String, constraintValue: String)
-                        (implicit ctx: Context = new Context) = {
+                        (implicit ctx: Context) = {
 
     txManager.withTransaction {
       // get the field we are working with
@@ -93,7 +93,7 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
   }
 
   def deleteConstraintValue(fieldId: String, constraintValue: String)
-                           (implicit ctx: Context = new Context) = {
+                           (implicit ctx: Context) = {
     log.info(s"Deleting constraint value [$constraintValue] for field [$fieldId]")
 
     txManager.withTransaction {

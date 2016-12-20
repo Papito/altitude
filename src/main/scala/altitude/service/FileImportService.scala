@@ -19,7 +19,7 @@ class FileImportService(app: Altitude) {
   protected val SUPPORTED_MEDIA_TYPES = List("audio", "image")
 
   def getFilesToImport(path: String)
-                      (implicit ctx: Context = new Context): List[FileImportAsset] = {
+                      (implicit ctx: Context): List[FileImportAsset] = {
     log.info(s"Finding assets to import @ '$path'", C.LogTag.SERVICE)
     val assets = DAO.iterateAssets(path = path).toList
     log.info(s"Found ${assets.size}", C.LogTag.SERVICE)
@@ -43,7 +43,7 @@ class FileImportService(app: Altitude) {
   }
 
   def importAsset(fileAsset: FileImportAsset)
-                 (implicit ctx: Context = new Context) : Option[Asset]  = {
+                 (implicit ctx: Context) : Option[Asset]  = {
     log.info(s"Importing file asset '$fileAsset'", C.LogTag.SERVICE)
     val assetType = detectAssetType(fileAsset)
 

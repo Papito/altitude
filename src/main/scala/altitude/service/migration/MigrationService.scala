@@ -68,7 +68,7 @@ abstract class MigrationService(app: Altitude) {
     }
   }
 
-  def migrationRequired(implicit ctx: Context = new Context): Boolean = {
+  def migrationRequired: Boolean = {
     log.info("Checking if migration is required")
     val version = existingVersion
     log.info(s"Current database version is @ $version")

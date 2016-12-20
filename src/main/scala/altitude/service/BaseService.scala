@@ -22,7 +22,7 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
   protected val CLEANER: Option[Cleaner] = None
 
   def add(objIn: Model, queryForDup: Option[Query] = None)
-         (implicit ctx: Context = new Context): JsObject = {
+         (implicit ctx: Context): JsObject = {
     val cleaned = cleanAndValidate(objIn)
 
     val existing = if (queryForDup.isDefined) query(queryForDup.get) else QueryResult.EMPTY
@@ -69,7 +69,7 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
     }
   }
 
-  def getById(id: String)(implicit ctx: Context = new Context): JsObject = {
+  def getById(id: String)(implicit ctx: Context): JsObject = {
     txManager.asReadOnly[JsObject] {
       val res: Option[JsObject] = DAO.getById(id)
 
@@ -80,25 +80,25 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
     }
   }
 
-  def getAll(implicit ctx: Context = new Context): List[JsObject] = {
+  def getAll(implicit ctx: Context): List[JsObject] = {
     txManager.asReadOnly[List[JsObject]] {
       DAO.getAll
     }
   }
 
-  def query(query: Query)(implicit ctx: Context = new Context): QueryResult = {
+  def query(query: Query)(implicit ctx: Context): QueryResult = {
     txManager.asReadOnly[QueryResult] {
       DAO.query(query)
     }
   }
 
-  def deleteById(id: String)(implicit ctx: Context = new Context): Int = {
+  def deleteById(id: String)(implicit ctx: Context): Int = {
     txManager.withTransaction[Int] {
       DAO.deleteById(id)
     }
   }
 
-  def deleteByQuery(query: Query)(implicit ctx: Context = new Context): Int = {
+  def deleteByQuery(query: Query)(implicit ctx: Context): Int = {
     txManager.withTransaction[Int] {
       DAO.deleteByQuery(query)
     }

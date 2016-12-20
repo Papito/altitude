@@ -12,7 +12,7 @@ class DataService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
 
   def getById(assetId: String)
-             (implicit ctx: Context = new Context): Data = {
+             (implicit ctx: Context): Data = {
     val asset: Asset = app.service.library.getById(assetId)
 
     val f: File = new File(asset.path)

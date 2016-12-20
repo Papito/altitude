@@ -13,7 +13,7 @@ class StatsService(app: Altitude){
   protected val DAO = app.injector.instance[StatDao]
   protected val txManager = app.injector.instance[AbstractTransactionManager]
 
-  def getStats(implicit ctx: Context = new Context): Stats = {
+  def getStats(implicit ctx: Context): Stats = {
     txManager.asReadOnly[Stats] {
       val q = Query(user = ctx.user.get)
       val allStats: List[Stat] = DAO.query(q).records.map(Stat.fromJson)
@@ -32,7 +32,7 @@ class StatsService(app: Altitude){
   }
 
   def createStat(dimension: String)
-                (implicit ctx: Context = new Context()) = {
+                (implicit ctx: Context) = {
     txManager.withTransaction {
       val stat = Stat(ctx.user.get.id.get, dimension, 0)
       DAO.add(stat)

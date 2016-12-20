@@ -21,7 +21,7 @@ class LibraryService(app: Altitude) {
 
   val PREVIEW_BOX_SIZE = app.config.getInt("preview.box.pixels")
 
-  def add(obj: Asset)(implicit ctx: Context = new Context): JsObject = {
+  def add(obj: Asset)(implicit ctx: Context): JsObject = {
     log.info(s"\nAdding asset with MD5: ${obj.md5}\n")
 
     if (app.service.folder.isRootFolder(Some(obj.folderId))) {
@@ -63,7 +63,7 @@ class LibraryService(app: Altitude) {
     }
   }
 
-  def deleteById(id: String)(implicit ctx: Context = new Context) = {
+  def deleteById(id: String)(implicit ctx: Context) = {
     txManager.withTransaction {
       val asset: Asset = getById(id)
 
@@ -78,21 +78,21 @@ class LibraryService(app: Altitude) {
     }
   }
 
-  def getById(id: String)(implicit ctx: Context = new Context): JsObject = {
+  def getById(id: String)(implicit ctx: Context): JsObject = {
     txManager.asReadOnly[JsObject] {
       app.service.asset.getById(id)
     }
   }
 
-  def getPreview(assetId: String)(implicit ctx: Context = new Context): Preview = {
+  def getPreview(assetId: String)(implicit ctx: Context): Preview = {
     app.service.preview.getById(assetId)
   }
 
-  def getData(assetId: String)(implicit ctx: Context = new Context): Data = {
+  def getData(assetId: String)(implicit ctx: Context): Data = {
     app.service.data.getById(assetId)
   }
 
-  def search(query: Query)(implicit ctx: Context = new Context): QueryResult = {
+  def search(query: Query)(implicit ctx: Context): QueryResult = {
     log.debug(s"Asset query $query")
 
     // parse out folder ids as a set
@@ -126,7 +126,7 @@ class LibraryService(app: Altitude) {
   }
 
   def genPreviewData(asset: Asset)
-                    (implicit ctx: Context = new Context): Array[Byte] = {
+                    (implicit ctx: Context): Array[Byte] = {
     asset.assetType.mediaType match {
       case "image" =>
         makeImageThumbnail(asset)
@@ -209,7 +209,7 @@ class LibraryService(app: Altitude) {
   }
 
   def moveAssetToFolder(assetId: String, folderId: String)
-                       (implicit ctx: Context = new Context): Asset = {
+                       (implicit ctx: Context): Asset = {
     txManager.withTransaction[Asset] {
       moveAssetsToFolder(Set(assetId), folderId)
       getById(assetId)
@@ -217,7 +217,7 @@ class LibraryService(app: Altitude) {
   }
 
   def moveAssetsToFolder(assetIds: Set[String], folderId: String)
-                        (implicit ctx: Context = new Context) = {
+                        (implicit ctx: Context) = {
     txManager.withTransaction {
       assetIds.foreach {assetId =>
 
@@ -248,14 +248,14 @@ class LibraryService(app: Altitude) {
   }
 
   def moveAssetToUncategorized(assetId: String)
-                              (implicit ctx: Context = new Context) = {
+                              (implicit ctx: Context) = {
     txManager.withTransaction {
       moveAssetsToUncategorized(Set(assetId))
     }
   }
 
   def moveAssetsToUncategorized(assetIds: Set[String])
-                               (implicit ctx: Context = new Context) = {
+                               (implicit ctx: Context) = {
     txManager.withTransaction[Unit] {
       moveAssetsToFolder(assetIds, ctx.user.get.uncatFolderId)
       app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS, assetIds.size)
@@ -263,7 +263,7 @@ class LibraryService(app: Altitude) {
   }
 
   def recycleAsset(assetId: String)
-                  (implicit ctx: Context = new Context): Trash = {
+                  (implicit ctx: Context): Trash = {
     txManager.withTransaction[Trash] {
       recycleAssets(Set(assetId))
       app.service.trash.getById(assetId)
@@ -271,7 +271,7 @@ class LibraryService(app: Altitude) {
   }
 
   def recycleAssets(assetIds: Set[String])
-                   (implicit ctx: Context = new Context) = {
+                   (implicit ctx: Context) = {
     var totalBytes = 0L
 
     txManager.withTransaction {
@@ -289,7 +289,7 @@ class LibraryService(app: Altitude) {
   }
 
   def moveRecycledAssetToFolder(assetId: String, folderId: String)
-                               (implicit ctx: Context = new Context): Asset = {
+                               (implicit ctx: Context): Asset = {
     txManager.withTransaction[Asset] {
       moveRecycledAssetsToFolder(Set(assetId), folderId)
       getById(assetId)
@@ -297,7 +297,7 @@ class LibraryService(app: Altitude) {
   }
 
   def moveRecycledAssetsToFolder(assetIds: Set[String], folderId: String)
-                                (implicit ctx: Context = new Context) = {
+                                (implicit ctx: Context) = {
     var totalBytes = 0L
 
     txManager.withTransaction[Unit] {
@@ -318,7 +318,7 @@ class LibraryService(app: Altitude) {
   }
 
   def restoreRecycledAsset(assetId: String)
-                          (implicit ctx: Context = new Context): Asset = {
+                          (implicit ctx: Context): Asset = {
     txManager.withTransaction[Asset] {
       restoreRecycledAssets(Set(assetId))
       getById(assetId)
@@ -326,7 +326,7 @@ class LibraryService(app: Altitude) {
   }
 
   def restoreRecycledAssets(assetIds: Set[String])
-                           (implicit ctx: Context = new Context) = {
+                           (implicit ctx: Context) = {
     var totalBytes = 0L
 
     txManager.withTransaction[Unit] {
