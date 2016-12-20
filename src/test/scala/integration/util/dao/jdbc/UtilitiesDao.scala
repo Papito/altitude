@@ -1,8 +1,7 @@
 package integration.util.dao.jdbc
 
-import altitude.Altitude
 import altitude.dao.jdbc.VoidJdbcDao
-import altitude.transactions.TransactionId
+import altitude.{Altitude, Context}
 
 class UtilitiesDao(app: Altitude) extends VoidJdbcDao(app) with integration.util.dao.UtilitiesDao {
 
@@ -29,8 +28,8 @@ class UtilitiesDao(app: Altitude) extends VoidJdbcDao(app) with integration.util
     txManager.txContainer.clear()
   }
 
-  override def createTransaction(txId: TransactionId): Unit = {
-    val tx = txManager.transaction(txId, readOnly = false)
+  override def createTransaction(ctx: Context): Unit = {
+    val tx = txManager.transaction(ctx, readOnly = false)
     // up one level so it does not get committed or closed
     tx.up()
   }

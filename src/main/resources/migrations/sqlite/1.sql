@@ -15,15 +15,14 @@ CREATE TABLE repository(
 );
 
 CREATE TABLE stats (
-  repository_id char(24) NOT NULL,
+  user_id char(24) NOT NULL,
   dimension varchar(60) PRIMARY KEY,
   dim_val INT NOT NULL DEFAULT 0
 );
-CREATE UNIQUE INDEX stats_repo_dimension ON stats(repository_id, dimension);
+CREATE UNIQUE INDEX stats_user_dimension ON stats(user_id, dimension);
 
 CREATE TABLE asset  (
   id char(24) PRIMARY KEY,
-  repository_id char(24) NOT NULL,
   user_id char(24) NOT NULL,
   md5 varchar(32) NOT NULL,
   media_type varchar(64) NOT NULL,
@@ -37,13 +36,12 @@ CREATE TABLE asset  (
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );
-CREATE UNIQUE INDEX asset_md5 ON asset(repository_id, md5);
-CREATE UNIQUE INDEX asset_path ON asset(repository_id, path);
+CREATE UNIQUE INDEX asset_md5 ON asset(user_id, md5);
+CREATE UNIQUE INDEX asset_path ON asset(user_id, path);
 CREATE INDEX asset_folder ON asset(folder_id);
 
 CREATE TABLE trash  (
   id char(24) PRIMARY KEY,
-  repository_id char(24) NOT NULL,
   user_id char(24) NOT NULL,
   md5 varchar(32) NOT NULL,
   media_type varchar(64) NOT NULL,
@@ -61,7 +59,7 @@ CREATE TABLE trash  (
 
 CREATE TABLE metadata_field (
   id char(24) PRIMARY KEY,
-  repository_id char(24) NOT NULL,
+  user_id char(24) NOT NULL,
   name varchar(255) NOT NULL,
   name_lc varchar(255) NOT NULL,
   field_type varchar(255) NOT NULL,
@@ -100,7 +98,7 @@ CREATE UNIQUE INDEX field_value_field_and_value ON metadata_field_value(field_id
 
 CREATE TABLE folder (
   id char(24) PRIMARY KEY,
-  repository_id char(24) NOT NULL,
+  user_id char(24) NOT NULL,
   name varchar(255) NOT NULL,
   name_lc varchar(255) NOT NULL,
   parent_id char(24) NOT NULL,

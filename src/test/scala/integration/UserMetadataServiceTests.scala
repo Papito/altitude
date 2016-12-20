@@ -9,7 +9,7 @@ import org.scalatest.Matchers._
   test("add/delete constraint value") {
     val metadataField = altitude.service.userMetadata.addField(
       UserMetadataField(
-        userId = CURRENT_USER_ID,
+        userId = currentUserId,
         name = "fieldName",
         fieldType = FieldType.NUMBER.toString))
 

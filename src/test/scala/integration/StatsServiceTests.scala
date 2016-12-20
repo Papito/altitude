@@ -76,7 +76,6 @@ import org.scalatest.Matchers._
     SET_USER_1()
 
     val stats = altitude.service.stats.getStats
-    println(stats)
     stats.getStatValue(Stats.TOTAL_ASSETS) should be (1)
     stats.getStatValue(Stats.RECYCLED_ASSETS) should be (0)
   }

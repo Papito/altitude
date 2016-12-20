@@ -1,8 +1,7 @@
 package altitude.dao.jdbc
 
-import altitude.models.{Folder, User}
-import altitude.transactions.TransactionId
-import altitude.{Altitude, Const => C}
+import altitude.models.Folder
+import altitude.{Altitude, Const => C, Context}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
@@ -21,7 +20,7 @@ abstract class FolderDao(val app: Altitude) extends BaseJdbcDao("folder") with a
     model
   }
 
-  override def add(jsonIn: JsObject)(implicit user: User,  txId: TransactionId): JsObject = {
+  override def add(jsonIn: JsObject)(implicit ctx: Context): JsObject = {
     val folder = jsonIn: Folder
 
     val sql = s"""

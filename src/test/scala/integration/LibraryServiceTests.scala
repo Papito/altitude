@@ -42,17 +42,17 @@ import org.scalatest.Matchers._
     val asset: Asset = altitude.service.library.add(makeAsset(folder1))
 
     altitude.service.library.search(
-      Query(CURRENT_USER, params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
+      Query(currentUser.get, params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
     ).records.length should be(1)
 
     altitude.service.library.moveAssetToFolder(asset.id.get, folder2.id.get)
 
     altitude.service.library.search(
-      Query(CURRENT_USER, params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
+      Query(currentUser.get, params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
     ).records.length should be(0)
 
     altitude.service.library.search(
-      Query(CURRENT_USER, params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2.id.get))
+      Query(currentUser.get, params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2.id.get))
     ).records.length should be(1)
   }
 
@@ -94,7 +94,7 @@ import org.scalatest.Matchers._
 
     // check counts
     val systemFolders = altitude.service.folder.getSysFolders()
-    systemFolders(CURRENT_USER.uncatFolderId).numOfAssets should be (2)
+    systemFolders(currentUser.get.uncatFolderId).numOfAssets should be (2)
 
     // prefetch all folders for speed
     val all = altitude.service.folder.getNonSysFolders()
@@ -108,11 +108,11 @@ import org.scalatest.Matchers._
     (altitude.service.folder.getByIdWithChildAssetCounts(folder2.id.get, all): Folder).numOfAssets should be (10)
 
     // test counts for immediate children
-    val rootChildren = altitude.service.folder.immediateChildren(CURRENT_USER.rootFolderId, all)
+    val rootChildren = altitude.service.folder.immediateChildren(currentUser.get.rootFolderId, all)
     rootChildren.head.numOfAssets should be(2)
     rootChildren.last.numOfAssets should be(10)
 
-    val rootChildren2 = altitude.service.folder.immediateChildren(CURRENT_USER.rootFolderId)
+    val rootChildren2 = altitude.service.folder.immediateChildren(currentUser.get.rootFolderId)
     rootChildren2.head.numOfAssets should be(2)
     rootChildren2.last.numOfAssets should be(10)
 
@@ -133,7 +133,7 @@ import org.scalatest.Matchers._
     altitude.service.asset.getAll.length should be (1)
 
     altitude.service.library.search(
-      Query(CURRENT_USER, params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
+      Query(currentUser.get, params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
     ).records.length should be(1)
 
     val all = altitude.service.folder.getNonSysFolders()

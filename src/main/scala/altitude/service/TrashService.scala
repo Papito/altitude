@@ -1,9 +1,8 @@
 package altitude.service
 
-import altitude.Altitude
+import altitude.{Context, Altitude}
 import altitude.dao.TrashDao
-import altitude.models.{Trash, User}
-import altitude.transactions.TransactionId
+import altitude.models.Trash
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsValue
@@ -12,7 +11,7 @@ class TrashService(app: Altitude) extends BaseService[Trash](app) {
   private final val log = LoggerFactory.getLogger(getClass)
   override protected val DAO = app.injector.instance[TrashDao]
 
-  def recycleAsset(assetId: String)(implicit user: User, txId: TransactionId = new TransactionId): Trash = {
+  def recycleAsset(assetId: String)(implicit ctx: Context = new Context): Trash = {
     val asset: JsValue = app.service.asset.getById(assetId)
     txManager.withTransaction[Trash] {
          // delete the original asset
@@ -26,7 +25,7 @@ class TrashService(app: Altitude) extends BaseService[Trash](app) {
     }
   }
 
-  def recycleAssets(assetIds: Set[String])(implicit user: User, txId: TransactionId = new TransactionId) = {
+  def recycleAssets(assetIds: Set[String])(implicit ctx: Context = new Context) = {
     txManager.withTransaction {
       assetIds.foreach(recycleAsset)
     }

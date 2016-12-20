@@ -1,8 +1,7 @@
 package integration.util.dao
 
-import altitude.Altitude
 import altitude.dao.BaseDao
-import altitude.transactions.TransactionId
+import altitude.{Altitude, Context}
 
 trait UtilitiesDao extends BaseDao {
   val app: Altitude
@@ -10,5 +9,5 @@ trait UtilitiesDao extends BaseDao {
   protected def rollback(): Unit
   protected def close(): Unit
   def cleanupTest(): Unit
-  def createTransaction(tx: TransactionId): Unit
+  def createTransaction(ctx: Context): Unit
 }

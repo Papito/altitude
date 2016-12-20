@@ -1,7 +1,6 @@
 package altitude.dao.mongo
 
-import altitude.Altitude
-import altitude.transactions.TransactionId
+import altitude.{Altitude, Context}
 import com.mongodb.DBObject
 import com.mongodb.casbah.Imports._
 import org.slf4j.LoggerFactory
@@ -9,7 +8,7 @@ import org.slf4j.LoggerFactory
 class MigrationDao(app: Altitude) extends altitude.dao.MigrationDao(app) {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override def currentVersion(implicit txId: TransactionId = new TransactionId): Int = {
+  override def currentVersion(implicit ctx: Context): Int = {
     val system = BaseMongoDao.DB.get("system")
 
     val res: Option[DBObject] = system.findOne()
@@ -24,11 +23,11 @@ class MigrationDao(app: Altitude) extends altitude.dao.MigrationDao(app) {
     }
   }
 
-  override def executeCommand(command: String)(implicit txId: TransactionId): Unit = {
+  override def executeCommand(command: String)(implicit ctx: Context): Unit = {
     val res = BaseMongoDao.DB.get.eval(command)
   }
 
-  override def versionUp()(implicit txId: TransactionId = new TransactionId): Unit = {
+  override def versionUp()(implicit ctx: Context): Unit = {
     val o: DBObject =  MongoDBObject(
       "$set" -> MongoDBObject("version" -> 1)
     )

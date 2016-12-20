@@ -3,13 +3,10 @@ package altitude.controllers.api
 import altitude.Validators.ApiValidator
 import altitude.controllers.BaseController
 import altitude.exceptions.{NotFoundException, ValidationException}
-import altitude.models.User
-import altitude.Util
-import altitude.{Const => C}
+import altitude.{Const => C, Context}
 import org.scalatra._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsNull, JsObject, Json}
-import org.slf4j.MDC
 
 import scala.compat.Platform
 
@@ -26,6 +23,9 @@ class BaseApiController extends BaseController with GZipSupport {
     // FIXME: cache this in the request itself
     if (request.body.isEmpty) Json.obj() else Json.parse(request.body).as[JsObject]
   )
+
+  // FIXME: cache in the request
+  implicit def context: Context = new Context
 
   def requestMethod = request.getMethod.toLowerCase
 

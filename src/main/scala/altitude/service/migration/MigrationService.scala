@@ -1,9 +1,9 @@
 package altitude.service.migration
 
-import altitude.Altitude
 import altitude.dao.MigrationDao
 import altitude.models.{Stats, User}
-import altitude.transactions.{AbstractTransactionManager, TransactionId}
+import altitude.transactions.AbstractTransactionManager
+import altitude.{Altitude, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 
@@ -20,7 +20,7 @@ abstract class MigrationService(app: Altitude) {
   protected val MIGRATIONS_DIR: String
   protected val FILE_EXTENSION: String
 
-  def runMigration(version: Int)(implicit txId: TransactionId = new TransactionId): Unit = {
+  def runMigration(version: Int)(implicit ctx: Context = new Context) = {
     val migrationCommands = parseMigrationCommands(version)
 
     txManager.withTransaction {
@@ -33,19 +33,23 @@ abstract class MigrationService(app: Altitude) {
     // must have schema changes committed
     txManager.withTransaction {
       version match {
-        case 1 => v1
+        case 1 => v1(ctx)
       }
 
       DAO.versionUp()
     }
   }
 
-  private def v1(implicit txId: TransactionId = new TransactionId): Unit = {
-    // FIXME: User should be created with migrations but during on-boarding. This is a hack
-    implicit val user = User(
+  /* FIXME: these should be created with migrations but during on-boarding. This is a hack
+     and the non-implicit context should be removed
+  */
+  private def v1(context: Context) = {
+    implicit val user = Some(User(
       Some("a11111111111111111111111"),
       rootFolderId  = "a11111111111111111111111",
-      uncatFolderId = "a22222222222222222222222")
+      uncatFolderId = "a22222222222222222222222"))
+
+    implicit val ctx: Context = new Context(txId = context.txId)
 
     // user "uncategorized" folder node
     val uncatFolder = app.service.folder.getUserUncatFolder()
@@ -56,16 +60,15 @@ abstract class MigrationService(app: Altitude) {
     app.service.stats.createStat(Stats.UNCATEGORIZED_ASSETS)
     app.service.stats.createStat(Stats.RECYCLED_ASSETS)
     app.service.stats.createStat(Stats.RECYCLED_BYTES)
-
   }
 
-  def existingVersion(implicit txId: TransactionId = new TransactionId): Int = {
+  def existingVersion(implicit ctx: Context = new Context): Int = {
     txManager.asReadOnly[Int] {
       DAO.currentVersion
     }
   }
 
-  def migrationRequired(implicit txId: TransactionId = new TransactionId): Boolean = {
+  def migrationRequired(implicit ctx: Context = new Context): Boolean = {
     log.info("Checking if migration is required")
     val version = existingVersion
     log.info(s"Current database version is @ $version")
@@ -84,7 +87,7 @@ abstract class MigrationService(app: Altitude) {
   //FIXME: placeholder, not DB-backed
   def migrationConfirmed = false
 
-  def migrate(): Unit = {
+  def migrate() = {
     val oldVersion = existingVersion
     log.warn("!!!! MIGRATING !!!!")
     log.info(s"From version $oldVersion to $CURRENT_VERSION")

@@ -2,7 +2,7 @@ package altitude.controllers.web
 
 import java.io.{File, StringWriter, Writer}
 
-import altitude.{Const, Environment}
+import altitude.Environment
 import com.mitchellbosecke.pebble.PebbleEngine
 import com.mitchellbosecke.pebble.template.PebbleTemplate
 import org.slf4j.LoggerFactory

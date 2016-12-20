@@ -10,10 +10,10 @@ import altitude.models.{Asset, FileImportAsset, User}
 import altitude.{Const => C}
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.{DefaultFormats, Formats, JValue, _}
-import org.scalatra.{SessionSupport, _}
 import org.scalatra.atmosphere._
 import org.scalatra.json.{JValueResult, JacksonJsonSupport}
 import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintExceededException}
+import org.scalatra.{SessionSupport, _}
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
 

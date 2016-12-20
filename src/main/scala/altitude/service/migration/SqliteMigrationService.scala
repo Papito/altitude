@@ -1,8 +1,7 @@
 package altitude.service.migration
 
-import altitude.Altitude
 import altitude.dao.sqlite
-import altitude.transactions.TransactionId
+import altitude.{Altitude, Context}
 import org.slf4j.LoggerFactory
 
 class SqliteMigrationService(app: Altitude) extends JdbcMigrationService(app) {
@@ -13,7 +12,7 @@ class SqliteMigrationService(app: Altitude) extends JdbcMigrationService(app) {
 
   log.info("SQLITE migration service initialized")
 
-  override def existingVersion(implicit txId: TransactionId = new TransactionId): Int = {
+  override def existingVersion(implicit ctx: Context = new Context): Int = {
     // cannot open a readonly connection for a non-existing DB
     txManager.withTransaction[Int] {
       DAO.currentVersion

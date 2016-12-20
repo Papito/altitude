@@ -1,8 +1,7 @@
 package altitude
 
-import altitude.models.{Repository, User}
+import altitude.models.User
 import altitude.transactions.TransactionId
 
-class Context(var user: Option[User] = None,
-              var txId: Option[TransactionId] = None,
-              var repoId: Option[Repository] = None)
+class Context(val txId: TransactionId = new TransactionId)
+             (implicit val repoId: Option[RepositoryId] = None, val user: Option[User] = None)

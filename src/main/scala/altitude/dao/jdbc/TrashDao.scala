@@ -1,8 +1,7 @@
 package altitude.dao.jdbc
 
-import altitude.models.{AssetType, Trash, User}
-import altitude.transactions.TransactionId
-import altitude.{Altitude, Const => C}
+import altitude.models.{AssetType, Trash}
+import altitude.{Altitude, Const => C, Context}
 import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
@@ -33,7 +32,7 @@ abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with alt
     model
   }
 
-  override def add(jsonIn: JsObject)(implicit user: User, txId: TransactionId): JsObject = {
+  override def add(jsonIn: JsObject)(implicit ctx: Context): JsObject = {
     val trash = jsonIn: Trash
 
     // Postgres will reject this sequence with jsonb

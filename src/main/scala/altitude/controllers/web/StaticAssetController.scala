@@ -3,7 +3,7 @@ package altitude.controllers.web
 import java.io.File
 
 import altitude.Environment
-import org.slf4j.{MDC, LoggerFactory}
+import org.slf4j.LoggerFactory
 
 class StaticAssetController extends BaseWebController {
   private final val log = LoggerFactory.getLogger(getClass)

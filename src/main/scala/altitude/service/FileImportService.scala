@@ -5,8 +5,7 @@ import java.io.{File, FileInputStream, InputStream}
 import altitude.dao.FileSystemImportDao
 import altitude.exceptions.{FormatException, MetadataExtractorException}
 import altitude.models._
-import altitude.transactions.TransactionId
-import altitude.{Altitude, Const => C}
+import altitude.{Const => C, Context, Altitude}
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
@@ -20,7 +19,7 @@ class FileImportService(app: Altitude) {
   protected val SUPPORTED_MEDIA_TYPES = List("audio", "image")
 
   def getFilesToImport(path: String)
-                      (implicit user: User, txId: TransactionId = new TransactionId): List[FileImportAsset] = {
+                      (implicit ctx: Context = new Context): List[FileImportAsset] = {
     log.info(s"Finding assets to import @ '$path'", C.LogTag.SERVICE)
     val assets = DAO.iterateAssets(path = path).toList
     log.info(s"Found ${assets.size}", C.LogTag.SERVICE)
@@ -44,7 +43,7 @@ class FileImportService(app: Altitude) {
   }
 
   def importAsset(fileAsset: FileImportAsset)
-                 (implicit user: User, txId: TransactionId = new TransactionId) : Option[Asset]  = {
+                 (implicit ctx: Context = new Context) : Option[Asset]  = {
     log.info(s"Importing file asset '$fileAsset'", C.LogTag.SERVICE)
     val assetType = detectAssetType(fileAsset)
 
@@ -67,12 +66,12 @@ class FileImportService(app: Altitude) {
     val fileSizeInBytes: Long = new File(fileAsset.absolutePath).length()
 
     val asset: Asset = Asset(
-      userId = user.id.get,
+      userId = ctx.user.get.id.get,
       path = fileAsset.absolutePath,
       md5 = getChecksum(fileAsset.absolutePath),
       assetType = assetType,
       sizeBytes = fileSizeInBytes,
-      folderId = user.uncatFolderId)
+      folderId = ctx.user.get.uncatFolderId)
 
 
     var previewData: Option[Array[Byte]] = None
@@ -89,7 +88,7 @@ class FileImportService(app: Altitude) {
 
 
     val assetWithPreview = Asset(
-      userId = user.id.get,
+      userId = ctx.user.get.id.get,
       path = asset.path,
       md5 = asset.md5,
       assetType = asset.assetType,

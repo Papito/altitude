@@ -2,10 +2,9 @@ package altitude.service
 
 import java.io._
 
-import altitude.Altitude
+import altitude.{Context, Altitude}
 import altitude.exceptions.NotFoundException
-import altitude.models.{Asset, Data, User}
-import altitude.transactions.TransactionId
+import altitude.models.{Asset, Data}
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 
@@ -13,7 +12,7 @@ class DataService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
 
   def getById(assetId: String)
-             (implicit user: User, txId: TransactionId = new TransactionId): Data = {
+             (implicit ctx: Context = new Context): Data = {
     val asset: Asset = app.service.library.getById(assetId)
 
     val f: File = new File(asset.path)

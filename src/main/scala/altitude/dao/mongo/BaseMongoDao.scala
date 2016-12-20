@@ -3,8 +3,7 @@ package altitude.dao.mongo
 import altitude.dao.BaseDao
 import altitude.models.search.{Query, QueryResult}
 import altitude.models.{BaseModel, User}
-import altitude.transactions.TransactionId
-import altitude.{Configuration, Const => C, Environment, Util}
+import altitude.{Configuration, Const => C, Context, Environment, Util}
 import com.mongodb.casbah.Imports._
 import com.mongodb.casbah.MongoClient
 import org.slf4j.LoggerFactory
@@ -42,7 +41,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
 
   protected lazy val MONGO_QUERY_BUILDER = new MongoQueryBuilder(COLLECTION)
 
-  override def add(jsonIn: JsObject)(implicit user: User, txId: TransactionId): JsObject = {
+  override def add(jsonIn: JsObject)(implicit ctx: Context): JsObject = {
     log.debug(s"Starting database INSERT for: $jsonIn")
 
     val o = makeObjectForInsert(jsonIn)
@@ -73,7 +72,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
       origObj ++ coreAttrObj
   }
 
-  override def deleteByQuery(q: Query)(implicit user: User, txId: TransactionId): Int = {
+  override def deleteByQuery(q: Query)(implicit ctx: Context): Int = {
     val query = fixMongoQuery(q)
     val mongoQuery: DBObject = query.params
     log.info(mongoQuery.toString)
@@ -83,7 +82,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     numDeleted
   }
 
-  override def getById(id: String)(implicit user: User, txId: TransactionId): Option[JsObject] = {
+  override def getById(id: String)(implicit ctx: Context): Option[JsObject] = {
     log.debug(s"Getting by ID '$id'", C.LogTag.DB)
 
     val o: Option[DBObject] = COLLECTION.findOneByID(id)
@@ -98,7 +97,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     }
   }
 
-  override def query(query: Query)(implicit user: User, txId: TransactionId): QueryResult = {
+  override def query(query: Query)(implicit ctx: Context): QueryResult = {
     val cursor: MongoCursor = MONGO_QUERY_BUILDER.toSelectCursor(query)
 
     log.debug(s"Found ${cursor.length} records")
@@ -127,20 +126,20 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     }
   }
 
-  protected final def fixMongoQuery(q: Query)(implicit user: User): Query = {
+  protected final def fixMongoQuery(q: Query)(implicit ctx: Context): Query = {
     // _id -> id
     q.params.contains("id")  match {
       case false => q
       case true => {
         val id = q.params.get("id").get
         val params = (q.params - "id") ++ Map("_id" -> id)
-        Query(user, params = params, rpp = q.rpp, page = q.page)
+        Query(ctx.user.get, params = params, rpp = q.rpp, page = q.page)
       }
     }
   }
 
   override def getByIds(ids: Set[String])
-                       (implicit user: User, txId: TransactionId): List[JsObject] = {
+                       (implicit ctx: Context): List[JsObject] = {
     val query: DBObject =  MongoDBObject(
       "_id" -> MongoDBObject("$in" -> ids)
     )
@@ -155,7 +154,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   }
 
   override def updateByQuery(q: Query, json: JsObject, fields: List[String])
-                            (implicit user: User, txId: TransactionId): Int = {
+                            (implicit ctx: Context): Int = {
     log.debug(s"Updating with data $json for $q")
 
     val query  = fixMongoQuery(q)
@@ -180,7 +179,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   }
 
   override def increment(id: String, field: String, count: Int = 1)
-                        (implicit user: User, txId: TransactionId) = {
+                        (implicit ctx: Context) = {
     val query: DBObject =  MongoDBObject(
       "_id" -> id
     )
@@ -192,7 +191,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   }
 
   override def decrement(id: String,  field: String, count: Int = 1)
-                        (implicit user: User, txId: TransactionId) = {
+                        (implicit ctx: Context) = {
     increment(id, field, -count)
   }
 }

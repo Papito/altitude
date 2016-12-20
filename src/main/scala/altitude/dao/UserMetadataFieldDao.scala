@@ -1,9 +1,8 @@
 package altitude.dao
 
-import altitude.models.User
-import altitude.transactions.TransactionId
+import altitude.Context
 
 trait UserMetadataFieldDao extends BaseDao {
-  def addConstraintValue(fieldId: String, constraintValue: String)(implicit user: User, txId: TransactionId)
-  def deleteConstraintValue(fieldId: String, constraintValue: String)(implicit user: User, txId: TransactionId)
+  def addConstraintValue(fieldId: String, constraintValue: String)(implicit ctx: Context)
+  def deleteConstraintValue(fieldId: String, constraintValue: String)(implicit ctx: Context)
 }

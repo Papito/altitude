@@ -1,7 +1,7 @@
 package altitude.controllers.api
 
 import altitude.models.search.Query
-import altitude.{Const => C}
+import altitude.{Const => C, Context}
 import org.scalatra.Ok
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
@@ -13,7 +13,7 @@ class SearchController extends BaseApiController {
     val foldersQuery = params.getOrElse(C.Api.Search.FOLDERS, "")
 
     val q = Query(
-      user,
+      user.get,
       params = Map(C.Api.Folder.QUERY_ARG_NAME -> foldersQuery),
       rpp = 20, page = 1)
 
@@ -34,9 +34,9 @@ class SearchController extends BaseApiController {
     // FIXME: magic constants
     val page = params.getOrElse(C.Api.Search.PAGE, "1").toInt
     val foldersQuery = this.params.getOrElse(C.Api.Search.FOLDERS, "")
-    
+
     val q = Query(
-      user,
+      user.get,
       params = Map(C.Api.Folder.QUERY_ARG_NAME -> foldersQuery),
       rpp = rpp, page = page)
 

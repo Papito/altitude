@@ -2,10 +2,9 @@ package altitude.dao
 
 import java.util.regex.Pattern
 
-import altitude.models.{BaseModel, User}
+import altitude.models.BaseModel
 import altitude.models.search.{Query, QueryResult}
-import altitude.transactions.TransactionId
-import altitude.{Altitude, Const => C}
+import altitude.{Altitude, Const => C, Context}
 import play.api.libs.json.JsObject
 
 trait BaseDao {
@@ -27,25 +26,25 @@ trait BaseDao {
     }
   }
 
-  def add(json: JsObject)(implicit user: User, txId: TransactionId): JsObject
-  def deleteByQuery(q: Query)(implicit user: User, txId: TransactionId): Int
-  def getById(id: String)(implicit user: User, txId: TransactionId): Option[JsObject]
-  def getByIds(id: Set[String])(implicit user: User, txId: TransactionId): List[JsObject]
-  def getAll(implicit user: User, txId: TransactionId): List[JsObject] = query(Query(user)).records
-  def query(q: Query)(implicit user: User, txId: TransactionId): QueryResult
+  def add(json: JsObject)(implicit ctx: Context): JsObject
+  def deleteByQuery(q: Query)(implicit ctx: Context): Int
+  def getById(id: String)(implicit ctx: Context): Option[JsObject]
+  def getByIds(id: Set[String])(implicit ctx: Context): List[JsObject]
+  def getAll(implicit ctx: Context): List[JsObject] = query(Query(ctx.user.get)).records
+  def query(q: Query)(implicit ctx: Context): QueryResult
 
-  def deleteById(id: String)(implicit user: User, txId: TransactionId): Int = {
-    val q: Query = Query(user, Map(C.Base.ID -> id))
+  def deleteById(id: String)(implicit ctx: Context): Int = {
+    val q: Query = Query(ctx.user.get, Map(C.Base.ID -> id))
     deleteByQuery(q)
   }
 
-  def updateById(id: String, data: JsObject, fields: List[String])(implicit user: User, txId: TransactionId): Int = {
-    val q: Query = Query(user, Map(C.Base.ID -> id))
+  def updateById(id: String, data: JsObject, fields: List[String])(implicit ctx: Context): Int = {
+    val q: Query = Query(ctx.user.get, Map(C.Base.ID -> id))
     updateByQuery(q, data, fields)
   }
 
-  def updateByQuery(q: Query, data: JsObject, fields: List[String])(implicit user: User, txId: TransactionId): Int
+  def updateByQuery(q: Query, data: JsObject, fields: List[String])(implicit ctx: Context): Int
 
-  def increment(id: String, field: String, count: Int = 1)(implicit user: User, txId: TransactionId)
-  def decrement(id: String, field: String, count: Int = 1)(implicit user: User, txId: TransactionId)
+  def increment(id: String, field: String, count: Int = 1)(implicit ctx: Context)
+  def decrement(id: String, field: String, count: Int = 1)(implicit ctx: Context)
 }
