@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import altitude.controllers.web.BaseWebController
 import altitude.exceptions.{AllDone, DuplicateException, MetadataExtractorException}
 import altitude.models.{Asset, FileImportAsset, User}
-import altitude.{Const => C}
+import altitude.{Const => C, Context}
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.{DefaultFormats, Formats, JValue, _}
 import org.scalatra.atmosphere._
@@ -76,8 +76,12 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
       @volatile var assetsIt: Option[Iterator[FileImportAsset]] = None
       var path: Option[String] = None
 
-      // FIXME: USER
-      implicit var user = User(id = Some("1"), rootFolderId = "0", uncatFolderId = "1")
+      // FIXME: This has to come from auth
+      private implicit val user = Some(User(
+        Some("a11111111111111111111111"),
+        rootFolderId  = "a11111111111111111111111",
+        uncatFolderId = "a22222222222222222222222"))
+      private implicit val context: Context = new Context()
 
       private def writeToYou(jsonMessage: JsValue): Unit = {
         log.info(s"YOU -> $jsonMessage")
