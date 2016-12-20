@@ -96,19 +96,19 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     rootFolderId = "a33333333333333333333333",
     uncatFolderId = "a44444444444444444444444")
 
-  implicit var currentUser: Option[User] = Some(user)
-  implicit def currentUserId: String = currentUser.get.id.get
+  var currentUser = user
+  def currentUserId: String = currentUser.id.get
 
-  implicit val currentRepoId: RepositoryId = new RepositoryId("a11111111111111111111111")
-  implicit var ctx: Context = new Context
+  private val currentRepoId: RepositoryId = new RepositoryId("a11111111111111111111111")
+  implicit var ctx: Context = new Context(repoId = currentRepoId, user = currentUser)
 
   def SET_USER_1() = {
-    currentUser = Some(user)
-    ctx = new Context(txId = ctx.txId)
+    currentUser = user
+    ctx = new Context(repoId = currentRepoId, user = currentUser, txId = ctx.txId)
   }
   def SET_USER_2() = {
-    currentUser = Some(anotherUser)
-    ctx = new Context(txId = ctx.txId)
+    currentUser = anotherUser
+    ctx = new Context(repoId = currentRepoId, user = currentUser, txId = ctx.txId)
   }
 
   protected def makeAsset(folder: Folder) = Asset(

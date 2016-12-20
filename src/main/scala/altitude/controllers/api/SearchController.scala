@@ -13,7 +13,7 @@ class SearchController extends BaseApiController {
     val foldersQuery = params.getOrElse(C.Api.Search.FOLDERS, "")
 
     val q = Query(
-      user.get,
+      context.user,
       params = Map(C.Api.Folder.QUERY_ARG_NAME -> foldersQuery),
       rpp = 20, page = 1)
 
@@ -36,7 +36,7 @@ class SearchController extends BaseApiController {
     val foldersQuery = this.params.getOrElse(C.Api.Search.FOLDERS, "")
 
     val q = Query(
-      user.get,
+      context.user,
       params = Map(C.Api.Folder.QUERY_ARG_NAME -> foldersQuery),
       rpp = rpp, page = page)
 

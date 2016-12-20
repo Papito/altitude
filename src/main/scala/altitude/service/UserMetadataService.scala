@@ -45,7 +45,7 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
           }
 
           val ret = UserMetadataField(
-            userId = ctx.user.get.id.get,
+            userId = ctx.user.id.get,
             name = field.name,
             fieldType = field.fieldType,
             maxLength = field.maxLength,

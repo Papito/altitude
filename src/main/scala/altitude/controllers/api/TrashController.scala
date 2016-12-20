@@ -86,7 +86,7 @@ class TrashController extends BaseApiController {
     // FIXME: magic constants
     val page = params.getOrElse(C.Api.Search.PAGE, "1").toInt
 
-    val q = Query(user.get, rpp = rpp, page = page)
+    val q = Query(context.user, rpp = rpp, page = page)
 
     val results = app.service.trash.query(q)
 

@@ -24,15 +24,15 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
     }
   }
 
-  implicit def user = if (request.contains("user"))
-    Some(request.getAttribute("user").asInstanceOf[User])
+  def user = if (request.contains("user"))
+    request.getAttribute("user").asInstanceOf[User]
   else
     throw new RuntimeException("User was not set for this request")
 
-  implicit def repoId = new RepositoryId("a11111111111111111111111")
-
   // FIXME: cache in the request
-  implicit def context: Context = new Context
+  implicit def context: Context = new Context(
+    repoId = new RepositoryId("a11111111111111111111111"),
+    user = user)
 
   before() {
     val requestId = Util.randomStr(size = 6)

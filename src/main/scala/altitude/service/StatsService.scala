@@ -15,7 +15,7 @@ class StatsService(app: Altitude){
 
   def getStats(implicit ctx: Context): Stats = {
     txManager.asReadOnly[Stats] {
-      val q = Query(user = ctx.user.get)
+      val q = Query(user = ctx.user)
       val allStats: List[Stat] = DAO.query(q).records.map(Stat.fromJson)
       Stats(allStats)
     }
@@ -34,7 +34,7 @@ class StatsService(app: Altitude){
   def createStat(dimension: String)
                 (implicit ctx: Context) = {
     txManager.withTransaction {
-      val stat = Stat(ctx.user.get.id.get, dimension, 0)
+      val stat = Stat(ctx.user.id.get, dimension, 0)
       DAO.add(stat)
     }
   }

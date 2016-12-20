@@ -28,7 +28,7 @@ class LibraryService(app: Altitude) {
       throw new IllegalOperationException("Cannot have assets in root folder")
     }
 
-    val query = Query(ctx.user.get, Map(C.Asset.MD5 -> obj.md5))
+    val query = Query(ctx.user, Map(C.Asset.MD5 -> obj.md5))
 
     txManager.withTransaction[JsObject] {
       val existing = app.service.asset.query(query)
@@ -46,7 +46,7 @@ class LibraryService(app: Altitude) {
       app.service.stats.incrementStat(Stats.TOTAL_ASSETS)
       app.service.stats.incrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
       // if there is no folder, increment the uncategorized counter
-      if (ctx.user.get.uncatFolderId == obj.folderId) {
+      if (ctx.user.uncatFolderId == obj.folderId) {
         app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS)
       }
 
@@ -68,7 +68,7 @@ class LibraryService(app: Altitude) {
       val asset: Asset = getById(id)
 
       // of this asset is still uncategorized, update the stat
-      if (ctx.user.get.uncatFolderId == asset.folderId) {
+      if (ctx.user.uncatFolderId == asset.folderId) {
         app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
       }
       app.service.stats.decrementStat(Stats.TOTAL_ASSETS)
@@ -112,7 +112,7 @@ class LibraryService(app: Altitude) {
 
           // repackage the query to include all folders (they will have to be re-parsed again)
           Query(
-            ctx.user.get,
+            ctx.user,
             params = query.params
               ++ Map(C.Api.Folder.QUERY_ARG_NAME -> allFolderIds.mkString(C.Api.MULTI_VALUE_DELIM)),
             page = query.page, rpp = query.rpp)
@@ -232,7 +232,7 @@ class LibraryService(app: Altitude) {
         val asset: Asset = this.getById(assetId)
 
         // if moving from uncategorized, decrement that stat
-        if (ctx.user.get.uncatFolderId == asset.folderId) {
+        if (ctx.user.uncatFolderId == asset.folderId) {
           app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
         }
 
@@ -257,7 +257,7 @@ class LibraryService(app: Altitude) {
   def moveAssetsToUncategorized(assetIds: Set[String])
                                (implicit ctx: Context) = {
     txManager.withTransaction[Unit] {
-      moveAssetsToFolder(assetIds, ctx.user.get.uncatFolderId)
+      moveAssetsToFolder(assetIds, ctx.user.uncatFolderId)
       app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS, assetIds.size)
     }
   }

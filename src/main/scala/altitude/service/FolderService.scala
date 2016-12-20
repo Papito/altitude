@@ -34,7 +34,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
       throw new IllegalOperationException("Cannot add a child to a system folder")
     }
 
-    val dupQuery = Query(ctx.user.get, Map(
+    val dupQuery = Query(ctx.user, Map(
       C.Folder.PARENT_ID -> folder.parentId,
       C.Folder.NAME_LC -> folder.nameLowercase))
 
@@ -53,9 +53,9 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
                   (implicit ctx: Context): JsObject = {
 
     val folder = Folder(
-      userId = ctx.user.get.id.get,
+      userId = ctx.user.id.get,
       name = name,
-      parentId = if (parentId.isDefined) parentId.get else ctx.user.get.rootFolderId)
+      parentId = if (parentId.isDefined) parentId.get else ctx.user.rootFolderId)
 
     add(folder)
   }
@@ -70,16 +70,16 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
   }
 
   def getUserRootFolder()(implicit ctx: Context) = Folder(
-    id = Some(ctx.user.get.rootFolderId),
-    userId = ctx.user.get.id.get,
-    parentId = ctx.user.get.rootFolderId,
+    id = Some(ctx.user.rootFolderId),
+    userId = ctx.user.id.get,
+    parentId = ctx.user.rootFolderId,
     name = C.Folder.Names.ROOT
   )
 
   def getUserUncatFolder()(implicit ctx: Context) = Folder(
-    id = Some(ctx.user.get.uncatFolderId),
-    userId = ctx.user.get.id.get,
-    parentId = ctx.user.get.rootFolderId,
+    id = Some(ctx.user.uncatFolderId),
+    userId = ctx.user.id.get,
+    parentId = ctx.user.rootFolderId,
     name = C.Folder.Names.UNCATEGORIZED
   )
 
@@ -87,7 +87,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
     List(getUserUncatFolder())
 
   def isRootFolder(id: Option[String])(implicit ctx: Context) =
-    id.contains(ctx.user.get.rootFolderId)
+    id.contains(ctx.user.rootFolderId)
 
   def isSystemFolder(id: Option[String])(implicit ctx: Context) =
     getUserSystemFolders().exists(_.id == id)
@@ -124,7 +124,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
    */
   def hierarchy(rootId: Option[String] = None, all: List[JsObject] = List())
                (implicit ctx: Context): List[Folder] = {
-    val _rootId = if (rootId.isDefined) rootId.get else ctx.user.get.rootFolderId
+    val _rootId = if (rootId.isDefined) rootId.get else ctx.user.rootFolderId
 
     txManager.asReadOnly {
       val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
@@ -240,7 +240,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
 
       Folder(
         id = Some(id),
-        userId = ctx.user.get.id.get,
+        userId = ctx.user.id.get,
         name = name,
         parentId = parentId,
         children = this.children(id, nonSysFolders),
@@ -369,12 +369,12 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
       val folderBeingMoved: Folder = getById(folderBeingMovedId)
 
       // destination parent cannot have folder by the same name
-      val dupQuery = Query(ctx.user.get, Map(
+      val dupQuery = Query(ctx.user, Map(
         C.Folder.PARENT_ID -> destFolderId,
         C.Folder.NAME_LC -> folderBeingMoved.nameLowercase))
 
       val folderForUpdate = Folder(
-        userId = ctx.user.get.id.get,
+        userId = ctx.user.id.get,
         parentId = destFolderId,
         name = folderBeingMoved.name)
 
@@ -397,13 +397,13 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
       val folder: Folder = getById(folderId)
 
       // new folder name cannot match the new one
-      val dupQuery = Query(ctx.user.get, Map(
+      val dupQuery = Query(ctx.user, Map(
         C.Folder.PARENT_ID -> folder.parentId,
         C.Folder.NAME_LC -> newName.toLowerCase))
 
       try {
         val folderForUpdate = Folder(
-          userId = ctx.user.get.id.get,
+          userId = ctx.user.id.get,
           parentId = folder.parentId,
           name = newName)
 

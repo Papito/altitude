@@ -20,7 +20,7 @@ abstract class StatDao (val app: Altitude) extends BaseJdbcDao("stats") with alt
            VALUES (? ,?)"""
 
     val stat: Stat = jsonIn
-    val values: List[Object] = ctx.user.get.id.get :: stat.dimension :: Nil
+    val values: List[Object] = ctx.user.id.get :: stat.dimension :: Nil
 
     addRecord(jsonIn, sql, values)
   }
@@ -43,6 +43,6 @@ abstract class StatDao (val app: Altitude) extends BaseJdbcDao("stats") with alt
     log.debug(s"INCR STAT SQL: $sql, for $statName")
 
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, sql, ctx.user.get.id.get, statName)
+    runner.update(conn, sql, ctx.user.id.get, statName)
   }
 }

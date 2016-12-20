@@ -77,11 +77,11 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
       var path: Option[String] = None
 
       // FIXME: This has to come from auth
-      private implicit val user = Some(User(
+      private val user = User(
         Some("a11111111111111111111111"),
         rootFolderId  = "a11111111111111111111111",
-        uncatFolderId = "a22222222222222222222222"))
-      private implicit val context: Context = new Context()
+        uncatFolderId = "a22222222222222222222222")
+      private implicit val context: Context = new Context(repoId = null, user = user)
 
       private def writeToYou(jsonMessage: JsValue): Unit = {
         log.info(s"YOU -> $jsonMessage")

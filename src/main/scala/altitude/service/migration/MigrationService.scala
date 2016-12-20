@@ -20,7 +20,12 @@ abstract class MigrationService(app: Altitude) {
   protected val MIGRATIONS_DIR: String
   protected val FILE_EXTENSION: String
 
-  def runMigration(version: Int)(implicit ctx: Context = new Context) = {
+  private val user = User(
+    Some("a11111111111111111111111"),
+    rootFolderId  = "a11111111111111111111111",
+    uncatFolderId = "a22222222222222222222222")
+
+  def runMigration(version: Int)(implicit ctx: Context = new Context(repoId = null, user = user)) = {
     val migrationCommands = parseMigrationCommands(version)
 
     txManager.withTransaction {
@@ -44,12 +49,12 @@ abstract class MigrationService(app: Altitude) {
      and the non-implicit context should be removed
   */
   private def v1(context: Context) = {
-    implicit val user = Some(User(
+    val user = User(
       Some("a11111111111111111111111"),
       rootFolderId  = "a11111111111111111111111",
-      uncatFolderId = "a22222222222222222222222"))
+      uncatFolderId = "a22222222222222222222222")
 
-    implicit val ctx: Context = new Context(txId = context.txId)
+    implicit val ctx: Context = new Context(txId = context.txId, user = user, repoId = null)
 
     // user "uncategorized" folder node
     val uncatFolder = app.service.folder.getUserUncatFolder()
@@ -62,7 +67,7 @@ abstract class MigrationService(app: Altitude) {
     app.service.stats.createStat(Stats.RECYCLED_BYTES)
   }
 
-  def existingVersion(implicit ctx: Context = new Context): Int = {
+  def existingVersion(implicit ctx: Context = new Context(repoId = null, user = user)): Int = {
     txManager.asReadOnly[Int] {
       DAO.currentVersion
     }

@@ -30,16 +30,16 @@ trait BaseDao {
   def deleteByQuery(q: Query)(implicit ctx: Context): Int
   def getById(id: String)(implicit ctx: Context): Option[JsObject]
   def getByIds(id: Set[String])(implicit ctx: Context): List[JsObject]
-  def getAll(implicit ctx: Context): List[JsObject] = query(Query(ctx.user.get)).records
+  def getAll(implicit ctx: Context): List[JsObject] = query(Query(ctx.user)).records
   def query(q: Query)(implicit ctx: Context): QueryResult
 
   def deleteById(id: String)(implicit ctx: Context): Int = {
-    val q: Query = Query(ctx.user.get, Map(C.Base.ID -> id))
+    val q: Query = Query(ctx.user, Map(C.Base.ID -> id))
     deleteByQuery(q)
   }
 
   def updateById(id: String, data: JsObject, fields: List[String])(implicit ctx: Context): Int = {
-    val q: Query = Query(ctx.user.get, Map(C.Base.ID -> id))
+    val q: Query = Query(ctx.user, Map(C.Base.ID -> id))
     updateByQuery(q, data, fields)
   }
 

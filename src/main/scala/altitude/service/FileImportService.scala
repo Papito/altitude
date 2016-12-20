@@ -66,12 +66,12 @@ class FileImportService(app: Altitude) {
     val fileSizeInBytes: Long = new File(fileAsset.absolutePath).length()
 
     val asset: Asset = Asset(
-      userId = ctx.user.get.id.get,
+      userId = ctx.user.id.get,
       path = fileAsset.absolutePath,
       md5 = getChecksum(fileAsset.absolutePath),
       assetType = assetType,
       sizeBytes = fileSizeInBytes,
-      folderId = ctx.user.get.uncatFolderId)
+      folderId = ctx.user.uncatFolderId)
 
 
     var previewData: Option[Array[Byte]] = None
@@ -88,7 +88,7 @@ class FileImportService(app: Altitude) {
 
 
     val assetWithPreview = Asset(
-      userId = ctx.user.get.id.get,
+      userId = ctx.user.id.get,
       path = asset.path,
       md5 = asset.md5,
       assetType = asset.assetType,
