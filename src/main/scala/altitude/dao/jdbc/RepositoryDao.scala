@@ -8,16 +8,27 @@ import play.api.libs.json.JsObject
 abstract class RepositoryDao(val app: Altitude) extends BaseJdbcDao("repository") with altitude.dao.RepositoryDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
+  override protected val ONE_SQL = s"""
+      SELECT $DEFAULT_SQL_COLS_FOR_SELECT
+        FROM $tableName
+       WHERE ${C.Base.ID} = ?"""
+
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val model = Repository(
       id = Some(rec.get(C.Base.ID).get.asInstanceOf[String]),
       name = rec.get(C.Repository.NAME).get.asInstanceOf[String],
-      rootFolderId = Some(rec.get(C.Repository.ROOT_FOLDER_ID).get.asInstanceOf[String]),
-      uncatFolderId = Some(rec.get(C.Repository.UNCAT_FOLDER_ID).get.asInstanceOf[String])
+      rootFolderId = rec.get(C.Repository.ROOT_FOLDER_ID).get.asInstanceOf[String],
+      uncatFolderId = rec.get(C.Repository.UNCAT_FOLDER_ID).get.asInstanceOf[String]
     )
 
     addCoreAttrs(model, rec)
     model
+  }
+
+  override def getById(id: String)(implicit ctx: Context): Option[JsObject] = {
+    log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
+    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(ONE_SQL, List(id))
+    if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
 
   override def add(jsonIn: JsObject)(implicit ctx: Context): JsObject = {
@@ -25,16 +36,18 @@ abstract class RepositoryDao(val app: Altitude) extends BaseJdbcDao("repository"
 
     val sql = s"""
         INSERT INTO $tableName (
-             $CORE_SQL_COLS_FOR_INSERT, ${C.Repository.NAME},
+             ${C.Base.ID}, ${C.Repository.NAME},
              ${C.Repository.ROOT_FOLDER_ID}, ${C.Repository.UNCAT_FOLDER_ID})
-            VALUES ($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?)
+            VALUES (?, ?, ?, ?)
     """
 
     val sqlVals: List[Object] = List(
       repo.name,
-      repo.rootFolderId.get,
-      repo.uncatFolderId.get)
+      repo.rootFolderId,
+      repo.uncatFolderId)
 
     addRecord(jsonIn, sql, sqlVals)
   }
+
+  override protected def combineInsertValues(id: String, vals: List[Object])(implicit  ctx: Context) = id :: vals
 }

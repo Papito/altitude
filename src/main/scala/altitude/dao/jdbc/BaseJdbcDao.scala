@@ -35,7 +35,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
   protected def GET_DATETIME_FROM_REC(field: String, rec: Map[String, AnyRef]): Option[DateTime]
 
-  protected val CORE_SQL_COLS_FOR_INSERT = s"${C.Base.ID}"
+  protected val CORE_SQL_COLS_FOR_INSERT = s"${C.Base.ID}, ${C.Base.REPO_ID}"
   protected val SYSTEM_TABLE = "system"
 
   protected def utcNow = Util.utcNow
@@ -49,7 +49,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   protected val ONE_SQL = s"""
       SELECT $DEFAULT_SQL_COLS_FOR_SELECT
         FROM $tableName
-       WHERE ${C.Base.ID} = ?"""
+       WHERE ${C.Base.ID} = ? AND ${C.Base.REPO_ID} = ?"""
 
   override def add(jsonIn: JsObject)(implicit ctx: Context): JsObject = {
     val sql: String =s"""
@@ -61,7 +61,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
   override def getById(id: String)(implicit ctx: Context): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
-    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(ONE_SQL, List(id))
+    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(ONE_SQL, List(id, ctx.repo.id.get))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
 
@@ -76,12 +76,12 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     val sql = s"""
       DELETE
         FROM $tableName
-       WHERE ${fieldPlaceholders.mkString(",")}
+       WHERE ${C.Base.REPO_ID} = ? AND ${fieldPlaceholders.mkString(",")}
       """
 
     log.debug(s"Delete SQL: $sql, with values: ${q.params.values.toList}")
     val runner: QueryRunner = new QueryRunner()
-    val numDeleted = runner.update(conn, sql,  q.params.values.toList:_*)
+    val numDeleted = runner.update(conn, sql,  ctx.repo.id.get :: q.params.values.toList:_*)
     log.debug(s"Deleted records: $numDeleted")
     numDeleted
   }
@@ -126,8 +126,8 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     val id = if (existingObjId.isDefined) existingObjId.get else BaseModel.genId
     verifyId(id)
 
-    // prepend ID, as it is required for any record (in base implementation)
-    val values: List[Object] = id :: vals
+    // prepend ID and REPO ID, as it is required for most records
+    val values: List[Object] = combineInsertValues(id, vals)
     log.debug(s"INSERT SQL: $q. ARGS: ${values.toString()}")
 
     val runner: QueryRunner = new QueryRunner()
@@ -139,6 +139,9 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     log.debug(s"Added: $recordJson")
     recordJson
   }
+
+  protected def combineInsertValues(id: String, vals: List[Object])(implicit  ctx: Context) =
+    id :: ctx.repo.id.get :: vals
 
   protected def addRecords(q: String, vals: List[Object])
                          (implicit ctx: Context) = {
@@ -181,13 +184,13 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     val sql = s"""
       SELECT $DEFAULT_SQL_COLS_FOR_SELECT
         FROM $tableName
-       WHERE id IN (${placeholders.mkString(",")})
+       WHERE ${C.Base.REPO_ID} = ? AND id IN (${placeholders.mkString(",")})
       """
 
     log.debug(s"SQL: $sql with values: ${ids.toList}")
 
     val runner: QueryRunner = new QueryRunner()
-    val res = runner.query(conn, sql, new MapListHandler(), ids.toList: _*)
+    val res = runner.query(conn, sql, new MapListHandler(), ctx.repo.id.get :: ids.toList: _*)
     log.debug(s"Found ${res.size()} records", C.LogTag.DB)
     val recs = res.map{_.toMap[String, AnyRef]}.toList
     recs.map{makeModel}
@@ -203,7 +206,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     val sql = s"""
       UPDATE $tableName
          SET ${C.Base.UPDATED_AT} = $CURRENT_TIME_FUNC, ${updateFieldPlaceholders.mkString(", ")}
-       WHERE ${queryFieldPlaceholders.mkString(",")}
+       WHERE ${C.Base.REPO_ID} = ? AND ${queryFieldPlaceholders.mkString(",")}
       """
 
     val dataUpdateValues = json.fields.filter{
@@ -212,9 +215,9 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
       // convert the values to string
       v: (String, JsValue) => v._2.as[String]}.toList.reverse
 
-    log.debug(s"Update SQL: $sql, with query values: ${q.params.values.toList} and data: $dataUpdateValues")
+    val valuesForAllPlaceholders = dataUpdateValues ::: List(ctx.repo.id.get) ::: q.params.values.toList
+    log.debug(s"Update SQL: $sql, with query values: $valuesForAllPlaceholders")
     val runner: QueryRunner = new QueryRunner()
-    val valuesForAllPlaceholders = dataUpdateValues ::: q.params.values.toList
 
     val numUpdated = runner.update(conn, sql,  valuesForAllPlaceholders:_*)
     numUpdated
@@ -225,12 +228,12 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     val sql = s"""
       UPDATE $tableName
          SET $field = $field + $count
-       WHERE id = ?
+       WHERE ${C.Base.REPO_ID} = ? AND id = ?
       """
     log.debug(s"INCR SQL: $sql, for $id")
 
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, sql, id)
+    runner.update(conn, sql, ctx.repo.id.get, id)
   }
 
   override def decrement(id: String,  field: String, count: Int = 1)

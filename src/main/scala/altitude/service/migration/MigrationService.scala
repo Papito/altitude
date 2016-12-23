@@ -1,7 +1,7 @@
 package altitude.service.migration
 
 import altitude.dao.MigrationDao
-import altitude.models.{Stats, User}
+import altitude.models.{Repository, Stats, User}
 import altitude.transactions.AbstractTransactionManager
 import altitude.{Altitude, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
@@ -20,12 +20,13 @@ abstract class MigrationService(app: Altitude) {
   protected val MIGRATIONS_DIR: String
   protected val FILE_EXTENSION: String
 
-  private val user = User(
-    Some("a11111111111111111111111"),
+  private val user = User(Some("a11111111111111111111111"))
+  private val repo = new Repository(name = "Repository",
+    id = Some("a31111111111111111111113"),
     rootFolderId  = "a11111111111111111111111",
     uncatFolderId = "a22222222222222222222222")
 
-  def runMigration(version: Int)(implicit ctx: Context = new Context(repoId = null, user = user)) = {
+  def runMigration(version: Int)(implicit ctx: Context = new Context(repo = repo, user = user)) = {
     val migrationCommands = parseMigrationCommands(version)
 
     txManager.withTransaction {
@@ -49,15 +50,11 @@ abstract class MigrationService(app: Altitude) {
      and the non-implicit context should be removed
   */
   private def v1(context: Context) = {
-    val user = User(
-      Some("a11111111111111111111111"),
-      rootFolderId  = "a11111111111111111111111",
-      uncatFolderId = "a22222222222222222222222")
 
-    implicit val ctx: Context = new Context(txId = context.txId, user = user, repoId = null)
+    implicit val ctx: Context = new Context(txId = context.txId, user = user, repo = repo)
 
     // user "uncategorized" folder node
-    val uncatFolder = app.service.folder.getUserUncatFolder()
+    val uncatFolder = app.service.folder.getUncatFolder()
     app.service.folder.add(uncatFolder)
 
     app.service.stats.createStat(Stats.TOTAL_ASSETS)
@@ -67,7 +64,7 @@ abstract class MigrationService(app: Altitude) {
     app.service.stats.createStat(Stats.RECYCLED_BYTES)
   }
 
-  def existingVersion(implicit ctx: Context = new Context(repoId = null, user = user)): Int = {
+  def existingVersion(implicit ctx: Context = new Context(repo = repo, user = user)): Int = {
     txManager.asReadOnly[Int] {
       DAO.currentVersion
     }

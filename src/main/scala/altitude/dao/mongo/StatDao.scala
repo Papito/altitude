@@ -8,7 +8,7 @@ class StatDao(val app: Altitude) extends BaseMongoDao("altitude_stats") with alt
   def incrementStat(statName: String, count: Long = 1)(implicit ctx: Context): Unit = {
     val query: DBObject =  MongoDBObject(
       C.Stat.DIMENSION -> statName,
-      C.Base.USER_ID -> ctx.user.id.get
+      C.Base.REPO_ID -> ctx.repo.id.get
     )
     val o: DBObject =  MongoDBObject(
       "$inc" -> MongoDBObject(C.Stat.DIM_VAL -> count)

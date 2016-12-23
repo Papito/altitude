@@ -1,16 +1,13 @@
 package unit
 
 import altitude.Util
-import altitude.models.User
+import altitude.models.{BaseModel, User}
 import altitude.models.search.Query
 import org.scalatest.FunSuite
 
 class SearchQueryModelTests extends FunSuite {
 
-  var user: User = User(
-    id = Some(Util.randomStr()),
-    rootFolderId = Util.randomStr(),
-    uncatFolderId = Util.randomStr())
+  var user: User = User(id = Some(BaseModel.genId))
 
   test("Invalid RPP") {
     intercept[IllegalArgumentException] {

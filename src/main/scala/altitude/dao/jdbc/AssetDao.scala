@@ -18,6 +18,7 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
     val model = new Asset(
       id = Some(rec.get(C.Base.ID).get.asInstanceOf[String]),
       userId = rec.get(C.Base.USER_ID).get.asInstanceOf[String],
+      repoId = rec.get(C.Base.REPO_ID).get.asInstanceOf[String],
       path = rec.get(C.Asset.PATH).get.asInstanceOf[String],
       md5 = rec.get(C.Asset.MD5).get.asInstanceOf[String],
       assetType = assetType,

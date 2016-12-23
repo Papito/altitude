@@ -4,7 +4,7 @@ import altitude.Validators.Validator
 import altitude.dao.FolderDao
 import altitude.exceptions.{DuplicateException, IllegalOperationException, NotFoundException, ValidationException}
 import altitude.models.search.Query
-import altitude.models.{Folder, User}
+import altitude.models.{Folder}
 import altitude.{Altitude, Cleaners, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
@@ -53,9 +53,9 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
                   (implicit ctx: Context): JsObject = {
 
     val folder = Folder(
-      userId = ctx.user.id.get,
+      repoId = ctx.repo.id.get,
       name = name,
-      parentId = if (parentId.isDefined) parentId.get else ctx.user.rootFolderId)
+      parentId = if (parentId.isDefined) parentId.get else ctx.repo.rootFolderId)
 
     add(folder)
   }
@@ -69,28 +69,28 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
     }
   }
 
-  def getUserRootFolder()(implicit ctx: Context) = Folder(
-    id = Some(ctx.user.rootFolderId),
-    userId = ctx.user.id.get,
-    parentId = ctx.user.rootFolderId,
+  def getRootFolder()(implicit ctx: Context) = Folder(
+    id = Some(ctx.repo.rootFolderId),
+    repoId = ctx.repo.id.get,
+    parentId = ctx.repo.rootFolderId,
     name = C.Folder.Names.ROOT
   )
 
-  def getUserUncatFolder()(implicit ctx: Context) = Folder(
-    id = Some(ctx.user.uncatFolderId),
-    userId = ctx.user.id.get,
-    parentId = ctx.user.rootFolderId,
+  def getUncatFolder()(implicit ctx: Context) = Folder(
+    id = Some(ctx.repo.uncatFolderId),
+    repoId = ctx.repo.id.get,
+    parentId = ctx.repo.rootFolderId,
     name = C.Folder.Names.UNCATEGORIZED
   )
 
-  def getUserSystemFolders()(implicit ctx: Context): List[Folder] =
-    List(getUserUncatFolder())
+  def getSystemFolders()(implicit ctx: Context): List[Folder] =
+    List(getUncatFolder())
 
   def isRootFolder(id: Option[String])(implicit ctx: Context) =
-    id.contains(ctx.user.rootFolderId)
+    id.contains(ctx.repo.rootFolderId)
 
   def isSystemFolder(id: Option[String])(implicit ctx: Context) =
-    getUserSystemFolders().exists(_.id == id)
+    getSystemFolders().exists(_.id == id)
 
 
   private def addAssetCount(folders: List[JsObject])
@@ -124,7 +124,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
    */
   def hierarchy(rootId: Option[String] = None, all: List[JsObject] = List())
                (implicit ctx: Context): List[Folder] = {
-    val _rootId = if (rootId.isDefined) rootId.get else ctx.user.rootFolderId
+    val _rootId = if (rootId.isDefined) rootId.get else ctx.repo.rootFolderId
 
     txManager.asReadOnly {
       val nonSysFolders = if (all.isEmpty) getNonSysFolders() else getNonSysFolders(all)
@@ -160,7 +160,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
 
       val parents = findParents(folderId =folderId, all = nonSysFolders)
 
-      List(getUserRootFolder()) ::: (folder :: parents).reverse
+      List(getRootFolder()) ::: (folder :: parents).reverse
     }
   }
 
@@ -240,7 +240,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
 
       Folder(
         id = Some(id),
-        userId = ctx.user.id.get,
+        repoId = ctx.repo.id.get,
         name = name,
         parentId = parentId,
         children = this.children(id, nonSysFolders),
@@ -277,7 +277,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
 
   override def getById(id: String)
                       (implicit ctx: Context): JsObject = {
-    if (isRootFolder(Some(id))) getUserRootFolder() else super.getById(id)
+    if (isRootFolder(Some(id))) getRootFolder() else super.getById(id)
   }
 
   def getByIdWithChildAssetCounts(id: String, all: List[JsObject] = List())
@@ -374,7 +374,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
         C.Folder.NAME_LC -> folderBeingMoved.nameLowercase))
 
       val folderForUpdate = Folder(
-        userId = ctx.user.id.get,
+        repoId = ctx.repo.id.get,
         parentId = destFolderId,
         name = folderBeingMoved.name)
 
@@ -403,7 +403,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
 
       try {
         val folderForUpdate = Folder(
-          userId = ctx.user.id.get,
+          repoId = ctx.repo.id.get,
           parentId = folder.parentId,
           name = newName)
 
@@ -441,7 +441,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
     txManager.asReadOnly[Map[String, Folder]] {
       all.isEmpty match {
         case true => {
-          val sysFolderIds: Set[String] = getUserSystemFolders().map(_.id.get).toSet
+          val sysFolderIds: Set[String] = getSystemFolders().map(_.id.get).toSet
           val allSysFolders = DAO.getByIds(sysFolderIds)
           getSystemFolderLookup(allSysFolders)
         }

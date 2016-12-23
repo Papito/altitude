@@ -17,7 +17,7 @@ abstract class UserMetadataFieldDao (val app: Altitude)
 
     val model = UserMetadataField(
       id = Some(rec.get(C.Base.ID).get.asInstanceOf[String]),
-      userId = rec.get(C.Base.USER_ID).get.asInstanceOf[String],
+      repoId = rec.get(C.Base.REPO_ID).get.asInstanceOf[String],
       name = rec.get(C.MetadataField.NAME).get.asInstanceOf[String],
       fieldType = rec.get(C.MetadataField.FIELD_TYPE).get.asInstanceOf[String],
       maxLength =  if (maxLength.isDefined) Some(rec.get(C.MetadataField.MAX_LENGTH).get.asInstanceOf[Int]) else None,
@@ -32,14 +32,13 @@ abstract class UserMetadataFieldDao (val app: Altitude)
 
     var sql = s"""
         INSERT INTO $tableName (
-             $CORE_SQL_COLS_FOR_INSERT, ${C.Base.USER_ID},
+             $CORE_SQL_COLS_FOR_INSERT,
              ${C.MetadataField.NAME}, ${C.MetadataField.NAME_LC}, ${C.MetadataField.FIELD_TYPE},
              ${C.MetadataField.MAX_LENGTH})
-            VALUES ($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?, ?, ?)
+            VALUES ($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?, ?)
     """
 
     var sqlVals: List[Object] = List(
-      metadataField.userId,
       metadataField.name,
       metadataField.nameLowercase,
       metadataField.fieldType,
@@ -50,16 +49,18 @@ abstract class UserMetadataFieldDao (val app: Altitude)
     // now insert constraint values if any
     if (metadataField.constraintList.isDefined) {
       val values = metadataField.constraintList.get
-      val valuePlaceholders = values.map{v => "(?, ?)"}
+      val valuePlaceholders = values.map{v => "(?, ?, ?)"}
 
       sql = s"""
           INSERT INTO $CONSTRAINT_VAL_TBL
-            (${C.MetadataConstraintValue.FIELD_ID}, ${C.MetadataConstraintValue.CONSTRAINT_VALUE})
+            (${C.MetadataConstraintValue.REPO_ID},
+             ${C.MetadataConstraintValue.FIELD_ID},
+             ${C.MetadataConstraintValue.CONSTRAINT_VALUE})
           VALUES ${valuePlaceholders.mkString(", ")}
          """
 
       sqlVals = values.foldLeft(List[Object]()) {
-        (res, v) => res ::: List(storedField.id.get, v.asInstanceOf[Object])}
+        (res, v) => res ::: List(ctx.repo.id.get, storedField.id.get, v.asInstanceOf[Object])}
 
       addRecords(sql, sqlVals)
     }
@@ -95,9 +96,6 @@ abstract class UserMetadataFieldDao (val app: Altitude)
           C.MetadataField.CONSTRAINT_LIST -> Json.toJson(constraintValues))))
     }
   }
-
-  final val CONSTRAINT_VALS_SQL_QUERY_BUILDER =
-    new SqlQueryBuilder(C.MetadataConstraintValue.CONSTRAINT_VALUE, CONSTRAINT_VAL_TBL)
 
   override def query(q: Query)
                     (implicit ctx: Context): QueryResult = {
@@ -168,12 +166,12 @@ abstract class UserMetadataFieldDao (val app: Altitude)
     val sql = s"""
       DELETE
         FROM $CONSTRAINT_VAL_TBL
-       WHERE ${C.MetadataConstraintValue.FIELD_ID} = ?
+       WHERE ${C.Base.REPO_ID} = ? AND ${C.MetadataConstraintValue.FIELD_ID} = ?
       """
 
     log.debug(s"Delete SQL: $sql, with values: ${List(id)}")
     val runner: QueryRunner = new QueryRunner()
-    val constraintValuesDeleted = runner.update(conn, sql,  List(id):_*)
+    val constraintValuesDeleted = runner.update(conn, sql,  ctx.repo.id.get, id)
     log.debug(s"Deleted records: $constraintValuesDeleted")
 
     val fieldsDeleted = super.deleteById(id)
@@ -185,21 +183,23 @@ abstract class UserMetadataFieldDao (val app: Altitude)
                                  (implicit ctx: Context) = {
     val sql = s"""
           INSERT INTO $CONSTRAINT_VAL_TBL
-            (${C.MetadataConstraintValue.FIELD_ID}, ${C.MetadataConstraintValue.CONSTRAINT_VALUE})
-          VALUES (?, ?)
+            (${C.Base.REPO_ID},
+             ${C.MetadataConstraintValue.FIELD_ID},
+             ${C.MetadataConstraintValue.CONSTRAINT_VALUE})
+          VALUES (?, ?, ?)
          """
 
-    addRecords(sql, List(fieldId, constraintValue))
+    addRecords(sql, List(ctx.repo.id.get, fieldId, constraintValue))
   }
 
   def deleteConstraintValue(fieldId: String, constraintValue: String)
                            (implicit ctx: Context) = {
     val sql = s"""
           DELETE FROM $CONSTRAINT_VAL_TBL
-                WHERE ${C.MetadataConstraintValue.FIELD_ID} = ?
+                WHERE ${C.Base.REPO_ID} = ? AND ${C.MetadataConstraintValue.FIELD_ID} = ?
                   AND ${C.MetadataConstraintValue.CONSTRAINT_VALUE} = ?
          """
 
-    addRecords(sql, List(fieldId, constraintValue))
+    addRecords(sql, List(ctx.repo.id.get, fieldId, constraintValue))
   }
 }

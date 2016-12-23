@@ -4,11 +4,12 @@ import altitude.dao.QueryParser
 import altitude.models.search.Query
 import com.mongodb.casbah.Imports._
 import org.slf4j.LoggerFactory
+import altitude.{Const => C, Context}
 
 class MongoQueryBuilder(collection: MongoCollection) extends QueryParser {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  def toSelectCursor(query: Query): MongoCursor = {
+  def toSelectCursor(query: Query)(implicit ctx: Context): MongoCursor = {
     val folderIds: Set[String] = getFolderIds(query)
 
     // filter out system parameters
@@ -17,7 +18,7 @@ class MongoQueryBuilder(collection: MongoCollection) extends QueryParser {
     val builder = MongoDBObject.newBuilder
     builder ++= params
 
-    builder += ("user_id" -> query.user.id.get)
+    builder += (C.Base.REPO_ID -> ctx.repo.id.get)
 
     if (folderIds.nonEmpty) {
       builder += ("folder_id" -> MongoDBObject("$in" -> folderIds))

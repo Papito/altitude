@@ -16,10 +16,11 @@ import org.scalatest.Matchers._
     val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
     val asset = new Asset(
       userId = currentUser.id.get,
+      repoId = ctx.repo.id.get,
       assetType = mediaType,
       path = "path",
       md5 = "md5",
-      folderId = currentUser.uncatFolderId,
+      folderId = ctx.repo.uncatFolderId,
       sizeBytes = 1L)
     altitude.service.asset.add(asset)
 
@@ -31,14 +32,15 @@ import org.scalatest.Matchers._
     val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
     val asset = new Asset(
       userId = currentUser.id.get,
+      repoId = ctx.repo.id.get,
       assetType = mediaType,
       path = "path",
       md5 = "md5",
-      folderId = currentUser.uncatFolderId,
+      folderId = ctx.repo.uncatFolderId,
       sizeBytes = 1L)
     altitude.service.asset.add(asset)
 
-    val query = Query(currentUser, params = Map(C.Api.Folder.QUERY_ARG_NAME -> currentUser.uncatFolderId))
+    val query = Query(currentUser, params = Map(C.Api.Folder.QUERY_ARG_NAME -> ctx.repo.uncatFolderId))
     val assets = altitude.service.library.search(query).records
     assets.length should be(1)
   }
@@ -61,14 +63,32 @@ import org.scalatest.Matchers._
 
     val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
 
-    altitude.service.asset.add(new Asset(folderId = folder1_1.id.get.toString,
-      userId = currentUser.id.get, assetType = mediaType, path = Util.randomStr(30), md5 = Util.randomStr(30), sizeBytes = 1L))
+    altitude.service.asset.add(new Asset(
+      folderId = folder1_1.id.get.toString,
+      repoId = ctx.repo.id.get,
+      userId = currentUser.id.get,
+      assetType = mediaType,
+      path = Util.randomStr(30),
+      md5 = Util.randomStr(32),
+      sizeBytes = 1L))
 
-    altitude.service.asset.add(new Asset(folderId = folder1_2.id.get.toString,
-      userId = currentUser.id.get, assetType = mediaType, path = Util.randomStr(30), md5 = Util.randomStr(30), sizeBytes = 1L))
+    altitude.service.asset.add(new Asset(
+      folderId = folder1_2.id.get.toString,
+      userId = currentUser.id.get,
+      repoId = ctx.repo.id.get,
+      assetType = mediaType,
+      path = Util.randomStr(30),
+      md5 = Util.randomStr(32),
+      sizeBytes = 1L))
 
-    altitude.service.asset.add(new Asset(folderId = folder1.id.get.toString,
-      userId = currentUser.id.get, assetType = mediaType, path = Util.randomStr(30), md5 = Util.randomStr(30), sizeBytes = 1L))
+    altitude.service.asset.add(new Asset(
+      folderId = folder1.id.get.toString,
+      userId = currentUser.id.get,
+      repoId = ctx.repo.id.get,
+      assetType = mediaType,
+      path = Util.randomStr(30),
+      md5 = Util.randomStr(32),
+      sizeBytes = 1L))
 
     altitude.service.library.search(
       Query(currentUser, params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1_2.id.get))
@@ -118,7 +138,7 @@ import org.scalatest.Matchers._
 
   test("pagination") {
     1 to 6 foreach { n =>
-      altitude.service.library.add(makeAsset(altitude.service.folder.getUserUncatFolder()))
+      altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder()))
     }
 
     val q = Query(currentUser, rpp = 2, page = 1)

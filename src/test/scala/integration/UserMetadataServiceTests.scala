@@ -1,5 +1,6 @@
 package integration
 
+import altitude.exceptions.ValidationException
 import altitude.models._
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
@@ -9,7 +10,7 @@ import org.scalatest.Matchers._
   test("add/delete constraint value") {
     val metadataField = altitude.service.userMetadata.addField(
       UserMetadataField(
-        userId = currentUserId,
+        repoId = ctx.repo.id.get,
         name = "fieldName",
         fieldType = FieldType.NUMBER.toString))
 
@@ -40,11 +41,10 @@ import org.scalatest.Matchers._
     updatedField.constraintList shouldBe empty
   }
 
-  /*
-  test("delete user field") {
+  test("delete field") {
     val metadataField = altitude.service.userMetadata.addField(
       UserMetadataField(
-        userId = CURRENT_USER_ID,
+        repoId = ctx.repo.id.get,
         name = "fieldName",
         fieldType = FieldType.STRING.toString,
         constraintList = Some(List("one", "two", "three"))))
@@ -54,10 +54,10 @@ import org.scalatest.Matchers._
     altitude.service.userMetadata.getAllFields shouldBe empty
   }
 
-  test("add/get user constraint list") {
+  test("add/get constraint list") {
     val metadataField = altitude.service.userMetadata.addField(
       UserMetadataField(
-        userId = CURRENT_USER_ID,
+        repoId = ctx.repo.id.get,
         name = "field name",
         fieldType = FieldType.STRING.toString,
         constraintList = Some(List("one", "two", "three"))))
@@ -76,41 +76,34 @@ import org.scalatest.Matchers._
     storedField.constraintList.get.length should be(metadataField.constraintList.get.length)
   }
 
-  test("add/get user fields") {
-    SET_USER_1()
+  test("add/get fields") {
     val metadataField = altitude.service.userMetadata.addField(
-      UserMetadataField(userId = CURRENT_USER_ID, name = "field name", fieldType = FieldType.STRING.toString))
+      UserMetadataField(repoId = ctx.repo.id.get, name = "field name", fieldType = FieldType.STRING.toString))
 
-    SET_USER_2()
-    altitude.service.userMetadata.addField(
-      UserMetadataField(userId = CURRENT_USER_ID, name = "field name", fieldType = FieldType.NUMBER.toString))
-
-    SET_USER_1()
     altitude.service.userMetadata.getFieldById(metadataField.id.get) should not be None
   }
 
-  test("get all user fields") {
+  test("get all fields") {
     altitude.service.userMetadata.addField(
-      UserMetadataField(userId = CURRENT_USER_ID, name = "field name 1", fieldType = FieldType.STRING.toString))
+      UserMetadataField(repoId = ctx.repo.id.get, name = "field name 1", fieldType = FieldType.STRING.toString))
     altitude.service.userMetadata.addField(
-      UserMetadataField(userId = CURRENT_USER_ID, name = "field name 2", fieldType = FieldType.STRING.toString))
+      UserMetadataField(repoId = ctx.repo.id.get, name = "field name 2", fieldType = FieldType.STRING.toString))
 
     SET_USER_2()
     altitude.service.userMetadata.addField(
-      UserMetadataField(userId = CURRENT_USER_ID, name = "field name 1", fieldType = FieldType.STRING.toString))
+      UserMetadataField(repoId = ctx.repo.id.get, name = "field name 3", fieldType = FieldType.STRING.toString))
 
     SET_USER_1()
-    altitude.service.userMetadata.getAllFields.length should be(2)
+    altitude.service.userMetadata.getAllFields.length should be(3)
 
     SET_USER_2()
-    altitude.service.userMetadata.getAllFields.length should be(1)
+    altitude.service.userMetadata.getAllFields.length should be(3)
   }
 
   test("add invalid field type") {
     intercept[ValidationException] {
         altitude.service.userMetadata.addField(
-          UserMetadataField(userId = CURRENT_USER_ID, name = "fieldName", fieldType = "SO_INVALID"))
+          UserMetadataField(repoId = ctx.repo.id.get, name = "fieldName", fieldType = "SO_INVALID"))
       }
   }
-  */
 }

@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import altitude.controllers.web.BaseWebController
 import altitude.exceptions.{AllDone, DuplicateException, MetadataExtractorException}
-import altitude.models.{Asset, FileImportAsset, User}
+import altitude.models.{Repository, Asset, FileImportAsset, User}
 import altitude.{Const => C, Context}
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.{DefaultFormats, Formats, JValue, _}
@@ -77,11 +77,12 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
       var path: Option[String] = None
 
       // FIXME: This has to come from auth
-      private val user = User(
-        Some("a11111111111111111111111"),
+      private val user = User(Some("a11111111111111111111111"))
+      private val repo = new Repository(name = "Repository",
+        id = Some("a31111111111111111111113"),
         rootFolderId  = "a11111111111111111111111",
         uncatFolderId = "a22222222222222222222222")
-      private implicit val context: Context = new Context(repoId = null, user = user)
+      private implicit val context: Context = new Context(repo = repo, user = user)
 
       private def writeToYou(jsonMessage: JsValue): Unit = {
         log.info(s"YOU -> $jsonMessage")

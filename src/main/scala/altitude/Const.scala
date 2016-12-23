@@ -5,7 +5,7 @@ object Const {
 
   trait Common {
     val ID = "id"
-    val DB_ID = "db_id"
+    val REPO_ID = "repository_id"
     val USER_ID = "user_id"
     val VALUES = "values"
     val DATA = "data"
@@ -30,10 +30,6 @@ object Const {
   }
 
   object User extends Common {
-    // TODO: belong to Repository
-    val ROOT_FOLDER_ID = "root_folder_id"
-    // TODO: belong to Repository
-    val UNCAT_FOLDER_ID = "uncat_folder_id"
   }
 
   object Asset extends Common {

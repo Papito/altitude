@@ -46,7 +46,7 @@ class LibraryService(app: Altitude) {
       app.service.stats.incrementStat(Stats.TOTAL_ASSETS)
       app.service.stats.incrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
       // if there is no folder, increment the uncategorized counter
-      if (ctx.user.uncatFolderId == obj.folderId) {
+      if (ctx.repo.uncatFolderId == obj.folderId) {
         app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS)
       }
 
@@ -68,7 +68,7 @@ class LibraryService(app: Altitude) {
       val asset: Asset = getById(id)
 
       // of this asset is still uncategorized, update the stat
-      if (ctx.user.uncatFolderId == asset.folderId) {
+      if (ctx.repo.uncatFolderId == asset.folderId) {
         app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
       }
       app.service.stats.decrementStat(Stats.TOTAL_ASSETS)
@@ -232,14 +232,14 @@ class LibraryService(app: Altitude) {
         val asset: Asset = this.getById(assetId)
 
         // if moving from uncategorized, decrement that stat
-        if (ctx.user.uncatFolderId == asset.folderId) {
+        if (ctx.repo.uncatFolderId == asset.folderId) {
           app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
         }
 
         // point asset to the new folder
         val updatedAsset: Asset = asset ++ Json.obj(C.Asset.FOLDER_ID -> folderId)
 
-        app.service.asset.updateById(asset.id.get, updatedAsset, fields = List(C.Asset.FOLDER_ID))
+        val i = app.service.asset.updateById(asset.id.get, updatedAsset, fields = List(C.Asset.FOLDER_ID))
         app.service.folder.decrAssetCount(asset.folderId)
       }
 
@@ -257,7 +257,7 @@ class LibraryService(app: Altitude) {
   def moveAssetsToUncategorized(assetIds: Set[String])
                                (implicit ctx: Context) = {
     txManager.withTransaction[Unit] {
-      moveAssetsToFolder(assetIds, ctx.user.uncatFolderId)
+      moveAssetsToFolder(assetIds, ctx.repo.uncatFolderId)
       app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS, assetIds.size)
     }
   }

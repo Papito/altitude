@@ -1,10 +1,10 @@
 db.system.createIndex({ "version" : 1 }, { unique: true })
 
-db.assets.createIndex({ "user_id" : 1, "md5" : 1 }, { unique: true })
-db.assets.createIndex({ "user_id" : 1, "path" : 1 }, { unique: true })
-db.assets.createIndex({ "folder_id" : 1 })
+db.assets.createIndex({ "repository_id": 1, "md5" : 1 }, { unique: true })
+db.assets.createIndex({ "repository_id": 1, "path" : 1 }, { unique: true })
+db.assets.createIndex({ "repository_id": 1, "folder_id" : 1 })
 
-db.folders.createIndex({ "parent_id" : 1 })
-db.folders.createIndex({ "parent_id" : 1, "name_lc": 1 }, { unique: true } )
+db.folders.createIndex({ "repository_id": 1, "parent_id" : 1 })
+db.folders.createIndex({ "repository_id": 1, "parent_id" : 1, "name_lc": 1 }, { unique: true } )
 
-db.metadata_fields.createIndex({ "user_id" : 1, "name_lc" : 1 }, { unique: true })
+db.metadata_fields.createIndex({ "repository_id" : 1, "name_lc" : 1 }, { unique: true })

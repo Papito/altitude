@@ -2,8 +2,8 @@ package altitude.controllers
 
 import java.io.{PrintWriter, StringWriter}
 
-import altitude.models.User
-import altitude.{Context, RepositoryId, SingleApplication, Util}
+import altitude.models.{Repository, User}
+import altitude.{Context, SingleApplication, Util}
 import org.scalatra.InternalServerError
 import org.slf4j.{LoggerFactory, MDC}
 
@@ -31,7 +31,10 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
 
   // FIXME: cache in the request
   implicit def context: Context = new Context(
-    repoId = new RepositoryId("a11111111111111111111111"),
+    repo = new Repository(name = "Repository",
+      id = Some("a11111111111111111111111"),
+      rootFolderId  = "a11111111111111111111111",
+      uncatFolderId = "a22222222222222222222222"),
     user = user)
 
   before() {
@@ -58,10 +61,7 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
   }
 
   protected def setUser() = {
-    val user = User(
-      Some("a11111111111111111111111"),
-      rootFolderId  = "a11111111111111111111111",
-      uncatFolderId = "a22222222222222222222222")
+    val user = User(Some("a11111111111111111111111"))
 
     request.setAttribute("user", user)
     MDC.put("USER", s"[${user.toString}]")

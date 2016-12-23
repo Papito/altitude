@@ -160,7 +160,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     val query  = fixMongoQuery(q)
     val mongoQuery: DBObject = query.params
 
-    // combine the selected fields we want to update from the JSON repr of the mode, with updated_at
+    // combine the selected fields we want to update from the JSON repr of the model, with updated_at
     val updateJson = JsObject(
       json.fieldSet.filter {v: (String, JsValue) => fields.contains(v._1)}.toSeq) ++ Json.obj(
       C.Base.UPDATED_AT -> Util.isoDateTime(Some(Util.utcNowNoTZ))

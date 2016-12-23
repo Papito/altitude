@@ -14,16 +14,17 @@ import org.scalatest.Matchers._
 
     // create an uncategorized asset
     val uncategorizedAsset: Asset = altitude.service.library.add(makeAsset(
-      altitude.service.folder.getUserUncatFolder()))
+      altitude.service.folder.getUncatFolder()))
 
     // create an asset and delete it
     val assetToDelete1: Asset = altitude.service.library.add(makeAsset(folder1))
     altitude.service.library.recycleAsset(assetToDelete1.id.get)
     val assetToDelete2: Asset = altitude.service.library.add(makeAsset(
-      altitude.service.folder.getUserUncatFolder()))
+      altitude.service.folder.getUncatFolder()))
     altitude.service.library.recycleAsset(assetToDelete2.id.get)
 
     val stats = altitude.service.stats.getStats
+    println(stats)
     stats.getStatValue(Stats.TOTAL_ASSETS) should be (2)
     stats.getStatValue(Stats.RECYCLED_ASSETS) should be (2)
     stats.getStatValue(Stats.UNCATEGORIZED_ASSETS) should be (1)
@@ -51,7 +52,8 @@ import org.scalatest.Matchers._
 
   test("test move recycled asset to folder") {
     val asset: Asset = altitude.service.library.add(makeAsset(
-      altitude.service.folder.getUserUncatFolder()))
+      altitude.service.folder.getUncatFolder()))
+
     altitude.service.library.recycleAsset(asset.id.get)
 
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
@@ -65,18 +67,18 @@ import org.scalatest.Matchers._
 
   test("restore recycled asset") {
     val asset: Asset = altitude.service.library.add(makeAsset(
-      altitude.service.folder.getUserUncatFolder()))
+      altitude.service.folder.getUncatFolder()))
     val trashed: Trash = altitude.service.library.recycleAsset(asset.id.get)
     altitude.service.library.restoreRecycledAsset(trashed.id.get)
 
     SET_USER_2()
     altitude.service.library.add(makeAsset(
-      altitude.service.folder.getUserUncatFolder()))
+      altitude.service.folder.getUncatFolder()))
 
     SET_USER_1()
 
     val stats = altitude.service.stats.getStats
-    stats.getStatValue(Stats.TOTAL_ASSETS) should be (1)
+    stats.getStatValue(Stats.TOTAL_ASSETS) should be (2)
     stats.getStatValue(Stats.RECYCLED_ASSETS) should be (0)
   }
 }

@@ -11,8 +11,8 @@ import org.scalatest.Matchers._
     val r = Repository(
       name = Util.randomStr(),
       // FIXME: these will be done by the service
-      rootFolderId = Some(BaseModel.genId),
-      uncatFolderId = Some(BaseModel.genId)
+      rootFolderId = BaseModel.genId,
+      uncatFolderId = BaseModel.genId
     )
 
     val r1: Repository = altitude.service.repository.add(r)

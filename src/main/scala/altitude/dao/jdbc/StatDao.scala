@@ -10,17 +10,17 @@ abstract class StatDao (val app: Altitude) extends BaseJdbcDao("stats") with alt
   private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = Stat(
-    rec.get("user_id").get.asInstanceOf[String],
-    rec.get("dimension").get.asInstanceOf[String],
-    rec.get("dim_val").get.asInstanceOf[Int])
+    rec.get(C.Base.REPO_ID).get.asInstanceOf[String],
+    rec.get(C.Stat.DIMENSION).get.asInstanceOf[String],
+    rec.get(C.Stat.DIM_VAL).get.asInstanceOf[Int])
 
   override def add(jsonIn: JsObject)(implicit ctx: Context): JsObject = {
     val sql: String =s"""
-      INSERT INTO $tableName (user_id, dimension)
+      INSERT INTO $tableName (${C.Base.REPO_ID}, ${C.Stat.DIMENSION})
            VALUES (? ,?)"""
 
     val stat: Stat = jsonIn
-    val values: List[Object] = ctx.user.id.get :: stat.dimension :: Nil
+    val values: List[Object] = ctx.repo.id.get :: stat.dimension :: Nil
 
     addRecord(jsonIn, sql, values)
   }
@@ -38,11 +38,11 @@ abstract class StatDao (val app: Altitude) extends BaseJdbcDao("stats") with alt
     val sql = s"""
       UPDATE $tableName
          SET ${C.Stat.DIM_VAL} = ${C.Stat.DIM_VAL} + $count
-       WHERE ${C.Base.USER_ID} = ? and ${C.Stat.DIMENSION} = ?
+       WHERE ${C.Base.REPO_ID} = ? and ${C.Stat.DIMENSION} = ?
       """
     log.debug(s"INCR STAT SQL: $sql, for $statName")
 
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, sql, ctx.user.id.get, statName)
+    runner.update(conn, sql, ctx.repo.id.get, statName)
   }
 }

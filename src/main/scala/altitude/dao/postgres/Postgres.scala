@@ -8,7 +8,7 @@ import org.joda.time.DateTime
 
 
 trait Postgres {
-  protected def CORE_SQL_VALS_FOR_INSERT = "?"
+  protected def CORE_SQL_VALS_FOR_INSERT = "?, ?"
 
   protected def DEFAULT_SQL_COLS_FOR_SELECT = s"""
       ${C.Base.ID}, *,

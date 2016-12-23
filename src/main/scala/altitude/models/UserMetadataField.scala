@@ -15,7 +15,7 @@ object UserMetadataField {
   implicit def fromJson(json: JsValue): UserMetadataField =
     UserMetadataField(
       id = (json \ C.Base.ID).asOpt[String],
-      userId = (json \ C.Base.USER_ID).as[String],
+      repoId = (json \ C.MetadataField.REPO_ID).as[String],
       name = (json \ C.MetadataField.NAME).as[String],
       fieldType = (json \ C.MetadataField.FIELD_TYPE).as[String],
       constraintList = (json \ C.MetadataField.CONSTRAINT_LIST).asOpt[List[String]],
@@ -25,7 +25,7 @@ object UserMetadataField {
 
 case class UserMetadataField(
                   id: Option[String] = None,
-                  userId: String,
+                  repoId: String,
                   name: String,
                   fieldType: String,
                   constraintList: Option[List[String]] = None,
@@ -34,8 +34,8 @@ case class UserMetadataField(
   val nameLowercase = name.toLowerCase
 
   override def toJson = Json.obj(
-      C.Base.USER_ID -> userId,
       C.MetadataField.NAME -> name,
+      C.MetadataField.REPO_ID -> repoId,
       C.MetadataField.NAME_LC -> nameLowercase,
       C.MetadataField.FIELD_TYPE -> fieldType,
       C.MetadataField.CONSTRAINT_LIST -> {
