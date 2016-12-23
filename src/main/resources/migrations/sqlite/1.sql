@@ -8,11 +8,13 @@ INSERT INTO system(id, version) VALUES(0, 0);
 CREATE TABLE repository(
   id char(24) PRIMARY KEY,
   name varchar(255) NOT NULL,
+  description TEXT,
   root_folder_id char(24) NOT NULL,
   uncat_folder_id char(24) NOT NULL,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );
+-- FIXME: unique constraint on lowercase name and server-side check before creating
 
 CREATE TABLE stats (
   repository_id char(24) NOT NULL,
@@ -72,7 +74,6 @@ CREATE TABLE metadata_field (
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );
-
 CREATE INDEX metadata_field_repo ON metadata_field(repository_id);
 CREATE UNIQUE INDEX metadata_field_name ON metadata_field(repository_id, name_lc);
 
