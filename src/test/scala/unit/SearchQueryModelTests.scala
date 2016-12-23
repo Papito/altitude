@@ -11,16 +11,16 @@ class SearchQueryModelTests extends FunSuite {
 
   test("Invalid RPP") {
     intercept[IllegalArgumentException] {
-      Query(user, rpp = -1)
+      Query(rpp = -1)
     }
   }
 
   test("Invalid page") {
     intercept[IllegalArgumentException] {
-      Query(user, page = 0)
+      Query(page = 0)
     }
     intercept[IllegalArgumentException] {
-      Query(user, page = -1)
+      Query(page = -1)
     }
   }
 }

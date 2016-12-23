@@ -15,8 +15,7 @@ class StatsService(app: Altitude){
 
   def getStats(implicit ctx: Context): Stats = {
     txManager.asReadOnly[Stats] {
-      val q = Query(user = ctx.user)
-      val allStats: List[Stat] = DAO.query(q).records.map(Stat.fromJson)
+      val allStats: List[Stat] = DAO.query(Query()).records.map(Stat.fromJson)
       Stats(allStats)
     }
   }

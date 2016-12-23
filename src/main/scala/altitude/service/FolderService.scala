@@ -34,7 +34,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
       throw new IllegalOperationException("Cannot add a child to a system folder")
     }
 
-    val dupQuery = Query(ctx.user, Map(
+    val dupQuery = Query(Map(
       C.Folder.PARENT_ID -> folder.parentId,
       C.Folder.NAME_LC -> folder.nameLowercase))
 
@@ -369,7 +369,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
       val folderBeingMoved: Folder = getById(folderBeingMovedId)
 
       // destination parent cannot have folder by the same name
-      val dupQuery = Query(ctx.user, Map(
+      val dupQuery = Query(Map(
         C.Folder.PARENT_ID -> destFolderId,
         C.Folder.NAME_LC -> folderBeingMoved.nameLowercase))
 
@@ -397,7 +397,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
       val folder: Folder = getById(folderId)
 
       // new folder name cannot match the new one
-      val dupQuery = Query(ctx.user, Map(
+      val dupQuery = Query(Map(
         C.Folder.PARENT_ID -> folder.parentId,
         C.Folder.NAME_LC -> newName.toLowerCase))
 

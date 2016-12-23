@@ -9,8 +9,6 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) extends Query
   private final val log = LoggerFactory.getLogger(getClass)
 
   def toSelectQuery(query: Query, countOnly: Boolean = false)(implicit ctx: Context): SqlQuery = {
-    require(query.user.id.nonEmpty)
-
     val folderIds: Set[String] = getFolderIds(query)
 
     // get the query params - and add the repository

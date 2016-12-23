@@ -133,7 +133,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
       case true => {
         val id = q.params.get("id").get
         val params = (q.params - "id") ++ Map("_id" -> id)
-        Query(ctx.user, params = params, rpp = q.rpp, page = q.page)
+        Query(params = params, rpp = q.rpp, page = q.page)
       }
     }
   }

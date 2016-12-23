@@ -28,7 +28,7 @@ class LibraryService(app: Altitude) {
       throw new IllegalOperationException("Cannot have assets in root folder")
     }
 
-    val query = Query(ctx.user, Map(C.Asset.MD5 -> obj.md5))
+    val query = Query(Map(C.Asset.MD5 -> obj.md5))
 
     txManager.withTransaction[JsObject] {
       val existing = app.service.asset.query(query)
@@ -112,7 +112,6 @@ class LibraryService(app: Altitude) {
 
           // repackage the query to include all folders (they will have to be re-parsed again)
           Query(
-            ctx.user,
             params = query.params
               ++ Map(C.Api.Folder.QUERY_ARG_NAME -> allFolderIds.mkString(C.Api.MULTI_VALUE_DELIM)),
             page = query.page, rpp = query.rpp)
