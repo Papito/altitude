@@ -1,8 +1,8 @@
 package altitude.service
 
-import altitude.{Context, Altitude}
 import altitude.dao.TrashDao
 import altitude.models.Trash
+import altitude.{Altitude, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsValue

@@ -1,9 +1,9 @@
 package altitude.dao.mongo
 
-import altitude.{Util, Const => C, Context, Altitude}
+import altitude.{Altitude, Const => C, Context}
 import com.mongodb.casbah.Imports._
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{Json, JsObject}
+import play.api.libs.json.{JsObject, Json}
 
 class RepositoryDao(val app: Altitude) extends BaseMongoDao("repositories") with altitude.dao.RepositoryDao {
   private final val log = LoggerFactory.getLogger(getClass)

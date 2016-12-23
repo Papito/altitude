@@ -1,10 +1,10 @@
 package altitude.service
 
-import altitude.{Context, Altitude}
 import altitude.dao.StatDao
 import altitude.models.search.Query
 import altitude.models.{Stat, Stats}
 import altitude.transactions.AbstractTransactionManager
+import altitude.{Altitude, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 

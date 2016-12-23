@@ -5,7 +5,7 @@ import java.io.{File, FileInputStream, InputStream}
 import altitude.dao.FileSystemImportDao
 import altitude.exceptions.{FormatException, MetadataExtractorException}
 import altitude.models._
-import altitude.{Const => C, Context, Altitude}
+import altitude.{Altitude, Const => C, Context}
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}

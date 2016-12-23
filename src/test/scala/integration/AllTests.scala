@@ -1,7 +1,7 @@
 package integration
 
 import org.scalatest.Suites
-import unit.{SearchQueryModelTests, ModelTests, FolderModelTests}
+import unit.{FolderModelTests, ModelTests, SearchQueryModelTests}
 
 abstract class AllTests(val config: Map[String, String]) extends Suites(
     new FileSystemImportTests(config),

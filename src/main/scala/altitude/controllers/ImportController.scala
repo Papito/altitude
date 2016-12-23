@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import altitude.controllers.web.BaseWebController
 import altitude.exceptions.{AllDone, DuplicateException, MetadataExtractorException}
-import altitude.models.{Repository, Asset, FileImportAsset, User}
+import altitude.models.{Asset, FileImportAsset, Repository, User}
 import altitude.{Const => C, Context}
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.{DefaultFormats, Formats, JValue, _}

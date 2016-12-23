@@ -2,9 +2,9 @@ package altitude.dao.mongo
 
 import altitude.dao.QueryParser
 import altitude.models.search.Query
+import altitude.{Const => C, Context}
 import com.mongodb.casbah.Imports._
 import org.slf4j.LoggerFactory
-import altitude.{Const => C, Context}
 
 class MongoQueryBuilder(collection: MongoCollection) extends QueryParser {
   private final val log = LoggerFactory.getLogger(getClass)

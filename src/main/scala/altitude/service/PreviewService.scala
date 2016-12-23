@@ -4,7 +4,7 @@ import java.io._
 
 import altitude.exceptions.NotFoundException
 import altitude.models.Preview
-import altitude.{Const => C, Context, Altitude}
+import altitude.{Altitude, Const => C, Context}
 import org.apache.commons.io.{FileUtils, FilenameUtils}
 import org.slf4j.LoggerFactory
 

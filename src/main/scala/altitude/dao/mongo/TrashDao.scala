@@ -1,7 +1,7 @@
 package altitude.dao.mongo
 
 import altitude.models.Trash
-import altitude.{Const => C, Context, Altitude, Util}
+import altitude.{Altitude, Const => C, Context, Util}
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.{JsObject, Json}
 

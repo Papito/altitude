@@ -1,7 +1,7 @@
 package altitude.controllers.api
 
 import altitude.models.search.Query
-import altitude.{Const => C, Context}
+import altitude.{Const => C}
 import org.scalatra.Ok
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json

@@ -9,7 +9,7 @@ import altitude.exceptions.{DuplicateException, FormatException, IllegalOperatio
 import altitude.models._
 import altitude.models.search.{Query, QueryResult}
 import altitude.transactions.AbstractTransactionManager
-import altitude.{Const => C, Context, Altitude}
+import altitude.{Altitude, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.imgscalr.Scalr
 import org.slf4j.LoggerFactory

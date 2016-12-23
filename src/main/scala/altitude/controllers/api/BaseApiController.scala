@@ -3,7 +3,7 @@ package altitude.controllers.api
 import altitude.Validators.ApiValidator
 import altitude.controllers.BaseController
 import altitude.exceptions.{NotFoundException, ValidationException}
-import altitude.{Const => C, Context}
+import altitude.{Const => C}
 import org.scalatra._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsNull, JsObject, Json}

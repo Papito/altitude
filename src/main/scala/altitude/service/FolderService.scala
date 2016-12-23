@@ -3,8 +3,8 @@ package altitude.service
 import altitude.Validators.Validator
 import altitude.dao.FolderDao
 import altitude.exceptions.{DuplicateException, IllegalOperationException, NotFoundException, ValidationException}
+import altitude.models.Folder
 import altitude.models.search.Query
-import altitude.models.{Folder}
 import altitude.{Altitude, Cleaners, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory

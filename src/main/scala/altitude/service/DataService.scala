@@ -2,9 +2,9 @@ package altitude.service
 
 import java.io._
 
-import altitude.{Context, Altitude}
 import altitude.exceptions.NotFoundException
 import altitude.models.{Asset, Data}
+import altitude.{Altitude, Context}
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 

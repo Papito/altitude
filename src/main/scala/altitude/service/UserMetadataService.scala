@@ -3,7 +3,7 @@ package altitude.service
 import altitude.dao.{NotImplementedDao, UserMetadataFieldDao}
 import altitude.exceptions.{NotFoundException, ValidationException}
 import altitude.models.{FieldType, UserMetadataField}
-import altitude.{Const => C, Context, Altitude}
+import altitude.{Altitude, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
