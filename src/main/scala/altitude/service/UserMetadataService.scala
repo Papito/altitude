@@ -26,6 +26,8 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
         throw ex
       }
 
+    // FIXME: verify name is unique before we hit the DB constraint (DuplicateException)
+
     METADATA_FIELD_DAO.add(metadataField)
     }
   }
