@@ -54,7 +54,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
       C.Base.ID -> JsString(id))
   }
 
-  protected def makeObjectForInsert(jsonIn: JsObject): DBObject = {
+  protected def makeObjectForInsert(jsonIn: JsObject)(implicit ctx: Context): DBObject = {
     // create id UNLESS specified
     val id: String = (jsonIn \ C.Base.ID).asOpt[String] match {
       case Some(id: String) => id
@@ -68,6 +68,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
 
     val coreAttrObj = MongoDBObject(
         "_id" -> id,
+        C.Base.REPO_ID -> ctx.repo.id.get,
         C.Base.CREATED_AT -> createdAt)
       origObj ++ coreAttrObj
   }
@@ -85,7 +86,11 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   override def getById(id: String)(implicit ctx: Context): Option[JsObject] = {
     log.debug(s"Getting by ID '$id'", C.LogTag.DB)
 
-    val o: Option[DBObject] = COLLECTION.findOneByID(id)
+    val q = MongoDBObject(
+      "_id" -> id,
+      C.Base.REPO_ID -> ctx.repo.id.get)
+
+    val o: Option[DBObject] = COLLECTION.findOne(q)
 
     log.debug(s"RETRIEVED object: $o", C.LogTag.DB)
 
@@ -141,6 +146,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   override def getByIds(ids: Set[String])
                        (implicit ctx: Context): List[JsObject] = {
     val query: DBObject =  MongoDBObject(
+      C.Base.REPO_ID -> ctx.repo.id.get,
       "_id" -> MongoDBObject("$in" -> ids)
     )
 
@@ -158,7 +164,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     log.debug(s"Updating with data $json for $q")
 
     val query  = fixMongoQuery(q)
-    val mongoQuery: DBObject = query.params
+    val mongoQuery: DBObject = query.params ++ MongoDBObject(C.Base.REPO_ID -> ctx.repo.id.get)
 
     // combine the selected fields we want to update from the JSON repr of the model, with updated_at
     val updateJson = JsObject(
@@ -181,8 +187,9 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   override def increment(id: String, field: String, count: Int = 1)
                         (implicit ctx: Context) = {
     val query: DBObject =  MongoDBObject(
-      "_id" -> id
-    )
+      "_id" -> id,
+      C.Base.REPO_ID -> ctx.repo.id.get)
+
     val o: DBObject =  MongoDBObject(
       "$inc" -> MongoDBObject(field -> count)
     )

@@ -1,7 +1,7 @@
 package altitude.dao.mongo
 
 import altitude.models.Trash
-import altitude.{Altitude, Const => C, Util}
+import altitude.{Const => C, Context, Altitude, Util}
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.{JsObject, Json}
 
@@ -10,7 +10,7 @@ class TrashDao(val app: Altitude) extends BaseMongoDao("trash") with altitude.da
       C.Trash.RECYCLED_AT ->  (json \ C.Trash.RECYCLED_AT \ "$date").asOpt[String]
     )
 
-  override protected def makeObjectForInsert(jsonIn: JsObject): DBObject = {
+  override protected def makeObjectForInsert(jsonIn: JsObject)(implicit ctx: Context): DBObject = {
     val trash: Trash = jsonIn
     super.makeObjectForInsert(jsonIn) ++ MongoDBObject(
       C.Trash.RECYCLED_AT -> Util.utcNowNoTZ,
