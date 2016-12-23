@@ -25,6 +25,7 @@ class RepositoryDao(val app: Altitude) extends BaseMongoDao("repositories") with
 
   override protected def makeObjectForInsert(jsonIn: JsObject)(implicit ctx: Context): DBObject = {
     val o = super.makeObjectForInsert(jsonIn)
+    // this is the only model that does not need the repository ID
     o.removeField(C.Base.REPO_ID)
     o
   }
