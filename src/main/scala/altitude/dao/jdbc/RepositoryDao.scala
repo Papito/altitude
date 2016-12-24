@@ -1,6 +1,7 @@
 package altitude.dao.jdbc
 
 import altitude.models.Repository
+import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
@@ -24,13 +25,13 @@ abstract class RepositoryDao(val app: Altitude) extends BaseJdbcDao("repository"
     model
   }
 
-  override def getById(id: String)(implicit ctx: Context): Option[JsObject] = {
+  override def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
     val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(ONE_SQL, List(id))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
 
-  override def add(jsonIn: JsObject)(implicit ctx: Context): JsObject = {
+  override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
     val repo = jsonIn: Repository
 
     val sql = s"""

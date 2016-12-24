@@ -1,5 +1,6 @@
 package altitude.dao.mongo
 
+import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
 import com.mongodb.casbah.Imports._
 import org.slf4j.LoggerFactory
@@ -8,7 +9,7 @@ import play.api.libs.json.{JsObject, Json}
 class RepositoryDao(val app: Altitude) extends BaseMongoDao("repositories") with altitude.dao.RepositoryDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override def getById(id: String)(implicit ctx: Context): Option[JsObject] = {
+  override def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting repository by ID '$id'", C.LogTag.DB)
 
     val o: Option[DBObject] = COLLECTION.findOneByID(id)
@@ -23,7 +24,7 @@ class RepositoryDao(val app: Altitude) extends BaseMongoDao("repositories") with
     }
   }
 
-  override protected def makeObjectForInsert(jsonIn: JsObject)(implicit ctx: Context): DBObject = {
+  override protected def makeObjectForInsert(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): DBObject = {
     val o = super.makeObjectForInsert(jsonIn)
     // this is the only model that does not need the repository ID
     o.removeField(C.Base.REPO_ID)

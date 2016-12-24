@@ -107,8 +107,6 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
     val data = new DataService(app)
     val folder = new FolderService(app)
     val stats = new StatsService(app)
-//    val importProfile = new ImportProfileService(app)
-    val tagConfig = new TagConfigService(app)
 
     val migration = dataSourceType match {
       case "mongo" => new MongoMigrationService(app)

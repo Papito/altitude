@@ -3,6 +3,7 @@ package altitude.service
 import altitude.dao.{NotImplementedDao, UserMetadataFieldDao}
 import altitude.exceptions.{NotFoundException, ValidationException}
 import altitude.models.{FieldType, UserMetadataField}
+import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
@@ -15,7 +16,7 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
   override protected val DAO = new NotImplementedDao(app)
 
   def addField(metadataField: UserMetadataField)
-              (implicit ctx: Context): UserMetadataField = {
+              (implicit ctx: Context, txId: TransactionId = new TransactionId): UserMetadataField = {
 
     txManager.withTransaction[UserMetadataField] {
       // verify that the field type is allowed
@@ -32,7 +33,7 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
     }
   }
 
-  def getFieldById(id: String)(implicit ctx: Context): Option[JsObject] =
+  def getFieldById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Option[JsObject] =
     txManager.asReadOnly[Option[JsObject]] {
       val fieldOpt = METADATA_FIELD_DAO.getById(id)
 
@@ -58,18 +59,18 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
       }
     }
 
-  def getAllFields()(implicit ctx: Context): List[JsObject] =
+  def getAllFields()(implicit ctx: Context, txId: TransactionId = new TransactionId): List[JsObject] =
     txManager.asReadOnly[List[JsObject]] {
       METADATA_FIELD_DAO.getAll
     }
 
-  def deleteFieldById(id: String)(implicit ctx: Context): Int =
+  def deleteFieldById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Int =
     txManager.withTransaction[Int] {
       METADATA_FIELD_DAO.deleteById(id)
     }
 
   def addConstraintValue(fieldId: String, constraintValue: String)
-                        (implicit ctx: Context) = {
+                        (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
 
     txManager.withTransaction {
       // get the field we are working with
@@ -95,7 +96,7 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
   }
 
   def deleteConstraintValue(fieldId: String, constraintValue: String)
-                           (implicit ctx: Context) = {
+                           (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
     log.info(s"Deleting constraint value [$constraintValue] for field [$fieldId]")
 
     txManager.withTransaction {

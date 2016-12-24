@@ -2,13 +2,14 @@ package altitude.dao.jdbc
 
 import altitude.dao.QueryParser
 import altitude.models.search.Query
+import altitude.transactions.TransactionId
 import altitude.{Const => C, Context}
 import org.slf4j.LoggerFactory
 
 class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) extends QueryParser {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  def toSelectQuery(query: Query, countOnly: Boolean = false)(implicit ctx: Context): SqlQuery = {
+  def toSelectQuery(query: Query, countOnly: Boolean = false)(implicit ctx: Context, txId: TransactionId): SqlQuery = {
     val folderIds: Set[String] = getFolderIds(query)
 
     // get the query params - and add the repository

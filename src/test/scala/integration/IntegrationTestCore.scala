@@ -3,6 +3,7 @@ package integration
 import java.io.File
 
 import altitude.models._
+import altitude.transactions.TransactionId
 import altitude.{Const => C, _}
 import com.google.inject.{AbstractModule, Guice}
 import integration.util.dao
@@ -32,6 +33,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
 
   val injector = Guice.createInjector(new InjectionModule)
   protected val dbUtilities = injector.instance[UtilitiesDao]
+  implicit val txId: TransactionId = new TransactionId
 
   private var count = 0
 
@@ -50,7 +52,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     val dataDirFile = new File(altitude.dataPath)
     FileUtils.deleteDirectory(dataDirFile)
     FileUtils.forceMkdir(dataDirFile)
-    dbUtilities.createTransaction(ctx)
+    dbUtilities.createTransaction(txId)
     //log.debug(s"Test transaction ID is ${txId.id}")
     SET_USER_1()
     SET_PRIMARY_REPO()
@@ -103,25 +105,21 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
 
   var currentRepo = repo
 
-  implicit var ctx: Context = new Context(repo = repo, user = currentUser)
+  implicit final def ctx: Context = new Context(repo = currentRepo, user = currentUser)
 
   def SET_USER_1() = {
     currentUser = user
-    ctx = new Context(repo = currentRepo, user = currentUser, txId = ctx.txId)
   }
   def SET_USER_2() = {
     currentUser = anotherUser
-    ctx = new Context(repo = currentRepo, user = currentUser, txId = ctx.txId)
   }
 
   def SET_PRIMARY_REPO() = {
     currentRepo = repo
-    ctx = new Context(repo = currentRepo, user = currentUser, txId = ctx.txId)
   }
 
   def SET_SECONDARY_REPO() = {
     currentRepo = repo2
-    ctx = new Context(repo = currentRepo, user = currentUser, txId = ctx.txId)
   }
 
   protected def makeAsset(folder: Folder) = Asset(

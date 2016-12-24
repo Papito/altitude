@@ -3,7 +3,7 @@ package altitude.transactions
 import java.sql.{Connection, DriverManager}
 import java.util.Properties
 
-import altitude.{Altitude, Const => C, Context}
+import altitude.{Altitude, Const => C}
 import org.slf4j.LoggerFactory
 
 class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collection.mutable.Map[Int, JdbcTransaction]) extends AbstractTransactionManager {
@@ -13,13 +13,13 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
   Get an existing transaction if we are already within a transaction context,
   else, create a new one
    */
-  def transaction(implicit ctx: Context, readOnly: Boolean = false): JdbcTransaction = {
-    log.debug(s"Getting transaction for ${ctx.txId.id}")
+  def transaction(implicit txId: TransactionId, readOnly: Boolean = false): JdbcTransaction = {
+    log.debug(s"Getting transaction for ${txId.id}")
 
     // see if we already have a transaction id defined
-    if (txContainer.contains(ctx.txId.id)) {
+    if (txContainer.contains(txId.id)) {
       // we do, eh
-      return txContainer.get(ctx.txId.id).get
+      return txContainer.get(txId.id).get
     }
 
     // get a connection and a new transaction
@@ -28,7 +28,8 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
     val tx: JdbcTransaction = new JdbcTransaction(conn)
     txContainer += (tx.id -> tx)
     // assign the integer transaction ID to the mutable transaction id "carrier" object
-    ctx.txId.id = tx.id
+    txId.id = tx.id
+    log.info(s"CREATING TRANSACTION ${txId.id}")
     app.transactions.CREATED += 1
     tx
   }
@@ -66,9 +67,9 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
   protected def lock(tx: Transaction): Unit = {}
   protected def unlock(tx: Transaction): Unit = {}
 
-  override def withTransaction[A](f: => A)(implicit ctx: Context) = {
+  override def withTransaction[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
     log.debug("WRITE transaction")
-    val tx = transaction(ctx, readOnly = false)
+    val tx = transaction(txId, readOnly = false)
 
     try {
       lock(tx)
@@ -98,15 +99,15 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
         log.debug(s"Closing: ${tx.id}", C.LogTag.DB)
         closeTransaction(tx)
         app.transactions.CLOSED += 1
-        txContainer.remove(ctx.txId.id)
+        txContainer.remove(txId.id)
       }
       unlock(tx)
     }
   }
 
-  override def asReadOnly[A](f: => A)(implicit ctx: Context) = {
+  override def asReadOnly[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
     log.debug("READ transaction")
-    val tx = transaction(ctx, readOnly = true)
+    val tx = transaction(txId, readOnly = true)
 
     try {
       tx.up()
@@ -128,7 +129,7 @@ class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collectio
         log.debug(s"Closing: ${tx.id}", C.LogTag.DB)
         closeTransaction(tx)
         app.transactions.CLOSED += 1
-        txContainer.remove(ctx.txId.id)
+        txContainer.remove(txId.id)
       }
     }
   }

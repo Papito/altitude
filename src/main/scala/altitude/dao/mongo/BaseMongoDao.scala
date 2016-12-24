@@ -3,6 +3,7 @@ package altitude.dao.mongo
 import altitude.dao.BaseDao
 import altitude.models.BaseModel
 import altitude.models.search.{Query, QueryResult}
+import altitude.transactions.TransactionId
 import altitude.{Configuration, Const => C, Context, Environment, Util}
 import com.mongodb.casbah.Imports._
 import com.mongodb.casbah.MongoClient
@@ -41,7 +42,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
 
   protected lazy val MONGO_QUERY_BUILDER = new MongoQueryBuilder(COLLECTION)
 
-  override def add(jsonIn: JsObject)(implicit ctx: Context): JsObject = {
+  override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
     log.debug(s"Starting database INSERT for: $jsonIn")
 
     val o = makeObjectForInsert(jsonIn)
@@ -54,7 +55,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
       C.Base.ID -> JsString(id))
   }
 
-  protected def makeObjectForInsert(jsonIn: JsObject)(implicit ctx: Context): DBObject = {
+  protected def makeObjectForInsert(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): DBObject = {
     // create id UNLESS specified
     val id: String = (jsonIn \ C.Base.ID).asOpt[String] match {
       case Some(id: String) => id
@@ -73,7 +74,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
       origObj ++ coreAttrObj
   }
 
-  override def deleteByQuery(q: Query)(implicit ctx: Context): Int = {
+  override def deleteByQuery(q: Query)(implicit ctx: Context, txId: TransactionId): Int = {
     val query = fixMongoQuery(q)
     val mongoQuery: DBObject = query.params
     log.info(mongoQuery.toString)
@@ -83,7 +84,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     numDeleted
   }
 
-  override def getById(id: String)(implicit ctx: Context): Option[JsObject] = {
+  override def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting by ID '$id'", C.LogTag.DB)
 
     val q = MongoDBObject(
@@ -102,7 +103,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     }
   }
 
-  override def query(query: Query)(implicit ctx: Context): QueryResult = {
+  override def query(query: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
     val cursor: MongoCursor = MONGO_QUERY_BUILDER.toSelectCursor(query)
 
     log.debug(s"Found ${cursor.length} records")
@@ -131,7 +132,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     }
   }
 
-  protected final def fixMongoQuery(q: Query)(implicit ctx: Context): Query = {
+  protected final def fixMongoQuery(q: Query)(implicit ctx: Context, txId: TransactionId): Query = {
     // _id -> id
     q.params.contains("id")  match {
       case false => q
@@ -144,7 +145,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   }
 
   override def getByIds(ids: Set[String])
-                       (implicit ctx: Context): List[JsObject] = {
+                       (implicit ctx: Context, txId: TransactionId): List[JsObject] = {
     val query: DBObject =  MongoDBObject(
       C.Base.REPO_ID -> ctx.repo.id.get,
       "_id" -> MongoDBObject("$in" -> ids)
@@ -160,7 +161,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   }
 
   override def updateByQuery(q: Query, json: JsObject, fields: List[String])
-                            (implicit ctx: Context): Int = {
+                            (implicit ctx: Context, txId: TransactionId): Int = {
     log.debug(s"Updating with data $json for $q")
 
     val query  = fixMongoQuery(q)
@@ -185,7 +186,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   }
 
   override def increment(id: String, field: String, count: Int = 1)
-                        (implicit ctx: Context) = {
+                        (implicit ctx: Context, txId: TransactionId) = {
     val query: DBObject =  MongoDBObject(
       "_id" -> id,
       C.Base.REPO_ID -> ctx.repo.id.get)
@@ -198,7 +199,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   }
 
   override def decrement(id: String,  field: String, count: Int = 1)
-                        (implicit ctx: Context) = {
+                        (implicit ctx: Context, txId: TransactionId) = {
     increment(id, field, -count)
   }
 }

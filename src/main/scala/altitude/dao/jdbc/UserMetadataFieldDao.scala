@@ -2,6 +2,7 @@ package altitude.dao.jdbc
 
 import altitude.models.UserMetadataField
 import altitude.models.search.{Query, QueryResult}
+import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
 import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
@@ -26,7 +27,7 @@ abstract class UserMetadataFieldDao (val app: Altitude)
     addCoreAttrs(model, rec)
   }
 
-  override def add(jsonIn: JsObject)(implicit ctx: Context): JsObject = {
+  override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
     val metadataField = jsonIn: UserMetadataField
 
     var sql = s"""
@@ -67,7 +68,7 @@ abstract class UserMetadataFieldDao (val app: Altitude)
     storedField
   }
 
-  override def getById(id: String)(implicit ctx: Context): Option[JsObject] = {
+  override def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
 
     val metadataFieldJson: Option[JsObject] = super.getById(id)
@@ -97,7 +98,7 @@ abstract class UserMetadataFieldDao (val app: Altitude)
   }
 
   override def query(q: Query)
-                    (implicit ctx: Context): QueryResult = {
+                    (implicit ctx: Context, txId: TransactionId): QueryResult = {
     // first, get the fields themselves
     val fieldResults: QueryResult = super.query(q)
 
@@ -158,7 +159,7 @@ abstract class UserMetadataFieldDao (val app: Altitude)
       query= fieldResults.query)
   }
 
-  override def deleteById(id: String)(implicit ctx: Context): Int = {
+  override def deleteById(id: String)(implicit ctx: Context, txId: TransactionId): Int = {
     // delete the constraint values
     log.debug(s"Deleting constraint values for field ID [$id]")
 
@@ -179,7 +180,7 @@ abstract class UserMetadataFieldDao (val app: Altitude)
   }
 
   def addConstraintValue(fieldId: String, constraintValue: String)
-                                 (implicit ctx: Context) = {
+                                 (implicit ctx: Context, txId: TransactionId) = {
     val sql = s"""
           INSERT INTO $CONSTRAINT_VAL_TBL
             (${C.Base.REPO_ID},
@@ -192,7 +193,7 @@ abstract class UserMetadataFieldDao (val app: Altitude)
   }
 
   def deleteConstraintValue(fieldId: String, constraintValue: String)
-                           (implicit ctx: Context) = {
+                           (implicit ctx: Context, txId: TransactionId) = {
     val sql = s"""
           DELETE FROM $CONSTRAINT_VAL_TBL
                 WHERE ${C.Base.REPO_ID} = ? AND ${C.MetadataConstraintValue.FIELD_ID} = ?

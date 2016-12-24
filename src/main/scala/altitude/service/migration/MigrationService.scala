@@ -2,7 +2,7 @@ package altitude.service.migration
 
 import altitude.dao.MigrationDao
 import altitude.models.{Repository, Stats, User}
-import altitude.transactions.AbstractTransactionManager
+import altitude.transactions.{TransactionId, AbstractTransactionManager}
 import altitude.{Altitude, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
@@ -21,7 +21,9 @@ abstract class MigrationService(app: Altitude) {
   protected val MIGRATIONS_DIR: String
   protected val FILE_EXTENSION: String
 
-  def runMigration(version: Int)(implicit ctx: Context = new Context(repo = C.REPO, user = C.USER)) = {
+  def runMigration(version: Int)
+                  (implicit ctx: Context = new Context(repo = C.REPO, user = C.USER),
+                   txId: TransactionId = new TransactionId) = {
     val migrationCommands = parseMigrationCommands(version)
 
     txManager.withTransaction {
@@ -41,9 +43,10 @@ abstract class MigrationService(app: Altitude) {
     }
   }
 
-  private def v1(context: Context) = {
+  private def v1(context: Context)
+                (implicit txId: TransactionId = new TransactionId) = {
 
-    implicit val ctx: Context = new Context(txId = context.txId, user = C.USER, repo = C.REPO)
+    implicit val ctx: Context = new Context(user = C.USER, repo = C.REPO)
 
     // user "uncategorized" folder node
     val uncatFolder = app.service.folder.getUncatFolder()
@@ -56,13 +59,14 @@ abstract class MigrationService(app: Altitude) {
     app.service.stats.createStat(Stats.RECYCLED_BYTES)
   }
 
-  def existingVersion(implicit ctx: Context = new Context(repo = C.REPO, user = C.USER)): Int = {
+  def existingVersion(implicit ctx: Context = new Context(repo = C.REPO, user = C.USER),
+                      txId: TransactionId = new TransactionId): Int = {
     txManager.asReadOnly[Int] {
       DAO.currentVersion
     }
   }
 
-  def migrationRequired: Boolean = {
+  def migrationRequired(implicit txId: TransactionId = new TransactionId): Boolean = {
     log.info("Checking if migration is required")
     val version = existingVersion
     log.info(s"Current database version is @ $version")

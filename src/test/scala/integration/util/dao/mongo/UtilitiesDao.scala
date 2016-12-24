@@ -1,6 +1,7 @@
 package integration.util.dao.mongo
 
 import altitude.dao.mongo.BaseMongoDao
+import altitude.transactions.TransactionId
 import altitude.{Altitude, Context}
 import integration.MongoSuite
 
@@ -13,5 +14,5 @@ class UtilitiesDao(val app: Altitude) extends BaseMongoDao("") with integration.
   override def close() = Unit
   override def rollback() = Unit
   override def cleanupTest() = Unit
-  override def createTransaction(ctx: Context) = Unit
+  override def createTransaction(txId: TransactionId) = Unit
 }

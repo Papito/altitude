@@ -6,7 +6,7 @@ import altitude.dao.BaseDao
 import altitude.exceptions.{DuplicateException, NotFoundException}
 import altitude.models.BaseModel
 import altitude.models.search.{Query, QueryResult}
-import altitude.transactions.AbstractTransactionManager
+import altitude.transactions.{TransactionId, AbstractTransactionManager}
 import altitude.{Altitude, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
@@ -22,7 +22,7 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
   protected val CLEANER: Option[Cleaner] = None
 
   def add(objIn: Model, queryForDup: Option[Query] = None)
-         (implicit ctx: Context): JsObject = {
+         (implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
     val cleaned = cleanAndValidate(objIn)
 
     val existing = if (queryForDup.isDefined) query(queryForDup.get) else QueryResult.EMPTY
@@ -38,7 +38,7 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
   }
 
   def updateById(id: String, objIn: Model, fields: List[String], queryForDup: Option[Query] = None)
-                (implicit ctx: Context): Int = {
+                (implicit ctx: Context, txId: TransactionId = new TransactionId): Int = {
     val cleaned = cleanAndValidate(objIn)
 
     val existing = if (queryForDup.isDefined) query(queryForDup.get) else QueryResult.EMPTY
@@ -69,7 +69,7 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
     }
   }
 
-  def getById(id: String)(implicit ctx: Context): JsObject = {
+  def getById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
     txManager.asReadOnly[JsObject] {
       val res: Option[JsObject] = DAO.getById(id)
 
@@ -80,25 +80,25 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
     }
   }
 
-  def getAll(implicit ctx: Context): List[JsObject] = {
+  def getAll(implicit ctx: Context, txId: TransactionId = new TransactionId): List[JsObject] = {
     txManager.asReadOnly[List[JsObject]] {
       DAO.getAll
     }
   }
 
-  def query(query: Query)(implicit ctx: Context): QueryResult = {
+  def query(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
     txManager.asReadOnly[QueryResult] {
       DAO.query(query)
     }
   }
 
-  def deleteById(id: String)(implicit ctx: Context): Int = {
+  def deleteById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Int = {
     txManager.withTransaction[Int] {
       DAO.deleteById(id)
     }
   }
 
-  def deleteByQuery(query: Query)(implicit ctx: Context): Int = {
+  def deleteByQuery(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): Int = {
     txManager.withTransaction[Int] {
       DAO.deleteByQuery(query)
     }

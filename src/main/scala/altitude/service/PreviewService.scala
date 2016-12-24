@@ -4,6 +4,7 @@ import java.io._
 
 import altitude.exceptions.NotFoundException
 import altitude.models.Preview
+import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
 import org.apache.commons.io.{FileUtils, FilenameUtils}
 import org.slf4j.LoggerFactory
@@ -12,7 +13,7 @@ class PreviewService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
 
   def add(preview: Preview)
-         (implicit ctx: Context): Unit = {
+         (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
     log.info(s"Adding preview for asset ${preview.assetId}")
 
     // get the full path to our preview file
@@ -34,7 +35,7 @@ class PreviewService(app: Altitude) {
   }
 
   def getById(assetId: String)
-             (implicit ctx: Context): Preview = {
+             (implicit ctx: Context, txId: TransactionId = new TransactionId): Preview = {
     val f: File = new File(previewFilePath(assetId))
 
     if (!f.isFile) {

@@ -2,6 +2,7 @@ package altitude.dao.mongo
 
 import altitude.exceptions.NotFoundException
 import altitude.models.UserMetadataField
+import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
 import com.mongodb.casbah.Imports._
 import org.slf4j.LoggerFactory
@@ -11,7 +12,7 @@ import play.api.libs.json.JsObject
 class UserMetadataFieldDao(val app: Altitude) extends BaseMongoDao("metadata_fields") with altitude.dao.UserMetadataFieldDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  def addConstraintValue(fieldId: String, constraintValue: String)(implicit ctx: Context) = {
+  def addConstraintValue(fieldId: String, constraintValue: String)(implicit ctx: Context, txId: TransactionId) = {
     log.info(s"Adding constraint value [$constraintValue] to field [$fieldId]")
     val query = MongoDBObject("_id" -> fieldId)
 
@@ -33,7 +34,7 @@ class UserMetadataFieldDao(val app: Altitude) extends BaseMongoDao("metadata_fie
     COLLECTION.update(query, cmd)
   }
 
-  def deleteConstraintValue(fieldId: String, constraintValue: String)(implicit ctx: Context) = {
+  def deleteConstraintValue(fieldId: String, constraintValue: String)(implicit ctx: Context, txId: TransactionId) = {
     val cmd = MongoDBObject("$pull" ->
       MongoDBObject(C.MetadataField.CONSTRAINT_LIST -> constraintValue))
 

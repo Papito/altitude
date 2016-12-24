@@ -5,6 +5,7 @@ import java.io.{File, FileInputStream, InputStream}
 import altitude.dao.FileSystemImportDao
 import altitude.exceptions.{FormatException, MetadataExtractorException}
 import altitude.models._
+import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tika.io.TikaInputStream
@@ -19,7 +20,7 @@ class FileImportService(app: Altitude) {
   protected val SUPPORTED_MEDIA_TYPES = List("audio", "image")
 
   def getFilesToImport(path: String)
-                      (implicit ctx: Context): List[FileImportAsset] = {
+                      (implicit ctx: Context, txId: TransactionId = new TransactionId): List[FileImportAsset] = {
     log.info(s"Finding assets to import @ '$path'", C.LogTag.SERVICE)
     val assets = DAO.iterateAssets(path = path).toList
     log.info(s"Found ${assets.size}", C.LogTag.SERVICE)
@@ -43,7 +44,7 @@ class FileImportService(app: Altitude) {
   }
 
   def importAsset(fileAsset: FileImportAsset)
-                 (implicit ctx: Context) : Option[Asset]  = {
+                 (implicit ctx: Context, txId: TransactionId = new TransactionId) : Option[Asset]  = {
     log.info(s"Importing file asset '$fileAsset'", C.LogTag.SERVICE)
     val assetType = detectAssetType(fileAsset)
 

@@ -4,6 +4,7 @@ import java.util.regex.Pattern
 
 import altitude.models.BaseModel
 import altitude.models.search.{Query, QueryResult}
+import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
 import play.api.libs.json.JsObject
 
@@ -26,25 +27,25 @@ trait BaseDao {
     }
   }
 
-  def add(json: JsObject)(implicit ctx: Context): JsObject
-  def deleteByQuery(q: Query)(implicit ctx: Context): Int
-  def getById(id: String)(implicit ctx: Context): Option[JsObject]
-  def getByIds(id: Set[String])(implicit ctx: Context): List[JsObject]
-  def getAll(implicit ctx: Context): List[JsObject] = query(Query()).records
-  def query(q: Query)(implicit ctx: Context): QueryResult
+  def add(json: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject
+  def deleteByQuery(q: Query)(implicit ctx: Context, txId: TransactionId): Int
+  def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject]
+  def getByIds(id: Set[String])(implicit ctx: Context, txId: TransactionId): List[JsObject]
+  def getAll(implicit ctx: Context, txId: TransactionId): List[JsObject] = query(Query()).records
+  def query(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult
 
-  def deleteById(id: String)(implicit ctx: Context): Int = {
+  def deleteById(id: String)(implicit ctx: Context, txId: TransactionId): Int = {
     val q: Query = Query(Map(C.Base.ID -> id))
     deleteByQuery(q)
   }
 
-  def updateById(id: String, data: JsObject, fields: List[String])(implicit ctx: Context): Int = {
+  def updateById(id: String, data: JsObject, fields: List[String])(implicit ctx: Context, txId: TransactionId): Int = {
     val q: Query = Query(Map(C.Base.ID -> id))
     updateByQuery(q, data, fields)
   }
 
-  def updateByQuery(q: Query, data: JsObject, fields: List[String])(implicit ctx: Context): Int
+  def updateByQuery(q: Query, data: JsObject, fields: List[String])(implicit ctx: Context, txId: TransactionId): Int
 
-  def increment(id: String, field: String, count: Int = 1)(implicit ctx: Context)
-  def decrement(id: String, field: String, count: Int = 1)(implicit ctx: Context)
+  def increment(id: String, field: String, count: Int = 1)(implicit ctx: Context, txId: TransactionId)
+  def decrement(id: String, field: String, count: Int = 1)(implicit ctx: Context, txId: TransactionId)
 }
