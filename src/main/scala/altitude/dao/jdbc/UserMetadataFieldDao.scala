@@ -24,7 +24,6 @@ abstract class UserMetadataFieldDao (val app: Altitude)
       constraintList = None
     )
     addCoreAttrs(model, rec)
-    model
   }
 
   override def add(jsonIn: JsObject)(implicit ctx: Context): JsObject = {

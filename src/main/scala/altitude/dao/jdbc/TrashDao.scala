@@ -25,12 +25,10 @@ abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with alt
       sizeBytes = rec.get(C.Asset.SIZE_BYTES).get.asInstanceOf[Int],
       folderId = rec.get(C.Asset.FOLDER_ID).get.asInstanceOf[String])
 
-    addCoreAttrs(model, rec)
-
     val recycledAt: Option[DateTime] = GET_DATETIME_FROM_REC(C.Trash.RECYCLED_AT, rec)
     if (recycledAt.isDefined) model.recycledAt = recycledAt.get
 
-    model
+    addCoreAttrs(model, rec)
   }
 
   override def add(jsonIn: JsObject)(implicit ctx: Context): JsObject = {

@@ -21,7 +21,6 @@ abstract class RepositoryDao(val app: Altitude) extends BaseJdbcDao("repository"
       uncatFolderId = rec.get(C.Repository.UNCAT_FOLDER_ID).get.asInstanceOf[String]
     )
 
-    addCoreAttrs(model, rec)
     model
   }
 

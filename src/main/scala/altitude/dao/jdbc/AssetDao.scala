@@ -26,7 +26,6 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
       folderId = rec.get(C.Asset.FOLDER_ID).get.asInstanceOf[String])
 
     addCoreAttrs(model, rec)
-    model
   }
 
   override def add(jsonIn: JsObject)(implicit ctx: Context): JsObject = {

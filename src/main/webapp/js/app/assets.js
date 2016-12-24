@@ -15,7 +15,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     this.folders = ko.observableArray();
     this.currentFolderPath = ko.observableArray();
-    this.currentFolderId = ko.observable("0");
+    this.currentFolderId = ko.observable("b10000000000000000000000");
     this._showAddFolder = ko.observable(false);
 
     this.detailAsset = ko.observable();

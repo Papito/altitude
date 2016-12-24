@@ -19,7 +19,7 @@ trait Sqlite {
 
   protected def JSON_FUNC = "?"
 
-  protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit = {
+  protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): model.type = {
     val createdAtSeconds = rec.getOrElse(C.Base.CREATED_AT, 0).asInstanceOf[Int]
     if (createdAtSeconds != 0) {
       model.createdAt = new DateTime(createdAtSeconds.toLong * 1000)
@@ -29,6 +29,8 @@ trait Sqlite {
     if (updatedAtSeconds != 0) {
       model.updatedAt = new DateTime(updatedAtSeconds.toLong * 1000)
     }
+
+    model
   }
 
   protected def GET_DATETIME_FROM_REC(field: String, rec: Map[String, AnyRef]): Option[DateTime] = {

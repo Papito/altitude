@@ -2,7 +2,8 @@ package altitude.controllers
 
 import java.io.{PrintWriter, StringWriter}
 
-import altitude.models.{Repository, User}
+import altitude.{Const => C}
+import altitude.models.User
 import altitude.{Context, SingleApplication, Util}
 import org.scalatra.InternalServerError
 import org.slf4j.{LoggerFactory, MDC}
@@ -28,12 +29,7 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
   else
     throw new RuntimeException("User was not set for this request")
 
-  implicit def context: Context = new Context(
-    repo = new Repository(name = "Repository",
-      id = Some("a11111111111111111111111"),
-      rootFolderId  = "a11111111111111111111111",
-      uncatFolderId = "a22222222222222222222222"),
-    user = user)
+  implicit def context: Context = new Context(repo = C.REPO, user = user)
 
   before() {
     val requestId = Util.randomStr(size = 6)
@@ -59,7 +55,7 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
   }
 
   protected def setUser() = {
-    val user = User(Some("a11111111111111111111111"))
+    val user = C.USER
 
     request.setAttribute("user", user)
     MDC.put("USER", s"[${user.toString}]")

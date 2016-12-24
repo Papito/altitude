@@ -1,5 +1,7 @@
 package altitude
 
+import altitude.models.{User, Repository}
+
 
 object Const {
 
@@ -176,6 +178,14 @@ object Const {
 
   // default results per page
   final val DEFAULT_RPP = "20"
+
+  // TEMPORARY constants for user and repo IDS
+  final val REPO = new Repository(name = "Repository",
+    id = Some("a10000000000000000000000"),
+    rootFolderId  = "b10000000000000000000000",
+    uncatFolderId = "c10000000000000000000000")
+
+  final val USER = new User(Some("a11111111111111111111111"))
 
   /*---------------------------------------------------------------------------
   LOG TAGS

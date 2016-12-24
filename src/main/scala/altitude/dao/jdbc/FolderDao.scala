@@ -17,7 +17,6 @@ abstract class FolderDao(val app: Altitude) extends BaseJdbcDao("folder") with a
       numOfAssets = rec.get(C.Folder.NUM_OF_ASSETS).get.asInstanceOf[Int]
     )
     addCoreAttrs(model, rec)
-    model
   }
 
   override def add(jsonIn: JsObject)(implicit ctx: Context): JsObject = {

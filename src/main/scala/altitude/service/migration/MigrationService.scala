@@ -8,6 +8,7 @@ import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 
 import scala.io.Source
+import altitude.{Const => C, _}
 
 abstract class MigrationService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -20,13 +21,7 @@ abstract class MigrationService(app: Altitude) {
   protected val MIGRATIONS_DIR: String
   protected val FILE_EXTENSION: String
 
-  private val user = User(Some("a11111111111111111111111"))
-  private val repo = new Repository(name = "Repository",
-    id = Some("a10000000000000000000000"),
-    rootFolderId  = "b10000000000000000000000",
-    uncatFolderId = "c10000000000000000000000")
-
-  def runMigration(version: Int)(implicit ctx: Context = new Context(repo = repo, user = user)) = {
+  def runMigration(version: Int)(implicit ctx: Context = new Context(repo = C.REPO, user = C.USER)) = {
     val migrationCommands = parseMigrationCommands(version)
 
     txManager.withTransaction {
@@ -48,7 +43,7 @@ abstract class MigrationService(app: Altitude) {
 
   private def v1(context: Context) = {
 
-    implicit val ctx: Context = new Context(txId = context.txId, user = user, repo = repo)
+    implicit val ctx: Context = new Context(txId = context.txId, user = C.USER, repo = C.REPO)
 
     // user "uncategorized" folder node
     val uncatFolder = app.service.folder.getUncatFolder()
@@ -61,7 +56,7 @@ abstract class MigrationService(app: Altitude) {
     app.service.stats.createStat(Stats.RECYCLED_BYTES)
   }
 
-  def existingVersion(implicit ctx: Context = new Context(repo = repo, user = user)): Int = {
+  def existingVersion(implicit ctx: Context = new Context(repo = C.REPO, user = C.USER)): Int = {
     txManager.asReadOnly[Int] {
       DAO.currentVersion
     }

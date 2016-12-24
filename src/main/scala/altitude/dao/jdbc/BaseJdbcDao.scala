@@ -254,5 +254,5 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
   /* Given a model and an SQL record, calculate and set properties common to most models
    */
-  protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit
+  protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): model.type
 }

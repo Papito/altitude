@@ -76,12 +76,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
       @volatile var assetsIt: Option[Iterator[FileImportAsset]] = None
       var path: Option[String] = None
 
-      private val user = User(Some("a11111111111111111111111"))
-      private val repo = new Repository(name = "Repository",
-        id = Some("a31111111111111111111113"),
-        rootFolderId  = "a11111111111111111111111",
-        uncatFolderId = "a22222222222222222222222")
-      private implicit val context: Context = new Context(repo = repo, user = user)
+      private implicit val context: Context = new Context(repo = C.REPO, user = C.USER)
 
       private def writeToYou(jsonMessage: JsValue): Unit = {
         log.info(s"YOU -> $jsonMessage")

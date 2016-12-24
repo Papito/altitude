@@ -20,7 +20,7 @@ trait Postgres {
 
   protected def JSON_FUNC = "CAST(? as jsonb)"
 
-  protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): Unit = {
+  protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): model.type = {
     val createdAtMilis = rec.getOrElse(C.Base.CREATED_AT, 0d).asInstanceOf[Double].toLong
     if (createdAtMilis != 0d) {
       model.createdAt = new DateTime(createdAtMilis * 1000)
@@ -30,6 +30,8 @@ trait Postgres {
     if (updatedAtMilis != 0d) {
       model.updatedAt = new DateTime(createdAtMilis * 1000)
     }
+
+    model
   }
 
   protected def GET_DATETIME_FROM_REC(field: String, rec: Map[String, AnyRef]): Option[DateTime] = {

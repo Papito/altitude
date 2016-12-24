@@ -87,17 +87,14 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   /* INTEGRATION UTILITIES*/
   private val ASSET_TYPE = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
 
-  private final val user: User = User(id = Some("a11111111111111111111111"))
+  private final val user: User = C.USER
 
   private final val anotherUser: User = User(id = Some("a22222222222222222222222"))
 
   var currentUser = user
   def currentUserId: String = currentUser.id.get
 
-  private val repo = new Repository(name = "Repository 1",
-    id = Some("a10000000000000000000000"),
-    rootFolderId  = "b10000000000000000000000",
-    uncatFolderId = "c10000000000000000000000")
+  private val repo = C.REPO
 
   private val repo2 = new Repository(name = "Repository 2",
     id = Some("a20000000000000000000000"),
