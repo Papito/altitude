@@ -28,7 +28,7 @@ class AssetController extends BaseApiController {
       data.data
     }
     catch {
-      case ex: NotFoundException => redirect("/i/1x1.png") //FIXME: preload and return binary data
+      case ex: NotFoundException => redirect("/i/1x1.png")
     }
   }
 

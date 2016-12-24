@@ -81,9 +81,7 @@ class TrashController extends BaseApiController {
   }
 
   get(s"/p/:${C.Api.Search.PAGE}/rpp/:${C.Api.Search.RESULTS_PER_PAGE}") {
-    // FIXME: magic constants
-    val rpp = params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, "20").toInt
-    // FIXME: magic constants
+    val rpp = params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, C.DEFAULT_RPP).toInt
     val page = params.getOrElse(C.Api.Search.PAGE, "1").toInt
 
     val q = Query(rpp = rpp, page = page)

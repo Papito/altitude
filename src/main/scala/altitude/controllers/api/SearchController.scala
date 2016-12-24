@@ -28,9 +28,7 @@ class SearchController extends BaseApiController {
   }
 
   get(s"/p/:${C.Api.Search.PAGE}/rpp/:${C.Api.Search.RESULTS_PER_PAGE}") {
-    // FIXME: magic constants
-    val rpp = params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, "20").toInt
-    // FIXME: magic constants
+    val rpp = params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, C.DEFAULT_RPP).toInt
     val page = params.getOrElse(C.Api.Search.PAGE, "1").toInt
     val foldersQuery = this.params.getOrElse(C.Api.Search.FOLDERS, "")
 

@@ -130,7 +130,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
       log.warn("Migration is required!")
     }
 
-    if (migrationRequired && service.migration.migrationConfirmed) {
+    if (migrationRequired) {
       log.info("Migration go-ahead confirmed by user")
       service.migration.migrate()
     }
@@ -144,7 +144,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
     log.info("Freeing transaction list")
   }
 
-  // TODO: this will be part of data acces
+  // DEPRECATED. this will be part of data acces
   val workPath = System.getProperty("user.dir")
   val dataDir = config.getString("dataDir")
   val dataPath = workPath + "/" + dataDir + "/"

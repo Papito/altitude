@@ -20,7 +20,6 @@ class BaseApiController extends BaseController with GZipSupport {
   val HTTP_UPDATE_VALIDATOR: Option[ApiValidator] = None
 
   def requestJson: Option[JsObject] = Some(
-    // FIXME: cache this in the request itself
     if (request.body.isEmpty) Json.obj() else Json.parse(request.body).as[JsObject]
   )
 

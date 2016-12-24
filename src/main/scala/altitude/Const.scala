@@ -16,13 +16,6 @@ object Const {
 
   object Base extends Common
 
-  object System {
-    // TODO: belong to stats
-    val UNCATEGORIZED_COUNT = "uncategorized_count"
-    // TODO: belong to stats
-    val TRASH_COUNT = "trash_count"
-  }
-
   object Repository extends Common {
     val NAME = "name"
     val ROOT_FOLDER_ID = "root_folder_id"
@@ -107,7 +100,7 @@ object Const {
     val MULTI_VALUE_DELIM = "+"
     val DUPLICATE_OF = "duplicate_of"
 
-    // FIXME: wrong naming convention
+    // wrong naming convention
     val TOTAL_RECORDS = "totalRecords"
     val TOTAL_PAGES = "totalPages"
     val CURRENT_PAGE = "currentPage"
@@ -180,6 +173,9 @@ object Const {
       val EMPTY_REQUEST_BODY = "Empty request body"
     }
   }
+
+  // default results per page
+  final val DEFAULT_RPP = "20"
 
   /*---------------------------------------------------------------------------
   LOG TAGS

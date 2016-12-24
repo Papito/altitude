@@ -26,7 +26,7 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
         throw ex
       }
 
-    // FIXME: verify name is unique before we hit the DB constraint (DuplicateException)
+    // verify here lowercase name is unique before we hit the DB constraint (DuplicateException)
 
     METADATA_FIELD_DAO.add(metadataField)
     }
@@ -82,7 +82,7 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
       val field: UserMetadataField = fieldOpt.get
       log.info(s"Adding constraint value [$constraintValue] to field ${field.name}")
 
-      /* TODO:
+      /* HERE:
 
           * clean (remove double spaces, tabs, and line breaks)
           * validate

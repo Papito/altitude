@@ -14,7 +14,6 @@ CREATE TABLE repository(
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );
--- FIXME: unique constraint on lowercase name and server-side check before creating
 
 CREATE TABLE stats (
   repository_id char(24) NOT NULL,
@@ -61,8 +60,6 @@ CREATE TABLE trash  (
   updated_at DATE DEFAULT NULL,
   recycled_at DATE DEFAULT (datetime('now', 'utc'))
 );
-
--- TODO: add indexes
 
 CREATE TABLE metadata_field (
   id char(24) PRIMARY KEY,

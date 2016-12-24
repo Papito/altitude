@@ -50,9 +50,6 @@ abstract class MigrationService(app: Altitude) {
 
     implicit val ctx: Context = new Context(txId = context.txId, user = user, repo = repo)
 
-    /* TODO: Most of this needs to be handled in a repo service
-    */
-
     // user "uncategorized" folder node
     val uncatFolder = app.service.folder.getUncatFolder()
     app.service.folder.add(uncatFolder)
@@ -85,9 +82,6 @@ abstract class MigrationService(app: Altitude) {
       migrate()
     }
   }
-
-  //FIXME: placeholder, not DB-backed
-  def migrationConfirmed = false
 
   def migrate() = {
     val oldVersion = existingVersion

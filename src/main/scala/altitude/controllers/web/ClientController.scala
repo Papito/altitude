@@ -23,7 +23,7 @@ class ClientController  extends BaseWebController {
   }
 
   private val builder = new PebbleEngine.Builder()
-  builder.cacheActive(false) // TODO: this should be a setting in prod
+  builder.cacheActive(false)
   private val engine: PebbleEngine = builder.build()
 
   before() {

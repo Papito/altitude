@@ -10,7 +10,6 @@ import org.scalatest.Matchers._
   test("create repository") {
     val r = Repository(
       name = Util.randomStr(),
-      // FIXME: these will be done by the service
       rootFolderId = BaseModel.genId,
       uncatFolderId = BaseModel.genId
     )

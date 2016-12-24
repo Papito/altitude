@@ -39,6 +39,7 @@ import org.scalatest.Matchers._
     SET_SECONDARY_REPO()
     val stats3 = altitude.service.stats.getStats
 
+    // this will be passing later
     intercept[RuntimeException] {
       stats3.getStatValue(Stats.TOTAL_ASSETS)
     }
@@ -91,6 +92,7 @@ import org.scalatest.Matchers._
     SET_SECONDARY_REPO()
     val stats2 = altitude.service.stats.getStats
 
+    // this will be passing later
     intercept[RuntimeException] {
       stats2.getStatValue(Stats.TOTAL_ASSETS)
     }
