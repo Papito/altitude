@@ -22,9 +22,9 @@ abstract class MigrationService(app: Altitude) {
 
   private val user = User(Some("a11111111111111111111111"))
   private val repo = new Repository(name = "Repository",
-    id = Some("a31111111111111111111113"),
-    rootFolderId  = "a11111111111111111111111",
-    uncatFolderId = "a22222222222222222222222")
+    id = Some("a10000000000000000000000"),
+    rootFolderId  = "b10000000000000000000000",
+    uncatFolderId = "c10000000000000000000000")
 
   def runMigration(version: Int)(implicit ctx: Context = new Context(repo = repo, user = user)) = {
     val migrationCommands = parseMigrationCommands(version)
@@ -46,12 +46,12 @@ abstract class MigrationService(app: Altitude) {
     }
   }
 
-  /* FIXME: these should be created with migrations but during on-boarding. This is a hack
-     and the non-implicit context should be removed
-  */
   private def v1(context: Context) = {
 
     implicit val ctx: Context = new Context(txId = context.txId, user = user, repo = repo)
+
+    /* TODO: Most of this needs to be handled in a repo service
+    */
 
     // user "uncategorized" folder node
     val uncatFolder = app.service.folder.getUncatFolder()

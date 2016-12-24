@@ -53,6 +53,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     dbUtilities.createTransaction(ctx)
     //log.debug(s"Test transaction ID is ${txId.id}")
     SET_USER_1()
+    SET_PRIMARY_REPO()
   }
 
   override def afterEach() {
@@ -93,20 +94,37 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   var currentUser = user
   def currentUserId: String = currentUser.id.get
 
-  private val repo = new Repository(name = "Repository",
-    id = Some("a31111111111111111111113"),
-    rootFolderId  = "a11111111111111111111111",
-    uncatFolderId = "a22222222222222222222222")
+  private val repo = new Repository(name = "Repository 1",
+    id = Some("a10000000000000000000000"),
+    rootFolderId  = "b10000000000000000000000",
+    uncatFolderId = "c10000000000000000000000")
+
+  private val repo2 = new Repository(name = "Repository 2",
+    id = Some("a20000000000000000000000"),
+    rootFolderId  = "b20000000000000000000000",
+    uncatFolderId = "c20000000000000000000000")
+
+  var currentRepo = repo
 
   implicit var ctx: Context = new Context(repo = repo, user = currentUser)
 
   def SET_USER_1() = {
     currentUser = user
-    ctx = new Context(repo = repo, user = currentUser, txId = ctx.txId)
+    ctx = new Context(repo = currentRepo, user = currentUser, txId = ctx.txId)
   }
   def SET_USER_2() = {
     currentUser = anotherUser
-    ctx = new Context(repo = repo, user = currentUser, txId = ctx.txId)
+    ctx = new Context(repo = currentRepo, user = currentUser, txId = ctx.txId)
+  }
+
+  def SET_PRIMARY_REPO() = {
+    currentRepo = repo
+    ctx = new Context(repo = currentRepo, user = currentUser, txId = ctx.txId)
+  }
+
+  def SET_SECONDARY_REPO() = {
+    currentRepo = repo2
+    ctx = new Context(repo = currentRepo, user = currentUser, txId = ctx.txId)
   }
 
   protected def makeAsset(folder: Folder) = Asset(

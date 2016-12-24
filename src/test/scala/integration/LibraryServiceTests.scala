@@ -33,6 +33,14 @@ import org.scalatest.Matchers._
     altitude.service.library.search(
       Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2.id.get))
     ).records.length should be(1)
+
+    SET_SECONDARY_REPO()
+
+    altitude.service.library.search(Query()).isEmpty shouldBe true
+
+    altitude.service.library.search(
+      Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
+    ).isEmpty shouldBe true
   }
 
   test("recycle asset") {
@@ -54,8 +62,11 @@ import org.scalatest.Matchers._
     trashed.createdAt should not be None
     trashed.createdAt.get.getMillis should equal(asset.createdAt.get.getMillis)
     trashed.recycledAt should not be None
-  }
 
+    SET_SECONDARY_REPO()
+
+    altitude.service.trash.getAll shouldBe empty
+  }
 
   test("folder counts") {
     /*

@@ -35,6 +35,13 @@ import org.scalatest.Matchers._
     stats2.getStatValue(Stats.TOTAL_ASSETS) should be (2)
     stats2.getStatValue(Stats.RECYCLED_ASSETS) should be (2)
     stats2.getStatValue(Stats.UNCATEGORIZED_ASSETS) should be (0)
+
+    SET_SECONDARY_REPO()
+    val stats3 = altitude.service.stats.getStats
+
+    intercept[RuntimeException] {
+      stats3.getStatValue(Stats.TOTAL_ASSETS)
+    }
   }
 
   test("test uncategorized") {
@@ -80,5 +87,13 @@ import org.scalatest.Matchers._
     val stats = altitude.service.stats.getStats
     stats.getStatValue(Stats.TOTAL_ASSETS) should be (2)
     stats.getStatValue(Stats.RECYCLED_ASSETS) should be (0)
+
+    SET_SECONDARY_REPO()
+    val stats2 = altitude.service.stats.getStats
+
+    intercept[RuntimeException] {
+      stats2.getStatValue(Stats.TOTAL_ASSETS)
+    }
+
   }
 }

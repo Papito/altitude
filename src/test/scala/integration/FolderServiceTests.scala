@@ -70,6 +70,11 @@ import org.scalatest.Matchers._
     path.length should be(4)
     path(1).id should be(folder2.id)
     path.last.id should be(folder2_1_1.id)
+
+    SET_SECONDARY_REPO()
+
+    val hierarchy2 = altitude.service.folder.hierarchy()
+    hierarchy2 shouldBe empty
   }
 
   test("bad hierarchy root") {
