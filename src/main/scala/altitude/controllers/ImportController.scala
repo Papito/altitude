@@ -76,8 +76,6 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
       @volatile var assetsIt: Option[Iterator[FileImportAsset]] = None
       var path: Option[String] = None
 
-      private implicit val context: Context = new Context(repo = C.REPO, user = C.USER)
-
       private def writeToYou(jsonMessage: JsValue): Unit = {
         log.info(s"YOU -> $jsonMessage")
         this.send(jsonMessage.toString())
@@ -97,6 +95,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
           // get the path we will be importing from
           val path: String = (json \ "path").extract[String]
 
+          implicit val context: Context = new Context(repo = C.REPO, user = C.USER)
           assets = Some(app.service.fileImport.getFilesToImport(path = path))
           assetsIt = Some(assets.get.toIterator)
 
@@ -171,6 +170,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
           log.info(s"Processing import asset $importAsset")
 
           try {
+            implicit val context: Context = new Context(repo = C.REPO, user = C.USER)
             val asset: Option[Asset] = app.service.fileImport.importAsset(importAsset)
             if (asset.isEmpty) throw NotImportable()
 
