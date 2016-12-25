@@ -68,10 +68,9 @@ extends AbstractTransactionManager {
 
     readOnly match {
       case true => conn.setReadOnly(true)
-      case false =>  {
+      case false =>
         conn.setReadOnly(false)
         conn.setAutoCommit(false)
-      }
     }
 
     conn
@@ -109,11 +108,10 @@ extends AbstractTransactionManager {
       res
     }
     catch {
-      case ex: Exception => {
+      case ex: Exception =>
         tx.down()
         log.error(s"Error (${ex.getClass.getName}): ${ex.getMessage}")
         throw ex
-      }
     }
     finally {
       // clean up, if we are done with this transaction
@@ -140,11 +138,10 @@ extends AbstractTransactionManager {
       res
     }
     catch {
-      case ex: Exception => {
+      case ex: Exception =>
         tx.down()
         log.error(s"Error (${ex.getClass.getName}): ${ex.getMessage}")
         throw ex
-      }
     }
     finally {
       if (!tx.isNested) {
