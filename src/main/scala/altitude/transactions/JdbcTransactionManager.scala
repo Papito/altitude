@@ -6,7 +6,10 @@ import java.util.Properties
 import altitude.{Altitude, Const => C}
 import org.slf4j.LoggerFactory
 
-class JdbcTransactionManager(val app: Altitude, val txContainer: scala.collection.mutable.Map[Int, JdbcTransaction]) extends AbstractTransactionManager {
+class JdbcTransactionManager(val app: Altitude,
+                             val txContainer: scala.collection.mutable.Map[Int, JdbcTransaction])
+extends AbstractTransactionManager {
+
   private final val log = LoggerFactory.getLogger(getClass)
 
   /*

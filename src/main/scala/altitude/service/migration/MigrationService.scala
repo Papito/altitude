@@ -75,13 +75,6 @@ abstract class MigrationService(app: Altitude) {
     isRequired
   }
 
-  def initDb(): Unit = {
-    if (existingVersion == 0) {
-      log.warn("NEW DATABASE. FORCING MIGRATION")
-      migrate()
-    }
-  }
-
   def migrate() = {
     val oldVersion = existingVersion
     log.warn("!!!! MIGRATING !!!!")

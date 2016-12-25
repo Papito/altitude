@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory
 class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
   private final val log = LoggerFactory.getLogger(getClass)
 
+  // ID for this application - which we may have multiple of in the same environment
   val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
   log.info(s"Initializing Altitude application instance with ID $id")
 
@@ -34,9 +35,11 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
 
   val app: Altitude = this
 
-  /*
-  Inject dependencies
+  /**
+   * Inject dependencies
    */
+  val injector = Guice.createInjector(new InjectionModule)
+
   class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
       dataSourceType match {
@@ -64,7 +67,6 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           bind[RepositoryDao].toInstance(new postgres.RepositoryDao(app))
           bind[AssetDao].toInstance(new postgres.AssetDao(app))
           bind[TrashDao].toInstance(new postgres.TrashDao(app))
-          //bind[ImportProfileDao].toInstance(new postgres.ImportProfileDao(app))
           bind[FolderDao].toInstance(new postgres.FolderDao(app))
           bind[StatDao].toInstance(new postgres.StatDao(app))
           bind[UserMetadataFieldDao].toInstance(new postgres.UserMetadataFieldDao(app))
@@ -81,7 +83,6 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           bind[RepositoryDao].toInstance(new sqlite.RepositoryDao(app))
           bind[AssetDao].toInstance(new sqlite.AssetDao(app))
           bind[TrashDao].toInstance(new sqlite.TrashDao(app))
-          //bind[ImportProfileDao].toInstance(new sqlite.ImportProfileDao(app))
           bind[FolderDao].toInstance(new sqlite.FolderDao(app))
           bind[StatDao].toInstance(new sqlite.StatDao(app))
           bind[UserMetadataFieldDao].toInstance(new sqlite.UserMetadataFieldDao(app))        }
@@ -92,9 +93,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
     }
   }
 
-  val injector = Guice.createInjector(new InjectionModule)
-
-  // create all services
+  // Create all service instances for this app
   object service {
     val repository = new RepositoryService(app)
     val fileImport = new FileImportService(app)
@@ -115,23 +114,18 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
     }
   }
 
+  /** Transaction counters.
+    * We use these for sanity checks during tests or for runtime stats.
+    */
   object transactions {
     var CREATED = 0
     var COMMITTED = 0
     var CLOSED = 0
   }
 
-  if (config.getFlag("migrationsEnabled")) {
-    service.migration.initDb()
-    val migrationRequired = service.migration.migrationRequired
-    if (migrationRequired) {
-      log.warn("Migration is required!")
-    }
-
-    if (migrationRequired) {
-      log.info("Migration go-ahead confirmed by user")
-      service.migration.migrate()
-    }
+  if (service.migration.migrationRequired) {
+    log.warn("Migration is required!")
+    service.migration.migrate()
   }
 
   def freeResources(): Unit = {
@@ -142,7 +136,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
     log.info("Freeing transaction list")
   }
 
-  // DEPRECATED. this will be part of data acces
+  // DEPRECATED. this will be part of data access
   val workPath = System.getProperty("user.dir")
   val dataDir = config.getString("dataDir")
   val dataPath = workPath + "/" + dataDir + "/"

@@ -26,8 +26,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
 
     "db.mongo.host" -> "localhost",
     "db.mongo.db" -> "altitude",
-    "db.mongo.port" -> "27017",
-    "migrationsEnabled" -> true
+    "db.mongo.port" -> "27017"
   )
 
   private val test = default ++ HashMap(
@@ -39,10 +38,7 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
     "db.sqlite.url" -> "jdbc:sqlite:tmp/test/test.sqlite.db",
 
     "db.mongo.db" -> s"altitude-test",
-    "db.mongo.port" -> "27018",
-
-    "migrationsEnabled" -> false
-
+    "db.mongo.port" -> "27018"
   )
 
   private val prod = default ++ HashMap()
