@@ -7,8 +7,6 @@ import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import org.joda.time.{DateTime, DateTimeZone}
 
 trait Sqlite {
-  protected def CORE_SQL_VALS_FOR_INSERT = "?, ?"
-
   protected def DEFAULT_SQL_COLS_FOR_SELECT = s"""
       ${C.Base.ID}, *,
       CAST(STRFTIME('%s', created_at) AS INT) AS created_at,

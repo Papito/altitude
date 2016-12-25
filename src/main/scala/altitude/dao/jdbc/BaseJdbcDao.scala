@@ -3,6 +3,7 @@ package altitude.dao.jdbc
 import java.sql.Connection
 
 import altitude.dao.BaseDao
+import altitude.exceptions.ConstraintException
 import altitude.models.BaseModel
 import altitude.models.search.{Query, QueryResult}
 import altitude.transactions.{TransactionId, JdbcTransactionManager}
@@ -23,27 +24,36 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
   protected def conn(implicit ctx: Context, txId: TransactionId): Connection = {
     // get transaction from the global lookup
-    txManager.transaction.getConnection
+    txManager.transaction().getConnection
   }
 
-  protected def CORE_SQL_VALS_FOR_INSERT: String
   protected def DEFAULT_SQL_COLS_FOR_SELECT: String
-  // used instead of DEFAULT_SQL_COLS_FOR_SELECT if needed in a separate DAO
-  protected def JSON_FUNC: String
-  protected def CURRENT_TIME_FUNC: String
-  protected def DATETIME_TO_DB_FUNC(datetime: Option[DateTime]): String
 
+  // if supported, DB function to store native JSON data
+  protected def JSON_FUNC: String
+  // DB current time function
+  protected def CURRENT_TIME_FUNC: String
+
+  // conversion function to go from Java time to DB time
+  protected def DATETIME_TO_DB_FUNC(datetime: Option[DateTime]): String
+  // opposite of the above
   protected def GET_DATETIME_FROM_REC(field: String, rec: Map[String, AnyRef]): Option[DateTime]
 
+  // common fields for new records, and their placeholders - mostly to avoid retyping
   protected val CORE_SQL_COLS_FOR_INSERT = s"${C.Base.ID}, ${C.Base.REPO_ID}"
+  protected def CORE_SQL_VALS_FOR_INSERT: String = "?, ?"
+
+  // the system table stores schema version info, for example.
   protected val SYSTEM_TABLE = "system"
 
+  // how we get current timestamp
   protected def utcNow = Util.utcNow
 
+  // datetime as a JSON value
   protected def dtAsJsString(dt: DateTime) = JsString(Util.isoDateTime(Some(dt)))
 
+  // table-specific SQL query builder)
   protected lazy val SQL_QUERY_BUILDER = new SqlQueryBuilder(DEFAULT_SQL_COLS_FOR_SELECT, tableName)
-
 
   // SQL to select the whole record, in very simple cases
   protected val ONE_SQL = s"""
@@ -51,6 +61,9 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
         FROM $tableName
        WHERE ${C.Base.ID} = ? AND ${C.Base.REPO_ID} = ?"""
 
+  /**
+   * Add a single record
+   */
   override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
     val sql: String =s"""
       INSERT INTO $tableName ($CORE_SQL_COLS_FOR_INSERT)
@@ -59,6 +72,14 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     addRecord(jsonIn, sql, List[Object]())
   }
 
+  /**
+   * Gert a single record by ID
+   *
+   * @param id record id as string
+   * @return optional JsObject, which implicitly can be turned into an instance of a concrete domain
+   *         model. This method does NOT throw a NotFound error, as it is not assumed it is always
+   *         and error.
+   */
   override def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
     val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(ONE_SQL, List(id, ctx.repo.id.get))
@@ -90,7 +111,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     this.query(q, SQL_QUERY_BUILDER)
 
   def query(query: Query, sqlQueryBuilder: SqlQueryBuilder)
-                    (implicit ctx: Context, txId: TransactionId): QueryResult = {
+           (implicit ctx: Context, txId: TransactionId): QueryResult = {
     val sqlQuery: SqlQuery = sqlQueryBuilder.toSelectQuery(query)
     val recs = manyBySqlQuery(sqlQuery.queryString, sqlQuery.selectBindValues)
 
@@ -116,7 +137,12 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     }
   }
 
-  protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object])
+  /**
+   * Internally used method to add records. It's convenient for classed overriding
+   * the add() method, as it accepts a ready-to-go SQL query, with bind methods.
+   * This function takes care of the actual plumbing common to all add() methods.
+   */
+  protected def addRecord(jsonIn: JsObject, sql: String, vals: List[Object])
                          (implicit  ctx: Context, txId: TransactionId): JsObject = {
     log.info(s"JDBC INSERT: $jsonIn")
 
@@ -128,10 +154,10 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
     // prepend ID and REPO ID, as it is required for most records
     val values: List[Object] = combineInsertValues(id, vals)
-    log.debug(s"INSERT SQL: $q. ARGS: ${values.toString()}")
+    log.debug(s"INSERT SQL: $sql. ARGS: ${values.toString()}")
 
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, q, values:_*)
+    runner.update(conn, sql, values:_*)
 
     val recordJson = jsonIn ++ JsObject(Seq(
       C.Base.ID -> JsString(id)))
@@ -140,11 +166,25 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     recordJson
   }
 
+  /**
+   * Create an array of values to insert, joining them in proper order.
+   * The base implementation assumes that it's [ID, REPO ID] + [THE REST],
+   * but it may not always be the case.
+   *
+   * @param id is always required
+   * @param vals any arbitrary values
+   * @return array of values to be bound to columbs
+   */
   protected def combineInsertValues(id: String, vals: List[Object])(implicit  ctx: Context) =
     id :: ctx.repo.id.get :: vals
 
+  /**
+   * Quick and dirty way to insert multiple records with SQL. Fast but not desireable to use,
+   * as it bypasses checks like valid record IDs. Constraint failures are delegated to the database.
+   * @return number of records inserted
+   */
   protected def addRecords(q: String, vals: List[Object])
-                         (implicit ctx: Context, txId: TransactionId) = {
+                          (implicit ctx: Context, txId: TransactionId): Int = {
     log.debug(s"INSERT MULTIPLE SQL: $q. ARGS: ${vals.toString()}")
     new QueryRunner().update(conn, q, vals:_*)
   }
@@ -157,6 +197,11 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     res.map{_.toMap[String, AnyRef]}.toList
   }
 
+  /**
+   * Internal method to return a UNIQUE object from DB. Does not just get the first one.
+   *
+   * @throws ConstraintException if a DB constraint is missed and more than one record is found
+   */
   protected def oneBySqlQuery(sql: String, vals: List[Object] = List())
                              (implicit ctx: Context, txId: TransactionId): Option[Map[String, AnyRef]] = {
     log.debug(s"SQL: $sql")
@@ -170,7 +215,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
       return None
 
     if (res.size() > 1)
-      throw new Exception("getById should return only a single result")
+      throw new ConstraintException("getById should return only a single result")
 
     val rec = res.head
 
@@ -223,6 +268,12 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     numUpdated
   }
 
+  /**
+   * Increment a field in a table by X
+   * @param id record id
+   * @param field field to increment
+   * @param count the X
+   */
   override def increment(id: String, field: String, count: Int = 1)
                         (implicit ctx: Context, txId: TransactionId) = {
     val sql = s"""
@@ -236,23 +287,29 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     runner.update(conn, sql, ctx.repo.id.get, id)
   }
 
+  /**
+   * Same and increment() but this inverts the value
+   */
   override def decrement(id: String,  field: String, count: Int = 1)
                         (implicit ctx: Context, txId: TransactionId) = {
     increment(id, field, -count)
   }
 
-  // Make a string of SQL placeholders for a list - such as "? , ? ,?, ?"
+  /**
+   * Make a string of SQL placeholders for a list - such as "? , ? ,?, ?"
+   */
   protected def makeSqlPlaceholders(s: Seq[AnyRef]): String = s.map(x => "?").mkString(",")
 
-  /*
-    Implementations should define this method, which returns an optional
-    JSON object which is guaranteed to serialize into a valid model backing this class.
-    JSON can be constructed directly, but best to create a model instance first
-    and return it, triggering implicit conversion.
+  /**
+   * Implementations should define this method, which returns an optional
+   * JSON object which is guaranteed to serialize into a valid model backing this class.
+   * JSON can be constructed directly, but best to create a model instance first
+   * and return it, triggering implicit conversion.
    */
   protected def makeModel(rec: Map[String, AnyRef]): JsObject
 
-  /* Given a model and an SQL record, calculate and set properties common to most models
+  /**
+   *  Given a model and an SQL record, calculate and set properties common to most models
    */
   protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): model.type
 }
