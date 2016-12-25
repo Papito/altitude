@@ -61,9 +61,6 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
         FROM $tableName
        WHERE ${C.Base.ID} = ? AND ${C.Base.REPO_ID} = ?"""
 
-  /**
-   * Add a single record
-   */
   override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
     val sql: String =s"""
       INSERT INTO $tableName ($CORE_SQL_COLS_FOR_INSERT)
@@ -72,14 +69,6 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     addRecord(jsonIn, sql, List[Object]())
   }
 
-  /**
-   * Gert a single record by ID
-   *
-   * @param id record id as string
-   * @return optional JsObject, which implicitly can be turned into an instance of a concrete domain
-   *         model. This method does NOT throw a NotFound error, as it is not assumed it is always
-   *         and error.
-   */
   override def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
     val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(ONE_SQL, List(id, ctx.repo.id.get))
@@ -268,12 +257,6 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     numUpdated
   }
 
-  /**
-   * Increment a field in a table by X
-   * @param id record id
-   * @param field field to increment
-   * @param count the X
-   */
   override def increment(id: String, field: String, count: Int = 1)
                         (implicit ctx: Context, txId: TransactionId) = {
     val sql = s"""
@@ -287,9 +270,6 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     runner.update(conn, sql, ctx.repo.id.get, id)
   }
 
-  /**
-   * Same and increment() but this inverts the value
-   */
   override def decrement(id: String,  field: String, count: Int = 1)
                         (implicit ctx: Context, txId: TransactionId) = {
     increment(id, field, -count)
