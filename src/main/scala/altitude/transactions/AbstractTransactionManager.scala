@@ -12,6 +12,12 @@ abstract class AbstractTransactionManager {
     var CREATED = 0
     var COMMITTED = 0
     var CLOSED = 0
+
+    def reset(): Unit = {
+      CREATED = 0
+      COMMITTED = 0
+      CLOSED = 0
+    }
   }
 
   def withTransaction[A](f: => A)(implicit txId: TransactionId): A

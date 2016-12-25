@@ -11,5 +11,4 @@ trait Transaction {
   def close(): Unit
   def commit(): Unit
   def rollback(): Unit
-
 }

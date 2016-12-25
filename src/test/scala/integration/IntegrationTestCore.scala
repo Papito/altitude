@@ -45,9 +45,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     dbUtilities.migrateDatabase()
 
     // keep transaction stats clean after DB migration dirties them
-    altitude.txManager.transactions.COMMITTED = 0
-    altitude.txManager.transactions.CREATED = 0
-    altitude.txManager.transactions.CLOSED = 0
+    altitude.txManager.transactions.reset()
 
     val dataDirFile = new File(altitude.dataPath)
     FileUtils.deleteDirectory(dataDirFile)
