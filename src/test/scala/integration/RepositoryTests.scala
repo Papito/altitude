@@ -16,6 +16,6 @@ import org.scalatest.Matchers._
 
     val r1: Repository = altitude.service.repository.add(r)
     val r2: Repository = altitude.service.repository.getById(r1.id.get)
-    r2.name should be(r.name)
+    r2.name shouldEqual r.name
   }
 }

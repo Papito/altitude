@@ -21,18 +21,18 @@ import org.scalatest.Matchers._
     altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "\"LOL\"")
     var updatedField: UserMetadataField = altitude.service.userMetadata.getFieldById(metadataField.id.get).get
     updatedField.constraintList should not be None
-    updatedField.constraintList.get.size should be(4)
-    updatedField.constraintList.get.head should be("\"LOL\"")
+    updatedField.constraintList.get.size shouldBe 4
+    updatedField.constraintList.get.head shouldEqual "\"LOL\""
 
     altitude.service.userMetadata.deleteConstraintValue(metadataField.id.get, "two")
     updatedField = altitude.service.userMetadata.getFieldById(metadataField.id.get).get
-    updatedField.constraintList.get.size should be(3)
-    updatedField.constraintList.get.head should be("\"LOL\"")
+    updatedField.constraintList.get.size shouldBe 3
+    updatedField.constraintList.get.head shouldEqual "\"LOL\""
 
     altitude.service.userMetadata.deleteConstraintValue(metadataField.id.get, "\"LOL\"")
     updatedField = altitude.service.userMetadata.getFieldById(metadataField.id.get).get
-    updatedField.constraintList.get.size should be(2)
-    updatedField.constraintList.get.head should be("one")
+    updatedField.constraintList.get.size shouldBe 2
+    updatedField.constraintList.get.head shouldEqual "one"
 
     altitude.service.userMetadata.deleteConstraintValue(metadataField.id.get, "one")
     altitude.service.userMetadata.deleteConstraintValue(metadataField.id.get, "three")
@@ -49,7 +49,7 @@ import org.scalatest.Matchers._
         fieldType = FieldType.STRING.toString,
         constraintList = Some(List("one", "two", "three"))))
 
-    altitude.service.userMetadata.getAllFields.length should be(1)
+    altitude.service.userMetadata.getAllFields.length shouldBe 1
     altitude.service.userMetadata.deleteFieldById(metadataField.id.get)
     altitude.service.userMetadata.getAllFields shouldBe empty
   }
@@ -66,14 +66,14 @@ import org.scalatest.Matchers._
     storedFieldOpt should not be None
     var storedField: UserMetadataField = storedFieldOpt.get
     storedField.constraintList should not be None
-    storedField.constraintList.get.length should be(metadataField.constraintList.get.length)
+    storedField.constraintList.get.length shouldBe metadataField.constraintList.get.length
 
     // get the same field by name (which triggers a multi-record query)
     val storedFieldOpt2 = altitude.service.userMetadata.getFieldById(metadataField.id.get)
     storedFieldOpt2 should not be None
     storedField = storedFieldOpt2.get
     storedField.constraintList should not be None
-    storedField.constraintList.get.length should be(metadataField.constraintList.get.length)
+    storedField.constraintList.get.length shouldBe metadataField.constraintList.get.length
   }
 
   test("add/get fields") {
@@ -94,10 +94,10 @@ import org.scalatest.Matchers._
       UserMetadataField(repoId = ctx.repo.id.get, name = "field name 3", fieldType = FieldType.STRING.toString))
 
     SET_USER_1()
-    altitude.service.userMetadata.getAllFields.length should be(3)
+    altitude.service.userMetadata.getAllFields.length shouldBe 3
 
     SET_USER_2()
-    altitude.service.userMetadata.getAllFields.length should be(3)
+    altitude.service.userMetadata.getAllFields.length shouldBe 3
   }
 
   test("add invalid field type") {

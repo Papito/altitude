@@ -20,6 +20,6 @@ class FolderModelTests extends FunSuite {
     val folder4 = new Folder(
       repoId = repoId, id = Option(Util.randomStr(30)), parentId = Util.randomStr(30), name = Util.randomStr(30))
 
-    Set(folder1, folder2, folder3, folder4).size should be(3)
+    Set(folder1, folder2, folder3, folder4).size shouldEqual 3
   }
 }

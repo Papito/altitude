@@ -9,7 +9,7 @@ import org.scalatest.Matchers._
 @DoNotDiscover class SearchTests(val config: Map[String, String]) extends IntegrationTestCore {
   test("empty search") {
     val assets = altitude.service.library.search(new Query()).records
-    assets.length should be(0)
+    assets.length shouldBe 0
   }
 
   test("search root folder") {
@@ -25,7 +25,7 @@ import org.scalatest.Matchers._
     altitude.service.asset.add(asset)
 
     val assets = altitude.service.library.search(Query()).records
-    assets.length should be(1)
+    assets.length shouldBe 1
   }
 
   test("search uncategorized folder") {
@@ -42,7 +42,7 @@ import org.scalatest.Matchers._
 
     val query = Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> ctx.repo.uncatFolderId))
     val assets = altitude.service.library.search(query).records
-    assets.length should be(1)
+    assets.length shouldBe 1
   }
 
   test("search a folder") {
@@ -92,15 +92,15 @@ import org.scalatest.Matchers._
 
     altitude.service.library.search(
       Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1_2.id.get))
-    ).records.length should be(1)
+    ).records.length shouldBe 1
 
     altitude.service.library.search(
       Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1_1.id.get))
-    ).records.length should be(1)
+    ).records.length shouldBe 1
 
     altitude.service.library.search(
       Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
-    ).records.length should be(3)
+    ).records.length shouldBe 3
   }
 
   test("folder filtering") {
@@ -125,15 +125,15 @@ import org.scalatest.Matchers._
 
     altitude.service.library.search(
       Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
-    ).records.length shouldEqual 2
+    ).records.length shouldBe 2
 
     altitude.service.library.search(
       Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2_1.id.get))
-    ).records.length shouldEqual 2
+    ).records.length shouldBe 2
 
     altitude.service.library.search(
       Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2.id.get))
-    ).records.length shouldEqual 4
+    ).records.length shouldBe 4
   }
 
   test("pagination") {
@@ -143,39 +143,39 @@ import org.scalatest.Matchers._
 
     val q = Query(rpp = 2, page = 1)
     val results = altitude.service.library.search(q)
-    results.total shouldEqual 6
-    results.records.length shouldEqual 2
-    results.nonEmpty shouldEqual true
-    results.totalPages shouldEqual 3
+    results.total shouldBe 6
+    results.records.length shouldBe 2
+    results.nonEmpty shouldBe true
+    results.totalPages shouldBe 3
 
     val q2 = Query(rpp = 2, page = 2)
     val results2 = altitude.service.library.search(q2)
-    results2.total shouldEqual 6
-    results2.records.length shouldEqual 2
-    results2.totalPages shouldEqual 3
+    results2.total shouldBe 6
+    results2.records.length shouldBe 2
+    results2.totalPages shouldBe 3
 
     val q3 = Query(rpp = 2, page = 3)
     val results3 = altitude.service.library.search(q3)
-    results3.total shouldEqual 6
-    results3.records.length shouldEqual 2
-    results3.totalPages shouldEqual 3
+    results3.total shouldBe 6
+    results3.records.length shouldBe 2
+    results3.totalPages shouldBe 3
 
     val q4 = Query(rpp = 2, page = 4)
     val results4 = altitude.service.library.search(q4)
-    results4.total shouldEqual 6
-    results4.records.length shouldEqual 0
-    results4.totalPages shouldEqual 3
+    results4.total shouldBe 6
+    results4.records.length shouldBe 0
+    results4.totalPages shouldBe 3
 
     val q5 = Query(rpp = 6, page = 1)
     val results5 = altitude.service.library.search(q5)
-    results5.total shouldEqual 6
-    results5.records.length shouldEqual 6
-    results5.totalPages shouldEqual 1
+    results5.total shouldBe 6
+    results5.records.length shouldBe 6
+    results5.totalPages shouldBe 1
 
     val q6 = Query(rpp = 20, page = 1)
     val results6 = altitude.service.library.search(q6)
-    results6.total shouldEqual 6
-    results6.records.length shouldEqual 6
-    results6.totalPages shouldEqual 1
+    results6.total shouldBe 6
+    results6.records.length shouldBe 6
+    results6.totalPages shouldBe 1
   }
 }

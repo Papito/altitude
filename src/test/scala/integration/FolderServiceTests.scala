@@ -16,7 +16,7 @@ import org.scalatest.Matchers._
 
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
-    folder1.parentId should be(ctx.repo.rootFolderId)
+    folder1.parentId shouldEqual ctx.repo.rootFolderId
 
     val folder1_1: Folder = altitude.service.folder.addFolder(
       name = "folder1_1", parentId = folder1.id)
@@ -37,7 +37,7 @@ import org.scalatest.Matchers._
     val folder2: Folder = altitude.service.folder.addFolder(
       name = "folder2")
 
-    folder2.parentId should be(ctx.repo.rootFolderId)
+    folder2.parentId shouldEqual ctx.repo.rootFolderId
 
     val folder2_1: Folder = altitude.service.folder.addFolder(
       name = "folder2_1", parentId = folder2.id)
@@ -55,11 +55,11 @@ import org.scalatest.Matchers._
     folder2.id should contain(folder2_2.parentId)
 
     val hierarchy = altitude.service.folder.hierarchy()
-    hierarchy.length should be(2)
-    hierarchy.head.children.length should be (2)
-    hierarchy(1).children.length should be (2)
-    hierarchy(1).children.head.children.length should be(1)
-    hierarchy(1).children(1).children.length should be(0)
+    hierarchy.length shouldBe 2
+    hierarchy.head.children.length shouldBe 2
+    hierarchy(1).children.length shouldBe 2
+    hierarchy(1).children.head.children.length shouldBe 1
+    hierarchy(1).children(1).children.length shouldBe 0
 
     // check immediate children of the second folder
     val immediateChildren = altitude.app.service.folder.immediateChildren(rootId = folder2_1.id.get)
@@ -67,9 +67,9 @@ import org.scalatest.Matchers._
 
     // check breadcrumb
     val path = altitude.app.service.folder.path(folderId = folder2_1_1.id.get)
-    path.length should be(4)
-    path(1).id should be(folder2.id)
-    path.last.id should be(folder2_1_1.id)
+    path.length shouldBe 4
+    path(1).id shouldBe folder2.id
+    path.last.id shouldBe folder2_1_1.id
 
     SET_SECONDARY_REPO()
 
@@ -102,7 +102,7 @@ import org.scalatest.Matchers._
     }
 
     val folders = altitude.service.folder.hierarchy()
-    folders.length should be(1)
+    folders.length shouldBe 1
   }
 
   test("validate") {
@@ -122,10 +122,10 @@ import org.scalatest.Matchers._
 
   test("sanitize") {
     val folder1: Folder = altitude.service.folder.addFolder(" folder  ")
-    folder1.name should be("folder")
+    folder1.name shouldEqual "folder"
 
     val folder2:Folder = altitude.service.folder.addFolder(" Folder one \n")
-    folder2.name should be("Folder one")
+    folder2.name shouldEqual "Folder one"
   }
 
   test("delete folder") {
@@ -155,7 +155,7 @@ import org.scalatest.Matchers._
       name = "folder1_2", parentId = folder1.id)
 
     val deleted = altitude.service.folder.deleteById(folder1.id.get)
-    deleted should be(6)
+    deleted shouldBe 6
 
     intercept[NotFoundException] {
       altitude.service.folder.getById(folder1.id.get)
@@ -334,7 +334,7 @@ import org.scalatest.Matchers._
     altitude.service.folder.rename(folder1.id.get, "newName")
 
     val renamedFolder: Folder = altitude.service.folder.getById(folder1.id.get)
-    renamedFolder.name should be("newName")
+    renamedFolder.name shouldEqual "newName"
   }
 
   test("illegal rename") {
