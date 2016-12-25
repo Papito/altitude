@@ -8,12 +8,14 @@ import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
 import play.api.libs.json.JsObject
 
-trait BaseDao {
-  val app: Altitude
-  protected val MAX_RECORDS = app.config.getInt("db.max_records")
-
+object BaseDao {
+  // this is the valid ID pattern
   private val VALID_ID_PATTERN = Pattern.compile("[a-z0-9]+")
-  protected def verifyId(id: String) = {
+
+  /**
+   * Verify that a DB id to be used is valid
+   */
+  def verifyId(id: String) = {
     if (id == null) {
       throw new IllegalArgumentException("ID is not defined")
     }
@@ -26,6 +28,11 @@ trait BaseDao {
       throw new IllegalArgumentException(s"ID [$id] is not alphanumeric")
     }
   }
+}
+
+trait BaseDao {
+  val app: Altitude
+  protected val MAX_RECORDS = app.config.getInt("db.max_records")
 
   /**
    * Add a single record
@@ -34,6 +41,12 @@ trait BaseDao {
    */
   def add(json: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject
 
+  /**
+   * Delete one or more document by query.
+   *
+   * @throws RuntimeException if attempting to delete all documents with an empty query
+   * @return number of documents deleted
+   */
   def deleteByQuery(q: Query)(implicit ctx: Context, txId: TransactionId): Int
 
   /**
@@ -80,7 +93,7 @@ trait BaseDao {
    *
    * @param id id of the document to be updated
    * @param data JSON data for the update document, which is NOT used to overwrite the existing one
-   * @param fields fields to be updated with new values
+   * @param fields fields to be updated with new values, taken from "data"
    *
    * @return number of documents updated - 0 or 1
    */
@@ -89,6 +102,15 @@ trait BaseDao {
     updateByQuery(q, data, fields)
   }
 
+  /**
+   * Update multiple documents by query with select field values (does not overwrite the document)
+   *
+   * @param q the query
+   * @param data JSON data for the update documents, which is NOT used to overwrite the existing one
+   * @param fields fields to be updated with new values, taken from "data"
+   *
+   * @return number of documents updated - 0 or 1
+   */
   def updateByQuery(q: Query, data: JsObject, fields: List[String])(implicit ctx: Context, txId: TransactionId): Int
 
   /**

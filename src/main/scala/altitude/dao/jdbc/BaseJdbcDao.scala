@@ -23,7 +23,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   protected final def txManager = app.injector.instance[JdbcTransactionManager]
 
   protected def conn(implicit ctx: Context, txId: TransactionId): Connection = {
-    // get transaction from the global lookup
+    // get the connection associated with this transaction
     txManager.transaction().getConnection
   }
 
@@ -39,11 +39,11 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   // opposite of the above
   protected def GET_DATETIME_FROM_REC(field: String, rec: Map[String, AnyRef]): Option[DateTime]
 
-  // common fields for new records, and their placeholders - mostly to avoid retyping
+  // common fields for new records, and their placeholders - mostly to avoid repetition
   protected val CORE_SQL_COLS_FOR_INSERT = s"${C.Base.ID}, ${C.Base.REPO_ID}"
   protected def CORE_SQL_VALS_FOR_INSERT: String = "?, ?"
 
-  // the system table stores schema version info, for example.
+  // the system table stores schema version info, for example
   protected val SYSTEM_TABLE = "system"
 
   // how we get current timestamp
@@ -52,7 +52,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   // datetime as a JSON value
   protected def dtAsJsString(dt: DateTime) = JsString(Util.isoDateTime(Some(dt)))
 
-  // table-specific SQL query builder)
+  // table-specific SQL query builder
   protected lazy val SQL_QUERY_BUILDER = new SqlQueryBuilder(DEFAULT_SQL_COLS_FOR_SELECT, tableName)
 
   // SQL to select the whole record, in very simple cases
@@ -77,7 +77,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
   override def deleteByQuery(q: Query)(implicit ctx: Context, txId: TransactionId): Int = {
     if (q.params.isEmpty) {
-      return 0
+      throw new RuntimeException("Cannot delete [ALL] document with an empty Query")
     }
 
     log.debug(s"Deleting record by query: $q")
@@ -99,7 +99,10 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   override def query(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
     this.query(q, SQL_QUERY_BUILDER)
 
-  def query(query: Query, sqlQueryBuilder: SqlQueryBuilder)
+  /**
+   * Internal version for querying with a customized query builder
+   */
+  protected def query(query: Query, sqlQueryBuilder: SqlQueryBuilder)
            (implicit ctx: Context, txId: TransactionId): QueryResult = {
     val sqlQuery: SqlQuery = sqlQueryBuilder.toSelectQuery(query)
     val recs = manyBySqlQuery(sqlQuery.queryString, sqlQuery.selectBindValues)
@@ -139,7 +142,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
     // create ID unless there is an override
     val id = if (existingObjId.isDefined) existingObjId.get else BaseModel.genId
-    verifyId(id)
+    BaseDao.verifyId(id)
 
     // prepend ID and REPO ID, as it is required for most records
     val values: List[Object] = combineInsertValues(id, vals)
@@ -232,6 +235,10 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
   override def updateByQuery(q: Query, json: JsObject, fields: List[String])
                             (implicit ctx: Context, txId: TransactionId): Int = {
+    if (q.params.isEmpty) {
+      throw new RuntimeException("Cannot update [ALL] documents with an empty Query")
+    }
+
     log.debug(s"Updating record by query $q with data $json for fields: $fields")
 
     val queryFieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList

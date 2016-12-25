@@ -62,7 +62,7 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
       case _ => BaseModel.genId
     }
 
-    verifyId(id)
+    BaseDao.verifyId(id)
 
     val createdAt = Util.utcNowNoTZ
     val origObj: DBObject =  com.mongodb.util.JSON.parse(jsonIn.toString()).asInstanceOf[DBObject]
@@ -75,6 +75,10 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   }
 
   override def deleteByQuery(q: Query)(implicit ctx: Context, txId: TransactionId): Int = {
+    if (q.params.isEmpty) {
+      throw new RuntimeException("Cannot delete [ALL] documents with an empty Query")
+    }
+
     val query = fixMongoQuery(q)
     val mongoQuery: DBObject = query.params
     log.info(mongoQuery.toString)
@@ -162,6 +166,10 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
 
   override def updateByQuery(q: Query, json: JsObject, fields: List[String])
                             (implicit ctx: Context, txId: TransactionId): Int = {
+    if (q.params.isEmpty) {
+      throw new RuntimeException("Cannot update [ALL] documents with an empty Query")
+    }
+
     log.debug(s"Updating with data $json for $q")
 
     val query  = fixMongoQuery(q)
