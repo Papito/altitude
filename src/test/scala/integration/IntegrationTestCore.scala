@@ -45,9 +45,9 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     dbUtilities.migrateDatabase()
 
     // keep transaction stats clean after DB migration dirties them
-    altitude.transactions.COMMITTED = 0
-    altitude.transactions.CREATED = 0
-    altitude.transactions.CLOSED = 0
+    altitude.txManager.transactions.COMMITTED = 0
+    altitude.txManager.transactions.CREATED = 0
+    altitude.txManager.transactions.CLOSED = 0
 
     val dataDirFile = new File(altitude.dataPath)
     FileUtils.deleteDirectory(dataDirFile)
@@ -63,12 +63,12 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
 
     if (datasource.contains("postgres") || datasource.contains("sqlite")) {
       // should not have committed anything for tests
-      require(altitude.transactions.COMMITTED == 0)
+      require(altitude.txManager.transactions.COMMITTED == 0)
       // should only have had one transaction - if this fails, implicit transaction semantics are off somewhere
-      if (altitude.transactions.CREATED != 1) {
-        log.error(s"${altitude.transactions.CREATED} transactions instead of 1!")
+      if (altitude.txManager.transactions.CREATED != 1) {
+        log.error(s"${altitude.txManager.transactions.CREATED} transactions instead of 1!")
       }
-      require(altitude.transactions.CREATED == 1)
+      require(altitude.txManager.transactions.CREATED == 1)
     }
   }
 

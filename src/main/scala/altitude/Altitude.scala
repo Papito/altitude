@@ -1,9 +1,9 @@
 package altitude
 
 import java.sql.DriverManager
+import net.codingwell.scalaguice.InjectorExtensions._
 
 import altitude.dao._
-import altitude.dao.mongo.BaseMongoDao
 import altitude.service._
 import altitude.service.migration.{MongoMigrationService, PostgresMigrationService, SqliteMigrationService}
 import altitude.transactions._
@@ -14,86 +14,41 @@ import org.slf4j.LoggerFactory
 
 class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
   private final val log = LoggerFactory.getLogger(getClass)
+  final val app: Altitude = this
 
   // ID for this application - which we may have multiple of in the same environment
-  val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
+  final val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
   log.info(s"Initializing Altitude application instance with ID $id")
 
-  val environment = Environment.ENV match {
+  // this is the environment we are running in
+  final val environment = Environment.ENV match {
     case Environment.DEV => "development"
     case Environment.PROD => "production"
     case Environment.TEST => "test"
   }
-
   log.info(s"Environment is: $environment")
 
-  val config = new Configuration(
+  final val config = new Configuration(
     additionalConfiguration = additionalConfiguration)
 
-  val dataSourceType = config.getString("datasource")
+  final val dataSourceType = config.getString("datasource")
   log.info(s"Datasource type: $dataSourceType", C.LogTag.APP)
 
-  val app: Altitude = this
+  /**
+   * At this point determine which data access classes we are loading, which
+   * transaction manager we are using for the data sources of choice, load the drivers,
+   * etc.
+   */
+  final val injector = Guice.createInjector(new InjectionModule)
 
   /**
-   * Inject dependencies
+   * This is our injected transaction manager, determined based on our database.
    */
-  val injector = Guice.createInjector(new InjectionModule)
+  final val txManager = app.injector.instance[AbstractTransactionManager]
 
-  class InjectionModule extends AbstractModule with ScalaModule  {
-    override def configure(): Unit = {
-      dataSourceType match {
-        case "mongo" => {
-          bind[AbstractTransactionManager].toInstance(new altitude.transactions.VoidTransactionManager(app))
-
-          bind[MigrationDao].toInstance(new mongo.MigrationDao(app))
-          bind[RepositoryDao].toInstance(new mongo.RepositoryDao(app))
-          bind[AssetDao].toInstance(new mongo.AssetDao(app))
-          bind[TrashDao].toInstance(new mongo.TrashDao(app))
-          bind[ImportProfileDao].toInstance(new mongo.ImportProfileDao(app))
-          bind[FolderDao].toInstance(new mongo.FolderDao(app))
-          bind[StatDao].toInstance(new mongo.StatDao(app))
-          bind[UserMetadataFieldDao].toInstance(new mongo.UserMetadataFieldDao(app))
-        }
-        case "postgres" => {
-          DriverManager.registerDriver(new org.postgresql.Driver)
-
-          val JDBC_TRANSACTIONS = scala.collection.mutable.Map[Int, JdbcTransaction]()
-          val jdbcTxManager = new altitude.transactions.JdbcTransactionManager(app, JDBC_TRANSACTIONS)
-          bind[AbstractTransactionManager].toInstance(jdbcTxManager)
-          bind[JdbcTransactionManager].toInstance(jdbcTxManager)
-
-          bind[MigrationDao].toInstance(new postgres.MigrationDao(app))
-          bind[RepositoryDao].toInstance(new postgres.RepositoryDao(app))
-          bind[AssetDao].toInstance(new postgres.AssetDao(app))
-          bind[TrashDao].toInstance(new postgres.TrashDao(app))
-          bind[FolderDao].toInstance(new postgres.FolderDao(app))
-          bind[StatDao].toInstance(new postgres.StatDao(app))
-          bind[UserMetadataFieldDao].toInstance(new postgres.UserMetadataFieldDao(app))
-        }
-        case "sqlite" => {
-          DriverManager.registerDriver(new org.sqlite.JDBC)
-
-          val JDBC_TRANSACTIONS = scala.collection.mutable.Map[Int, JdbcTransaction]()
-          val jdbcTxManager = new SqliteTransactionManager(app, JDBC_TRANSACTIONS)
-          bind[AbstractTransactionManager].toInstance(jdbcTxManager)
-          bind[JdbcTransactionManager].toInstance(jdbcTxManager)
-
-          bind[MigrationDao].toInstance(new sqlite.MigrationDao(app))
-          bind[RepositoryDao].toInstance(new sqlite.RepositoryDao(app))
-          bind[AssetDao].toInstance(new sqlite.AssetDao(app))
-          bind[TrashDao].toInstance(new sqlite.TrashDao(app))
-          bind[FolderDao].toInstance(new sqlite.FolderDao(app))
-          bind[StatDao].toInstance(new sqlite.StatDao(app))
-          bind[UserMetadataFieldDao].toInstance(new sqlite.UserMetadataFieldDao(app))        }
-        case _ => {
-          throw new IllegalArgumentException(s"Do not know of datasource $dataSourceType")
-        }
-      }
-    }
-  }
-
-  // Create all service instances for this app
+  /**
+   * This is all of the internal services the app will be using
+   */
   object service {
     val repository = new RepositoryService(app)
     val fileImport = new FileImportService(app)
@@ -114,26 +69,67 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
     }
   }
 
-  /** Transaction counters.
-    * We use these for sanity checks during tests or for runtime stats.
-    */
-  object transactions {
-    var CREATED = 0
-    var COMMITTED = 0
-    var CLOSED = 0
-  }
-
   if (service.migration.migrationRequired) {
     log.warn("Migration is required!")
     service.migration.migrate()
   }
 
-  def freeResources(): Unit = {
-    if (BaseMongoDao.CLIENT.isDefined) {
-      log.info("Closing MONGO client")
-      BaseMongoDao.CLIENT.get.close()
+  /**
+   * Inject dependencies
+   */
+  class InjectionModule extends AbstractModule with ScalaModule  {
+    override def configure(): Unit = {
+      dataSourceType match {
+        case "mongo" => {
+          bind[AbstractTransactionManager].toInstance(new altitude.transactions.VoidTransactionManager(app))
+
+          bind[MigrationDao].toInstance(new mongo.MigrationDao(app))
+          bind[RepositoryDao].toInstance(new mongo.RepositoryDao(app))
+          bind[AssetDao].toInstance(new mongo.AssetDao(app))
+          bind[TrashDao].toInstance(new mongo.TrashDao(app))
+          bind[ImportProfileDao].toInstance(new mongo.ImportProfileDao(app))
+          bind[FolderDao].toInstance(new mongo.FolderDao(app))
+          bind[StatDao].toInstance(new mongo.StatDao(app))
+          bind[UserMetadataFieldDao].toInstance(new mongo.UserMetadataFieldDao(app))
+        }
+        case "postgres" => {
+          DriverManager.registerDriver(new org.postgresql.Driver)
+
+          val jdbcTxManager = new altitude.transactions.JdbcTransactionManager(app)
+          bind[AbstractTransactionManager].toInstance(jdbcTxManager)
+          bind[JdbcTransactionManager].toInstance(jdbcTxManager)
+
+          bind[MigrationDao].toInstance(new postgres.MigrationDao(app))
+          bind[RepositoryDao].toInstance(new postgres.RepositoryDao(app))
+          bind[AssetDao].toInstance(new postgres.AssetDao(app))
+          bind[TrashDao].toInstance(new postgres.TrashDao(app))
+          bind[FolderDao].toInstance(new postgres.FolderDao(app))
+          bind[StatDao].toInstance(new postgres.StatDao(app))
+          bind[UserMetadataFieldDao].toInstance(new postgres.UserMetadataFieldDao(app))
+        }
+        case "sqlite" => {
+          DriverManager.registerDriver(new org.sqlite.JDBC)
+
+          val jdbcTxManager = new SqliteTransactionManager(app)
+          bind[AbstractTransactionManager].toInstance(jdbcTxManager)
+          bind[JdbcTransactionManager].toInstance(jdbcTxManager)
+
+          bind[MigrationDao].toInstance(new sqlite.MigrationDao(app))
+          bind[RepositoryDao].toInstance(new sqlite.RepositoryDao(app))
+          bind[AssetDao].toInstance(new sqlite.AssetDao(app))
+          bind[TrashDao].toInstance(new sqlite.TrashDao(app))
+          bind[FolderDao].toInstance(new sqlite.FolderDao(app))
+          bind[StatDao].toInstance(new sqlite.StatDao(app))
+          bind[UserMetadataFieldDao].toInstance(new sqlite.UserMetadataFieldDao(app))        }
+        case _ => {
+          throw new IllegalArgumentException(s"Do not know of datasource $dataSourceType")
+        }
+      }
     }
-    log.info("Freeing transaction list")
+  }
+
+  def freeResources(): Unit = {
+    txManager.freeResources()
   }
 
   // DEPRECATED. this will be part of data access

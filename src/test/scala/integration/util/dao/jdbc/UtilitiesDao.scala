@@ -10,14 +10,14 @@ class UtilitiesDao(app: Altitude) extends VoidJdbcDao(app) with integration.util
 
   override def rollback() = {
 
-    txManager.txContainer.foreach(tx => {
+    txManager.txRegistry.foreach(tx => {
       tx._2.down()
       tx._2.rollback()
     })
   }
 
   override def close() = {
-    txManager.txContainer.foreach(tx => {
+    txManager.txRegistry.foreach(tx => {
       tx._2.down()
       txManager.closeTransaction(tx._2)
     })
@@ -26,7 +26,7 @@ class UtilitiesDao(app: Altitude) extends VoidJdbcDao(app) with integration.util
   override def cleanupTest() = {
     rollback()
     close()
-    txManager.txContainer.clear()
+    txManager.txRegistry.clear()
   }
 
   override def createTransaction(txId: TransactionId): Unit = {

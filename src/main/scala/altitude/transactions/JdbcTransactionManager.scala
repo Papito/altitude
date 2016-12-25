@@ -6,34 +6,41 @@ import java.util.Properties
 import altitude.{Altitude, Const => C}
 import org.slf4j.LoggerFactory
 
-class JdbcTransactionManager(val app: Altitude,
-                             val txContainer: scala.collection.mutable.Map[Int, JdbcTransaction])
+class JdbcTransactionManager(val app: Altitude)
 extends AbstractTransactionManager {
-
   private final val log = LoggerFactory.getLogger(getClass)
 
-  /*
-  Get an existing transaction if we are already within a transaction context,
-  else, create a new one
+  /**
+   * This transaction registry is the heart of it all - we use it to keep track of existing
+   * transactions, creating new ones, and cleaning up after a transaction is ending.
+   */
+  val txRegistry = scala.collection.mutable.Map[Int, JdbcTransaction]()
+
+  /**
+   *  Get an existing transaction if we are already within a transaction context, else,
+   *  create a new transaction - AND a connection
    */
   def transaction(implicit txId: TransactionId, readOnly: Boolean = false): JdbcTransaction = {
     log.debug(s"Getting transaction for ${txId.id}")
 
-    // see if we already have a transaction id defined
-    if (txContainer.contains(txId.id)) {
-      // we do, eh
-      return txContainer.get(txId.id).get
+    // see if we already have a transaction ID defined
+    if (txRegistry.contains(txId.id)) {
+      // we do - do nothing, return the transaction
+      return txRegistry.get(txId.id).get
     }
 
-    // get a connection and a new transaction
+    // get a connection and a new transaction, read-only if so requested
     val conn: Connection = connection(readOnly)
 
     val tx: JdbcTransaction = new JdbcTransaction(conn)
-    txContainer += (tx.id -> tx)
+
+    // add this to our transaction registry
+    txRegistry += (tx.id -> tx)
+
     // assign the integer transaction ID to the mutable transaction id "carrier" object
     txId.id = tx.id
     log.info(s"CREATING TRANSACTION ${txId.id}")
-    app.transactions.CREATED += 1
+    transactions.CREATED += 1
     tx
   }
 
@@ -46,6 +53,9 @@ extends AbstractTransactionManager {
     tx.close()
   }
 
+  /**
+   * JDBC-specific connection snooze-fest
+   */
   def connection(readOnly: Boolean): Connection = {
     val props = new Properties
     val user = app.config.getString("db.postgres.user")
@@ -67,6 +77,9 @@ extends AbstractTransactionManager {
     conn
   }
 
+  /**
+   * This is defined for any JDBC driver that is not thread-safe for writes
+   */
   protected def lock(tx: Transaction): Unit = {}
   protected def unlock(tx: Transaction): Unit = {}
 
@@ -75,16 +88,22 @@ extends AbstractTransactionManager {
     val tx = transaction(txId, readOnly = false)
 
     try {
-      lock(tx)
-      tx.up() // level up - any new transactions within will be "nested"
+      lock(tx) // this is a no-op for a "real" database
+      // level up - any new transactions within will be "nested" and not committed
+      tx.up()
+
+      // actual function call
       val res: A = f
+
+      // level down - if the level is zero, the transaction is not nested and will be committed
       tx.down()
 
+      // commit exiting transactions
       if (!tx.isNested) {
         log.debug(s"End: ${tx.id}", C.LogTag.DB)
         log.info(s"COMMITTING ${tx.id}", C.LogTag.DB)
         tx.commit()
-        app.transactions.COMMITTED += 1
+        transactions.COMMITTED += 1
       }
 
       res
@@ -101,8 +120,8 @@ extends AbstractTransactionManager {
       if (!tx.isNested) {
         log.debug(s"Closing: ${tx.id}", C.LogTag.DB)
         closeTransaction(tx)
-        app.transactions.CLOSED += 1
-        txContainer.remove(txId.id)
+        transactions.CLOSED += 1
+        txRegistry.remove(txId.id)
       }
       unlock(tx)
     }
@@ -113,6 +132,7 @@ extends AbstractTransactionManager {
     val tx = transaction(txId, readOnly = true)
 
     try {
+      // we have to keep track of TX level as this may still be withing a write transaction
       tx.up()
       val res: A = f
       tx.down()
@@ -131,10 +151,9 @@ extends AbstractTransactionManager {
         log.debug(s"End: ${tx.id}", C.LogTag.DB)
         log.debug(s"Closing: ${tx.id}", C.LogTag.DB)
         closeTransaction(tx)
-        app.transactions.CLOSED += 1
-        txContainer.remove(txId.id)
+        transactions.CLOSED += 1
+        txRegistry.remove(txId.id)
       }
     }
   }
-
 }

@@ -19,8 +19,8 @@ object SqliteTransactionManager {
   wConnection.setAutoCommit(false)
 }
 
-class SqliteTransactionManager(app: Altitude, txContainer: scala.collection.mutable.Map[Int, JdbcTransaction])
-  extends JdbcTransactionManager(app, txContainer) {
+class SqliteTransactionManager(app: Altitude)
+  extends JdbcTransactionManager(app) {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override def connection(readOnly: Boolean = false): Connection = {
