@@ -1,6 +1,6 @@
 package altitude.controllers.api
 
-import altitude.Validators.ApiValidator
+import altitude.Validators.ApiRequestValidator
 import altitude.controllers.BaseController
 import altitude.exceptions.{NotFoundException, ValidationException}
 import altitude.{Const => C}
@@ -15,9 +15,9 @@ class BaseApiController extends BaseController with GZipSupport {
 
   val OK = Ok("{}")
 
-  val HTTP_POST_VALIDATOR: Option[ApiValidator] = None
-  val HTTP_DELETE_VALIDATOR: Option[ApiValidator] = None
-  val HTTP_UPDATE_VALIDATOR: Option[ApiValidator] = None
+  val HTTP_POST_VALIDATOR: Option[ApiRequestValidator] = None
+  val HTTP_DELETE_VALIDATOR: Option[ApiRequestValidator] = None
+  val HTTP_UPDATE_VALIDATOR: Option[ApiRequestValidator] = None
 
   def requestJson: Option[JsObject] = Some(
     if (request.body.isEmpty) Json.obj() else Json.parse(request.body).as[JsObject]
@@ -33,21 +33,21 @@ class BaseApiController extends BaseController with GZipSupport {
     Process all validators that may be set for this controller/method.
      */
     HTTP_POST_VALIDATOR match {
-      case Some(ApiValidator(required)) if requestMethod == "post" => HTTP_POST_VALIDATOR.get.validate(requestJson.get)
+      case Some(ApiRequestValidator(required)) if requestMethod == "post" => HTTP_POST_VALIDATOR.get.validate(requestJson.get)
       case _ if requestMethod == "post" =>
         log.debug(s"No POST validator specified for ${this.getClass.getName}")
       case _ =>
     }
 
     HTTP_DELETE_VALIDATOR match {
-      case Some(ApiValidator(fields)) if requestMethod == "delete" => HTTP_DELETE_VALIDATOR.get.validate(requestJson.get)
+      case Some(ApiRequestValidator(fields)) if requestMethod == "delete" => HTTP_DELETE_VALIDATOR.get.validate(requestJson.get)
       case _ if requestMethod == "delete" =>
         log.debug(s"No DELETE validator specified for ${this.getClass.getName}")
       case _ =>
     }
 
     HTTP_UPDATE_VALIDATOR match {
-      case Some(ApiValidator(required)) if requestMethod == "put" => HTTP_UPDATE_VALIDATOR.get.validate(requestJson.get)
+      case Some(ApiRequestValidator(required)) if requestMethod == "put" => HTTP_UPDATE_VALIDATOR.get.validate(requestJson.get)
       case _ if requestMethod == "update"  =>
         log.debug(s"No PUT validator specified for ${this.getClass.getName}")
       case _ =>

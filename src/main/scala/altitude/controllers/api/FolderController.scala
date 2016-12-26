@@ -1,6 +1,6 @@
 package altitude.controllers.api
 
-import altitude.Validators.ApiValidator
+import altitude.Validators.ApiRequestValidator
 import altitude.models.Folder
 import altitude.{Const => C}
 import org.scalatra.Ok
@@ -10,7 +10,7 @@ import play.api.libs.json.{JsObject, Json}
 class FolderController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override val HTTP_POST_VALIDATOR = Some(ApiValidator(List(
+  override val HTTP_POST_VALIDATOR = Some(ApiRequestValidator(List(
     C.Api.Folder.NAME, C.Api.Folder.PARENT_ID
   )))
 

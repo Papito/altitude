@@ -1,6 +1,6 @@
 package altitude.controllers.api
 
-import altitude.Validators.ApiValidator
+import altitude.Validators.ApiRequestValidator
 import altitude.exceptions.NotFoundException
 import altitude.models.Data
 import altitude.{Const => C}
@@ -47,7 +47,7 @@ class AssetController extends BaseApiController {
 
     log.info(s"Moving assets to $folderId")
 
-    val validator = ApiValidator(List(C.Api.Folder.ASSET_IDS))
+    val validator = ApiRequestValidator(List(C.Api.Folder.ASSET_IDS))
     validator.validate(requestJson.get)
 
     val assetIds = (requestJson.get \ C.Api.Folder.ASSET_IDS).as[Set[String]]
@@ -70,7 +70,7 @@ class AssetController extends BaseApiController {
   post(s"/move/to/uncategorized") {
     log.info(s"Clearing category")
 
-    val validator = ApiValidator(List(C.Api.Folder.ASSET_IDS))
+    val validator = ApiRequestValidator(List(C.Api.Folder.ASSET_IDS))
     validator.validate(requestJson.get)
 
     val assetIds = (requestJson.get \ C.Api.Folder.ASSET_IDS).as[Set[String]]

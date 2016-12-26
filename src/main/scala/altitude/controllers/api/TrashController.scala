@@ -1,6 +1,6 @@
 package altitude.controllers.api
 
-import altitude.Validators.ApiValidator
+import altitude.Validators.ApiRequestValidator
 import altitude.models.search.Query
 import altitude.{Const => C}
 import org.scalatra.Ok
@@ -21,7 +21,7 @@ class TrashController extends BaseApiController {
   post(s"/recycle") {
     log.info(s"Deleting assets")
 
-    val validator = ApiValidator(List(C.Api.Folder.ASSET_IDS))
+    val validator = ApiRequestValidator(List(C.Api.Folder.ASSET_IDS))
     validator.validate(requestJson.get)
 
     val assetIds = (requestJson.get \ C.Api.Folder.ASSET_IDS).as[Set[String]]
@@ -46,7 +46,7 @@ class TrashController extends BaseApiController {
     val folderId = params.get(C.Api.Asset.FOLDER_ID).get
     log.info(s"Moving recycled assets to $folderId")
 
-    val validator = ApiValidator(List(C.Api.Trash.ASSET_IDS))
+    val validator = ApiRequestValidator(List(C.Api.Trash.ASSET_IDS))
     validator.validate(requestJson.get)
 
     val assetIds = (requestJson.get \ C.Api.Trash.ASSET_IDS).as[Set[String]]
@@ -69,7 +69,7 @@ class TrashController extends BaseApiController {
   post(s"/restore") {
     log.info("Restoring multiple assets")
 
-    val validator = ApiValidator(List(C.Api.Trash.ASSET_IDS))
+    val validator = ApiRequestValidator(List(C.Api.Trash.ASSET_IDS))
     validator.validate(requestJson.get)
 
     val assetIds = (requestJson.get \ C.Api.Trash.ASSET_IDS).as[Set[String]]

@@ -1,7 +1,7 @@
 package altitude.service
 
 import altitude.Cleaners.Cleaner
-import altitude.Validators.Validator
+import altitude.Validators.ModelDataValidator
 import altitude.dao.BaseDao
 import altitude.exceptions.{DuplicateException, NotFoundException}
 import altitude.models.BaseModel
@@ -22,7 +22,7 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
   // object cleaner
   protected val CLEANER: Option[Cleaner] = None
   // object validator, invoked AFTER the cleaner, to avoid false negatives
-  protected val VALIDATOR: Option[Validator] = None
+  protected val VALIDATOR: Option[ModelDataValidator] = None
 
   /**
    * Add a single document
