@@ -75,10 +75,6 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   }
 
   override def deleteByQuery(q: Query)(implicit ctx: Context, txId: TransactionId): Int = {
-    if (q.params.isEmpty) {
-      throw new RuntimeException("Cannot delete [ALL] documents with an empty Query")
-    }
-
     val query = fixMongoQuery(q)
     val mongoQuery: DBObject = query.params
     log.info(mongoQuery.toString)
@@ -121,8 +117,8 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
     QueryResult(records = records, total = cursor.count(), query = Some(query))
   }
 
-  /*
-  Return a JSON record with timestamp and ID fields translated from Mongo's "extended" format
+  /**
+   * Return a JSON record with timestamp and ID fields translated from Mongo's "extended" format
    */
   protected def fixMongoFields(json: JsObject): JsObject = {
     val out = json ++ Json.obj(
@@ -137,14 +133,13 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
   }
 
   protected final def fixMongoQuery(q: Query)(implicit ctx: Context, txId: TransactionId): Query = {
-    // _id -> id
+    // id -> _id
     q.params.contains("id")  match {
       case false => q
-      case true => {
+      case true =>
         val id = q.params.get("id").get
         val params = (q.params - "id") ++ Map("_id" -> id)
         Query(params = params, rpp = q.rpp, page = q.page)
-      }
     }
   }
 
@@ -166,10 +161,6 @@ abstract class BaseMongoDao(protected val collectionName: String) extends BaseDa
 
   override def updateByQuery(q: Query, json: JsObject, fields: List[String])
                             (implicit ctx: Context, txId: TransactionId): Int = {
-    if (q.params.isEmpty) {
-      throw new RuntimeException("Cannot update [ALL] documents with an empty Query")
-    }
-
     log.debug(s"Updating with data $json for $q")
 
     val query  = fixMongoQuery(q)

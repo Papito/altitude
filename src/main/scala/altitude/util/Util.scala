@@ -6,6 +6,9 @@ import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.{DateTime, DateTimeZone}
 import org.slf4j.LoggerFactory
 
+/**
+ * This grab-bag if miscellany will be up for some spring cleaning at some point.
+ */
 package object Util {
   private final val log = LoggerFactory.getLogger(getClass)
 

@@ -3,13 +3,31 @@ package altitude
 import altitude.{Const => C}
 import play.api.libs.json.{JsObject, Json}
 
+/**
+ * Cleaners are used for data hygiene, before validation.
+ *
+ * Data - especially user data will come to us in a form that's not suitable to store
+ * in its initial form, and it will happen a lot. But even though a leading space in
+ * and email address is not what we want, it does not warrant a validation exception.
+ */
 object Cleaners {
+
+  /**
+   * Base version of the cleaner.
+   *
+   * @param trim fields to trim leading and trailing spaces from
+   * @param lower fields to lowercase
+   * @param defaults fields to set defaults for, if they are not given
+   */
   case class Cleaner(trim: Option[List[String]] = None,
                      lower:  Option[List[String]] = None,
                      defaults:  Option[Map[String, String]] = None) {
 
     def clean(json: JsObject): JsObject = {
-      doLower(doDefaults(doTrim(json))) ++ Json.obj(C.Base.IS_CLEAN -> true)
+      val trimmed = doTrim(json)
+      val wDefaults = doDefaults(trimmed)
+      val lowerCased = doLower(wDefaults)
+      lowerCased ++ Json.obj(C.Base.IS_CLEAN -> true)
     }
 
     protected def doTrim(json: JsObject): JsObject = {

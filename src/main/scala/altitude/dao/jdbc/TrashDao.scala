@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
 abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with altitude.dao.TrashDao {
-  private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val mediaType = new AssetType(

@@ -9,7 +9,11 @@ import scala.language.implicitConversions
 
 object BaseModel {
   final val ID_LEN = 24
+
+  // make a new model ID
   final def genId: String = scala.util.Random.alphanumeric.take(ID_LEN).mkString.toLowerCase
+
+  // implicit converter to go from a model to JSON
   implicit def toJson(obj: BaseModel): JsObject = obj.toJson
 }
 
@@ -18,7 +22,7 @@ abstract class BaseModel {
 
   def toJson: JsObject
 
-  // created at
+  // created at - mutable, but can only be set once
   protected var _createdAt: Option[DateTime] = None
 
   def createdAt = _createdAt
@@ -29,7 +33,7 @@ abstract class BaseModel {
     _createdAt = Some(arg)
   }
 
-  // updated at
+  // updated at - mutable, but can only be set once
   protected var _updatedAt: Option[DateTime] = None
 
   def updatedAt = _updatedAt
@@ -54,8 +58,8 @@ abstract class BaseModel {
     isClean
   }
 
-  /*
-  Returns core JSON attributes that every model should have
+  /**
+   * Returns core JSON attributes that every model should have
    */
   protected def coreJsonAttrs = JsObject(Map(
     C.Base.ID -> {id match {
@@ -74,10 +78,9 @@ abstract class BaseModel {
     }}
   ).toSeq)
 
-  /*
-    Return this type of object, but with core attributes
-    present, parsed from the passed in JSON object
-    (if the values are present)
+  /**
+   * Return this type of object, but with core attributes
+   * present, parsed from the passed in JSON object (if the values are present)
    */
   protected def withCoreAttr(json: JsValue): this.type  = {
     val isoCreatedAt = (json \ C.Base.CREATED_AT).asOpt[String]

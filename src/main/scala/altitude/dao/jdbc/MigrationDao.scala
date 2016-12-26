@@ -8,6 +8,11 @@ import org.slf4j.LoggerFactory
 class MigrationDao(app: Altitude) extends altitude.dao.MigrationDao(app) {
   private final val log = LoggerFactory.getLogger(getClass)
 
+  /**
+   * Get current version of the schema
+   *
+   * @return The integer version
+   */
   override def currentVersion(implicit ctx: Context, txId: TransactionId = new TransactionId): Int = {
     val sql = s"SELECT version FROM $SYSTEM_TABLE"
     val version = try {
@@ -21,12 +26,18 @@ class MigrationDao(app: Altitude) extends altitude.dao.MigrationDao(app) {
     version
   }
 
+  /**
+   * Execute an arbitrary command
+   */
   override def executeCommand(command: String)(implicit ctx: Context, txId: TransactionId): Unit = {
     val stmt = conn.createStatement()
     stmt.executeUpdate(command)
     stmt.close()
   }
 
+  /**
+   * Up the schema version by one after completion
+   */
   override def versionUp()(implicit ctx: Context, txId: TransactionId): Unit = {
     log.info("VERSION UP")
     val runner: QueryRunner = new QueryRunner()

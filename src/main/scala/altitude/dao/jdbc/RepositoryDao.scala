@@ -9,6 +9,7 @@ import play.api.libs.json.JsObject
 abstract class RepositoryDao(val app: Altitude) extends BaseJdbcDao("repository") with altitude.dao.RepositoryDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
+  // this is the same as the base one - minus the repository ID, which is model does not have
   override protected val ONE_SQL = s"""
       SELECT $DEFAULT_SQL_COLS_FOR_SELECT
         FROM $tableName
@@ -49,5 +50,7 @@ abstract class RepositoryDao(val app: Altitude) extends BaseJdbcDao("repository"
     addRecord(jsonIn, sql, sqlVals)
   }
 
-  override protected def combineInsertValues(id: String, vals: List[Object])(implicit  ctx: Context) = id :: vals
+  // we do not use repository ID here
+  override protected def combineInsertValues(id: String, vals: List[Object])(implicit  ctx: Context) =
+    id :: vals
 }

@@ -5,7 +5,6 @@ import altitude.{Const => C}
 
 /*
 abstract class ImportProfileDao(val app: Altitude) extends BaseJdbcDao("import_profile") with altitude.dao.ImportProfileDao {
-  private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val model = ImportProfile(

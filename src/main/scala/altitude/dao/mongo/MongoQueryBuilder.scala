@@ -13,17 +13,16 @@ class MongoQueryBuilder(collection: MongoCollection) extends QueryParser {
   def toSelectCursor(query: Query)(implicit ctx: Context, txId: TransactionId): MongoCursor = {
     val folderIds: Set[String] = getFolderIds(query)
 
-    // filter out system parameters
     val params = getParams(query)
 
     val builder = MongoDBObject.newBuilder
     builder ++= params
 
+    // we always search within a repository
     builder += (C.Base.REPO_ID -> ctx.repo.id.get)
 
-    if (folderIds.nonEmpty) {
+    if (folderIds.nonEmpty)
       builder += ("folder_id" -> MongoDBObject("$in" -> folderIds))
-    }
 
     val mongoQuery: DBObject = builder.result()
 

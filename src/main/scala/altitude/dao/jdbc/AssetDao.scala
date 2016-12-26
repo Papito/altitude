@@ -6,9 +6,7 @@ import altitude.{Altitude, Const => C, Context}
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
 
-
 abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with altitude.dao.AssetDao {
-  private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val assetType = new AssetType(
@@ -35,9 +33,6 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
     // Postgres will reject this sequence with jsonb
     val metadata: String = asset.metadata.toString().replaceAll("\\\\u0000", "")
 
-    /*
-    Add the asset
-     */
     val sql = s"""
         INSERT INTO $tableName (
              $CORE_SQL_COLS_FOR_INSERT, ${C.Base.USER_ID}, ${C.Asset.PATH}, ${C.Asset.MD5},

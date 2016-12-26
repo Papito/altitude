@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
 abstract class FolderDao(val app: Altitude) extends BaseJdbcDao("folder") with altitude.dao.FolderDao {
-  private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val model = Folder(

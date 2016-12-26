@@ -76,10 +76,6 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   }
 
   override def deleteByQuery(q: Query)(implicit ctx: Context, txId: TransactionId): Int = {
-    if (q.params.isEmpty) {
-      throw new RuntimeException("Cannot delete [ALL] document with an empty Query")
-    }
-
     log.debug(s"Deleting record by query: $q")
     val fieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
 
@@ -235,10 +231,6 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
   override def updateByQuery(q: Query, json: JsObject, fields: List[String])
                             (implicit ctx: Context, txId: TransactionId): Int = {
-    if (q.params.isEmpty) {
-      throw new RuntimeException("Cannot update [ALL] documents with an empty Query")
-    }
-
     log.debug(s"Updating record by query $q with data $json for fields: $fields")
 
     val queryFieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList

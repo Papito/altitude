@@ -11,6 +11,7 @@ import play.api.libs.json.{JsObject, Json}
 abstract class UserMetadataFieldDao (val app: Altitude)
   extends BaseJdbcDao("metadata_field") with altitude.dao.UserMetadataFieldDao {
   private final val log = LoggerFactory.getLogger(getClass)
+
   private final val CONSTRAINT_VAL_TBL = "constraint_value"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
@@ -85,7 +86,7 @@ abstract class UserMetadataFieldDao (val app: Altitude)
     """
     val recs: List[Map[String, AnyRef]] = manyBySqlQuery(SQL, List(id))
 
-    val constraintValues: List[String] = recs.map{m =>
+    val constraintValues: List[String] = recs.map { m =>
       m.get(C.MetadataConstraintValue.CONSTRAINT_VALUE).get.asInstanceOf[String]
     }.sorted
 

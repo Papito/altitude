@@ -6,21 +6,22 @@ import com.mongodb.casbah.Imports._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, Json}
 
-class RepositoryDao(val app: Altitude) extends BaseMongoDao("repositories") with altitude.dao.RepositoryDao {
+class RepositoryDao(val app: Altitude)
+  extends BaseMongoDao("repositories") with altitude.dao.RepositoryDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting repository by ID '$id'", C.LogTag.DB)
 
-    val o: Option[DBObject] = COLLECTION.findOneByID(id)
+    val res: Option[DBObject] = COLLECTION.findOneByID(id)
 
-    log.debug(s"RETRIEVED object: $o", C.LogTag.DB)
+    log.debug(s"RETRIEVED object: $res", C.LogTag.DB)
 
-    o.isDefined match {
-      case false => None
-      case true =>
-        val json = Json.parse(o.get.toString).as[JsObject]
+    res match {
+      case Some(obj) =>
+        val json = Json.parse(obj.toString).as[JsObject]
         Some(fixMongoFields(json))
+      case None => None
     }
   }
 

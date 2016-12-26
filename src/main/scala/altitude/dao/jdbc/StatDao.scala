@@ -34,6 +34,11 @@ abstract class StatDao (val app: Altitude) extends BaseJdbcDao("stats") with alt
     jsonIn
   }
 
+  /**
+   * Increment a particular stat name, per repository
+   * @param statName the name of the stat
+   * @param count the value to increment by - CAN be negative
+   */
   def incrementStat(statName: String, count: Long = 1)
                    (implicit ctx: Context, txId: TransactionId): Unit = {
     val sql = s"""

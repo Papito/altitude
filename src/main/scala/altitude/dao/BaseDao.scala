@@ -44,10 +44,9 @@ trait BaseDao {
   /**
    * Delete one or more document by query.
    *
-   * @throws RuntimeException if attempting to delete all documents with an empty query
    * @return number of documents deleted
    */
-  def deleteByQuery(q: Query)(implicit ctx: Context, txId: TransactionId): Int
+  def deleteByQuery(query: Query)(implicit ctx: Context, txId: TransactionId): Int
 
   /**
    * Gert a single record by ID
@@ -93,11 +92,12 @@ trait BaseDao {
    *
    * @param id id of the document to be updated
    * @param data JSON data for the update document, which is NOT used to overwrite the existing one
-   * @param fields fields to be updated with new values, taken from "data"
+   * @param fields fields to be updated with new values, taken from <code>data</code>
    *
    * @return number of documents updated - 0 or 1
    */
-  def updateById(id: String, data: JsObject, fields: List[String])(implicit ctx: Context, txId: TransactionId): Int = {
+  def updateById(id: String, data: JsObject, fields: List[String])
+                (implicit ctx: Context, txId: TransactionId): Int = {
     val q: Query = Query(Map(C.Base.ID -> id))
     updateByQuery(q, data, fields)
   }
@@ -105,13 +105,13 @@ trait BaseDao {
   /**
    * Update multiple documents by query with select field values (does not overwrite the document)
    *
-   * @param q the query
-   * @param data JSON data for the update documents, which is NOT used to overwrite the existing one
-   * @param fields fields to be updated with new values, taken from "data"
+   * @param query the query to find the documents to update
+   * @param data JSON data for the update document, which is NOT used to overwrite the existing one
+   * @param fields fields to be updated with new values, taken from <code>data</code>
    *
-   * @return number of documents updated - 0 or 1
+   * @return number of documents updated
    */
-  def updateByQuery(q: Query, data: JsObject, fields: List[String])(implicit ctx: Context, txId: TransactionId): Int
+  def updateByQuery(query: Query, data: JsObject, fields: List[String])(implicit ctx: Context, txId: TransactionId): Int
 
   /**
    * Increment an integer field in a table by X
