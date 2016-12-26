@@ -24,7 +24,7 @@ class LibraryService(app: Altitude) {
   def add(obj: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
     log.info(s"\nAdding asset with MD5: ${obj.md5}\n")
 
-    if (app.service.folder.isRootFolder(Some(obj.folderId))) {
+    if (app.service.folder.isRootFolder(obj.folderId)) {
       throw new IllegalOperationException("Cannot have assets in root folder")
     }
 
@@ -221,7 +221,7 @@ class LibraryService(app: Altitude) {
       assetIds.foreach {assetId =>
 
         // cannot have assets in root folder - just other folders
-        if (app.service.folder.isRootFolder(Some(folderId))) {
+        if (app.service.folder.isRootFolder(folderId)) {
           throw new IllegalOperationException("Cannot move assets to root folder")
         }
 

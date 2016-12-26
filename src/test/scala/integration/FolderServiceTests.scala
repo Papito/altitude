@@ -195,7 +195,7 @@ import org.scalatest.Matchers._
   }
 
   test("delete sys folder") {
-    altitude.service.folder.getSystemFolders().foreach { sysFolder =>
+    altitude.service.folder.getSystemFolders.foreach { sysFolder =>
       intercept[IllegalOperationException] {
         altitude.service.folder.deleteById(sysFolder.id.get)
       }
@@ -203,7 +203,7 @@ import org.scalatest.Matchers._
   }
 
   test("add a child to a sys folder") {
-    altitude.service.folder.getSystemFolders().foreach { sysFolder =>
+    altitude.service.folder.getSystemFolders.foreach { sysFolder =>
       intercept[IllegalOperationException] {
         altitude.service.folder.addFolder(name = "folder1", parentId = sysFolder.id)
         }

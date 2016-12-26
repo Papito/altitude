@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory
  * the jurisdiction of the Library service - it does all the counter decrementin' and wrist slappin'
  */
 class AssetService(app: Altitude) extends BaseService[Asset](app) {
-  private final val log = LoggerFactory.getLogger(getClass)
   override protected val DAO = app.injector.instance[AssetDao]
 
   // NO

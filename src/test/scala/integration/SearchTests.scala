@@ -138,7 +138,7 @@ import org.scalatest.Matchers._
 
   test("pagination") {
     1 to 6 foreach { n =>
-      altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder()))
+      altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
     }
 
     val q = Query(rpp = 2, page = 1)

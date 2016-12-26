@@ -44,10 +44,10 @@ import org.scalatest.Matchers._
   }
 
   test("recycle asset") {
-    altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder()))
+    altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
 
     SET_USER_2()
-    altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder()))
+    altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
 
     SET_USER_1()
     altitude.service.asset.getAll.length shouldBe 2
@@ -95,7 +95,7 @@ import org.scalatest.Matchers._
 
     // fill up the hierarchy with assets x times over
     1 to 2 foreach {n =>
-      altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder()))
+      altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
       altitude.service.library.add(makeAsset(folder1))
       altitude.service.library.add(makeAsset(folder2))
       altitude.service.library.add(makeAsset(folder2_1))
@@ -135,7 +135,7 @@ import org.scalatest.Matchers._
   }
 
   test("move recycled asset to folder") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder()))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
     altitude.service.library.recycleAsset(asset.id.get)
 
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
@@ -162,7 +162,7 @@ import org.scalatest.Matchers._
 */
 
   test("restore recycled asset") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder()))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
     val trashed: Trash = altitude.service.library.recycleAsset(asset.id.get)
     altitude.service.library.restoreRecycledAsset(trashed.id.get)
     altitude.service.trash.getAll.length shouldBe 0
@@ -170,7 +170,7 @@ import org.scalatest.Matchers._
   }
 
   test("restore recycled asset to non-existing folder") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder()))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
     altitude.service.library.recycleAsset(asset.id.get)
 
     intercept[NotFoundException] {

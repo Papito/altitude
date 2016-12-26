@@ -49,7 +49,7 @@ abstract class MigrationService(app: Altitude) {
     implicit val ctx: Context = new Context(user = C.USER, repo = C.REPO)
 
     // user "uncategorized" folder node
-    val uncatFolder = app.service.folder.getUncatFolder()
+    val uncatFolder = app.service.folder.getUncatFolder
     app.service.folder.add(uncatFolder)
 
     app.service.stats.createStat(Stats.TOTAL_ASSETS)
