@@ -7,11 +7,11 @@ import play.api.libs.json.JsValue
 
 abstract class AbstractMetadataService {
 
-  /*
-  This structure defines how we construct the final metadata object.
-  Metadata can have a lot of fields that are related or identical -
-  this sets the priority for them, so we know which field to take
-  from source metadata, depending on availability.
+  /**
+   * This structure defines how we construct the final metadata object.
+   * Metadata can have a lot of fields that are related or identical -
+   * this sets the priority for them, so we know which field to take
+   * from source metadata, depending on availability.
    */
   val FIELD_BIBLE: Map[String, List[String]] = Map(
     /*
