@@ -1,6 +1,6 @@
 package altitude
 
-import altitude.models.{User, Repository}
+import altitude.models.{Repository, User}
 
 
 object Const {

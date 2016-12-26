@@ -1,8 +1,8 @@
 package integration.util.dao
 
+import altitude.Altitude
 import altitude.dao.BaseDao
 import altitude.transactions.TransactionId
-import altitude.{Altitude, Context}
 
 trait UtilitiesDao extends BaseDao {
   val app: Altitude

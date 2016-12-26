@@ -2,9 +2,8 @@ package altitude.controllers
 
 import java.io.{PrintWriter, StringWriter}
 
-import altitude.{Const => C}
 import altitude.models.User
-import altitude.{Context, SingleApplication, Util}
+import altitude.{Const => C, Context, SingleApplication, Util}
 import org.scalatra.InternalServerError
 import org.slf4j.{LoggerFactory, MDC}
 

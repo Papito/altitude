@@ -1,7 +1,6 @@
 package altitude
 
 import java.sql.DriverManager
-import net.codingwell.scalaguice.InjectorExtensions._
 
 import altitude.dao._
 import altitude.service._
@@ -9,6 +8,7 @@ import altitude.service.migration.{MongoMigrationService, PostgresMigrationServi
 import altitude.transactions._
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
+import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
 import org.slf4j.LoggerFactory
 

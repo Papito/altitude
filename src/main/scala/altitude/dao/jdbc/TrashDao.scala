@@ -4,7 +4,6 @@ import altitude.models.{AssetType, Trash}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
 import org.joda.time.DateTime
-import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
 abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with altitude.dao.TrashDao {

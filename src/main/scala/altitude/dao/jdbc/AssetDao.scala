@@ -3,7 +3,6 @@ package altitude.dao.jdbc
 import altitude.models.{Asset, AssetType}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
-import org.slf4j.LoggerFactory
 import play.api.libs.json._
 
 abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with altitude.dao.AssetDao {

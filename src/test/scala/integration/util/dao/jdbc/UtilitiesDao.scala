@@ -1,8 +1,8 @@
 package integration.util.dao.jdbc
 
+import altitude.Altitude
 import altitude.dao.jdbc.VoidJdbcDao
 import altitude.transactions.TransactionId
-import altitude.{Altitude, Context}
 
 class UtilitiesDao(app: Altitude) extends VoidJdbcDao(app) with integration.util.dao.UtilitiesDao {
 

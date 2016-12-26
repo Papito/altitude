@@ -1,8 +1,8 @@
 package integration.util.dao.mongo
 
+import altitude.Altitude
 import altitude.dao.mongo.BaseMongoDao
 import altitude.transactions.TransactionId
-import altitude.{Altitude, Context}
 import integration.MongoSuite
 
 class UtilitiesDao(val app: Altitude) extends BaseMongoDao("") with integration.util.dao.UtilitiesDao {

@@ -2,7 +2,7 @@ package altitude.service
 
 import altitude.Validators.ModelDataValidator
 import altitude.dao.FolderDao
-import altitude.exceptions.{IllegalOperationException, ValidationException, DuplicateException, NotFoundException}
+import altitude.exceptions.{DuplicateException, IllegalOperationException, NotFoundException, ValidationException}
 import altitude.models.Folder
 import altitude.models.search.Query
 import altitude.transactions.TransactionId

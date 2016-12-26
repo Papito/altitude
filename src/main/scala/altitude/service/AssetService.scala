@@ -4,7 +4,6 @@ import altitude.Altitude
 import altitude.dao.AssetDao
 import altitude.models.Asset
 import net.codingwell.scalaguice.InjectorExtensions._
-import org.slf4j.LoggerFactory
 
 /**
  * This is a "dumb" service - meaning it delegates everything to to the base service implementation

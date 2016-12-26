@@ -6,7 +6,7 @@ import altitude.dao.BaseDao
 import altitude.exceptions.ConstraintException
 import altitude.models.BaseModel
 import altitude.models.search.{Query, QueryResult}
-import altitude.transactions.{TransactionId, JdbcTransactionManager}
+import altitude.transactions.{JdbcTransactionManager, TransactionId}
 import altitude.{Const => C, Context, Util}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.apache.commons.dbutils.QueryRunner

@@ -8,7 +8,7 @@ import javax.imageio.ImageIO
 import altitude.exceptions.{DuplicateException, FormatException, IllegalOperationException}
 import altitude.models._
 import altitude.models.search.{Query, QueryResult}
-import altitude.transactions.{TransactionId, AbstractTransactionManager}
+import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import altitude.{Altitude, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.imgscalr.Scalr

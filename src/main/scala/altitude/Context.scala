@@ -1,7 +1,6 @@
 package altitude
 
 import altitude.models.{Repository, User}
-import altitude.transactions.TransactionId
 
 /**
  * The Context is the object that is implicitly passed from the service layer

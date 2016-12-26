@@ -1,14 +1,13 @@
 package altitude.service.migration
 
 import altitude.dao.MigrationDao
-import altitude.models.{Repository, Stats, User}
-import altitude.transactions.{TransactionId, AbstractTransactionManager}
-import altitude.{Altitude, Context}
+import altitude.models.Stats
+import altitude.transactions.{AbstractTransactionManager, TransactionId}
+import altitude.{Altitude, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 
 import scala.io.Source
-import altitude.{Const => C, _}
 
 abstract class MigrationService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
