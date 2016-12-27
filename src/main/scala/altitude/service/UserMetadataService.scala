@@ -1,13 +1,13 @@
 package altitude.service
 
 import altitude.dao.{NotImplementedDao, UserMetadataFieldDao}
-import altitude.exceptions.{NotFoundException, ValidationException}
+import altitude.exceptions.{DuplicateException, NotFoundException, ValidationException}
 import altitude.models.{FieldType, UserMetadataField}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
-import play.api.libs.json.JsObject
+import play.api.libs.json.{JsString, JsObject}
 
 
 class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](app){
@@ -82,15 +82,20 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
       val field: UserMetadataField = fieldOpt.get
       log.info(s"Adding constraint value [$constraintValue] to field ${field.name}")
 
+      val existingConstraintValues = field.constraintList
+
       /* HERE:
-
           * clean (remove double spaces, tabs, and line breaks)
-          * validate
-          * make sure we don't already have the constraint
-          * lowercase
        */
+      val constraintValueLc = constraintValue.trim.toLowerCase
 
-      METADATA_FIELD_DAO.addConstraintValue(fieldId, constraintValue)
+      if (field.constraintList.isDefined && field.constraintList.get.contains(constraintValueLc)) {
+        // duplicate exception expects model json for both this object and the duplicate
+        val o = JsObject(Seq(C.MetadataConstraintValue.CONSTRAINT_VALUE -> JsString(constraintValueLc)))
+        throw new DuplicateException(o, o)
+      }
+
+      METADATA_FIELD_DAO.addConstraintValue(fieldId, constraintValueLc)
     }
   }
 

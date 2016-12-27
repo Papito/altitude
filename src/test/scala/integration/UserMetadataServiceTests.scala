@@ -1,12 +1,25 @@
 package integration
 
-import altitude.exceptions.ValidationException
+import altitude.exceptions.{DuplicateException, ValidationException}
 import altitude.models._
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
 @DoNotDiscover class UserMetadataServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 
+  test("constraint value constraints") {
+    val metadataField = altitude.service.userMetadata.addField(
+      UserMetadataField(
+        name = "fieldName",
+        fieldType = FieldType.NUMBER.toString))
+    altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "one")
+
+    intercept[DuplicateException] {
+      altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "ONE")
+    }
+  }
+
+/*
   test("add/delete constraint value") {
     val metadataField = altitude.service.userMetadata.addField(
       UserMetadataField(
@@ -103,4 +116,5 @@ import org.scalatest.Matchers._
           UserMetadataField(name = "fieldName", fieldType = "SO_INVALID"))
       }
   }
+*/
 }
