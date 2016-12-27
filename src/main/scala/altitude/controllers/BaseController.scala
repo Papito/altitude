@@ -56,5 +56,4 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
       log.error(s"Exception ${sw.toString}")
       InternalServerError(sw.toString)
   }
-
 }

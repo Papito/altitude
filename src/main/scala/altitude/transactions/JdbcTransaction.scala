@@ -5,7 +5,7 @@ import java.sql.Connection
 import altitude.{Const => C}
 import org.slf4j.LoggerFactory
 
-class JdbcTransaction(private val conn: Connection) extends Transaction {
+class JdbcTransaction(private val conn: Connection, val isReadOnly: Boolean) extends Transaction {
   private final val log = LoggerFactory.getLogger(getClass)
 
   log.debug(s"New JDBC transaction $id", C.LogTag.DB)

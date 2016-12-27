@@ -2,6 +2,7 @@ package altitude.transactions
 
 trait Transaction {
   val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
+  val isReadOnly: Boolean
   var _level: Int  = 0
   def level = _level
   def isNested: Boolean = level > 0

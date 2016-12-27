@@ -61,7 +61,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     // get a connection and a new transaction, read-only if so requested
     val conn: Connection = connection(readOnly)
 
-    val tx: JdbcTransaction = new JdbcTransaction(conn)
+    val tx: JdbcTransaction = new JdbcTransaction(conn, readOnly)
 
     // add this to our transaction registry
     txRegistry += (tx.id -> tx)
@@ -114,6 +114,10 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
   override def withTransaction[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
     log.debug("WRITE transaction")
     val tx = transaction(readOnly = false)
+
+    if (tx.isReadOnly) {
+      throw new IllegalStateException("The parent for this transaction is read-only!")
+    }
 
     try {
       lock(tx) // this is a no-op for a "real" database
