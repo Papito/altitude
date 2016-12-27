@@ -131,7 +131,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
       tx.down()
 
       // commit exiting transactions
-      if (!tx.isNested) {
+      if (tx.mustCommit) {
         log.debug(s"End: ${tx.id}", C.LogTag.DB)
         log.info(s"COMMITTING ${tx.id}", C.LogTag.DB)
         tx.commit()
@@ -148,7 +148,7 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     }
     finally {
       // clean up, if we are done with this transaction
-      if (!tx.isNested) {
+      if (!tx.hasParents) {
         log.debug(s"Closing: ${tx.id}", C.LogTag.DB)
         closeTransaction(tx)
         transactions.CLOSED += 1
@@ -163,21 +163,19 @@ class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManag
     val tx = transaction(readOnly = true)
 
     try {
-      // we have to keep track of TX level as this may still be within a write transaction
-      tx.up()
-      val res: A = f
-      tx.down()
-
-      res
+      tx.up()  // level up - any new transactions within will be "nested" and use the same connection
+      f
     }
     catch {
       case ex: Exception =>
-        tx.down()
         log.error(s"Error (${ex.getClass.getName}): ${ex.getMessage}")
         throw ex
     }
     finally {
-      if (!tx.isNested) {
+      // unlike write transactions, we can level down here, as we are not committing read-only connections
+      tx.down()
+
+      if (!tx.hasParents) {
         log.debug(s"End: ${tx.id}", C.LogTag.DB)
         log.debug(s"Closing: ${tx.id}", C.LogTag.DB)
         closeTransaction(tx)

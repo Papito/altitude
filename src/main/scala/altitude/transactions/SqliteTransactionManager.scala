@@ -34,7 +34,7 @@ class SqliteTransactionManager(app: Altitude)
   }
 
   override def lock(tx: Transaction): Unit = {
-    if (tx.isNested) {
+    if (tx.hasParents) {
       // already inside a transaction
       return
     }
@@ -44,7 +44,7 @@ class SqliteTransactionManager(app: Altitude)
   }
 
   override def unlock(tx: Transaction): Unit = {
-    if (tx.isNested) {
+    if (tx.hasParents) {
       // already inside a transaction
       return
     }
