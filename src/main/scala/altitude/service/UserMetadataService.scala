@@ -82,14 +82,13 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
       val field: UserMetadataField = fieldOpt.get
       log.info(s"Adding constraint value [$constraintValue] to field ${field.name}")
 
-      val existingConstraintValues = field.constraintList
-
       /* HERE:
           * clean (remove double spaces, tabs, and line breaks)
        */
+      val existingConstraintValues = field.constraintList.getOrElse(List[String]())
       val constraintValueLc = constraintValue.trim.toLowerCase
 
-      if (field.constraintList.isDefined && field.constraintList.get.contains(constraintValueLc)) {
+      if (existingConstraintValues.contains(constraintValueLc)) {
         // duplicate exception expects model json for both this object and the duplicate
         val o = JsObject(Seq(C.MetadataConstraintValue.CONSTRAINT_VALUE -> JsString(constraintValueLc)))
         throw new DuplicateException(o, o)
