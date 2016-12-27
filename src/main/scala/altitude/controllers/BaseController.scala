@@ -2,7 +2,7 @@ package altitude.controllers
 
 import java.io.{PrintWriter, StringWriter}
 
-import altitude.models.User
+import altitude.models.{Repository, User}
 import altitude.{Const => C, Context, SingleApplication, Util}
 import org.scalatra.InternalServerError
 import org.slf4j.{LoggerFactory, MDC}
@@ -12,23 +12,11 @@ import scala.compat.Platform
 abstract class BaseController extends AltitudeStack with SingleApplication {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  error {
-    case ex: Exception => {
-      ex.printStackTrace()
-      val sw: StringWriter = new StringWriter()
-      val pw: PrintWriter = new PrintWriter(sw)
-      ex.printStackTrace(pw)
-      log.error(s"Exception ${sw.toString}")
-      InternalServerError(sw.toString)
-    }
-  }
+  final def user = request.getAttribute("user").asInstanceOf[User]
 
-  def user = if (request.contains("user"))
-    request.getAttribute("user").asInstanceOf[User]
-  else
-    throw new RuntimeException("User was not set for this request")
+  final def repository = request.getAttribute("repository").asInstanceOf[Repository]
 
-  implicit def context: Context = new Context(repo = C.REPO, user = user)
+  implicit lazy val context = new Context(repo = repository, user = user)
 
   before() {
     val requestId = Util.randomStr(size = 6)
@@ -54,9 +42,19 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
   }
 
   protected def setUser() = {
-    val user = C.USER
-
-    request.setAttribute("user", user)
-    MDC.put("USER", s"[${user.toString}]")
+    request.setAttribute("user", C.USER)
+    MDC.put("USER", s"[${C.USER.toString}]")
+    request.setAttribute("repository", C.REPO)
   }
+
+  error {
+    case ex: Exception =>
+      ex.printStackTrace()
+      val sw: StringWriter = new StringWriter()
+      val pw: PrintWriter = new PrintWriter(sw)
+      ex.printStackTrace(pw)
+      log.error(s"Exception ${sw.toString}")
+      InternalServerError(sw.toString)
+  }
+
 }
