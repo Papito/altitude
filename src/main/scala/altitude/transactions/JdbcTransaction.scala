@@ -5,6 +5,14 @@ import java.sql.{SQLException, Connection}
 import altitude.{Const => C}
 import org.slf4j.LoggerFactory
 
+/**
+ * JDBC transaction object. It is important to note that most/all methods here should NOT THROW.
+ * We assume the methods on the connection are called within catch/finally blocks, and therefore
+ * we should let those methods finish.
+ *
+ * @param conn the connection
+ * @param isReadOnly is this connection read-only?
+ */
 class JdbcTransaction(private val conn: Connection, val isReadOnly: Boolean) extends Transaction {
   private final val log = LoggerFactory.getLogger(getClass)
 
@@ -17,7 +25,8 @@ class JdbcTransaction(private val conn: Connection, val isReadOnly: Boolean) ext
         conn.close()
       }
       catch {
-        case e: SQLException => log.error(s"Error closing connection for transaction [$id]")
+        case e: SQLException => log.error(s"SQL ERROR closing connection for transaction [$id]: $e")
+        case e: Exception => log.error(s"ERROR closing connection for transaction [$id]: $e")
       }
     }
   }
@@ -28,7 +37,8 @@ class JdbcTransaction(private val conn: Connection, val isReadOnly: Boolean) ext
         conn.commit()
       }
       catch {
-        case e: SQLException => log.error(s"Error committing connection for transaction [$id]")
+        case e: SQLException => log.error(s"SQL ERROR committing connection for transaction [$id]: $e")
+        case e: Exception => log.error(s"ERROR committing connection for transaction [$id]: $e")
       }
     }
   }
@@ -40,7 +50,8 @@ class JdbcTransaction(private val conn: Connection, val isReadOnly: Boolean) ext
         conn.rollback()
       }
       catch {
-        case e: SQLException => log.error(s"Error rolling back connection for transaction [$id]")
+        case e: SQLException => log.error(s"SQL ERROR rolling back connection for transaction [$id]: $e")
+        case e: Exception => log.error(s"ERROR rolling back connection for transaction [$id]: $e")
       }
     }
   }
