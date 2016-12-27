@@ -6,36 +6,6 @@ import java.util.Properties
 import altitude.{Altitude, Const => C}
 import org.slf4j.LoggerFactory
 
-/**
- * The transaction manager, created for each specific type of database, and if supported,
- * ensures that a particular block of service code is atomically committed after
- * it exits successfully, or rolled back on failure (or forced to do so during testing)
- *
- * For example:
- *
- * <code>
- * withTransaction[T] {
- *
- * } // commit after done, if outside of scope of other transactions
- * </code>
- *
- * <code>
- * asReadOnly[T] {
- *
- * } // do not commit, but respect the scope of outside transactions
- * </code>
- *
- * The scope is important, a write transaction that is nested within another write transaction
- * will NOT commit. Only the ourside withTransaction{} block can commit, and so the caller
- * that initiates the transaction first is the only one who can commit it.
- *
- * <code>
- * withTransaction[T] {
- *   withTransaction[T] {
- *   } // will NOT commit
- * } // WILL commit
- * </code>
- */
 class JdbcTransactionManager(val app: Altitude) extends AbstractTransactionManager {
   private final val log = LoggerFactory.getLogger(getClass)
 
