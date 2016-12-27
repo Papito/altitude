@@ -10,7 +10,6 @@ import org.scalatest.Matchers._
   test("add/delete constraint value") {
     val metadataField = altitude.service.userMetadata.addField(
       UserMetadataField(
-        repoId = ctx.repo.id.get,
         name = "fieldName",
         fieldType = FieldType.NUMBER.toString))
 
@@ -44,7 +43,6 @@ import org.scalatest.Matchers._
   test("delete field") {
     val metadataField = altitude.service.userMetadata.addField(
       UserMetadataField(
-        repoId = ctx.repo.id.get,
         name = "fieldName",
         fieldType = FieldType.STRING.toString,
         constraintList = Some(List("one", "two", "three"))))
@@ -57,7 +55,6 @@ import org.scalatest.Matchers._
   test("add/get constraint list") {
     val metadataField = altitude.service.userMetadata.addField(
       UserMetadataField(
-        repoId = ctx.repo.id.get,
         name = "field name",
         fieldType = FieldType.STRING.toString,
         constraintList = Some(List("one", "two", "three"))))
@@ -78,20 +75,20 @@ import org.scalatest.Matchers._
 
   test("add/get fields") {
     val metadataField = altitude.service.userMetadata.addField(
-      UserMetadataField(repoId = ctx.repo.id.get, name = "field name", fieldType = FieldType.STRING.toString))
+      UserMetadataField(name = "field name", fieldType = FieldType.STRING.toString))
 
     altitude.service.userMetadata.getFieldById(metadataField.id.get) should not be None
   }
 
   test("get all fields") {
     altitude.service.userMetadata.addField(
-      UserMetadataField(repoId = ctx.repo.id.get, name = "field name 1", fieldType = FieldType.STRING.toString))
+      UserMetadataField(name = "field name 1", fieldType = FieldType.STRING.toString))
     altitude.service.userMetadata.addField(
-      UserMetadataField(repoId = ctx.repo.id.get, name = "field name 2", fieldType = FieldType.STRING.toString))
+      UserMetadataField(name = "field name 2", fieldType = FieldType.STRING.toString))
 
     SET_SECONDARY_USER()
     altitude.service.userMetadata.addField(
-      UserMetadataField(repoId = ctx.repo.id.get, name = "field name 3", fieldType = FieldType.STRING.toString))
+      UserMetadataField(name = "field name 3", fieldType = FieldType.STRING.toString))
 
     SET_PRIMARY_USER()
     altitude.service.userMetadata.getAllFields.length shouldBe 3
@@ -103,7 +100,7 @@ import org.scalatest.Matchers._
   test("add invalid field type") {
     intercept[ValidationException] {
         altitude.service.userMetadata.addField(
-          UserMetadataField(repoId = ctx.repo.id.get, name = "fieldName", fieldType = "SO_INVALID"))
+          UserMetadataField(name = "fieldName", fieldType = "SO_INVALID"))
       }
   }
 }

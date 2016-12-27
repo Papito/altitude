@@ -10,7 +10,6 @@ object Asset {
   implicit def fromJson(json: JsValue): Asset = Asset(
     id = (json \ C.Base.ID).asOpt[String],
     userId = (json \ C.Base.USER_ID).as[String],
-    repoId = (json \ C.Base.REPO_ID).as[String],
     assetType = json \ C.Asset.ASSET_TYPE,
     path = (json \ C.Asset.PATH).as[String],
     folderId = (json \ C.Asset.FOLDER_ID).as[String],
@@ -22,7 +21,6 @@ object Asset {
 
 case class Asset(id: Option[String] = None,
                  userId: String,
-                 repoId: String,
                  assetType: AssetType,
                  path: String,
                  md5: String,
@@ -35,7 +33,6 @@ case class Asset(id: Option[String] = None,
 
   override def toJson = Json.obj(
     C.Base.USER_ID -> userId,
-    C.Base.REPO_ID -> repoId,
     C.Asset.PATH -> path,
     C.Asset.FOLDER_ID -> folderId,
     C.Asset.MD5 -> md5,

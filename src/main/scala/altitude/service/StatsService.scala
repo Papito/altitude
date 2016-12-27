@@ -33,7 +33,7 @@ class StatsService(app: Altitude){
   def createStat(dimension: String)
                 (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
     txManager.withTransaction {
-      val stat = Stat(ctx.repo.id.get, dimension, 0)
+      val stat = Stat(dimension, 0)
       DAO.add(stat)
     }
   }

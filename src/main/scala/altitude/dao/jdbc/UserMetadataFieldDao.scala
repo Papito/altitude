@@ -19,7 +19,6 @@ abstract class UserMetadataFieldDao (val app: Altitude)
 
     val model = UserMetadataField(
       id = Some(rec.get(C.Base.ID).get.asInstanceOf[String]),
-      repoId = rec.get(C.Base.REPO_ID).get.asInstanceOf[String],
       name = rec.get(C.MetadataField.NAME).get.asInstanceOf[String],
       fieldType = rec.get(C.MetadataField.FIELD_TYPE).get.asInstanceOf[String],
       maxLength =  if (maxLength.isDefined) Some(rec.get(C.MetadataField.MAX_LENGTH).get.asInstanceOf[Int]) else None,

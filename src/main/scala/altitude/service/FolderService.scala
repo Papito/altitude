@@ -58,7 +58,6 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
                   (implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
 
     val folder = Folder(
-      repoId = ctx.repo.id.get,
       name = name,
       parentId = if (parentId.isDefined) parentId.get else ctx.repo.rootFolderId)
 
@@ -79,7 +78,6 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
    */
   def getRootFolder(implicit ctx: Context, txId: TransactionId = new TransactionId) = Folder(
     id = Some(ctx.repo.rootFolderId),
-    repoId = ctx.repo.id.get,
     parentId = ctx.repo.rootFolderId,
     name = C.Folder.Names.ROOT
   )
@@ -89,7 +87,6 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
    */
   def getUncatFolder(implicit ctx: Context, txId: TransactionId = new TransactionId) = Folder(
     id = Some(ctx.repo.uncatFolderId),
-    repoId = ctx.repo.id.get,
     parentId = ctx.repo.rootFolderId,
     name = C.Folder.Names.UNCATEGORIZED
   )
@@ -260,7 +257,6 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
 
       Folder(
         id = Some(id),
-        repoId = ctx.repo.id.get,
         name = name,
         parentId = parentId,
         children = this.children(id, nonSysFolders),
@@ -403,7 +399,6 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
         C.Folder.NAME_LC -> folderBeingMoved.nameLowercase))
 
       val folderForUpdate = Folder(
-        repoId = ctx.repo.id.get,
         parentId = destFolderId,
         name = folderBeingMoved.name)
 
@@ -432,7 +427,6 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
 
       try {
         val folderForUpdate = Folder(
-          repoId = ctx.repo.id.get,
           parentId = folder.parentId,
           name = newName)
 

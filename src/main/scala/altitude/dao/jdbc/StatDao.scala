@@ -11,7 +11,6 @@ abstract class StatDao (val app: Altitude) extends BaseJdbcDao("stats") with alt
   private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = Stat(
-    rec.get(C.Base.REPO_ID).get.asInstanceOf[String],
     rec.get(C.Stat.DIMENSION).get.asInstanceOf[String],
     rec.get(C.Stat.DIM_VAL).get.asInstanceOf[Int])
 

@@ -16,7 +16,6 @@ import org.scalatest.Matchers._
     val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
     val asset = new Asset(
       userId = currentUser.id.get,
-      repoId = ctx.repo.id.get,
       assetType = mediaType,
       path = "path",
       md5 = "md5",
@@ -32,7 +31,6 @@ import org.scalatest.Matchers._
     val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
     val asset = new Asset(
       userId = currentUser.id.get,
-      repoId = ctx.repo.id.get,
       assetType = mediaType,
       path = "path",
       md5 = "md5",
@@ -65,7 +63,6 @@ import org.scalatest.Matchers._
 
     altitude.service.asset.add(new Asset(
       folderId = folder1_1.id.get.toString,
-      repoId = ctx.repo.id.get,
       userId = currentUser.id.get,
       assetType = mediaType,
       path = Util.randomStr(30),
@@ -75,7 +72,6 @@ import org.scalatest.Matchers._
     altitude.service.asset.add(new Asset(
       folderId = folder1_2.id.get.toString,
       userId = currentUser.id.get,
-      repoId = ctx.repo.id.get,
       assetType = mediaType,
       path = Util.randomStr(30),
       md5 = Util.randomStr(32),
@@ -84,7 +80,6 @@ import org.scalatest.Matchers._
     altitude.service.asset.add(new Asset(
       folderId = folder1.id.get.toString,
       userId = currentUser.id.get,
-      repoId = ctx.repo.id.get,
       assetType = mediaType,
       path = Util.randomStr(30),
       md5 = Util.randomStr(32),

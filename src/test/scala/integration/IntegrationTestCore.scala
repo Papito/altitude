@@ -99,7 +99,6 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
    */
   protected def makeAsset(folder: Folder) = Asset(
     userId = currentUser.id.get,
-    repoId = ctx.repo.id.get,
     folderId = folder.id.get,
     assetType = new AssetType(
       mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime"),

@@ -11,7 +11,6 @@ object Folder {
 
     Folder(
       id = (json \ C.Base.ID).asOpt[String],
-      repoId = (json \ C.Base.REPO_ID).as[String],
       name = (json \ C.Folder.NAME).as[String],
       children = childrenJson.map(Folder.fromJson),
       parentId = (json \ C.Folder.PARENT_ID).as[String],
@@ -21,7 +20,6 @@ object Folder {
 }
 
 case class Folder(id: Option[String] = None,
-                  repoId: String,
                   parentId: String,
                   name: String,
                   children: List[Folder] = List(),
@@ -32,7 +30,6 @@ case class Folder(id: Option[String] = None,
   override def toJson = {
     val childrenJson: List[JsValue] = children.map(_.toJson)
     Json.obj(
-      C.Base.REPO_ID -> repoId,
       C.Folder.NAME -> name,
       C.Folder.NAME_LC -> nameLowercase,
       C.Folder.PARENT_ID -> parentId,
