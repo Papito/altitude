@@ -89,14 +89,14 @@ import org.scalatest.Matchers._
     altitude.service.userMetadata.addField(
       UserMetadataField(repoId = ctx.repo.id.get, name = "field name 2", fieldType = FieldType.STRING.toString))
 
-    SET_USER_2()
+    SET_SECONDARY_USER()
     altitude.service.userMetadata.addField(
       UserMetadataField(repoId = ctx.repo.id.get, name = "field name 3", fieldType = FieldType.STRING.toString))
 
-    SET_USER_1()
+    SET_PRIMARY_USER()
     altitude.service.userMetadata.getAllFields.length shouldBe 3
 
-    SET_USER_2()
+    SET_SECONDARY_USER()
     altitude.service.userMetadata.getAllFields.length shouldBe 3
   }
 

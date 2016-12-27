@@ -46,10 +46,10 @@ import org.scalatest.Matchers._
   test("recycle asset") {
     altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
 
-    SET_USER_2()
+    SET_SECONDARY_USER()
     altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
 
-    SET_USER_1()
+    SET_PRIMARY_USER()
     altitude.service.asset.getAll.length shouldBe 2
 
     val asset: Asset = altitude.service.asset.getAll.head

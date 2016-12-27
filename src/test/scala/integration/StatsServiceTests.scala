@@ -79,11 +79,11 @@ import org.scalatest.Matchers._
     val trashed: Trash = altitude.service.library.recycleAsset(asset.id.get)
     altitude.service.library.restoreRecycledAsset(trashed.id.get)
 
-    SET_USER_2()
+    SET_SECONDARY_USER()
     altitude.service.library.add(makeAsset(
       altitude.service.folder.getUncatFolder))
 
-    SET_USER_1()
+    SET_PRIMARY_USER()
 
     val stats = altitude.service.stats.getStats
     stats.getStatValue(Stats.TOTAL_ASSETS) should be (2)

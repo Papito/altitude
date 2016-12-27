@@ -11,8 +11,7 @@ object PostgresSuite {
   val app = new Altitude(Map("datasource" -> "postgres"))
 }
 
-class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres"))
-  with BeforeAndAfterAll {
+class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres")) with BeforeAndAfterAll {
   Environment.ENV = Environment.TEST
   val log =  LoggerFactory.getLogger(getClass)
 
@@ -45,5 +44,5 @@ class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres"))
 
     PostgresSuite.app.service.migration.migrate()
     log.info("END SETUP")
- }
+  }
 }

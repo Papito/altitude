@@ -11,7 +11,6 @@ object SqliteSuite {
 }
 
 class SqliteSuite extends AllTests(config = Map("datasource" -> "sqlite")) with BeforeAndAfterAll {
-
   Environment.ENV = Environment.TEST
   val log =  LoggerFactory.getLogger(getClass)
 
@@ -23,11 +22,11 @@ class SqliteSuite extends AllTests(config = Map("datasource" -> "sqlite")) with 
     log.info("Clearing sqlite database")
     val sql =
       """
-        |PRAGMA writable_schema = 1;
-        |delete from sqlite_master where type in ('table', 'index', 'trigger');
-        |PRAGMA writable_schema = 0;
-        |VACUUM;
-        |PRAGMA INTEGRITY_CHECK;
+        PRAGMA writable_schema = 1;
+        delete from sqlite_master where type in ('table', 'index', 'trigger');
+        PRAGMA writable_schema = 0;
+        VACUUM;
+        PRAGMA INTEGRITY_CHECK;
       """.stripMargin
 
     val conn = DriverManager.getConnection(url)
