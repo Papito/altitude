@@ -49,43 +49,43 @@ import org.scalatest.Matchers._
 */
 
     test("delete field") {
-      val metadataField = altitude.service.userMetadata.addField(
+      val metadataField = altitude.service.metadata.addField(
         MetadataField(
           name = "fieldName",
           fieldType = FieldType.STRING.toString))
 
-      altitude.service.userMetadata.getAllFields.length shouldBe 1
-      altitude.service.userMetadata.deleteFieldById(metadataField.id.get)
-      altitude.service.userMetadata.getAllFields shouldBe empty
+      altitude.service.metadata.getAllFields.length shouldBe 1
+      altitude.service.metadata.deleteFieldById(metadataField.id.get)
+      altitude.service.metadata.getAllFields shouldBe empty
     }
 
     test("add/get fields") {
-      val metadataField = altitude.service.userMetadata.addField(
+      val metadataField = altitude.service.metadata.addField(
         MetadataField(name = "field name", fieldType = FieldType.STRING.toString))
 
-      altitude.service.userMetadata.getFieldById(metadataField.id.get) should not be None
+      altitude.service.metadata.getFieldById(metadataField.id.get) should not be None
     }
 
     test("get all fields") {
-      altitude.service.userMetadata.addField(
+      altitude.service.metadata.addField(
         MetadataField(name = "field name 1", fieldType = FieldType.STRING.toString))
-      altitude.service.userMetadata.addField(
+      altitude.service.metadata.addField(
         MetadataField(name = "field name 2", fieldType = FieldType.STRING.toString))
 
       SET_SECONDARY_USER()
-      altitude.service.userMetadata.addField(
+      altitude.service.metadata.addField(
         MetadataField(name = "field name 3", fieldType = FieldType.STRING.toString))
 
       SET_PRIMARY_USER()
-      altitude.service.userMetadata.getAllFields.length shouldBe 3
+      altitude.service.metadata.getAllFields.length shouldBe 3
 
       SET_SECONDARY_USER()
-      altitude.service.userMetadata.getAllFields.length shouldBe 3
+      altitude.service.metadata.getAllFields.length shouldBe 3
     }
 
     test("add invalid field type") {
       intercept[ValidationException] {
-          altitude.service.userMetadata.addField(
+          altitude.service.metadata.addField(
             MetadataField(name = "fieldName", fieldType = "SO_INVALID"))
         }
     }

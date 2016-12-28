@@ -36,7 +36,7 @@ class FileImportService(app: Altitude) {
       val url: java.net.URL = importAsset.file.toURI.toURL
       val metadata: TikaMetadata = new TikaMetadata
       inputStream = Some(TikaInputStream.get(url, metadata))
-      app.service.metadata.detectAssetTypeFromStream(inputStream.get)
+      app.service.metadataExtractor.detectAssetTypeFromStream(inputStream.get)
     }
     finally {
       if (inputStream.isDefined) inputStream.get.close()
@@ -55,7 +55,7 @@ class FileImportService(app: Altitude) {
 
     var metadataParserException: Option[Exception] = None
     val metadata: JsValue = try {
-      app.service.metadata.extract(fileAsset, assetType)
+      app.service.metadataExtractor.extract(fileAsset, assetType)
     }
     catch {
       case ex: Exception => {

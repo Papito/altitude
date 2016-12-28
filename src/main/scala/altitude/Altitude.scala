@@ -52,8 +52,8 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
   object service {
     val repository = new RepositoryService(app)
     val fileImport = new FileImportService(app)
-    val metadata = new TikaMetadataExtractionService
-    val userMetadata = new MetadataService(app)
+    val metadataExtractor = new TikaMetadataExtractionService
+    val metadata = new MetadataService(app)
     val library = new LibraryService(app)
     val asset = new AssetService(app)
     val trash = new TrashService(app)

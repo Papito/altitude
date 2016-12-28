@@ -41,7 +41,7 @@ import play.api.libs.json.JsValue
     val path = getClass.getResource(s"../import/$p").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
     val mediaType = altitude.service.fileImport.detectAssetType(fileImportAsset)
-    altitude.service.metadata.extract(fileImportAsset, mediaType)
+    altitude.service.metadataExtractor.extract(fileImportAsset, mediaType)
   }
 
 }
