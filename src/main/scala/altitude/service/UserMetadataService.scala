@@ -93,6 +93,16 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
         throw ex
       }
 
+      // check that the value respects max length setting, if the setting is defined
+      field.maxLength match {
+        case Some(maxLen) if trimmedValue.length > maxLen =>
+          val ex = ValidationException()
+          val msg = C.Msg.Err.VALUE_TOO_LONG.format(maxLen)
+          ex.errors += (C.MetadataConstraintValue.CONSTRAINT_VALUE -> msg)
+          throw ex
+        case _ =>
+      }
+
       // check for duplicates
       val existingConstraintValues = field.constraintList.getOrElse(List[String]())
 

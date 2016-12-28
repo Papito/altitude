@@ -169,6 +169,7 @@ object Const {
 
     object Err {
       val CANNOT_BE_EMPTY = "This field cannot be empty"
+      val VALUE_TOO_LONG = "The value cannot be more than %s characters long"
       val VALIDATION_ERROR = "Validation error"
       val VALIDATION_ERRORS = "There are validation errors in: %s"
       val WRONG_TYPE = "This field does not match the required type (%s)"

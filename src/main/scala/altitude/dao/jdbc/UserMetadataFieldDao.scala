@@ -15,13 +15,13 @@ abstract class UserMetadataFieldDao (val app: Altitude)
   private final val CONSTRAINT_VAL_TBL = "constraint_value"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
-    val maxLength = rec.get(C.MetadataField.MAX_LENGTH)
+    val maxLength = rec.get(C.MetadataField.MAX_LENGTH).get
 
     val model = UserMetadataField(
       id = Some(rec.get(C.Base.ID).get.asInstanceOf[String]),
       name = rec.get(C.MetadataField.NAME).get.asInstanceOf[String],
       fieldType = rec.get(C.MetadataField.FIELD_TYPE).get.asInstanceOf[String],
-      maxLength =  if (maxLength.isDefined) Some(rec.get(C.MetadataField.MAX_LENGTH).get.asInstanceOf[Int]) else None,
+      maxLength =  if (maxLength != null) Some(maxLength.asInstanceOf[Int]) else None,
       constraintList = None
     )
     addCoreAttrs(model, rec)

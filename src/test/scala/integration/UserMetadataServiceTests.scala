@@ -13,6 +13,8 @@ import org.scalatest.Matchers._
         name = "fieldName",
         fieldType = FieldType.NUMBER.toString))
 
+    metadataField.maxLength shouldNot contain(0)
+
     altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "one")
 
     // everything should be lowercased
@@ -20,7 +22,7 @@ import org.scalatest.Matchers._
       altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "ONE")
     }
 
-    // test for trimmed space characaters
+    // test for trimmed space characters
     altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "  Two     \t   Three  \n \t \r\n   Four ")
 
     // no empty values allowed
@@ -34,6 +36,9 @@ import org.scalatest.Matchers._
     updatedField.constraintList.get should contain("two three four")
   }
 
+  test("constraint value field rules") {
+
+  }
 /*
   test("add/delete constraint value") {
     val metadataField = altitude.service.userMetadata.addField(
