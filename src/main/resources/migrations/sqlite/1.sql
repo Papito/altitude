@@ -74,16 +74,6 @@ CREATE TABLE metadata_field (
 CREATE INDEX metadata_field_repo ON metadata_field(repository_id);
 CREATE UNIQUE INDEX metadata_field_name ON metadata_field(repository_id, name_lc);
 
-CREATE TABLE constraint_value (
-  repository_id char(24) NOT NULL,
-  field_id char(24) NOT NULL,
-  constraint_value TEXT NOT NULL,
-  created_at DATE DEFAULT (datetime('now', 'utc')),
-  updated_at DATE DEFAULT NULL
-);
-CREATE INDEX constraint_value_field_id ON constraint_value(repository_id, field_id);
-CREATE UNIQUE INDEX constraint_value_field_and_value ON constraint_value(field_id, constraint_value);
-
 CREATE TABLE metadata_field_value (
   repository_id char(24) NOT NULL,
   asset_id char(24) NOT NULL,
