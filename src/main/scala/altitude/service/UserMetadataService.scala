@@ -85,7 +85,7 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
       val constraintValueLc = constraintValue.trim.toLowerCase
 
       // trim spaces and replace any two or more adjacent spaces with one
-      val trimmedValue = constraintValueLc.trim.replaceAll("[\\s]{2,}", " ").trim
+      val trimmedValue = constraintValueLc.trim.replaceAll("[\\s]{2,}", " ")
 
       if (trimmedValue.isEmpty) {
         val ex = ValidationException()
@@ -93,7 +93,9 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
         throw ex
       }
 
+      // check for duplicates
       val existingConstraintValues = field.constraintList.getOrElse(List[String]())
+
       if (existingConstraintValues.contains(trimmedValue)) {
         // duplicate exception expects model json for both this object and the duplicate
         val o = JsObject(Seq(C.MetadataConstraintValue.CONSTRAINT_VALUE -> JsString(constraintValueLc)))
