@@ -11,9 +11,9 @@ object FieldType extends Enumeration {
   val FLAG = Value("FLAG")
 }
 
-object UserMetadataField {
-  implicit def fromJson(json: JsValue): UserMetadataField =
-    UserMetadataField(
+object MetadataField {
+  implicit def fromJson(json: JsValue): MetadataField =
+    MetadataField(
       id = (json \ C.Base.ID).asOpt[String],
       name = (json \ C.MetadataField.NAME).as[String],
       fieldType = (json \ C.MetadataField.FIELD_TYPE).as[String],
@@ -21,7 +21,7 @@ object UserMetadataField {
     ).withCoreAttr(json)
 }
 
-case class UserMetadataField(
+case class MetadataField(
                   id: Option[String] = None,
                   name: String,
                   fieldType: String,

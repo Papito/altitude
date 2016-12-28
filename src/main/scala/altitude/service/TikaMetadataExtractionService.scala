@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory
 import org.xml.sax.helpers.DefaultHandler
 import play.api.libs.json.{JsNull, JsValue, Json}
 
-class TikaMetadataService extends AbstractMetadataService {
+class TikaMetadataExtractionService extends MetadataExtractionService {
   val log =  LoggerFactory.getLogger(getClass)
 
   private object PARSERS {

@@ -5,7 +5,7 @@ import java.io.InputStream
 import altitude.models.{AssetType, FileImportAsset}
 import play.api.libs.json.JsValue
 
-abstract class AbstractMetadataService {
+abstract class MetadataExtractionService {
 
   /**
    * This structure defines how we construct the final metadata object.

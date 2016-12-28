@@ -1,8 +1,8 @@
 package altitude.service
 
-import altitude.dao.{NotImplementedDao, UserMetadataFieldDao}
+import altitude.dao.{NotImplementedDao, MetadataFieldDao}
 import altitude.exceptions.{DuplicateException, NotFoundException, ValidationException}
-import altitude.models.{FieldType, UserMetadataField}
+import altitude.models.{FieldType, MetadataField}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
@@ -10,15 +10,15 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsString, JsObject}
 
 
-class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](app){
+class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
   private final val log = LoggerFactory.getLogger(getClass)
-  protected val METADATA_FIELD_DAO = app.injector.instance[UserMetadataFieldDao]
+  protected val METADATA_FIELD_DAO = app.injector.instance[MetadataFieldDao]
   override protected val DAO = new NotImplementedDao(app)
 
-  def addField(metadataField: UserMetadataField)
-              (implicit ctx: Context, txId: TransactionId = new TransactionId): UserMetadataField = {
+  def addField(metadataField: MetadataField)
+              (implicit ctx: Context, txId: TransactionId = new TransactionId): MetadataField = {
 
-    txManager.withTransaction[UserMetadataField] {
+    txManager.withTransaction[MetadataField] {
       // verify that the field type is allowed
       if (!FieldType.values.exists(v => v.toString == metadataField.fieldType.toUpperCase)) {
         val ex = ValidationException()
@@ -40,9 +40,9 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
       fieldOpt match {
         case None => None
         case _ =>
-          val field: UserMetadataField = fieldOpt.get
+          val field: MetadataField = fieldOpt.get
 
-          val ret = UserMetadataField(
+          val ret = MetadataField(
             name = field.name,
             fieldType = field.fieldType,
             maxLength = field.maxLength)

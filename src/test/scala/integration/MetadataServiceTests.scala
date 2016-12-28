@@ -5,7 +5,7 @@ import altitude.models._
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
-@DoNotDiscover class UserMetadataServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
+@DoNotDiscover class MetadataServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 
 /*
     test("hygiene and validation") {
@@ -50,7 +50,7 @@ import org.scalatest.Matchers._
 
     test("delete field") {
       val metadataField = altitude.service.userMetadata.addField(
-        UserMetadataField(
+        MetadataField(
           name = "fieldName",
           fieldType = FieldType.STRING.toString))
 
@@ -61,20 +61,20 @@ import org.scalatest.Matchers._
 
     test("add/get fields") {
       val metadataField = altitude.service.userMetadata.addField(
-        UserMetadataField(name = "field name", fieldType = FieldType.STRING.toString))
+        MetadataField(name = "field name", fieldType = FieldType.STRING.toString))
 
       altitude.service.userMetadata.getFieldById(metadataField.id.get) should not be None
     }
 
     test("get all fields") {
       altitude.service.userMetadata.addField(
-        UserMetadataField(name = "field name 1", fieldType = FieldType.STRING.toString))
+        MetadataField(name = "field name 1", fieldType = FieldType.STRING.toString))
       altitude.service.userMetadata.addField(
-        UserMetadataField(name = "field name 2", fieldType = FieldType.STRING.toString))
+        MetadataField(name = "field name 2", fieldType = FieldType.STRING.toString))
 
       SET_SECONDARY_USER()
       altitude.service.userMetadata.addField(
-        UserMetadataField(name = "field name 3", fieldType = FieldType.STRING.toString))
+        MetadataField(name = "field name 3", fieldType = FieldType.STRING.toString))
 
       SET_PRIMARY_USER()
       altitude.service.userMetadata.getAllFields.length shouldBe 3
@@ -86,7 +86,7 @@ import org.scalatest.Matchers._
     test("add invalid field type") {
       intercept[ValidationException] {
           altitude.service.userMetadata.addField(
-            UserMetadataField(name = "fieldName", fieldType = "SO_INVALID"))
+            MetadataField(name = "fieldName", fieldType = "SO_INVALID"))
         }
     }
 }

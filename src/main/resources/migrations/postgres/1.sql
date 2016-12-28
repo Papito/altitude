@@ -75,8 +75,10 @@ CREATE UNIQUE INDEX metadata_field_name ON metadata_field(repository_id, name_lc
 
 CREATE TABLE metadata_field_value (
   repository_id char(24) NOT NULL,
+  asset_id char(24) NOT NULL,
   field_id char(24) NOT NULL,
-  field_value TEXT NOT NULL
+  field_value TEXT NOT NULL,
+  field_value_lc TEXT NOT NULL
 ) INHERITS (_core);
 CREATE INDEX field_value_field_id_asset_id ON metadata_field_value(repository_id, asset_id, field_id);
 CREATE UNIQUE INDEX field_value_field_and_value ON metadata_field_value(repository_id, asset_id, field_id, field_value_lc);
