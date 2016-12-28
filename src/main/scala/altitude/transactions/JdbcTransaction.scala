@@ -1,6 +1,6 @@
 package altitude.transactions
 
-import java.sql.{SQLException, Connection}
+import java.sql.{Connection, SQLException}
 
 import altitude.{Const => C}
 import org.slf4j.LoggerFactory

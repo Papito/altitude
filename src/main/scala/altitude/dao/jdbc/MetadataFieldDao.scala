@@ -1,12 +1,9 @@
 package altitude.dao.jdbc
 
 import altitude.models.MetadataField
-import altitude.models.search.{Query, QueryResult}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
-import org.apache.commons.dbutils.QueryRunner
-import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.JsObject
 
 abstract class MetadataFieldDao (val app: Altitude)
   extends BaseJdbcDao("metadata_field") with altitude.dao.MetadataFieldDao {
