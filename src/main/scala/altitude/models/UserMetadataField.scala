@@ -17,7 +17,6 @@ object UserMetadataField {
       id = (json \ C.Base.ID).asOpt[String],
       name = (json \ C.MetadataField.NAME).as[String],
       fieldType = (json \ C.MetadataField.FIELD_TYPE).as[String],
-      constraintList = (json \ C.MetadataField.CONSTRAINT_LIST).asOpt[List[String]],
       maxLength = (json \ C.MetadataField.MAX_LENGTH).asOpt[Int]
     ).withCoreAttr(json)
 }
@@ -26,7 +25,6 @@ case class UserMetadataField(
                   id: Option[String] = None,
                   name: String,
                   fieldType: String,
-                  constraintList: Option[List[String]] = None,
                   maxLength: Option[Int] = None) extends BaseModel {
 
   val nameLowercase = name.toLowerCase
@@ -35,9 +33,6 @@ case class UserMetadataField(
       C.MetadataField.NAME -> name,
       C.MetadataField.NAME_LC -> nameLowercase,
       C.MetadataField.FIELD_TYPE -> fieldType,
-      C.MetadataField.CONSTRAINT_LIST -> {
-        if (constraintList.isEmpty) JsNull else Json.toJson(constraintList.get)
-      },
       C.MetadataField.MAX_LENGTH -> maxLength
     ) ++ coreJsonAttrs
 

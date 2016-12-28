@@ -82,13 +82,7 @@ object Const {
     val NAME = "name"
     val NAME_LC = "name_lc"
     val FIELD_TYPE = "field_type"
-    val CONSTRAINT_LIST = "constraint_list"
     val MAX_LENGTH = "max_length"
-  }
-
-  object MetadataConstraintValue extends Common {
-    val FIELD_ID = "field_id"
-    val CONSTRAINT_VALUE = "constraint_value"
   }
 
   object Api {

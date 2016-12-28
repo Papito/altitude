@@ -39,22 +39,15 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
 
       fieldOpt match {
         case None => None
-        case _ => {
+        case _ =>
           val field: UserMetadataField = fieldOpt.get
-
-          val sortedConstraintList = field.constraintList match {
-            case None => None
-            case _ => Some(field.constraintList.get.sorted)
-          }
 
           val ret = UserMetadataField(
             name = field.name,
             fieldType = field.fieldType,
-            maxLength = field.maxLength,
-            constraintList = sortedConstraintList)
+            maxLength = field.maxLength)
 
           Some(ret)
-        }
       }
     }
 
@@ -67,61 +60,4 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
     txManager.withTransaction[Int] {
       METADATA_FIELD_DAO.deleteById(id)
     }
-
-  def addConstraintValue(fieldId: String, constraintValue: String)
-                        (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
-
-    txManager.withTransaction {
-      // get the field we are working with
-      val fieldOpt = getFieldById(fieldId)
-
-      if (fieldOpt.isEmpty) {
-        throw NotFoundException(s"Cannot find user metadata field by ID [$fieldId]")
-      }
-
-      val field: UserMetadataField = fieldOpt.get
-      log.info(s"Adding constraint value [$constraintValue] to field ${field.name}")
-
-      val constraintValueLc = constraintValue.trim.toLowerCase
-
-      // trim spaces and replace any two or more adjacent spaces with one
-      val trimmedValue = constraintValueLc.trim.replaceAll("[\\s]{2,}", " ")
-
-      if (trimmedValue.isEmpty) {
-        val ex = ValidationException()
-        ex.errors += (C.MetadataConstraintValue.CONSTRAINT_VALUE -> C.Msg.Err.CANNOT_BE_EMPTY)
-        throw ex
-      }
-
-      // check that the value respects max length setting, if the setting is defined
-      field.maxLength match {
-        case Some(maxLen) if trimmedValue.length > maxLen =>
-          val ex = ValidationException()
-          val msg = C.Msg.Err.VALUE_TOO_LONG.format(maxLen)
-          ex.errors += (C.MetadataConstraintValue.CONSTRAINT_VALUE -> msg)
-          throw ex
-        case _ =>
-      }
-
-      // check for duplicates
-      val existingConstraintValues = field.constraintList.getOrElse(List[String]())
-
-      if (existingConstraintValues.contains(trimmedValue)) {
-        // duplicate exception expects model json for both this object and the duplicate
-        val o = JsObject(Seq(C.MetadataConstraintValue.CONSTRAINT_VALUE -> JsString(constraintValueLc)))
-        throw new DuplicateException(o, o)
-      }
-
-      METADATA_FIELD_DAO.addConstraintValue(fieldId, trimmedValue)
-    }
-  }
-
-  def deleteConstraintValue(fieldId: String, constraintValue: String)
-                           (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
-    log.info(s"Deleting constraint value [$constraintValue] for field [$fieldId]")
-
-    txManager.withTransaction {
-      METADATA_FIELD_DAO.deleteConstraintValue(fieldId, constraintValue)
-    }
-  }
 }
