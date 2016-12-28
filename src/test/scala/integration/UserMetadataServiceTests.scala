@@ -37,7 +37,15 @@ import org.scalatest.Matchers._
   }
 
   test("constraint value field rules") {
+    val metadataField = altitude.service.userMetadata.addField(
+      UserMetadataField(
+        name = "String field name",
+        maxLength = Some(5),
+        fieldType = FieldType.NUMBER.toString))
 
+    intercept[ValidationException] {
+      altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "very very long")
+    }
   }
 /*
   test("add/delete constraint value") {
