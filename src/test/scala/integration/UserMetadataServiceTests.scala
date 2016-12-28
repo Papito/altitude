@@ -7,14 +7,12 @@ import org.scalatest.Matchers._
 
 @DoNotDiscover class UserMetadataServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 
-  /*
-    test("constraint value constraints") {
+/*
+    test("hygiene and validation") {
       val metadataField = altitude.service.userMetadata.addField(
         UserMetadataField(
-          name = "fieldName",
+          name = "string field",
           fieldType = FieldType.NUMBER.toString))
-
-      metadataField.maxLength shouldNot contain(0)
 
       altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "one")
 
@@ -48,39 +46,8 @@ import org.scalatest.Matchers._
         altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "very very long")
       }
     }
-    test("add/delete constraint value") {
-      val metadataField = altitude.service.userMetadata.addField(
-        UserMetadataField(
-          name = "fieldName",
-          fieldType = FieldType.NUMBER.toString))
-
-      altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "one")
-      altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "two")
-      altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "three")
-      // test proper value binding
-      altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "\"LOL\"")
-      var updatedField: UserMetadataField = altitude.service.userMetadata.getFieldById(metadataField.id.get).get
-      updatedField.constraintList should not be None
-      updatedField.constraintList.get.size shouldBe 4
-      updatedField.constraintList.get.head shouldEqual "\"LOL\""
-
-      altitude.service.userMetadata.deleteConstraintValue(metadataField.id.get, "two")
-      updatedField = altitude.service.userMetadata.getFieldById(metadataField.id.get).get
-      updatedField.constraintList.get.size shouldBe 3
-      updatedField.constraintList.get.head shouldEqual "\"LOL\""
-
-      altitude.service.userMetadata.deleteConstraintValue(metadataField.id.get, "\"LOL\"")
-      updatedField = altitude.service.userMetadata.getFieldById(metadataField.id.get).get
-      updatedField.constraintList.get.size shouldBe 2
-      updatedField.constraintList.get.head shouldEqual "one"
-
-      altitude.service.userMetadata.deleteConstraintValue(metadataField.id.get, "one")
-      altitude.service.userMetadata.deleteConstraintValue(metadataField.id.get, "three")
-
-      updatedField = altitude.service.userMetadata.getFieldById(metadataField.id.get).get
-      updatedField.constraintList shouldBe empty
-    }
 */
+
     test("delete field") {
       val metadataField = altitude.service.userMetadata.addField(
         UserMetadataField(

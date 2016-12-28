@@ -83,8 +83,8 @@ CREATE TABLE metadata_field_value (
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );
-CREATE INDEX field_value_field_id ON metadata_field_value(repository_id, field_id);
-CREATE UNIQUE INDEX field_value_field_and_value ON metadata_field_value(repository_id, field_id, field_value);
+CREATE INDEX field_value_field_id_asset_id ON metadata_field_value(repository_id, asset_id, field_id);
+CREATE UNIQUE INDEX field_value_field_and_value ON metadata_field_value(repository_id, asset_id, field_id, field_value_lc);
 
 --CREATE TABLE import_profile (
 --  id char(24) PRIMARY KEY,
