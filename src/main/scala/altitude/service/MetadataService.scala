@@ -44,8 +44,7 @@ class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
 
           val ret = MetadataField(
             name = field.name,
-            fieldType = field.fieldType,
-            maxLength = field.maxLength)
+            fieldType = field.fieldType)
 
           Some(ret)
       }

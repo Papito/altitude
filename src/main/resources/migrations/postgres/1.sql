@@ -67,8 +67,7 @@ CREATE TABLE metadata_field (
   repository_id char(24) NOT NULL,
   name varchar(255) NOT NULL,
   name_lc varchar(255) NOT NULL,
-  field_type varchar(255) NOT NULL,
-  max_length INT DEFAULT NULL
+  field_type varchar(255) NOT NULL
 ) INHERITS (_core);
 CREATE INDEX metadata_field_repo ON metadata_field(repository_id);
 CREATE UNIQUE INDEX metadata_field_name ON metadata_field(repository_id, name_lc);

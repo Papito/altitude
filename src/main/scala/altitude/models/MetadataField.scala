@@ -6,9 +6,11 @@ import play.api.libs.json._
 import scala.language.implicitConversions
 
 object FieldType extends Enumeration {
+  val TEXT = Value("TEXT")
   val STRING = Value("STRING")
   val NUMBER = Value("NUMBER")
-  val FLAG = Value("FLAG")
+  val BOOL = Value("BOOL")
+  val DATETIME = Value("DATETIME")
 }
 
 object MetadataField {
@@ -16,24 +18,21 @@ object MetadataField {
     MetadataField(
       id = (json \ C.Base.ID).asOpt[String],
       name = (json \ C.MetadataField.NAME).as[String],
-      fieldType = (json \ C.MetadataField.FIELD_TYPE).as[String],
-      maxLength = (json \ C.MetadataField.MAX_LENGTH).asOpt[Int]
+      fieldType = (json \ C.MetadataField.FIELD_TYPE).as[String]
     ).withCoreAttr(json)
 }
 
 case class MetadataField(
                   id: Option[String] = None,
                   name: String,
-                  fieldType: String,
-                  maxLength: Option[Int] = None) extends BaseModel {
+                  fieldType: String) extends BaseModel {
 
   val nameLowercase = name.toLowerCase
 
   override def toJson = Json.obj(
       C.MetadataField.NAME -> name,
       C.MetadataField.NAME_LC -> nameLowercase,
-      C.MetadataField.FIELD_TYPE -> fieldType,
-      C.MetadataField.MAX_LENGTH -> maxLength
+      C.MetadataField.FIELD_TYPE -> fieldType
     ) ++ coreJsonAttrs
 
 }

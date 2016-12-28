@@ -82,7 +82,6 @@ object Const {
     val NAME = "name"
     val NAME_LC = "name_lc"
     val FIELD_TYPE = "field_type"
-    val MAX_LENGTH = "max_length"
   }
 
   object Api {
