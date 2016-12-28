@@ -12,11 +12,26 @@ import org.scalatest.Matchers._
       UserMetadataField(
         name = "fieldName",
         fieldType = FieldType.NUMBER.toString))
+
     altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "one")
 
+    // everything should be lowercased
     intercept[DuplicateException] {
       altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "ONE")
     }
+
+    // test for trimmed space characaters
+    altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "  Two     \t   Three  \n \t \r\n   Four ")
+
+    // no empty values allowed
+    intercept[ValidationException] {
+      altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "\r\n")
+    }
+
+    val updatedField: UserMetadataField = altitude.service.userMetadata.getFieldById(metadataField.id.get).get
+
+    updatedField.constraintList.get should contain("one")
+    updatedField.constraintList.get should contain("two three four")
   }
 
 /*

@@ -82,19 +82,25 @@ class UserMetadataService(app: Altitude) extends BaseService[UserMetadataField](
       val field: UserMetadataField = fieldOpt.get
       log.info(s"Adding constraint value [$constraintValue] to field ${field.name}")
 
-      /* HERE:
-          * clean (remove double spaces, tabs, and line breaks)
-       */
-      val existingConstraintValues = field.constraintList.getOrElse(List[String]())
       val constraintValueLc = constraintValue.trim.toLowerCase
 
-      if (existingConstraintValues.contains(constraintValueLc)) {
+      // trim spaces and replace any two or more adjacent spaces with one
+      val trimmedValue = constraintValueLc.trim.replaceAll("[\\s]{2,}", " ").trim
+
+      if (trimmedValue.isEmpty) {
+        val ex = ValidationException()
+        ex.errors += (C.MetadataConstraintValue.CONSTRAINT_VALUE -> C.Msg.Err.CANNOT_BE_EMPTY)
+        throw ex
+      }
+
+      val existingConstraintValues = field.constraintList.getOrElse(List[String]())
+      if (existingConstraintValues.contains(trimmedValue)) {
         // duplicate exception expects model json for both this object and the duplicate
         val o = JsObject(Seq(C.MetadataConstraintValue.CONSTRAINT_VALUE -> JsString(constraintValueLc)))
         throw new DuplicateException(o, o)
       }
 
-      METADATA_FIELD_DAO.addConstraintValue(fieldId, constraintValueLc)
+      METADATA_FIELD_DAO.addConstraintValue(fieldId, trimmedValue)
     }
   }
 
