@@ -7,7 +7,6 @@ import scala.language.implicitConversions
 
 object FieldType extends Enumeration {
   val TEXT = Value("TEXT")
-  val STRING = Value("STRING")
   val NUMBER = Value("NUMBER")
   val BOOL = Value("BOOL")
   val DATETIME = Value("DATETIME")

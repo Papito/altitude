@@ -73,7 +73,7 @@ CREATE TABLE metadata_field (
 CREATE INDEX metadata_field_repo ON metadata_field(repository_id);
 CREATE UNIQUE INDEX metadata_field_name ON metadata_field(repository_id, name_lc);
 
-CREATE TABLE metadata_field_value (
+CREATE TABLE metadata_value (
   repository_id char(24) NOT NULL,
   asset_id char(24) NOT NULL,
   field_id char(24) NOT NULL,
@@ -82,8 +82,8 @@ CREATE TABLE metadata_field_value (
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );
-CREATE INDEX field_value_field_id_asset_id ON metadata_field_value(repository_id, asset_id, field_id);
-CREATE UNIQUE INDEX field_value_field_and_value ON metadata_field_value(repository_id, asset_id, field_id, field_value_lc);
+CREATE INDEX metadata_value_id_asset_id ON metadata_value(repository_id, asset_id, field_id);
+CREATE UNIQUE INDEX metadata_value_field_and_value ON metadata_value(repository_id, asset_id, field_id, field_value_lc);
 
 --CREATE TABLE import_profile (
 --  id char(24) PRIMARY KEY,
