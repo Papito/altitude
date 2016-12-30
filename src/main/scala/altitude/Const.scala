@@ -84,6 +84,13 @@ object Const {
     val FIELD_TYPE = "field_type"
   }
 
+  object MetadataValue extends Common {
+    val FIELD_ID = "field_id"
+    val ASSET_ID = "asset_id"
+    val FIELD_VALUE = "field_value"
+    val FIELD_VALUE_LC = "field_value_lc"
+  }
+
   object Api {
     val USER_ID = "user_id"
     val ERROR = "error"
