@@ -34,7 +34,7 @@ object Const {
     val MD5 = "md5"
     val SIZE_BYTES = "size_bytes"
     val FILENAME = "filename"
-    val METADATA = "metadata"
+    val EXTRACTED_METADATA = "extracted_metadata"
   }
 
   object AssetType extends Common {

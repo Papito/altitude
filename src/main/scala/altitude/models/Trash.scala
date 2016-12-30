@@ -18,7 +18,7 @@ object Trash {
       folderId = (json \ C.Asset.FOLDER_ID).as[String],
       md5 = (json \ C.Asset.MD5).as[String],
       sizeBytes = (json \ C.Asset.SIZE_BYTES).as[Long],
-      metadata = json \ C.Asset.METADATA
+      extractedMetadata = json \ C.Asset.EXTRACTED_METADATA
     ).withCoreAttr(json)
 
     val isoRecycledAt = (json \ C.Trash.RECYCLED_AT).asOpt[String]
@@ -38,7 +38,7 @@ class Trash(override val id: Option[String] = None,
             override val md5: String,
             override val sizeBytes: Long,
             override val folderId: String,
-            override val metadata: JsValue = JsNull,
+            override val extractedMetadata: JsValue = JsNull,
             override val previewData: Array[Byte] = new Array[Byte](0)) extends Asset(id = id,
                                                                                       userId,
                                                                                       assetType = assetType,
@@ -46,7 +46,7 @@ class Trash(override val id: Option[String] = None,
                                                                                       md5 = md5,
                                                                                       sizeBytes = sizeBytes,
                                                                                       folderId = folderId,
-                                                                                      metadata = metadata,
+                                                                                      extractedMetadata = extractedMetadata,
                                                                                       previewData = previewData) {
   // created at
   protected var _recycledAt: Option[DateTime] = None

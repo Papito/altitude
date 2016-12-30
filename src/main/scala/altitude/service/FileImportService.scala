@@ -95,7 +95,7 @@ class FileImportService(app: Altitude) {
       assetType = asset.assetType,
       sizeBytes = asset.sizeBytes,
       folderId = asset.folderId,
-      metadata = metadata,
+      extractedMetadata = metadata,
       previewData = previewData.get)
 
     val res = app.service.library.add(assetWithPreview)

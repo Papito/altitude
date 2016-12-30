@@ -33,7 +33,7 @@ abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with alt
     val trash = jsonIn: Trash
 
     // Postgres will reject this sequence with jsonb
-    val metadata: String = trash.metadata.toString().replaceAll("\\\\u0000", "")
+    val metadata: String = trash.extractedMetadata.toString().replaceAll("\\\\u0000", "")
 
     val sql = s"""
         INSERT INTO $tableName (
@@ -41,7 +41,7 @@ abstract class TrashDao(val app: Altitude) extends BaseJdbcDao("trash") with alt
              ${C.Asset.FILENAME}, ${C.Asset.SIZE_BYTES},
              ${C.AssetType.MEDIA_TYPE}, ${C.AssetType.MEDIA_SUBTYPE}, ${C.AssetType.MIME_TYPE},
              ${C.Asset.FOLDER_ID}, ${C.Base.CREATED_AT}, ${C.Base.UPDATED_AT},
-             ${C.Asset.METADATA})
+             ${C.Asset.EXTRACTED_METADATA})
             VALUES(
               $CORE_SQL_VALS_FOR_INSERT,
               ?, ?, ?, ?, ?, ?, ?, ?, ?,
