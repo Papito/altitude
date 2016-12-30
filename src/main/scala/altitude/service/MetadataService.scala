@@ -1,13 +1,13 @@
 package altitude.service
 
 import altitude.dao.{MetadataFieldDao, NotImplementedDao}
-import altitude.exceptions.ValidationException
+import altitude.exceptions.{NotFoundException, DuplicateException, ValidationException}
 import altitude.models.{FieldType, MetadataField}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
-import play.api.libs.json.JsObject
+import play.api.libs.json.{JsString, JsObject}
 
 
 class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
@@ -59,4 +59,35 @@ class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
     txManager.withTransaction[Int] {
       METADATA_FIELD_DAO.deleteById(id)
     }
+
+  def addValues(fieldId: String, assetId: String, values: String*)
+               (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+
+    txManager.withTransaction {
+      // get the field we are working with
+      val fieldOpt = getFieldById(fieldId)
+
+      if (fieldOpt.isEmpty) {
+        throw NotFoundException(s"Cannot find user metadata field by ID [$fieldId]")
+      }
+
+      val field: MetadataField = fieldOpt.get
+      log.info(s"Adding values to [${field.name}]: [${values.mkString(" ,")}}]")
+
+      val trimmedValues = values
+        .map(_.toLowerCase)
+        .map(_.trim)
+        .filter(_.nonEmpty)
+/*
+      // check for duplicates
+      val existingConstraintValues = field.constraintList.getOrElse(List[String]())
+
+      if (existingConstraintValues.contains(trimmedValue)) {
+        // duplicate exception expects model json for both this object and the duplicate
+        val o = JsObject(Seq(C.MetadataConstraintValue.CONSTRAINT_VALUE -> JsString(constraintValueLc)))
+        throw new DuplicateException(o, o)
+      }
+*/
+    }
+  }
 }

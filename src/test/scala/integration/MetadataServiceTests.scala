@@ -7,86 +7,58 @@ import org.scalatest.Matchers._
 
 @DoNotDiscover class MetadataServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 
+  test("add values") {
+    val metadataField = altitude.service.metadata.addField(
+      MetadataField(
+        name = "string field",
+        fieldType = FieldType.NUMBER.toString))
+
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
+
+    altitude.service.metadata.addValues(metadataField.id.get, asset.id.get, "one", "two", "three", "  \r\n \t ")
+  }
+
 /*
-    test("hygiene and validation") {
-      val metadataField = altitude.service.userMetadata.addField(
-        UserMetadataField(
-          name = "string field",
-          fieldType = FieldType.NUMBER.toString))
+  test("delete field") {
+    val metadataField = altitude.service.metadata.addField(
+      MetadataField(
+        name = "fieldName",
+        fieldType = FieldType.STRING.toString))
 
-      altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "one")
+    altitude.service.metadata.getAllFields.length shouldBe 1
+    altitude.service.metadata.deleteFieldById(metadataField.id.get)
+    altitude.service.metadata.getAllFields shouldBe empty
+  }
 
-      // everything should be lowercased
-      intercept[DuplicateException] {
-        altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "ONE")
-      }
+  test("add/get fields") {
+    val metadataField = altitude.service.metadata.addField(
+      MetadataField(name = "field name", fieldType = FieldType.STRING.toString))
 
-      // test for trimmed space characters
-      altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "  Two     \t   Three  \n \t \r\n   Four ")
+    altitude.service.metadata.getFieldById(metadataField.id.get) should not be None
+  }
 
-      // no empty values allowed
-      intercept[ValidationException] {
-        altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "\r\n")
-      }
+  test("get all fields") {
+    altitude.service.metadata.addField(
+      MetadataField(name = "field name 1", fieldType = FieldType.STRING.toString))
+    altitude.service.metadata.addField(
+      MetadataField(name = "field name 2", fieldType = FieldType.STRING.toString))
 
-      val updatedField: UserMetadataField = altitude.service.userMetadata.getFieldById(metadataField.id.get).get
+    SET_SECONDARY_USER()
+    altitude.service.metadata.addField(
+      MetadataField(name = "field name 3", fieldType = FieldType.STRING.toString))
 
-      updatedField.constraintList.get should contain("one")
-      updatedField.constraintList.get should contain("two three four")
-    }
+    SET_PRIMARY_USER()
+    altitude.service.metadata.getAllFields.length shouldBe 3
 
-    test("constraint value field rules") {
-      val metadataField = altitude.service.userMetadata.addField(
-        UserMetadataField(
-          name = "String field name",
-          maxLength = Some(5),
-          fieldType = FieldType.NUMBER.toString))
+    SET_SECONDARY_USER()
+    altitude.service.metadata.getAllFields.length shouldBe 3
+  }
 
-      intercept[ValidationException] {
-        altitude.service.userMetadata.addConstraintValue(metadataField.id.get, "very very long")
-      }
-    }
-*/
-
-    test("delete field") {
-      val metadataField = altitude.service.metadata.addField(
-        MetadataField(
-          name = "fieldName",
-          fieldType = FieldType.STRING.toString))
-
-      altitude.service.metadata.getAllFields.length shouldBe 1
-      altitude.service.metadata.deleteFieldById(metadataField.id.get)
-      altitude.service.metadata.getAllFields shouldBe empty
-    }
-
-    test("add/get fields") {
-      val metadataField = altitude.service.metadata.addField(
-        MetadataField(name = "field name", fieldType = FieldType.STRING.toString))
-
-      altitude.service.metadata.getFieldById(metadataField.id.get) should not be None
-    }
-
-    test("get all fields") {
-      altitude.service.metadata.addField(
-        MetadataField(name = "field name 1", fieldType = FieldType.STRING.toString))
-      altitude.service.metadata.addField(
-        MetadataField(name = "field name 2", fieldType = FieldType.STRING.toString))
-
-      SET_SECONDARY_USER()
-      altitude.service.metadata.addField(
-        MetadataField(name = "field name 3", fieldType = FieldType.STRING.toString))
-
-      SET_PRIMARY_USER()
-      altitude.service.metadata.getAllFields.length shouldBe 3
-
-      SET_SECONDARY_USER()
-      altitude.service.metadata.getAllFields.length shouldBe 3
-    }
-
-    test("add invalid field type") {
-      intercept[ValidationException] {
+  test("add invalid field type") {
+    intercept[ValidationException] {
           altitude.service.metadata.addField(
             MetadataField(name = "fieldName", fieldType = "SO_INVALID"))
         }
-    }
+  }
+*/
 }
