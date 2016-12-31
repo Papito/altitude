@@ -22,7 +22,7 @@ object Validators {
       val ex: ValidationException = ValidationException()
       checkRequired(json, ex)
 
-      if (raise && ex.errors.nonEmpty) throw ex
+      if (raise && ex.nonEmpty) throw ex
       ex
     }
 
@@ -60,7 +60,7 @@ object Validators {
         }
       }
 
-      if (ex.errors.nonEmpty) throw ex
+      if (ex.nonEmpty) throw ex
     }
   }
 }

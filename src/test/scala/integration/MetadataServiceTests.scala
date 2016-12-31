@@ -33,6 +33,14 @@ import scala.collection.immutable.HashMap
       altitude.service.metadata.setMetadata(asset.id.get, new Metadata(badData))
     }
 
+    // duplicate values passed in
+    val duplicateData = Map[String, Set[String]](
+      keywordMetadataField.id.get -> Set("one", "One", "ONE"))
+
+    intercept[ValidationException] {
+      altitude.service.metadata.setMetadata(asset.id.get, new Metadata(duplicateData))
+    }
+
     // valid
     val data = Map[String, Set[String]](
       keywordMetadataField.id.get -> Set("one", "two", "three"),

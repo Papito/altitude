@@ -6,4 +6,6 @@ import scala.collection.mutable
 
 case class ValidationException(message: String = "") extends Exception {
   val errors: mutable.Map[String, String] = mutable.Map()
+  final def isEmpty = message.isEmpty && errors.isEmpty
+  final def nonEmpty = !isEmpty
 }

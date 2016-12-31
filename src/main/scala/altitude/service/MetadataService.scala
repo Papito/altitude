@@ -78,52 +78,48 @@ class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
       val existingFieldIds = fields.keys.toSet
       val suppliedFieldIds = metadata.keys
 
-      suppliedFieldIds.diff(existingFieldIds) match {
-        case missing: Set[String] if missing.nonEmpty =>
+      val missing = suppliedFieldIds.diff(existingFieldIds)
+
+      if (missing.nonEmpty)
           throw NotFoundException(
             s"Fields [${missing.mkString(", ")}] are not supported by this repository"
           )
-        case _ =>
-      }
 
       /**
-       * Audit every value passed in. This can build a pretty big validation exception,
-       * depending on how much of this is bad
+       * Clean the metadata to be ready for validation
        */
       val cleanData = metadata.data.foldLeft(Map[String, Set[String]]()) { (res, m) =>
         val fieldId = m._1
         val values: Set[String] = m._2
-        log.info(s"Validating field $fieldId with values [${values.mkString(", ")}]")
-
-        val trimmedValues = values.map(_.toLowerCase).map(_.trim).filter(_.nonEmpty)
-
-        log.info(s"Clean values [${trimmedValues.mkString(", ")}]")
-        res + (fieldId -> trimmedValues)
+        log.debug(s"Cleaning field $fieldId with values [${values.mkString(", ")}]")
+        val trimmed = values.map(_.trim).filter(_.nonEmpty)
+        log.debug(s"Cleaned values [${trimmed.mkString(", ")}]")
+        res + (fieldId -> trimmed)
       }
+
+
+      /**
+       * Validate for duplicates in passed data
+       */
+      val ex = ValidationException()
+
+      cleanData.foreach { m =>
+        val fieldId = m._1
+        val values: Set[String] = m._2
+        val valuesLower = values.map(_.toLowerCase)
+
+        if (values.size != valuesLower.size) {
+          val field: MetadataField = fields(fieldId)
+          ex.errors += (field.name ->
+            C.Msg.Warn.DUPLICATE_FIELD_VALUE.format(field.name, values.mkString(", ")))
+        }
+      }
+
+      if (ex.nonEmpty)
+        throw ex
 
       val cleanMetadata = new Metadata(cleanData)
 
-      /*
-            if (fieldOpt.isEmpty) {
-              throw NotFoundException(s"Cannot find user metadata field by ID [$fieldId]")
-            }
-
-            val field: MetadataField = fieldOpt.get
-            log.info(s"Adding values to [${field.name}]: [${values.mkString(" ,")}}]")
-
-            val trimmedValues = values
-              .map(_.toLowerCase)
-              .map(_.trim)
-              .filter(_.nonEmpty)
-            // check for duplicates
-            val existingConstraintValues = field.constraintList.getOrElse(List[String]())
-
-            if (existingConstraintValues.contains(trimmedValue)) {
-              // duplicate exception expects model json for both this object and the duplicate
-              val o = JsObject(Seq(C.MetadataConstraintValue.CONSTRAINT_VALUE -> JsString(constraintValueLc)))
-              throw new DuplicateException(o, o)
-            }
-      */
     }
   }
 
