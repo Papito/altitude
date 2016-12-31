@@ -6,6 +6,7 @@ import play.api.libs.json._
 import scala.language.implicitConversions
 
 object FieldType extends Enumeration {
+  val KEYWORD = Value("KEYWORD")
   val TEXT = Value("TEXT")
   val NUMBER = Value("NUMBER")
   val BOOL = Value("BOOL")

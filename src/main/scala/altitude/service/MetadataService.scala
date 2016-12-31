@@ -71,9 +71,10 @@ class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
     log.info(s"Setting metadata for asset [$assetId]: $metadata")
 
     txManager.withTransaction {
+      // get all metadata fields configured for this repository
       val fields = getAllFields
 
-      // make sure we have all metadata field IDs
+      // make sure all metadata field IDs given to us are known
       val existingFieldIds = fields.keys.toSet
       val suppliedFieldIds = metadata.keys
 
@@ -84,6 +85,24 @@ class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
           )
         case _ =>
       }
+
+      /**
+       * Audit every value passed in. This can build a pretty big validation exception,
+       * depending on how much of this is bad
+       */
+      val cleanData = metadata.data.foldLeft(Map[String, Set[String]]()) { (res, m) =>
+        val fieldId = m._1
+        val values: Set[String] = m._2
+        log.info(s"Validating field $fieldId with values [${values.mkString(", ")}]")
+
+        val trimmedValues = values.map(_.toLowerCase).map(_.trim).filter(_.nonEmpty)
+
+        log.info(s"Clean values [${trimmedValues.mkString(", ")}]")
+        res + (fieldId -> trimmedValues)
+      }
+
+      val cleanMetadata = new Metadata(cleanData)
+
       /*
             if (fieldOpt.isEmpty) {
               throw NotFoundException(s"Cannot find user metadata field by ID [$fieldId]")

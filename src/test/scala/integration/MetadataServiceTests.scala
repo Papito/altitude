@@ -11,16 +11,22 @@ import scala.collection.immutable.HashMap
 @DoNotDiscover class MetadataServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 
   test("set metadata values") {
-    val metadataField = altitude.service.metadata.addField(
+    val keywordMetadataField = altitude.service.metadata.addField(
       MetadataField(
-        name = "string field",
+        name = "keyword field",
+        // FIXME: use the enumeration
+        fieldType = FieldType.KEYWORD.toString))
+
+    val numberMetadataField = altitude.service.metadata.addField(
+      MetadataField(
+        name = "number field",
         fieldType = FieldType.NUMBER.toString))
 
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
 
     // add a field we do not expect
     val badData = Map[String, Set[String]](
-      metadataField.id.get -> Set("one", "two", "three"),
+      keywordMetadataField.id.get -> Set("one", "two", "three"),
       BaseModel.genId -> Set("four"))
 
     intercept[NotFoundException] {
@@ -28,7 +34,10 @@ import scala.collection.immutable.HashMap
     }
 
     // valid
-    val data = Map[String, Set[String]](metadataField.id.get -> Set("one", "two", "three"))
+    val data = Map[String, Set[String]](
+      keywordMetadataField.id.get -> Set("one", "two", "three"),
+      numberMetadataField.id.get -> Set("1", "2", "3.002", "14.1", "1.25", "123456789"))
+
     altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
   }
 

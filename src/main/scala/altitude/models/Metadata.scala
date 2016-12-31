@@ -14,13 +14,15 @@ object Metadata {
   }
 }
 
-class Metadata(private val data: Map[String, Set[String]] = Map[String, Set[String]]()) extends BaseModel with NoId {
+class Metadata(val data: Map[String, Set[String]] = Map[String, Set[String]]())
+  extends BaseModel with NoId {
 
   override val toJson = data.foldLeft(Json.obj()) { (res, m) =>
     val fieldName = m._1
-    val values: JsArray = JsArray(m._2.toSeq.map { v =>
-      Json.obj(fieldName -> JsString(v))
-    })
-    res ++ Json.obj(fieldName.toString -> values)
+
+    val valuesJsArray: JsArray = JsArray(m._2.toSeq.map(JsString))
+
+    // append to the resulting JSON object
+    res ++ Json.obj(fieldName -> valuesJsArray)
   }
 }
