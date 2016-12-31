@@ -6,7 +6,7 @@ import altitude.{Context, Altitude, Const => C}
 import play.api.libs.json.JsObject
 
 abstract class MetadataValueDao (val app: Altitude)
-  extends BaseJdbcDao("metadata_value") with altitude.dao.MetadataValueDao {
+  extends BaseJdbcDao("metadata_values") with altitude.dao.MetadataValueDao {
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val model = MetadataValue(

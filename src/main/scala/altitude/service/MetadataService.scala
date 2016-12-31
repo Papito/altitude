@@ -2,7 +2,7 @@ package altitude.service
 
 import altitude.dao.{MetadataFieldDao, NotImplementedDao}
 import altitude.exceptions.{NotFoundException, DuplicateException, ValidationException}
-import altitude.models.{FieldType, MetadataField}
+import altitude.models.{Metadata, FieldType, MetadataField}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
@@ -50,9 +50,15 @@ class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
       }
     }
 
-  def getAllFields()(implicit ctx: Context, txId: TransactionId = new TransactionId): List[JsObject] =
-    txManager.asReadOnly[List[JsObject]] {
-      METADATA_FIELD_DAO.getAll
+  /**
+   * Returns a lookup map (by ID) of all configured fields in this repository
+   */
+  def getAllFields(implicit ctx: Context, txId: TransactionId = new TransactionId): Map[String, MetadataField] =
+    txManager.asReadOnly[Map[String, MetadataField]] {
+      METADATA_FIELD_DAO.getAll.map{ res =>
+        val metadataField: MetadataField = res
+        metadataField.id.get -> metadataField
+      }.toMap
     }
 
   def deleteFieldById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Int =
@@ -60,34 +66,45 @@ class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
       METADATA_FIELD_DAO.deleteById(id)
     }
 
-  def addValues(fieldId: String, assetId: String, values: String*)
+  def setMetadata(assetId: String, metadata: Metadata)
                (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+    log.info(s"Setting metadata for asset [$assetId]: $metadata")
 
     txManager.withTransaction {
-      // get the field we are working with
-      val fieldOpt = getFieldById(fieldId)
+      val fields = getAllFields
 
-      if (fieldOpt.isEmpty) {
-        throw NotFoundException(s"Cannot find user metadata field by ID [$fieldId]")
+      // make sure we have all metadata field IDs
+      val existingFieldIds = fields.keys.toSet
+      val suppliedFieldIds = metadata.keys
+
+      suppliedFieldIds.diff(existingFieldIds) match {
+        case missing: Set[String] if missing.nonEmpty =>
+          throw NotFoundException(
+            s"Fields [${missing.mkString(", ")}] are not supported by this repository"
+          )
+        case _ =>
       }
+      /*
+            if (fieldOpt.isEmpty) {
+              throw NotFoundException(s"Cannot find user metadata field by ID [$fieldId]")
+            }
 
-      val field: MetadataField = fieldOpt.get
-      log.info(s"Adding values to [${field.name}]: [${values.mkString(" ,")}}]")
+            val field: MetadataField = fieldOpt.get
+            log.info(s"Adding values to [${field.name}]: [${values.mkString(" ,")}}]")
 
-      val trimmedValues = values
-        .map(_.toLowerCase)
-        .map(_.trim)
-        .filter(_.nonEmpty)
-/*
-      // check for duplicates
-      val existingConstraintValues = field.constraintList.getOrElse(List[String]())
+            val trimmedValues = values
+              .map(_.toLowerCase)
+              .map(_.trim)
+              .filter(_.nonEmpty)
+            // check for duplicates
+            val existingConstraintValues = field.constraintList.getOrElse(List[String]())
 
-      if (existingConstraintValues.contains(trimmedValue)) {
-        // duplicate exception expects model json for both this object and the duplicate
-        val o = JsObject(Seq(C.MetadataConstraintValue.CONSTRAINT_VALUE -> JsString(constraintValueLc)))
-        throw new DuplicateException(o, o)
-      }
-*/
+            if (existingConstraintValues.contains(trimmedValue)) {
+              // duplicate exception expects model json for both this object and the duplicate
+              val o = JsObject(Seq(C.MetadataConstraintValue.CONSTRAINT_VALUE -> JsString(constraintValueLc)))
+              throw new DuplicateException(o, o)
+            }
+      */
     }
   }
 

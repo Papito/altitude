@@ -15,6 +15,7 @@ object Asset {
     folderId = (json \ C.Asset.FOLDER_ID).as[String],
     md5 = (json \ C.Asset.MD5).as[String],
     sizeBytes = (json \ C.Asset.SIZE_BYTES).as[Long],
+    metadata = Metadata.fromJson((json \ C.Asset.METADATA).as[JsObject]),
     extractedMetadata = json \ C.Asset.EXTRACTED_METADATA
   ).withCoreAttr(json)
 }
@@ -26,6 +27,7 @@ case class Asset(id: Option[String] = None,
                  md5: String,
                  sizeBytes: Long,
                  folderId: String,
+                 metadata: Metadata = new Metadata(),
                  extractedMetadata: JsValue = JsNull,
                  previewData: Array[Byte] = new Array[Byte](0)) extends BaseModel {
 
@@ -39,7 +41,8 @@ case class Asset(id: Option[String] = None,
     C.Asset.FILENAME -> fileName,
     C.Asset.SIZE_BYTES -> sizeBytes,
     C.Asset.ASSET_TYPE -> (assetType: JsValue),
-    C.Asset.EXTRACTED_METADATA -> extractedMetadata) ++ coreJsonAttrs
+    C.Asset.EXTRACTED_METADATA -> extractedMetadata,
+    C.Asset.METADATA -> metadata.toJson) ++ coreJsonAttrs
 
   override def toString = s"${this.path} ${this.assetType.mediaType} ${this.assetType.mediaSubtype}"
 }

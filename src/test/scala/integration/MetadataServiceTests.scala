@@ -1,13 +1,16 @@
 package integration
 
-import altitude.exceptions.ValidationException
+import altitude.exceptions.{NotFoundException, ValidationException}
 import altitude.models._
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
+import scala.collection.immutable.HashMap
+
+
 @DoNotDiscover class MetadataServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 
-  test("add values") {
+  test("set metadata values") {
     val metadataField = altitude.service.metadata.addField(
       MetadataField(
         name = "string field",
@@ -15,7 +18,18 @@ import org.scalatest.Matchers._
 
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
 
-    altitude.service.metadata.addValues(metadataField.id.get, asset.id.get, "one", "two", "three", "  \r\n \t ")
+    // add a field we do not expect
+    val badData = Map[String, Set[String]](
+      metadataField.id.get -> Set("one", "two", "three"),
+      BaseModel.genId -> Set("four"))
+
+    intercept[NotFoundException] {
+      altitude.service.metadata.setMetadata(asset.id.get, new Metadata(badData))
+    }
+
+    // valid
+    val data = Map[String, Set[String]](metadataField.id.get -> Set("one", "two", "three"))
+    altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
   }
 
 /*
