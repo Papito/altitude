@@ -2,6 +2,7 @@ package altitude.service
 
 import altitude.dao.{MetadataFieldDao, NotImplementedDao}
 import altitude.exceptions.{NotFoundException, DuplicateException, ValidationException}
+import altitude.models.search.{Query, QueryResult}
 import altitude.models.{Metadata, FieldType, MetadataField}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
@@ -27,9 +28,16 @@ class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
         throw ex
       }
 
-    // verify here lowercase name is unique before we hit the DB constraint (DuplicateException)
+      val existing = METADATA_FIELD_DAO.query(Query(Map(
+        C.MetadataField.NAME_LC -> metadataField.nameLowercase
+      )))
 
-    METADATA_FIELD_DAO.add(metadataField)
+      if (existing.nonEmpty) {
+        log.debug(s"Duplicate found for field [${metadataField.name}]")
+        throw DuplicateException(metadataField, existing.records.head)
+      }
+
+      METADATA_FIELD_DAO.add(metadataField)
     }
   }
 
@@ -120,6 +128,10 @@ class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
 
       val cleanMetadata = new Metadata(cleanData)
 
+
+      /**
+       * TODO: get the current metadata and check for duplicates or noop due to same data
+       */
     }
   }
 

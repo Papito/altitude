@@ -1,6 +1,6 @@
 package integration
 
-import altitude.exceptions.{NotFoundException, ValidationException}
+import altitude.exceptions.{DuplicateException, NotFoundException, ValidationException}
 import altitude.models._
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
@@ -92,4 +92,15 @@ import scala.collection.immutable.HashMap
         }
   }
 */
+
+  test("add duplicate field") {
+    val fieldName = "field name"
+    altitude.service.metadata.addField(
+      MetadataField(name = fieldName, fieldType = FieldType.KEYWORD.toString))
+
+    intercept[DuplicateException] {
+      altitude.service.metadata.addField(
+        MetadataField(name = fieldName, fieldType = FieldType.KEYWORD.toString))
+    }
+  }
 }
