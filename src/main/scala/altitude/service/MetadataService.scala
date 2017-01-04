@@ -1,6 +1,6 @@
 package altitude.service
 
-import altitude.dao.{MetadataFieldDao, NotImplementedDao}
+import altitude.dao.{AssetDao, MetadataFieldDao, NotImplementedDao}
 import altitude.exceptions.{NotFoundException, DuplicateException, ValidationException}
 import altitude.models.search.{Query, QueryResult}
 import altitude.models.{Metadata, FieldType, MetadataField}
@@ -8,12 +8,16 @@ import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsString, JsObject}
+import play.api.libs.json.{Json, JsString, JsObject}
 
 
 class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
   private final val log = LoggerFactory.getLogger(getClass)
+
   protected val METADATA_FIELD_DAO = app.injector.instance[MetadataFieldDao]
+  protected val ASSET_DAO = app.injector.instance[AssetDao]
+
+  // this is a combo service so it does not have its own DAO
   override protected val DAO = new NotImplementedDao(app)
 
   def addField(metadataField: MetadataField)
@@ -75,7 +79,7 @@ class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
     }
 
   def setMetadata(assetId: String, metadata: Metadata)
-               (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+               (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
     log.info(s"Setting metadata for asset [$assetId]: $metadata")
 
     txManager.withTransaction {
@@ -99,9 +103,8 @@ class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
       val cleanData = metadata.data.foldLeft(Map[String, Set[String]]()) { (res, m) =>
         val fieldId = m._1
         val values: Set[String] = m._2
-        log.debug(s"Cleaning field $fieldId with values [${values.mkString(", ")}]")
+        // trim all values and discard blanks
         val trimmed = values.map(_.trim).filter(_.nonEmpty)
-        log.debug(s"Cleaned values [${trimmed.mkString(", ")}]")
         res + (fieldId -> trimmed)
       }
 
@@ -127,12 +130,15 @@ class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
         throw ex
 
       val cleanMetadata = new Metadata(cleanData)
-
-
-      /**
-       * TODO: get the current metadata and check for duplicates or noop due to same data
-       */
+      ASSET_DAO.setMetadata(assetId = assetId, metadata = cleanMetadata)
     }
   }
 
+  def getMetadata(assetId: String)
+                 (implicit ctx: Context, txId: TransactionId = new TransactionId): Metadata =
+    // return the metadata or a new empty one if blank
+    ASSET_DAO.getMetadata(assetId) match {
+      case Some(metadata) => metadata
+      case None => new Metadata()
+    }
 }

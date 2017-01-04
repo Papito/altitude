@@ -47,6 +47,12 @@ import scala.collection.immutable.HashMap
       numberMetadataField.id.get -> Set("1", "2", "3.002", "14.1", "1.25", "123456789"))
 
     altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+
+    val storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
+
+    storedMetadata.data should not be empty
+    storedMetadata.data.keys should contain(keywordMetadataField.id.get)
+    storedMetadata.data.keys should contain(numberMetadataField.id.get)
   }
 
 /*
@@ -91,7 +97,6 @@ import scala.collection.immutable.HashMap
             MetadataField(name = "fieldName", fieldType = "SO_INVALID"))
         }
   }
-*/
 
   test("add duplicate field") {
     val fieldName = "field name"
@@ -103,4 +108,5 @@ import scala.collection.immutable.HashMap
         MetadataField(name = fieldName, fieldType = FieldType.KEYWORD.toString))
     }
   }
+*/
 }

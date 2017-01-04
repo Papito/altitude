@@ -255,7 +255,7 @@ class LibraryService(app: Altitude) {
 
   def moveAssetsToUncategorized(assetIds: Set[String])
                                (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
-    txManager.withTransaction[Unit] {
+    txManager.withTransaction {
       moveAssetsToFolder(assetIds, ctx.repo.uncatFolderId)
       app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS, assetIds.size)
     }
@@ -299,7 +299,7 @@ class LibraryService(app: Altitude) {
                                 (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
     var totalBytes = 0L
 
-    txManager.withTransaction[Unit] {
+    txManager.withTransaction {
       val restoredAssetIds: Set[String] = assetIds.map { assetId: String =>
         val trashed: Asset = app.service.trash.getById(assetId)
         app.service.trash.deleteById(assetId)
@@ -328,7 +328,7 @@ class LibraryService(app: Altitude) {
                            (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
     var totalBytes = 0L
 
-    txManager.withTransaction[Unit] {
+    txManager.withTransaction {
       assetIds.foreach { assetId =>
         val trashed: Asset = app.service.trash.getById(assetId)
         app.service.trash.deleteById(assetId)

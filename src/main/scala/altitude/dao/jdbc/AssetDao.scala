@@ -1,11 +1,14 @@
 package altitude.dao.jdbc
 
-import altitude.models.{Asset, AssetType}
+import altitude.models.{Metadata, Asset, AssetType}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
+import org.apache.commons.dbutils.QueryRunner
+import org.slf4j.LoggerFactory
 import play.api.libs.json._
 
 abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with altitude.dao.AssetDao {
+  private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val assetType = new AssetType(
@@ -56,5 +59,37 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
       metadata)
 
     addRecord(jsonIn, sql, sqlVals)
+  }
+
+  override def setMetadata(assetId: String, metadata: Metadata)
+                          (implicit ctx: Context, txId: TransactionId) = {
+    val sql = s"""
+      UPDATE $tableName
+         SET ${C.Base.UPDATED_AT} = $CURRENT_TIME_FUNC, ${C.Asset.METADATA} = $JSON_FUNC
+       WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
+      """
+
+    val updateValues = List(metadata.toString, ctx.repo.id.get, assetId)
+    log.debug(s"Update SQL: [$sql] with values: $updateValues")
+    val runner: QueryRunner = new QueryRunner()
+
+    runner.update(conn, sql, updateValues:_*)
+  }
+
+  override def getMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Option[Metadata] = {
+    val sql = s"""
+      SELECT ${C.Asset.METADATA}
+         FROM $tableName
+       WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
+      """
+
+    oneBySqlQuery(sql, List(ctx.repo.id.get, assetId)) match {
+      case Some(rec) =>
+        val metadataJson: String = rec.getOrElse(C.Asset.METADATA, "{}").asInstanceOf[String]
+        val json = Json.parse(metadataJson).as[JsObject]
+        val metadata = Metadata.fromJson(json)
+        Some(metadata)
+      case None => None
+    }
   }
 }
