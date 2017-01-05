@@ -18,21 +18,21 @@ object MetadataField {
     MetadataField(
       id = (json \ C.Base.ID).asOpt[String],
       name = (json \ C.MetadataField.NAME).as[String],
-      fieldType = (json \ C.MetadataField.FIELD_TYPE).as[String]
+      fieldType = FieldType.withName((json \ C.MetadataField.FIELD_TYPE).as[String])
     ).withCoreAttr(json)
 }
 
 case class MetadataField(
                   id: Option[String] = None,
                   name: String,
-                  fieldType: String) extends BaseModel {
+                  fieldType: FieldType.Value) extends BaseModel {
 
   val nameLowercase = name.toLowerCase
 
   override def toJson = Json.obj(
       C.MetadataField.NAME -> name,
       C.MetadataField.NAME_LC -> nameLowercase,
-      C.MetadataField.FIELD_TYPE -> fieldType
+      C.MetadataField.FIELD_TYPE -> fieldType.toString
     ) ++ coreJsonAttrs
 
 }

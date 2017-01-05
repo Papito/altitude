@@ -1,6 +1,6 @@
 package altitude.dao.jdbc
 
-import altitude.models.MetadataField
+import altitude.models.{FieldType, MetadataField}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
 import play.api.libs.json.JsObject
@@ -12,7 +12,8 @@ abstract class MetadataFieldDao (val app: Altitude)
     val model = MetadataField(
       id = Some(rec.get(C.Base.ID).get.asInstanceOf[String]),
       name = rec.get(C.MetadataField.NAME).get.asInstanceOf[String],
-      fieldType = rec.get(C.MetadataField.FIELD_TYPE).get.asInstanceOf[String]
+      fieldType = FieldType.withName(
+        rec.get(C.MetadataField.FIELD_TYPE).get.asInstanceOf[String])
     )
     addCoreAttrs(model, rec)
   }
@@ -32,7 +33,7 @@ abstract class MetadataFieldDao (val app: Altitude)
     val sqlVals: List[Object] = List(
       metadataField.name,
       metadataField.nameLowercase,
-      metadataField.fieldType)
+      metadataField.fieldType.toString)
 
     addRecord(jsonIn, sql, sqlVals)
   }

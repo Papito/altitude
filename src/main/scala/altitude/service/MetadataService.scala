@@ -24,14 +24,6 @@ class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
               (implicit ctx: Context, txId: TransactionId = new TransactionId): MetadataField = {
 
     txManager.withTransaction[MetadataField] {
-      // verify that the field type is allowed
-      if (!FieldType.values.exists(v => v.toString == metadataField.fieldType.toUpperCase)) {
-        val ex = ValidationException()
-        ex.errors += (C.MetadataField.FIELD_TYPE ->
-          C.Msg.Err.WRONG_VALUE.format(FieldType.values.mkString(", ")))
-        throw ex
-      }
-
       val existing = METADATA_FIELD_DAO.query(Query(Map(
         C.MetadataField.NAME_LC -> metadataField.nameLowercase
       )))
