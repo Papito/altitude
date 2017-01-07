@@ -24,7 +24,6 @@ import org.scalatest.Matchers._
     altitude.service.library.recycleAsset(assetToDelete2.id.get)
 
     val stats = altitude.service.stats.getStats
-    println(stats)
     stats.getStatValue(Stats.TOTAL_ASSETS) should be (2)
     stats.getStatValue(Stats.RECYCLED_ASSETS) should be (2)
     stats.getStatValue(Stats.UNCATEGORIZED_ASSETS) should be (1)

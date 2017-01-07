@@ -2,7 +2,7 @@ package altitude.dao.postgres
 
 import altitude.models.Metadata
 import altitude.transactions.TransactionId
-import altitude.{Const => C, Context, Altitude}
+import altitude.{Altitude, Const => C, Context}
 import play.api.libs.json.{JsObject, Json}
 
 class AssetDao(app: Altitude) extends altitude.dao.jdbc.AssetDao(app) with Postgres {
