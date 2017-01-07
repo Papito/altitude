@@ -12,8 +12,8 @@ object AltitudeBuild extends Build {
   val Organization = "altitude"
   val Name = "Altitude"
   val Version = "0.1.0-SNAPSHOT"
-  val ScalaVersion = "2.11.7"
-  val ScalatraVersion = "2.4.0"
+  val ScalaVersion = "2.11.8"
+  val ScalatraVersion = "2.5.0"
   val json4sversion = "3.3.0"
   val jettyVersion = "9.1.3.v20140225"
 
