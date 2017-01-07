@@ -13,7 +13,7 @@ object AltitudeBuild extends Build {
   val Name = "Altitude"
   val Version = "0.1.0-SNAPSHOT"
   val ScalaVersion = "2.11.8"
-  val ScalatraVersion = "2.5.0"
+  val ScalatraVersion = "2.4.0"
   val json4sversion = "3.3.0"
   val jettyVersion = "9.1.3.v20140225"
 
@@ -32,12 +32,11 @@ object AltitudeBuild extends Build {
     libraryDependencies ++= Seq(
       "org.scalatra"                %% "scalatra"              % ScalatraVersion,
       "org.scalatra"                %% "scalatra-atmosphere"   % ScalatraVersion,
-      "com.mitchellbosecke"          % "pebble"                % "2.2.0",
+      "com.mitchellbosecke"          % "pebble"                % "2.3.0",
       "org.scalatra"                %% "scalatra-scalatest"    % ScalatraVersion % "test",
       "org.json4s"                  %% "json4s-jackson"        % json4sversion,
       "org.json4s"                  %% "json4s-mongo"          % json4sversion,
       "com.typesafe.play"           %% "play-json"             % "2.3.10",
-
 
       "org.apache.tika"              % "tika-parsers"          % "1.7",
       "org.apache.tika"              % "tika-serialization"    % "1.7",
@@ -45,13 +44,13 @@ object AltitudeBuild extends Build {
       "commons-dbutils"              % "commons-dbutils"       % "1.6",
 
       "ch.qos.logback"               % "logback-classic"       % "1.1.2" % "runtime",
-      "net.codingwell"              %% "scala-guice"           % "4.0.0-beta5",
+      "net.codingwell"              %% "scala-guice"           % "4.1.0",
       "org.imgscalr"                 % "imgscalr-lib"          % "4.2",
 
       "org.postgresql"               % "postgresql"            % "9.4-1201-jdbc41",
       "org.mongodb"                  % "casbah_2.11"           % "3.1.1",
       "org.mongodb"                  % "casbah-commons_2.11"   % "3.1.1",
-      "org.xerial"                   % "sqlite-jdbc"           % "3.8.11.1",
+      "org.xerial"                   % "sqlite-jdbc"           % "3.15.1",
 
       "org.eclipse.jetty"            %  "jetty-plus"           % jettyVersion % "container;compile",
       "org.eclipse.jetty.websocket"  %  "websocket-server"     % jettyVersion % "container;compile",
