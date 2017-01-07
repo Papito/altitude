@@ -10,7 +10,6 @@ object FieldType extends Enumeration {
   val TEXT = Value("TEXT")
   val NUMBER = Value("NUMBER")
   val BOOL = Value("BOOL")
-  val DATETIME = Value("DATETIME")
 }
 
 object MetadataField {

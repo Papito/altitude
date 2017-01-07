@@ -10,11 +10,53 @@ import scala.collection.immutable.HashMap
 
 @DoNotDiscover class MetadataServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 
+  test("update metadata values") {
+    val field1 = altitude.service.metadata.addField(
+      MetadataField(
+        name = "field 1",
+        fieldType = FieldType.KEYWORD))
+
+    val field2 = altitude.service.metadata.addField(
+      MetadataField(
+        name = "field 2",
+        fieldType = FieldType.NUMBER))
+
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
+
+    var data = Map[String, Set[String]](
+      field1.id.get -> Set("one", "two", "three"),
+      field2.id.get -> Set("1", "2", "3.002", "14.1", "1.25", "123456789"))
+
+    altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+
+    var storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
+    storedMetadata.data.keys should contain(field1.id.get)
+    storedMetadata.data.keys should contain(field2.id.get)
+
+    val field3 = altitude.service.metadata.addField(
+      MetadataField(
+        name = "field 3",
+        fieldType = FieldType.KEYWORD))
+
+    data = Map[String, Set[String]](
+      field3.id.get -> Set("test 1", "test 2"),
+      field2.id.get -> Set("3.002", "14.1", "1.25", "123456789"))
+
+    altitude.service.metadata.updateMetadata(asset.id.get, new Metadata(data))
+
+    storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
+    storedMetadata.data.keys should contain(field1.id.get)
+    storedMetadata.data.keys should contain(field2.id.get)
+    storedMetadata.data.keys should contain(field3.id.get)
+
+    storedMetadata.data(field2.id.get) shouldNot contain("1")
+    storedMetadata.data(field2.id.get) shouldNot contain("2")
+  }
+
   test("set metadata values") {
     val keywordMetadataField = altitude.service.metadata.addField(
       MetadataField(
         name = "keyword field",
-        // FIXME: use the enumeration
         fieldType = FieldType.KEYWORD))
 
     val numberMetadataField = altitude.service.metadata.addField(
@@ -55,7 +97,6 @@ import scala.collection.immutable.HashMap
     storedMetadata.data.keys should contain(numberMetadataField.id.get)
   }
 
-  /*
     test("add/get fields") {
       val metadataField = altitude.service.metadata.addField(
         MetadataField(name = "field name", fieldType = FieldType.KEYWORD))
@@ -65,47 +106,42 @@ import scala.collection.immutable.HashMap
       (storedField.get: MetadataField).fieldType shouldBe FieldType.KEYWORD
     }
 
-    test("update metadata values") {
-
-    }
-
     test("delete field") {
       val metadataField = altitude.service.metadata.addField(
         MetadataField(
           name = "fieldName",
-          fieldType = FieldType.STRING))
+          fieldType = FieldType.KEYWORD))
 
-      altitude.service.metadata.getAllFields.length shouldBe 1
+      altitude.service.metadata.getAllFields.size shouldBe 1
       altitude.service.metadata.deleteFieldById(metadataField.id.get)
       altitude.service.metadata.getAllFields shouldBe empty
     }
 
     test("get all fields") {
       altitude.service.metadata.addField(
-        MetadataField(name = "field name 1", fieldType = FieldType.STRING.toString))
+        MetadataField(name = "field name 1", fieldType = FieldType.KEYWORD))
       altitude.service.metadata.addField(
-        MetadataField(name = "field name 2", fieldType = FieldType.STRING.toString))
+        MetadataField(name = "field name 2", fieldType = FieldType.KEYWORD))
 
       SET_SECONDARY_USER()
       altitude.service.metadata.addField(
-        MetadataField(name = "field name 3", fieldType = FieldType.STRING.toString))
+        MetadataField(name = "field name 3", fieldType = FieldType.KEYWORD))
 
       SET_PRIMARY_USER()
-      altitude.service.metadata.getAllFields.length shouldBe 3
+      altitude.service.metadata.getAllFields.size shouldBe 3
 
       SET_SECONDARY_USER()
-      altitude.service.metadata.getAllFields.length shouldBe 3
+      altitude.service.metadata.getAllFields.size shouldBe 3
     }
 
     test("add duplicate field") {
       val fieldName = "field name"
       altitude.service.metadata.addField(
-        MetadataField(name = fieldName, fieldType = FieldType.KEYWORD.toString))
+        MetadataField(name = fieldName, fieldType = FieldType.KEYWORD))
 
       intercept[DuplicateException] {
         altitude.service.metadata.addField(
-          MetadataField(name = fieldName, fieldType = FieldType.KEYWORD.toString))
+          MetadataField(name = fieldName, fieldType = FieldType.KEYWORD))
       }
     }
-  */
 }

@@ -70,62 +70,6 @@ class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
       METADATA_FIELD_DAO.deleteById(id)
     }
 
-  def setMetadata(assetId: String, metadata: Metadata)
-               (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
-    log.info(s"Setting metadata for asset [$assetId]: $metadata")
-
-    txManager.withTransaction {
-      // get all metadata fields configured for this repository
-      val fields = getAllFields
-
-      // make sure all metadata field IDs given to us are known
-      val existingFieldIds = fields.keys.toSet
-      val suppliedFieldIds = metadata.keys
-
-      val missing = suppliedFieldIds.diff(existingFieldIds)
-
-      if (missing.nonEmpty)
-          throw NotFoundException(
-            s"Fields [${missing.mkString(", ")}] are not supported by this repository"
-          )
-
-      /**
-       * Clean the metadata to be ready for validation
-       */
-      val cleanData = metadata.data.foldLeft(Map[String, Set[String]]()) { (res, m) =>
-        val fieldId = m._1
-        val values: Set[String] = m._2
-        // trim all values and discard blanks
-        val trimmed = values.map(_.trim).filter(_.nonEmpty)
-        res + (fieldId -> trimmed)
-      }
-
-
-      /**
-       * Validate for duplicates in passed data
-       */
-      val ex = ValidationException()
-
-      cleanData.foreach { m =>
-        val fieldId = m._1
-        val values: Set[String] = m._2
-        val valuesLower = values.map(_.toLowerCase)
-
-        if (values.size != valuesLower.size) {
-          val field: MetadataField = fields(fieldId)
-          ex.errors += (field.name ->
-            C.Msg.Warn.DUPLICATE_FIELD_VALUE.format(field.name, values.mkString(", ")))
-        }
-      }
-
-      if (ex.nonEmpty)
-        throw ex
-
-      val cleanMetadata = new Metadata(cleanData)
-      ASSET_DAO.setMetadata(assetId = assetId, metadata = cleanMetadata)
-    }
-  }
-
   def getMetadata(assetId: String)
                  (implicit ctx: Context, txId: TransactionId = new TransactionId): Metadata =
     // return the metadata or a new empty one if blank
@@ -133,4 +77,81 @@ class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
       case Some(metadata) => metadata
       case None => new Metadata()
     }
+
+  def setMetadata(assetId: String, metadata: Metadata)
+               (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
+    log.info(s"Setting metadata for asset [$assetId]: $metadata")
+
+    txManager.withTransaction {
+      val _metadata = cleanAndValidateMetadata(metadata)
+      ASSET_DAO.setMetadata(assetId = assetId, metadata = _metadata)
+    }
+  }
+
+  def updateMetadata(assetId: String, metadata: Metadata)
+                 (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
+    log.info(s"Updating metadata for asset [$assetId]: $metadata")
+
+    txManager.withTransaction {
+      val _metadata = cleanAndValidateMetadata(metadata)
+      ASSET_DAO.updateMetadata(assetId, _metadata)
+    }
+  }
+
+  /**
+   * Makes sure the metadata fields are configured in this syste,m after common-sense data
+   * hygiene
+   *
+   * @return clean, de-duplicated copy of the metadata
+   */
+  private def cleanAndValidateMetadata(metadata: Metadata)
+                                      (implicit ctx: Context, txId: TransactionId ) = {
+    // get all metadata fields configured for this repository
+    val fields = getAllFields
+
+    // make sure all metadata field IDs given to us are known
+    val existingFieldIds = fields.keys.toSet
+    val suppliedFieldIds = metadata.keys
+
+    val missing = suppliedFieldIds.diff(existingFieldIds)
+
+    if (missing.nonEmpty)
+      throw NotFoundException(
+        s"Fields [${missing.mkString(", ")}] are not supported by this repository"
+      )
+
+    /**
+     * Clean the metadata to be ready for validation
+     */
+    val cleanData = metadata.data.foldLeft(Map[String, Set[String]]()) { (res, m) =>
+      val fieldId = m._1
+      val values: Set[String] = m._2
+      // trim all values and discard blanks
+      val trimmed = values.map(_.trim).filter(_.nonEmpty)
+      res + (fieldId -> trimmed)
+    }
+
+
+    /**
+     * Validate for duplicates in passed data
+     */
+    val ex = ValidationException()
+
+    cleanData.foreach { m =>
+      val fieldId = m._1
+      val values: Set[String] = m._2
+      val valuesLower = values.map(_.toLowerCase)
+
+      if (values.size != valuesLower.size) {
+        val field: MetadataField = fields(fieldId)
+        ex.errors += (field.name ->
+          C.Msg.Warn.DUPLICATE_FIELD_VALUE.format(field.name, values.mkString(", ")))
+      }
+    }
+
+    if (ex.nonEmpty)
+      throw ex
+
+    new Metadata(cleanData)
+  }
 }

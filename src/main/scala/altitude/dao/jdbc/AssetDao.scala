@@ -28,6 +28,23 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
     addCoreAttrs(model, rec)
   }
 
+  override def getMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Option[Metadata] = {
+    val sql = s"""
+      SELECT ${C.Asset.METADATA}
+         FROM $tableName
+       WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
+      """
+
+    oneBySqlQuery(sql, List(ctx.repo.id.get, assetId)) match {
+      case Some(rec) =>
+        val metadataJson: String = rec.getOrElse(C.Asset.METADATA, "{}").asInstanceOf[String]
+        val json = Json.parse(metadataJson).as[JsObject]
+        val metadata = Metadata.fromJson(json)
+        Some(metadata)
+      case None => None
+    }
+  }
+
   override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
     val asset = jsonIn: Asset
 
@@ -74,22 +91,5 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
     val runner: QueryRunner = new QueryRunner()
 
     runner.update(conn, sql, updateValues:_*)
-  }
-
-  override def getMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Option[Metadata] = {
-    val sql = s"""
-      SELECT ${C.Asset.METADATA}
-         FROM $tableName
-       WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
-      """
-
-    oneBySqlQuery(sql, List(ctx.repo.id.get, assetId)) match {
-      case Some(rec) =>
-        val metadataJson: String = rec.getOrElse(C.Asset.METADATA, "{}").asInstanceOf[String]
-        val json = Json.parse(metadataJson).as[JsObject]
-        val metadata = Metadata.fromJson(json)
-        Some(metadata)
-      case None => None
-    }
   }
 }
