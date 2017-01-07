@@ -11,7 +11,7 @@ trait AssetDao extends BaseDao {
   def getMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Option[Metadata]
   def setMetadata(assetId: String, metadata: Metadata)(implicit ctx: Context, txId: TransactionId)
 
-  def updateMetadata(assetId: String, metadata: Metadata)
+  def updateMetadata(assetId: String, metadata: Metadata, deletedFields: Set[String])
                              (implicit ctx: Context, txId: TransactionId) = {
     /**
      * Pedestrian version of this just overwrites fields for old metadata and re-sets it on the asset.
@@ -23,7 +23,8 @@ trait AssetDao extends BaseDao {
     }
 
     log.debug(s"Updating $existingMetadata with $metadata")
-    val newMetadata = new Metadata(existingMetadata.data ++ metadata.data)
+    val newData = (existingMetadata.data ++ metadata.data).filterNot(m => deletedFields.contains(m._1))
+    val newMetadata = new Metadata(newData)
     log.debug(s"New metadata -> $newMetadata")
 
     setMetadata(assetId, newMetadata)

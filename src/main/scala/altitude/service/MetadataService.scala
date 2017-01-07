@@ -83,8 +83,8 @@ class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
     log.info(s"Setting metadata for asset [$assetId]: $metadata")
 
     txManager.withTransaction {
-      val _metadata = cleanAndValidateMetadata(metadata)
-      ASSET_DAO.setMetadata(assetId = assetId, metadata = _metadata)
+      val cleanMetadata = cleanAndValidateMetadata(metadata)
+      ASSET_DAO.setMetadata(assetId = assetId, metadata = cleanMetadata)
     }
   }
 
@@ -93,8 +93,14 @@ class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
     log.info(s"Updating metadata for asset [$assetId]: $metadata")
 
     txManager.withTransaction {
-      val _metadata = cleanAndValidateMetadata(metadata)
-      ASSET_DAO.updateMetadata(assetId, _metadata)
+      val cleanMetadata = cleanAndValidateMetadata(metadata)
+
+      /**
+       * If the cleaned metadata does not have fields found in the original -
+       * those are empty and should be deleted
+       */
+      val deletedFields = metadata.data.keys.filterNot(cleanMetadata.data.keys.toSet.contains).toSet
+      ASSET_DAO.updateMetadata(assetId, cleanMetadata, deletedFields)
     }
   }
 
@@ -128,9 +134,12 @@ class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
       val values: Set[String] = m._2
       // trim all values and discard blanks
       val trimmed = values.map(_.trim).filter(_.nonEmpty)
-      res + (fieldId -> trimmed)
-    }
 
+      if (trimmed.nonEmpty)
+        res + (fieldId -> trimmed)
+      else
+        res
+    }
 
     /**
      * Validate for duplicates in passed data
