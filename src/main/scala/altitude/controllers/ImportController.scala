@@ -67,7 +67,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
 
   atmosphere("/ws") {
     new AtmosphereClient {
-      private def uuidJson: JsValue = JsObject(Seq("uid" -> JsString(uuid)))
+      private def uuidJson: JsValue = Json.obj("uid" -> JsString(uuid))
       private var stopImport = false
       private case class NotImportable() extends Exception
       private val workerNum: AtomicInteger = new AtomicInteger(0)
@@ -100,7 +100,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
           assets = Some(app.service.fileImport.getFilesToImport(path = path))
           assetsIt = Some(assets.get.toIterator)
 
-          this.writeToYou(JsObject(Seq("total" -> JsNumber(assets.get.size))))
+          this.writeToYou(Json.obj("total" -> JsNumber(assets.get.size)))
         }
 
         case message @ JsonMessage(JObject(JField("action", JString("stopImport")) :: fields)) => {
@@ -125,10 +125,9 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
               runImportWorker(threadIdx)
             } onFailure {
               case allDone: AllDone => cleanupWorker()
-              case ex: Exception => {
+              case ex: Exception =>
                 cleanupWorker()
                 log.error("Unknown worker exception: $ex")
-              }
             }
           }
         }
@@ -158,7 +157,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
         if (workersNow == 0) {
           log.debug(s"ALL DONE")
           stopImport = false
-          this.writeToYou(JsObject(Seq("end" -> JsBoolean(true))))
+          this.writeToYou(Json.obj("end" -> JsBoolean(true)))
         }
       }
 
@@ -174,35 +173,33 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
             val asset: Option[Asset] = app.service.fileImport.importAsset(importAsset)
             if (asset.isEmpty) throw NotImportable()
 
-            val resp = JsObject(Seq(
+            val resp = Json.obj(
               C.Api.Asset.ASSET -> asset.get.toJson,
-              C.Api.Import.IMPORTED -> JsBoolean(true)
-            ))
+              C.Api.Import.IMPORTED -> JsBoolean(true))
             this.writeToYou(resp)
           }
           catch {
-            case ex: NotImportable => {/* next */}
-            case ex: DuplicateException => {
+            case ex: NotImportable =>
+            case ex: DuplicateException =>
               log.warn(s"Duplicate for $importAsset")
               val duplicateOf: Asset = ex.duplicateOf
-              val resp = JsObject(Seq(
+              val resp = Json.obj(
                 C.Api.WARNING -> JsString(C.Msg.Warn.DUPLICATE + " of " + duplicateOf.path),
                 C.Api.Asset.ASSET -> ex.objJson,
                 C.Api.DUPLICATE_OF -> ex.duplicateOf,
-                C.Api.Import.IMPORTED -> JsBoolean(false)
-              ))
+                C.Api.Import.IMPORTED -> JsBoolean(false))
               this.writeToYou(resp)
-            }
-            case ex: MetadataExtractorException => {
+
+            case ex: MetadataExtractorException =>
               log.warn(s"Metadata extraction error for $importAsset")
-              val resp =JsObject(Seq(
+              val resp =Json.obj(
                 C.Api.WARNING -> JsString(
                   s"Metadata parser(s) failed. Asset still imported"),
                 C.Api.Asset.ASSET -> ex.asset.toJson,
-                C.Api.Import.IMPORTED -> JsBoolean(true)))
+                C.Api.Import.IMPORTED -> JsBoolean(true))
               this.writeToYou(resp)
-            }
-            case ex: Exception => {
+
+            case ex: Exception =>
               log.error(s"Import error for $importAsset")
               val sw: StringWriter = new StringWriter()
               val pw: PrintWriter = new PrintWriter(sw)
@@ -210,13 +207,11 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
 
               log.error(s"${ex.getClass.getName} exception: ${sw.toString}")
 
-              val resp = JsObject(Seq(
+              val resp = Json.obj(
                 C.Api.ERROR -> JsString(ex.toString),
                 C.Api.Import.IMPORTED -> JsBoolean(false),
-                C.Api.ImportAsset.IMPORT_ASSET -> importAsset.toJson
-              ))
+                C.Api.ImportAsset.IMPORT_ASSET -> importAsset.toJson)
               this.writeToYou(resp)
-            }
           }
         }
 

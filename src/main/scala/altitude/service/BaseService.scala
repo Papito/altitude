@@ -28,7 +28,6 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
    * Add a single document
    * @param objIn the document to be added
    * @param queryForDup query to find duplicate documents
-   * @throws DuplicateException if the duplicate query finds anything
    *
    * @return the document, complete with its ID in the database
    */
@@ -59,7 +58,6 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
    *                    updating a record with a certain email if that email already exists somewhere
    *                    else. The DAO layer will relegate this to the storage engine to deal with,
    *                    if this is missed.
-   * @throws DuplicateException if the query to find a duplicate yields something
    *
    * @return number of documents updated - 0 or 1
    */
@@ -126,7 +124,6 @@ abstract class BaseService[Model <: BaseModel](app: Altitude) {
    * Gert a single record by ID
    *
    * @param id record id as string
-   * @throws NotFoundException if the id lookup is a miss
    *
    * @return the document
    */

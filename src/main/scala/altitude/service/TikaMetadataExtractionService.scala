@@ -53,14 +53,11 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
 
     try {
       normalized match {
-        case None => {
-          JsNull
-        }
-        case _ => {
+        case None => JsNull
+        case _ =>
           JsonMetadata.toJson(normalized.get, writer)
           val jsonData = writer.toString
           Json.parse(jsonData)
-        }
       }
     }
     finally {
@@ -86,11 +83,10 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
         }
         catch {
           case ex: AllDone => throw ex
-          case ex: Exception => {
+          case ex: Exception =>
             ex.printStackTrace()
             log.error(
               s"Error extracting metadata for '$importAsset' with ${parser.getClass.getSimpleName}: ${ex.toString}")
-          }
         }
         finally {
           if (inputStream.isDefined)
@@ -117,14 +113,13 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
         case true if raw.get.names().contains(destField) => {
           normalized.add(destField, raw.get.get(destField).trim)
         }
-        case _ => {
+        case _ =>
           // find all the fields that exist in metadata
           val existingSrcFields = srcFields.filter(raw.get.names().contains)
           // the field on TOP is it
           if (existingSrcFields.nonEmpty) {
             normalized.add(destField, raw.get.get(existingSrcFields.head).trim)
           }
-        }
       }
 
     }

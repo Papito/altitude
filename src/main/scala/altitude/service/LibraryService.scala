@@ -53,10 +53,9 @@ class LibraryService(app: Altitude) {
       // make and add preview, UNLESS we already have the data
       obj.previewData.length match {
         case 0 => addPreview(asset)
-        case _ => {
+        case _ =>
           log.debug("Asset preview data already given")
           addPreviewData(asset, obj.previewData)
-        }
       }
 
       assetJson
@@ -106,7 +105,7 @@ class LibraryService(app: Altitude) {
         // no folder filtering, query as is
         case true => query
         // create a new query that includes folder children, since we are searching the hierarchy
-        case false => {
+        case false =>
           val allFolderIds = app.service.folder.flatChildrenIds(parentIds = folderIds)
           log.debug(s"Expanded folder ids: $allFolderIds")
 
@@ -115,7 +114,6 @@ class LibraryService(app: Altitude) {
             params = query.params
               ++ Map(C.Api.Folder.QUERY_ARG_NAME -> allFolderIds.mkString(C.Api.MULTI_VALUE_DELIM)),
             page = query.page, rpp = query.rpp)
-        }
       }
 
       log.info("SEARCH QUERY: " + _query)

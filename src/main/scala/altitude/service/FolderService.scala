@@ -112,8 +112,7 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
       val id = (json \ C.Base.ID).as[String]
       val assetCount = flatChildren(id, folders).toSeq.map(_.numOfAssets).sum
 
-      json ++ JsObject(Seq(
-        C.Folder.NUM_OF_ASSETS -> JsNumber(assetCount)))
+      json ++ Json.obj(C.Folder.NUM_OF_ASSETS -> JsNumber(assetCount))
     }
   }
 
@@ -145,8 +144,10 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
       val rootEl = nonSysFolders.find(json => (json \ C.Base.ID).as[String] == _rootId)
 
       isRootFolder(_rootId) || rootEl.isDefined match {
-        case true => children(_rootId, nonSysFolders)
-        case false => throw NotFoundException(s"Cannot get hierarchy. Root folder $rootId does not exist")
+        case true =>
+          children(_rootId, nonSysFolders)
+        case false =>
+          throw NotFoundException(s"Cannot get hierarchy. Root folder $rootId does not exist")
       }
     }
   }
@@ -166,8 +167,10 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
 
       val folderEl = nonSysFolders.find(json => (json \ C.Base.ID).as[String] == folderId)
       val folder: Folder = folderEl.isDefined match {
-        case true => Folder.fromJson(folderEl.get)
-        case false => throw NotFoundException(s"Folder with ID '$folderId' not found")
+        case true =>
+          Folder.fromJson(folderEl.get)
+        case false =>
+          throw NotFoundException(s"Folder with ID '$folderId' not found")
       }
 
       val parents = findParents(folderId = folderId, all = nonSysFolders)
@@ -276,18 +279,19 @@ class FolderService(app: Altitude) extends BaseService[Folder](app) {
     val folderEl = nonSysFolders.find(json => (json \ C.Base.ID).as[String] == folderId)
 
     val parentId = folderEl.isDefined match {
-      case true => (folderEl.get \ C.Folder.PARENT_ID).as[String]
-      case false => throw NotFoundException(s"Folder with ID '$folderId' not found")
+      case true =>
+        (folderEl.get \ C.Folder.PARENT_ID).as[String]
+      case false =>
+        throw NotFoundException(s"Folder with ID '$folderId' not found")
     }
 
     val parentElements = nonSysFolders filter (json => (json \ C.Base.ID).as[String] == parentId)
 
     parentElements.isEmpty match {
       case true => List()
-      case false => {
+      case false =>
         val folder = Folder.fromJson(parentElements.head)
         List(folder) ++ findParents(folderId = folder.id.get, nonSysFolders)
-      }
     }
   }
 

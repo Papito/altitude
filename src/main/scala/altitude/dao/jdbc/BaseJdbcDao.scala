@@ -147,8 +147,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     val runner: QueryRunner = new QueryRunner()
     runner.update(conn, sql, values:_*)
 
-    val recordJson = jsonIn ++ JsObject(Seq(
-      C.Base.ID -> JsString(id)))
+    val recordJson = jsonIn ++ Json.obj(C.Base.ID -> id)
 
     log.debug(s"Added: $recordJson")
     recordJson

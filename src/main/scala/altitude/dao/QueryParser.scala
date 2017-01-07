@@ -10,12 +10,11 @@ trait QueryParser {
     val foldersParam = query.params.filter(_._1 == C.Api.Folder.QUERY_ARG_NAME)
     foldersParam.isEmpty match {
       case true => Set[String]()
-      case false => {
+      case false =>
         foldersParam.head._2.toString
           .split(s"\\${C.Api.MULTI_VALUE_DELIM}")
           .map(_.trim)
           .filter(_.nonEmpty).toSet
-      }
     }
   }
 
