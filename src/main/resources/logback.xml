@@ -1,0 +1,23 @@
+<configuration>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- encoders are assigned the type
+         ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+    <encoder>
+      <pattern>%boldWhite(%d{HH:mm:ss.SSS}) %cyan(%X{REQUEST_ID}) %gray(%X{USER}) %highlight(%-5level) %logger{36}:%M:%L - %highlight(%msg) %n</pattern>
+    </encoder>
+  </appender>
+
+  <root level="DEBUG">
+    <appender-ref ref="STDOUT" />
+  </root>
+
+  <logger name="altitude" level="DEBUG" />
+  <logger name="altitude.transactions" level="WARN" />
+  <logger name="org.fusesource.scalate" level="WARN" />
+  <logger name="org.atmosphere" level="WARN" />
+  <logger name="org.scalatra.servlet" level="INFO" />
+  <logger name="org.eclipse.jetty" level="INFO" />
+  <logger name="com.mongodb" level="WARN" />
+  <logger name="org.mongodb" level="WARN" />
+  <logger name="com.mitchellbosecke.pebble" level="INFO" />
+</configuration>

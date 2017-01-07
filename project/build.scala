@@ -38,8 +38,8 @@ object AltitudeBuild extends Build {
       "org.json4s"                  %% "json4s-mongo"          % json4sversion,
       "com.typesafe.play"           %% "play-json"             % "2.3.10",
 
-      "org.apache.tika"              % "tika-parsers"          % "1.7",
-      "org.apache.tika"              % "tika-serialization"    % "1.7",
+      "org.apache.tika"              % "tika-parsers"          % "1.14",
+      "org.apache.tika"              % "tika-serialization"    % "1.14",
       "commons-io"                   % "commons-io"            % "2.5",
       "commons-dbutils"              % "commons-dbutils"       % "1.6",
 
@@ -56,7 +56,9 @@ object AltitudeBuild extends Build {
       "org.eclipse.jetty.websocket"  %  "websocket-server"     % jettyVersion % "container;compile",
       "org.eclipse.jetty"            %  "jetty-webapp"         % jettyVersion % "container;compile",
       "javax.servlet"                %  "javax.servlet-api"    % "3.1.0" % "provided"
-    )
+    ).map(_.exclude("commons-logging", "commons-logging"))
+     .map(_.exclude("org.apache.cxf", "cxf-core"))
+     .map(_.exclude("org.apache.cxf", "cxf-cxf-rt-transports-http"))
   )
   val scalateSettings =
     ScalatePlugin.scalateSettings ++ Seq(
@@ -77,8 +79,6 @@ object AltitudeBuild extends Build {
   assemblyMergeStrategy in assembly := {
     case x if x.startsWith("META-INF") => MergeStrategy.discard
     case x if x.endsWith(".html") => MergeStrategy.discard
-    case PathList("commons-logging", "commons-logging", xs@_ *) => MergeStrategy.first
-    case PathList("commons-logging", "commons-logging-api", xs@_ *) => MergeStrategy.first
     case x =>
       val oldStrategy = (assemblyMergeStrategy in assembly).value
       oldStrategy(x)
