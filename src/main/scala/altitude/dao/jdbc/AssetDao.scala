@@ -1,6 +1,6 @@
 package altitude.dao.jdbc
 
-import altitude.models.{Metadata, Asset, AssetType}
+import altitude.models.{Asset, AssetType, Metadata}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
 import org.apache.commons.dbutils.QueryRunner

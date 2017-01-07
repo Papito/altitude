@@ -2,7 +2,7 @@ package altitude.dao.jdbc
 
 import altitude.models.MetadataValue
 import altitude.transactions.TransactionId
-import altitude.{Context, Altitude, Const => C}
+import altitude.{Altitude, Const => C, Context}
 import play.api.libs.json.JsObject
 
 abstract class MetadataValueDao (val app: Altitude)

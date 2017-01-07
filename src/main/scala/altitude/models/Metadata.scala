@@ -1,8 +1,8 @@
 package altitude.models
 
-import scala.language.implicitConversions
-
 import play.api.libs.json._
+
+import scala.language.implicitConversions
 
 object Metadata {
   implicit def fromJson(json: JsObject): Metadata = {

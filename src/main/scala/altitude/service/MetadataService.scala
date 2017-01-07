@@ -1,14 +1,14 @@
 package altitude.service
 
 import altitude.dao.{AssetDao, MetadataFieldDao, NotImplementedDao}
-import altitude.exceptions.{NotFoundException, DuplicateException, ValidationException}
-import altitude.models.search.{Query, QueryResult}
-import altitude.models.{Metadata, FieldType, MetadataField}
+import altitude.exceptions.{DuplicateException, NotFoundException, ValidationException}
+import altitude.models.search.Query
+import altitude.models.{Metadata, MetadataField}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{Json, JsString, JsObject}
+import play.api.libs.json.JsObject
 
 
 class MetadataService(app: Altitude) extends BaseService[MetadataField](app){

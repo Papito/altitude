@@ -5,8 +5,6 @@ import altitude.models._
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
-import scala.collection.immutable.HashMap
-
 
 @DoNotDiscover class MetadataServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 

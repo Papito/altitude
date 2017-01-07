@@ -1,11 +1,11 @@
 package altitude.dao.mongo
 
-import altitude.transactions.TransactionId
-import altitude.{Const => C, Context, Altitude}
 import altitude.models.Metadata
+import altitude.transactions.TransactionId
+import altitude.{Altitude, Const => C, Context}
 import com.mongodb.casbah.Imports._
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsValue, JsUndefined, JsObject, Json}
+import play.api.libs.json.{JsObject, JsUndefined, JsValue, Json}
 
 class AssetDao(val app: Altitude) extends BaseMongoDao("assets") with altitude.dao.AssetDao {
   private final val log = LoggerFactory.getLogger(getClass)

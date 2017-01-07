@@ -2,6 +2,7 @@ package altitude.models
 
 import altitude.{Const => C}
 import play.api.libs.json.{JsValue, Json}
+
 import scala.language.implicitConversions
 
 object MetadataValue {
