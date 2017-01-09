@@ -103,4 +103,10 @@ CREATE TABLE folder (
 CREATE INDEX folder_parent_id ON folder(repository_id, parent_id);
 CREATE UNIQUE INDEX folder_parent_id_and_name ON folder(repository_id, parent_id, name_lc);
 
-
+CREATE TABLE search_index (
+  repository_id char(24) NOT NULL,
+  asset_id char(24) NOT NULL,
+  field_id char(24) NOT NULL,
+  field_value_lc TEXT NOT NULL
+);
+CREATE UNIQUE INDEX search_index_01 ON search_index(repository_id, asset_id, field_id, field_value_lc);

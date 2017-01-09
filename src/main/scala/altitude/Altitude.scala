@@ -55,6 +55,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
     val metadataExtractor = new TikaMetadataExtractionService
     val metadata = new MetadataService(app)
     val library = new LibraryService(app)
+    val search = new SearchService(app)
     val asset = new AssetService(app)
     val trash = new TrashService(app)
     val preview = new PreviewService(app)
