@@ -8,7 +8,7 @@ import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsValue
 
-class TrashService(app: Altitude) extends BaseService[Trash](app) {
+class TrashService(val app: Altitude) extends BaseService[Trash] {
   private final val log = LoggerFactory.getLogger(getClass)
   override protected val DAO = app.injector.instance[TrashDao]
 

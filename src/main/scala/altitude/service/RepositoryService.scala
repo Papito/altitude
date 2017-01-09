@@ -7,7 +7,7 @@ import altitude.transactions.AbstractTransactionManager
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 
-class RepositoryService(app: Altitude) extends BaseService[Repository](app) {
+class RepositoryService(val app: Altitude) extends BaseService[Repository] {
   private final val log = LoggerFactory.getLogger(getClass)
   protected val DAO = app.injector.instance[RepositoryDao]
   override protected val txManager = app.injector.instance[AbstractTransactionManager]

@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
 
-class MetadataService(app: Altitude) extends BaseService[MetadataField](app){
+class MetadataService(val app: Altitude) extends BaseService[MetadataField] {
   private final val log = LoggerFactory.getLogger(getClass)
 
   protected val METADATA_FIELD_DAO = app.injector.instance[MetadataFieldDao]

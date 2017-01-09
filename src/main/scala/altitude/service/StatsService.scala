@@ -8,7 +8,7 @@ import altitude.{Altitude, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 
-class StatsService(app: Altitude){
+class StatsService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
   protected val DAO = app.injector.instance[StatDao]
   protected val txManager = app.injector.instance[AbstractTransactionManager]

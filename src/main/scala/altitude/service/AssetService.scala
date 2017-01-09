@@ -12,7 +12,7 @@ import net.codingwell.scalaguice.InjectorExtensions._
  * If there is anything special to be done with an asset, it's under
  * the jurisdiction of the Library service - it does all the counter decrementin' and wrist slappin'
  */
-class AssetService(app: Altitude) extends BaseService[Asset](app) {
+class AssetService(val app: Altitude) extends BaseService[Asset] {
   override protected val DAO = app.injector.instance[AssetDao]
 
   // NO

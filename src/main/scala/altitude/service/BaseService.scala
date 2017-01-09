@@ -14,7 +14,8 @@ import play.api.libs.json.JsObject
 
 import scala.language.implicitConversions
 
-abstract class BaseService[Model <: BaseModel](app: Altitude) {
+abstract class BaseService[Model <: BaseModel] {
+  protected val app: Altitude
   private final val log = LoggerFactory.getLogger(getClass)
   protected val DAO: BaseDao
   protected val txManager = app.injector.instance[AbstractTransactionManager]

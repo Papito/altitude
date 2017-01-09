@@ -17,7 +17,7 @@ object FolderService {
       required = Some(List(C.Folder.NAME, C.Folder.PARENT_ID)))
 }
 
-class FolderService(app: Altitude) extends BaseService[Folder](app) {
+class FolderService(val app: Altitude) extends BaseService[Folder] {
   private final val log = LoggerFactory.getLogger(getClass)
   override protected val DAO = app.injector.instance[FolderDao]
 
