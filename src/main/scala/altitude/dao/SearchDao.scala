@@ -1,3 +1,5 @@
 package altitude.dao
 
-trait SearchDao extends BaseDao
+trait SearchDao extends BaseDao {
+
+}

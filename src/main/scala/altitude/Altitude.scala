@@ -88,10 +88,10 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           bind[RepositoryDao].toInstance(new mongo.RepositoryDao(app))
           bind[AssetDao].toInstance(new mongo.AssetDao(app))
           bind[TrashDao].toInstance(new mongo.TrashDao(app))
-          bind[ImportProfileDao].toInstance(new mongo.ImportProfileDao(app))
           bind[FolderDao].toInstance(new mongo.FolderDao(app))
           bind[StatDao].toInstance(new mongo.StatDao(app))
           bind[MetadataFieldDao].toInstance(new mongo.MetadataFieldDao(app))
+          bind[SearchDao].toInstance(new mongo.SearchDao(app))
         }
         case "postgres" => {
           DriverManager.registerDriver(new org.postgresql.Driver)
@@ -106,6 +106,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           bind[TrashDao].toInstance(new postgres.TrashDao(app))
           bind[FolderDao].toInstance(new postgres.FolderDao(app))
           bind[StatDao].toInstance(new postgres.StatDao(app))
+          bind[SearchDao].toInstance(new postgres.SearchDao(app))
           bind[MetadataFieldDao].toInstance(new postgres.MetadataFieldDao(app))
         }
         case "sqlite" => {
@@ -121,6 +122,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
           bind[TrashDao].toInstance(new sqlite.TrashDao(app))
           bind[FolderDao].toInstance(new sqlite.FolderDao(app))
           bind[StatDao].toInstance(new sqlite.StatDao(app))
+          bind[SearchDao].toInstance(new sqlite.SearchDao(app))
           bind[MetadataFieldDao].toInstance(new sqlite.MetadataFieldDao(app))        }
         case _ => {
           throw new IllegalArgumentException(s"Do not know of datasource $dataSourceType")
