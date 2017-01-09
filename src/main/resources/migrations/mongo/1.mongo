@@ -1,5 +1,8 @@
 db.system.createIndex({ "version" : 1 }, { unique: true })
 
+db.altitude_stats.createIndex({ "repository_id": 1 })
+db.altitude_stats.createIndex({ "repository_id": 1, "dimension" : 1 }, { unique: true })
+
 db.assets.createIndex({ "repository_id": 1, "md5" : 1 }, { unique: true })
 db.assets.createIndex({ "repository_id": 1, "path" : 1 }, { unique: true })
 db.assets.createIndex({ "repository_id": 1, "folder_id" : 1 })
