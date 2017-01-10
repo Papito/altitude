@@ -75,15 +75,6 @@ CREATE TABLE metadata_field (
 CREATE INDEX metadata_field_01 ON metadata_field(repository_id);
 CREATE UNIQUE INDEX metadata_field_02 ON metadata_field(repository_id, name_lc);
 
---CREATE TABLE import_profile (
---  id char(24) PRIMARY KEY,
---  name varchar(255) NOT NULL,
---  tag_data TEXT NOT NULL,
---  created_at DATE DEFAULT (datetime('now', 'localtime')),
---  updated_at DATE DEFAULT NULL
---);
---CREATE UNIQUE INDEX import_profile_name ON import_profile(name);
-
 
 CREATE TABLE folder (
   id char(24) PRIMARY KEY,

@@ -84,13 +84,6 @@ CREATE TABLE metadata_value (
 CREATE INDEX metadata_value_id_asset_id ON metadata_value(repository_id, asset_id, field_id);
 CREATE UNIQUE INDEX metadata_value_field_and_value ON metadata_value(repository_id, asset_id, field_id, field_value_lc);
 
---CREATE TABLE import_profile (
---  id char(24) PRIMARY KEY,
---  name varchar(255) NOT NULL,
---  tag_data jsonb NOT NULL
---) INHERITS (_core);
---CREATE UNIQUE INDEX import_profile_name ON import_profile(name);
-
 
 CREATE TABLE folder (
   id char(24) PRIMARY KEY,
