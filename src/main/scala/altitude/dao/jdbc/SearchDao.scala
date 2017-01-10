@@ -1,9 +1,10 @@
 package altitude.dao.jdbc
 
+import java.sql.PreparedStatement
+
 import altitude.transactions.TransactionId
 import altitude.{Const => C, Context, Altitude}
 import altitude.models.{MetadataField, Asset}
-import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, Json}
 
@@ -34,17 +35,18 @@ abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_token") 
                 VALUES(?, ?, ?, ?)
             """
 
+          log.debug(s"INSERT SQL: $sql. ARGS: ${values.toString()}")
+
+          val preparedStatement: PreparedStatement = conn.prepareStatement(sql)
+
           values.foreach { value =>
-            val sqlVals: List[Object] = List(
-              ctx.repo.id.get,
-              asset.id.get,
-              metadataField.id.get,
-              value)
-
-            log.debug(s"INSERT SQL: $sql. ARGS: ${values.toString()}")
-
-            val runner: QueryRunner = new QueryRunner()
-            runner.update(conn, sql, sqlVals:_*)
+            log.debug(s"Executing for [${metadataField.name}] and [$value]")
+            preparedStatement.clearParameters()
+            preparedStatement.setString(1, ctx.repo.id.get)
+            preparedStatement.setString(2, asset.id.get)
+            preparedStatement.setString(3, metadataField.id.get)
+            preparedStatement.setString(4, value)
+            preparedStatement.execute()
           }
       }
     }
