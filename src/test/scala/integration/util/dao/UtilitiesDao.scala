@@ -4,8 +4,7 @@ import altitude.Altitude
 import altitude.dao.BaseDao
 import altitude.transactions.TransactionId
 
-trait UtilitiesDao extends BaseDao {
-  val app: Altitude
+trait UtilitiesDao {
   def migrateDatabase(): Unit
   protected def rollback(): Unit
   protected def close(): Unit

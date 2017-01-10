@@ -2,9 +2,12 @@ package integration.util.dao.jdbc
 
 import altitude.Altitude
 import altitude.dao.jdbc.VoidJdbcDao
-import altitude.transactions.TransactionId
+import altitude.transactions.{JdbcTransactionManager, TransactionId}
+import net.codingwell.scalaguice.InjectorExtensions._
 
-class UtilitiesDao(app: Altitude) extends VoidJdbcDao(app) with integration.util.dao.UtilitiesDao {
+class UtilitiesDao(app: Altitude) extends integration.util.dao.UtilitiesDao {
+
+  protected final def txManager = app.injector.instance[JdbcTransactionManager]
 
   override def migrateDatabase() = {}
 

@@ -1,24 +1,22 @@
 package altitude.service
 
-import altitude.dao.{AssetDao, MetadataFieldDao, NotImplementedDao}
+import altitude.dao.{AssetDao, MetadataFieldDao}
 import altitude.exceptions.{DuplicateException, NotFoundException, ValidationException}
 import altitude.models.search.Query
 import altitude.models.{Metadata, MetadataField}
-import altitude.transactions.TransactionId
+import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import altitude.{Altitude, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 
 
-class MetadataService(val app: Altitude) extends BaseService[MetadataField] {
+class MetadataService(val app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
 
+  protected val txManager = app.injector.instance[AbstractTransactionManager]
   protected val METADATA_FIELD_DAO = app.injector.instance[MetadataFieldDao]
   protected val ASSET_DAO = app.injector.instance[AssetDao]
-
-  // this is a combo service so it does not have its own DAO
-  override protected val DAO = new NotImplementedDao(app)
 
   def addField(metadataField: MetadataField)
               (implicit ctx: Context, txId: TransactionId = new TransactionId): MetadataField = {

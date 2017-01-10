@@ -5,7 +5,7 @@ import altitude.dao.mongo.BaseMongoDao
 import altitude.transactions.TransactionId
 import integration.MongoSuite
 
-class UtilitiesDao(val app: Altitude) extends BaseMongoDao("") with integration.util.dao.UtilitiesDao {
+class UtilitiesDao(val app: Altitude) extends integration.util.dao.UtilitiesDao {
   override def migrateDatabase(): Unit = {
     BaseMongoDao.DB.get.dropDatabase()
     MongoSuite.app.service.migration.migrate()
