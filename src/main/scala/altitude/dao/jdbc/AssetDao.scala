@@ -16,6 +16,9 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
       mediaSubtype = rec.get(C.AssetType.MEDIA_SUBTYPE).get.asInstanceOf[String],
       mime = rec.get(C.AssetType.MIME_TYPE).get.asInstanceOf[String])
 
+    val metadataJsonStr: String = rec.getOrElse(C.Asset.METADATA, "{}").asInstanceOf[String]
+    val metadataJson = Json.parse(metadataJsonStr).as[JsObject]
+
     val model = new Asset(
       id = Some(rec.get(C.Base.ID).get.asInstanceOf[String]),
       userId = rec.get(C.Base.USER_ID).get.asInstanceOf[String],
@@ -23,6 +26,7 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
       md5 = rec.get(C.Asset.MD5).get.asInstanceOf[String],
       assetType = assetType,
       sizeBytes = rec.get(C.Asset.SIZE_BYTES).get.asInstanceOf[Int],
+      metadata = metadataJson: Metadata,
       folderId = rec.get(C.Asset.FOLDER_ID).get.asInstanceOf[String])
 
     addCoreAttrs(model, rec)
@@ -37,9 +41,9 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
 
     oneBySqlQuery(sql, List(ctx.repo.id.get, assetId)) match {
       case Some(rec) =>
-        val metadataJson: String = rec.getOrElse(C.Asset.METADATA, "{}").asInstanceOf[String]
-        val json = Json.parse(metadataJson).as[JsObject]
-        val metadata = Metadata.fromJson(json)
+        val metadataJsonStr: String = rec.getOrElse(C.Asset.METADATA, "{}").asInstanceOf[String]
+        val metadataJson = Json.parse(metadataJsonStr).as[JsObject]
+        val metadata = Metadata.fromJson(metadataJson)
         Some(metadata)
       case None => None
     }
