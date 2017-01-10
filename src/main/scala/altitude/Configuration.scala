@@ -2,7 +2,7 @@ package altitude
 
 import scala.collection.immutable.HashMap
 
-class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
+class Configuration(configOverride: Map[String, Any] = new HashMap()) {
   def getString(key: String) = data.getOrElse(key, "").asInstanceOf[String]
   def getFlag(key: String) = data.getOrElse(key, false).asInstanceOf[Boolean]
   def getInt(key: String) = data.getOrElse(key, 0).asInstanceOf[Int]
@@ -44,8 +44,8 @@ class Configuration(additionalConfiguration: Map[String, Any] = new HashMap()) {
   private val prod = default ++ HashMap()
 
   val data: Map[String, Any] = Environment.ENV match {
-    case Environment.TEST => test ++ additionalConfiguration
-    case Environment.DEV => default ++ additionalConfiguration
-    case Environment.PROD => prod ++ additionalConfiguration
+    case Environment.TEST => test ++ configOverride
+    case Environment.DEV => default ++ configOverride
+    case Environment.PROD => prod ++ configOverride
   }
 }

@@ -13,7 +13,7 @@ import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
 import org.slf4j.LoggerFactory
 
-class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
+class Altitude(configOverride: Map[String, Any] = Map()) {
   private final val log = LoggerFactory.getLogger(getClass)
   final val app: Altitude = this
 
@@ -30,7 +30,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
   log.info(s"Environment is: $environment")
 
   final val config = new Configuration(
-    additionalConfiguration = additionalConfiguration)
+    configOverride = configOverride)
 
   final val dataSourceType = config.getString("datasource")
   log.info(s"Datasource type: $dataSourceType", C.LogTag.APP)
