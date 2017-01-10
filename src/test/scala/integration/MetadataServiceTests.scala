@@ -8,38 +8,29 @@ import org.scalatest.Matchers._
 
 @DoNotDiscover class MetadataServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 
-  test("test/update empty value sets") {
-    val field1 = altitude.service.metadata.addField(
+  test("number field type") {
+    val field = altitude.service.metadata.addField(
       MetadataField(
-        name = "field 1",
-        fieldType = FieldType.KEYWORD))
-
-    val field2 = altitude.service.metadata.addField(
-      MetadataField(
-        name = "field 2",
+        name = "number field",
         fieldType = FieldType.NUMBER))
-
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
 
-    var data = Map[String, Set[String]](
-      field1.id.get -> Set("one", "two", "three"),
-      field2.id.get -> Set())
+    var data = Map[String, Set[String]](field.id.get -> Set("one"))
+    intercept[ValidationException] {
+      altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+    }
 
-    altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+    data = Map[String, Set[String]](field.id.get -> Set("."))
+    intercept[ValidationException] {
+      altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+    }
 
-    var storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
-    storedMetadata.data.keys should contain(field1.id.get)
-    storedMetadata.data.keys shouldNot contain(field2.id.get)
-
-    // update with nothing
-    data = Map[String, Set[String]](field1.id.get -> Set())
-
-    altitude.service.metadata.updateMetadata(asset.id.get, new Metadata(data))
-
-    storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
-    storedMetadata.data shouldBe empty
+    // these should be ok
+    data = Map[String, Set[String]](
+      field.id.get -> Set("000.", "0", "", "0000.00123", ".000"))
   }
 
+/*
   test("set metadata values") {
     val keywordMetadataField = altitude.service.metadata.addField(
       MetadataField(
@@ -82,6 +73,40 @@ import org.scalatest.Matchers._
     storedMetadata.data should not be empty
     storedMetadata.data.keys should contain(keywordMetadataField.id.get)
     storedMetadata.data.keys should contain(numberMetadataField.id.get)
+  }
+*/
+
+/*
+  test("test/update empty value sets") {
+    val field1 = altitude.service.metadata.addField(
+      MetadataField(
+        name = "field 1",
+        fieldType = FieldType.KEYWORD))
+
+    val field2 = altitude.service.metadata.addField(
+      MetadataField(
+        name = "field 2",
+        fieldType = FieldType.NUMBER))
+
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
+
+    var data = Map[String, Set[String]](
+      field1.id.get -> Set("one", "two", "three"),
+      field2.id.get -> Set())
+
+    altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+
+    var storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
+    storedMetadata.data.keys should contain(field1.id.get)
+    storedMetadata.data.keys shouldNot contain(field2.id.get)
+
+    // update with nothing
+    data = Map[String, Set[String]](field1.id.get -> Set())
+
+    altitude.service.metadata.updateMetadata(asset.id.get, new Metadata(data))
+
+    storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
+    storedMetadata.data shouldBe empty
   }
 
   test("update metadata values") {
@@ -174,4 +199,5 @@ import org.scalatest.Matchers._
             MetadataField(name = fieldName, fieldType = FieldType.KEYWORD))
         }
   }
+*/
 }

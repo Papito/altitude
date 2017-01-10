@@ -3,7 +3,7 @@ package altitude.service
 import altitude.dao.{AssetDao, MetadataFieldDao}
 import altitude.exceptions.{DuplicateException, NotFoundException, ValidationException}
 import altitude.models.search.Query
-import altitude.models.{Metadata, MetadataField}
+import altitude.models.{FieldType, Metadata, MetadataField}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import altitude.{Altitude, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
@@ -103,8 +103,8 @@ class MetadataService(val app: Altitude) {
   }
 
   /**
-   * Makes sure the metadata fields are configured in this syste,m after common-sense data
-   * hygiene
+   * Makes sure the metadata fields are configured in this system after common-sense data
+   * hygiene. Validates correct type for anything
    *
    * @return clean, de-duplicated copy of the metadata
    */
@@ -151,8 +151,44 @@ class MetadataService(val app: Altitude) {
 
       if (values.size != valuesLower.size) {
         val field: MetadataField = fields(fieldId)
-        ex.errors += (field.name ->
-          C.Msg.Warn.DUPLICATE_FIELD_VALUE.format(field.name, values.mkString(", ")))
+        ex.errors += (field.id.get ->
+          C.Msg.Warn.DUPLICATE_FIELD_VALUE.format(values.mkString(", ")))
+      }
+    }
+
+    if (ex.nonEmpty)
+      throw ex
+
+    /**
+     * Validate based on field type
+     */
+
+    // for each field
+    cleanData.foreach { m =>
+      val fieldId = m._1
+      val field: MetadataField = fields(fieldId)
+      val values: Set[String] = m._2
+
+      // gather illegal valyes
+      val illegalValues: Set[Option[String]] = values.map { value =>
+        field.fieldType match {
+          case FieldType.NUMBER => try {
+              value.toDouble
+              None
+            } catch {
+              case _: Throwable => Some(value)
+          }
+          case FieldType.KEYWORD => None
+          case FieldType.TEXT => None
+          case FieldType.BOOL => None
+        }
+        // get rid of None's - those are good
+      }.filter(_.isDefined)
+
+      // add to the validation exception if any
+      if (illegalValues.nonEmpty) {
+        ex.errors += (field.id.get ->
+          C.Msg.Warn.INCORRECT_VALUE_TYPE.format(field.name, illegalValues.mkString(", ")))
       }
     }
 

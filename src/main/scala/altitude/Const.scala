@@ -174,8 +174,9 @@ object Const {
 
     object Warn {
       val DUPLICATE = "Duplicate"
-      val DUPLICATE_FIELD_VALUE = "Field [%s] has duplicate values in [%s]"
+      val DUPLICATE_FIELD_VALUE = "Duplicate values in [%s]"
       val REQUIRED = "This field is required"
+      val INCORRECT_VALUE_TYPE = "Incorrect value type for [%s]"
     }
 
     object Err {
