@@ -5,7 +5,6 @@ import java.sql.DriverManager
 import altitude.dao._
 import altitude.service._
 import altitude.service.migration.{MongoMigrationService, PostgresMigrationService, SqliteMigrationService}
-import altitude.service.search.SqlSearchService
 import altitude.transactions._
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
@@ -56,7 +55,7 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
     val metadataExtractor = new TikaMetadataExtractionService
     val metadata = new MetadataService(app)
     val library = new LibraryService(app)
-    val search = new SqlSearchService(app)
+    val search = new SearchService(app)
     val asset = new AssetService(app)
     val trash = new TrashService(app)
     val preview = new PreviewService(app)
@@ -82,7 +81,8 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
   class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
       dataSourceType match {
-        case "mongo" => {
+
+        case "mongo" =>
           bind[AbstractTransactionManager].toInstance(new altitude.transactions.VoidTransactionManager(app))
 
           bind[MigrationDao].toInstance(new mongo.MigrationDao(app))
@@ -93,8 +93,8 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
           bind[StatDao].toInstance(new mongo.StatDao(app))
           bind[MetadataFieldDao].toInstance(new mongo.MetadataFieldDao(app))
           bind[SearchDao].toInstance(new mongo.SearchDao(app))
-        }
-        case "postgres" => {
+
+        case "postgres" =>
           DriverManager.registerDriver(new org.postgresql.Driver)
 
           val jdbcTxManager = new altitude.transactions.JdbcTransactionManager(app)
@@ -107,10 +107,10 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
           bind[TrashDao].toInstance(new postgres.TrashDao(app))
           bind[FolderDao].toInstance(new postgres.FolderDao(app))
           bind[StatDao].toInstance(new postgres.StatDao(app))
-          bind[SearchDao].toInstance(new postgres.SearchDao(app))
           bind[MetadataFieldDao].toInstance(new postgres.MetadataFieldDao(app))
-        }
-        case "sqlite" => {
+          bind[SearchDao].toInstance(new postgres.SearchDao(app))
+
+        case "sqlite" =>
           DriverManager.registerDriver(new org.sqlite.JDBC)
 
           val jdbcTxManager = new SqliteTransactionManager(app)
@@ -123,11 +123,11 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
           bind[TrashDao].toInstance(new sqlite.TrashDao(app))
           bind[FolderDao].toInstance(new sqlite.FolderDao(app))
           bind[StatDao].toInstance(new sqlite.StatDao(app))
+          bind[MetadataFieldDao].toInstance(new sqlite.MetadataFieldDao(app))
           bind[SearchDao].toInstance(new sqlite.SearchDao(app))
-          bind[MetadataFieldDao].toInstance(new sqlite.MetadataFieldDao(app))        }
-        case _ => {
+
+        case _ =>
           throw new IllegalArgumentException(s"Do not know of datasource $dataSourceType")
-        }
       }
     }
   }

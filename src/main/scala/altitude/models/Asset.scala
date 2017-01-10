@@ -44,5 +44,5 @@ case class Asset(id: Option[String] = None,
     C.Asset.EXTRACTED_METADATA -> extractedMetadata,
     C.Asset.METADATA -> metadata.toJson) ++ coreJsonAttrs
 
-  override def toString = s"${this.path} ${this.assetType.mediaType} ${this.assetType.mediaSubtype}"
+  override def toString = s"path: [${this.path}] class: [${this.assetType.mediaType}:${this.assetType.mediaSubtype}]"
 }

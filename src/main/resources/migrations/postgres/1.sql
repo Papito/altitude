@@ -1,6 +1,6 @@
 CREATE TABLE _core (
-  created_at timestamp WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'utc'),
-  updated_at timestamp WITH TIME ZONE DEFAULT NULL
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'utc'),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
 );
 
 CREATE TABLE system (
@@ -59,9 +59,9 @@ CREATE TABLE trash (
   folder_id char(24) NOT NULL,
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
-  created_at timestamp WITH TIME ZONE NOT NULL,
-  updated_at timestamp WITH TIME ZONE DEFAULT NULL,
-  recycled_at timestamp WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'utc')
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+  recycled_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'utc')
 );
 
 CREATE TABLE metadata_field (
@@ -103,10 +103,17 @@ CREATE TABLE folder (
 CREATE INDEX folder_parent_id ON folder(repository_id, parent_id);
 CREATE UNIQUE INDEX folder_parent_id_and_name ON folder(repository_id, parent_id, name_lc);
 
-CREATE TABLE search_index (
+CREATE TABLE search_token (
   repository_id char(24) NOT NULL,
   asset_id char(24) NOT NULL,
   field_id char(24) NOT NULL,
-  field_value_lc TEXT NOT NULL
+  field_value_txt TEXT NOT NULL,
+  field_value_num DECIMAL,
+  field_value_bool BOOLEAN,
+  field_value_dt TIMESTAMP WITH TIME ZONE
 );
-CREATE UNIQUE INDEX search_index_01 ON search_index(repository_id, asset_id, field_id, field_value_lc);
+CREATE UNIQUE INDEX search_token_01 ON search_token(repository_id, asset_id, field_id, field_value_txt);
+CREATE INDEX search_token_02 ON search_token(repository_id, field_id, field_value_txt);
+CREATE INDEX search_token_03 ON search_token(repository_id, field_id, field_value_num);
+CREATE INDEX search_token_04 ON search_token(repository_id, field_id, field_value_bool);
+CREATE INDEX search_token_05 ON search_token(repository_id, field_id, field_value_dt);
