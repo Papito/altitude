@@ -6,7 +6,7 @@ import com.mongodb.DBObject
 import com.mongodb.casbah.Imports._
 import org.slf4j.LoggerFactory
 
-class MigrationDao(app: Altitude) extends altitude.dao.MigrationDao(app) {
+class MigrationDao(val app: Altitude) extends altitude.dao.MigrationDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override def currentVersion(implicit ctx: Context, txId: TransactionId ): Int = {
@@ -15,11 +15,10 @@ class MigrationDao(app: Altitude) extends altitude.dao.MigrationDao(app) {
     val res: Option[DBObject] = system.findOne()
 
     res.isDefined match {
-      case true => {
+      case true =>
         val rec = res.get
         val version = rec.get("version")
         version.asInstanceOf[Int]
-      }
       case false => 0
     }
   }

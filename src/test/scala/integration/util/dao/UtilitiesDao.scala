@@ -1,7 +1,5 @@
 package integration.util.dao
 
-import altitude.Altitude
-import altitude.dao.BaseDao
 import altitude.transactions.TransactionId
 
 trait UtilitiesDao {

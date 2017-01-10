@@ -1,7 +1,6 @@
 package integration.util.dao.jdbc
 
 import altitude.Altitude
-import altitude.dao.jdbc.VoidJdbcDao
 import altitude.transactions.{JdbcTransactionManager, TransactionId}
 import net.codingwell.scalaguice.InjectorExtensions._
 

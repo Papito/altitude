@@ -5,7 +5,7 @@ import java.sql.DriverManager
 import altitude.dao._
 import altitude.service._
 import altitude.service.migration.{MongoMigrationService, PostgresMigrationService, SqliteMigrationService}
-import altitude.service.search.{SqlSearchService, SearchService}
+import altitude.service.search.SqlSearchService
 import altitude.transactions._
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}

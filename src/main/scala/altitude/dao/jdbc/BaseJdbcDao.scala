@@ -43,9 +43,6 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   protected val CORE_SQL_COLS_FOR_INSERT = s"${C.Base.ID}, ${C.Base.REPO_ID}"
   protected def CORE_SQL_VALS_FOR_INSERT: String = "?, ?"
 
-  // the system table stores schema version info, for example
-  protected val SYSTEM_TABLE = "system"
-
   // how we get current timestamp
   protected def utcNow = Util.utcNow
 

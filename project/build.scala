@@ -6,7 +6,7 @@ import sbt.Keys._
 import sbt._
 import sbtassembly.AssemblyKeys._
 import sbtassembly.AssemblyPlugin._
-import sbtassembly.{MergeStrategy, PathList}
+import sbtassembly.MergeStrategy
 
 object AltitudeBuild extends Build {
   val Organization = "altitude"

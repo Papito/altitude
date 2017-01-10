@@ -4,9 +4,12 @@ import altitude.transactions.TransactionId
 import altitude.{Altitude, Context}
 import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
+import play.api.libs.json.JsObject
 
-class MigrationDao(app: Altitude) extends altitude.dao.MigrationDao(app) {
+abstract class MigrationDao(val app: Altitude) extends BaseJdbcDao("repository") with altitude.dao.MigrationDao {
   private final val log = LoggerFactory.getLogger(getClass)
+
+  protected val SYSTEM_TABLE = "system"
 
   /**
    * Get current version of the schema
@@ -45,4 +48,6 @@ class MigrationDao(app: Altitude) extends altitude.dao.MigrationDao(app) {
     log.info(sql)
     runner.update(conn, sql)
   }
+
+  protected override  def makeModel(rec: Map[String, AnyRef]): JsObject = throw new NotImplementedError
 }
