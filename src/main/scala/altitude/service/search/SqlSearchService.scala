@@ -1,12 +1,12 @@
-package altitude.service
+package altitude.service.search
 
 import altitude.transactions.TransactionId
 import altitude.{Context, Altitude}
-import altitude.dao.NotImplementedDao
 import altitude.models.Asset
+import org.slf4j.LoggerFactory
 
-class SearchService(val app: Altitude) extends BaseService {
-  override protected val DAO = new NotImplementedDao(app)
+class SqlSearchService(app: Altitude) extends SearchService {
+  private final val log = LoggerFactory.getLogger(getClass)
 
   def indexAsset(asset: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId) = {
 

@@ -5,6 +5,7 @@ import java.sql.DriverManager
 import altitude.dao._
 import altitude.service._
 import altitude.service.migration.{MongoMigrationService, PostgresMigrationService, SqliteMigrationService}
+import altitude.service.search.{SqlSearchService, SearchService}
 import altitude.transactions._
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
@@ -55,7 +56,7 @@ class Altitude(additionalConfiguration: Map[String, Any] = Map()) {
     val metadataExtractor = new TikaMetadataExtractionService
     val metadata = new MetadataService(app)
     val library = new LibraryService(app)
-    val search = new SearchService(app)
+    val search = new SqlSearchService(app)
     val asset = new AssetService(app)
     val trash = new TrashService(app)
     val preview = new PreviewService(app)
