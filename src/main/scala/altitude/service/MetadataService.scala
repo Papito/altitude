@@ -110,8 +110,12 @@ class MetadataService(val app: Altitude) {
    *
    * @return clean, de-duplicated copy of the metadata
    */
-  private def cleanAndValidateMetadata(metadata: Metadata)
-                                      (implicit ctx: Context, txId: TransactionId ) = {
+  def cleanAndValidateMetadata(metadata: Metadata)
+                              (implicit ctx: Context, txId: TransactionId): Metadata = {
+    if (metadata.data.isEmpty) {
+      return metadata
+    }
+
     // get all metadata fields configured for this repository
     val fields = getAllFields
 

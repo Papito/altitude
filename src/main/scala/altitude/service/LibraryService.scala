@@ -38,13 +38,36 @@ class LibraryService(app: Altitude) {
         throw DuplicateException(obj.toJson, existing.records.head)
       }
 
-      val assetJson: JsObject = app.service.asset.add(obj)
-      val asset: Asset = assetJson
+      /**
+      * Process metadata
+      */
+      val metadata = app.service.metadata.cleanAndValidateMetadata(obj.metadata)
 
-      // counters
+      val assetWithMetadata = Asset(
+        id = obj.id,
+        userId = ctx.user.id.get,
+        path = obj.path,
+        md5 = obj.md5,
+        assetType = obj.assetType,
+        sizeBytes = obj.sizeBytes,
+        folderId = obj.folderId,
+        extractedMetadata = obj.extractedMetadata,
+        metadata = metadata)
+
+      val asset: Asset = app.service.asset.add(assetWithMetadata): Asset
+
+      /**
+      * Search index
+      */
+      app.service.search.indexAsset(asset)
+
+      /**
+      * Update repository counters
+      */
       app.service.folder.incrAssetCount(obj.folderId)
       app.service.stats.incrementStat(Stats.TOTAL_ASSETS)
       app.service.stats.incrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
+
       // if there is no folder, increment the uncategorized counter
       if (ctx.repo.uncatFolderId == obj.folderId) {
         app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS)
@@ -58,7 +81,7 @@ class LibraryService(app: Altitude) {
           addPreviewData(asset, obj.previewData)
       }
 
-      assetJson
+      asset
     }
   }
 

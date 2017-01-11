@@ -97,13 +97,14 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   /**
    * A helper method to quickly cook a test asset
    */
-  protected def makeAsset(folder: Folder) = Asset(
+  protected def makeAsset(folder: Folder, metadata: Metadata = new Metadata()) = Asset(
     userId = currentUser.id.get,
     folderId = folder.id.get,
     assetType = new AssetType(
       mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime"),
     path = Util.randomStr(50),
     md5 = Util.randomStr(32),
+    metadata = metadata,
     sizeBytes = 1L)
 
   // test count - we use it as a request ID for our logging environment

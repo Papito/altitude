@@ -16,7 +16,8 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
       mediaSubtype = rec.get(C.AssetType.MEDIA_SUBTYPE).get.asInstanceOf[String],
       mime = rec.get(C.AssetType.MIME_TYPE).get.asInstanceOf[String])
 
-    val metadataJsonStr: String = rec.getOrElse(C.Asset.METADATA, "{}").asInstanceOf[String]
+    val metadataCol = rec.get(C.Asset.METADATA).get
+    val metadataJsonStr: String = if (metadataCol == null) "{}" else metadataCol.asInstanceOf[String]
     val metadataJson = Json.parse(metadataJsonStr).as[JsObject]
 
     val model = new Asset(

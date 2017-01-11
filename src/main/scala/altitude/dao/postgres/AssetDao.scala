@@ -21,7 +21,8 @@ class AssetDao(app: Altitude) extends altitude.dao.jdbc.AssetDao(app) with Postg
 
     oneBySqlQuery(sql, List(ctx.repo.id.get, assetId)) match {
       case Some(rec) =>
-        val metadataJsonStr: String = rec.getOrElse(C.Asset.METADATA, "{}").asInstanceOf[String]
+        val metadataCol = rec.get(C.Asset.METADATA).get
+        val metadataJsonStr: String = if (metadataCol == null) "{}" else metadataCol.asInstanceOf[String]
         val metadataJson = Json.parse(metadataJsonStr).as[JsObject]
         val metadata = Metadata.fromJson(metadataJson)
         Some(metadata)

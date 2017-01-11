@@ -16,17 +16,10 @@ import org.scalatest.DoNotDiscover
         name = "field 2",
         fieldType = FieldType.NUMBER))
 
-    val folder1: Folder = altitude.service.folder.addFolder("folder1")
-    val asset: Asset = altitude.service.library.add(makeAsset(folder1))
-
     val data = Map[String, Set[String]](
         field1.id.get -> Set("one", "two", "three"),
         field2.id.get -> Set("1", "2", "3.002", "14.1", "1.25", "123456789"))
-
-    altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
-
-    val storedAsset = altitude.service.asset.getById(asset.id.get)
-
-    altitude.service.search.indexAsset(storedAsset)
+    val assetData1 = makeAsset(altitude.service.folder.getUncatFolder, new Metadata(data))
+    val asset1: Asset = altitude.service.library.add(assetData1)
   }
 }
