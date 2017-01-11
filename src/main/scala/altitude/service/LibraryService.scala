@@ -39,22 +39,14 @@ class LibraryService(app: Altitude) {
       }
 
       /**
-      * Process metadata
+      * Process metadata and append it to the asset
       */
       val metadata = app.service.metadata.cleanAndValidateMetadata(obj.metadata)
 
-      val assetWithMetadata = Asset(
-        id = obj.id,
-        userId = ctx.user.id.get,
-        path = obj.path,
-        md5 = obj.md5,
-        assetType = obj.assetType,
-        sizeBytes = obj.sizeBytes,
-        folderId = obj.folderId,
-        extractedMetadata = obj.extractedMetadata,
-        metadata = metadata)
+      // mush the metadata JSON key into the JSON repr of the asset and get a new asset
+      val assetToAdd: Asset = obj.toJson ++ Json.obj(C.Asset.METADATA -> metadata.toJson)
 
-      val asset: Asset = app.service.asset.add(assetWithMetadata): Asset
+      val asset: Asset = app.service.asset.add(assetToAdd)
 
       /**
       * Search index
