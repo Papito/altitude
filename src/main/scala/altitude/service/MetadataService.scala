@@ -131,9 +131,28 @@ class MetadataService(val app: Altitude) {
      */
     val cleanData = metadata.data.foldLeft(Map[String, Set[String]]()) { (res, m) =>
       val fieldId = m._1
+      val field: MetadataField = fields(fieldId)
       val values: Set[String] = m._2
-      // trim all values and discard blanks
-      val trimmed = values.map(_.trim).filter(_.nonEmpty)
+
+      val trimmed = field.fieldType match {
+        case FieldType.KEYWORD => values
+          // trim leading/trailing
+          .map(_.trim)
+          // compact multiple space characters into one
+          .map(_.replaceAll("[\\s]{2,}", " ")) // match two or more spaces and make it one
+          // force a space character to be vanilla whitespace
+          .map(_.replaceAll("\\s", " "))
+          // and lose the blanks
+          .filter(_.nonEmpty)
+
+        case FieldType.NUMBER | FieldType.BOOL => values
+          // trim leading/trailing
+          .map(_.trim)
+          // and lose the blanks
+          .filter(_.nonEmpty)
+
+        case FieldType.TEXT => values.map(_.trim)
+      }
 
       if (trimmed.nonEmpty)
         res + (fieldId -> trimmed)
