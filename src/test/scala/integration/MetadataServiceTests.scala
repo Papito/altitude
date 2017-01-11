@@ -27,10 +27,49 @@ import org.scalatest.Matchers._
 
     // these should be ok
     data = Map[String, Set[String]](
-      field.id.get -> Set("000.", "0", "", "0000.00123", ".000"))
+      field.id.get -> Set("000.", "0", "", "0000.00123", ".000", "36352424", "234324221"))
   }
 
-/*
+  test("boolean field type") {
+    val field = altitude.service.metadata.addField(
+      MetadataField(
+        name = "boolean field",
+        fieldType = FieldType.BOOL))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
+
+    var data = Map[String, Set[String]](field.id.get -> Set("one"))
+    intercept[ValidationException] {
+      altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+    }
+
+    data = Map[String, Set[String]](field.id.get -> Set("on"))
+    intercept[ValidationException] {
+      altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+    }
+
+    // cannot have conflicting boolean values
+    data = Map[String, Set[String]](field.id.get -> Set("TRUE", "FALSE"))
+    intercept[ValidationException] {
+      altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+    }
+    // ... but non-conflicting duplicates are ok
+    data = Map[String, Set[String]](field.id.get -> Set("TRUE", "TRUE"))
+
+    // these should be ok
+    data = Map[String, Set[String]](field.id.get -> Set("TRUE"))
+    altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+
+    data = Map[String, Set[String]](field.id.get -> Set("FALSE"))
+    altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+
+    data = Map[String, Set[String]](field.id.get -> Set("true"))
+    altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+
+    data = Map[String, Set[String]](field.id.get -> Set("False"))
+    altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+  }
+
+  /*
   test("set metadata values") {
     val keywordMetadataField = altitude.service.metadata.addField(
       MetadataField(

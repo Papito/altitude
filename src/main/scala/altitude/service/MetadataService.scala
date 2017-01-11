@@ -1,5 +1,6 @@
 package altitude.service
 
+import util.control.Breaks._
 import altitude.dao.{AssetDao, MetadataFieldDao}
 import altitude.exceptions.{DuplicateException, NotFoundException, ValidationException}
 import altitude.models.search.Query
@@ -17,6 +18,7 @@ class MetadataService(val app: Altitude) {
   protected val txManager = app.injector.instance[AbstractTransactionManager]
   protected val METADATA_FIELD_DAO = app.injector.instance[MetadataFieldDao]
   protected val ASSET_DAO = app.injector.instance[AssetDao]
+  private final val VALID_BOOLEAN_VALUES = Set("0", "1", "true", "false")
 
   def addField(metadataField: MetadataField)
               (implicit ctx: Context, txId: TransactionId = new TransactionId): MetadataField = {
@@ -169,26 +171,40 @@ class MetadataService(val app: Altitude) {
       val field: MetadataField = fields(fieldId)
       val values: Set[String] = m._2
 
-      // gather illegal valyes
-      val illegalValues: Set[Option[String]] = values.map { value =>
-        field.fieldType match {
-          case FieldType.NUMBER => try {
+      breakable {
+        // booleans cannot have multiple values
+        if (field.fieldType == FieldType.BOOL && values.size > 1) {
+          ex.errors += (field.id.get -> C.Msg.Warn.INCORRECT_VALUE_TYPE)
+          break()
+        }
+
+        // gather illegal values
+        val illegalValues: Set[Option[String]] = values.map { value =>
+          field.fieldType match {
+            case FieldType.NUMBER => try {
               value.toDouble
               None
             } catch {
               case _: Throwable => Some(value)
+            }
+            case FieldType.KEYWORD => None
+            case FieldType.TEXT => None
+            case FieldType.BOOL =>
+              if (VALID_BOOLEAN_VALUES.contains(value.toLowerCase)) {
+                None
+              }
+              else {
+                Some(value)
+              }
           }
-          case FieldType.KEYWORD => None
-          case FieldType.TEXT => None
-          case FieldType.BOOL => None
-        }
-        // get rid of None's - those are good
-      }.filter(_.isDefined)
+          // get rid of None's - those are good
+        }.filter(_.isDefined)
 
-      // add to the validation exception if any
-      if (illegalValues.nonEmpty) {
-        ex.errors += (field.id.get ->
-          C.Msg.Warn.INCORRECT_VALUE_TYPE.format(field.name, illegalValues.mkString(", ")))
+        // add to the validation exception if any
+        if (illegalValues.nonEmpty) {
+          ex.errors += (field.id.get ->
+            C.Msg.Warn.INCORRECT_VALUE_TYPE.format(field.name, illegalValues.mkString(", ")))
+        }
       }
     }
 
