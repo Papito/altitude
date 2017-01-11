@@ -27,10 +27,7 @@ class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres")) w
     val url = appConfig.getString("db.postgres.url")
 
     log.info("Clearing postgres database")
-    val sql =
-      """
-        |DROP SCHEMA IF EXISTS "altitude-test" CASCADE; CREATE SCHEMA "altitude-test";
-      """.stripMargin
+    val sql = "DROP SCHEMA IF EXISTS \"altitude-test\" CASCADE; CREATE SCHEMA \"altitude-test\";"
 
     val conn = DriverManager.getConnection(url, props)
     val stmt = conn.createStatement()

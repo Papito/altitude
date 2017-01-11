@@ -89,6 +89,7 @@ object Const {
     val ASSET_ID = "asset_id"
     val FIELD_ID = "field_id"
     val FIELD_VALUE_TXT = "field_value_txt"
+    val FIELD_VALUE_KW = "field_value_kw"
     val FIELD_VALUE_NUM = "field_value_num"
     val FIELD_VALUE_BOOL = "field_value_bool"
     val FIELD_VALUE_DT = "field_value_dt"

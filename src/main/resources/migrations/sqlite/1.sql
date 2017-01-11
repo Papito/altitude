@@ -94,12 +94,14 @@ CREATE TABLE search_token (
   asset_id char(24) NOT NULL,
   field_id char(24) NOT NULL,
   field_value_txt TEXT NOT NULL,
+  field_value_kw TEXT NULL,
   field_value_num DECIMAL,
   field_value_bool BOOLEAN,
   field_value_dt DATE
 );
 CREATE UNIQUE INDEX search_token_01 ON search_token(repository_id, asset_id, field_id, field_value_txt);
 CREATE INDEX search_token_02 ON search_token(repository_id, field_id, field_value_txt);
-CREATE INDEX search_token_03 ON search_token(repository_id, field_id, field_value_num);
-CREATE INDEX search_token_04 ON search_token(repository_id, field_id, field_value_bool);
-CREATE INDEX search_token_05 ON search_token(repository_id, field_id, field_value_dt);
+CREATE INDEX search_token_03 ON search_token(repository_id, field_id, field_value_kw);
+CREATE INDEX search_token_04 ON search_token(repository_id, field_id, field_value_num);
+CREATE INDEX search_token_05 ON search_token(repository_id, field_id, field_value_bool);
+CREATE INDEX search_token_06 ON search_token(repository_id, field_id, field_value_dt);
