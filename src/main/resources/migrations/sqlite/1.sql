@@ -105,3 +105,5 @@ CREATE INDEX search_parameter_03 ON search_parameter(repository_id, field_id, fi
 CREATE INDEX search_parameter_04 ON search_parameter(repository_id, field_id, field_value_num);
 CREATE INDEX search_parameter_05 ON search_parameter(repository_id, field_id, field_value_bool);
 CREATE INDEX search_parameter_06 ON search_parameter(repository_id, field_id, field_value_dt);
+
+CREATE VIRTUAL TABLE search_document USING fts3(path, metadata_values, extracted_metadata_values, body);
