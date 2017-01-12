@@ -8,7 +8,7 @@ import altitude.models.{FieldType, MetadataField, Asset}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, Json}
 
-abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_token") with altitude.dao.SearchDao {
+abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_parameter") with altitude.dao.SearchDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = Json.obj()

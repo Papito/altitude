@@ -87,7 +87,7 @@ CREATE TABLE folder (
 CREATE INDEX folder_01 ON folder(repository_id, parent_id);
 CREATE UNIQUE INDEX folder_02 ON folder(repository_id, parent_id, name_lc);
 
-CREATE TABLE search_token (
+CREATE TABLE search_parameter (
   repository_id char(24) NOT NULL,
   asset_id char(24) NOT NULL,
   field_id char(24) NOT NULL,
@@ -97,9 +97,34 @@ CREATE TABLE search_token (
   field_value_bool BOOLEAN,
   field_value_dt TIMESTAMP WITH TIME ZONE
 );
-CREATE UNIQUE INDEX search_token_01 ON search_token(repository_id, asset_id, field_id, field_value_txt);
-CREATE INDEX search_token_02 ON search_token(repository_id, field_id, field_value_txt);
-CREATE INDEX search_token_03 ON search_token(repository_id, field_id, field_value_kw);
-CREATE INDEX search_token_04 ON search_token(repository_id, field_id, field_value_num);
-CREATE INDEX search_token_05 ON search_token(repository_id, field_id, field_value_bool);
-CREATE INDEX search_token_06 ON search_token(repository_id, field_id, field_value_dt);
+CREATE UNIQUE INDEX search_parameter_01 ON search_parameter(repository_id, asset_id, field_id, field_value_txt);
+CREATE INDEX search_parameter_02 ON search_parameter(repository_id, field_id, field_value_txt);
+CREATE INDEX search_parameter_03 ON search_parameter(repository_id, field_id, field_value_kw);
+CREATE INDEX search_parameter_04 ON search_parameter(repository_id, field_id, field_value_num);
+CREATE INDEX search_parameter_05 ON search_parameter(repository_id, field_id, field_value_bool);
+CREATE INDEX search_parameter_06 ON search_parameter(repository_id, field_id, field_value_dt);
+
+CREATE TABLE search_document (
+  repository_id char(24) NOT NULL,
+  asset_id char(24) NOT NULL,
+  path TEXT NOT NULL,
+  metadata_values TEXT,
+  extracted_metadata_values TEXT,
+  body TEXT NOT NULL,
+  tsv TSVECTOR
+);
+CREATE UNIQUE INDEX search_document_01 ON search_document(repository_id, asset_id);
+
+--WITH t(json_stuff) AS ( VALUES
+--  ('{"things": "stuff"}'::JSON),
+--  ('{"more_things": "more_stuff"}'::JSON)
+--)
+--SELECT array_agg(stuff.key) result
+--FROM t, json_each(t.json_stuff) stuff;
+
+UPDATE search_document SET tsv = (
+  setweight(to_tsvector(path), 'A') ||
+  setweight(to_tsvector(metadata_values), 'B') ||
+  setweight(to_tsvector(extracted_metadata_values), 'C') ||
+  setweight(to_tsvector(body), 'D')
+);
