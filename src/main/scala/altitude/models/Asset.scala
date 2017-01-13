@@ -16,7 +16,7 @@ object Asset {
     md5 = (json \ C.Asset.MD5).as[String],
     sizeBytes = (json \ C.Asset.SIZE_BYTES).as[Long],
     metadata = Metadata.fromJson((json \ C.Asset.METADATA).as[JsObject]),
-    extractedMetadata = json \ C.Asset.EXTRACTED_METADATA
+    extractedMetadata = Metadata.fromJson((json \ C.Asset.EXTRACTED_METADATA).as[JsObject])
   ).withCoreAttr(json)
 }
 
@@ -28,7 +28,7 @@ case class Asset(id: Option[String] = None,
                  sizeBytes: Long,
                  folderId: String,
                  metadata: Metadata = new Metadata(),
-                 extractedMetadata: JsValue = JsNull,
+                 extractedMetadata: Metadata = new Metadata(),
                  previewData: Array[Byte] = new Array[Byte](0)) extends BaseModel {
 
   val fileName: String = FilenameUtils.getName(path)
@@ -42,7 +42,7 @@ case class Asset(id: Option[String] = None,
     C.Asset.SIZE_BYTES -> sizeBytes,
     C.Asset.ASSET_TYPE -> (assetType: JsValue),
     C.Asset.METADATA -> metadata.toJson,
-    C.Asset.EXTRACTED_METADATA -> extractedMetadata
+    C.Asset.EXTRACTED_METADATA -> extractedMetadata.toJson
   ) ++ coreJsonAttrs
 
   override def toString = s"path: [${this.path}] class: [${this.assetType.mediaType}:${this.assetType.mediaSubtype}]"

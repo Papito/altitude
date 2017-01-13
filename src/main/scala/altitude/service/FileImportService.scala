@@ -54,7 +54,7 @@ class FileImportService(app: Altitude) {
     }
 
     var metadataParserException: Option[Exception] = None
-    val metadata: JsValue = try {
+    val extractedMetadata: Metadata = try {
       app.service.metadataExtractor.extract(fileAsset, assetType)
     }
     catch {
@@ -72,7 +72,7 @@ class FileImportService(app: Altitude) {
       assetType = assetType,
       sizeBytes = fileSizeInBytes,
       folderId = ctx.repo.uncatFolderId,
-      extractedMetadata = metadata)
+      extractedMetadata = extractedMetadata)
 
     var res: Option[JsValue] = None
 

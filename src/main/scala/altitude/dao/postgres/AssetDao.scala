@@ -7,7 +7,9 @@ import play.api.libs.json.{JsObject, Json}
 
 class AssetDao(app: Altitude) extends altitude.dao.jdbc.AssetDao(app) with Postgres {
   override protected def DEFAULT_SQL_COLS_FOR_SELECT = s"""
-      ${C.Base.ID}, *, (${C.Asset.METADATA}#>>'{}')::text as ${C.Asset.METADATA},
+      ${C.Base.ID}, *,
+      (${C.Asset.METADATA}#>>'{}')::text as ${C.Asset.METADATA},
+      (${C.Asset.EXTRACTED_METADATA}#>>'{}')::text as ${C.Asset.EXTRACTED_METADATA},
       EXTRACT(EPOCH FROM created_at) AS created_at,
       EXTRACT(EPOCH FROM updated_at) AS updated_at
     """

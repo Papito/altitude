@@ -27,6 +27,15 @@ abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_paramete
                      metadata_values, extracted_metadata_values, body)
               VALUES (?, ?, ?, ?, ?, ?)
        """
+
+    val metadataValues = asset.metadata.data.foldLeft(Set[String]()) { (res, m) =>
+      res ++ m._2
+    }
+
+    println("!!!!!!!!!!!!!!!!!!!")
+    println(metadataValues)
+    println("!!!!!!!!!!!!!!!!!!!")
+
     val sqlVals: List[Object] = List(
       ctx.repo.id.get,
       asset.id.get,

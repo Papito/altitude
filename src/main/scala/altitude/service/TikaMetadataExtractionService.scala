@@ -3,11 +3,10 @@ package altitude.service
 import java.io.{InputStream, StringWriter}
 
 import altitude.exceptions.AllDone
-import altitude.models.{AssetType, FileImportAsset}
+import altitude.models.{Metadata, AssetType, FileImportAsset}
 import altitude.{Const => C}
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
-import org.apache.tika.metadata.serialization.JsonMetadata
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
 import org.apache.tika.parser.AbstractParser
@@ -30,7 +29,7 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
 
   final private val TIKA_HANDLER = new DefaultHandler
 
-  override def extract(importAsset: FileImportAsset, mediaType: AssetType, asRaw: Boolean = false): JsValue = {
+  override def extract(importAsset: FileImportAsset, mediaType: AssetType, asRaw: Boolean = false): Metadata = {
     val raw: Option[TikaMetadata]  = mediaType match {
       case mt: AssetType if mt.mediaType == "image" =>
         extractMetadata(importAsset, List(new JpegParser, new TiffParser))
@@ -45,24 +44,24 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
         None
     }
 
+    val metadata = rawToMetadata(raw)
+
     // make it nice and neat out of the horrible mess that this probably is
-    val normalized: Option[TikaMetadata] = if (asRaw) raw else normalize(raw)
+    if (asRaw) metadata else normalize(metadata)
+  }
 
-    // return as JSON
-    val writer = new StringWriter()
+  private def rawToMetadata(raw: Option[TikaMetadata]): Metadata = {
+    if (raw.isEmpty) {
+      return new Metadata()
+    }
 
-    try {
-      normalized match {
-        case None => JsNull
-        case _ =>
-          JsonMetadata.toJson(normalized.get, writer)
-          val jsonData = writer.toString
-          Json.parse(jsonData)
-      }
+    val data = scala.collection.mutable.Map[String, Set[String]]()
+
+    for (name <- raw.get.names()) {
+      data(name) = Set(raw.get.get(name).trim)
     }
-    finally {
-      writer.close()
-    }
+
+    new Metadata(data.toMap)
   }
 
   private def extractMetadata(importAsset: FileImportAsset, parsers: List[AbstractParser]): Option[TikaMetadata]  = {
@@ -101,30 +100,26 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
     metadata
   }
 
-  private def normalize(raw: Option[TikaMetadata]): Option[TikaMetadata] = {
-    if (raw.isEmpty)
-      return None
-
-    val normalized = new TikaMetadata
+  private def normalize(metadata: Metadata): Metadata = {
+    val normalizedData = scala.collection.mutable.Map[String, Set[String]]()
 
     FIELD_BIBLE.foreach { case (destField, srcFields) =>
       srcFields.isEmpty match {
         // if the single destination field is the same as the source
-        case true if raw.get.names().contains(destField) => {
-          normalized.add(destField, raw.get.get(destField).trim)
+        case true if metadata.data.keys.toSeq.contains(destField) => {
+          normalizedData(destField) =  metadata.data(destField)
         }
         case _ =>
           // find all the fields that exist in metadata
-          val existingSrcFields = srcFields.filter(raw.get.names().contains)
+          val existingSrcFields = srcFields.filter(metadata.data.keys.toSeq.contains)
           // the field on TOP is it
           if (existingSrcFields.nonEmpty) {
-            normalized.add(destField, raw.get.get(existingSrcFields.head).trim)
+            normalizedData(destField) = metadata.data(existingSrcFields.head)
           }
       }
-
     }
 
-    Some(normalized)
+    new Metadata(normalizedData.toMap)
   }
 
   def detectAssetTypeFromStream(is: InputStream): AssetType = {

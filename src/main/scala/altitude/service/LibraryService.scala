@@ -63,7 +63,7 @@ class LibraryService(app: Altitude) {
       /**
       * Search index
       */
-      app.service.search.indexAsset(asset)
+      //app.service.search.indexAsset(asset)
 
       /**
       * Update repository counters

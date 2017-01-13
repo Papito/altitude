@@ -20,6 +20,11 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
     val metadataJsonStr: String = if (metadataCol == null) "{}" else metadataCol.asInstanceOf[String]
     val metadataJson = Json.parse(metadataJsonStr).as[JsObject]
 
+    val extractedMetadataCol = rec.get(C.Asset.EXTRACTED_METADATA).get
+    val extractedMetadataJsonStr: String =
+      if (extractedMetadataCol == null) "{}" else extractedMetadataCol.asInstanceOf[String]
+    val extractedMetadataJson = Json.parse(extractedMetadataJsonStr).as[JsObject]
+
     val model = new Asset(
       id = Some(rec.get(C.Base.ID).get.asInstanceOf[String]),
       userId = rec.get(C.Base.USER_ID).get.asInstanceOf[String],
@@ -28,6 +33,7 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
       assetType = assetType,
       sizeBytes = rec.get(C.Asset.SIZE_BYTES).get.asInstanceOf[Int],
       metadata = metadataJson: Metadata,
+      extractedMetadata = extractedMetadataJson: Metadata,
       folderId = rec.get(C.Asset.FOLDER_ID).get.asInstanceOf[String])
 
     addCoreAttrs(model, rec)
@@ -54,7 +60,7 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
     val asset = jsonIn: Asset
 
     // Postgres will reject this sequence with jsonb
-    val metadata: String = asset.extractedMetadata.toString().replaceAll("\\\\u0000", "")
+    val extracetedMetadata: String = asset.extractedMetadata.toString().replaceAll("\\\\u0000", "")
 
     val sql = s"""
         INSERT INTO $tableName (
@@ -62,10 +68,7 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
              ${C.Asset.FILENAME}, ${C.Asset.SIZE_BYTES},
              ${C.AssetType.MEDIA_TYPE}, ${C.AssetType.MEDIA_SUBTYPE}, ${C.AssetType.MIME_TYPE},
              ${C.Asset.FOLDER_ID}, ${C.Asset.EXTRACTED_METADATA})
-            VALUES(
-              $CORE_SQL_VALS_FOR_INSERT,
-              ?, ?, ?, ?, ?, ?, ?, ?, ?,
-      $JSON_FUNC)
+            VALUES( $CORE_SQL_VALS_FOR_INSERT, ?, ?, ?, ?, ?, ?, ?, ?, ?, $JSON_FUNC)
     """
 
     val sqlVals: List[Object] = List(
@@ -78,7 +81,7 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
       asset.assetType.mediaSubtype,
       asset.assetType.mime,
       asset.folderId,
-      metadata)
+      extracetedMetadata)
 
     addRecord(jsonIn, sql, sqlVals)
   }
