@@ -58,10 +58,9 @@ class FileImportService(app: Altitude) {
       app.service.metadataExtractor.extract(fileAsset, assetType)
     }
     catch {
-      case ex: Exception => {
+      case ex: Exception =>
         metadataParserException = Some(ex)
         Json.obj()
-      }
     }
 
     val fileSizeInBytes: Long = new File(fileAsset.absolutePath).length()

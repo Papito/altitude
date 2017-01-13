@@ -28,14 +28,14 @@ abstract class MetadataExtractionService {
     "tiff:Orientation" -> List(),
 
     "Image Width" -> List(
+      "tiff:ImageWidth",
       "Image Width",
-      "Exif Image Width",
-      "tiff:ImageWidth"),
+      "Exif Image Width"),
 
     "Image Height" -> List(
+      "tiff:ImageLength",
       "Image Height",
-      "Exif Image Height",
-      "tiff:ImageLength"),
+      "Exif Image Height"),
 
     "tiff:Make" -> List(
       "tiff:Make",
