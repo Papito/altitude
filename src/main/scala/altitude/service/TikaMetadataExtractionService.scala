@@ -105,20 +105,19 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
 
     FIELD_BIBLE.foreach { case (destField, srcFields) =>
       srcFields.isEmpty match {
-        // if the single destination field is the same as the source
-        case true if metadata.data.keys.toSeq.contains(destField) => {
-          normalizedData(destField) =  metadata.data(destField)
-        }
+        // if the destination field is the same as the source
+        case true if metadata.contains(destField) =>
+          normalizedData(destField) = metadata.data(destField)
+
         case _ =>
           // find all the fields that exist in metadata
-          val existingSrcFields = srcFields.filter(metadata.data.keys.toSeq.contains)
+          val existingSrcFields = srcFields.filter(metadata.contains)
           // the field on TOP is it
           if (existingSrcFields.nonEmpty) {
             normalizedData(destField) = metadata.data(existingSrcFields.head)
           }
       }
     }
-
     new Metadata(normalizedData.toMap)
   }
 

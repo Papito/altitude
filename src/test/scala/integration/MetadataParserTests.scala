@@ -2,7 +2,7 @@ package integration
 
 import java.io.File
 
-import altitude.models.FileImportAsset
+import altitude.models.{Metadata, FileImportAsset}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 import play.api.libs.json.JsValue
@@ -15,8 +15,8 @@ import play.api.libs.json.JsValue
     val verify = Map(
       "Exposure Mode" -> "Auto exposure",
       "Exposure Program" -> "Landscape mode",
-      "Image Height" -> "8 pixels",
-      "Image Width" -> "10 pixels",
+      "Image Height" -> "8",
+      "Image Width" -> "10",
       "exif:ExposureTime" -> "0.0025",
       "exif:FNumber" -> "8.0",
       "exif:Flash" -> "false",
@@ -28,20 +28,20 @@ import play.api.libs.json.JsValue
       "tiff:Software" -> "GIMP 2.8.10")
 
     verify.foreach { case (k, v) =>
-      (metadata \ k).asOpt[String] should contain(v)
+      metadata.data.keys.toSeq should contain(k)
+      metadata(k) should contain (v)
     }
 
-    (metadata \ "X Resolution").asOpt[String] shouldNot be(None)
-    (metadata \ "X Resolution").as[String].startsWith("72 dots") shouldBe true
-    (metadata \ "Y Resolution").asOpt[String] shouldNot be(None)
-    (metadata \ "Y Resolution").as[String].startsWith("72 dots") shouldBe true
+    metadata.get("X Resolution") shouldNot be(None)
+    metadata("X Resolution") should contain ("72 dots per inch")
+    metadata.get("Y Resolution") shouldNot be(None)
+    metadata("Y Resolution") should contain ("72 dots per inch")
   }
 
-  private def getMetadata(p: String): JsValue = {
+  private def getMetadata(p: String): Metadata = {
     val path = getClass.getResource(s"../import/$p").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
     val mediaType = altitude.service.fileImport.detectAssetType(fileImportAsset)
     altitude.service.metadataExtractor.extract(fileImportAsset, mediaType)
   }
-
 }
