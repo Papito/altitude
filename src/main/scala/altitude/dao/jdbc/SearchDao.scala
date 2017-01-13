@@ -5,6 +5,7 @@ import java.sql.{Types, PreparedStatement}
 import altitude.transactions.TransactionId
 import altitude.{Const => C, Context, Altitude}
 import altitude.models.{FieldType, MetadataField, Asset}
+import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, Json}
 
@@ -16,6 +17,29 @@ abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_paramete
   override def indexAsset(asset: Asset, metadataFields: Map[String, MetadataField])(implicit ctx: Context, txId: TransactionId) = {
     log.debug(s"Indexing asset $asset with metadata [${asset.metadata}]")
 
+    /**
+     * Create the search document
+     */
+    val docSql =
+      s"""
+         INSERT INTO search_document (
+                     ${C.SearchToken.REPO_ID}, ${C.SearchToken.ASSET_ID}, ${C.Asset.PATH},
+                     metadata_values, extracted_metadata_values, body)
+              VALUES (?, ?, ?, ?, ?, ?)
+       """
+    val sqlVals: List[Object] = List(
+      ctx.repo.id.get,
+      asset.id.get,
+      asset.path,
+      "",
+      "",
+      "")
+
+    addRecord(asset, docSql, sqlVals)
+
+    /**
+     * Index each metadata value as a strongly-typed dimension
+     */
     asset.metadata.data.foreach { m =>
       val fieldId = m._1
 
@@ -28,15 +52,15 @@ abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_paramete
           val values = m._2
           log.debug(s"Processing field [${field.nameLowercase}] with values [$values]")
 
-          val sql = s"""
+          val sql =  s"""
             INSERT INTO $tableName (
-                 ${C.SearchToken.REPO_ID}, ${C.SearchToken.ASSET_ID},
-                 ${C.SearchToken.FIELD_ID},
-                 ${C.SearchToken.FIELD_VALUE_TXT},
-                 ${C.SearchToken.FIELD_VALUE_KW},
-                 ${C.SearchToken.FIELD_VALUE_NUM},
-                 ${C.SearchToken.FIELD_VALUE_BOOL})
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+                        ${C.SearchToken.REPO_ID}, ${C.SearchToken.ASSET_ID},
+                        ${C.SearchToken.FIELD_ID},
+                        ${C.SearchToken.FIELD_VALUE_TXT},
+                        ${C.SearchToken.FIELD_VALUE_KW},
+                        ${C.SearchToken.FIELD_VALUE_NUM},
+                        ${C.SearchToken.FIELD_VALUE_BOOL})
+                 VALUES (?, ?, ?, ?, ?, ?, ?)
             """
 
           log.debug(s"INSERT SQL: $sql. ARGS: ${values.toString()}")
@@ -74,6 +98,13 @@ abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_paramete
           }
       }
     }
+  }
+
+  override protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object])
+                                  (implicit ctx: Context, txId: TransactionId): JsObject = {
+    val runner: QueryRunner = new QueryRunner()
+    runner.update(conn, q, vals:_*)
+    jsonIn
   }
 }
 

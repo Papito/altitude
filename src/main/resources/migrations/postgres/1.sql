@@ -111,17 +111,10 @@ CREATE TABLE search_document (
   path TEXT NOT NULL,
   metadata_values TEXT,
   extracted_metadata_values TEXT,
-  body TEXT NOT NULL,
+  body TEXT,
   tsv TSVECTOR
 );
 CREATE UNIQUE INDEX search_document_01 ON search_document(repository_id, asset_id);
-
---WITH t(json_stuff) AS ( VALUES
---  ('{"things": "stuff"}'::JSON),
---  ('{"more_things": "more_stuff"}'::JSON)
---)
---SELECT array_agg(stuff.key) result
---FROM t, json_each(t.json_stuff) stuff;
 
 UPDATE search_document SET tsv = (
   setweight(to_tsvector(path), 'A') ||
@@ -129,3 +122,8 @@ UPDATE search_document SET tsv = (
   setweight(to_tsvector(body), 'C') ||
   setweight(to_tsvector(extracted_metadata_values), 'D')
 );
+
+UPDATE search_document SET tsv = to_tsvector(
+  'english', path || ' ' || metadata_values || ' ' || extracted_metadata_values || ' ' || body);
+
+CREATE INDEX search_document_02 ON search_document USING gin(tsv);
