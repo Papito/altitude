@@ -13,7 +13,7 @@ import altitude.{Altitude, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.imgscalr.Scalr
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsNull, JsValue, JsObject, Json}
 
 class LibraryService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -38,13 +38,25 @@ class LibraryService(app: Altitude) {
         throw DuplicateException(obj.toJson, existing.records.head)
       }
 
+      val data = app.service.library.genPreviewData(obj)
+
       /**
       * Process metadata and append it to the asset
       */
       val metadata = app.service.metadata.cleanAndValidateMetadata(obj.metadata)
 
       // mush the metadata JSON key into the JSON repr of the asset and get a new asset
-      val assetToAdd: Asset = obj.toJson ++ Json.obj(C.Asset.METADATA -> metadata.toJson)
+      val assetToAdd: Asset = Asset(
+        id = obj.id,
+        userId = obj.userId,
+        assetType = obj.assetType,
+        path = obj.path,
+        md5 = obj.md5,
+        sizeBytes = obj.sizeBytes,
+        folderId = obj.folderId,
+        metadata = metadata,
+        extractedMetadata = obj.extractedMetadata,
+        previewData = data)
 
       val asset: Asset = app.service.asset.add(assetToAdd)
 

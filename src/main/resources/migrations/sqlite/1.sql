@@ -32,6 +32,7 @@ CREATE TABLE asset  (
   media_subtype varchar(64) NOT NULL,
   mime_type varchar(64) NOT NULL,
   extracted_metadata TEXT,
+  raw_metadata TEXT,
   metadata TEXT,
   path TEXT NOT NULL,
   folder_id char(24) NOT NULL,

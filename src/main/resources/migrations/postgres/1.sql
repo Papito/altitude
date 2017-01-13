@@ -36,8 +36,9 @@ CREATE TABLE asset (
   media_type varchar(64) NOT NULL,
   media_subtype varchar(64) NOT NULL,
   mime_type varchar(64) NOT NULL,
-  extracted_metadata jsonb,
   metadata jsonb,
+  extracted_metadata jsonb,
+  raw_metadata jsonb,
   path TEXT NOT NULL,
   folder_id char(24) NOT NULL DEFAULT '1',
   filename TEXT NOT NULL,
@@ -125,6 +126,6 @@ CREATE UNIQUE INDEX search_document_01 ON search_document(repository_id, asset_i
 UPDATE search_document SET tsv = (
   setweight(to_tsvector(path), 'A') ||
   setweight(to_tsvector(metadata_values), 'B') ||
-  setweight(to_tsvector(extracted_metadata_values), 'C') ||
-  setweight(to_tsvector(body), 'D')
+  setweight(to_tsvector(body), 'C') ||
+  setweight(to_tsvector(extracted_metadata_values), 'D')
 );

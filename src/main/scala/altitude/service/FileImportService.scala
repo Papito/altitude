@@ -11,7 +11,7 @@ import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 
 class FileImportService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -72,40 +72,25 @@ class FileImportService(app: Altitude) {
       md5 = getChecksum(fileAsset.absolutePath),
       assetType = assetType,
       sizeBytes = fileSizeInBytes,
-      folderId = ctx.repo.uncatFolderId)
+      folderId = ctx.repo.uncatFolderId,
+      extractedMetadata = metadata)
 
-
-    var previewData: Option[Array[Byte]] = None
+    var res: Option[JsValue] = None
 
     try {
-      val data = app.service.library.genPreviewData(asset)
-      previewData = Some(data)
+      res = Some(app.service.library.add(asset))
     }
     catch {
-      case ex: FormatException => {
+      case ex: FormatException =>
         return None
-      }
     }
-
-
-    val assetWithPreview = Asset(
-      userId = ctx.user.id.get,
-      path = asset.path,
-      md5 = asset.md5,
-      assetType = asset.assetType,
-      sizeBytes = asset.sizeBytes,
-      folderId = asset.folderId,
-      extractedMetadata = metadata,
-      previewData = previewData.get)
-
-    val res = app.service.library.add(assetWithPreview)
 
     // if there was a parser error, throw exception, the caller needs to know there was an error
     if (metadataParserException.isDefined) {
       throw MetadataExtractorException(asset, metadataParserException.get)
     }
 
-    Some(res)
+    Some(Asset.fromJson(res.get))
   }
 
   protected def getChecksum(file: File): String = {

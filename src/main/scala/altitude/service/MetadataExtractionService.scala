@@ -91,7 +91,6 @@ abstract class MetadataExtractionService {
       "Comment")
   )
 
-
   def extract(importAsset: FileImportAsset, assetType: AssetType, asRaw: Boolean): JsValue
   def detectAssetTypeFromStream(is: InputStream): AssetType
 }
