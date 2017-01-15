@@ -10,7 +10,7 @@ class MigrationDao(app: Altitude) extends altitude.dao.jdbc.MigrationDao(app) wi
 
 class MetadataFieldDao(app: Altitude) extends altitude.dao.jdbc.MetadataFieldDao(app) with Postgres
 
-class TrashDao(app: Altitude) extends altitude.dao.jdbc.TrashDao(app) with Postgres
+
 
 class SearchDao(app: Altitude) extends altitude.dao.jdbc.SearchDao(app) with Postgres 
 

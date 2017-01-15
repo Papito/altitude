@@ -48,8 +48,6 @@ object AltitudeBuild extends Build {
       "org.imgscalr"                 % "imgscalr-lib"          % "4.2",
 
       "org.postgresql"               % "postgresql"            % "9.4-1201-jdbc41",
-      "org.mongodb"                  % "casbah_2.11"           % "3.1.1",
-      "org.mongodb"                  % "casbah-commons_2.11"   % "3.1.1",
       "org.xerial"                   % "sqlite-jdbc"           % "3.15.1",
 
       "org.eclipse.jetty"            %  "jetty-plus"           % jettyVersion % "container;compile",

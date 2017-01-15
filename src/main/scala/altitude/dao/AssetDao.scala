@@ -1,7 +1,8 @@
 package altitude.dao
 
 import altitude.Context
-import altitude.models.Metadata
+import altitude.models.search.{QueryResult, Query}
+import altitude.models.{Asset, Metadata}
 import altitude.transactions.TransactionId
 import org.slf4j.LoggerFactory
 
@@ -10,6 +11,9 @@ trait AssetDao extends BaseDao {
 
   def getMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Option[Metadata]
   def setMetadata(assetId: String, metadata: Metadata)(implicit ctx: Context, txId: TransactionId)
+  def setAsRecycled(assetId: String, isRecycled: Boolean)(implicit ctx: Context, txId: TransactionId)
+  protected def setRecycledAtProperty(asset: Asset, rec: Map[String, AnyRef]): Asset
+  def queryNotRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult
 
   def updateMetadata(assetId: String, metadata: Metadata, deletedFields: Set[String])
                              (implicit ctx: Context, txId: TransactionId) = {

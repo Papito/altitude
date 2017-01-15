@@ -1,5 +1,6 @@
 package altitude.dao.jdbc
 
+import altitude.models.search.{QueryResult, Query}
 import altitude.models.{Asset, AssetType, Metadata}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
@@ -38,6 +39,10 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
 
     addCoreAttrs(model, rec)
   }
+
+  protected lazy val ASSET_QUERY_BUILDER = new AssetQueryBuilder(DEFAULT_SQL_COLS_FOR_SELECT, tableName)
+  override def queryNotRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
+    this.query(q, ASSET_QUERY_BUILDER)
 
   override def getMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Option[Metadata] = {
     val sql = s"""
@@ -101,4 +106,25 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
 
     runner.update(conn, sql, updateValues:_*)
   }
+
+  override def setAsRecycled(assetId: String, isRecycled: Boolean)
+                            (implicit ctx: Context, txId: TransactionId) = {
+    val sql = isRecycled match {
+      case true => s"""
+        UPDATE $tableName
+           SET ${C.Base.UPDATED_AT} = $CURRENT_TIME_FUNC,
+               ${C.Asset.RECYCLED_AT} = $CURRENT_TIME_FUNC
+         WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ? """
+      case false => s"""
+        UPDATE $tableName
+           SET ${C.Base.UPDATED_AT} = $CURRENT_TIME_FUNC,
+               ${C.Asset.RECYCLED_AT} = NULL
+         WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ? """
+    }
+
+    val runner: QueryRunner = new QueryRunner()
+
+    val numUpdated = runner.update(conn, sql,  ctx.repo.id.get, assetId)
+  }
+
 }

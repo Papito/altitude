@@ -1,6 +1,6 @@
 package integration
 
-import altitude.models.{Asset, Folder, Stats, Trash}
+import altitude.models.{Asset, Folder, Stats}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
@@ -75,7 +75,7 @@ import org.scalatest.Matchers._
   test("restore recycled asset") {
     val asset: Asset = altitude.service.library.add(makeAsset(
       altitude.service.folder.getUncatFolder))
-    val trashed: Trash = altitude.service.library.recycleAsset(asset.id.get)
+    val trashed: Asset = altitude.service.library.recycleAsset(asset.id.get)
     altitude.service.library.restoreRecycledAsset(trashed.id.get)
 
     SET_SECONDARY_USER()

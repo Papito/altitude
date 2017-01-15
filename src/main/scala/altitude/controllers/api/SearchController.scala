@@ -16,7 +16,7 @@ class SearchController extends BaseApiController {
       params = Map(C.Api.Folder.QUERY_ARG_NAME -> foldersQuery),
       rpp = 20, page = 1)
 
-    val results = app.service.library.search(q)
+    val results = app.service.library.query(q)
 
     Ok(Json.obj(
       C.Api.Search.ASSETS -> results.records,
@@ -36,7 +36,7 @@ class SearchController extends BaseApiController {
       params = Map(C.Api.Folder.QUERY_ARG_NAME -> foldersQuery),
       rpp = rpp, page = page)
 
-    val results = app.service.library.search(q)
+    val results = app.service.library.query(q)
 
     Ok(Json.obj(
       C.Api.Search.ASSETS -> results.records,

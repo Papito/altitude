@@ -4,7 +4,7 @@ import java.sql.DriverManager
 
 import altitude.dao._
 import altitude.service._
-import altitude.service.migration.{MongoMigrationService, PostgresMigrationService, SqliteMigrationService}
+import altitude.service.migration.{PostgresMigrationService, SqliteMigrationService}
 import altitude.transactions._
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
@@ -57,14 +57,12 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
     val library = new LibraryService(app)
     val search = new SearchService(app)
     val asset = new AssetService(app)
-    val trash = new TrashService(app)
     val preview = new PreviewService(app)
     val data = new DataService(app)
     val folder = new FolderService(app)
     val stats = new StatsService(app)
 
     val migration = dataSourceType match {
-      case "mongo" => new MongoMigrationService(app)
       case "sqlite" => new SqliteMigrationService(app)
       case "postgres" => new PostgresMigrationService(app)
     }
@@ -82,18 +80,6 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
     override def configure(): Unit = {
       dataSourceType match {
 
-        case "mongo" =>
-          bind[AbstractTransactionManager].toInstance(new altitude.transactions.VoidTransactionManager(app))
-
-          bind[MigrationDao].toInstance(new mongo.MigrationDao(app))
-          bind[RepositoryDao].toInstance(new mongo.RepositoryDao(app))
-          bind[AssetDao].toInstance(new mongo.AssetDao(app))
-          bind[TrashDao].toInstance(new mongo.TrashDao(app))
-          bind[FolderDao].toInstance(new mongo.FolderDao(app))
-          bind[StatDao].toInstance(new mongo.StatDao(app))
-          bind[MetadataFieldDao].toInstance(new mongo.MetadataFieldDao(app))
-          bind[SearchDao].toInstance(new mongo.SearchDao(app))
-
         case "postgres" =>
           DriverManager.registerDriver(new org.postgresql.Driver)
 
@@ -104,7 +90,6 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
           bind[MigrationDao].toInstance(new postgres.MigrationDao(app))
           bind[RepositoryDao].toInstance(new postgres.RepositoryDao(app))
           bind[AssetDao].toInstance(new postgres.AssetDao(app))
-          bind[TrashDao].toInstance(new postgres.TrashDao(app))
           bind[FolderDao].toInstance(new postgres.FolderDao(app))
           bind[StatDao].toInstance(new postgres.StatDao(app))
           bind[MetadataFieldDao].toInstance(new postgres.MetadataFieldDao(app))
@@ -120,7 +105,6 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
           bind[MigrationDao].toInstance(new sqlite.MigrationDao(app))
           bind[RepositoryDao].toInstance(new sqlite.RepositoryDao(app))
           bind[AssetDao].toInstance(new sqlite.AssetDao(app))
-          bind[TrashDao].toInstance(new sqlite.TrashDao(app))
           bind[FolderDao].toInstance(new sqlite.FolderDao(app))
           bind[StatDao].toInstance(new sqlite.StatDao(app))
           bind[MetadataFieldDao].toInstance(new sqlite.MetadataFieldDao(app))

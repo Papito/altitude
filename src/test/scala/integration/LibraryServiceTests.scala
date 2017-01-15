@@ -2,7 +2,7 @@ package integration
 
 import altitude.exceptions.NotFoundException
 import altitude.models.search.Query
-import altitude.models.{Asset, Folder, Trash}
+import altitude.models.{Asset, Folder}
 import altitude.{Const => C}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
@@ -158,14 +158,12 @@ import org.scalatest.Matchers._
   test("get recycled asset") {
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
     altitude.service.library.recycleAsset(asset.id.get)
-    val trashed: Trash = altitude.service.library.recycleAsset(asset.id.get)
   }
 
   test("restore recycled asset") {
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
-    val trashed: Trash = altitude.service.library.recycleAsset(asset.id.get)
+    val trashed: Asset = altitude.service.library.recycleAsset(asset.id.get)
     altitude.service.library.restoreRecycledAsset(trashed.id.get)
-    altitude.service.trash.getAll.length shouldBe 0
     altitude.service.asset.getAll.length shouldBe 1
   }
 

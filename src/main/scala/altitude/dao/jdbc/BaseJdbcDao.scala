@@ -4,7 +4,7 @@ import java.sql.Connection
 
 import altitude.dao.BaseDao
 import altitude.exceptions.ConstraintException
-import altitude.models.BaseModel
+import altitude.models.{Asset, BaseModel}
 import altitude.models.search.{Query, QueryResult}
 import altitude.transactions.{JdbcTransactionManager, TransactionId}
 import altitude.{Const => C, Context, Util}
@@ -123,7 +123,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   }
 
   /**
-   * Internally used method to add records. It's convenient for classed overriding
+   * Internally used method to add records. It's convenient for classes overriding
    * the add() method, as it accepts a ready-to-go SQL query, with bind methods.
    * This function takes care of the actual plumbing common to all add() methods.
    */

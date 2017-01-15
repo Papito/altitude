@@ -25,7 +25,6 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
 
   val datasource = config.get("datasource")
   protected def altitude: Altitude = datasource match {
-    case Some("mongo") => MongoSuite.app
     case Some("postgres") => PostgresSuite.app
     case Some("sqlite") => SqliteSuite.app
     case _ => throw new IllegalArgumentException(s"Do not know of datasource: $datasource")
@@ -43,9 +42,6 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
    * The transaction managers will not commit transactions if it's an existing
    * transaction ID. This allows us to rollback every test, keeping the database
    * clean.
-   *
-   * Note that it does not work for all data stores. Mongo, for instance, requires
-   * a full database wipe for each test (yes, it does make it the slowest).
    */
   implicit val txId: TransactionId = new TransactionId
 
@@ -149,8 +145,6 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
       log.info(s"Datasource type: ${altitude.dataSourceType}", C.LogTag.APP)
 
       altitude.dataSourceType match {
-        case "mongo" =>
-          bind[UtilitiesDao].toInstance(new dao.mongo.UtilitiesDao(altitude))
         case "postgres" | "sqlite" =>
           bind[UtilitiesDao].toInstance(new dao.jdbc.UtilitiesDao(altitude))
         case _ => throw new IllegalArgumentException(s"Do not know of datasource: ${altitude.dataSourceType}")

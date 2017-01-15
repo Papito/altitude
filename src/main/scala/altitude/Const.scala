@@ -36,16 +36,13 @@ object Const {
     val FILENAME = "filename"
     val METADATA = "metadata"
     val EXTRACTED_METADATA = "extracted_metadata"
+    val RECYCLED_AT = "recycled_at"
   }
 
   object AssetType extends Common {
     val MIME_TYPE = "mime_type"
     val MEDIA_TYPE = "media_type"
     val MEDIA_SUBTYPE = "media_subtype"
-  }
-
-  object Trash extends Common {
-    val RECYCLED_AT = "recycled_at"
   }
 
   object Folder extends Common {

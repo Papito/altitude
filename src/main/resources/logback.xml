@@ -17,7 +17,5 @@
   <logger name="org.atmosphere" level="WARN" />
   <logger name="org.scalatra.servlet" level="INFO" />
   <logger name="org.eclipse.jetty" level="INFO" />
-  <logger name="com.mongodb" level="WARN" />
-  <logger name="org.mongodb" level="WARN" />
   <logger name="com.mitchellbosecke.pebble" level="INFO" />
 </configuration>

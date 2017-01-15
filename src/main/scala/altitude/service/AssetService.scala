@@ -1,6 +1,7 @@
 package altitude.service
 
-import altitude.Altitude
+import altitude.transactions.TransactionId
+import altitude.{Context, Altitude}
 import altitude.dao.AssetDao
 import altitude.models.Asset
 import net.codingwell.scalaguice.InjectorExtensions._
@@ -15,6 +16,9 @@ import net.codingwell.scalaguice.InjectorExtensions._
 class AssetService(val app: Altitude) extends BaseService[Asset] {
   override protected val DAO = app.injector.instance[AssetDao]
 
+  def setAsRecycled(assetId: String, isRecycled: Boolean)(implicit ctx: Context, txId: TransactionId) = {
+    DAO.setAsRecycled(assetId, isRecycled = isRecycled)
+  }
   // NO
   // Read the class description
 }
