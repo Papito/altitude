@@ -15,7 +15,7 @@ class TrashService(val app: Altitude) extends BaseService[Trash] {
   def recycleAsset(assetId: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Trash = {
     val asset: JsValue = app.service.asset.getById(assetId)
     txManager.withTransaction[Trash] {
-         // delete the original asset
+      // delete the original asset
       app.service.library.deleteById(assetId)
 
       // since the models are essentially the same, we can pull shit like this

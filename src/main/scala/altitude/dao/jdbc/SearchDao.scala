@@ -31,6 +31,9 @@ abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_paramete
     val metadataValues = asset.metadata.data.foldLeft(Set[String]()) { (res, m) =>
       res ++ m._2
     }
+    val extractedMetadataValues = asset.extractedMetadata.data.foldLeft(Set[String]()) { (res, m) =>
+      res ++ m._2
+    }
 
     println("!!!!!!!!!!!!!!!!!!!")
     println(metadataValues)
@@ -40,8 +43,8 @@ abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_paramete
       ctx.repo.id.get,
       asset.id.get,
       asset.path,
-      "",
-      "",
+      metadataValues.mkString(" "),
+      extractedMetadataValues.mkString(" "),
       "")
 
     addRecord(asset, docSql, sqlVals)

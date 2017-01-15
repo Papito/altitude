@@ -9,6 +9,7 @@ import org.scalatest.Matchers._
 
 @DoNotDiscover class LibraryServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 
+/*
   test("move asset to a different folder") {
     /*
     folder1
@@ -153,13 +154,12 @@ import org.scalatest.Matchers._
     (altitude.service.folder.getByIdWithChildAssetCounts(folder1.id.get, all): Folder).numOfAssets should be (1)
   }
 
-/*
+*/
   test("get recycled asset") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUserUncatFolder()))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
     altitude.service.library.recycleAsset(asset.id.get)
     val trashed: Trash = altitude.service.library.recycleAsset(asset.id.get)
   }
-*/
 
   test("restore recycled asset") {
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))

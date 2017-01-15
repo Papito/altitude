@@ -69,7 +69,6 @@ import org.scalatest.Matchers._
     altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
   }
 
-  /*
   test("set metadata values") {
     val keywordMetadataField = altitude.service.metadata.addField(
       MetadataField(
@@ -113,9 +112,7 @@ import org.scalatest.Matchers._
     storedMetadata.data.keys should contain(keywordMetadataField.id.get)
     storedMetadata.data.keys should contain(numberMetadataField.id.get)
   }
-*/
 
-/*
   test("test/update empty value sets") {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
@@ -238,5 +235,23 @@ import org.scalatest.Matchers._
             MetadataField(name = fieldName, fieldType = FieldType.KEYWORD))
         }
   }
-*/
+
+  test("metadata added initially") {
+    val field = altitude.service.metadata.addField(
+      MetadataField(
+        name = "number field",
+        fieldType = FieldType.KEYWORD))
+
+    val data = Map[String, Set[String]](field.id.get -> Set("one", "two"))
+    val metadata = new Metadata(data)
+
+    val asset: Asset = altitude.service.library.add(
+      makeAsset(altitude.service.folder.getUncatFolder, metadata = metadata))
+
+    val storedAsset: Asset = altitude.service.asset.getById(asset.id.get)
+
+    storedAsset.metadata.isEmpty shouldBe false
+    //storedAsset.extractedMetadata.isEmpty shouldBe false
+  }
+
 }
