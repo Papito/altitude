@@ -32,15 +32,4 @@ class AssetDao(app: Altitude) extends altitude.dao.jdbc.AssetDao(app) with Postg
       case None => None
     }
   }
-
-  override protected def setRecycledAtProperty(asset: Asset, rec: Map[String, AnyRef]): Asset = {
-    val recycledAtMilis = rec.getOrElse(C.Base.CREATED_AT, 0d).asInstanceOf[Double].toLong
-    if (recycledAtMilis != 0d) {
-      asset.recycledAt = new DateTime(recycledAtMilis * 1000)
-    }
-
-    asset
-  }
-
-
 }

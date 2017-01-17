@@ -40,9 +40,14 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
     addCoreAttrs(model, rec)
   }
 
-  protected lazy val ASSET_QUERY_BUILDER = new AssetQueryBuilder(DEFAULT_SQL_COLS_FOR_SELECT, tableName)
+  protected lazy val NOT_RECYCLED_QUERY_BUILDER = new NotRecycledQueryBuilder(DEFAULT_SQL_COLS_FOR_SELECT, tableName)
   override def queryNotRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
-    this.query(q, ASSET_QUERY_BUILDER)
+    this.query(q, NOT_RECYCLED_QUERY_BUILDER)
+
+
+  protected lazy val RECYCLED_QUERY_BUILDER = new RecycledQueryBuilder(DEFAULT_SQL_COLS_FOR_SELECT, tableName)
+  override def queryRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
+    this.query(q, RECYCLED_QUERY_BUILDER)
 
   override def getMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Option[Metadata] = {
     val sql = s"""
@@ -107,24 +112,21 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
     runner.update(conn, sql, updateValues:_*)
   }
 
-  override def setAsRecycled(assetId: String, isRecycled: Boolean)
+  override def setAssetAsRecycled(assetId: String, isRecycled: Boolean)
                             (implicit ctx: Context, txId: TransactionId) = {
-    val sql = isRecycled match {
-      case true => s"""
+    // FIXME: do via update
+    val sql = s"""
         UPDATE $tableName
            SET ${C.Base.UPDATED_AT} = $CURRENT_TIME_FUNC,
-               ${C.Asset.RECYCLED_AT} = $CURRENT_TIME_FUNC
-         WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ? """
-      case false => s"""
-        UPDATE $tableName
-           SET ${C.Base.UPDATED_AT} = $CURRENT_TIME_FUNC,
-               ${C.Asset.RECYCLED_AT} = NULL
-         WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ? """
-    }
+               ${C.Asset.IS_RECYCLED} = ?
+         WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
+      """
+
+    val updateValues = List(isRecycled.asInstanceOf[Object], ctx.repo.id.get, assetId)
+    log.debug(s"Update SQL: [$sql] with values: $updateValues")
 
     val runner: QueryRunner = new QueryRunner()
-
-    val numUpdated = runner.update(conn, sql,  ctx.repo.id.get, assetId)
+    runner.update(conn, sql, updateValues:_*)
   }
 
 }

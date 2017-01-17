@@ -45,25 +45,6 @@ CREATE UNIQUE INDEX asset_01 ON asset(repository_id, md5);
 CREATE UNIQUE INDEX asset_02 ON asset(repository_id, path);
 CREATE INDEX asset_03 ON asset(repository_id, folder_id);
 
-CREATE TABLE trash  (
-  id char(24) PRIMARY KEY,
-  repository_id char(24) NOT NULL,
-  user_id char(24) NOT NULL,
-  md5 varchar(32) NOT NULL,
-  media_type varchar(64) NOT NULL,
-  media_subtype varchar(64) NOT NULL,
-  mime_type varchar(64) NOT NULL,
-  extracted_metadata TEXT,
-  metadata TEXT,
-  path TEXT NOT NULL,
-  folder_id char(24) NOT NULL,
-  filename TEXT NOT NULL,
-  size_bytes INT NOT NULL,
-  created_at DATE NOT NULL,
-  updated_at DATE DEFAULT NULL,
-  recycled_at DATE DEFAULT (datetime('now', 'utc'))
-);
-
 CREATE TABLE metadata_field (
   id char(24) PRIMARY KEY,
   repository_id char(24) NOT NULL,

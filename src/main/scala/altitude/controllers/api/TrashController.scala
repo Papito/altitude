@@ -86,7 +86,7 @@ class TrashController extends BaseApiController {
 
     val q = Query(rpp = rpp, page = page)
 
-    val results = app.service.library.trash(q)
+    val results = app.service.library.queryRecycled(q)
 
     Ok(Json.obj(
       C.Api.Search.ASSETS -> results.records,

@@ -149,6 +149,10 @@ class LibraryService(app: Altitude) {
     }
   }
 
+  def queryRecycled(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
+    app.service.asset.queryRecycled(query)
+  }
+
   def genPreviewData(asset: Asset)
                     (implicit ctx: Context, txId: TransactionId = new TransactionId): Array[Byte] = {
     asset.assetType.mediaType match {
@@ -302,7 +306,7 @@ class LibraryService(app: Altitude) {
     txManager.withTransaction {
       assetIds.foreach { assetId =>
         val asset: Asset = getById(assetId)
-        app.service.asset.setAsRecycled(assetId, isRecycled = true)
+        app.service.asset.setAssetAsRecycled(assetId, isRecycled = true)
 
         app.service.folder.decrAssetCount(asset.folderId)
 
@@ -317,7 +321,7 @@ class LibraryService(app: Altitude) {
       app.service.stats.incrementStat(Stats.RECYCLED_ASSETS, assetIds.size)
       app.service.stats.decrementStat(Stats.TOTAL_BYTES, totalBytes)
       app.service.stats.incrementStat(Stats.RECYCLED_BYTES, totalBytes)
-   }
+    }
   }
 
   def moveRecycledAssetToFolder(assetId: String, folderId: String)
@@ -334,7 +338,7 @@ class LibraryService(app: Altitude) {
 
     txManager.withTransaction {
       val restoredAssetIds: Set[String] = assetIds.map { assetId: String =>
-        app.service.asset.setAsRecycled(assetId, isRecycled = false)
+        app.service.asset.setAssetAsRecycled(assetId, isRecycled = false)
         val asset: Asset = getById(assetId)
 
         totalBytes += asset.sizeBytes
@@ -346,7 +350,7 @@ class LibraryService(app: Altitude) {
       app.service.stats.decrementStat(Stats.RECYCLED_ASSETS, assetIds.size)
       app.service.stats.incrementStat(Stats.TOTAL_BYTES, totalBytes)
       app.service.stats.decrementStat(Stats.RECYCLED_BYTES, totalBytes)
-   }
+    }
   }
 
   def restoreRecycledAsset(assetId: String)
@@ -363,7 +367,7 @@ class LibraryService(app: Altitude) {
 
     txManager.withTransaction {
       assetIds.foreach { assetId =>
-        app.service.asset.setAsRecycled(assetId, isRecycled = false)
+        app.service.asset.setAssetAsRecycled(assetId, isRecycled = false)
         val asset: Asset = getById(assetId)
         totalBytes += asset.sizeBytes
       }
@@ -373,10 +377,5 @@ class LibraryService(app: Altitude) {
       app.service.stats.incrementStat(Stats.TOTAL_BYTES, totalBytes)
       app.service.stats.decrementStat(Stats.RECYCLED_BYTES, totalBytes)
     }
-  }
-
-  def trash(q: Query): QueryResult = {
-    // FIXME: after query class is more flexibe with the NOT capability
-    QueryResult(records = List(), total = 0, query = None)
   }
 }

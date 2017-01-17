@@ -1,16 +1,13 @@
 package altitude.models
 
-import altitude.{Const => C, Util}
+import altitude.{Const => C}
 import org.apache.commons.io.FilenameUtils
-import org.joda.time.DateTime
-import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json._
 
 import scala.language.implicitConversions
 
 object Asset {
-  implicit def fromJson(json: JsValue): Asset = {
-    val asset = Asset(
+  implicit def fromJson(json: JsValue): Asset = Asset(
       id = (json \ C.Base.ID).asOpt[String],
       userId = (json \ C.Base.USER_ID).as[String],
       assetType = json \ C.Asset.ASSET_TYPE,
@@ -19,16 +16,9 @@ object Asset {
       md5 = (json \ C.Asset.MD5).as[String],
       sizeBytes = (json \ C.Asset.SIZE_BYTES).as[Long],
       metadata = Metadata.fromJson((json \ C.Asset.METADATA).as[JsObject]),
-      extractedMetadata = Metadata.fromJson((json \ C.Asset.EXTRACTED_METADATA).as[JsObject])
+      extractedMetadata = Metadata.fromJson((json \ C.Asset.EXTRACTED_METADATA).as[JsObject]),
+      isRecycled = (json \ C.Asset.IS_RECYCLED).as[Boolean]
     ).withCoreAttr(json)
-
-    val isoRecycledAt = (json \ C.Asset.RECYCLED_AT).asOpt[String]
-    if (isoRecycledAt.isDefined) {
-      asset.recycledAt = ISODateTimeFormat.dateTime().parseDateTime(isoRecycledAt.get)
-    }
-
-    asset
-  }
 }
 
 case class Asset(id: Option[String] = None,
@@ -39,21 +29,11 @@ case class Asset(id: Option[String] = None,
                  sizeBytes: Long,
                  folderId: String,
                  metadata: Metadata = new Metadata(),
+                 isRecycled: Boolean = false,
                  extractedMetadata: Metadata = new Metadata(),
                  previewData: Array[Byte] = new Array[Byte](0)) extends BaseModel {
 
   val fileName: String = FilenameUtils.getName(path)
-
-  // recycled at - mutable, but can only be set once
-  protected var _recycledAt: Option[DateTime] = None
-
-  def recycledAt = _recycledAt
-
-  def recycledAt_= (arg: DateTime): Unit = {
-    if (_recycledAt.isDefined)
-      throw new RuntimeException("Cannot set 'created at' twice")
-    _createdAt = Some(arg)
-  }
 
   override def toJson = Json.obj(
     C.Base.USER_ID -> userId,
@@ -64,11 +44,9 @@ case class Asset(id: Option[String] = None,
     C.Asset.SIZE_BYTES -> sizeBytes,
     C.Asset.ASSET_TYPE -> (assetType: JsValue),
     C.Asset.METADATA -> metadata.toJson,
-    C.Asset.EXTRACTED_METADATA -> extractedMetadata.toJson
-  ) ++ Json.obj(C.Asset.RECYCLED_AT -> {recycledAt match {
-    case None => JsNull
-    case _ => JsString(Util.isoDateTime(recycledAt))
-  }}) ++ coreJsonAttrs
+    C.Asset.EXTRACTED_METADATA -> extractedMetadata.toJson,
+    C.Asset.IS_RECYCLED -> isRecycled
+  ) ++ coreJsonAttrs
 
   override def toString = s"path: [${this.path}] class: [${this.assetType.mediaType}:${this.assetType.mediaSubtype}]"
 }

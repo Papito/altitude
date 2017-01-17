@@ -36,7 +36,7 @@ object Const {
     val FILENAME = "filename"
     val METADATA = "metadata"
     val EXTRACTED_METADATA = "extracted_metadata"
-    val RECYCLED_AT = "recycled_at"
+    val IS_RECYCLED = "is_recycled"
   }
 
   object AssetType extends Common {

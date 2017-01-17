@@ -1,5 +1,6 @@
 package altitude.service
 
+import altitude.models.search.{QueryResult, Query}
 import altitude.transactions.TransactionId
 import altitude.{Context, Altitude}
 import altitude.dao.AssetDao
@@ -16,9 +17,18 @@ import net.codingwell.scalaguice.InjectorExtensions._
 class AssetService(val app: Altitude) extends BaseService[Asset] {
   override protected val DAO = app.injector.instance[AssetDao]
 
-  def setAsRecycled(assetId: String, isRecycled: Boolean)(implicit ctx: Context, txId: TransactionId) = {
-    DAO.setAsRecycled(assetId, isRecycled = isRecycled)
+  def setAssetAsRecycled(assetId: String, isRecycled: Boolean)(implicit ctx: Context, txId: TransactionId) = {
+    DAO.setAssetAsRecycled(assetId, isRecycled = isRecycled)
   }
+
+  override def query(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+    DAO.queryNotRecycled(q)
+  }
+
+  def queryRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+    DAO.queryRecycled(q)
+  }
+
   // NO
   // Read the class description
 }

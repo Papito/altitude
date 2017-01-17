@@ -43,30 +43,11 @@ CREATE TABLE asset (
   folder_id char(24) NOT NULL DEFAULT '1',
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
-  recycled_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
+  is_recycled BOOLEAN NOT NULL DEFAULT FALSE
 ) INHERITS (_core);
-CREATE UNIQUE INDEX asset_01 ON asset(repository_id, md5);
-CREATE UNIQUE INDEX asset_02 ON asset(repository_id, path);
-CREATE INDEX asset_03 ON asset(repository_id, folder_id);
-
-CREATE TABLE trash (
-  id char(24) PRIMARY KEY,
-  repository_id char(24) NOT NULL,
-  user_id char(24) NOT NULL,
-  md5 varchar(32) NOT NULL,
-  media_type varchar(64) NOT NULL,
-  media_subtype varchar(64) NOT NULL,
-  mime_type varchar(64) NOT NULL,
-  extracted_metadata jsonb,
-  metadata jsonb,
-  path TEXT NOT NULL,
-  folder_id char(24) NOT NULL,
-  filename TEXT NOT NULL,
-  size_bytes INT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
-  recycled_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'utc')
-);
+CREATE UNIQUE INDEX asset_01 ON asset(repository_id, md5, is_recycled);
+CREATE UNIQUE INDEX asset_02 ON asset(repository_id, path, is_recycled);
+CREATE INDEX asset_03 ON asset(repository_id, folder_id, is_recycled);
 
 CREATE TABLE metadata_field (
   id char(24) PRIMARY KEY,
