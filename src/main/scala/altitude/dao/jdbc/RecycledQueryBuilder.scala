@@ -6,6 +6,6 @@ class RecycledQueryBuilder(sqlColsForSelect: String, tableName: String) extends
 SqlQueryBuilder(sqlColsForSelect, tableName) {
 
   override protected def assembleQuery(select: String, from: String, where: String, rpp: Int = 0, page: Int = 0): String = {
-    super.assembleQuery(select, from, s"$where AND ${C.Asset.IS_RECYCLED} = true", rpp, page)
+    super.assembleQuery(select, from, s"$where AND ${C.Asset.IS_RECYCLED} = 1", rpp, page)
   }
 }

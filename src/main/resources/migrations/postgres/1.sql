@@ -41,7 +41,7 @@ CREATE TABLE asset (
   folder_id CHAR(24) NOT NULL DEFAULT '1',
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
-  is_recycled BOOLEAN NOT NULL DEFAULT FALSE
+  is_recycled SMALLINT NOT NULL DEFAULT 0
 ) INHERITS (_core);
 CREATE UNIQUE INDEX asset_01 ON asset(repository_id, md5, is_recycled);
 CREATE UNIQUE INDEX asset_02 ON asset(repository_id, path, is_recycled);

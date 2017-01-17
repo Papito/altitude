@@ -1,5 +1,7 @@
 package altitude.dao.jdbc
 
+import java.sql.PreparedStatement
+
 import altitude.models.search.{QueryResult, Query}
 import altitude.models.{Asset, AssetType, Metadata}
 import altitude.transactions.TransactionId
@@ -122,7 +124,8 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
          WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
       """
 
-    val updateValues = List(isRecycled.asInstanceOf[Object], ctx.repo.id.get, assetId)
+    val _isRecycled = if (isRecycled) 1 else 0
+    val updateValues = List[Object](_isRecycled.asInstanceOf[Object], ctx.repo.id.get, assetId)
     log.debug(s"Update SQL: [$sql] with values: $updateValues")
 
     val runner: QueryRunner = new QueryRunner()

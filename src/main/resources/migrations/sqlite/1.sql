@@ -38,13 +38,13 @@ CREATE TABLE asset  (
   folder_id CHAR(24) NOT NULL,
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
-  is_recycled TINYINT NOT NULL DEFAULT FALSE,
+  is_recycled TINYINT NOT NULL DEFAULT 0,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );
-CREATE UNIQUE INDEX asset_01 ON asset(repository_id, md5);
-CREATE UNIQUE INDEX asset_02 ON asset(repository_id, path);
-CREATE INDEX asset_03 ON asset(repository_id, folder_id);
+CREATE UNIQUE INDEX asset_01 ON asset(repository_id, md5, is_recycled);
+CREATE UNIQUE INDEX asset_02 ON asset(repository_id, path, is_recycled);
+CREATE INDEX asset_03 ON asset(repository_id, folder_id, is_recycled);
 
 CREATE TABLE metadata_field (
   id CHAR(24) PRIMARY KEY,
