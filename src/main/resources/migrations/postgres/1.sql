@@ -7,7 +7,7 @@ CREATE TABLE system (
   id INT NOT NULL,
   version INT NOT NULL
 );
-CREATE UNIQUE INDEX system_record ON system(id);
+CREATE UNIQUE INDEX system_01 ON system(id);
 INSERT INTO system(id, version) VALUES(0, 0);
 
 CREATE TABLE repository(
@@ -41,7 +41,7 @@ CREATE TABLE asset (
   folder_id CHAR(24) NOT NULL DEFAULT '1',
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
-  is_recycled SMALLINT NOT NULL DEFAULT 0
+  is_recycled INT NOT NULL DEFAULT 0
 ) INHERITS (_core);
 CREATE UNIQUE INDEX asset_01 ON asset(repository_id, md5, is_recycled);
 CREATE UNIQUE INDEX asset_02 ON asset(repository_id, path, is_recycled);
@@ -90,7 +90,6 @@ CREATE TABLE search_document (
   asset_id CHAR(24) NOT NULL,
   path TEXT NOT NULL,
   metadata_values TEXT,
-  extracted_metadata_values TEXT,
   body TEXT,
   tsv TSVECTOR
 );
@@ -99,11 +98,10 @@ CREATE UNIQUE INDEX search_document_01 ON search_document(repository_id, asset_i
 UPDATE search_document SET tsv = (
   setweight(to_tsvector(path), 'A') ||
   setweight(to_tsvector(metadata_values), 'B') ||
-  setweight(to_tsvector(body), 'C') ||
-  setweight(to_tsvector(extracted_metadata_values), 'D')
+  setweight(to_tsvector(body), 'C'))
 );
 
 UPDATE search_document SET tsv = to_tsvector(
-  'english', path || ' ' || metadata_values || ' ' || extracted_metadata_values || ' ' || body);
+  'english', path || ' ' || metadata_values || ' ' || body);
 
 CREATE INDEX search_document_02 ON search_document USING gin(tsv);

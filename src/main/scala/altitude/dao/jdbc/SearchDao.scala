@@ -24,27 +24,19 @@ abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_paramete
       s"""
          INSERT INTO search_document (
                      ${C.SearchToken.REPO_ID}, ${C.SearchToken.ASSET_ID}, ${C.Asset.PATH},
-                     metadata_values, extracted_metadata_values, body)
-              VALUES (?, ?, ?, ?, ?, ?)
+                     metadata_values, body)
+              VALUES (?, ?, ?, ?, ?)
        """
 
     val metadataValues = asset.metadata.data.foldLeft(Set[String]()) { (res, m) =>
       res ++ m._2
     }
-    val extractedMetadataValues = asset.extractedMetadata.data.foldLeft(Set[String]()) { (res, m) =>
-      res ++ m._2
-    }
-
-    println("!!!!!!!!!!!!!!!!!!!")
-    println(metadataValues)
-    println("!!!!!!!!!!!!!!!!!!!")
 
     val sqlVals: List[Object] = List(
       ctx.repo.id.get,
       asset.id.get,
       asset.path,
       metadataValues.mkString(" "),
-      extractedMetadataValues.mkString(" "),
       "")
 
     addRecord(asset, docSql, sqlVals)
