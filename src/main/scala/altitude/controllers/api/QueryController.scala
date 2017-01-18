@@ -6,7 +6,7 @@ import org.scalatra.Ok
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 
-class SearchController extends BaseApiController {
+class QueryController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
   get("/") {

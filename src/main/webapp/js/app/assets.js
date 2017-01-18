@@ -400,7 +400,7 @@ AssetsViewModel = BaseViewModel.extend({
 
   getUrl: function() {
     var self = this;
-    return '/api/v1/search/p/' +  self.currentPage() + '/rpp/' + self.resultsPerPage() + '?' + self.queryString
+    return '/api/v1/query/p/' +  self.currentPage() + '/rpp/' + self.resultsPerPage() + '?' + self.queryString
   },
 
   search: function(callback) {
