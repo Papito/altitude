@@ -25,11 +25,8 @@ abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_paramete
       s"""
          INSERT INTO search_document (
                      ${C.SearchToken.REPO_ID}, ${C.SearchToken.ASSET_ID}, ${C.Asset.PATH},
-                     metadata_values, body, tsv)
-              VALUES (
-                ?, ?, ?, ?, ?,
-                to_tsvector('english', ? || ' ' || ? || ' ' || ?)
-              )
+                     metadata_values, body)
+              VALUES (?, ?, ?, ?, ?)
        """
 
     val metadataValues = asset.metadata.data.foldLeft(Set[String]()) { (res, m) =>
@@ -41,7 +38,7 @@ abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_paramete
       asset.id.get,
       asset.path,
       metadataValues.mkString(" "),
-      "", asset.path, metadataValues.mkString(" "), "")
+      "")
 
     addRecord(asset, docSql, sqlVals)
 

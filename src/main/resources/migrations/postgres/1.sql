@@ -89,9 +89,9 @@ CREATE TABLE search_document (
   repository_id CHAR(24) NOT NULL,
   asset_id CHAR(24) NOT NULL,
   path TEXT NOT NULL,
-  metadata_values TEXT,
-  body TEXT,
-  tsv TSVECTOR
+  metadata_values TEXT NOT NULL,
+  body TEXT NOT NULL,
+  tsv TSVECTOR NOT NULL
 );#END
 CREATE UNIQUE INDEX search_document_01 ON search_document(repository_id, asset_id);#END
 CREATE INDEX search_document_02 ON search_document USING gin(tsv);#END
