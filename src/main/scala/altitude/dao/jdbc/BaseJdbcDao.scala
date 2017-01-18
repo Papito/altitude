@@ -100,8 +100,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     val sqlQuery: SqlQuery = sqlQueryBuilder.toSelectQuery(query)
     val recs = manyBySqlQuery(sqlQuery.queryString, sqlQuery.selectBindValues)
 
-    // do not perform a count query if we got zero results in the first place
-    val count: Int =  getQueryResultCount(query, sqlQuery.selectBindValues)
+    val count: Int = getQueryResultCount(query, sqlQuery.selectBindValues)
 
     log.debug(s"Found [$count] records. Retrieved [${recs.length}] records")
     if (recs.nonEmpty) {
@@ -113,10 +112,15 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   protected def getQueryResultCount(query: Query, values: List[Object] = List())
                                    (implicit  ctx: Context, txId: TransactionId): Int = {
     val sqlCountQuery: SqlQuery = SQL_QUERY_BUILDER.toSelectQuery(query, countOnly = true)
+    getQueryResultCountBySql(sqlCountQuery.queryString, values)
+  }
+
+  protected def getQueryResultCountBySql(sql: String, values: List[Object] = List())
+                                   (implicit  ctx: Context, txId: TransactionId): Int = {
     val runner: QueryRunner = new QueryRunner()
 
     // We are defensive with different JDBC drivers operating with either java.lang.Int or java.lang.Long
-    runner.query(conn, sqlCountQuery.queryString, new ScalarHandler[AnyRef]("count"),  values: _*) match {
+    runner.query(conn, sql, new ScalarHandler[AnyRef]("count"),  values: _*) match {
       case v: java.lang.Integer => v.intValue
       case v: java.lang.Long => v.asInstanceOf[Long].toInt
     }
@@ -175,6 +179,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
   protected def manyBySqlQuery(sql: String, values: List[Object] = List())
                               (implicit ctx: Context, txId: TransactionId): List[Map[String, AnyRef]] = {
+    log.debug(s"Running SQL query [$sql] with $values")
     val runner: QueryRunner = new QueryRunner()
     val res = runner.query(conn, sql, new MapListHandler(), values: _*)
     log.debug(s"Found ${res.size()} records", C.LogTag.DB)
@@ -186,12 +191,12 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
    *
    * @throws ConstraintException if a DB constraint is missed and more than one record is found
    */
-  protected def oneBySqlQuery(sql: String, vals: List[Object] = List())
+  protected def oneBySqlQuery(sql: String, values: List[Object] = List())
                              (implicit ctx: Context, txId: TransactionId): Option[Map[String, AnyRef]] = {
-    log.debug(s"SQL: $sql")
+    log.debug(s"Running SQL query [$sql] with $values")
 
     val runner: QueryRunner = new QueryRunner()
-    val res = runner.query(conn, sql, new MapListHandler(), vals:_*)
+    val res = runner.query(conn, sql, new MapListHandler(), values:_*)
 
     log.debug(s"Found ${res.size()} records", C.LogTag.DB)
 

@@ -87,7 +87,7 @@ abstract class MigrationService(app: Altitude) {
     log.info(s"RUNNING MIGRATION TO VERSION $version")
     val path = s"$ROOT_MIGRATIONS_PATH$MIGRATIONS_DIR$version$FILE_EXTENSION"
     val r = getClass.getResource(path)
-    Source.fromURL(r).mkString.split(";").map(_.trim).toList.filter(_.nonEmpty)
+    Source.fromURL(r).mkString.split("#END").map(_.trim).toList.filter(_.nonEmpty)
   }
 
 }

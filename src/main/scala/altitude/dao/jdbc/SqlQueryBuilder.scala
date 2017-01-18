@@ -6,6 +6,18 @@ import altitude.transactions.TransactionId
 import altitude.{Const => C, Context}
 import org.slf4j.LoggerFactory
 
+/**
+ * This is no substitute for a real ORM query generator, but more of a helper stitching
+ * together SQL queries.
+ *
+ * Fortunately there are a lot of solid assumptions that make this much easier - like the fact
+ * that the "where" clause is never, ever empty.
+ *
+ * This is only for SELECT queries, and it covers a big chunk of use cases.
+ *
+ * @param sqlColsForSelect columns to select
+ * @param tableName table name to query
+ */
 class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) extends QueryParser {
   private final val log = LoggerFactory.getLogger(getClass)
 
@@ -15,7 +27,6 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) extends Query
     // get the query params - and add the repository
     val params = getParams(query) + (C.Base.REPO_ID -> ctx.repo.id.get)
 
-    // filter out system parameters
     val (sqlColumns, sqlValues) = params.unzip
     // create pairs of column names and value placeholders, to be joined in the final clause
     val whereClauses: List[String] = sqlColumns.map(_ + " = ?").toList
@@ -50,16 +61,12 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) extends Query
     }
 
     val bindValues = sqlValues.toList ::: folderIds.toList
-    log.debug(s"SQL QUERY: $sql with $bindValues")
+    //log.debug(s"SQL QUERY: $sql with $bindValues")
     SqlQuery(sql, bindValues)
   }
 
   protected def assembleQuery(select: String, from: String, where: String, rpp: Int = 0, page: Int = 0): String = {
-    val sqlWithoutPaging = s"""
-      SELECT $select
-        FROM $from
-        $where
-    """
+    val sqlWithoutPaging = s"SELECT $select FROM $from $where"
 
     rpp match  {
       case 0 => sqlWithoutPaging

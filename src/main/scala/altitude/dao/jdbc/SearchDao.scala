@@ -2,6 +2,7 @@ package altitude.dao.jdbc
 
 import java.sql.{Types, PreparedStatement}
 
+import altitude.models.search.{Query, QueryResult}
 import altitude.transactions.TransactionId
 import altitude.{Const => C, Context, Altitude}
 import altitude.models.{FieldType, MetadataField, Asset}
@@ -24,8 +25,11 @@ abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_paramete
       s"""
          INSERT INTO search_document (
                      ${C.SearchToken.REPO_ID}, ${C.SearchToken.ASSET_ID}, ${C.Asset.PATH},
-                     metadata_values, body)
-              VALUES (?, ?, ?, ?, ?)
+                     metadata_values, body, tsv)
+              VALUES (
+                ?, ?, ?, ?, ?,
+                to_tsvector('english', ? || ' ' || ? || ' ' || ?)
+              )
        """
 
     val metadataValues = asset.metadata.data.foldLeft(Set[String]()) { (res, m) =>
@@ -37,7 +41,7 @@ abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_paramete
       asset.id.get,
       asset.path,
       metadataValues.mkString(" "),
-      "")
+      "", asset.path, metadataValues.mkString(" "), "")
 
     addRecord(asset, docSql, sqlVals)
 
@@ -72,7 +76,7 @@ abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_paramete
           val preparedStatement: PreparedStatement = conn.prepareStatement(sql)
 
           values.foreach { value =>
-            log.debug(s"Executing for [${field.name}] and [$value]")
+            //log.debug(s"Executing for [${field.name}] and [$value]")
 
             preparedStatement.clearParameters()
             preparedStatement.setString(1, ctx.repo.id.get)
@@ -103,6 +107,40 @@ abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_paramete
       }
     }
   }
+
+  override def search(textQuery: String)
+                     (implicit ctx: Context, txId: TransactionId): QueryResult = {
+    val sql =
+      s"""
+        SELECT *
+        FROM search_document
+        WHERE tsv @@ to_tsquery(?)
+      """
+    val countSql =
+      s"""
+        SELECT COUNT(*) AS count
+        FROM search_document
+        WHERE tsv @@ to_tsquery(?)
+      """
+
+    val recs = manyBySqlQuery(sql, List(textQuery))
+    val count: Int = getQueryResultCountBySql(countSql, List(textQuery))
+
+    log.debug(s"Found [$count] records. Retrieved [${recs.length}] records")
+    if (recs.nonEmpty) {
+      log.debug(recs.map(_.toString()).mkString("\n"))
+    }
+
+    log.debug(s"Found [$count] records. Retrieved [${recs.length}] records")
+    if (recs.nonEmpty) {
+      log.debug(recs.map(_.toString()).mkString("\n"))
+    }
+    QueryResult(records = recs.map{makeModel}, total = count, query = None)
+  }
+
+  override def query(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
+    this.query(q, SQL_QUERY_BUILDER)
+
 
   override protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object])
                                   (implicit ctx: Context, txId: TransactionId): JsObject = {

@@ -1,6 +1,7 @@
 package altitude.service
 
 import altitude.dao.{MetadataFieldDao, SearchDao}
+import altitude.models.search.QueryResult
 import altitude.models.{MetadataField, Asset}
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Context}
@@ -16,5 +17,9 @@ class SearchService(app: Altitude) {
     log.info(s"Indexing asset $asset")
     val metadataFields: Map[String, MetadataField] = app.service.metadata.getAllFields
     SEARCH_DAO.indexAsset(asset, metadataFields)
+  }
+
+  def search(textQuery: String)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+    SEARCH_DAO.search(textQuery)
   }
 }

@@ -1,11 +1,14 @@
+
 package integration
 
 import altitude.models._
+import altitude.models.search.QueryResult
 import org.scalatest.DoNotDiscover
+import org.scalatest.Matchers._
 
 @DoNotDiscover class SearchServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 
-  test("simple text search") {
+  test("simple text indexing") {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "keywords",
@@ -56,10 +59,18 @@ import org.scalatest.DoNotDiscover
           I’d like to stop thinking of the present as some minor, insignificant preamble to something else.
           """
         ),
-        field3.id.get -> Set("Keanu Reeves", "Sandra Bullock", "Dennis Hopper"))
+        field3.id.get -> Set("Keanu Reeves", "Sandra Bullock", "Dennis Hopper", "Teri Hatcher"))
 
     val assetData2 = makeAsset(altitude.service.folder.getUncatFolder, new Metadata(data))
     val asset2: Asset = altitude.service.library.add(assetData2)
+
+    var results: QueryResult = altitude.service.search.search("keanu")
+    results.nonEmpty shouldBe true
+    results.total shouldBe 1
+
+    results = altitude.service.search.search("TERI")
+    results.nonEmpty shouldBe true
+    results.total shouldBe 2
   }
 
   /*
