@@ -5,6 +5,64 @@ import org.scalatest.DoNotDiscover
 
 @DoNotDiscover class SearchServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 
+  test("simple text search") {
+    val field1 = altitude.service.metadata.addField(
+      MetadataField(
+        name = "keywords",
+        fieldType = FieldType.KEYWORD))
+
+    val field2 = altitude.service.metadata.addField(
+      MetadataField(
+        name = "quotes",
+        fieldType = FieldType.TEXT))
+
+    val field3 = altitude.service.metadata.addField(
+      MetadataField(
+        name = "actors",
+        fieldType = FieldType.KEYWORD))
+
+    var data = Map[String, Set[String]](
+        field1.id.get -> Set("picture", "man", "office", "monday", "how is this my life?"),
+        field2.id.get -> Set(
+          """
+          We have blueberry, raspberry, ginseng, sleepy time, green tea,
+          green tea with lemon, green tea with lemon and honey, liver disaster,
+          ginger with honey, ginger without honey, vanilla almond, white truffel,
+          blueberry chamomile, vanilla walnut, constant comment and... earl grey.
+          """,
+          """
+          Ok this next song goes out to the guy who keeps yelling from the balcony.
+          It's called "We Hate You, Please Die."
+          """,
+          """
+          I partake not in the meat, nor the breastmilk, nor the ovum, of any creature, with a face.
+          """
+        ),
+        field3.id.get -> Set("Lindsay Lohan", "Conan O'Brien", "Teri Hatcher", "Sam Rockwell"))
+
+    val assetData1 = makeAsset(altitude.service.folder.getUncatFolder, new Metadata(data))
+    val asset1: Asset = altitude.service.library.add(assetData1)
+
+    data = Map[String, Set[String]](
+        field1.id.get -> Set("tree", "shoe", "desert", "California"),
+        field2.id.get -> Set(
+          """
+          “If I ever start referring to these as the best years of my life — remind me to kill myself.”
+          """,
+          """
+          George Washington was in a cult, and that cult was into aliens, man.
+          """,
+          """
+          I’d like to stop thinking of the present as some minor, insignificant preamble to something else.
+          """
+        ),
+        field3.id.get -> Set("Keanu Reeves", "Sandra Bullock", "Dennis Hopper"))
+
+    val assetData2 = makeAsset(altitude.service.folder.getUncatFolder, new Metadata(data))
+    val asset2: Asset = altitude.service.library.add(assetData2)
+  }
+
+  /*
   test("index and search assets") {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
@@ -35,4 +93,5 @@ import org.scalatest.DoNotDiscover
     val assetData2 = makeAsset(altitude.service.folder.getUncatFolder, new Metadata(data))
     val asset2: Asset = altitude.service.library.add(assetData2)
   }
+*/
 }

@@ -94,6 +94,7 @@ CREATE TABLE search_document (
   tsv TSVECTOR
 );
 CREATE UNIQUE INDEX search_document_01 ON search_document(repository_id, asset_id);
+CREATE INDEX search_document_02 ON search_document USING gin(tsv);
 
 UPDATE search_document SET tsv = (
   setweight(to_tsvector(path), 'A') ||
@@ -104,4 +105,3 @@ UPDATE search_document SET tsv = (
 UPDATE search_document SET tsv = to_tsvector(
   'english', path || ' ' || metadata_values || ' ' || body);
 
-CREATE INDEX search_document_02 ON search_document USING gin(tsv);
