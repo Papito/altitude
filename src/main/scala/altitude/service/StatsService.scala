@@ -1,9 +1,9 @@
 package altitude.service
 
 import altitude.dao.StatDao
-import altitude.models.search.Query
 import altitude.models.{Stat, Stats}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
+import altitude.util.Query
 import altitude.{Altitude, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory

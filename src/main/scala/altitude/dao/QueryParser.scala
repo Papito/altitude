@@ -1,6 +1,6 @@
 package altitude.dao
 
-import altitude.models.search.Query
+import altitude.util.Query
 import altitude.{Const => C}
 
 trait QueryParser {

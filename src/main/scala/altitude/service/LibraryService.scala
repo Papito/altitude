@@ -5,15 +5,16 @@ import java.awt.{AlphaComposite, Graphics2D}
 import java.io._
 import javax.imageio.ImageIO
 
+
 import altitude.exceptions.{DuplicateException, FormatException, IllegalOperationException}
-import altitude.models._
-import altitude.models.search.{Query, QueryResult}
+import altitude.models.{Stats, Preview, Data, Asset}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
+import altitude.util.{QueryResult, Query}
 import altitude.{Altitude, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.imgscalr.Scalr
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsNull, JsValue, JsObject, Json}
+import play.api.libs.json.{JsObject, Json}
 
 class LibraryService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)

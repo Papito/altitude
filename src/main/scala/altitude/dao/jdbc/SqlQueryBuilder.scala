@@ -1,8 +1,8 @@
 package altitude.dao.jdbc
 
 import altitude.dao.QueryParser
-import altitude.models.search.Query
 import altitude.transactions.TransactionId
+import altitude.util.Query
 import altitude.{Const => C, Context}
 import org.slf4j.LoggerFactory
 

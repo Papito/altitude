@@ -2,8 +2,8 @@ package altitude.dao.jdbc
 
 import java.sql.{Types, PreparedStatement}
 
-import altitude.models.search.{Query, QueryResult}
 import altitude.transactions.TransactionId
+import altitude.util.{QueryResult, Query}
 import altitude.{Const => C, Context, Altitude}
 import altitude.models.{FieldType, MetadataField, Asset}
 import org.apache.commons.dbutils.QueryRunner

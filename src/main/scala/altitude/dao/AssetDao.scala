@@ -1,9 +1,9 @@
 package altitude.dao
 
 import altitude.Context
-import altitude.models.search.{QueryResult, Query}
-import altitude.models.{Asset, Metadata}
+import altitude.models.Metadata
 import altitude.transactions.TransactionId
+import altitude.util.{QueryResult, Query}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 

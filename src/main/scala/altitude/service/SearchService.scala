@@ -1,9 +1,9 @@
 package altitude.service
 
 import altitude.dao.{MetadataFieldDao, SearchDao}
-import altitude.models.search.QueryResult
 import altitude.models.{MetadataField, Asset}
 import altitude.transactions.TransactionId
+import altitude.util.QueryResult
 import altitude.{Altitude, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory

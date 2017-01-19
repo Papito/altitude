@@ -5,8 +5,7 @@ import play.api.libs.json.JsValue
 import scala.language.implicitConversions
 
 object StorageType extends Enumeration {
-  type StorageType = Value
-  val file_system, amazon_s3, amazon_cloud_drive, google_drive = Value
+  val FS, S3 = Value
 
-  implicit def fromJson(jsVal: JsValue): StorageType = StorageType.Value(jsVal.toString())
+  implicit def fromJson(jsVal: JsValue): StorageType.Value = StorageType.Value(jsVal.toString())
 }

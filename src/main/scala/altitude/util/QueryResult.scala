@@ -1,4 +1,4 @@
-package altitude.models.search
+package altitude.util
 
 import play.api.libs.json.JsObject
 

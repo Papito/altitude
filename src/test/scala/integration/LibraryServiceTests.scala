@@ -1,8 +1,8 @@
 package integration
 
 import altitude.exceptions.NotFoundException
-import altitude.models.search.Query
 import altitude.models.{Asset, Folder}
+import altitude.util.Query
 import altitude.{Const => C}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._

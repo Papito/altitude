@@ -1,7 +1,7 @@
 package altitude.service
 
-import altitude.models.search.{QueryResult, Query}
 import altitude.transactions.TransactionId
+import altitude.util.{QueryResult, Query}
 import altitude.{Context, Altitude}
 import altitude.dao.AssetDao
 import altitude.models.Asset

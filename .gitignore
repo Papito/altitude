@@ -84,3 +84,4 @@ Thumbs.db
 /.idea_modules
 
 *.sqlite.db
+out.txt

@@ -3,8 +3,8 @@ package altitude.dao
 import java.util.regex.Pattern
 
 import altitude.models.BaseModel
-import altitude.models.search.{Query, QueryResult}
 import altitude.transactions.TransactionId
+import altitude.util.{QueryResult, Query}
 import altitude.{Altitude, Const => C, Context}
 import play.api.libs.json.JsObject
 

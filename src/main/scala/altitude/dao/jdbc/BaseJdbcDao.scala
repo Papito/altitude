@@ -4,9 +4,9 @@ import java.sql.Connection
 
 import altitude.dao.BaseDao
 import altitude.exceptions.ConstraintException
-import altitude.models.{Asset, BaseModel}
-import altitude.models.search.{Query, QueryResult}
+import altitude.models.BaseModel
 import altitude.transactions.{JdbcTransactionManager, TransactionId}
+import altitude.util.{QueryResult, Query}
 import altitude.{Const => C, Context, Util}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.apache.commons.dbutils.QueryRunner

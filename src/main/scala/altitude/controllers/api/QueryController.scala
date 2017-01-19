@@ -1,6 +1,6 @@
 package altitude.controllers.api
 
-import altitude.models.search.Query
+import altitude.util.Query
 import altitude.{Const => C}
 import org.scalatra.Ok
 import org.slf4j.LoggerFactory

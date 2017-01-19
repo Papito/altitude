@@ -1,9 +1,10 @@
 package altitude.service
 
+import altitude.util.Query
+
 import util.control.Breaks._
 import altitude.dao.{AssetDao, MetadataFieldDao}
 import altitude.exceptions.{DuplicateException, NotFoundException, ValidationException}
-import altitude.models.search.Query
 import altitude.models.{FieldType, Metadata, MetadataField}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import altitude.{Altitude, Const => C, Context}
