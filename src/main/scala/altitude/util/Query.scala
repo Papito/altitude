@@ -8,7 +8,7 @@ object Query {
   case class QueryParam private (values: Set[Any], paramType: ParamType.Value, negate: Boolean = false) {
     require(values.nonEmpty)
 
-    // a range requires two values
+    // types that requires two values
     if (paramType == ParamType.RANGE || paramType == ParamType.OR)
       require(values.size == 2)
 
