@@ -33,7 +33,7 @@ abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_paramete
       res ++ m._2
     }
 
-    val sqlVals: List[Object] = List(
+    val sqlVals: List[Any] = List(
       ctx.repo.id.get,
       asset.id.get,
       asset.path,
@@ -139,10 +139,10 @@ abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_paramete
     this.query(q, SQL_QUERY_BUILDER)
 
 
-  override protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object])
+  override protected def addRecord(jsonIn: JsObject, q: String, values: List[Any])
                                   (implicit ctx: Context, txId: TransactionId): JsObject = {
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, q, vals:_*)
+    runner.update(conn, q, values.map(_.asInstanceOf[Object]):_*)
     jsonIn
   }
 }

@@ -81,7 +81,7 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
             VALUES( $CORE_SQL_VALS_FOR_INSERT, ?, ?, ?, ?, ?, ?, ?, ?, ?, $JSON_FUNC, $JSON_FUNC)
     """
 
-    val sqlVals: List[Object] = List(
+    val sqlVals: List[Any] = List(
       asset.userId,
       asset.path,
       asset.md5,

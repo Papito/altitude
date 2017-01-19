@@ -2,14 +2,14 @@ package altitude.util
 
 object Query {
   object ParamType extends Enumeration {
-    val EQ, NEQ, GT, LT, GTE, LTE, IN, RNG, OR = Value
+    val EQ, NOT_EQ, GT, LT, GTE, LTE, IN, RANGE, OR, CONTAINS, MATCHES = Value
   }
 
   case class QueryParam private (values: Set[Any], paramType: ParamType.Value) {
     require(values.nonEmpty)
 
     // a range requires two values
-    if (paramType == ParamType.RNG || paramType == ParamType.OR)
+    if (paramType == ParamType.RANGE || paramType == ParamType.OR)
       require(values.size == 2)
 
     // overloaded to accept one value
@@ -27,7 +27,7 @@ object Query {
 
   def EQUALS(value: Any) = new QueryParam(value)
 
-  def NOT_EQUALS(value: Any) = new QueryParam(value, ParamType.NEQ)
+  def NOT_EQUALS(value: Any) = new QueryParam(value, ParamType.NOT_EQ)
 
   def LT(value: Any) = new QueryParam(value, ParamType.LT)
 
@@ -37,7 +37,7 @@ object Query {
 
   def GTE(value: Any) = new QueryParam(value, ParamType.GTE)
 
-  def RANGE(values: List[Any]) = new QueryParam(values, ParamType.RNG)
+  def RANGE(values: List[Any]) = new QueryParam(values, ParamType.RANGE)
 
   def OR(values: List[Any]) = new QueryParam(values, ParamType.OR)
 

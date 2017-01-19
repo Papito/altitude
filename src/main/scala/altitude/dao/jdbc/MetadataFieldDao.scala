@@ -30,7 +30,7 @@ abstract class MetadataFieldDao (val app: Altitude)
             VALUES ($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?)
         """
 
-    val sqlVals: List[Object] = List(
+    val sqlVals: List[Any] = List(
       metadataField.name,
       metadataField.nameLowercase,
       metadataField.fieldType.toString)

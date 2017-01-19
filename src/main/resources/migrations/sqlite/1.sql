@@ -1,9 +1,9 @@
 CREATE TABLE system (
   id INT NOT NULL,
   version INT NOT NULL
-);
-CREATE UNIQUE INDEX system_01 ON system(id);
-INSERT INTO system(id, version) VALUES(0, 0);
+);#END
+CREATE UNIQUE INDEX system_01 ON system(id);#END
+INSERT INTO system(id, version) VALUES(0, 0);#END
 
 CREATE TABLE repository(
   id CHAR(24) PRIMARY KEY,
@@ -13,15 +13,15 @@ CREATE TABLE repository(
   uncat_folder_id CHAR(24) NOT NULL,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
-);
+);#END
 
 CREATE TABLE stats (
   repository_id CHAR(24) NOT NULL,
   dimension VARCHAR(60) PRIMARY KEY,
   dim_val INT NOT NULL DEFAULT 0
-);
-CREATE INDEX stats_01 ON stats(repository_id);
-CREATE UNIQUE INDEX stats_02 ON stats(repository_id, dimension);
+);#END
+CREATE INDEX stats_01 ON stats(repository_id);#END
+CREATE UNIQUE INDEX stats_02 ON stats(repository_id, dimension);#END
 
 CREATE TABLE asset  (
   id CHAR(24) PRIMARY KEY,
@@ -41,10 +41,10 @@ CREATE TABLE asset  (
   is_recycled TINYINT NOT NULL DEFAULT 0,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
-);
-CREATE UNIQUE INDEX asset_01 ON asset(repository_id, md5, is_recycled);
-CREATE UNIQUE INDEX asset_02 ON asset(repository_id, path, is_recycled);
-CREATE INDEX asset_03 ON asset(repository_id, folder_id, is_recycled);
+);#END
+CREATE UNIQUE INDEX asset_01 ON asset(repository_id, md5, is_recycled);#END
+CREATE UNIQUE INDEX asset_02 ON asset(repository_id, path, is_recycled);#END
+CREATE INDEX asset_03 ON asset(repository_id, folder_id, is_recycled);#END
 
 CREATE TABLE metadata_field (
   id CHAR(24) PRIMARY KEY,
@@ -54,9 +54,9 @@ CREATE TABLE metadata_field (
   field_type VARCHAR(255) NOT NULL,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
-);
-CREATE INDEX metadata_field_01 ON metadata_field(repository_id);
-CREATE UNIQUE INDEX metadata_field_02 ON metadata_field(repository_id, name_lc);
+);#END
+CREATE INDEX metadata_field_01 ON metadata_field(repository_id);#END
+CREATE UNIQUE INDEX metadata_field_02 ON metadata_field(repository_id, name_lc);#END
 
 
 CREATE TABLE folder (
@@ -68,9 +68,9 @@ CREATE TABLE folder (
   num_of_assets INTEGER NOT NULL DEFAULT 0,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
-);
-CREATE INDEX folder_01 ON folder(repository_id, parent_id);
-CREATE UNIQUE INDEX folder_02 ON folder(repository_id, parent_id, name_lc);
+);#END
+CREATE INDEX folder_01 ON folder(repository_id, parent_id);#END
+CREATE UNIQUE INDEX folder_02 ON folder(repository_id, parent_id, name_lc);#END
 
 CREATE TABLE search_parameter (
   repository_id CHAR(24) NOT NULL,
@@ -81,12 +81,12 @@ CREATE TABLE search_parameter (
   field_value_num DECIMAL,
   field_value_bool BOOLEAN,
   field_value_dt DATE
-);
-CREATE UNIQUE INDEX search_parameter_01 ON search_parameter(repository_id, asset_id, field_id, field_value_txt);
-CREATE INDEX search_parameter_02 ON search_parameter(repository_id, field_id, field_value_txt);
-CREATE INDEX search_parameter_03 ON search_parameter(repository_id, field_id, field_value_kw);
-CREATE INDEX search_parameter_04 ON search_parameter(repository_id, field_id, field_value_num);
-CREATE INDEX search_parameter_05 ON search_parameter(repository_id, field_id, field_value_bool);
-CREATE INDEX search_parameter_06 ON search_parameter(repository_id, field_id, field_value_dt);
+);#END
+CREATE UNIQUE INDEX search_parameter_01 ON search_parameter(repository_id, asset_id, field_id, field_value_txt);#END
+CREATE INDEX search_parameter_02 ON search_parameter(repository_id, field_id, field_value_txt);#END
+CREATE INDEX search_parameter_03 ON search_parameter(repository_id, field_id, field_value_kw);#END
+CREATE INDEX search_parameter_04 ON search_parameter(repository_id, field_id, field_value_num);#END
+CREATE INDEX search_parameter_05 ON search_parameter(repository_id, field_id, field_value_bool);#END
+CREATE INDEX search_parameter_06 ON search_parameter(repository_id, field_id, field_value_dt);#END
 
-CREATE VIRTUAL TABLE search_document USING fts3(path, metadata_values, extracted_metadata_values, body);
+CREATE VIRTUAL TABLE search_document USING fts3(path, metadata_values, extracted_metadata_values, body);#END

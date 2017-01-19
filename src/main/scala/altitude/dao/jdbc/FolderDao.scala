@@ -27,7 +27,7 @@ abstract class FolderDao(val app: Altitude) extends BaseJdbcDao("folder") with a
             VALUES ($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?)
     """
 
-    val sqlVals: List[Object] = List(
+    val sqlVals: List[Any] = List(
       folder.name,
       folder.nameLowercase,
       folder.parentId)

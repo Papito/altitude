@@ -63,7 +63,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
       INSERT INTO $tableName ($CORE_SQL_COLS_FOR_INSERT)
            VALUES ($CORE_SQL_VALS_FOR_INSERT)"""
 
-    addRecord(jsonIn, sql, List[Object]())
+    addRecord(jsonIn, sql, List[Any]())
   }
 
   override def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
@@ -132,7 +132,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
    * the add() method, as it accepts a ready-to-go SQL query, with bind methods.
    * This function takes care of the actual plumbing common to all add() methods.
    */
-  protected def addRecord(jsonIn: JsObject, sql: String, vals: List[Object])
+  protected def addRecord(jsonIn: JsObject, sql: String, values: List[Any])
                          (implicit  ctx: Context, txId: TransactionId): JsObject = {
     log.info(s"JDBC INSERT: $jsonIn")
 
@@ -143,11 +143,11 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     BaseDao.verifyId(id)
 
     // prepend ID and REPO ID, as it is required for most records
-    val values: List[Object] = combineInsertValues(id, vals)
-    log.debug(s"INSERT SQL: $sql. ARGS: ${values.toString()}")
+    val _values: List[Any] = combineInsertValues(id, values)
+    log.debug(s"INSERT SQL: $sql. ARGS: ${_values.toString()}")
 
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, sql, values:_*)
+    runner.update(conn, sql, _values.map(_.asInstanceOf[Object]):_*)
 
     val recordJson = jsonIn ++ Json.obj(C.Base.ID -> id)
 
@@ -164,7 +164,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
    * @param vals any arbitrary values
    * @return array of values to be bound to columbs
    */
-  protected def combineInsertValues(id: String, vals: List[Object])(implicit  ctx: Context) =
+  protected def combineInsertValues(id: String, vals: List[Any])(implicit  ctx: Context) =
     id :: ctx.repo.id.get :: vals
 
   /**
@@ -192,12 +192,12 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
    *
    * @throws ConstraintException if a DB constraint is missed and more than one record is found
    */
-  protected def oneBySqlQuery(sql: String, values: List[Object] = List())
+  protected def oneBySqlQuery(sql: String, values: List[Any] = List())
                              (implicit ctx: Context, txId: TransactionId): Option[Map[String, AnyRef]] = {
     log.debug(s"Running SQL query [$sql] with $values")
 
     val runner: QueryRunner = new QueryRunner()
-    val res = runner.query(conn, sql, new MapListHandler(), values:_*)
+    val res = runner.query(conn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]):_*)
 
     log.debug(s"Found ${res.size()} records", C.LogTag.DB)
 

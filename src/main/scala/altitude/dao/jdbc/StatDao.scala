@@ -20,16 +20,16 @@ abstract class StatDao (val app: Altitude) extends BaseJdbcDao("stats") with alt
            VALUES (? ,?)"""
 
     val stat: Stat = jsonIn
-    val values: List[Object] = ctx.repo.id.get :: stat.dimension :: Nil
+    val values: List[Any] = ctx.repo.id.get :: stat.dimension :: Nil
 
     addRecord(jsonIn, sql, values)
   }
 
-  override protected def addRecord(jsonIn: JsObject, q: String, vals: List[Object])
+  override protected def addRecord(jsonIn: JsObject, q: String, values: List[Any])
                          (implicit ctx: Context, txId: TransactionId): JsObject = {
     log.info(s"JDBC INSERT: $jsonIn")
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, q, vals:_*)
+    runner.update(conn, q, values.map(_.asInstanceOf[Object]):_*)
     jsonIn
   }
 

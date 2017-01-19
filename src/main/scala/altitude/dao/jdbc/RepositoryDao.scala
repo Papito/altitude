@@ -42,7 +42,7 @@ abstract class RepositoryDao(val app: Altitude) extends BaseJdbcDao("repository"
             VALUES (?, ?, ?, ?)
     """
 
-    val sqlVals: List[Object] = List(
+    val sqlVals: List[Any] = List(
       repo.name,
       repo.rootFolderId,
       repo.uncatFolderId)
@@ -51,6 +51,6 @@ abstract class RepositoryDao(val app: Altitude) extends BaseJdbcDao("repository"
   }
 
   // we do not use repository ID here
-  override protected def combineInsertValues(id: String, vals: List[Object])(implicit  ctx: Context) =
+  override protected def combineInsertValues(id: String, vals: List[Any])(implicit  ctx: Context) =
     id :: vals
 }
