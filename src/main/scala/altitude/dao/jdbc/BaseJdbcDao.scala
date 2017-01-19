@@ -84,7 +84,8 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
     log.debug(s"Delete SQL: $sql, with values: ${q.params.values.toList}")
     val runner: QueryRunner = new QueryRunner()
-    val numDeleted = runner.update(conn, sql,  ctx.repo.id.get :: q.params.values.toList:_*)
+    val numDeleted = runner.update(
+      conn, sql,  ctx.repo.id.get :: q.params.values.toList.map(_.asInstanceOf[Object]):_*)
     log.debug(s"Deleted records: $numDeleted")
     numDeleted
   }
@@ -109,18 +110,18 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     QueryResult(records = recs.map{makeModel}, total = count, query = Some(query))
   }
 
-  protected def getQueryResultCount(query: Query, values: List[Object] = List())
+  protected def getQueryResultCount(query: Query, values: List[Any] = List())
                                    (implicit  ctx: Context, txId: TransactionId): Int = {
     val sqlCountQuery: SqlQuery = SQL_QUERY_BUILDER.toSelectQuery(query, countOnly = true)
     getQueryResultCountBySql(sqlCountQuery.queryString, values)
   }
 
-  protected def getQueryResultCountBySql(sql: String, values: List[Object] = List())
+  protected def getQueryResultCountBySql(sql: String, values: List[Any] = List())
                                    (implicit  ctx: Context, txId: TransactionId): Int = {
     val runner: QueryRunner = new QueryRunner()
 
     // We are defensive with different JDBC drivers operating with either java.lang.Int or java.lang.Long
-    runner.query(conn, sql, new ScalarHandler[AnyRef]("count"),  values: _*) match {
+    runner.query(conn, sql, new ScalarHandler[AnyRef]("count"),  values.map(_.asInstanceOf[Object]):_*) match {
       case v: java.lang.Integer => v.intValue
       case v: java.lang.Long => v.asInstanceOf[Long].toInt
     }
@@ -171,17 +172,17 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
    * as it bypasses checks like valid record IDs. Constraint failures are delegated to the database.
    * @return number of records inserted
    */
-  protected def addRecords(q: String, vals: List[Object])
+  protected def addRecords(q: String, values: List[Any])
                           (implicit ctx: Context, txId: TransactionId): Int = {
-    log.debug(s"INSERT MULTIPLE SQL: $q. ARGS: ${vals.toString()}")
-    new QueryRunner().update(conn, q, vals:_*)
+    log.debug(s"INSERT MULTIPLE SQL: $q. ARGS: ${values.toString()}")
+    new QueryRunner().update(conn, q, values.map(_.asInstanceOf[Object]):_*)
   }
 
-  protected def manyBySqlQuery(sql: String, values: List[Object] = List())
+  protected def manyBySqlQuery(sql: String, values: List[Any] = List())
                               (implicit ctx: Context, txId: TransactionId): List[Map[String, AnyRef]] = {
     log.debug(s"Running SQL query [$sql] with $values")
     val runner: QueryRunner = new QueryRunner()
-    val res = runner.query(conn, sql, new MapListHandler(), values: _*)
+    val res = runner.query(conn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]):_*)
     log.debug(s"Found ${res.size()} records", C.LogTag.DB)
     res.map{_.toMap[String, AnyRef]}.toList
   }
@@ -253,7 +254,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     log.debug(s"Update SQL: $sql, with query values: $valuesForAllPlaceholders")
     val runner: QueryRunner = new QueryRunner()
 
-    val numUpdated = runner.update(conn, sql,  valuesForAllPlaceholders:_*)
+    val numUpdated = runner.update(conn, sql,  valuesForAllPlaceholders.map(_.asInstanceOf[Object]):_*)
     numUpdated
   }
 
