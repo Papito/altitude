@@ -11,7 +11,7 @@ import play.api.libs.json._
 abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with altitude.dao.AssetDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override def makeModel(rec: Map[String, AnyRef]): JsObject = {
+  override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val assetType = new AssetType(
       mediaType = rec.get(C.AssetType.MEDIA_TYPE).get.asInstanceOf[String],
       mediaSubtype = rec.get(C.AssetType.MEDIA_SUBTYPE).get.asInstanceOf[String],
