@@ -6,14 +6,18 @@ import altitude.{Altitude, Const => C, Context}
 import org.joda.time.DateTime
 import play.api.libs.json.{JsObject, Json}
 
-class AssetDao(app: Altitude) extends altitude.dao.jdbc.AssetDao(app) with Postgres {
-  override protected def DEFAULT_SQL_COLS_FOR_SELECT = s"""
-      ${C.Base.ID}, *,
-      (${C.Asset.METADATA}#>>'{}')::text as ${C.Asset.METADATA},
-      (${C.Asset.EXTRACTED_METADATA}#>>'{}')::text as ${C.Asset.EXTRACTED_METADATA},
-      EXTRACT(EPOCH FROM created_at) AS created_at,
-      EXTRACT(EPOCH FROM updated_at) AS updated_at
+object AssetDao {
+    val DEFAULT_SQL_COLS_FOR_SELECT = s"""
+      asset.*,
+      (asset.${C.Asset.METADATA}#>>'{}')::text as ${C.Asset.METADATA},
+      (asset.${C.Asset.EXTRACTED_METADATA}#>>'{}')::text as ${C.Asset.EXTRACTED_METADATA},
+      EXTRACT(EPOCH FROM asset.created_at) AS created_at,
+      EXTRACT(EPOCH FROM asset.updated_at) AS updated_at
     """
+}
+
+class AssetDao(app: Altitude) extends altitude.dao.jdbc.AssetDao(app) with Postgres {
+  override protected def DEFAULT_SQL_COLS_FOR_SELECT = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT
 
   override def getMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Option[Metadata] = {
     val sql = s"""

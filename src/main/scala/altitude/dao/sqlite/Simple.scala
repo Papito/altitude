@@ -1,10 +1,6 @@
 package altitude.dao.sqlite
 
-import altitude.models.Asset
-import altitude.{Const => C, Altitude}
-import org.joda.time.DateTime
-
-class AssetDao(app: Altitude) extends altitude.dao.jdbc.AssetDao(app) with Sqlite
+import altitude.Altitude
 
 class FolderDao(app: Altitude) extends altitude.dao.jdbc.FolderDao(app) with Sqlite
 

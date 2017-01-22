@@ -46,14 +46,7 @@ class SearchDao(app: Altitude) extends altitude.dao.jdbc.SearchDao(app) with Pos
            AND search_document.tsv @@ to_tsquery(?)
       """
 
-    val selectSql = sql.format(
-      s"""
-        asset.*,
-        (${C.Asset.METADATA}#>>'{}')::text as ${C.Asset.METADATA},
-        (${C.Asset.EXTRACTED_METADATA}#>>'{}')::text as ${C.Asset.EXTRACTED_METADATA},
-        EXTRACT(EPOCH FROM asset.created_at) AS created_at,
-        EXTRACT(EPOCH FROM asset.updated_at) AS updated_at
-      """)
+    val selectSql = sql.format(AssetDao.DEFAULT_SQL_COLS_FOR_SELECT)
 
     val countSql = sql.format("COUNT(*) as count")
 

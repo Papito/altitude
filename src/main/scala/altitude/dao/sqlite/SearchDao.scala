@@ -43,12 +43,7 @@ class SearchDao(app: Altitude) extends altitude.dao.jdbc.SearchDao(app) with Sql
            AND body MATCH ?
       """
 
-    val selectSql = sql.format(
-    s"""
-       asset.*,
-       CAST(STRFTIME('%s', created_at) AS INT) AS created_at,
-       CAST(STRFTIME('%s', updated_at) AS INT) AS updated_at
-    """)
+    val selectSql = sql.format(AssetDao.DEFAULT_SQL_COLS_FOR_SELECT)
 
     val countSql = sql.format("COUNT(*) as count")
 
