@@ -76,17 +76,14 @@ CREATE TABLE search_parameter (
   repository_id CHAR(24) NOT NULL,
   asset_id CHAR(24) NOT NULL,
   field_id CHAR(24) NOT NULL,
-  field_value_txt TEXT NOT NULL,
   field_value_kw TEXT NULL,
   field_value_num DECIMAL,
   field_value_bool BOOLEAN,
   field_value_dt DATE
 );#END
-CREATE UNIQUE INDEX search_parameter_01 ON search_parameter(repository_id, asset_id, field_id, field_value_txt);#END
-CREATE INDEX search_parameter_02 ON search_parameter(repository_id, field_id, field_value_txt);#END
-CREATE INDEX search_parameter_03 ON search_parameter(repository_id, field_id, field_value_kw);#END
-CREATE INDEX search_parameter_04 ON search_parameter(repository_id, field_id, field_value_num);#END
-CREATE INDEX search_parameter_05 ON search_parameter(repository_id, field_id, field_value_bool);#END
-CREATE INDEX search_parameter_06 ON search_parameter(repository_id, field_id, field_value_dt);#END
+CREATE INDEX search_parameter_01 ON search_parameter(repository_id, field_id, field_value_kw);#END
+CREATE INDEX search_parameter_02 ON search_parameter(repository_id, field_id, field_value_num);#END
+CREATE INDEX search_parameter_03 ON search_parameter(repository_id, field_id, field_value_bool);#END
+CREATE INDEX search_parameter_04 ON search_parameter(repository_id, field_id, field_value_dt);#END
 
 CREATE VIRTUAL TABLE search_document USING fts3(path, metadata_values, extracted_metadata_values, body);#END
