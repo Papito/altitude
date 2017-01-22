@@ -1,10 +1,10 @@
 package altitude.service
 
-import altitude.transactions.TransactionId
-import altitude.util.{QueryResult, Query}
-import altitude.{Context, Altitude}
 import altitude.dao.AssetDao
 import altitude.models.Asset
+import altitude.transactions.TransactionId
+import altitude.util.{Query, QueryResult}
+import altitude.{Altitude, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 
 /**

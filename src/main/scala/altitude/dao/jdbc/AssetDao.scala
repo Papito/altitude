@@ -2,7 +2,7 @@ package altitude.dao.jdbc
 
 import altitude.models.{Asset, AssetType, Metadata}
 import altitude.transactions.TransactionId
-import altitude.util.{QueryResult, Query}
+import altitude.util.{Query, QueryResult}
 import altitude.{Altitude, Const => C, Context}
 import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory

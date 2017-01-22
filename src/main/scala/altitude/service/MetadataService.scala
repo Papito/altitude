@@ -1,16 +1,16 @@
 package altitude.service
 
-import altitude.util.Query
-
-import util.control.Breaks._
 import altitude.dao.{AssetDao, MetadataFieldDao}
 import altitude.exceptions.{DuplicateException, NotFoundException, ValidationException}
 import altitude.models.{FieldType, Metadata, MetadataField}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
+import altitude.util.Query
 import altitude.{Altitude, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
+
+import scala.util.control.Breaks._
 
 
 class MetadataService(val app: Altitude) {

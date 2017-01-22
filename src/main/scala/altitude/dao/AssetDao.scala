@@ -3,7 +3,7 @@ package altitude.dao
 import altitude.Context
 import altitude.models.Metadata
 import altitude.transactions.TransactionId
-import altitude.util.{QueryResult, Query}
+import altitude.util.{Query, QueryResult}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 

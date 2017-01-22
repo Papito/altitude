@@ -2,8 +2,7 @@ package altitude.service
 
 import java.io.InputStream
 
-import altitude.models.{Metadata, AssetType, FileImportAsset}
-import play.api.libs.json.JsValue
+import altitude.models.{AssetType, FileImportAsset, Metadata}
 
 abstract class MetadataExtractionService {
 

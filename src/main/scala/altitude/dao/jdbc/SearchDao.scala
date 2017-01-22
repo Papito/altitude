@@ -1,14 +1,14 @@
 package altitude.dao.jdbc
 
-import java.sql.{Types, PreparedStatement}
+import java.sql.{PreparedStatement, Types}
 
-import altitude.transactions.TransactionId
-import altitude.util.{QueryResult, Query}
-import altitude.{Const => C, Context, Altitude}
 import altitude.models._
+import altitude.transactions.TransactionId
+import altitude.util.QueryResult
+import altitude.{Altitude, Const => C, Context}
 import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.JsObject
 
 abstract class SearchDao(override val app: Altitude) extends AssetDao(app) with altitude.dao.SearchDao {
   private final val log = LoggerFactory.getLogger(getClass)

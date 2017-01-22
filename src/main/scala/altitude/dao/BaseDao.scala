@@ -4,7 +4,7 @@ import java.util.regex.Pattern
 
 import altitude.models.BaseModel
 import altitude.transactions.TransactionId
-import altitude.util.{QueryResult, Query}
+import altitude.util.{Query, QueryResult}
 import altitude.{Altitude, Const => C, Context}
 import play.api.libs.json.JsObject
 

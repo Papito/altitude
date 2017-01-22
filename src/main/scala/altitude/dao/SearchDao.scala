@@ -1,7 +1,7 @@
 package altitude.dao
 
 import altitude.Context
-import altitude.models.{MetadataField, Asset}
+import altitude.models.{Asset, MetadataField}
 import altitude.transactions.TransactionId
 import altitude.util.QueryResult
 

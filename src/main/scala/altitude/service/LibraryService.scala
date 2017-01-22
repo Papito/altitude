@@ -5,11 +5,10 @@ import java.awt.{AlphaComposite, Graphics2D}
 import java.io._
 import javax.imageio.ImageIO
 
-
 import altitude.exceptions.{DuplicateException, FormatException, IllegalOperationException}
-import altitude.models.{Stats, Preview, Data, Asset}
+import altitude.models.{Asset, Data, Preview, Stats}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
-import altitude.util.{QueryResult, Query}
+import altitude.util.{Query, QueryResult}
 import altitude.{Altitude, Const => C, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.imgscalr.Scalr

@@ -11,7 +11,7 @@ import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsValue, Json}
 
 class FileImportService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)

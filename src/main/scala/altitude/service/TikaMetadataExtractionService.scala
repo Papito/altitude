@@ -1,9 +1,9 @@
 package altitude.service
 
-import java.io.{InputStream, StringWriter}
+import java.io.InputStream
 
 import altitude.exceptions.AllDone
-import altitude.models.{Metadata, AssetType, FileImportAsset}
+import altitude.models.{AssetType, FileImportAsset, Metadata}
 import altitude.{Const => C}
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
@@ -16,7 +16,6 @@ import org.apache.tika.parser.jpeg.JpegParser
 import org.apache.tika.parser.mp3.Mp3Parser
 import org.slf4j.LoggerFactory
 import org.xml.sax.helpers.DefaultHandler
-import play.api.libs.json.{JsNull, JsValue, Json}
 
 class TikaMetadataExtractionService extends MetadataExtractionService {
   val log =  LoggerFactory.getLogger(getClass)

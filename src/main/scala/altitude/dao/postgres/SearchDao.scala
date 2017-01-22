@@ -1,11 +1,9 @@
 package altitude.dao.postgres
 
-import java.sql.{Types, PreparedStatement}
-
+import altitude.models.Asset
 import altitude.transactions.TransactionId
 import altitude.util.QueryResult
-import altitude.{Const => C, Context, Altitude}
-import altitude.models.{FieldType, MetadataField, Asset}
+import altitude.{Altitude, Const => C, Context}
 import org.slf4j.LoggerFactory
 
 class SearchDao(app: Altitude) extends altitude.dao.jdbc.SearchDao(app) with Postgres {

@@ -1,9 +1,8 @@
 package altitude.dao.postgres
 
-import altitude.models.{BaseModel, Asset, AssetType, Metadata}
+import altitude.models.Metadata
 import altitude.transactions.TransactionId
 import altitude.{Altitude, Const => C, Context}
-import org.joda.time.DateTime
 import play.api.libs.json.{JsObject, Json}
 
 object AssetDao {
