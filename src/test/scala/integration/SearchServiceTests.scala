@@ -7,7 +7,7 @@ import org.scalatest.Matchers._
 
 @DoNotDiscover class SearchServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
 
-  test("simple text indexing") {
+  test("index and search by term") {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "keywords",
@@ -73,7 +73,7 @@ import org.scalatest.Matchers._
   }
 
   /*
-  test("index and search assets") {
+  test("index and search by metadata") {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "field 1",
@@ -102,6 +102,9 @@ import org.scalatest.Matchers._
         field3.id.get -> Set("true"))
     val assetData2 = makeAsset(altitude.service.folder.getUncatFolder, new Metadata(data))
     val asset2: Asset = altitude.service.library.add(assetData2)
+  }
+
+  test("index and search by term and metadata") {
   }
 */
 }

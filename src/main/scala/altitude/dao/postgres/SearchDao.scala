@@ -12,9 +12,6 @@ class SearchDao(app: Altitude) extends altitude.dao.jdbc.SearchDao(app) with Pos
   private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def addSearchDocument(asset: Asset)(implicit ctx: Context, txId: TransactionId): Unit = {
-    /**
-     * Create the search document
-     */
     val docSql =
       s"""
          INSERT INTO search_document (
@@ -43,18 +40,19 @@ class SearchDao(app: Altitude) extends altitude.dao.jdbc.SearchDao(app) with Pos
       s"""
         SELECT *
         FROM search_document
-        WHERE tsv @@ to_tsquery(?)
+        WHERE ${C.Base.REPO_ID} = ? AND tsv @@ to_tsquery(?)
       """
 
     val countSql =
       s"""
         SELECT COUNT(*) AS count
         FROM search_document
-        WHERE tsv @@ to_tsquery(?)
+        WHERE ${C.Base.REPO_ID} = ? AND tsv @@ to_tsquery(?)
       """
 
-    val recs = manyBySqlQuery(sql, List(textQuery))
-    val count: Int = getQueryResultCountBySql(countSql, List(textQuery))
+    val bindVals: List[Any] = List(ctx.repo.id.get, textQuery)
+    val recs = manyBySqlQuery(sql, bindVals)
+    val count: Int = getQueryResultCountBySql(countSql, bindVals)
 
     log.debug(s"Found [$count] records. Retrieved [${recs.length}] records")
     if (recs.nonEmpty) {

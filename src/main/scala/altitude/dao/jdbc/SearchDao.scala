@@ -25,8 +25,9 @@ abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_paramete
                          (implicit ctx: Context, txId: TransactionId): Unit = {
     log.debug(s"Indexing asset $asset with metadata [${asset.metadata}]")
 
-    addSearchDocument(asset)
     indexMetadata(asset, metadataFields)
+
+    addSearchDocument(asset)
   }
 
   override protected def addRecord(jsonIn: JsObject, q: String, values: List[Any])
