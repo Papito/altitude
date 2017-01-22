@@ -14,8 +14,6 @@ class MigrationDao(app: Altitude) extends altitude.dao.jdbc.MigrationDao(app) wi
 
 class RepositoryDao(app: Altitude) extends altitude.dao.jdbc.RepositoryDao(app) with Sqlite
 
-class SearchDao(app: Altitude) extends altitude.dao.jdbc.SearchDao(app) with Sqlite
-
 class StatDao(app: Altitude) extends altitude.dao.jdbc.StatDao(app) with Sqlite {
   override def DEFAULT_SQL_COLS_FOR_SELECT = "*"
 }

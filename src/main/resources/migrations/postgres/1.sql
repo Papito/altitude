@@ -85,6 +85,7 @@ CREATE INDEX search_parameter_04 ON search_parameter(repository_id, field_id, fi
 CREATE INDEX search_parameter_05 ON search_parameter(repository_id, field_id, field_value_bool);#END
 CREATE INDEX search_parameter_06 ON search_parameter(repository_id, field_id, field_value_dt);#END
 #END
+
 CREATE TABLE search_document (
   repository_id CHAR(24) NOT NULL,
   asset_id CHAR(24) NOT NULL,

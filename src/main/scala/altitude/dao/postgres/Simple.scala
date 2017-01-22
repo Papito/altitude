@@ -10,10 +10,6 @@ class MigrationDao(app: Altitude) extends altitude.dao.jdbc.MigrationDao(app) wi
 
 class MetadataFieldDao(app: Altitude) extends altitude.dao.jdbc.MetadataFieldDao(app) with Postgres
 
-
-
-class SearchDao(app: Altitude) extends altitude.dao.jdbc.SearchDao(app) with Postgres 
-
 class StatDao(app: Altitude) extends altitude.dao.jdbc.StatDao(app) with Postgres {
   override def DEFAULT_SQL_COLS_FOR_SELECT = "*"
 }
