@@ -5,7 +5,7 @@ import java.sql.{Types, PreparedStatement}
 import altitude.transactions.TransactionId
 import altitude.util.{QueryResult, Query}
 import altitude.{Const => C, Context, Altitude}
-import altitude.models.{FieldType, MetadataField, Asset}
+import altitude.models._
 import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, Json}
@@ -13,7 +13,35 @@ import play.api.libs.json.{JsObject, Json}
 abstract class SearchDao(val app: Altitude) extends BaseJdbcDao("search_parameter") with altitude.dao.SearchDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override protected def makeModel(rec: Map[String, AnyRef]): JsObject = Json.obj()
+
+  override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
+    val assetType = new AssetType(
+      mediaType = rec.get(C.AssetType.MEDIA_TYPE).get.asInstanceOf[String],
+      mediaSubtype = rec.get(C.AssetType.MEDIA_SUBTYPE).get.asInstanceOf[String],
+      mime = rec.get(C.AssetType.MIME_TYPE).get.asInstanceOf[String])
+
+    val metadataCol = rec.get(C.Asset.METADATA).get
+    val metadataJsonStr: String = if (metadataCol == null) "{}" else metadataCol.asInstanceOf[String]
+    val metadataJson = Json.parse(metadataJsonStr).as[JsObject]
+
+    val extractedMetadataCol = rec.get(C.Asset.EXTRACTED_METADATA).get
+    val extractedMetadataJsonStr: String =
+      if (extractedMetadataCol == null) "{}" else extractedMetadataCol.asInstanceOf[String]
+    val extractedMetadataJson = Json.parse(extractedMetadataJsonStr).as[JsObject]
+
+    val model = new Asset(
+      id = Some(rec.get(C.Base.ID).get.asInstanceOf[String]),
+      userId = rec.get(C.Base.USER_ID).get.asInstanceOf[String],
+      path = rec.get(C.Asset.PATH).get.asInstanceOf[String],
+      md5 = rec.get(C.Asset.MD5).get.asInstanceOf[String],
+      assetType = assetType,
+      sizeBytes = rec.get(C.Asset.SIZE_BYTES).get.asInstanceOf[Int],
+      metadata = metadataJson: Metadata,
+      extractedMetadata = extractedMetadataJson: Metadata,
+      folderId = rec.get(C.Asset.FOLDER_ID).get.asInstanceOf[String])
+
+    addCoreAttrs(model, rec)
+  }
 
   override def search(textQuery: String)(implicit ctx: Context, txId: TransactionId): QueryResult =
     throw new NotImplementedError

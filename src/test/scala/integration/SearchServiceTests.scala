@@ -66,6 +66,9 @@ import org.scalatest.Matchers._
     var results: QueryResult = altitude.service.search.search("keanu")
     results.nonEmpty shouldBe true
     results.total shouldBe 1
+    // check that the document is indeed - an asset
+    val resultJson = results.records.head
+    val resultAsset: Asset = resultJson
 
     results = altitude.service.search.search("TERI")
     results.nonEmpty shouldBe true

@@ -38,20 +38,28 @@ class SearchDao(app: Altitude) extends altitude.dao.jdbc.SearchDao(app) with Pos
                      (implicit ctx: Context, txId: TransactionId): QueryResult = {
     val sql =
       s"""
-        SELECT *
-        FROM search_document
-        WHERE ${C.Base.REPO_ID} = ? AND tsv @@ to_tsquery(?)
+        SELECT %s
+          FROM search_document, asset
+         WHERE asset.${C.Base.REPO_ID} = ?
+           AND search_document.${C.Base.REPO_ID} = ?
+           AND search_document.${C.SearchToken.ASSET_ID} = asset.id
+           AND search_document.tsv @@ to_tsquery(?)
       """
 
-    val countSql =
+    val selectSql = sql.format(
       s"""
-        SELECT COUNT(*) AS count
-        FROM search_document
-        WHERE ${C.Base.REPO_ID} = ? AND tsv @@ to_tsquery(?)
-      """
+        asset.*,
+        (${C.Asset.METADATA}#>>'{}')::text as ${C.Asset.METADATA},
+        (${C.Asset.EXTRACTED_METADATA}#>>'{}')::text as ${C.Asset.EXTRACTED_METADATA},
+        EXTRACT(EPOCH FROM asset.created_at) AS created_at,
+        EXTRACT(EPOCH FROM asset.updated_at) AS updated_at
+      """)
 
-    val bindVals: List[Any] = List(ctx.repo.id.get, textQuery)
-    val recs = manyBySqlQuery(sql, bindVals)
+    val countSql = sql.format("COUNT(*) as count")
+
+    val bindVals: List[Any] = List(ctx.repo.id.get, ctx.repo.id.get, textQuery)
+
+    val recs = manyBySqlQuery(selectSql, bindVals)
     val count: Int = getQueryResultCountBySql(countSql, bindVals)
 
     log.debug(s"Found [$count] records. Retrieved [${recs.length}] records")
