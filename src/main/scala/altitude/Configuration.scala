@@ -12,7 +12,7 @@ class Configuration(configOverride: Map[String, Any] = new HashMap()) {
     "dataDir" -> "data",
     "previewDir" -> "p",
 
-    "datasource" -> "postgres", // postgres, sqlite
+    "datasource" -> "sqlite", // postgres, sqlite
 
     "preview.box.pixels" -> 200,
 

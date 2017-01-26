@@ -35,7 +35,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
 
   private val userHomeDir = System.getProperty("user.home")
 
-  get("/source/local/listing") {
+  get("/fs/listing") {
     val file: File = new File(this.params.getOrElse(C.Api.PATH, userHomeDir))
     log.debug(s"Getting directory name list for $file")
     val files: Seq[File] = file.listFiles().toSeq
@@ -47,7 +47,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
       C.Api.OS_DIR_SEPARATOR -> File.separator).toString()
   }
 
-  get("/source/local/listing/parent") {
+  get("/fs/listing/parent") {
     val path = this.params.getOrElse(C.Api.PATH, userHomeDir)
     log.debug(s"Path: $path")
     val file: File = new File(this.params.getOrElse(C.Api.PATH, userHomeDir))
@@ -97,7 +97,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
           // get the path we will be importing from
           val path: String = (json \ "path").extract[String]
 
-          assets = Some(app.service.fileImport.getFilesToImport(path = path))
+          assets = Some(app.service.assetImport.getFilesToImport(path = path))
           assetsIt = Some(assets.get.toIterator)
 
           this.writeToYou(Json.obj("total" -> JsNumber(assets.get.size)))
@@ -170,7 +170,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
           log.info(s"Processing import asset $importAsset")
 
           try {
-            val asset: Option[Asset] = app.service.fileImport.importAsset(importAsset)
+            val asset: Option[Asset] = app.service.assetImport.importAsset(importAsset)
             if (asset.isEmpty) throw NotImportable()
 
             val resp = Json.obj(

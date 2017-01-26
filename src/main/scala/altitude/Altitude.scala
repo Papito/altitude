@@ -51,7 +51,7 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
    */
   object service {
     val repository = new RepositoryService(app)
-    val fileImport = new FileImportService(app)
+    val assetImport = new AssetImportService(app)
     val metadataExtractor = new TikaMetadataExtractionService
     val metadata = new MetadataService(app)
     val library = new LibraryService(app)
@@ -61,6 +61,8 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
     val data = new DataService(app)
     val folder = new FolderService(app)
     val stats = new StatsService(app)
+
+    // client
 
     val migration = dataSourceType match {
       case "sqlite" => new SqliteMigrationService(app)

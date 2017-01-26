@@ -1301,7 +1301,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     // some browsers can fire the doubleclick event when populating the list
     this.disableDoubleClick = true;
-    this.get('/import/source/local/listing', opts);
+    this.get('/import/fs/listing', opts);
   },
 
   gotoPreviousDirectory: function() {
@@ -1320,7 +1320,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     // some browsers can fire the doubleclick event when populating the list
     this.disableDoubleClick = true;
-    this.get('/import/source/local/listing/parent', opts);
+    this.get('/import/fs/listing/parent', opts);
   },
 
   dropIntoDirectory: function(directoryName) {

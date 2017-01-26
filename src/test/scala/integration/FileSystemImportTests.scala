@@ -23,20 +23,20 @@ import org.scalatest.Matchers._
     val fileImportAsset = new FileImportAsset(new File(path))
 
     intercept[DuplicateException] {
-      altitude.service.fileImport.importAsset(fileImportAsset)
+      altitude.service.assetImport.importAsset(fileImportAsset)
     }
   }
 
   test("import file list") {
     val incomingPath = getClass.getResource("../import").getPath
-    val assets = altitude.service.fileImport.getFilesToImport(path=incomingPath)
+    val assets = altitude.service.assetImport.getFilesToImport(path=incomingPath)
     assets should not be empty
   }
 
   private def importFile(p: String): Asset = {
     val path = getClass.getResource(s"../import/$p").getPath
     val fileImportAsset = new FileImportAsset(new File(path))
-    val importedAsset = altitude.service.fileImport.importAsset(fileImportAsset).get
+    val importedAsset = altitude.service.assetImport.importAsset(fileImportAsset).get
     importedAsset.assetType should equal(importedAsset.assetType)
     importedAsset.path should not be empty
     importedAsset.md5 should not be empty

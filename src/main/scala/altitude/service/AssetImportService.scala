@@ -13,11 +13,11 @@ import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsValue, Json}
 
-class FileImportService(app: Altitude) {
+class AssetImportService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
 
   protected val DAO = new FileSystemImportDao(app)
-  protected val SUPPORTED_MEDIA_TYPES = List("audio", "image")
+  protected val SUPPORTED_MEDIA_TYPES = Set("audio", "image")
 
   def getFilesToImport(path: String)
                       (implicit ctx: Context, txId: TransactionId = new TransactionId): List[FileImportAsset] = {

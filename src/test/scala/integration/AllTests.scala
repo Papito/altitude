@@ -4,6 +4,7 @@ import org.scalatest.Suites
 import unit.{FolderModelTests, ModelTests, SearchQueryModelTests}
 
 abstract class AllTests(val config: Map[String, String]) extends Suites(
+/*
     new FolderModelTests,
     new ModelTests,
     new SearchQueryModelTests,
@@ -14,8 +15,9 @@ abstract class AllTests(val config: Map[String, String]) extends Suites(
     new MetadataServiceTests(config),
     new StatsServiceTests(config),
     new AssetQueryTests(config),
-    new FileSystemImportTests(config),
     new LibraryServiceTests(config),
-    new SearchServiceTests(config)
+    new SearchServiceTests(config),
+*/
+    new FileSystemImportTests(config)
 )
 
