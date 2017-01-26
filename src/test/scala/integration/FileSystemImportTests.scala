@@ -29,7 +29,7 @@ import org.scalatest.Matchers._
 
   test("import file list") {
     val incomingPath = getClass.getResource("../import").getPath
-    val assets = altitude.service.assetImport.getFilesToImport(path=incomingPath)
+    val assets = altitude.service.source.fileSystem.getFilesToImport(path=incomingPath)
     assets should not be empty
   }
 

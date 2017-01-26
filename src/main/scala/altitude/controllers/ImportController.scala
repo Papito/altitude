@@ -65,7 +65,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
       C.Api.CURRENT_PATH -> parentFile.getAbsolutePath).toString()
   }
 
-  atmosphere("/ws") {
+  atmosphere("/fs/ws") {
     new AtmosphereClient {
       private def uuidJson: JsValue = Json.obj("uid" -> JsString(uuid))
       private var stopImport = false
@@ -97,7 +97,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
           // get the path we will be importing from
           val path: String = (json \ "path").extract[String]
 
-          assets = Some(app.service.assetImport.getFilesToImport(path = path))
+          assets = Some(app.service.source.fileSystem.getFilesToImport(path = path))
           assetsIt = Some(assets.get.toIterator)
 
           this.writeToYou(Json.obj("total" -> JsNumber(assets.get.size)))

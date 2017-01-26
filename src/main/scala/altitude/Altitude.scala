@@ -5,6 +5,7 @@ import java.sql.DriverManager
 import altitude.dao._
 import altitude.service._
 import altitude.service.migration.{PostgresMigrationService, SqliteMigrationService}
+import altitude.service.sources.FileSystemSourceService
 import altitude.transactions._
 import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
@@ -62,7 +63,9 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
     val folder = new FolderService(app)
     val stats = new StatsService(app)
 
-    // client
+    object source {
+      val fileSystem = new FileSystemSourceService(app)
+    }
 
     val migration = dataSourceType match {
       case "sqlite" => new SqliteMigrationService(app)

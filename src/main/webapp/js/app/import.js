@@ -6,7 +6,7 @@ ProtocolHandler = Base.extend({
     this.base();
 
     this.request = {
-      url: "/import/ws",
+      url: "/import/fs/ws",
       logLevel: 'debug',
       contentType : "application/json",
       closeAsync: true,
