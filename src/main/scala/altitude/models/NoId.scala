@@ -1,8 +1,8 @@
 package altitude.models
 
 /**
- * Trait to use for submodels that are not stored in databases as a separate documents,
- * hence requiring no ID.
+ * Trait to use for submodels and transient objects that are not
+ * stored in databases as separate entities.
  */
 trait NoId {
   val id: Option[String] = None

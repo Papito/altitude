@@ -17,15 +17,14 @@ class AssetImportService(app: Altitude) {
 
   protected val SUPPORTED_MEDIA_TYPES = Set("audio", "image")
 
-  def detectAssetType(importAsset: FileImportAsset): AssetType = {
-    log.debug(s"Detecting media type for: '$importAsset'", C.LogTag.SERVICE)
+  def detectAssetType(importAsset: ImportAsset): AssetType = {
+    log.debug(s"Detecting media type for: '$importAsset'")
 
     var inputStream: Option[InputStream] = None
 
     try {
-      val url: java.net.URL = importAsset.file.toURI.toURL
       val metadata: TikaMetadata = new TikaMetadata
-      inputStream = Some(TikaInputStream.get(url, metadata))
+      inputStream = Some(TikaInputStream.get(importAsset.data, metadata))
       app.service.metadataExtractor.detectAssetTypeFromStream(inputStream.get)
     }
     finally {
@@ -33,19 +32,19 @@ class AssetImportService(app: Altitude) {
     }
   }
 
-  def importAsset(fileAsset: FileImportAsset)
+  def importAsset(importAsset: ImportAsset)
                  (implicit ctx: Context, txId: TransactionId = new TransactionId) : Option[Asset]  = {
-    log.info(s"Importing file asset '$fileAsset'", C.LogTag.SERVICE)
-    val assetType = detectAssetType(fileAsset)
+    log.info(s"Importing file asset '$importAsset'")
+    val assetType = detectAssetType(importAsset)
 
     if (!SUPPORTED_MEDIA_TYPES.contains(assetType.mediaType)) {
-      log.warn(s"Ignoring ${fileAsset.absolutePath} of type ${assetType.mediaType}")
+      log.warn(s"Ignoring ${importAsset.path} of type ${assetType.mediaType}")
       return None
     }
 
     var metadataParserException: Option[Exception] = None
     val extractedMetadata: Metadata = try {
-      app.service.metadataExtractor.extract(fileAsset, assetType)
+      app.service.metadataExtractor.extract(importAsset, assetType)
     }
     catch {
       case ex: Exception =>
@@ -53,14 +52,13 @@ class AssetImportService(app: Altitude) {
         Json.obj()
     }
 
-    val fileSizeInBytes: Long = new File(fileAsset.absolutePath).length()
-
     val asset: Asset = Asset(
       userId = ctx.user.id.get,
-      path = fileAsset.absolutePath,
-      md5 = getChecksum(fileAsset.absolutePath),
+      data = importAsset.data,
+      path = importAsset.path,
+      md5 = getChecksum(importAsset),
       assetType = assetType,
-      sizeBytes = fileSizeInBytes,
+      sizeBytes = importAsset.data.length,
       folderId = ctx.repo.uncatFolderId,
       extractedMetadata = extractedMetadata)
 
@@ -82,17 +80,6 @@ class AssetImportService(app: Altitude) {
     Some(Asset.fromJson(res.get))
   }
 
-  protected def getChecksum(file: File): String = {
-    var inputStream: Option[InputStream] = None
-
-    try {
-      inputStream = Some(new FileInputStream(file))
-      DigestUtils.md5Hex(inputStream.get)
-    }
-    finally  {
-      if (inputStream.isDefined) inputStream.get.close()
-    }
-  }
-
-  protected def getChecksum(path: String): String = getChecksum(new File(path))
+  protected def getChecksum(importAsset: ImportAsset): String =
+    DigestUtils.md5Hex(importAsset.data)
 }

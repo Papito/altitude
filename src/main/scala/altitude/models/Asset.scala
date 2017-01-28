@@ -23,6 +23,7 @@ object Asset {
 
 case class Asset(id: Option[String] = None,
                  userId: String,
+                 data: Array[Byte] = new Array[Byte](0),
                  assetType: AssetType,
                  path: String,
                  md5: String,

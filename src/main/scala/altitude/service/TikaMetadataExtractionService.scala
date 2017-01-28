@@ -3,7 +3,7 @@ package altitude.service
 import java.io.InputStream
 
 import altitude.exceptions.AllDone
-import altitude.models.{AssetType, FileImportAsset, Metadata}
+import altitude.models.{AssetType, ImportAsset, Metadata}
 import altitude.{Const => C}
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
@@ -28,7 +28,7 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
 
   final private val TIKA_HANDLER = new DefaultHandler
 
-  override def extract(importAsset: FileImportAsset, mediaType: AssetType, asRaw: Boolean = false): Metadata = {
+  override def extract(importAsset: ImportAsset, mediaType: AssetType, asRaw: Boolean = false): Metadata = {
     val raw: Option[TikaMetadata]  = mediaType match {
       case mt: AssetType if mt.mediaType == "image" =>
         extractMetadata(importAsset, List(new JpegParser, new TiffParser))
@@ -63,7 +63,7 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
     new Metadata(data.toMap)
   }
 
-  private def extractMetadata(importAsset: FileImportAsset, parsers: List[AbstractParser]): Option[TikaMetadata]  = {
+  private def extractMetadata(importAsset: ImportAsset, parsers: List[AbstractParser]): Option[TikaMetadata]  = {
     var inputStream: Option[InputStream] = None
     var metadata: Option[TikaMetadata] = None
 
@@ -73,9 +73,8 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
         metadata = None
 
         try {
-          val url: java.net.URL = importAsset.file.toURI.toURL
           metadata = Some(new TikaMetadata)
-          inputStream = Some(TikaInputStream.get(url, metadata.get))
+          inputStream = Some(TikaInputStream.get(importAsset.data, metadata.get))
           parser.parse(inputStream.get, TIKA_HANDLER, metadata.get, null)
           throw AllDone()
         }

@@ -6,7 +6,7 @@ import java.io._
 import javax.imageio.ImageIO
 
 import altitude.exceptions.{DuplicateException, FormatException, IllegalOperationException}
-import altitude.models.{Asset, Data, Preview, Stats}
+import altitude.models._
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import altitude.util.{Query, QueryResult}
 import altitude.{Altitude, Const => C, Context}
@@ -21,69 +21,63 @@ class LibraryService(app: Altitude) {
 
   val PREVIEW_BOX_SIZE = app.config.getInt("preview.box.pixels")
 
-  def add(obj: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
-    log.info(s"\nAdding asset with MD5: ${obj.md5}\n")
+  def add(assetIn: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
+    log.info(s"\nAdding asset with MD5: ${assetIn.md5}\n")
 
-    if (app.service.folder.isRootFolder(obj.folderId)) {
+    if (app.service.folder.isRootFolder(assetIn.folderId)) {
       throw new IllegalOperationException("Cannot have assets in root folder")
     }
 
-    val query = Query(Map(C.Asset.MD5 -> obj.md5))
+    val query = Query(Map(C.Asset.MD5 -> assetIn.md5))
 
     txManager.withTransaction[JsObject] {
       val existing = app.service.asset.query(query)
 
       if (existing.nonEmpty) {
-        log.warn(s"Asset already exists for ${obj.path}")
-        throw DuplicateException(obj.toJson, existing.records.head)
+        log.warn(s"Asset already exists for ${assetIn.path}")
+        throw DuplicateException(assetIn.toJson, existing.records.head)
       }
-
-      val data = app.service.library.genPreviewData(obj)
 
       /**
       * Process metadata and append it to the asset
       */
-      val metadata = app.service.metadata.cleanAndValidateMetadata(obj.metadata)
+      val metadata = app.service.metadata.cleanAndValidateMetadata(assetIn.metadata)
 
-      // mush the metadata JSON key into the JSON repr of the asset and get a new asset
+      val assetId = BaseModel.genId
+
       val assetToAdd: Asset = Asset(
-        id = obj.id,
-        userId = obj.userId,
-        assetType = obj.assetType,
-        path = obj.path,
-        md5 = obj.md5,
-        sizeBytes = obj.sizeBytes,
-        folderId = obj.folderId,
+        id = Some(assetId),
+        data = assetIn.data,
+        userId = assetIn.userId,
+        assetType = assetIn.assetType,
+        path = assetIn.path,
+        md5 = assetIn.md5,
+        sizeBytes = assetIn.sizeBytes,
+        folderId = assetIn.folderId,
         metadata = metadata,
-        extractedMetadata = obj.extractedMetadata,
-        previewData = data)
+        extractedMetadata = assetIn.extractedMetadata)
 
       val asset: Asset = app.service.asset.add(assetToAdd)
 
       /**
-      * Search index
+      * Add to search index
       */
       app.service.search.indexAsset(asset)
 
       /**
       * Update repository counters
       */
-      app.service.folder.incrAssetCount(obj.folderId)
+      app.service.folder.incrAssetCount(assetIn.folderId)
       app.service.stats.incrementStat(Stats.TOTAL_ASSETS)
       app.service.stats.incrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
 
       // if there is no folder, increment the uncategorized counter
-      if (ctx.repo.uncatFolderId == obj.folderId) {
+      if (ctx.repo.uncatFolderId == assetIn.folderId) {
         app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS)
       }
 
-      // make and add preview, UNLESS we already have the data
-      obj.previewData.length match {
-        case 0 => addPreview(asset)
-        case _ =>
-          log.debug("Asset preview data already given")
-          addPreviewData(asset, obj.previewData)
-      }
+      // add preview data
+      addPreview(assetToAdd)
 
       asset
     }
@@ -199,8 +193,9 @@ class LibraryService(app: Altitude) {
   private def makeImageThumbnail(asset: Asset)
                                 (implicit ctx: Context, txId: TransactionId): Array[Byte] = {
     try {
-      val inFile = new File(asset.path)
-      val srcImage: BufferedImage = ImageIO.read(inFile)
+      require(asset.data.length != 0)
+      val dataStream: InputStream = new ByteArrayInputStream(asset.data)
+      val srcImage: BufferedImage = ImageIO.read(dataStream)
       val scaledImage: BufferedImage = Scalr.resize(srcImage, Scalr.Method.ULTRA_QUALITY, PREVIEW_BOX_SIZE)
       val height: Int = scaledImage.getHeight
       val width: Int = scaledImage.getWidth

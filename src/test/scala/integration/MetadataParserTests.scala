@@ -2,7 +2,7 @@ package integration
 
 import java.io.File
 
-import altitude.models.{FileImportAsset, Metadata}
+import altitude.models.{ImportAsset, Metadata}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
@@ -39,8 +39,8 @@ import org.scalatest.Matchers._
 
   private def getMetadata(p: String): Metadata = {
     val path = getClass.getResource(s"../import/$p").getPath
-    val fileImportAsset = new FileImportAsset(new File(path))
-    val mediaType = altitude.service.assetImport.detectAssetType(fileImportAsset)
-    altitude.service.metadataExtractor.extract(fileImportAsset, mediaType)
+    val importAsset = altitude.service.source.fileSystem.fileToImportAsset(new File(path))
+    val mediaType = altitude.service.assetImport.detectAssetType(importAsset)
+    altitude.service.metadataExtractor.extract(importAsset, mediaType)
   }
 }

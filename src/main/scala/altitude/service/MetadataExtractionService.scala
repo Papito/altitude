@@ -2,7 +2,7 @@ package altitude.service
 
 import java.io.InputStream
 
-import altitude.models.{AssetType, FileImportAsset, Metadata}
+import altitude.models.{AssetType, ImportAsset, Metadata}
 
 abstract class MetadataExtractionService {
 
@@ -90,6 +90,6 @@ abstract class MetadataExtractionService {
       "Comment")
   )
 
-  def extract(importAsset: FileImportAsset, assetType: AssetType, asRaw: Boolean): Metadata
+  def extract(importAsset: ImportAsset, assetType: AssetType, asRaw: Boolean): Metadata
   def detectAssetTypeFromStream(is: InputStream): AssetType
 }

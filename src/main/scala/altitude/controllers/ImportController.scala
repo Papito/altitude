@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import altitude.controllers.web.BaseWebController
 import altitude.exceptions.{AllDone, DuplicateException, MetadataExtractorException}
-import altitude.models.{Asset, FileImportAsset}
+import altitude.models.{Asset, ImportAsset}
 import altitude.{Const => C, Context}
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.{DefaultFormats, Formats, JValue, _}
@@ -72,8 +72,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
       private case class NotImportable() extends Exception
       private val workerNum: AtomicInteger = new AtomicInteger(0)
 
-      var assets: Option[List[FileImportAsset]] = None
-      @volatile var assetsIt: Option[Iterator[FileImportAsset]] = None
+      @volatile var assetsIt: Option[Iterator[ImportAsset]] = None
       var path: Option[String] = None
 
       implicit val context: Context = new Context(repo = C.REPO, user = C.USER)
@@ -97,10 +96,10 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
           // get the path we will be importing from
           val path: String = (json \ "path").extract[String]
 
-          assets = Some(app.service.source.fileSystem.getFilesToImport(path = path))
-          assetsIt = Some(assets.get.toIterator)
+          assetsIt = Some(app.service.source.fileSystem.assetIterator(path))
 
-          this.writeToYou(Json.obj("total" -> JsNumber(assets.get.size)))
+          val count = app.service.source.fileSystem.count(path)
+          this.writeToYou(Json.obj("total" -> JsNumber(count)))
         }
 
         case message @ JsonMessage(JObject(JField("action", JString("stopImport")) :: fields)) => {
@@ -166,7 +165,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
         workerNum.incrementAndGet()
 
         while (assetsIt.get.hasNext && !stopImport) {
-          val importAsset: FileImportAsset = Some(assetsIt.get.next()).get
+          val importAsset: ImportAsset = Some(assetsIt.get.next()).get
           log.info(s"Processing import asset $importAsset")
 
           try {
