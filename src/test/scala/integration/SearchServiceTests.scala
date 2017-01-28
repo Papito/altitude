@@ -5,7 +5,7 @@ import altitude.util.QueryResult
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
-@DoNotDiscover class SearchServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
+@DoNotDiscover class SearchServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
   test("index and search by term") {
     val field1 = altitude.service.metadata.addField(

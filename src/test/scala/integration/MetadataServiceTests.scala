@@ -6,7 +6,7 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
 
-@DoNotDiscover class MetadataServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
+@DoNotDiscover class MetadataServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
   test("number field type") {
     val field = altitude.service.metadata.addField(

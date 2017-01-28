@@ -4,7 +4,7 @@ import altitude.models.{Asset, Folder, Stats}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
-@DoNotDiscover class StatsServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
+@DoNotDiscover class StatsServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
   test("test totals") {
     // create an asset in a folder

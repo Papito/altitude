@@ -18,15 +18,15 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   val log =  LoggerFactory.getLogger(getClass)
 
   // Stores test app config overrides, since we run same tests with a different app setup.
-  val config: Map[String, String]
+  val config: Map[String, Any]
 
   // Force environment to always be TEST
   Environment.ENV = Environment.TEST
 
-  val datasource = config.get("datasource")
+  val datasource = config.get("datasource").get.asInstanceOf[C.DatasourceType.Value]
   protected def altitude: Altitude = datasource match {
-    case Some("postgres") => PostgresSuite.app
-    case Some("sqlite") => SqliteSuite.app
+    case C.DatasourceType.POSTGRES => PostgresSuite.app
+    case C.DatasourceType.SQLITE => SqliteSuite.app
     case _ => throw new IllegalArgumentException(s"Do not know of datasource: $datasource")
   }
 
@@ -129,10 +129,10 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   override def afterEach() {
     dbUtilities.cleanupTest()
 
-    if (datasource.contains("postgres") || datasource.contains("sqlite")) {
+    if (datasource == C.DatasourceType.SQLITE || datasource == C.DatasourceType.POSTGRES) {
       // should not have committed anything for tests
       require(altitude.txManager.transactions.COMMITTED == 0)
-      // should only have had one transaction - if this fails, implicit transaction semantics are off somewhere
+      // should only have had one transaction - if this fails, implicit transaction logic is likely broken
       if (altitude.txManager.transactions.CREATED != 1) {
         log.error(s"${altitude.txManager.transactions.CREATED} transactions instead of 1!")
       }
@@ -145,7 +145,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
       log.info(s"Datasource type: ${altitude.dataSourceType}", C.LogTag.APP)
 
       altitude.dataSourceType match {
-        case "postgres" | "sqlite" =>
+        case C.DatasourceType.POSTGRES | C.DatasourceType.SQLITE =>
           bind[UtilitiesDao].toInstance(new dao.jdbc.UtilitiesDao(altitude))
         case _ => throw new IllegalArgumentException(s"Do not know of datasource: ${altitude.dataSourceType}")
       }

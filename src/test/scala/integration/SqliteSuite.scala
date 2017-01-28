@@ -2,15 +2,15 @@ package integration
 
 import java.sql.DriverManager
 
-import altitude.{Altitude, Configuration, Environment}
+import altitude.{Altitude, Configuration, Environment, Const => C}
 import org.scalatest.BeforeAndAfterAll
 import org.slf4j.LoggerFactory
 
 object SqliteSuite {
-  val app = new Altitude(Map("datasource" -> "sqlite"))
+  val app = new Altitude(Map("datasource" ->C.DatasourceType.SQLITE))
 }
 
-class SqliteSuite extends AllTests(config = Map("datasource" -> "sqlite")) with BeforeAndAfterAll {
+class SqliteSuite extends AllTests(config = Map("datasource" -> C.DatasourceType.SQLITE)) with BeforeAndAfterAll {
   Environment.ENV = Environment.TEST
   val log =  LoggerFactory.getLogger(getClass)
 

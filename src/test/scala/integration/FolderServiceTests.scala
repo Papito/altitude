@@ -5,7 +5,7 @@ import altitude.models.Folder
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
-@DoNotDiscover class FolderServiceTests (val config: Map[String, String]) extends IntegrationTestCore {
+@DoNotDiscover class FolderServiceTests (val config: Map[String, Any]) extends IntegrationTestCore {
 
   test("hierarchy") {
     /*

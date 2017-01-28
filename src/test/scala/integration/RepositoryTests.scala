@@ -5,7 +5,7 @@ import altitude.models.{BaseModel, Repository}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
-@DoNotDiscover class RepositoryTests (val config: Map[String, String]) extends IntegrationTestCore {
+@DoNotDiscover class RepositoryTests (val config: Map[String, Any]) extends IntegrationTestCore {
 
   test("create repository") {
     val r = Repository(

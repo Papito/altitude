@@ -7,7 +7,7 @@ import altitude.{Const => C}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
-@DoNotDiscover class LibraryServiceTests(val config: Map[String, String]) extends IntegrationTestCore {
+@DoNotDiscover class LibraryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
   test("move recycled asset to folder") {
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))

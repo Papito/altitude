@@ -32,8 +32,8 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
   final val config = new Configuration(
     configOverride = configOverride)
 
-  final val dataSourceType = config.getString("datasource")
-  log.info(s"Datasource type: $dataSourceType", C.LogTag.APP)
+  final val dataSourceType = config.datasourceType
+  log.info(s"Datasource type: $dataSourceType")
 
   /**
    * At this point determine which data access classes we are loading, which
@@ -68,8 +68,8 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
     }
 
     val migration = dataSourceType match {
-      case "sqlite" => new SqliteMigrationService(app)
-      case "postgres" => new PostgresMigrationService(app)
+      case C.DatasourceType.SQLITE => new SqliteMigrationService(app)
+      case C.DatasourceType.POSTGRES => new PostgresMigrationService(app)
     }
   }
 
@@ -85,7 +85,7 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
     override def configure(): Unit = {
       dataSourceType match {
 
-        case "postgres" =>
+        case C.DatasourceType.POSTGRES =>
           DriverManager.registerDriver(new org.postgresql.Driver)
 
           val jdbcTxManager = new altitude.transactions.JdbcTransactionManager(app)
@@ -100,7 +100,7 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
           bind[MetadataFieldDao].toInstance(new postgres.MetadataFieldDao(app))
           bind[SearchDao].toInstance(new postgres.SearchDao(app))
 
-        case "sqlite" =>
+        case C.DatasourceType.SQLITE =>
           DriverManager.registerDriver(new org.sqlite.JDBC)
 
           val jdbcTxManager = new SqliteTransactionManager(app)

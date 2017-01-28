@@ -6,7 +6,6 @@ import altitude.models._
 import altitude.{Altitude, Const => C}
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
-import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.slf4j.LoggerFactory
 
 class FileSystemSourceService(app: Altitude) extends AssetSourceService {
@@ -42,7 +41,7 @@ class FileSystemSourceService(app: Altitude) extends AssetSourceService {
 
   def fileToImportAsset(file: File): ImportAsset = new ImportAsset(
     path = file.getAbsolutePath,
-    sourceType = StorageType.FS,
+    sourceType = C.AssetStoreType.FS,
     data =  FileUtils.readFileToByteArray(file),
     metadata = new Metadata())
 }

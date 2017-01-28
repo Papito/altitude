@@ -7,7 +7,7 @@ import altitude.models.{Asset, Preview}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
-@DoNotDiscover class FileSystemImportTests(val config: Map[String, String]) extends IntegrationTestCore {
+@DoNotDiscover class FileSystemImportTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
   test("import duplicate") {
     importFile("images/1.jpg")

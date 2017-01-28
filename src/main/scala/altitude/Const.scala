@@ -5,6 +5,20 @@ import altitude.models.{Repository, User}
 
 object Const {
 
+  /**
+   * TYPES
+   */
+  object DatasourceType extends Enumeration {
+    val SQLITE, POSTGRES = Value
+  }
+
+  object AssetStoreType extends Enumeration {
+    val FS, S3 = Value
+  }
+
+  /**
+   * MODEL FIELDS (in JSON and database)
+   */
   trait Common {
     val ID = "id"
     val REPO_ID = "repository_id"
@@ -102,7 +116,7 @@ object Const {
     val MULTI_VALUE_DELIM = "+"
     val DUPLICATE_OF = "duplicate_of"
 
-    // wrong naming convention
+    // FIXME: wrong naming convention
     val TOTAL_RECORDS = "totalRecords"
     val TOTAL_PAGES = "totalPages"
     val CURRENT_PAGE = "currentPage"
@@ -191,9 +205,6 @@ object Const {
 
   final val USER = new User(Some("a11111111111111111111111"))
 
-  /*---------------------------------------------------------------------------
-  LOG TAGS
-  ---------------------------------------------------------------------------*/
   object LogTag {
     val APP     = "APP"
     val API     = "API"
@@ -201,14 +212,6 @@ object Const {
     val WEB     = "WEB"
     val SERVICE = "SERVICE"
     val DB = "DB"
-  }
-
-  /*---------------------------------------------------------------------------
-  MISC
-  ---------------------------------------------------------------------------*/
-  object IdType {
-    val ID = "ID"
-    val QUERY = "QUERY"
   }
 
 }

@@ -1,18 +1,20 @@
 package altitude
 
 import scala.collection.immutable.HashMap
+import altitude.{Const => C}
 
 class Configuration(configOverride: Map[String, Any] = new HashMap()) {
   def getString(key: String) = data.getOrElse(key, "").asInstanceOf[String]
   def getFlag(key: String) = data.getOrElse(key, false).asInstanceOf[Boolean]
   def getInt(key: String) = data.getOrElse(key, 0).asInstanceOf[Int]
+  def datasourceType = data.get("datasource").get.asInstanceOf[C.DatasourceType.Value]
 
   private val default = HashMap(
     "app.name" -> "Altitude",
     "dataDir" -> "data",
     "previewDir" -> "p",
 
-    "datasource" -> "postgres", // postgres, sqlite
+    "datasource" -> C.DatasourceType.SQLITE,
 
     "preview.box.pixels" -> 200,
 

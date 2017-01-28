@@ -6,7 +6,7 @@ import altitude.{Const => C, Util}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
-@DoNotDiscover class AssetQueryTests(val config: Map[String, String]) extends IntegrationTestCore {
+@DoNotDiscover class AssetQueryTests(val config: Map[String, Any]) extends IntegrationTestCore {
   test("empty search") {
     val assets = altitude.service.library.query(new Query()).records
     assets.length shouldBe 0

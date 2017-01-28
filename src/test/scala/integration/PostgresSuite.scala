@@ -3,15 +3,15 @@ package integration
 import java.sql.DriverManager
 import java.util.Properties
 
-import altitude.{Altitude, Configuration, Environment}
+import altitude.{Const  => C, Altitude, Configuration, Environment}
 import org.scalatest.BeforeAndAfterAll
 import org.slf4j.LoggerFactory
 
 object PostgresSuite {
-  val app = new Altitude(Map("datasource" -> "postgres"))
+  val app = new Altitude(Map("datasource" ->C.DatasourceType.POSTGRES))
 }
 
-class PostgresSuite extends AllTests(config = Map("datasource" -> "postgres")) with BeforeAndAfterAll {
+class PostgresSuite extends AllTests(config = Map("datasource" -> C.DatasourceType.POSTGRES)) with BeforeAndAfterAll {
   Environment.ENV = Environment.TEST
   val log =  LoggerFactory.getLogger(getClass)
 

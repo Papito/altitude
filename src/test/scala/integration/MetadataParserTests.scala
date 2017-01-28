@@ -6,7 +6,7 @@ import altitude.models.Metadata
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
-@DoNotDiscover class MetadataParserTests(val config: Map[String, String]) extends IntegrationTestCore {
+@DoNotDiscover class MetadataParserTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
   test("normalize metadata") {
     val metadata = getMetadata("images/6.jpg")
