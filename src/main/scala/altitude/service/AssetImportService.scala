@@ -1,6 +1,6 @@
 package altitude.service
 
-import java.io.{File, FileInputStream, InputStream}
+import java.io.InputStream
 
 import altitude.exceptions.{FormatException, MetadataExtractorException}
 import altitude.models._

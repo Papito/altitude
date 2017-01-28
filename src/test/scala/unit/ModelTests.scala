@@ -1,8 +1,6 @@
 package unit
 
-import java.io.File
-
-import altitude.models.{BaseModel, ImportAsset}
+import altitude.models.BaseModel
 import altitude.{Const => C}
 import org.scalatest._
 import play.api.libs.json._

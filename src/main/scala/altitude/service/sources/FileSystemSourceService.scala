@@ -1,18 +1,13 @@
 package altitude.service.sources
 
-import java.io.{File, FileInputStream, InputStream}
+import java.io.File
 
-import altitude.exceptions.{FormatException, MetadataExtractorException}
 import altitude.models._
-import altitude.transactions.TransactionId
-import altitude.{Altitude, Const => C, Context}
-import org.apache.commons.codec.digest.DigestUtils
+import altitude.{Altitude, Const => C}
 import org.apache.commons.io.FileUtils
-import org.apache.commons.io.filefilter.{TrueFileFilter, IOFileFilter}
-import org.apache.tika.io.TikaInputStream
+import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsValue, Json}
 
 class FileSystemSourceService(app: Altitude) extends AssetSourceService {
   private final val log = LoggerFactory.getLogger(getClass)

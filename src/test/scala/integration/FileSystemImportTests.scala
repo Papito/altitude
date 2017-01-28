@@ -3,7 +3,7 @@ package integration
 import java.io.File
 
 import altitude.exceptions.DuplicateException
-import altitude.models.{Asset, ImportAsset, Preview}
+import altitude.models.{Asset, Preview}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
