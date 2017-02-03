@@ -12,8 +12,12 @@ object Const {
     val SQLITE, POSTGRES = Value
   }
 
-  object AssetStoreType extends Enumeration {
+  object FileStoreType extends Enumeration {
     val FS, S3 = Value
+  }
+
+  object ImportMode extends Enumeration {
+    val COPY, MOVE, LEAVE = Value
   }
 
   /**

@@ -41,7 +41,7 @@ class FileSystemSourceService(app: Altitude) extends AssetSourceService {
 
   def fileToImportAsset(file: File): ImportAsset = new ImportAsset(
     path = file.getAbsolutePath,
-    sourceType = C.AssetStoreType.FS,
+    sourceType = C.FileStoreType.FS,
     data =  FileUtils.readFileToByteArray(file),
     metadata = new Metadata())
 }

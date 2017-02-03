@@ -48,7 +48,7 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
   final val txManager = app.injector.instance[AbstractTransactionManager]
 
   /**
-   * This is all of the internal services the app will be using
+   * This is all of the services the app will be using
    */
   object service {
     val repository = new RepositoryService(app)

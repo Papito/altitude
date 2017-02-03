@@ -5,7 +5,7 @@ import altitude.{Const => C}
 
 class ImportAsset(val path: String,
                   val data: Array[Byte],
-                  val sourceType: C.AssetStoreType.Value,
+                  val sourceType: C.FileStoreType.Value,
                   val metadata: Metadata)
   extends BaseModel with NoId {
 
