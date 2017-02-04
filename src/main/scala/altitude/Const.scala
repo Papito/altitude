@@ -17,7 +17,7 @@ object Const {
   }
 
   object ImportMode extends Enumeration {
-    val COPY, MOVE, LEAVE = Value
+    val COPY, MOVE = Value
   }
 
   /**
@@ -39,6 +39,7 @@ object Const {
   object Repository extends Common {
     val NAME = "name"
     val ROOT_FOLDER_ID = "root_folder_id"
+    // uncategorized folder
     val UNCAT_FOLDER_ID = "uncat_folder_id"
   }
 

@@ -4,6 +4,7 @@ import java.sql.DriverManager
 
 import altitude.dao._
 import altitude.service._
+import altitude.service.filestore.FileSystemStoreService
 import altitude.service.migration.{PostgresMigrationService, SqliteMigrationService}
 import altitude.service.sources.FileSystemSourceService
 import altitude.transactions._
@@ -35,6 +36,9 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
   final val dataSourceType = config.datasourceType
   log.info(s"Datasource type: $dataSourceType")
 
+  final val fileStoreType = config.fileStoreType
+  log.info(s"File store type: $fileStoreType")
+
   /**
    * At this point determine which data access classes we are loading, which
    * transaction manager we are using for the data sources of choice, load the drivers,
@@ -65,6 +69,11 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
 
     object source {
       val fileSystem = new FileSystemSourceService(app)
+    }
+
+    val fileStore = fileStoreType match {
+      case C.FileStoreType.FS => new FileSystemStoreService(app)
+      case _ => throw new NotImplementedError
     }
 
     val migration = dataSourceType match {
