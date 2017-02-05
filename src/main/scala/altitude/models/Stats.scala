@@ -4,7 +4,7 @@ package altitude.models
 object Stats {
   final val TOTAL_ASSETS = "total_assets"
   final val TOTAL_BYTES = "total_bytes"
-  final val UNCATEGORIZED_ASSETS = "uncategorized_assets"
+  final val UNSORTED_ASSETS = "unsorted_assets"
   final val RECYCLED_ASSETS = "recycled_assets"
   final val RECYCLED_BYTES = "recycles_bytes"
 }

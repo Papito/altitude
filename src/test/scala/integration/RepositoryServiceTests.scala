@@ -12,7 +12,7 @@ import org.scalatest.Matchers._
     val r = Repository(
       name = Util.randomStr(),
       rootFolderId = BaseModel.genId,
-      uncatFolderId = BaseModel.genId,
+      unsortedFolderId = BaseModel.genId,
       fileStoreType = C.FileStoreType.FS,
       fileStoreConfig = Map()
     )

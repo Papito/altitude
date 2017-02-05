@@ -39,8 +39,7 @@ object Const {
   object Repository extends Common {
     val NAME = "name"
     val ROOT_FOLDER_ID = "root_folder_id"
-    // uncategorized folder
-    val UNCAT_FOLDER_ID = "uncat_folder_id"
+    val UNSORTED_FOLDER_ID = "unsorted_folder_id"
     val FILE_STORE_TYPE = "file_store_type"
     val FILES_STORE_CONFIG = "file_store_config"
 
@@ -79,8 +78,8 @@ object Const {
     val IS_ROOT = "is_root"
 
     object Names {
-      val ROOT = "All"
-      val UNCATEGORIZED = "Uncategorized"
+      val ROOT = "sorted"
+      val UNSORTED = "unsorted"
     }
   }
 
@@ -166,7 +165,7 @@ object Const {
       val QUERY_ARG_NAME = "__FOLDERS__"
       val HIERARCHY = "hierarchy"
       val SYSTEM = "system"
-      val UNCATEGORIZED = "uncategorized"
+      val UNSORTED = "unsorted"
       val TRASH = "trash"
       val FOLDERS = "folders"
       val FOLDER = "folder"

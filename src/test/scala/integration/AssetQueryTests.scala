@@ -19,7 +19,7 @@ import org.scalatest.Matchers._
       assetType = mediaType,
       path = "path",
       md5 = "md5",
-      folderId = ctx.repo.uncatFolderId,
+      folderId = ctx.repo.unsortedFolderId,
       sizeBytes = 1L)
     altitude.service.asset.add(asset)
 
@@ -27,18 +27,18 @@ import org.scalatest.Matchers._
     assets.length shouldBe 1
   }
 
-  test("search uncategorized folder") {
+  test("search unsorted folder") {
     val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
     val asset = new Asset(
       userId = currentUser.id.get,
       assetType = mediaType,
       path = "path",
       md5 = "md5",
-      folderId = ctx.repo.uncatFolderId,
+      folderId = ctx.repo.unsortedFolderId,
       sizeBytes = 1L)
     altitude.service.asset.add(asset)
 
-    val query = Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> ctx.repo.uncatFolderId))
+    val query = Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> ctx.repo.unsortedFolderId))
     val assets = altitude.service.library.query(query).records
     assets.length shouldBe 1
   }
@@ -133,7 +133,7 @@ import org.scalatest.Matchers._
 
   test("pagination") {
     1 to 6 foreach { n =>
-      altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
+      altitude.service.library.add(makeAsset(altitude.service.folder.getUnsortedFolder))
     }
 
     val q = Query(rpp = 2, page = 1)

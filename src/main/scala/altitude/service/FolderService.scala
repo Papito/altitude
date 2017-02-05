@@ -83,19 +83,19 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   )
 
   /**
-   * Get the Uncategorized forlder for this repository
+   * Get the Unsorted folder for this repository
    */
-  def getUncatFolder(implicit ctx: Context, txId: TransactionId = new TransactionId) = Folder(
-    id = Some(ctx.repo.uncatFolderId),
+  def getUnsortedFolder(implicit ctx: Context, txId: TransactionId = new TransactionId) = Folder(
+    id = Some(ctx.repo.unsortedFolderId),
     parentId = ctx.repo.rootFolderId,
-    name = C.Folder.Names.UNCATEGORIZED
+    name = C.Folder.Names.UNSORTED
   )
 
   /**
    * Get all systems folders - the ones the user cannot alter
    */
   def getSystemFolders(implicit ctx: Context, txId: TransactionId = new TransactionId): List[Folder] =
-    List(getUncatFolder)
+    List(getUnsortedFolder)
 
   def isRootFolder(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId) =
     id == ctx.repo.rootFolderId

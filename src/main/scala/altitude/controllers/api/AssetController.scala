@@ -59,15 +59,15 @@ class AssetController extends BaseApiController {
     OK
   }
 
-  post(s"/:${C.Api.ID}/move/to/uncategorized") {
+  post(s"/:${C.Api.ID}/move/to/unsorted") {
     val id = params.get(C.Api.ID).get
-    log.info(s"Moving $id to UNCATEGORIZED")
-    app.service.library.moveAssetToUncategorized(id)
+    log.info(s"Moving $id to UNSORTED")
+    app.service.library.moveAssetToUnsorted(id)
 
     OK
   }
 
-  post(s"/move/to/uncategorized") {
+  post(s"/move/to/unsorted") {
     log.info(s"Clearing category")
 
     val validator = ApiRequestValidator(List(C.Api.Folder.ASSET_IDS))
@@ -75,9 +75,9 @@ class AssetController extends BaseApiController {
 
     val assetIds = (requestJson.get \ C.Api.Folder.ASSET_IDS).as[Set[String]]
 
-    log.debug(s"Assets to move to uncategorized: $assetIds")
+    log.debug(s"Assets to move to unsorted: $assetIds")
 
-    app.service.library.moveAssetsToUncategorized(assetIds)
+    app.service.library.moveAssetsToUnsorted(assetIds)
 
     OK
   }

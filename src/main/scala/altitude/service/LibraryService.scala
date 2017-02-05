@@ -71,9 +71,9 @@ class LibraryService(app: Altitude) {
       app.service.stats.incrementStat(Stats.TOTAL_ASSETS)
       app.service.stats.incrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
 
-      // if there is no folder, increment the uncategorized counter
-      if (ctx.repo.uncatFolderId == assetIn.folderId) {
-        app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS)
+      // if there is no folder, increment the unsorted counter
+      if (ctx.repo.unsortedFolderId == assetIn.folderId) {
+        app.service.stats.incrementStat(Stats.UNSORTED_ASSETS)
       }
 
       // add preview data
@@ -89,9 +89,9 @@ class LibraryService(app: Altitude) {
     txManager.withTransaction {
       val asset: Asset = getById(id)
 
-      // of this asset is still uncategorized, update the stat
-      if (ctx.repo.uncatFolderId == asset.folderId) {
-        app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
+      // of this asset is still unsorted, update the stat
+      if (ctx.repo.unsortedFolderId == asset.folderId) {
+        app.service.stats.decrementStat(Stats.UNSORTED_ASSETS)
       }
       app.service.stats.decrementStat(Stats.TOTAL_ASSETS)
       app.service.stats.decrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
@@ -256,9 +256,9 @@ class LibraryService(app: Altitude) {
 
         val asset: Asset = this.getById(assetId)
 
-        // if moving from uncategorized, decrement that stat
-        if (ctx.repo.uncatFolderId == asset.folderId) {
-          app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
+        // if moving from unsorted, decrement that stat
+        if (ctx.repo.unsortedFolderId == asset.folderId) {
+          app.service.stats.decrementStat(Stats.UNSORTED_ASSETS)
         }
 
         // point asset to the new folder
@@ -272,18 +272,18 @@ class LibraryService(app: Altitude) {
     }
   }
 
-  def moveAssetToUncategorized(assetId: String)
+  def moveAssetToUnsorted(assetId: String)
                               (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
     txManager.withTransaction {
-      moveAssetsToUncategorized(Set(assetId))
+      moveAssetsToUnsorted(Set(assetId))
     }
   }
 
-  def moveAssetsToUncategorized(assetIds: Set[String])
+  def moveAssetsToUnsorted(assetIds: Set[String])
                                (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
     txManager.withTransaction {
-      moveAssetsToFolder(assetIds, ctx.repo.uncatFolderId)
-      app.service.stats.incrementStat(Stats.UNCATEGORIZED_ASSETS, assetIds.size)
+      moveAssetsToFolder(assetIds, ctx.repo.unsortedFolderId)
+      app.service.stats.incrementStat(Stats.UNSORTED_ASSETS, assetIds.size)
     }
   }
 
@@ -307,8 +307,8 @@ class LibraryService(app: Altitude) {
 
         app.service.folder.decrAssetCount(asset.folderId)
 
-        if (app.service.folder.getUncatFolder.id.contains(asset.folderId)) {
-          app.service.stats.decrementStat(Stats.UNCATEGORIZED_ASSETS)
+        if (app.service.folder.getUnsortedFolder.id.contains(asset.folderId)) {
+          app.service.stats.decrementStat(Stats.UNSORTED_ASSETS)
         }
 
         totalBytes += asset.sizeBytes

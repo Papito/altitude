@@ -13,7 +13,7 @@ import org.scalatest.Matchers._
       MetadataField(
         name = "number field",
         fieldType = FieldType.NUMBER))
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUnsortedFolder))
 
     var data = Map[String, Set[String]](field.id.get -> Set("one"))
     intercept[ValidationException] {
@@ -35,7 +35,7 @@ import org.scalatest.Matchers._
       MetadataField(
         name = "boolean field",
         fieldType = FieldType.BOOL))
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUnsortedFolder))
 
     var data = Map[String, Set[String]](field.id.get -> Set("one"))
     intercept[ValidationException] {
@@ -80,7 +80,7 @@ import org.scalatest.Matchers._
         name = "number field",
         fieldType = FieldType.NUMBER))
 
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUnsortedFolder))
 
     // add a field we do not expect
     val badData = Map[String, Set[String]](
@@ -124,7 +124,7 @@ import org.scalatest.Matchers._
         name = "field 2",
         fieldType = FieldType.NUMBER))
 
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUnsortedFolder))
 
     var data = Map[String, Set[String]](
       field1.id.get -> Set("one", "two", "three"),
@@ -156,7 +156,7 @@ import org.scalatest.Matchers._
         name = "field 2",
         fieldType = FieldType.NUMBER))
 
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUnsortedFolder))
 
     var data = Map[String, Set[String]](
         field1.id.get -> Set("one", "two", "three"),
@@ -246,7 +246,7 @@ import org.scalatest.Matchers._
     val metadata = new Metadata(data)
 
     val asset: Asset = altitude.service.library.add(
-      makeAsset(altitude.service.folder.getUncatFolder, metadata = metadata))
+      makeAsset(altitude.service.folder.getUnsortedFolder, metadata = metadata))
 
     val storedAsset: Asset = altitude.service.asset.getById(asset.id.get)
 

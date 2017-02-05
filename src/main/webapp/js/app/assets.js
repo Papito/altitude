@@ -22,7 +22,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     this.stats = {};
     this.stats.totalAssets = ko.observable(0);
-    this.stats.uncategorizedAssets = ko.observable(0);
+    this.stats.unsortedAssets = ko.observable(0);
     this.stats.recycledAssets = ko.observable(0);
 
     this.selectedAssetsMap = {};
@@ -143,24 +143,24 @@ AssetsViewModel = BaseViewModel.extend({
         }
     );
 
-    this.uncategorizedEl = $('#uncategorized');
+    this.unsortedEl = $('#unsorted');
     this.trashEl = $('#trash');
 
     /*
      system folders
      */
 
-    // uncategorized
-    this.uncategorizedEl.droppable({
+    // unsorted
+    this.unsortedEl.droppable({
       accept: ".result-box",
       hoverClass: "highlight",
       tolerance: "pointer"
     });
 
-    this.uncategorizedEl.on("drop", function( event, ui ) {
+    this.unsortedEl.on("drop", function( event, ui ) {
       self.resetAllMessages();
       var assetId = $(ui.draggable.context).attr('asset_id');
-      self.moveToUncategorized(assetId);
+      self.moveToUnsorted(assetId);
     });
 
     // trash
@@ -997,8 +997,8 @@ AssetsViewModel = BaseViewModel.extend({
     self.post('/api/v1/assets/move/to/' + moveToFolderId, opts);
   },
 
-  moveToUncategorized: function(assetId) {
-    console.log(assetId, 'to uncategorized');
+  moveToUnsorted: function(assetId) {
+    console.log(assetId, 'to unsorted');
 
     var self = this;
     var opts = {
@@ -1008,7 +1008,7 @@ AssetsViewModel = BaseViewModel.extend({
       }
     };
 
-    this.post('/api/v1/assets/' + assetId + '/move/to/uncategorized', opts);
+    this.post('/api/v1/assets/' + assetId + '/move/to/unsorted', opts);
   },
 
   moveToTrash: function(assetId, callback) {
@@ -1143,7 +1143,7 @@ AssetsViewModel = BaseViewModel.extend({
       'successCallback': function (json) {
         var stats = json['stats'];
         self.stats.totalAssets(stats.total_assets);
-        self.stats.uncategorizedAssets(stats.uncategorized_assets);
+        self.stats.unsortedAssets(stats.unsorted_assets);
         self.stats.recycledAssets(stats.recycled_assets);
       }
     };

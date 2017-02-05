@@ -59,7 +59,7 @@ class AssetImportService(app: Altitude) {
       md5 = getChecksum(importAsset),
       assetType = assetType,
       sizeBytes = importAsset.data.length,
-      folderId = ctx.repo.uncatFolderId,
+      folderId = ctx.repo.unsortedFolderId,
       extractedMetadata = extractedMetadata)
 
     var res: Option[JsValue] = None

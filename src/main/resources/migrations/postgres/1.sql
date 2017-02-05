@@ -15,7 +15,7 @@ CREATE TABLE repository(
   name VARCHAR(255) NOT NULL,
   description TEXT,
   root_folder_id CHAR(24) NOT NULL,
-  uncat_folder_id CHAR(24) NOT NULL,
+  unsorted_folder_id CHAR(24) NOT NULL,
   file_store_type VARCHAR NOT NULL
 ) INHERITS (_core);#END
 

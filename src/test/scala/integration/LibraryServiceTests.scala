@@ -10,7 +10,7 @@ import org.scalatest.Matchers._
 @DoNotDiscover class LibraryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
   test("move recycled asset to folder") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUnsortedFolder))
     altitude.service.asset.query(Query()).records.length shouldBe 1
     altitude.service.asset.queryRecycled(Query()).records.length shouldBe 0
     altitude.service.library.recycleAsset(asset.id.get)
@@ -66,10 +66,10 @@ import org.scalatest.Matchers._
   }
 
   test("recycle asset") {
-    altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
+    altitude.service.library.add(makeAsset(altitude.service.folder.getUnsortedFolder))
 
     SET_SECONDARY_USER()
-    altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
+    altitude.service.library.add(makeAsset(altitude.service.folder.getUnsortedFolder))
 
     SET_PRIMARY_USER()
     altitude.service.asset.query(Query()).records.length shouldBe 2
@@ -112,7 +112,7 @@ import org.scalatest.Matchers._
 
     // fill up the hierarchy with assets x times over
     1 to 2 foreach {n =>
-      altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
+      altitude.service.library.add(makeAsset(altitude.service.folder.getUnsortedFolder))
       altitude.service.library.add(makeAsset(folder1))
       altitude.service.library.add(makeAsset(folder2))
       altitude.service.library.add(makeAsset(folder2_1))
@@ -123,7 +123,7 @@ import org.scalatest.Matchers._
 
     // check counts
     val systemFolders = altitude.service.folder.getSysFolders()
-    systemFolders(ctx.repo.uncatFolderId).numOfAssets should be (2)
+    systemFolders(ctx.repo.unsortedFolderId).numOfAssets should be (2)
 
     // prefetch all folders for speed
     val all = altitude.service.folder.getNonSysFolders()
@@ -152,19 +152,19 @@ import org.scalatest.Matchers._
   }
 
   test("get recycled asset") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUnsortedFolder))
     altitude.service.library.recycleAsset(asset.id.get)
   }
 
   test("restore recycled asset") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUnsortedFolder))
     val trashed: Asset = altitude.service.library.recycleAsset(asset.id.get)
     altitude.service.library.restoreRecycledAsset(trashed.id.get)
     altitude.service.asset.query(Query()).isEmpty shouldBe false
   }
 
   test("restore recycled asset to non-existing folder") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUncatFolder))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getUnsortedFolder))
     altitude.service.library.recycleAsset(asset.id.get)
 
     intercept[NotFoundException] {
