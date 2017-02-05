@@ -2,16 +2,19 @@ package integration
 
 import altitude.Util
 import altitude.models.{BaseModel, Repository}
+import altitude.{Const => C}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
-@DoNotDiscover class RepositoryTests (val config: Map[String, Any]) extends IntegrationTestCore {
+@DoNotDiscover class RepositoryServiceTests (val config: Map[String, Any]) extends IntegrationTestCore {
 
   test("create repository") {
     val r = Repository(
       name = Util.randomStr(),
       rootFolderId = BaseModel.genId,
-      uncatFolderId = BaseModel.genId
+      uncatFolderId = BaseModel.genId,
+      fileStoreType = C.FileStoreType.FS,
+      fileStoreConfig = Map()
     )
 
     val r1: Repository = altitude.service.repository.add(r)

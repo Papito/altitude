@@ -12,8 +12,7 @@ import org.slf4j.LoggerFactory
 class PreviewService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  def add(preview: Preview)
-         (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+  def add(preview: Preview)(implicit ctx: Context): Unit = {
     log.info(s"Adding preview for asset ${preview.assetId}")
 
     // get the full path to our preview file
@@ -34,8 +33,7 @@ class PreviewService(app: Altitude) {
     }
   }
 
-  def getById(assetId: String)
-             (implicit ctx: Context, txId: TransactionId = new TransactionId): Preview = {
+  def getById(assetId: String)(implicit ctx: Context): Preview = {
     val f: File = new File(previewFilePath(assetId))
 
     if (!f.isFile) {
@@ -56,8 +54,12 @@ class PreviewService(app: Altitude) {
     }
   }
 
-  private def previewFilePath(assetId: String): String = {
+  private def previewFilePath(assetId: String)(implicit ctx: Context): String = {
     val dirName = assetId.substring(0, 3)
-    app.previewPath + dirName + "/" + assetId + ".jpg"
+    previewPath + dirName + "/" + assetId + ".jpg"
   }
+
+  private def previewPath(implicit ctx: Context): String =
+    ctx.repo.fileStoreConfig(C.Repository.Config.PATH) + "p/"
+
 }

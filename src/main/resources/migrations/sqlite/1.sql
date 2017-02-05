@@ -11,6 +11,7 @@ CREATE TABLE repository(
   description TEXT,
   root_folder_id CHAR(24) NOT NULL,
   uncat_folder_id CHAR(24) NOT NULL,
+  file_store_type VARCHAR NOT NULL,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );#END

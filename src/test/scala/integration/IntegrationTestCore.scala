@@ -2,6 +2,7 @@ package integration
 
 import java.io.File
 
+import altitude.Const.FileStoreType
 import altitude.models._
 import altitude.transactions.TransactionId
 import altitude.{Const => C, _}
@@ -49,7 +50,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
    * Our test users. We may alternate between them to make sure there is proper
    * separation.
    */
-  private final val user: User = C.USER
+  private final val user: User = altitude.USER
   private final val anotherUser: User = User(id = Some("a22222222222222222222222"))
   var currentUser = user
 
@@ -58,11 +59,19 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
    * bounds are not broken. Normally, no request should ever be able to peek into
    * data from other repositories. This is enforced in the DAO layer.
    */
-  private val repo = C.REPO
+  private val repo = altitude.REPO
+
+  // FIXME: clumsy - use file utils
+  private val workPath = System.getProperty("user.dir")
+  private val dataDir = altitude.config.getString("dataDir")
+  private val dataPath = workPath + "/" + dataDir + "2/"
+
   private val repo2 = new Repository(name = "Repository 2",
     id = Some("a20000000000000000000000"),
     rootFolderId  = "b20000000000000000000000",
-    uncatFolderId = "c20000000000000000000000")
+    uncatFolderId = "c20000000000000000000000",
+    fileStoreType = FileStoreType.FS,
+    fileStoreConfig = Map(C.Repository.Config.PATH -> dataPath))
   var currentRepo = repo
 
   /**

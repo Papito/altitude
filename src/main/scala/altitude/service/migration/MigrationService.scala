@@ -21,7 +21,7 @@ abstract class MigrationService(app: Altitude) {
   protected val FILE_EXTENSION: String
 
   def runMigration(version: Int)
-                  (implicit ctx: Context = new Context(repo = C.REPO, user = C.USER),
+                  (implicit ctx: Context = new Context(repo = app.REPO, user = app.USER),
                    txId: TransactionId = new TransactionId) = {
     val migrationCommands = parseMigrationCommands(version)
 
@@ -45,7 +45,9 @@ abstract class MigrationService(app: Altitude) {
   private def v1(context: Context)
                 (implicit txId: TransactionId = new TransactionId) = {
 
-    implicit val ctx: Context = new Context(user = C.USER, repo = C.REPO)
+    println("!!!!!!!")
+    println(app.REPO)
+    implicit val ctx: Context = new Context(user = app.USER, repo = app.REPO)
 
     // user "uncategorized" folder node
     val uncatFolder = app.service.folder.getUncatFolder
@@ -58,7 +60,7 @@ abstract class MigrationService(app: Altitude) {
     app.service.stats.createStat(Stats.RECYCLED_BYTES)
   }
 
-  def existingVersion(implicit ctx: Context = new Context(repo = C.REPO, user = C.USER),
+  def existingVersion(implicit ctx: Context = new Context(repo = app.REPO, user = app.USER),
                       txId: TransactionId = new TransactionId): Int = {
     txManager.asReadOnly[Int] {
       DAO.currentVersion

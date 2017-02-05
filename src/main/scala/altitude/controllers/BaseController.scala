@@ -42,9 +42,9 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
   }
 
   protected def setUser() = {
-    request.setAttribute("user", C.USER)
-    MDC.put("USER", s"[${C.USER.toString}]")
-    request.setAttribute("repository", C.REPO)
+    request.setAttribute("user", app.USER)
+    MDC.put("USER", s"[${app.USER.toString}]")
+    request.setAttribute("repository", app.REPO)
   }
 
   error {

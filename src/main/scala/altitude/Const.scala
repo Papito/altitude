@@ -41,6 +41,12 @@ object Const {
     val ROOT_FOLDER_ID = "root_folder_id"
     // uncategorized folder
     val UNCAT_FOLDER_ID = "uncat_folder_id"
+    val FILE_STORE_TYPE = "file_store_type"
+    val FILES_STORE_CONFIG = "file_store_config"
+
+    object Config {
+      val PATH = "path"
+    }
   }
 
   object User extends Common {
@@ -201,14 +207,6 @@ object Const {
 
   // default results per page
   final val DEFAULT_RPP = "20"
-
-  // TEMPORARY constants for user and repo IDS
-  final val REPO = new Repository(name = "Repository",
-    id = Some("a10000000000000000000000"),
-    rootFolderId  = "b10000000000000000000000",
-    uncatFolderId = "c10000000000000000000000")
-
-  final val USER = new User(Some("a11111111111111111111111"))
 
   object LogTag {
     val APP     = "APP"

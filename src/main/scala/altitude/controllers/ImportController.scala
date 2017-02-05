@@ -75,7 +75,7 @@ with JacksonJsonSupport with SessionSupport with AtmosphereSupport  with FileUpl
       @volatile var assetsIt: Option[Iterator[ImportAsset]] = None
       var path: Option[String] = None
 
-      implicit val context: Context = new Context(repo = C.REPO, user = C.USER)
+      implicit val context: Context = new Context(repo = app.REPO, user = app.USER)
 
       private def writeToYou(jsonMessage: JsValue): Unit = {
         log.info(s"YOU -> $jsonMessage")

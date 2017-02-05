@@ -2,7 +2,9 @@ package altitude
 
 import java.sql.DriverManager
 
+import altitude.Const.FileStoreType
 import altitude.dao._
+import altitude.models.{User, Repository}
 import altitude.service._
 import altitude.service.filestore.FileSystemStoreService
 import altitude.service.migration.{PostgresMigrationService, SqliteMigrationService}
@@ -38,6 +40,22 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
 
   final val fileStoreType = config.fileStoreType
   log.info(s"File store type: $fileStoreType")
+
+  // TEMPORARY constants for user and repo IDS
+  val workPath = System.getProperty("user.dir")
+  val dataDir = config.getString("dataDir")
+  val dataPath = workPath + "/" + dataDir + "/"
+  log.info(s"Data path is '$dataPath'")
+
+  final val REPO = new Repository(name = "Repository",
+    id = Some("a10000000000000000000000"),
+    rootFolderId  = "b10000000000000000000000",
+    uncatFolderId = "c10000000000000000000000",
+    fileStoreType = FileStoreType.FS,
+    fileStoreConfig = Map(C.Repository.Config.PATH -> dataPath))
+
+  final val USER = new User(Some("a11111111111111111111111"))
+  // end TEMP definitions
 
   /**
    * At this point determine which data access classes we are loading, which
@@ -134,11 +152,6 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
     txManager.freeResources()
   }
 
-  // DEPRECATED. this will be part of data access
-  val workPath = System.getProperty("user.dir")
-  val dataDir = config.getString("dataDir")
-  val dataPath = workPath + "/" + dataDir + "/"
-  log.info(s"Data path is '$dataPath'")
-  val previewPath = dataPath + "p/"
+
   log.info(s"Altitude instance initialized")
 }

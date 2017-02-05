@@ -20,7 +20,10 @@ abstract class RepositoryDao(val app: Altitude) extends BaseJdbcDao("repository"
       id = Some(rec.get(C.Base.ID).get.asInstanceOf[String]),
       name = rec.get(C.Repository.NAME).get.asInstanceOf[String],
       rootFolderId = rec.get(C.Repository.ROOT_FOLDER_ID).get.asInstanceOf[String],
-      uncatFolderId = rec.get(C.Repository.UNCAT_FOLDER_ID).get.asInstanceOf[String]
+      uncatFolderId = rec.get(C.Repository.UNCAT_FOLDER_ID).get.asInstanceOf[String],
+      fileStoreType = C.FileStoreType.withName(
+        rec.get(C.Repository.FILE_STORE_TYPE).get.asInstanceOf[String]),
+      fileStoreConfig = Map()
     )
 
     model
@@ -37,13 +40,14 @@ abstract class RepositoryDao(val app: Altitude) extends BaseJdbcDao("repository"
 
     val sql = s"""
         INSERT INTO $tableName (
-             ${C.Base.ID}, ${C.Repository.NAME},
+             ${C.Base.ID}, ${C.Repository.NAME}, ${C.Repository.FILE_STORE_TYPE},
              ${C.Repository.ROOT_FOLDER_ID}, ${C.Repository.UNCAT_FOLDER_ID})
-            VALUES (?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?)
     """
 
     val sqlVals: List[Any] = List(
       repo.name,
+      repo.fileStoreType.toString,
       repo.rootFolderId,
       repo.uncatFolderId)
 
