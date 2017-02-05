@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory
 class FileSystemStoreService(app: Altitude) extends FileStoreService {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override def createFolder(parent: Folder, folder: Folder)(implicit ctx: Context, txId: TransactionId): Unit = {
-
+  override def addFolder(folder: Folder)(implicit ctx: Context, txId: TransactionId): Unit = {
+    log.debug(s"Adding folder $folder")
   }
 
   override def deleteFolder(id: String)(implicit ctx: Context, txId: TransactionId): Unit = {

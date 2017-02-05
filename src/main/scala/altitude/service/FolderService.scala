@@ -41,7 +41,9 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       C.Folder.NAME_LC -> folder.nameLowercase))
 
     try {
-      super.add(folder, Some(dupQuery))
+      val addedFolder = super.add(folder, Some(dupQuery))
+      app.service.fileStore.addFolder(folder)
+      addedFolder
     } catch {
       case _: DuplicateException => {
         val ex = ValidationException()

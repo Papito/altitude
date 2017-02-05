@@ -7,11 +7,10 @@ object Environment extends Enumeration {
   var ENV = DEV
 
   def root: String = ENV match  {
-    case PROD => {
+    case PROD =>
       val url = Environment.getClass.getProtectionDomain.getCodeSource.getLocation
       val path = new File(url.toURI).getParentFile.getPath
       File.separator + path + File.separator
-    }
     case _ => ""
   }
 }
