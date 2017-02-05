@@ -38,9 +38,6 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
   final val dataSourceType = config.datasourceType
   log.info(s"Datasource type: $dataSourceType")
 
-  final val fileStoreType = config.fileStoreType
-  log.info(s"File store type: $fileStoreType")
-
   // TEMPORARY constants for user and repo IDS
   val workPath = System.getProperty("user.dir")
   val dataDir = config.getString("dataDir")
@@ -56,6 +53,9 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
 
   final val USER = new User(Some("a11111111111111111111111"))
   // end TEMP definitions
+
+  final val fileStoreType = REPO.fileStoreType
+  log.info(s"File store type: $fileStoreType")
 
   /**
    * At this point determine which data access classes we are loading, which

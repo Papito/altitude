@@ -45,8 +45,6 @@ abstract class MigrationService(app: Altitude) {
   private def v1(context: Context)
                 (implicit txId: TransactionId = new TransactionId) = {
 
-    println("!!!!!!!")
-    println(app.REPO)
     implicit val ctx: Context = new Context(user = app.USER, repo = app.REPO)
 
     // user "uncategorized" folder node

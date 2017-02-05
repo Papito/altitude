@@ -79,7 +79,7 @@ class LibraryService(app: Altitude) {
       // add preview data
       addPreview(assetToAdd)
 
-      //app.service.fileStore.createFolder()
+      app.service.fileStore.addAsset(asset)
 
       asset
     }
