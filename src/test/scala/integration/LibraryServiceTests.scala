@@ -26,7 +26,7 @@ import org.scalatest.Matchers._
       Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
     ).records.length shouldBe 1
 
-    val all = altitude.service.folder.getNonSysFolders()
+    val all = altitude.service.folder.getUserFolders()
 
     (altitude.service.folder.getByIdWithChildAssetCounts(folder1.id.get, all): Folder).numOfAssets should be (1)
   }
@@ -126,7 +126,7 @@ import org.scalatest.Matchers._
     systemFolders(ctx.repo.unsortedFolderId).numOfAssets should be (2)
 
     // prefetch all folders for speed
-    val all = altitude.service.folder.getNonSysFolders()
+    val all = altitude.service.folder.getUserFolders()
 
     // test counts for individual folders
     (altitude.service.folder.getByIdWithChildAssetCounts(folder1.id.get, all): Folder).numOfAssets should be (2)

@@ -73,6 +73,7 @@ object Const {
     val NAME = "name"
     val NAME_LC = "name_lc"
     val PARENT_ID = "parent_id"
+    val PATH = "path"
     val NUM_OF_ASSETS = "num_of_assets"
     val CHILDREN = "children"
     val IS_ROOT = "is_root"
@@ -202,6 +203,15 @@ object Const {
       val WRONG_VALUE = "This is not an allowed value. Allowed values are: %s"
       val EMPTY_REQUEST_BODY = "Empty request body"
     }
+  }
+
+  /**
+   * Paths for major data partitions, relative to root path
+   */
+  object Path {
+    val SORTED = "sorted"
+    val TRIAGE = "triage"
+    val TRASH = "trash"
   }
 
   // default results per page

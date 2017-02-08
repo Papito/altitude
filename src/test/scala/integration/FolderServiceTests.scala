@@ -66,7 +66,7 @@ import org.scalatest.Matchers._
     immediateChildren.length should be (1)
 
     // check breadcrumb
-    val path = altitude.app.service.folder.path(folderId = folder2_1_1.id.get)
+    val path = altitude.app.service.folder.pathComponents(folderId = folder2_1_1.id.get)
     path.length shouldBe 4
     path(1).id shouldBe folder2.id
     path.last.id shouldBe folder2_1_1.id
@@ -84,13 +84,13 @@ import org.scalatest.Matchers._
   }
 
   test("root path") {
-    val path: List[Folder] = altitude.app.service.folder.path(folderId = ctx.repo.rootFolderId)
+    val path: List[Folder] = altitude.app.service.folder.pathComponents(folderId = ctx.repo.rootFolderId)
     path.length should equal(0)
   }
 
   test("bad path") {
     intercept[NotFoundException] {
-      altitude.app.service.folder.path(folderId = "bogus")
+      altitude.app.service.folder.pathComponents(folderId = "bogus")
     }
   }
 

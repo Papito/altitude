@@ -66,12 +66,14 @@ CREATE TABLE folder (
   name VARCHAR(255) NOT NULL,
   name_lc VARCHAR(255) NOT NULL,
   parent_id CHAR(24) NOT NULL,
+  path TEXT NOT NULL,
   num_of_assets INTEGER NOT NULL DEFAULT 0,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );#END
 CREATE INDEX folder_01 ON folder(repository_id, parent_id);#END
 CREATE UNIQUE INDEX folder_02 ON folder(repository_id, parent_id, name_lc);#END
+CREATE UNIQUE INDEX folder_03 ON folder(repository_id, parent_id, name_lc);#END
 
 CREATE TABLE search_parameter (
   repository_id CHAR(24) NOT NULL,
