@@ -14,6 +14,7 @@ import altitude.{Const => C}
 import com.google.inject.{AbstractModule, Guice}
 import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
+import org.apache.commons.io.{FilenameUtils, FileUtils}
 import org.slf4j.LoggerFactory
 
 class Altitude(configOverride: Map[String, Any] = Map()) {
@@ -41,7 +42,7 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
   // TEMPORARY constants for user and repo IDS
   val workPath = System.getProperty("user.dir")
   val dataDir = config.getString("dataDir")
-  val dataPath = workPath + "/" + dataDir + "/"
+  val dataPath = FilenameUtils.concat(workPath, dataDir)
   log.info(s"Data path is '$dataPath'")
 
   final val REPO = new Repository(name = "Repository",
@@ -102,7 +103,9 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
 
   if (service.migration.migrationRequired) {
     log.warn("Migration is required!")
-    service.migration.migrate()
+    if (Environment.ENV != Environment.TEST) {
+      service.migration.migrate()
+    }
   }
 
   /**

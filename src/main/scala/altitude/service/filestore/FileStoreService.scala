@@ -5,9 +5,10 @@ import altitude.models.{Asset, Folder}
 import altitude.transactions.TransactionId
 
 trait FileStoreService {
-  def addAsset(asset: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId)
-  def deleteAsset(asset: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId)
-  def moveAsset(asset: Asset, folder: Folder)(implicit ctx: Context, txId: TransactionId = new TransactionId)
-  def addFolder(folder: Folder)(implicit ctx: Context, txId: TransactionId = new TransactionId)
-  def deleteFolder(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId)
+  def addAsset(asset: Asset)(implicit ctx: Context)
+  def deleteAsset(asset: Asset)(implicit ctx: Context)
+  def moveAsset(asset: Asset, folder: Folder)(implicit ctx: Context)
+  def addFolder(folder: Folder)(implicit ctx: Context)
+  def deleteFolder(folder: Folder)(implicit ctx: Context)
+  def renameFolder(folder: Folder, newName: String)(implicit ctx: Context)
 }

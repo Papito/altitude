@@ -29,7 +29,8 @@ class Configuration(configOverride: Map[String, Any] = new HashMap()) {
   )
 
   private val test = default ++ HashMap(
-    "dataDir" -> "tmp/test/data",
+    "testDir" -> "tmp/test",
+    "dataDir" -> "tmp/test/data/1",
     "importMode" -> C.ImportMode.COPY,
 
     "db.postgres.url" -> "jdbc:postgresql://localhost/altitude-test",

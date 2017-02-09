@@ -187,7 +187,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   }
 
   private def calculateRelativePath(name: String, parentId: String)
-                                   (implicit ctx: Context): String = {
+                                   (implicit ctx: Context, txId: TransactionId = new TransactionId): String = {
     val parent: Folder = getById(parentId)
     FilenameUtils.concat(parent.path, name)
   }

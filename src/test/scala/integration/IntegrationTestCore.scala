@@ -11,7 +11,7 @@ import integration.util.dao
 import integration.util.dao.UtilitiesDao
 import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
-import org.apache.commons.io.FileUtils
+import org.apache.commons.io.{FilenameUtils, FileUtils}
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach, FunSuite}
 import org.slf4j.{LoggerFactory, MDC}
 
@@ -32,7 +32,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   }
 
   /**
-   * Inject DB utilitites, based on current data source
+   * Inject DB utilities, based on current data source
    */
   val injector = Guice.createInjector(new InjectionModule)
   protected val dbUtilities = injector.instance[UtilitiesDao]
@@ -61,10 +61,9 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
    */
   private val repo = altitude.REPO
 
-  // FIXME: clumsy - use file utils
   private val workPath = System.getProperty("user.dir")
   private val dataDir = altitude.config.getString("dataDir")
-  private val dataPath = workPath + "/" + dataDir + "2/"
+  private val dataPath = FilenameUtils.concat(FilenameUtils.concat(workPath, dataDir), "2")
 
   private val repo2 = new Repository(name = "Repository 2",
     id = Some("a20000000000000000000000"),
@@ -121,14 +120,17 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     count = count + 1
     MDC.put("REQUEST_ID", s"[TEST: $count]")
 
+    // FIXME: should be in settings
+    val testDir = new File("tmp/test/data")
+    FileUtils.cleanDirectory(testDir)
+    FileUtils.forceMkdir(testDir)
+
     dbUtilities.migrateDatabase()
 
     // keep transaction stats clean after DB migration dirties them
     altitude.txManager.transactions.reset()
 
-    val dataDirFile = new File(altitude.dataPath)
-    FileUtils.deleteDirectory(dataDirFile)
-    FileUtils.forceMkdir(dataDirFile)
+
     dbUtilities.createTransaction(txId)
 
     SET_PRIMARY_USER()

@@ -21,62 +21,63 @@ import org.scalatest.Matchers._
     val folder1_1: Folder = altitude.service.folder.addFolder(
       name = "folder1_1", parentId = folder1.id)
 
-    folder1_1.parentId should not be None
+        folder1_1.parentId should not be None
 
-    val folder1_2: Folder = altitude.service.folder.addFolder(
-      name = "folder1_2", parentId = folder1.id)
+        val folder1_2: Folder = altitude.service.folder.addFolder(
+          name = "folder1_2", parentId = folder1.id)
 
-    folder1.id should contain(folder1_2.parentId)
+        folder1.id should contain(folder1_2.parentId)
 
-    /*
-      folder2
-        folder2_1
-          folder2_1_1
-        folder2_2
-      */
-    val folder2: Folder = altitude.service.folder.addFolder(
-      name = "folder2")
+        /*
+          folder2
+            folder2_1
+              folder2_1_1
+            folder2_2
+          */
+        val folder2: Folder = altitude.service.folder.addFolder(
+          name = "folder2")
 
-    folder2.parentId shouldEqual ctx.repo.rootFolderId
+        folder2.parentId shouldEqual ctx.repo.rootFolderId
 
-    val folder2_1: Folder = altitude.service.folder.addFolder(
-      name = "folder2_1", parentId = folder2.id)
+        val folder2_1: Folder = altitude.service.folder.addFolder(
+          name = "folder2_1", parentId = folder2.id)
 
-    folder2.id should contain(folder2_1.parentId)
+        folder2.id should contain(folder2_1.parentId)
 
-    val folder2_1_1: Folder = altitude.service.folder.addFolder(
-      name = "folder2_1_1", parentId = folder2_1.id)
+        val folder2_1_1: Folder = altitude.service.folder.addFolder(
+          name = "folder2_1_1", parentId = folder2_1.id)
 
-    folder2_1.id should contain(folder2_1_1.parentId)
+        folder2_1.id should contain(folder2_1_1.parentId)
 
-    val folder2_2: Folder = altitude.service.folder.addFolder(
-      name = "folder2_2", parentId = folder2.id)
+        val folder2_2: Folder = altitude.service.folder.addFolder(
+          name = "folder2_2", parentId = folder2.id)
 
-    folder2.id should contain(folder2_2.parentId)
+        folder2.id should contain(folder2_2.parentId)
 
-    val hierarchy = altitude.service.folder.hierarchy()
-    hierarchy.length shouldBe 2
-    hierarchy.head.children.length shouldBe 2
-    hierarchy(1).children.length shouldBe 2
-    hierarchy(1).children.head.children.length shouldBe 1
-    hierarchy(1).children(1).children.length shouldBe 0
+        val hierarchy = altitude.service.folder.hierarchy()
+        hierarchy.length shouldBe 2
+        hierarchy.head.children.length shouldBe 2
+        hierarchy(1).children.length shouldBe 2
+        hierarchy(1).children.head.children.length shouldBe 1
+        hierarchy(1).children(1).children.length shouldBe 0
 
-    // check immediate children of the second folder
-    val immediateChildren = altitude.app.service.folder.immediateChildren(rootId = folder2_1.id.get)
-    immediateChildren.length should be (1)
+        // check immediate children of the second folder
+        val immediateChildren = altitude.app.service.folder.immediateChildren(rootId = folder2_1.id.get)
+        immediateChildren.length should be (1)
 
-    // check breadcrumb
-    val path = altitude.app.service.folder.pathComponents(folderId = folder2_1_1.id.get)
-    path.length shouldBe 4
-    path(1).id shouldBe folder2.id
-    path.last.id shouldBe folder2_1_1.id
+        // check breadcrumb
+        val path = altitude.app.service.folder.pathComponents(folderId = folder2_1_1.id.get)
+        path.length shouldBe 4
+        path(1).id shouldBe folder2.id
+        path.last.id shouldBe folder2_1_1.id
 
-    SET_SECONDARY_REPO()
+        SET_SECONDARY_REPO()
 
-    val hierarchy2 = altitude.service.folder.hierarchy()
-    hierarchy2 shouldBe empty
+        val hierarchy2 = altitude.service.folder.hierarchy()
+        hierarchy2 shouldBe empty
   }
 
+/*
   test("bad hierarchy root") {
     intercept[NotFoundException] {
       altitude.service.folder.hierarchy(rootId = Some("bogus"))
@@ -354,5 +355,6 @@ import org.scalatest.Matchers._
       altitude.service.folder.rename(ctx.repo.rootFolderId, folder1.name)
     }
   }
+*/
 
 }
