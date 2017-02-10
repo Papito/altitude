@@ -77,7 +77,6 @@ import org.scalatest.Matchers._
         hierarchy2 shouldBe empty
   }
 
-/*
   test("bad hierarchy root") {
     intercept[NotFoundException] {
       altitude.service.folder.hierarchy(rootId = Some("bogus"))
@@ -355,6 +354,4 @@ import org.scalatest.Matchers._
       altitude.service.folder.rename(ctx.repo.rootFolderId, folder1.name)
     }
   }
-*/
-
 }

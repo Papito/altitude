@@ -17,8 +17,8 @@ abstract class AllTests(val config: Map[String, Any]) extends Suites(
     new FileSystemImportTests(config),
     new RepositoryServiceTests(config),
     new FolderModelTests,
-*/
     new FolderServiceTests(config),
+*/
     new FileStoreServiceTests(config)
 )
 

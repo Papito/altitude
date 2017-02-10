@@ -12,6 +12,7 @@ import integration.util.dao.UtilitiesDao
 import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
 import org.apache.commons.io.{FilenameUtils, FileUtils}
+import org.scalatest.Matchers._
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach, FunSuite}
 import org.slf4j.{LoggerFactory, MDC}
 
@@ -61,16 +62,16 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
    */
   private val repo = altitude.REPO
 
-  private val workPath = System.getProperty("user.dir")
+  private val workPath = FileUtils.getUserDirectory.getAbsolutePath
   private val dataDir = altitude.config.getString("dataDir")
-  private val dataPath = FilenameUtils.concat(FilenameUtils.concat(workPath, dataDir), "2")
+  private val dataPath2 = FilenameUtils.concat(FilenameUtils.concat(workPath, dataDir), "2")
 
   private val repo2 = new Repository(name = "Repository 2",
     id = Some("a20000000000000000000000"),
     rootFolderId  = "b20000000000000000000000",
     unsortedFolderId = "c20000000000000000000000",
     fileStoreType = FileStoreType.FS,
-    fileStoreConfig = Map(C.Repository.Config.PATH -> dataPath))
+    fileStoreConfig = Map(C.Repository.Config.PATH -> dataPath2))
   var currentRepo = repo
 
   /**
@@ -163,4 +164,18 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     }
   }
 
+  def checkRepositoryDirPath(path: String) = {
+    // get current repo root
+    val rootPath = currentRepo.fileStoreConfig(C.Repository.Config.PATH)
+    val f = new File(rootPath, path)
+    f.exists should be (true)
+    f.isDirectory should be (true)
+  }
+
+  def checkNoRepositoryDirPath(path: String) = {
+    // get current repo root
+    val rootPath = currentRepo.fileStoreConfig(C.Repository.Config.PATH)
+    val f = new File(rootPath, path)
+    f.exists should be (false)
+  }
 }

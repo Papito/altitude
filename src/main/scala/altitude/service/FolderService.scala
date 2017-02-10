@@ -246,6 +246,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
           val folderId = t._2
           DAO.deleteById(folderId)}
 
+        app.service.fileStore.deleteFolder(folder)
         // return number of folders deleted
         childrenAndDepths.length
       }
@@ -459,6 +460,8 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
           throw ex
         }
       }
+
+      app.service.fileStore.moveFolder(folder, newName)
     }
   }
 

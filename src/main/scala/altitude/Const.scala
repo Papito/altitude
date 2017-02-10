@@ -17,7 +17,7 @@ object Const {
   }
 
   object ImportMode extends Enumeration {
-    val COPY, MOVE, COPY_AND_BACKUP = Value
+    val COPY, MOVE, COPY_AND_LANDFILL = Value
   }
 
   /**

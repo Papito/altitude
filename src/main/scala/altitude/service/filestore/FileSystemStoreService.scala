@@ -1,9 +1,11 @@
 package altitude.service.filestore
 
-import java.io.File
+import java.io.{IOException, File}
 
+import altitude.exceptions.StorageException
 import altitude.{Const => C, Altitude, Context}
 import altitude.models.{Asset, Folder}
+import org.apache.commons.io.{FilenameUtils, FileUtils}
 import org.slf4j.LoggerFactory
 
 class FileSystemStoreService(app: Altitude) extends FileStoreService {
@@ -12,18 +14,69 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   override def addFolder(folder: Folder)(implicit ctx: Context): Unit = {
     val folderPath = fullPath(folder.path)
     log.debug(s"Adding FS folder [$folderPath]")
-    FileUtils.forceMkdir(folderPath)
+
+    try {
+      FileUtils.forceMkdir(folderPath)
+    }
+    catch {
+      case ex: IOException =>
+        throw new StorageException(s"Directory [$folderPath] could not be created: $ex")
+    }
+
+    if (!(folderPath.exists && folderPath.isDirectory)) {
+      throw new StorageException(s"Directory [$folderPath] could not be created")
+    }
   }
 
   override def deleteFolder(folder: Folder)(implicit ctx: Context): Unit = {
+    val folderPath = fullPath(folder.path)
+    log.debug(s"Removing FS folder [$folderPath]")
+
+    // ignore if not here anymore
+    if (!folderPath.exists) {
+      log.warn(s"Folder [$folderPath] no longer exists. Not trying to delete")
+      return
+    }
+
+    try {
+      FileUtils.deleteDirectory(folderPath)
+    }
+    catch {
+      case ex: IOException =>
+        throw new StorageException(s"Directory [$folderPath] could not be deleted: $ex")
+    }
+
+    if (folderPath.exists || folderPath.isDirectory) {
+      throw new StorageException(s"Directory [$folderPath] could not be deleted")
+    }
   }
 
-  override def renameFolder(folder: Folder, newName: String)(implicit ctx: Context): Unit = {
-    log.debug(s"Adding folder $folder")
+  override def moveFolder(folder: Folder, newName: String)(implicit ctx: Context): Unit = {
+    val srcFolderPath = fullPath(folder.path)
+    val newPath = FilenameUtils.concat(srcFolderPath.getParent, newName)
+    val destFolderPath = fullPath(newPath)
+    log.debug(s"Moving folder [$srcFolderPath] to [$destFolderPath]")
+
+    if (destFolderPath.exists) {
+      throw new StorageException(
+        s"Cannot move [$srcFolderPath] to [$destFolderPath]: destination already exists")
+    }
+
+    try {
+      FileUtils.moveDirectory(srcFolderPath, destFolderPath)
+    }
+    catch {
+      case ex: IOException =>
+        throw new StorageException(s"Directory [$srcFolderPath] could not be moved: $ex")
+    }
+
+    if (!(destFolderPath.exists && destFolderPath.isDirectory)) {
+      throw new StorageException(s"Directory [$srcFolderPath] could not be moved")
+    }
   }
 
   override def addAsset(asset: Asset)(implicit ctx: Context): Unit = {
-    log.debug(s"Adding asset $asset")
+    log.debug(s"Creating asset [$asset] at [${asset.path}]")
   }
 
   override def deleteAsset(asset: Asset)(implicit ctx: Context): Unit = {

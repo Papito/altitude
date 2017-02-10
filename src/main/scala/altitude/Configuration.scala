@@ -15,6 +15,7 @@ class Configuration(configOverride: Map[String, Any] = new HashMap()) {
     "previewDir" -> "p",
 
     "datasource" -> C.DatasourceType.SQLITE,
+    "filestore" -> C.FileStoreType.FS,
     "importMode" -> C.ImportMode.COPY,
 
     "preview.box.pixels" -> 200,
@@ -32,6 +33,7 @@ class Configuration(configOverride: Map[String, Any] = new HashMap()) {
     "testDir" -> "tmp/test",
     "dataDir" -> "tmp/test/data/1",
     "importMode" -> C.ImportMode.COPY,
+    "filestore" -> C.FileStoreType.FS,
 
     "db.postgres.url" -> "jdbc:postgresql://localhost/altitude-test",
     "db.postgres.user" -> "altitude-test",
