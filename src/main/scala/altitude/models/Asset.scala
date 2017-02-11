@@ -31,8 +31,8 @@ case class Asset(id: Option[String] = None,
                  folderId: String,
                  metadata: Metadata = new Metadata(),
                  isRecycled: Boolean = false,
-                 extractedMetadata: Metadata = new Metadata(),
-                 previewData: Array[Byte] = new Array[Byte](0)) extends BaseModel {
+                 extractedMetadata: Metadata = new Metadata())
+  extends BaseModel {
 
   val fileName: String = FilenameUtils.getName(path)
 

@@ -178,4 +178,20 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     val f = new File(rootPath, path)
     f.exists should be (false)
   }
+
+  def checkRepositoryFilePath(path: String) = {
+    // get current repo root
+    val rootPath = currentRepo.fileStoreConfig(C.Repository.Config.PATH)
+    val f = new File(rootPath, path)
+    f.exists should be (true)
+    f.isFile should be (true)
+    f.length should not be 0
+  }
+
+  def checkNoRepositoryFilePath(path: String) = {
+    // get current repo root
+    val rootPath = currentRepo.fileStoreConfig(C.Repository.Config.PATH)
+    val f = new File(rootPath, path)
+    f.exists should be (false)
+  }
 }

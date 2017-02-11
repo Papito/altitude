@@ -1,12 +1,15 @@
 package altitude.service.filestore
 
 import altitude.Context
-import altitude.models.{Asset, Folder}
+import altitude.models.{Data, Asset, Folder}
 import altitude.transactions.TransactionId
 
 trait FileStoreService {
   def calculateAssetPath(asset: Asset)
                         (implicit ctx: Context, txId: TransactionId = new TransactionId): String
+
+  def getById(id: String)
+             (implicit ctx: Context, txId: TransactionId = new TransactionId): Data
 
   def addAsset(asset: Asset)(implicit ctx: Context)
 

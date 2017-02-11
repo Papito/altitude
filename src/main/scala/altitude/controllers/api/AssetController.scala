@@ -23,7 +23,7 @@ class AssetController extends BaseApiController {
     val id = params.get(C.Api.ID).get
 
     try {
-      val data: Data = app.service.data.getById(id)
+      val data: Data = app.service.fileStore.getById(id)
       this.contentType = data.mimeType
       data.data
     }

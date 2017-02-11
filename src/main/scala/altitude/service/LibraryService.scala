@@ -45,14 +45,14 @@ class LibraryService(app: Altitude) {
 
       val assetId = BaseModel.genId
 
-      val path = app.service.fileStore.calculateAssetPath(assetIn)
+      val destFilePath = app.service.fileStore.calculateAssetPath(assetIn)
 
       val assetToAdd: Asset = Asset(
         id = Some(assetId),
         data = assetIn.data,
         userId = assetIn.userId,
         assetType = assetIn.assetType,
-        path = assetIn.path,
+        path = destFilePath,
         md5 = assetIn.md5,
         sizeBytes = assetIn.sizeBytes,
         folderId = assetIn.folderId,
@@ -81,7 +81,7 @@ class LibraryService(app: Altitude) {
       // add preview data
       addPreview(assetToAdd)
 
-      app.service.fileStore.addAsset(asset)
+      app.service.fileStore.addAsset(assetToAdd)
 
       asset
     }
@@ -113,7 +113,7 @@ class LibraryService(app: Altitude) {
   }
 
   def getData(assetId: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Data = {
-    app.service.data.getById(assetId)
+    app.service.fileStore.getById(assetId)
   }
 
   def query(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {

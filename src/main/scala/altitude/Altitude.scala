@@ -82,7 +82,6 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
     val search = new SearchService(app)
     val asset = new AssetService(app)
     val preview = new PreviewService(app)
-    val data = new DataService(app)
     val folder = new FolderService(app)
     val stats = new StatsService(app)
 
