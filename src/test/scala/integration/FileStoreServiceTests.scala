@@ -2,9 +2,8 @@ package integration
 
 import java.io.File
 
-import altitude.exceptions.{NotFoundException, IllegalOperationException}
 import altitude.models.{Folder, Asset}
-import altitude.{Const => C}
+import altitude.{Const => C, NotFoundException}
 import org.apache.commons.io.FilenameUtils
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._

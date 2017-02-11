@@ -1,11 +1,10 @@
 package altitude.service
 
 import altitude.dao.{AssetDao, MetadataFieldDao}
-import altitude.exceptions.{DuplicateException, NotFoundException, ValidationException}
 import altitude.models.{FieldType, Metadata, MetadataField}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import altitude.util.Query
-import altitude.{Altitude, Const => C, Context}
+import altitude.{Const => C, _}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject

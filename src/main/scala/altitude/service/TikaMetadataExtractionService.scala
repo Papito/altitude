@@ -2,9 +2,8 @@ package altitude.service
 
 import java.io.InputStream
 
-import altitude.exceptions.AllDone
 import altitude.models.{AssetType, ImportAsset, Metadata}
-import altitude.{Const => C}
+import altitude.{Const => C, AllDone}
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}

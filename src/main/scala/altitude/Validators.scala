@@ -1,6 +1,5 @@
 package altitude
 
-import altitude.exceptions.ValidationException
 import altitude.{Const => C}
 import play.api.libs.json.JsObject
 

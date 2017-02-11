@@ -5,9 +5,8 @@ import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
 import altitude.controllers.web.BaseWebController
-import altitude.exceptions.{AllDone, DuplicateException, MetadataExtractorException}
 import altitude.models.{Asset, ImportAsset}
-import altitude.{Const => C, Context}
+import altitude.{Const => C, AllDone, MetadataExtractorException, DuplicateException, Context}
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.{DefaultFormats, Formats, JValue, _}
 import org.scalatra.atmosphere._

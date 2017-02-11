@@ -3,11 +3,10 @@ package altitude.service
 import altitude.Cleaners.Cleaner
 import altitude.Validators.ModelDataValidator
 import altitude.dao.BaseDao
-import altitude.exceptions.{DuplicateException, NotFoundException}
 import altitude.models.BaseModel
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import altitude.util.{Query, QueryResult}
-import altitude.{Altitude, Context}
+import altitude.{NotFoundException, DuplicateException, Altitude, Context}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject

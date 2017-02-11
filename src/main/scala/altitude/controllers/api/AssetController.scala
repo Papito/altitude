@@ -1,9 +1,8 @@
 package altitude.controllers.api
 
 import altitude.Validators.ApiRequestValidator
-import altitude.exceptions.NotFoundException
 import altitude.models.Data
-import altitude.{Const => C}
+import altitude.{Const => C, NotFoundException}
 import org.scalatra.Ok
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json

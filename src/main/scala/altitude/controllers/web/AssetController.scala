@@ -1,8 +1,7 @@
 package altitude.controllers.web
 
-import altitude.exceptions.NotFoundException
 import altitude.models.Preview
-import altitude.{Const => C}
+import altitude.{Const => C, NotFoundException}
 import org.slf4j.LoggerFactory
 
 class AssetController extends BaseWebController {

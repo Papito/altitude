@@ -1,11 +1,9 @@
 package altitude.service.filestore
 
 import java.io._
-import java.nio.file.{Paths, Path}
 
-import altitude.exceptions.{NotFoundException, StorageException}
 import altitude.transactions.TransactionId
-import altitude.{Const => C, Altitude, Context}
+import altitude.{Const => C, StorageException, NotFoundException, Altitude, Context}
 import altitude.models.{Preview, Data, Asset, Folder}
 import org.apache.commons.io.{FilenameUtils, FileUtils}
 import org.slf4j.LoggerFactory

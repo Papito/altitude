@@ -1,6 +1,6 @@
 package integration
 
-import altitude.exceptions.{DuplicateException, NotFoundException, ValidationException}
+import altitude.{DuplicateException, NotFoundException, ValidationException}
 import altitude.models._
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._

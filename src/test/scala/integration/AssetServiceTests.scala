@@ -1,7 +1,6 @@
 package integration
 
-import altitude.exceptions.NotFoundException
-import altitude.{Const => C}
+import altitude.NotFoundException
 import org.scalatest.DoNotDiscover
 
 @DoNotDiscover class AssetServiceTests (val config: Map[String, Any]) extends IntegrationTestCore {

@@ -1,6 +1,6 @@
 package integration
 
-import altitude.exceptions.{IllegalOperationException, NotFoundException, ValidationException}
+import altitude.{ValidationException, NotFoundException, IllegalOperationException}
 import altitude.models.Folder
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._

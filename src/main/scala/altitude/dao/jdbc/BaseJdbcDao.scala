@@ -3,11 +3,10 @@ package altitude.dao.jdbc
 import java.sql.Connection
 
 import altitude.dao.BaseDao
-import altitude.exceptions.ConstraintException
 import altitude.models.BaseModel
 import altitude.transactions.{JdbcTransactionManager, TransactionId}
 import altitude.util.{Query, QueryResult}
-import altitude.{Const => C, Context, Util}
+import altitude.{Const => C, ConstraintException, Context, Util}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.apache.commons.dbutils.QueryRunner
 import org.apache.commons.dbutils.handlers.{MapListHandler, ScalarHandler}
