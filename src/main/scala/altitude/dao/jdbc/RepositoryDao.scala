@@ -20,7 +20,7 @@ abstract class RepositoryDao(val app: Altitude) extends BaseJdbcDao("repository"
       id = Some(rec.get(C.Base.ID).get.asInstanceOf[String]),
       name = rec.get(C.Repository.NAME).get.asInstanceOf[String],
       rootFolderId = rec.get(C.Repository.ROOT_FOLDER_ID).get.asInstanceOf[String],
-      unsortedFolderId = rec.get(C.Repository.UNSORTED_FOLDER_ID).get.asInstanceOf[String],
+      triageFolderId = rec.get(C.Repository.TRIAGE_FOLDER_ID).get.asInstanceOf[String],
       fileStoreType = C.FileStoreType.withName(
         rec.get(C.Repository.FILE_STORE_TYPE).get.asInstanceOf[String]),
       fileStoreConfig = Map()
@@ -41,7 +41,7 @@ abstract class RepositoryDao(val app: Altitude) extends BaseJdbcDao("repository"
     val sql = s"""
         INSERT INTO $tableName (
              ${C.Base.ID}, ${C.Repository.NAME}, ${C.Repository.FILE_STORE_TYPE},
-             ${C.Repository.ROOT_FOLDER_ID}, ${C.Repository.UNSORTED_FOLDER_ID})
+             ${C.Repository.ROOT_FOLDER_ID}, ${C.Repository.TRIAGE_FOLDER_ID})
             VALUES (?, ?, ?, ?, ?)
     """
 
@@ -49,7 +49,7 @@ abstract class RepositoryDao(val app: Altitude) extends BaseJdbcDao("repository"
       repo.name,
       repo.fileStoreType.toString,
       repo.rootFolderId,
-      repo.unsortedFolderId)
+      repo.triageFolderId)
 
     addRecord(jsonIn, sql, sqlVals)
   }

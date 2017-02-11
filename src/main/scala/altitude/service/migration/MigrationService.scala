@@ -47,12 +47,12 @@ abstract class MigrationService(app: Altitude) {
 
     implicit val ctx: Context = new Context(user = app.USER, repo = app.REPO)
 
-    val unsortedFolder = app.service.folder.getUnsortedFolder
-    app.service.folder.add(unsortedFolder)
+    val triageFolder = app.service.folder.getTriageFolder
+    app.service.folder.add(triageFolder)
 
     app.service.stats.createStat(Stats.TOTAL_ASSETS)
     app.service.stats.createStat(Stats.TOTAL_BYTES)
-    app.service.stats.createStat(Stats.UNSORTED_ASSETS)
+    app.service.stats.createStat(Stats.TRIAGE_ASSETS)
     app.service.stats.createStat(Stats.RECYCLED_ASSETS)
     app.service.stats.createStat(Stats.RECYCLED_BYTES)
   }

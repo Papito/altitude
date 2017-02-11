@@ -39,7 +39,7 @@ object Const {
   object Repository extends Common {
     val NAME = "name"
     val ROOT_FOLDER_ID = "root_folder_id"
-    val UNSORTED_FOLDER_ID = "unsorted_folder_id"
+    val TRIAGE_FOLDER_ID = "triage_folder_id"
     val FILE_STORE_TYPE = "file_store_type"
     val FILES_STORE_CONFIG = "file_store_config"
 
@@ -80,7 +80,7 @@ object Const {
 
     object Names {
       val ROOT = "sorted"
-      val UNSORTED = "unsorted"
+      val TRIAGE = "triage"
     }
   }
 
@@ -166,7 +166,7 @@ object Const {
       val QUERY_ARG_NAME = "__FOLDERS__"
       val HIERARCHY = "hierarchy"
       val SYSTEM = "system"
-      val UNSORTED = "unsorted"
+      val TRIAGE = "triage"
       val TRASH = "trash"
       val FOLDERS = "folders"
       val FOLDER = "folder"

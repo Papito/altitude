@@ -22,7 +22,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     this.stats = {};
     this.stats.totalAssets = ko.observable(0);
-    this.stats.unsortedAssets = ko.observable(0);
+    this.stats.triageAssets = ko.observable(0);
     this.stats.recycledAssets = ko.observable(0);
 
     this.selectedAssetsMap = {};
@@ -143,24 +143,24 @@ AssetsViewModel = BaseViewModel.extend({
         }
     );
 
-    this.unsortedEl = $('#unsorted');
+    this.triageEl = $('#triage');
     this.trashEl = $('#trash');
 
     /*
      system folders
      */
 
-    // unsorted
-    this.unsortedEl.droppable({
+    // triage
+    this.triageEl.droppable({
       accept: ".result-box",
       hoverClass: "highlight",
       tolerance: "pointer"
     });
 
-    this.unsortedEl.on("drop", function( event, ui ) {
+    this.triageEl.on("drop", function( event, ui ) {
       self.resetAllMessages();
       var assetId = $(ui.draggable.context).attr('asset_id');
-      self.moveToUnsorted(assetId);
+      self.moveToTriage(assetId);
     });
 
     // trash
@@ -997,8 +997,8 @@ AssetsViewModel = BaseViewModel.extend({
     self.post('/api/v1/assets/move/to/' + moveToFolderId, opts);
   },
 
-  moveToUnsorted: function(assetId) {
-    console.log(assetId, 'to unsorted');
+  moveToTriage: function(assetId) {
+    console.log(assetId, 'to triage');
 
     var self = this;
     var opts = {
@@ -1008,7 +1008,7 @@ AssetsViewModel = BaseViewModel.extend({
       }
     };
 
-    this.post('/api/v1/assets/' + assetId + '/move/to/unsorted', opts);
+    this.post('/api/v1/assets/' + assetId + '/move/to/triage', opts);
   },
 
   moveToTrash: function(assetId, callback) {
@@ -1143,7 +1143,7 @@ AssetsViewModel = BaseViewModel.extend({
       'successCallback': function (json) {
         var stats = json['stats'];
         self.stats.totalAssets(stats.total_assets);
-        self.stats.unsortedAssets(stats.unsorted_assets);
+        self.stats.triageAssets(stats.triage_assets);
         self.stats.recycledAssets(stats.recycled_assets);
       }
     };

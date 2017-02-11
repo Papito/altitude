@@ -1,10 +1,10 @@
 {% extends "./base.html" %}
 
-{% block title %} Unsorted {% endblock %}
+{% block title %} Triage {% endblock %}
 
 {% block assets %}
 <script src="/static/js/app/assets.js"></script>
-<script src="/static/js/app/unsorted.js"></script>
+<script src="/static/js/app/triage.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -83,8 +83,8 @@
 
 <script>
   $(document).ready(function() {
-    var unsortedViewModel = new UnsortedViewModel();
-    ko.applyBindings(unsortedViewModel);
+    var triageViewModel = new TriageViewModel();
+    ko.applyBindings(triageViewModel);
   });
 </script>
 {% endblock%}

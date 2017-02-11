@@ -89,12 +89,12 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   )
 
   /**
-   * Get the Unsorted folder for this repository
+   * Get the Triage folder for this repository
    */
-  def getUnsortedFolder(implicit ctx: Context, txId: TransactionId = new TransactionId) = Folder(
-    id = Some(ctx.repo.unsortedFolderId),
+  def getTriageFolder(implicit ctx: Context, txId: TransactionId = new TransactionId) = Folder(
+    id = Some(ctx.repo.triageFolderId),
     parentId = ctx.repo.rootFolderId,
-    name = C.Folder.Names.UNSORTED,
+    name = C.Folder.Names.TRIAGE,
     path = app.service.fileStore.triageFolderPath
   )
 
@@ -102,7 +102,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
    * Get all systems folders - the ones the user cannot alter
    */
   def getSystemFolders(implicit ctx: Context, txId: TransactionId = new TransactionId): List[Folder] =
-    List(getUnsortedFolder)
+    List(getTriageFolder)
 
   def isRootFolder(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId) =
     id == ctx.repo.rootFolderId

@@ -42,7 +42,7 @@ import org.scalatest.Matchers._
         ),
         field3.id.get -> Set("Lindsay Lohan", "Conan O'Brien", "Teri Hatcher", "Sam Rockwell"))
 
-    val assetData1 = makeAsset(altitude.service.folder.getUnsortedFolder, new Metadata(data))
+    val assetData1 = makeAsset(altitude.service.folder.getTriageFolder, new Metadata(data))
     val asset1: Asset = altitude.service.library.add(assetData1)
 
     data = Map[String, Set[String]](
@@ -60,7 +60,7 @@ import org.scalatest.Matchers._
         ),
         field3.id.get -> Set("Keanu Reeves", "Sandra Bullock", "Dennis Hopper", "Teri Hatcher"))
 
-    val assetData2 = makeAsset(altitude.service.folder.getUnsortedFolder, new Metadata(data))
+    val assetData2 = makeAsset(altitude.service.folder.getTriageFolder, new Metadata(data))
     val asset2: Asset = altitude.service.library.add(assetData2)
 
     var results: QueryResult = altitude.service.search.search("keanu")
@@ -96,14 +96,14 @@ import org.scalatest.Matchers._
         field1.id.get -> Set("one", "two", "three"),
         field2.id.get -> Set("1", "2", "3.002", "14.1", "1.25", "123456789"),
         field3.id.get -> Set("true"))
-    val assetData1 = makeAsset(altitude.service.folder.getUnsortedFolder, new Metadata(data))
+    val assetData1 = makeAsset(altitude.service.folder.getTriageFolder, new Metadata(data))
     val asset1: Asset = altitude.service.library.add(assetData1)
 
     data = Map[String, Set[String]](
         field1.id.get -> Set("six", "seven"),
         field2.id.get -> Set("5", "1001", "1"),
         field3.id.get -> Set("true"))
-    val assetData2 = makeAsset(altitude.service.folder.getUnsortedFolder, new Metadata(data))
+    val assetData2 = makeAsset(altitude.service.folder.getTriageFolder, new Metadata(data))
     val asset2: Asset = altitude.service.library.add(assetData2)
   }
 

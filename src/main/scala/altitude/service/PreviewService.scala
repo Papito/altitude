@@ -55,11 +55,11 @@ class PreviewService(app: Altitude) {
   }
 
   private def previewFilePath(assetId: String)(implicit ctx: Context): String = {
-    val dirName = assetId.substring(0, 3)
-    previewPath + dirName + "/" + assetId + ".jpg"
+    val dirName = assetId.substring(0, 2)
+    new File(new File(previewPath, dirName).getPath, assetId + ".png").getPath
   }
 
   private def previewPath(implicit ctx: Context): String =
-    ctx.repo.fileStoreConfig(C.Repository.Config.PATH) + "p/"
+    new File(ctx.repo.fileStoreConfig(C.Repository.Config.PATH), "p").getPath
 
 }

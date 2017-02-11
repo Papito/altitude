@@ -73,9 +73,9 @@ class LibraryService(app: Altitude) {
       app.service.stats.incrementStat(Stats.TOTAL_ASSETS)
       app.service.stats.incrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
 
-      // if there is no folder, increment the unsorted counter
-      if (ctx.repo.unsortedFolderId == assetIn.folderId) {
-        app.service.stats.incrementStat(Stats.UNSORTED_ASSETS)
+      // if there is no folder, increment the triage counter
+      if (ctx.repo.triageFolderId == assetIn.folderId) {
+        app.service.stats.incrementStat(Stats.TRIAGE_ASSETS)
       }
 
       // add preview data
@@ -91,9 +91,9 @@ class LibraryService(app: Altitude) {
     txManager.withTransaction {
       val asset: Asset = getById(id)
 
-      // of this asset is still unsorted, update the stat
-      if (ctx.repo.unsortedFolderId == asset.folderId) {
-        app.service.stats.decrementStat(Stats.UNSORTED_ASSETS)
+      // of this asset is still in triage, update the stat
+      if (ctx.repo.triageFolderId == asset.folderId) {
+        app.service.stats.decrementStat(Stats.TRIAGE_ASSETS)
       }
       app.service.stats.decrementStat(Stats.TOTAL_ASSETS)
       app.service.stats.decrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
@@ -181,19 +181,6 @@ class LibraryService(app: Altitude) {
     }
   }
 
-  private def addPreviewData(asset: Asset, previewData: Array[Byte])
-                            (implicit ctx: Context, txId: TransactionId): Preview = {
-    require(asset.id.nonEmpty)
-
-    val preview: Preview = Preview(
-      assetId = asset.id.get,
-      mimeType = asset.assetType.mime,
-      data = previewData)
-
-    app.service.preview.add(preview)
-    preview
-  }
-
   private def makeImageThumbnail(asset: Asset)
                                 (implicit ctx: Context, txId: TransactionId): Array[Byte] = {
     try {
@@ -227,11 +214,10 @@ class LibraryService(app: Altitude) {
 
       byteArray.toByteArray
     } catch {
-      case ex: Exception => {
+      case ex: Exception =>
         log.error(s"Error generating preview for $asset")
         altitude.Util.logStacktrace(ex)
         throw FormatException(asset)
-      }
     }
   }
 
@@ -258,9 +244,9 @@ class LibraryService(app: Altitude) {
 
         val asset: Asset = this.getById(assetId)
 
-        // if moving from unsorted, decrement that stat
-        if (ctx.repo.unsortedFolderId == asset.folderId) {
-          app.service.stats.decrementStat(Stats.UNSORTED_ASSETS)
+        // if moving from triage, decrement that stat
+        if (ctx.repo.triageFolderId == asset.folderId) {
+          app.service.stats.decrementStat(Stats.TRIAGE_ASSETS)
         }
 
         // point asset to the new folder
@@ -274,18 +260,18 @@ class LibraryService(app: Altitude) {
     }
   }
 
-  def moveAssetToUnsorted(assetId: String)
+  def moveAssetToTriage(assetId: String)
                               (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
     txManager.withTransaction {
-      moveAssetsToUnsorted(Set(assetId))
+      moveAssetsToTriage(Set(assetId))
     }
   }
 
-  def moveAssetsToUnsorted(assetIds: Set[String])
+  def moveAssetsToTriage(assetIds: Set[String])
                                (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
     txManager.withTransaction {
-      moveAssetsToFolder(assetIds, ctx.repo.unsortedFolderId)
-      app.service.stats.incrementStat(Stats.UNSORTED_ASSETS, assetIds.size)
+      moveAssetsToFolder(assetIds, ctx.repo.triageFolderId)
+      app.service.stats.incrementStat(Stats.TRIAGE_ASSETS, assetIds.size)
     }
   }
 
@@ -309,8 +295,8 @@ class LibraryService(app: Altitude) {
 
         app.service.folder.decrAssetCount(asset.folderId)
 
-        if (app.service.folder.getUnsortedFolder.id.contains(asset.folderId)) {
-          app.service.stats.decrementStat(Stats.UNSORTED_ASSETS)
+        if (app.service.folder.getTriageFolder.id.contains(asset.folderId)) {
+          app.service.stats.decrementStat(Stats.TRIAGE_ASSETS)
         }
 
         totalBytes += asset.sizeBytes
