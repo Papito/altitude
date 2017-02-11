@@ -1,7 +1,7 @@
 package altitude.service.filestore
 
 import altitude.Context
-import altitude.models.{Data, Asset, Folder}
+import altitude.models.{Preview, Data, Asset, Folder}
 import altitude.transactions.TransactionId
 
 trait FileStoreService {
@@ -29,4 +29,8 @@ trait FileStoreService {
   def sortedFolderPath(implicit ctx: Context): String
 
   def triageFolderPath(implicit ctx: Context): String
+
+  def addPreview(preview: Preview)(implicit ctx: Context): Unit
+
+  def getPreviewById(assetId: String)(implicit ctx: Context): Preview
 }

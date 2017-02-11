@@ -6,7 +6,7 @@ import altitude.Const.FileStoreType
 import altitude.dao._
 import altitude.models.{User, Repository}
 import altitude.service._
-import altitude.service.filestore.FileSystemStoreService
+import altitude.service.filestore.{FileStoreService, FileSystemStoreService}
 import altitude.service.migration.{PostgresMigrationService, SqliteMigrationService}
 import altitude.service.sources.FileSystemSourceService
 import altitude.transactions._
@@ -81,7 +81,6 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
     val library = new LibraryService(app)
     val search = new SearchService(app)
     val asset = new AssetService(app)
-    val preview = new PreviewService(app)
     val folder = new FolderService(app)
     val stats = new StatsService(app)
 
@@ -89,7 +88,7 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
       val fileSystem = new FileSystemSourceService(app)
     }
 
-    val fileStore = fileStoreType match {
+    val fileStore: FileStoreService = fileStoreType match {
       case C.FileStoreType.FS => new FileSystemStoreService(app)
       case _ => throw new NotImplementedError
     }

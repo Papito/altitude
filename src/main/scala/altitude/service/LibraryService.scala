@@ -109,7 +109,7 @@ class LibraryService(app: Altitude) {
   }
 
   def getPreview(assetId: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Preview = {
-    app.service.preview.getById(assetId)
+    app.service.fileStore.getPreviewById(assetId)
   }
 
   def getData(assetId: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Data = {
@@ -174,7 +174,7 @@ class LibraryService(app: Altitude) {
           mimeType=asset.assetType.mime,
           data=previewData)
 
-        app.service.preview.add(preview)
+        app.service.fileStore.addPreview(preview)
 
         Some(preview)
       case _ => None

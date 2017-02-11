@@ -1,12 +1,12 @@
 package altitude.service.filestore
 
-import java.io.{ByteArrayInputStream, InputStream, IOException, File}
+import java.io._
 import java.nio.file.{Paths, Path}
 
 import altitude.exceptions.{NotFoundException, StorageException}
 import altitude.transactions.TransactionId
 import altitude.{Const => C, Altitude, Context}
-import altitude.models.{Data, Asset, Folder}
+import altitude.models.{Preview, Data, Asset, Folder}
 import org.apache.commons.io.{FilenameUtils, FileUtils}
 import org.slf4j.LoggerFactory
 
@@ -126,6 +126,53 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     val parent: Folder = app.service.folder.getById(parentId)
     new File(parent.path, name).getPath
   }
+
+  override def addPreview(preview: Preview)(implicit ctx: Context): Unit = {
+    log.info(s"Adding preview for asset ${preview.assetId}")
+
+    // get the full path to our preview file
+    val destFilePath = previewFilePath(preview.assetId)
+    // parse out the dir path
+    val dirPath = FilenameUtils.getFullPath(destFilePath)
+
+    FileUtils.forceMkdir(new File(dirPath))
+
+    try {
+      FileUtils.writeByteArrayToFile(new File(destFilePath), preview.data)
+    }
+    catch {
+      case ex: IOException => log.error(s"Could not save preview data to [$destFilePath]")
+    }
+  }
+
+  override def getPreviewById(assetId: String)(implicit ctx: Context): Preview = {
+    val f: File = new File(previewFilePath(assetId))
+
+    if (!f.isFile) {
+      throw NotFoundException(s"Cannot find preview for asset '$assetId'")
+    }
+
+    val byteArray = FileUtils.readFileToByteArray(f)
+    val is: InputStream = new ByteArrayInputStream(byteArray)
+
+    try {
+      Preview(
+        assetId = assetId,
+        data = byteArray,
+        mimeType = "application/octet-stream")
+    }
+    finally {
+      if (is != null) is.close()
+    }
+  }
+
+  private def previewFilePath(assetId: String)(implicit ctx: Context): String = {
+    val dirName = assetId.substring(0, 2)
+    new File(new File(previewDirPath, dirName).getPath, assetId + ".png").getPath
+  }
+
+  private def previewDirPath(implicit ctx: Context): String =
+    new File(ctx.repo.fileStoreConfig(C.Repository.Config.PATH), "p").getPath
 
   /**
    * Get the absolute path to the asset on file system,
