@@ -64,7 +64,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     val folder = Folder(
       name = name,
       parentId = _parentId,
-      path = calculateRelativePath(name, _parentId))
+      path = app.service.fileStore.calculateFolderPath(name, _parentId))
 
     add(folder)
   }
@@ -85,7 +85,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     id = Some(ctx.repo.rootFolderId),
     parentId = ctx.repo.rootFolderId,
     name = C.Folder.Names.ROOT,
-    path = FilenameUtils.concat("/", C.Path.SORTED)
+    path = app.service.fileStore.sortedFolderPath
   )
 
   /**
@@ -95,7 +95,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     id = Some(ctx.repo.unsortedFolderId),
     parentId = ctx.repo.rootFolderId,
     name = C.Folder.Names.UNSORTED,
-    path = FilenameUtils.concat("/", C.Path.TRIAGE)
+    path = app.service.fileStore.triageFolderPath
   )
 
   /**
@@ -184,12 +184,6 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
 
       List(getRootFolder) ::: (folder :: parents).reverse
     }
-  }
-
-  private def calculateRelativePath(name: String, parentId: String)
-                                   (implicit ctx: Context, txId: TransactionId = new TransactionId): String = {
-    val parent: Folder = getById(parentId)
-    FilenameUtils.concat(parent.path, name)
   }
 
   /**
@@ -421,7 +415,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       val folderForUpdate = Folder(
         parentId = destFolderId,
         name = folderBeingMoved.name,
-        path = calculateRelativePath(folderBeingMoved.name, destFolderId))
+        path = app.service.fileStore.calculateFolderPath(folderBeingMoved.name, destFolderId))
 
       try {
         updateById(folderBeingMovedId, folderForUpdate, List(C.Folder.PARENT_ID), Some(dupQuery))
@@ -450,15 +444,14 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
         val folderForUpdate = Folder(
           parentId = folder.parentId,
           name = newName,
-          path = calculateRelativePath(newName, folder.parentId))
+          path = app.service.fileStore.calculateFolderPath(newName, folder.parentId))
 
         updateById(folderId, folderForUpdate, List(C.Folder.NAME, C.Folder.NAME_LC), Some(dupQuery))
       } catch {
-        case _: DuplicateException => {
+        case _: DuplicateException =>
           val ex = ValidationException()
           ex.errors += C.Folder.NAME -> C.Msg.Warn.DUPLICATE
           throw ex
-        }
       }
 
       app.service.fileStore.moveFolder(folder, newName)

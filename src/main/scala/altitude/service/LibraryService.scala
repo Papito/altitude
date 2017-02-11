@@ -45,6 +45,8 @@ class LibraryService(app: Altitude) {
 
       val assetId = BaseModel.genId
 
+      val path = app.service.fileStore.calculateAssetPath(assetIn)
+
       val assetToAdd: Asset = Asset(
         id = Some(assetId),
         data = assetIn.data,

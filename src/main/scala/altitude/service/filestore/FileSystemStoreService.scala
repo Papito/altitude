@@ -3,6 +3,7 @@ package altitude.service.filestore
 import java.io.{IOException, File}
 
 import altitude.exceptions.StorageException
+import altitude.transactions.TransactionId
 import altitude.{Const => C, Altitude, Context}
 import altitude.models.{Asset, Folder}
 import org.apache.commons.io.{FilenameUtils, FileUtils}
@@ -10,6 +11,11 @@ import org.slf4j.LoggerFactory
 
 class FileSystemStoreService(app: Altitude) extends FileStoreService {
   private final val log = LoggerFactory.getLogger(getClass)
+
+  private def fullPath(relativePath: String)(implicit ctx: Context): File =  {
+    val rootDirectory = ctx.repo.fileStoreConfig(C.Repository.Config.PATH)
+    new File(rootDirectory, relativePath)
+  }
 
   override def addFolder(folder: Folder)(implicit ctx: Context): Unit = {
     val folderPath = fullPath(folder.path)
@@ -87,8 +93,18 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
 
   }
 
-  private def fullPath(relativePath: String)(implicit ctx: Context): File =  {
-    val rootDirectory = ctx.repo.fileStoreConfig(C.Repository.Config.PATH)
-    new File(rootDirectory, relativePath)
+  override def calculateAssetPath(asset: Asset)
+                                 (implicit ctx: Context, txId: TransactionId = new TransactionId): String = {
+    ""
   }
+
+  override def calculateFolderPath(name: String, parentId: String)
+                                  (implicit ctx: Context, txId: TransactionId = new TransactionId): String = {
+    val parent: Folder = app.service.folder.getById(parentId)
+    FilenameUtils.concat(parent.path, name)
+  }
+
+  override def sortedFolderPath(implicit ctx: Context): String = FilenameUtils.concat("/", C.Path.SORTED)
+  override def triageFolderPath(implicit ctx: Context): String = FilenameUtils.concat("/", C.Path.TRIAGE)
+
 }

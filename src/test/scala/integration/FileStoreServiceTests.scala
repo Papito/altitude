@@ -11,7 +11,7 @@ import org.scalatest.Matchers._
 
 @DoNotDiscover class FileStoreServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
-  test("folder management") {
+  test("folders") {
     /*
       folder1
       folder2
@@ -76,13 +76,9 @@ import org.scalatest.Matchers._
     checkNoRepositoryDirPath(relativePath)
   }
 
-/*
-  test("import file list") {
+  test("assets") {
     val asset = importFile("images/1.jpg")
-    val results = altitude.service.library.query(Query())
-    results.records.length shouldBe 1
   }
-*/
 
   private def importFile(p: String): Asset = {
     val path = getClass.getResource(s"../import/$p").getPath
