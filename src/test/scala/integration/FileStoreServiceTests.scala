@@ -76,9 +76,13 @@ import org.scalatest.Matchers._
   }
 
   test("assets") {
-    importFile("images/1.jpg")
+    val asset = importFile("images/1.jpg")
     val relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
     checkRepositoryFilePath(relAssetPath.getPath)
+
+    // move asset to trash
+    altitude.service.library.recycleAsset(asset.id.get)
+    checkNoRepositoryFilePath(relAssetPath.getPath)
   }
 
   private def importFile(p: String): Asset = {

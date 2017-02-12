@@ -13,9 +13,13 @@ trait FileStoreService {
 
   def addAsset(asset: Asset)(implicit ctx: Context)
 
-  def deleteAsset(asset: Asset)(implicit ctx: Context)
+  def purgeAsset(asset: Asset)(implicit ctx: Context)
 
   def moveAsset(asset: Asset, folder: Folder)(implicit ctx: Context)
+
+  def recycleAsset(asset: Asset)(implicit ctx: Context)
+
+  def restoreAsset(asset: Asset)(implicit ctx: Context)
 
   def addFolder(folder: Folder)(implicit ctx: Context)
 
@@ -30,7 +34,11 @@ trait FileStoreService {
 
   def triageFolderPath(implicit ctx: Context): String
 
-  def addPreview(preview: Preview)(implicit ctx: Context): Unit
+  def trashFolderPath(implicit ctx: Context): String
+
+  def landfillFolderPath(implicit ctx: Context): String
+
+  def addPreview(preview: Preview)(implicit ctx: Context)
 
   def getPreviewById(assetId: String)(implicit ctx: Context): Preview
 }

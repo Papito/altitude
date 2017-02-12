@@ -13,6 +13,8 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
 
   override def sortedFolderPath(implicit ctx: Context): String = FilenameUtils.concat("/", C.Path.SORTED)
   override def triageFolderPath(implicit ctx: Context): String = FilenameUtils.concat("/", C.Path.TRIAGE)
+  override def trashFolderPath(implicit ctx: Context): String = FilenameUtils.concat("/", C.Path.TRASH)
+  override def landfillFolderPath(implicit ctx: Context): String = FilenameUtils.concat("/", C.Path.LANDFILL)
 
   override def addFolder(folder: Folder)(implicit ctx: Context): Unit = {
     val destFile = absoluteFile(folder.path)
@@ -101,15 +103,44 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
 
   override def addAsset(asset: Asset)(implicit ctx: Context): Unit = {
     val destFile = absoluteFile(asset.path)
-    log.debug(s"Creating asset [$asset] at [$destFile]")
-    FileUtils.writeByteArrayToFile(destFile, asset.data)
-  }
+    log.debug(s"Creating asset [$asset] on file system at [$destFile]")
 
-  override def deleteAsset(asset: Asset)(implicit ctx: Context): Unit = {
-
+    try {
+      FileUtils.writeByteArrayToFile(destFile, asset.data)
+    }
+    catch {
+      case ex: IOException =>
+        throw new StorageException(s"Error creating [$asset] @ [$destFile]: $ex]")
+    }
   }
 
   override def moveAsset(asset: Asset, folder: Folder)(implicit ctx: Context): Unit = {
+
+  }
+
+  override def recycleAsset(asset: Asset)(implicit ctx: Context) = {
+    log.info(s"Recycling: [$asset]")
+    val srcFile = absoluteFile(asset.path)
+
+    val recyclePath = findNextAvailableFilename(new File(trashFolderPath, asset.fileName))
+    val destFile = absoluteFile(recyclePath)
+
+    log.debug(s"Moving [$srcFile] to [$destFile]")
+
+    try {
+      FileUtils.moveFile(srcFile, destFile)
+    }
+    catch {
+      case ex: IOException =>
+        throw new StorageException(s"Error moving [$srcFile] to [$destFile]: $ex]")
+    }
+  }
+
+  override def restoreAsset(asset: Asset)(implicit ctx: Context) = {
+
+  }
+
+  override def purgeAsset(asset: Asset)(implicit ctx: Context): Unit = {
 
   }
 
@@ -191,7 +222,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     var idx = 0
     while (absoluteFile(fileToCheck.getPath).exists) {
       idx += 1
-      baseName = baseName + idx
+      baseName = s"${baseName}_$idx"
       fileToCheck = new File(path, filenameFromBaseAndExt(baseName, ext))
     }
 

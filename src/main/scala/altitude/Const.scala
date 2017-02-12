@@ -212,6 +212,7 @@ object Const {
     val SORTED = "sorted"
     val TRIAGE = "triage"
     val TRASH = "trash"
+    val LANDFILL = "landfill"
   }
 
   // default results per page

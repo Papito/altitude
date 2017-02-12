@@ -21,16 +21,16 @@ class LibraryService(app: Altitude) {
   val PREVIEW_BOX_SIZE = app.config.getInt("preview.box.pixels")
 
   def add(assetIn: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
-    log.info(s"\nAdding asset with MD5: ${assetIn.md5}\n")
+    log.info(s"Adding asset [$assetIn]")
 
     if (app.service.folder.isRootFolder(assetIn.folderId)) {
       throw new IllegalOperationException("Cannot have assets in root folder")
     }
 
-    val query = Query(Map(C.Asset.MD5 -> assetIn.md5))
+    val qForExisting = Query(Map(C.Asset.MD5 -> assetIn.md5))
 
     txManager.withTransaction[JsObject] {
-      val existing = app.service.asset.query(query)
+      val existing = app.service.asset.query(qForExisting)
 
       if (existing.nonEmpty) {
         log.warn(s"Asset already exists for ${assetIn.path}")
@@ -276,7 +276,7 @@ class LibraryService(app: Altitude) {
 
 
   def recycleAsset(assetId: String)
-                  (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
+                  (implicit ctx: Context, txId: TransactionId = new TransactionId): Asset = {
     txManager.withTransaction {
       recycleAssets(Set(assetId))
       getById(assetId)
@@ -285,27 +285,27 @@ class LibraryService(app: Altitude) {
 
   def recycleAssets(assetIds: Set[String])
                    (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
-    var totalBytes = 0L
 
-    txManager.withTransaction {
       assetIds.foreach { assetId =>
-        val asset: Asset = getById(assetId)
-        app.service.asset.setAssetAsRecycled(assetId, isRecycled = true)
+        txManager.withTransaction {
+          val asset: Asset = getById(assetId)
+          app.service.asset.setAssetAsRecycled(assetId, isRecycled = true)
 
-        app.service.folder.decrAssetCount(asset.folderId)
+          app.service.folder.decrAssetCount(asset.folderId)
 
-        if (app.service.folder.getTriageFolder.id.contains(asset.folderId)) {
-          app.service.stats.decrementStat(Stats.TRIAGE_ASSETS)
+          // if recycling from triage - decrement the corresponding counter
+          if (app.service.folder.getTriageFolder.id.contains(asset.folderId)) {
+            app.service.stats.decrementStat(Stats.TRIAGE_ASSETS)
+          }
+
+          app.service.stats.decrementStat(Stats.TOTAL_ASSETS, assetIds.size)
+          app.service.stats.incrementStat(Stats.RECYCLED_ASSETS, assetIds.size)
+          app.service.stats.decrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
+          app.service.stats.incrementStat(Stats.RECYCLED_BYTES, asset.sizeBytes)
+
+          app.service.fileStore.recycleAsset(asset)
         }
-
-        totalBytes += asset.sizeBytes
       }
-
-      app.service.stats.decrementStat(Stats.TOTAL_ASSETS, assetIds.size)
-      app.service.stats.incrementStat(Stats.RECYCLED_ASSETS, assetIds.size)
-      app.service.stats.decrementStat(Stats.TOTAL_BYTES, totalBytes)
-      app.service.stats.incrementStat(Stats.RECYCLED_BYTES, totalBytes)
-    }
   }
 
   def moveRecycledAssetToFolder(assetId: String, folderId: String)
