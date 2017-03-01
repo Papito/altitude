@@ -354,6 +354,8 @@ class LibraryService(app: Altitude) {
         app.service.asset.setAssetAsRecycled(assetId, isRecycled = false)
         val asset: Asset = getById(assetId)
         totalBytes += asset.sizeBytes
+
+        app.service.fileStore.restoreAsset(asset)
       }
 
       app.service.stats.incrementStat(Stats.TOTAL_ASSETS, assetIds.size)

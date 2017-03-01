@@ -73,6 +73,8 @@ import org.scalatest.Matchers._
     altitude.service.folder.rename(folder3.id.get, "folder3_new")
     relativePath = FilenameUtils.concat(C.Path.SORTED, folder3_3.name)
     checkNoRepositoryDirPath(relativePath)
+
+
   }
 
   test("assets") {
@@ -83,6 +85,10 @@ import org.scalatest.Matchers._
     // move asset to trash
     altitude.service.library.recycleAsset(asset.id.get)
     checkNoRepositoryFilePath(relAssetPath.getPath)
+
+    // restore the asset
+    altitude.service.library.restoreRecycledAsset(asset.id.get)
+    checkRepositoryFilePath(relAssetPath.getPath)
   }
 
   private def importFile(p: String): Asset = {

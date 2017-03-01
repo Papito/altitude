@@ -120,24 +120,22 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
 
   override def recycleAsset(asset: Asset)(implicit ctx: Context) = {
     log.info(s"Recycling: [$asset]")
+
     val srcFile = absoluteFile(asset.path)
+    val relRecyclePath = recyclePath(asset)
+    val destFile = absoluteFile(relRecyclePath)
 
-    val recyclePath = findNextAvailableFilename(new File(trashFolderPath, asset.fileName))
-    val destFile = absoluteFile(recyclePath)
-
-    log.debug(s"Moving [$srcFile] to [$destFile]")
-
-    try {
-      FileUtils.moveFile(srcFile, destFile)
-    }
-    catch {
-      case ex: IOException =>
-        throw new StorageException(s"Error moving [$srcFile] to [$destFile]: $ex]")
-    }
+    moveFile(srcFile, destFile)
   }
 
   override def restoreAsset(asset: Asset)(implicit ctx: Context) = {
+    log.info(s"Restoring: [$asset]")
 
+    val relRecyclePath = recyclePath(asset)
+    val srcFile = absoluteFile(relRecyclePath)
+    val destFile = absoluteFile(asset.path)
+
+    moveFile(srcFile, destFile)
   }
 
   override def purgeAsset(asset: Asset)(implicit ctx: Context): Unit = {
@@ -200,6 +198,13 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     new File(new File(previewDirPath, dirName).getPath, assetId + ".png").getPath
   }
 
+  private def recyclePath(asset: Asset)(implicit ctx: Context): String = {
+    val ext = FilenameUtils.getExtension(asset.path)
+    new File(
+      trashFolderPath,
+      s"${asset.id.get}${FilenameUtils.EXTENSION_SEPARATOR}$ext").toString
+  }
+
   private def previewDirPath(implicit ctx: Context): String =
     new File(ctx.repo.fileStoreConfig(C.Repository.Config.PATH), "p").getPath
 
@@ -227,6 +232,18 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     }
 
     fileToCheck.getPath
+  }
+
+  private def moveFile(src: File, dest: File): Unit = {
+    log.debug(s"Moving [$src] to [$dest]")
+
+    try {
+      FileUtils.moveFile(src, dest)
+    }
+    catch {
+      case ex: IOException =>
+        throw new StorageException(s"Error moving [$dest] to [$dest]: $ex]")
+    }
   }
 
   private def filenameFromBaseAndExt(baseName: String, ext: String): String = {
