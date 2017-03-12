@@ -10,6 +10,28 @@ import org.scalatest.Matchers._
 
 @DoNotDiscover class FileStoreServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
+  test("move asset") {
+    val asset = importFile("images/1.jpg")
+    var relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
+    checkRepositoryFilePath(relAssetPath.getPath)
+
+    var folder: Folder = altitude.service.folder.addFolder("folder1")
+    relAssetPath = new File(folder.path, "1.jpg")
+    var movedAsset = altitude.service.library.moveAssetToFolder(asset.id.get, folder.id.get)
+    checkRepositoryFilePath(relAssetPath.getPath)
+    movedAsset.path shouldBe relAssetPath.getPath
+
+    // create a dummy file in place of destination
+    folder  = altitude.service.folder.addFolder("folder2")
+    relAssetPath = new File(folder.path, "1.jpg")
+    FileUtils.writeByteArrayToFile(getAbsoluteFile(relAssetPath.getPath), new Array[Byte](0))
+
+    // move the file again - into an existing file
+    movedAsset = altitude.service.library.moveAssetToFolder(movedAsset.id.get, folder.id.get)
+    relAssetPath = new File(folder.path, "1_1.jpg")
+    checkRepositoryFilePath(relAssetPath.getPath)
+    movedAsset.path shouldBe relAssetPath.getPath
+  }
 
   test("restore asset") {
     val asset1 = importFile("images/1.jpg")
@@ -21,7 +43,6 @@ import org.scalatest.Matchers._
     checkNoRepositoryFilePath(relAssetPath.getPath)
 
     // create a dummy file in place of previously recycled asset
-
     FileUtils.writeByteArrayToFile(getAbsoluteFile(asset1.path), new Array[Byte](0))
 
     // restore the asset
@@ -93,18 +114,6 @@ import org.scalatest.Matchers._
     altitude.service.folder.rename(folder3.id.get, "folder3_new")
     relativePath = FilenameUtils.concat(C.Path.SORTED, folder3_3.name)
     checkNoRepositoryDirPath(relativePath)
-  }
-
-  test("move asset") {
-    val asset = importFile("images/1.jpg")
-    var relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
-    checkRepositoryFilePath(relAssetPath.getPath)
-
-    val folder: Folder = altitude.service.folder.addFolder("folder1")
-    relAssetPath = new File(folder.path, "1.jpg")
-    val movedAsset = altitude.service.library.moveAssetToFolder(asset.id.get, folder.id.get)
-    checkRepositoryFilePath(relAssetPath.getPath)
-    movedAsset.path shouldBe relAssetPath.getPath
   }
 
   private def checkRepositoryDirPath(path: String) = {
