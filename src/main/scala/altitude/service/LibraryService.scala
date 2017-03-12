@@ -44,7 +44,8 @@ class LibraryService(app: Altitude) {
 
       val assetId = BaseModel.genId
 
-      val destFilePath = app.service.fileStore.calculateAssetPath(assetIn)
+      val folder: Folder = app.service.folder.getById(assetIn.folderId)
+      val destFilePath = app.service.fileStore.calculateAssetPath(assetIn, folder)
 
       val assetToAdd: Asset = Asset(
         id = Some(assetId),
@@ -228,37 +229,6 @@ class LibraryService(app: Altitude) {
     }
   }
 
-  def moveAssetsToFolder(assetIds: Set[String], folderId: String)
-                        (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
-    txManager.withTransaction {
-      assetIds.foreach {assetId =>
-
-        // cannot have assets in root folder - just other folders
-        if (app.service.folder.isRootFolder(folderId)) {
-          throw new IllegalOperationException("Cannot move assets to root folder")
-        }
-
-        // this checks folder validity
-        app.service.folder.getById(folderId)
-
-        val asset: Asset = this.getById(assetId)
-
-        // if moving from triage, decrement that stat
-        if (ctx.repo.triageFolderId == asset.folderId) {
-          app.service.stats.decrementStat(Stats.TRIAGE_ASSETS)
-        }
-
-        // point asset to the new folder
-        val updatedAsset: Asset = asset ++ Json.obj(C.Asset.FOLDER_ID -> folderId)
-
-        val i = app.service.asset.updateById(asset.id.get, updatedAsset, fields = List(C.Asset.FOLDER_ID))
-        app.service.folder.decrAssetCount(asset.folderId)
-      }
-
-      app.service.folder.incrAssetCount(folderId, assetIds.size)
-    }
-  }
-
   def moveAssetToTriage(assetId: String)
                               (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
     txManager.withTransaction {
@@ -289,7 +259,13 @@ class LibraryService(app: Altitude) {
       assetIds.foreach { assetId =>
         txManager.withTransaction {
           val asset: Asset = getById(assetId)
+          /** The asset retains its original path in the database, but in the file
+            * store we go off of the ID - so the database and file store
+            * paths for recycled assets diverge. This way can find recycled assets
+            * in the file store - but we also know their original path.
+          */
           app.service.asset.setAssetAsRecycled(assetId, isRecycled = true)
+          val a: Asset = getById(assetId)
 
           app.service.folder.decrAssetCount(asset.folderId)
 
@@ -308,32 +284,52 @@ class LibraryService(app: Altitude) {
       }
   }
 
-  def moveRecycledAssetToFolder(assetId: String, folderId: String)
-                               (implicit ctx: Context, txId: TransactionId = new TransactionId): Asset = {
-    txManager.withTransaction[Asset] {
-      moveRecycledAssetsToFolder(Set(assetId), folderId)
-      getById(assetId)
-    }
-  }
-
-  def moveRecycledAssetsToFolder(assetIds: Set[String], folderId: String)
-                                (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
-    var totalBytes = 0L
+  def moveAssetsToFolder(assetIds: Set[String], folderId: String)
+                        (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
 
     txManager.withTransaction {
-      val restoredAssetIds: Set[String] = assetIds.map { assetId: String =>
-        app.service.asset.setAssetAsRecycled(assetId, isRecycled = false)
+      assetIds.foreach {assetId =>
+        // cannot have assets in root folder - just other folders
+        if (app.service.folder.isRootFolder(folderId)) {
+          throw new IllegalOperationException("Cannot move assets to root folder")
+        }
+
+        val folder = app.service.folder.getById(folderId)
+
         val asset: Asset = getById(assetId)
 
-        totalBytes += asset.sizeBytes
-        asset.id.get
-      }
+        // if moving from triage, decrement that stat
+        if (asset.folderId == ctx.repo.triageFolderId) {
+          app.service.stats.decrementStat(Stats.TRIAGE_ASSETS)
+        }
 
-      moveAssetsToFolder(restoredAssetIds, folderId)
-      app.service.stats.incrementStat(Stats.TOTAL_ASSETS, assetIds.size)
-      app.service.stats.decrementStat(Stats.RECYCLED_ASSETS, assetIds.size)
-      app.service.stats.incrementStat(Stats.TOTAL_BYTES, totalBytes)
-      app.service.stats.decrementStat(Stats.RECYCLED_BYTES, totalBytes)
+        // if it's a recycled asset, we are adding it back to the population
+        if (asset.isRecycled) {
+          app.service.stats.incrementStat(Stats.TOTAL_ASSETS)
+          app.service.stats.decrementStat(Stats.RECYCLED_ASSETS)
+          app.service.stats.incrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
+          app.service.stats.decrementStat(Stats.RECYCLED_BYTES, asset.sizeBytes)
+          app.service.asset.setAssetAsRecycled(assetId = assetId, isRecycled = false)
+        }
+
+        app.service.folder.incrAssetCount(folderId)
+
+        // let the file store figure out the new available path
+        val newAssetPath = app.service.fileStore.calculateAssetPath(asset, folder)
+
+        // point asset to the new folder and update the path
+        val updatedAsset: Asset = asset ++ Json.obj(
+          C.Asset.FOLDER_ID -> folderId,
+          C.Asset.PATH -> newAssetPath)
+
+        app.service.asset.updateById(
+          asset.id.get, updatedAsset,
+          fields = List(C.Asset.FOLDER_ID, C.Asset.PATH))
+
+        app.service.folder.decrAssetCount(asset.folderId)
+
+        app.service.fileStore.moveAsset(asset, newAssetPath)
+      }
     }
   }
 
@@ -347,21 +343,19 @@ class LibraryService(app: Altitude) {
 
   def restoreRecycledAssets(assetIds: Set[String])
                            (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
-    var totalBytes = 0L
-
     txManager.withTransaction {
       assetIds.foreach { assetId =>
-        app.service.asset.setAssetAsRecycled(assetId, isRecycled = false)
         val asset: Asset = getById(assetId)
-        totalBytes += asset.sizeBytes
+
+        app.service.stats.incrementStat(Stats.TOTAL_ASSETS)
+        app.service.stats.decrementStat(Stats.RECYCLED_ASSETS)
+        app.service.stats.incrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
+        app.service.stats.decrementStat(Stats.RECYCLED_BYTES, asset.sizeBytes)
+
+        app.service.asset.setAssetAsRecycled(assetId, isRecycled = false)
 
         app.service.fileStore.restoreAsset(asset)
       }
-
-      app.service.stats.incrementStat(Stats.TOTAL_ASSETS, assetIds.size)
-      app.service.stats.decrementStat(Stats.RECYCLED_ASSETS, assetIds.size)
-      app.service.stats.incrementStat(Stats.TOTAL_BYTES, totalBytes)
-      app.service.stats.decrementStat(Stats.RECYCLED_BYTES, totalBytes)
     }
   }
 }

@@ -5,9 +5,6 @@ import altitude.models.{Preview, Data, Asset, Folder}
 import altitude.transactions.TransactionId
 
 trait FileStoreService {
-  def calculateAssetPath(asset: Asset)
-                        (implicit ctx: Context, txId: TransactionId = new TransactionId): String
-
   def getById(id: String)
              (implicit ctx: Context, txId: TransactionId = new TransactionId): Data
 
@@ -15,7 +12,7 @@ trait FileStoreService {
 
   def purgeAsset(asset: Asset)(implicit ctx: Context)
 
-  def moveAsset(asset: Asset, folder: Folder)(implicit ctx: Context)
+  def moveAsset(asset: Asset, destPath: String)(implicit ctx: Context)
 
   def recycleAsset(asset: Asset)(implicit ctx: Context)
 
@@ -29,6 +26,13 @@ trait FileStoreService {
 
   def calculateFolderPath(name: String, parentId: String)
                          (implicit ctx: Context, txId: TransactionId = new TransactionId): String
+
+  def calculateAssetPath(asset: Asset, folder:Folder)
+                         (implicit ctx: Context, txId: TransactionId = new TransactionId): String
+
+  def getAssetPath(asset: Asset)(implicit ctx: Context): String
+
+  def getRecycledAssetPath(asset: Asset)(implicit ctx: Context): String
 
   def sortedFolderPath(implicit ctx: Context): String
 

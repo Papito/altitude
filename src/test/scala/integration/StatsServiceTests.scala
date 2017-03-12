@@ -65,7 +65,7 @@ import org.scalatest.Matchers._
 
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
-    altitude.service.library.moveRecycledAssetToFolder(asset.id.get, folder1.id.get)
+    altitude.service.library.moveAssetToFolder(asset.id.get, folder1.id.get)
 
     val stats = altitude.service.stats.getStats
     stats.getStatValue(Stats.TOTAL_ASSETS) should be (1)

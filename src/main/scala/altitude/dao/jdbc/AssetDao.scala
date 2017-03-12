@@ -30,6 +30,10 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
       id = Some(rec.get(C.Base.ID).get.asInstanceOf[String]),
       userId = rec.get(C.Base.USER_ID).get.asInstanceOf[String],
       path = rec.get(C.Asset.PATH).get.asInstanceOf[String],
+      isRecycled = rec.get(C.Asset.IS_RECYCLED).get.asInstanceOf[Int] match {
+        case 0 => false
+        case 1 => true
+      },
       md5 = rec.get(C.Asset.MD5).get.asInstanceOf[String],
       assetType = assetType,
       sizeBytes = rec.get(C.Asset.SIZE_BYTES).get.asInstanceOf[Int],

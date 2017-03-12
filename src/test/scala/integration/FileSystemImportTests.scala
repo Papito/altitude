@@ -34,9 +34,9 @@ import org.scalatest.Matchers._
     assets should not be empty
   }
 
-  private def importFile(p: String): Asset = {
-    val path = getClass.getResource(s"../import/$p").getPath
-    val fileImportAsset = altitude.service.source.fileSystem.fileToImportAsset(new File(path))
+  private def importFile(path: String): Asset = {
+    val _path = getClass.getResource(s"../import/$path").getPath
+    val fileImportAsset = altitude.service.source.fileSystem.fileToImportAsset(new File(_path))
     val importedAsset = altitude.service.assetImport.importAsset(fileImportAsset).get
     importedAsset.assetType should equal(importedAsset.assetType)
     importedAsset.path should not be empty

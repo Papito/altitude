@@ -11,10 +11,10 @@ import org.slf4j.LoggerFactory
 class FileSystemStoreService(app: Altitude) extends FileStoreService {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override def sortedFolderPath(implicit ctx: Context): String = FilenameUtils.concat("/", C.Path.SORTED)
-  override def triageFolderPath(implicit ctx: Context): String = FilenameUtils.concat("/", C.Path.TRIAGE)
-  override def trashFolderPath(implicit ctx: Context): String = FilenameUtils.concat("/", C.Path.TRASH)
-  override def landfillFolderPath(implicit ctx: Context): String = FilenameUtils.concat("/", C.Path.LANDFILL)
+  override def sortedFolderPath(implicit ctx: Context): String = C.Path.SORTED
+  override def triageFolderPath(implicit ctx: Context): String = C.Path.TRIAGE
+  override def trashFolderPath(implicit ctx: Context): String = C.Path.TRASH
+  override def landfillFolderPath(implicit ctx: Context): String = C.Path.LANDFILL
 
   override def addFolder(folder: Folder)(implicit ctx: Context): Unit = {
     val destFile = absoluteFile(folder.path)
@@ -114,15 +114,19 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     }
   }
 
-  override def moveAsset(asset: Asset, folder: Folder)(implicit ctx: Context): Unit = {
+  override def moveAsset(asset: Asset, destPath: String)(implicit ctx: Context): Unit = {
+    val srcFile = absoluteFile(getAssetPath(asset))
+    val destFile = absoluteFile(destPath)
 
+    log.debug(s"Moving asset [$asset] on file system from [$srcFile] to [$destFile]")
+    moveFile(srcFile, destFile)
   }
 
   override def recycleAsset(asset: Asset)(implicit ctx: Context) = {
     log.info(s"Recycling: [$asset]")
 
     val srcFile = absoluteFile(asset.path)
-    val relRecyclePath = recyclePath(asset)
+    val relRecyclePath = getRecycledAssetPath(asset)
     val destFile = absoluteFile(relRecyclePath)
 
     moveFile(srcFile, destFile)
@@ -131,8 +135,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   override def restoreAsset(asset: Asset)(implicit ctx: Context) = {
     log.info(s"Restoring: [$asset]")
 
-    val relRecyclePath = recyclePath(asset)
-    val srcFile = absoluteFile(relRecyclePath)
+    val srcFile = absoluteFile(getAssetPath(asset))
     val destFile = absoluteFile(asset.path)
 
     moveFile(srcFile, destFile)
@@ -142,16 +145,30 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
 
   }
 
-  override def calculateAssetPath(asset: Asset)
-                                 (implicit ctx: Context, txId: TransactionId = new TransactionId): String = {
-    val folder: Folder = app.service.folder.getById(asset.folderId)
-    findNextAvailableFilename(new File(folder.path, asset.fileName))
-  }
-
   override def calculateFolderPath(name: String, parentId: String)
                                   (implicit ctx: Context, txId: TransactionId = new TransactionId): String = {
     val parent: Folder = app.service.folder.getById(parentId)
     new File(parent.path, name).getPath
+  }
+
+  override def calculateAssetPath(asset: Asset, folder: Folder)
+                        (implicit ctx: Context, txId: TransactionId = new TransactionId): String = {
+
+        findNextAvailableFilename(new File(folder.path, asset.fileName))
+  }
+
+  override def getAssetPath(asset: Asset)(implicit ctx: Context): String = {
+    asset.isRecycled match {
+      case false => asset.path
+      case true => getRecycledAssetPath(asset)
+    }
+  }
+
+  override def getRecycledAssetPath(asset: Asset)(implicit ctx: Context): String = {
+    val ext = FilenameUtils.getExtension(asset.path)
+    new File(
+      trashFolderPath,
+      s"${asset.id.get}${FilenameUtils.EXTENSION_SEPARATOR}$ext").toString
   }
 
   override def addPreview(preview: Preview)(implicit ctx: Context): Unit = {
@@ -196,13 +213,6 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   private def previewFilePath(assetId: String)(implicit ctx: Context): String = {
     val dirName = assetId.substring(0, 2)
     new File(new File(previewDirPath, dirName).getPath, assetId + ".png").getPath
-  }
-
-  private def recyclePath(asset: Asset)(implicit ctx: Context): String = {
-    val ext = FilenameUtils.getExtension(asset.path)
-    new File(
-      trashFolderPath,
-      s"${asset.id.get}${FilenameUtils.EXTENSION_SEPARATOR}$ext").toString
   }
 
   private def previewDirPath(implicit ctx: Context): String =

@@ -37,7 +37,7 @@ class TrashController extends BaseApiController {
     val folderId = params.get(C.Api.Asset.FOLDER_ID).get
     log.info(s"Moving recycled asset $id to $folderId")
 
-    app.service.library.moveRecycledAssetToFolder(id, folderId)
+    app.service.library.moveAssetToFolder(id, folderId)
 
     OK
   }
@@ -52,7 +52,7 @@ class TrashController extends BaseApiController {
     val assetIds = (requestJson.get \ C.Api.Trash.ASSET_IDS).as[Set[String]]
     log.debug(s"Recycled assets to move: $assetIds")
 
-    app.service.library.moveRecycledAssetsToFolder(assetIds, folderId)
+    app.service.library.moveAssetsToFolder(assetIds, folderId)
 
     OK
   }

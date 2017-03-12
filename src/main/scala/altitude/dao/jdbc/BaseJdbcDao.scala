@@ -235,7 +235,11 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     log.debug(s"Updating record by query $q with data $json for fields: $fields")
 
     val queryFieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
-    val updateFieldPlaceholders: List[String] = json.keys.filter(fields.contains(_)).map(_ + " = ?").toList
+    val updateFieldPlaceholders: List[String] = json.fields.filter {
+      // extract only the json elements we want to update
+      v: (String, JsValue) => fields.contains(v._1)}.map {
+      v: (String, JsValue) => s"${v._1} = ?"
+    }.toList
 
     val sql = s"""
       UPDATE $tableName
@@ -243,11 +247,11 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
        WHERE ${C.Base.REPO_ID} = ? AND ${queryFieldPlaceholders.mkString(",")}
       """
 
-    val dataUpdateValues = json.fields.filter{
+    val dataUpdateValues = json.fields.filter {
       // extract only the json elements we want to update
-      v: (String, JsValue) => fields.contains(v._1)}.map{
+      v: (String, JsValue) => fields.contains(v._1)}.map {
       // convert the values to string
-      v: (String, JsValue) => v._2.as[String]}.toList.reverse
+      v: (String, JsValue) => v._2.as[String]}.toList
 
     val valuesForAllPlaceholders = dataUpdateValues ::: List(ctx.repo.id.get) ::: q.params.values.toList
     log.debug(s"Update SQL: $sql, with query values: $valuesForAllPlaceholders")

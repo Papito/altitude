@@ -34,19 +34,19 @@ import org.scalatest.Matchers._
     val folder2_1: Folder = altitude.service.folder.addFolder(
       name = "folder2_1", parentId = folder2.id)
 
-    relativePath = FilenameUtils.concat(C.Path.SORTED, folder2_1.path)
+    relativePath = folder2_1.path
     checkRepositoryDirPath(relativePath)
 
     val folder2_1_1: Folder = altitude.service.folder.addFolder(
       name = "folder2_1_1", parentId = folder2_1.id)
 
-    relativePath = FilenameUtils.concat(C.Path.SORTED, folder2_1_1.path)
+    relativePath = folder2_1_1.path
     checkRepositoryDirPath(relativePath)
 
     val folder2_2: Folder = altitude.service.folder.addFolder(
       name = "folder2_2", parentId = folder2.id)
 
-    relativePath = FilenameUtils.concat(C.Path.SORTED, folder2_2.path)
+    relativePath = folder2_2.path
     checkRepositoryDirPath(relativePath)
 
     // delete the empty folder
@@ -73,11 +73,9 @@ import org.scalatest.Matchers._
     altitude.service.folder.rename(folder3.id.get, "folder3_new")
     relativePath = FilenameUtils.concat(C.Path.SORTED, folder3_3.name)
     checkNoRepositoryDirPath(relativePath)
-
-
   }
 
-  test("assets") {
+  test("restore asset") {
     val asset = importFile("images/1.jpg")
     val relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
     checkRepositoryFilePath(relAssetPath.getPath)
@@ -91,15 +89,27 @@ import org.scalatest.Matchers._
     checkRepositoryFilePath(relAssetPath.getPath)
   }
 
-  private def importFile(p: String): Asset = {
-    val path = getClass.getResource(s"../import/$p").getPath
-    val fileImportAsset = altitude.service.source.fileSystem.fileToImportAsset(new File(path))
+  test("move asset") {
+    val asset = importFile("images/1.jpg")
+    var relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
+    checkRepositoryFilePath(relAssetPath.getPath)
+
+    val folder: Folder = altitude.service.folder.addFolder("folder1")
+    relAssetPath = new File(folder.path, "1.jpg")
+    val movedAsset = altitude.service.library.moveAssetToFolder(asset.id.get, folder.id.get)
+    checkRepositoryFilePath(relAssetPath.getPath)
+    movedAsset.path shouldBe relAssetPath.getPath
+  }
+
+  private def importFile(path: String): Asset = {
+    val _path = getClass.getResource(s"../import/$path").getPath
+    val fileImportAsset = altitude.service.source.fileSystem.fileToImportAsset(new File(_path))
     val importedAsset = altitude.service.assetImport.importAsset(fileImportAsset).get
     importedAsset.assetType should equal(importedAsset.assetType)
     importedAsset.path should not be empty
     importedAsset.md5 should not be empty
 
-    val asset = altitude.service.library.getById(importedAsset.id.get): Asset
+    val asset: Asset = altitude.service.library.getById(importedAsset.id.get)
     asset.assetType should equal(importedAsset.assetType)
     asset.path should not be empty
     asset.md5 should not be empty

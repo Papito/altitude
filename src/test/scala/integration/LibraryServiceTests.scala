@@ -17,7 +17,7 @@ import org.scalatest.Matchers._
 
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
-    altitude.service.library.moveRecycledAssetToFolder(asset.id.get, folder1.id.get)
+    altitude.service.library.moveAssetToFolder(asset.id.get, folder1.id.get)
     altitude.service.asset.queryRecycled(Query()).records.length shouldBe 0
     altitude.service.asset.query(Query()).records.length shouldBe 1
 
@@ -167,7 +167,7 @@ import org.scalatest.Matchers._
     altitude.service.library.recycleAsset(asset.id.get)
 
     intercept[NotFoundException] {
-      altitude.service.library.moveRecycledAssetToFolder(asset.id.get, "bad")
+      altitude.service.library.moveAssetToFolder(asset.id.get, "bad")
     }
   }
 }
