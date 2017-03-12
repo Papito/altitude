@@ -265,8 +265,6 @@ class LibraryService(app: Altitude) {
             * in the file store - but we also know their original path.
           */
           app.service.asset.setAssetAsRecycled(assetId, isRecycled = true)
-          val a: Asset = getById(assetId)
-
           app.service.folder.decrAssetCount(asset.folderId)
 
           // if recycling from triage - decrement the corresponding counter
@@ -354,7 +352,16 @@ class LibraryService(app: Altitude) {
 
         app.service.asset.setAssetAsRecycled(assetId, isRecycled = false)
 
-        app.service.fileStore.restoreAsset(asset)
+        val folder = app.service.folder.getById(asset.folderId)
+        val newAssetPath = app.service.fileStore.calculateAssetPath(asset, folder)
+        val restoredAsset: Asset = asset ++ Json.obj(
+          C.Asset.PATH -> newAssetPath)
+
+        app.service.asset.updateById(
+          asset.id.get, restoredAsset,
+          fields = List(C.Asset.PATH))
+
+        app.service.fileStore.restoreAsset(restoredAsset)
       }
     }
   }

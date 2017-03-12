@@ -132,11 +132,13 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     moveFile(srcFile, destFile)
   }
 
-  override def restoreAsset(asset: Asset)(implicit ctx: Context) = {
+  override def restoreAsset(asset: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId) = {
     log.info(s"Restoring: [$asset]")
 
-    val srcFile = absoluteFile(getAssetPath(asset))
+    val srcFile = absoluteFile(getRecycledAssetPath(asset))
     val destFile = absoluteFile(asset.path)
+    println("!!!!!!!!!")
+    println(destFile)
 
     moveFile(srcFile, destFile)
   }
@@ -153,7 +155,6 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
 
   override def calculateAssetPath(asset: Asset, folder: Folder)
                         (implicit ctx: Context, txId: TransactionId = new TransactionId): String = {
-
         findNextAvailableFilename(new File(folder.path, asset.fileName))
   }
 

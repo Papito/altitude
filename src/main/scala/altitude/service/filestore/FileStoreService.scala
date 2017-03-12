@@ -16,7 +16,7 @@ trait FileStoreService {
 
   def recycleAsset(asset: Asset)(implicit ctx: Context)
 
-  def restoreAsset(asset: Asset)(implicit ctx: Context)
+  def restoreAsset(asset: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId)
 
   def addFolder(folder: Folder)(implicit ctx: Context)
 
