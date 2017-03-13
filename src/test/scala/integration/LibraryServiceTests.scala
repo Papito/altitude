@@ -2,11 +2,30 @@ package integration
 
 import altitude.models.{Asset, Folder}
 import altitude.util.Query
-import altitude.{Const => C, NotFoundException}
+import altitude.{Const => C, IllegalOperationException, NotFoundException}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
 @DoNotDiscover class LibraryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
+
+  test("rename asset") {
+    var asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
+    var updatedAsset: Asset = altitude.service.library.renameAsset(asset.id.get, "newName")
+    updatedAsset.fileName shouldBe "newName"
+    updatedAsset.path.contains("newName") shouldBe true
+
+    // get the asset again to make sure it has been updated
+    updatedAsset = altitude.service.library.getById(asset.id.get)
+    updatedAsset.fileName shouldBe "newName"
+    updatedAsset.path.contains("newName") shouldBe true
+
+    // attempt to rename a recycled asset
+    asset = altitude.service.library.recycleAsset(asset.id.get)
+
+    intercept[IllegalOperationException] {
+      altitude.service.library.renameAsset(asset.id.get, "newName2")
+    }
+  }
 
   test("move recycled asset to folder") {
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
@@ -29,6 +48,7 @@ import org.scalatest.Matchers._
 
     (altitude.service.folder.getByIdWithChildAssetCounts(folder1.id.get, all): Folder).numOfAssets should be (1)
   }
+
 
   test("move asset to a different folder") {
     /*

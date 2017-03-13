@@ -331,6 +331,31 @@ class LibraryService(app: Altitude) {
     }
   }
 
+  def renameAsset(assetId: String, newFilename: String)
+                 (implicit ctx: Context, txId: TransactionId = new TransactionId): Asset = {
+    val asset: Asset = getById(assetId)
+
+    if (asset.isRecycled) {
+      throw new IllegalOperationException(s"Cannot rename a recycled asset: [$asset]")
+    }
+
+    val path = app.service.fileStore.calculatePathWithNewFilename(asset, newFilename)
+
+    val assetWithNewPath: Asset = asset ++ Json.obj(C.Asset.PATH -> path)
+
+    val availablePath = app.service.fileStore.calculateAssetPath(assetWithNewPath)
+
+    val assetWithAvailablePath: Asset = asset ++ Json.obj(C.Asset.PATH -> availablePath)
+
+    app.service.asset.updateById(
+      asset.id.get, assetWithAvailablePath,
+      fields = List(C.Asset.PATH, C.Asset.FILENAME))
+
+    app.service.fileStore.moveAsset(asset, availablePath)
+
+    assetWithAvailablePath
+  }
+
   def restoreRecycledAsset(assetId: String)
                           (implicit ctx: Context, txId: TransactionId = new TransactionId): Asset = {
     txManager.withTransaction[Asset] {
@@ -352,8 +377,7 @@ class LibraryService(app: Altitude) {
 
         app.service.asset.setAssetAsRecycled(assetId, isRecycled = false)
 
-        val folder = app.service.folder.getById(asset.folderId)
-        val newAssetPath = app.service.fileStore.calculateAssetPath(asset, folder)
+        val newAssetPath = app.service.fileStore.calculateAssetPath(asset)
         val restoredAsset: Asset = asset ++ Json.obj(
           C.Asset.PATH -> newAssetPath)
 

@@ -30,6 +30,10 @@ trait FileStoreService {
   def calculateAssetPath(asset: Asset, folder:Folder)
                          (implicit ctx: Context, txId: TransactionId = new TransactionId): String
 
+  def calculateAssetPath(asset: Asset)(implicit ctx: Context): String
+
+  def calculatePathWithNewFilename(asset: Asset, newFilename: String)(implicit ctx: Context): String
+
   def getAssetPath(asset: Asset)(implicit ctx: Context): String
 
   def getRecycledAssetPath(asset: Asset)(implicit ctx: Context): String

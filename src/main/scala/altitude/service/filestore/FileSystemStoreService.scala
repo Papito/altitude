@@ -158,6 +158,16 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
         findNextAvailableFilename(new File(folder.path, asset.fileName))
   }
 
+  override def calculateAssetPath(asset: Asset)(implicit ctx: Context): String = {
+    findNextAvailableFilename(new File(asset.path))
+  }
+
+  def calculatePathWithNewFilename(asset: Asset, newFilename: String)
+                                  (implicit ctx: Context): String = {
+    val path = FilenameUtils.getFullPath(asset.path)
+    FilenameUtils.concat(path, newFilename)
+  }
+
   override def getAssetPath(asset: Asset)(implicit ctx: Context): String = {
     asset.isRecycled match {
       case false => asset.path

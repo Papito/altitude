@@ -51,6 +51,24 @@ import org.scalatest.Matchers._
     checkRepositoryFilePath(relAssetPath.getPath)
   }
 
+  test("rename asset") {
+    var asset = importFile("images/1.jpg")
+    var relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
+    checkRepositoryFilePath(relAssetPath.getPath)
+
+    asset = altitude.service.library.renameAsset(asset.id.get, "2.jpg")
+    relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "2.jpg")
+    checkRepositoryFilePath(relAssetPath.getPath)
+
+    // rename the asset with a file already at destination
+    relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "3.jpg")
+    FileUtils.writeByteArrayToFile(getAbsoluteFile(relAssetPath.getPath), new Array[Byte](0))
+
+    asset = altitude.service.library.renameAsset(asset.id.get, "3.jpg")
+    relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "3_1.jpg")
+    checkRepositoryFilePath(relAssetPath.getPath)
+  }
+
   test("folders") {
     /*
       folder1
