@@ -73,7 +73,7 @@ class FolderController extends BaseApiController {
     val newParentId = (requestJson.get \ C.Api.Folder.PARENT_ID).asOpt[String]
 
     if (newName.isDefined) {
-      app.service.folder.rename(id, newName.get)
+      app.service.library.renameFolder(id, newName.get)
     }
 
     if (newParentId.isDefined) {

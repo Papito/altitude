@@ -2,13 +2,46 @@ package integration
 
 import java.io.File
 
-import altitude.models.{Folder, Asset}
+import altitude.models.{Stats, Folder, Asset}
 import altitude.{Const => C, NotFoundException}
 import org.apache.commons.io.{FileUtils, FilenameUtils}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
 @DoNotDiscover class FileStoreServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
+
+  test("rename directory") {
+    var folder1: Folder = altitude.service.folder.addFolder("folder1")
+
+    var asset1: Asset = altitude.service.library.add(makeAsset(folder1))
+    val asset2: Asset = altitude.service.library.add(makeAsset(folder1))
+
+    checkRepositoryFilePath(asset1.path)
+    checkRepositoryFilePath(asset2.path)
+
+    folder1 = altitude.service.library.renameFolder(folder1.id.get, "newName")
+
+    checkNoRepositoryFilePath(asset1.path)
+    checkNoRepositoryFilePath(asset2.path)
+
+    //asset1 = altitude.service.library.getById(asset1.id.get)
+    //asset1.path.contains("folder1") shouldBe false
+  }
+
+  test("delete recursively") {
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+
+    val asset1: Asset = altitude.service.library.add(makeAsset(folder1))
+    val asset2: Asset = altitude.service.library.add(makeAsset(folder1))
+
+    checkRepositoryFilePath(asset1.path)
+    checkRepositoryFilePath(asset2.path)
+
+    altitude.service.folder.deleteById(folder1.id.get)
+
+    checkNoRepositoryFilePath(asset1.path)
+    checkNoRepositoryFilePath(asset2.path)
+  }
 
   test("move asset") {
     val asset = importFile("images/1.jpg")
@@ -69,7 +102,7 @@ import org.scalatest.Matchers._
     checkRepositoryFilePath(relAssetPath.getPath)
   }
 
-  test("folders") {
+  test("manage folders") {
     /*
       folder1
       folder2
@@ -150,7 +183,6 @@ import org.scalatest.Matchers._
     val f = getAbsoluteFile(path)
     f.exists shouldBe true
     f.isFile shouldBe true
-    f.length should not be 0
   }
 
   private def checkNoRepositoryFilePath(path: String) = {

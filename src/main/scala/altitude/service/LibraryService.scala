@@ -333,27 +333,37 @@ class LibraryService(app: Altitude) {
 
   def renameAsset(assetId: String, newFilename: String)
                  (implicit ctx: Context, txId: TransactionId = new TransactionId): Asset = {
-    val asset: Asset = getById(assetId)
 
-    if (asset.isRecycled) {
-      throw new IllegalOperationException(s"Cannot rename a recycled asset: [$asset]")
+    txManager.withTransaction[Asset] {
+      val asset: Asset = getById(assetId)
+
+      if (asset.isRecycled) {
+        throw new IllegalOperationException(s"Cannot rename a recycled asset: [$asset]")
+      }
+
+      val path = app.service.fileStore.calculatePathWithNewFilename(asset, newFilename)
+
+      val assetWithNewPath: Asset = asset ++ Json.obj(C.Asset.PATH -> path)
+
+      val availablePath = app.service.fileStore.calculateAssetPath(assetWithNewPath)
+
+      val assetWithAvailablePath: Asset = asset ++ Json.obj(C.Asset.PATH -> availablePath)
+
+      app.service.asset.updateById(
+        asset.id.get, assetWithAvailablePath,
+        fields = List(C.Asset.PATH, C.Asset.FILENAME))
+
+      app.service.fileStore.moveAsset(asset, availablePath)
+
+      assetWithAvailablePath
     }
+  }
 
-    val path = app.service.fileStore.calculatePathWithNewFilename(asset, newFilename)
-
-    val assetWithNewPath: Asset = asset ++ Json.obj(C.Asset.PATH -> path)
-
-    val availablePath = app.service.fileStore.calculateAssetPath(assetWithNewPath)
-
-    val assetWithAvailablePath: Asset = asset ++ Json.obj(C.Asset.PATH -> availablePath)
-
-    app.service.asset.updateById(
-      asset.id.get, assetWithAvailablePath,
-      fields = List(C.Asset.PATH, C.Asset.FILENAME))
-
-    app.service.fileStore.moveAsset(asset, availablePath)
-
-    assetWithAvailablePath
+  def renameFolder(folderId: String, newName: String)
+                  (implicit ctx: Context, txId: TransactionId = new TransactionId): Folder = {
+    txManager.withTransaction[Folder] {
+      app.service.folder.rename(folderId, newName)
+    }
   }
 
   def restoreRecycledAsset(assetId: String)

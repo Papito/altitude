@@ -331,7 +331,7 @@ import org.scalatest.Matchers._
   test("rename") {
     val folder1: Folder = altitude.service.folder.addFolder("folder")
 
-    altitude.service.folder.rename(folder1.id.get, "newName")
+    altitude.service.library.renameFolder(folder1.id.get, "newName")
 
     val renamedFolder: Folder = altitude.service.folder.getById(folder1.id.get)
     renamedFolder.name shouldEqual "newName"
@@ -341,17 +341,17 @@ import org.scalatest.Matchers._
     val folder1: Folder = altitude.service.folder.addFolder("folder")
 
     intercept[ValidationException] {
-      altitude.service.folder.rename(folder1.id.get, folder1.name)
+      altitude.service.library.renameFolder(folder1.id.get, folder1.name)
     }
 
     // rename to same but with different casing
     intercept[ValidationException] {
-      altitude.service.folder.rename(folder1.id.get, folder1.name.toUpperCase)
+      altitude.service.library.renameFolder(folder1.id.get, folder1.name.toUpperCase)
     }
 
     // rename a system folder
     intercept[IllegalOperationException] {
-      altitude.service.folder.rename(ctx.repo.rootFolderId, folder1.name)
+      altitude.service.library.renameFolder(ctx.repo.rootFolderId, folder1.name)
     }
   }
 }

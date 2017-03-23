@@ -425,7 +425,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   }
 
   def rename(folderId: String, newName: String)
-            (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+            (implicit ctx: Context, txId: TransactionId = new TransactionId): Folder = {
     if (isRootFolder(folderId)) {
       throw new IllegalOperationException("Cannot rename the root folder")
     }
@@ -433,18 +433,20 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     txManager.withTransaction {
       val folder: Folder = getById(folderId)
 
-      // new folder name cannot match the new one
+      // new folder name cannot match existing one
       val dupQuery = Query(Map(
         C.Folder.PARENT_ID -> folder.parentId,
         C.Folder.NAME_LC -> newName.toLowerCase))
 
+      var folderForUpdate: Option[Folder] = None
+
       try {
-        val folderForUpdate = Folder(
+        folderForUpdate = Some(Folder(
           parentId = folder.parentId,
           name = newName,
-          path = app.service.fileStore.calculateFolderPath(newName, folder.parentId))
+          path = app.service.fileStore.calculateFolderPath(newName, folder.parentId)))
 
-        updateById(folderId, folderForUpdate, List(C.Folder.NAME, C.Folder.NAME_LC), Some(dupQuery))
+        updateById(folderId, folderForUpdate.get, List(C.Folder.NAME, C.Folder.NAME_LC), Some(dupQuery))
       } catch {
         case _: DuplicateException =>
           val ex = ValidationException()
@@ -453,6 +455,12 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       }
 
       app.service.fileStore.moveFolder(folder, newName)
+
+      /*
+        FIXME: this does not update paths for assets, until dynamic paths are implemented
+       */
+
+      folderForUpdate.get
     }
   }
 
