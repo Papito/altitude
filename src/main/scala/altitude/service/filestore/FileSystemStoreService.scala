@@ -11,13 +11,14 @@ import org.slf4j.LoggerFactory
 class FileSystemStoreService(app: Altitude) extends FileStoreService {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override def sortedFolderPath(implicit ctx: Context): String = C.Path.SORTED
-  override def triageFolderPath(implicit ctx: Context): String = C.Path.TRIAGE
-  override def trashFolderPath(implicit ctx: Context): String = C.Path.TRASH
-  override def landfillFolderPath(implicit ctx: Context): String = C.Path.LANDFILL
+  final override val pathSeparator = File.separator
+  final override def sortedFolderPath(implicit ctx: Context): String = C.Path.SORTED
+  final override def triageFolderPath(implicit ctx: Context): String = C.Path.TRIAGE
+  final override def trashFolderPath(implicit ctx: Context): String = C.Path.TRASH
+  final override def landfillFolderPath(implicit ctx: Context): String = C.Path.LANDFILL
 
   override def addFolder(folder: Folder)(implicit ctx: Context): Unit = {
-    val destFile = absoluteFile(folder.path)
+    val destFile = absoluteFile(folder.path.get)
     log.debug(s"Adding FS folder [$destFile]")
 
     try {
@@ -34,7 +35,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   }
 
   override def deleteFolder(folder: Folder)(implicit ctx: Context): Unit = {
-    val destFile = absoluteFile(folder.path)
+    val destFile = absoluteFile(folder.path.get)
     log.debug(s"Removing FS folder [$destFile]")
 
     // ignore if not here anymore
@@ -57,9 +58,9 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   }
 
   override def moveFolder(folder: Folder, newName: String)(implicit ctx: Context): Unit = {
-    val srcFile = absoluteFile(folder.path)
+    val srcFile = absoluteFile(folder.path.get)
     val newPath = FilenameUtils.concat(srcFile.getParent, newName)
-    val destFile = absoluteFile(newPath)
+    val destFile = new File(newPath)
     log.debug(s"Moving folder [$srcFile] to [$destFile]")
 
     if (destFile.exists) {
@@ -137,8 +138,6 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
 
     val srcFile = absoluteFile(getRecycledAssetPath(asset))
     val destFile = absoluteFile(asset.path)
-    println("!!!!!!!!!")
-    println(destFile)
 
     moveFile(srcFile, destFile)
   }
@@ -150,12 +149,12 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   override def calculateFolderPath(name: String, parentId: String)
                                   (implicit ctx: Context, txId: TransactionId = new TransactionId): String = {
     val parent: Folder = app.service.folder.getById(parentId)
-    new File(parent.path, name).getPath
+    new File(parent.path.get, name).getPath
   }
 
   override def calculateAssetPath(asset: Asset, folder: Folder)
                         (implicit ctx: Context, txId: TransactionId = new TransactionId): String = {
-        findNextAvailableFilename(new File(folder.path, asset.fileName))
+        findNextAvailableFilename(new File(folder.path.get, asset.fileName))
   }
 
   override def calculateAssetPath(asset: Asset)(implicit ctx: Context): String = {
@@ -219,6 +218,10 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     finally {
       if (is != null) is.close()
     }
+  }
+
+  override def assemblePath(pathComponents: List[String]): String = {
+    pathComponents.mkString(pathSeparator)
   }
 
   private def previewFilePath(assetId: String)(implicit ctx: Context): String = {

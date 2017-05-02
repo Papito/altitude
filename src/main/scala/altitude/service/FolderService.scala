@@ -35,19 +35,22 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       throw new IllegalOperationException("Cannot add a child to a system folder")
     }
 
-    val dupQuery = Query(Map(
-      C.Folder.PARENT_ID -> folder.parentId,
-      C.Folder.NAME_LC -> folder.nameLowercase))
+    txManager.withTransaction[JsObject] {
+      val dupQuery = Query(Map(
+        C.Folder.PARENT_ID -> folder.parentId,
+        C.Folder.NAME_LC -> folder.nameLowercase))
 
-    try {
-      val addedFolder = super.add(folder, Some(dupQuery))
-      app.service.fileStore.addFolder(folder)
-      addedFolder
-    } catch {
-      case _: DuplicateException => {
-        val ex = ValidationException()
-        ex.errors += (C.Folder.NAME -> C.Msg.Warn.DUPLICATE)
-        throw ex
+      try {
+        val addedFolder = addPath(super.add(folder, Some(dupQuery)))
+        require(addedFolder.path.nonEmpty)
+        app.service.fileStore.addFolder(addedFolder)
+        addedFolder
+      } catch {
+        case _: DuplicateException => {
+          val ex = ValidationException()
+          ex.errors += (C.Folder.NAME -> C.Msg.Warn.DUPLICATE)
+          throw ex
+        }
       }
     }
   }
@@ -57,12 +60,10 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
    */
   def addFolder(name: String, parentId: Option[String] = None)
                (implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
-
     val _parentId = if (parentId.isDefined) parentId.get else ctx.repo.rootFolderId
     val folder = Folder(
       name = name,
-      parentId = _parentId,
-      path = app.service.fileStore.calculateFolderPath(name, _parentId))
+      parentId = _parentId)
 
     add(folder)
   }
@@ -72,7 +73,10 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
    */
   override def getAll(implicit ctx: Context, txId: TransactionId = new TransactionId): List[JsObject] = {
     txManager.asReadOnly[List[JsObject]] {
-      addAssetCount(DAO.getAll)
+     val wCounts = addAssetCount(DAO.getAll)
+     //val wPaths = addPaths(wCounts)
+     val wPaths = wCounts
+     wPaths
     }
   }
 
@@ -83,7 +87,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     id = Some(ctx.repo.rootFolderId),
     parentId = ctx.repo.rootFolderId,
     name = C.Folder.Names.ROOT,
-    path = app.service.fileStore.sortedFolderPath
+    path = Some(app.service.fileStore.sortedFolderPath)
   )
 
   /**
@@ -93,7 +97,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     id = Some(ctx.repo.triageFolderId),
     parentId = ctx.repo.rootFolderId,
     name = C.Folder.Names.TRIAGE,
-    path = app.service.fileStore.triageFolderPath
+    path = Some(app.service.fileStore.triageFolderPath)
   )
 
   /**
@@ -105,19 +109,62 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   def isRootFolder(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId) =
     id == ctx.repo.rootFolderId
 
+  def isTriageFolder(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId) =
+    id == ctx.repo.triageFolderId
+
   def isSystemFolder(id: Option[String])(implicit ctx: Context, txId: TransactionId = new TransactionId) =
     getSystemFolders.exists(_.id == id)
 
   /**
-   * Given a list of folders, append the asset count property to all of them
+   * Given a list of folders, calculate and append asset counts
    */
   private def addAssetCount(folders: List[JsObject])
-                           (implicit ctx: Context, txId: TransactionId): List[JsObject] = {
-    folders.map{ json =>
+                           (implicit ctx: Context): List[JsObject] = {
+    folders.map { json =>
       val id = (json \ C.Base.ID).as[String]
       val assetCount = flatChildren(id, folders).toSeq.map(_.numOfAssets).sum
 
       json ++ Json.obj(C.Folder.NUM_OF_ASSETS -> JsNumber(assetCount))
+    }
+  }
+
+  /**
+   * Given a list of folders, calculate and append the folder paths
+   */
+  private def addPaths(folders: List[JsObject])
+                      (implicit ctx: Context, txId: TransactionId): List[JsObject] = {
+
+    txManager.asReadOnly[List[JsObject]] {
+    /*
+        folders.filter {
+          json => (json \ C.Base.ID).as[String] == _parentId }.map { json =>
+          // get parent ID (it already has the path calculated)
+          val parentFolder = get
+          json ++ Json.obj(C.Folder.PATH -> JsNumber(assetCount))
+        }
+    */
+    List()
+    }
+  }
+
+  private def addPath(folder: Folder)(implicit ctx: Context, txId: TransactionId): Folder = {
+    if (isRootFolder(folder.id.get)) {
+      return getRootFolder
+    }
+
+    if (isTriageFolder(folder.id.get)) {
+      return getTriageFolder
+    }
+
+    txManager.asReadOnly[Folder] {
+      val _pathComponents = pathComponents(folder.id.get).map(_.name)
+      val relPath = app.service.fileStore.assemblePath(_pathComponents)
+
+      Folder(
+        id = folder.id,
+        name = folder.name,
+        parentId = folder.parentId,
+        path = Some(relPath))
     }
   }
 
@@ -158,10 +205,10 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   }
 
   /**
-   * Breadcrumbs. This is folder ancestry as a list, left folders closer to root.
+   * Folder ancestry as a list, top->bottom = root->this folder.
    */
   def pathComponents(folderId: String)
-          (implicit ctx: Context, txId: TransactionId = new TransactionId): List[Folder] = {
+                    (implicit ctx: Context, txId: TransactionId = new TransactionId): List[Folder] = {
     // short-circuit for root folder
     if (isRootFolder(folderId)) {
       return List[Folder]()
@@ -268,7 +315,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       Folder(
         id = Some(id),
         name = name,
-        path = path,
+        path = Some(path),
         parentId = parentId,
         children = this.children(id, userFolders),
         numOfAssets = assetCount)
@@ -305,8 +352,8 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
 
   override def getById(id: String)
                       (implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
-    // Root folder as is does not exist in the database, so we need to check for it explicitly
-    if (isRootFolder(id)) getRootFolder else super.getById(id)
+    val folder: Folder = if (isRootFolder(id)) getRootFolder else super.getById(id)
+    addPath(folder)
   }
 
   /**
@@ -356,7 +403,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
    * Returns flat children as a set of Folder objects
    */
   def flatChildren(parentId: String, all: List[JsObject], depth: Int = 0)
-                  (implicit ctx: Context, txId: TransactionId = new TransactionId): Set[Folder]  = {
+                  (implicit ctx: Context): Set[Folder]  = {
     val parentElements = all filter (json => (json \ C.Base.ID).as[String] == parentId)
 
     if (parentElements.isEmpty) {
@@ -413,7 +460,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       val folderForUpdate = Folder(
         parentId = destFolderId,
         name = folderBeingMoved.name,
-        path = app.service.fileStore.calculateFolderPath(folderBeingMoved.name, destFolderId))
+        path = Some(app.service.fileStore.calculateFolderPath(folderBeingMoved.name, destFolderId)))
 
       try {
         updateById(folderBeingMovedId, folderForUpdate, List(C.Folder.PARENT_ID), Some(dupQuery))
@@ -444,7 +491,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
         folderForUpdate = Some(Folder(
           parentId = folder.parentId,
           name = newName,
-          path = app.service.fileStore.calculateFolderPath(newName, folder.parentId)))
+          path = Some(app.service.fileStore.calculateFolderPath(newName, folder.parentId))))
 
         updateById(folderId, folderForUpdate.get, List(C.Folder.NAME, C.Folder.NAME_LC), Some(dupQuery))
       } catch {

@@ -21,7 +21,7 @@ abstract class BaseService[Model <: BaseModel] {
 
   // object cleaner
   protected val CLEANER: Option[Cleaner] = None
-  // object validator, invoked AFTER the cleaner, to avoid false negatives
+  // object validator, invoked AFTER the cleaner
   protected val VALIDATOR: Option[ModelDataValidator] = None
 
   /**

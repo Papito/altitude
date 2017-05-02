@@ -5,6 +5,8 @@ import altitude.models.{Preview, Data, Asset, Folder}
 import altitude.transactions.TransactionId
 
 trait FileStoreService {
+  val pathSeparator: String
+
   def getById(id: String)
              (implicit ctx: Context, txId: TransactionId = new TransactionId): Data
 
@@ -49,4 +51,6 @@ trait FileStoreService {
   def addPreview(preview: Preview)(implicit ctx: Context)
 
   def getPreviewById(assetId: String)(implicit ctx: Context): Preview
+
+  def assemblePath(pathComponents: List[String]): String
 }

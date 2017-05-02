@@ -10,6 +10,29 @@ import org.scalatest.Matchers._
 
 @DoNotDiscover class FileStoreServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
+  test("move asset") {
+    val asset = importFile("images/1.jpg")
+    var relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
+    checkRepositoryFilePath(relAssetPath.getPath)
+
+    var folder: Folder = altitude.service.folder.addFolder("folder1")
+    relAssetPath = new File(folder.path.get, "1.jpg")
+    var movedAsset = altitude.service.library.moveAssetToFolder(asset.id.get, folder.id.get)
+    checkRepositoryFilePath(relAssetPath.getPath)
+    movedAsset.path shouldBe relAssetPath.getPath
+
+    // create a dummy file in place of destination
+    folder  = altitude.service.folder.addFolder("folder2")
+    relAssetPath = new File(folder.path.get, "1.jpg")
+    FileUtils.writeByteArrayToFile(getAbsoluteFile(relAssetPath.getPath), new Array[Byte](0))
+
+    // move the file again - into an existing file
+    movedAsset = altitude.service.library.moveAssetToFolder(movedAsset.id.get, folder.id.get)
+    relAssetPath = new File(folder.path.get, "1_1.jpg")
+    checkRepositoryFilePath(relAssetPath.getPath)
+    movedAsset.path shouldBe relAssetPath.getPath
+  }
+
   test("rename directory") {
     var folder1: Folder = altitude.service.folder.addFolder("folder1")
 
@@ -41,29 +64,6 @@ import org.scalatest.Matchers._
 
     checkNoRepositoryFilePath(asset1.path)
     checkNoRepositoryFilePath(asset2.path)
-  }
-
-  test("move asset") {
-    val asset = importFile("images/1.jpg")
-    var relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
-    checkRepositoryFilePath(relAssetPath.getPath)
-
-    var folder: Folder = altitude.service.folder.addFolder("folder1")
-    relAssetPath = new File(folder.path, "1.jpg")
-    var movedAsset = altitude.service.library.moveAssetToFolder(asset.id.get, folder.id.get)
-    checkRepositoryFilePath(relAssetPath.getPath)
-    movedAsset.path shouldBe relAssetPath.getPath
-
-    // create a dummy file in place of destination
-    folder  = altitude.service.folder.addFolder("folder2")
-    relAssetPath = new File(folder.path, "1.jpg")
-    FileUtils.writeByteArrayToFile(getAbsoluteFile(relAssetPath.getPath), new Array[Byte](0))
-
-    // move the file again - into an existing file
-    movedAsset = altitude.service.library.moveAssetToFolder(movedAsset.id.get, folder.id.get)
-    relAssetPath = new File(folder.path, "1_1.jpg")
-    checkRepositoryFilePath(relAssetPath.getPath)
-    movedAsset.path shouldBe relAssetPath.getPath
   }
 
   test("restore asset") {
@@ -126,19 +126,19 @@ import org.scalatest.Matchers._
     val folder2_1: Folder = altitude.service.folder.addFolder(
       name = "folder2_1", parentId = folder2.id)
 
-    relativePath = folder2_1.path
+    relativePath = folder2_1.path.get
     checkRepositoryDirPath(relativePath)
 
     val folder2_1_1: Folder = altitude.service.folder.addFolder(
       name = "folder2_1_1", parentId = folder2_1.id)
 
-    relativePath = folder2_1_1.path
+    relativePath = folder2_1_1.path.get
     checkRepositoryDirPath(relativePath)
 
     val folder2_2: Folder = altitude.service.folder.addFolder(
       name = "folder2_2", parentId = folder2.id)
 
-    relativePath = folder2_2.path
+    relativePath = folder2_2.path.get
     checkRepositoryDirPath(relativePath)
 
     // delete the empty folder
@@ -165,6 +165,8 @@ import org.scalatest.Matchers._
     altitude.service.folder.rename(folder3.id.get, "folder3_new")
     relativePath = FilenameUtils.concat(C.Path.SORTED, folder3_3.name)
     checkNoRepositoryDirPath(relativePath)
+    relativePath = FilenameUtils.concat(C.Path.SORTED, "folder3_new")
+    checkRepositoryDirPath(relativePath)
   }
 
   private def checkRepositoryDirPath(path: String) = {
@@ -196,7 +198,6 @@ import org.scalatest.Matchers._
     val rootPath = currentRepo.fileStoreConfig(C.Repository.Config.PATH)
     new File(rootPath, path)
   }
-
 
   private def importFile(path: String): Asset = {
     val _path = getClass.getResource(s"../import/$path").getPath
