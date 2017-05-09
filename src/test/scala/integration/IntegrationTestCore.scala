@@ -13,7 +13,7 @@ import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
 import org.apache.commons.io.{FilenameUtils, FileUtils}
 import org.scalatest.Matchers._
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach, FunSuite}
+import org.scalatest.{Tag, BeforeAndAfter, BeforeAndAfterEach, FunSuite}
 import org.slf4j.{LoggerFactory, MDC}
 
 abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with BeforeAndAfterEach {
@@ -46,6 +46,21 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
    * clean.
    */
   implicit val txId: TransactionId = new TransactionId
+
+  /**
+   * Scalatest tag to run a specific test[s]
+   *
+   * test("work in progress", CurrentTest) {
+   *
+   * }
+   *
+   * To run:
+   *
+   * sbt> test-only -- -n Current
+   * sbt> test-only integration.SqliteSuite -- -n Current
+   */
+  object CurrentTag extends Tag("Current")
+
 
   /**
    * Our test users. We may alternate between them to make sure there is proper
