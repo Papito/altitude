@@ -13,4 +13,8 @@ If `browse` doesn't launch your browser, manually open [http://localhost:8080/](
 
 ## Running tests against a particular database:
 
-    testOnly integration.[SqliteSuite|PostgresSuite]
+    sbt> test-only integration.[SqliteSuite|PostgresSuite] 
+
+## Running a tagged test(s):
+    sbt> test-only -- -n Current
+    sbt> test-only integration.SqliteSuite -- -n Current
