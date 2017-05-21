@@ -50,7 +50,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   /**
    * Scalatest tag to run a specific test[s]
    *
-   * test("work in progress", CurrentTest) {
+   * test("work in progress", CurrentTag) {
    *
    * }
    *
@@ -122,7 +122,8 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     folderId = folder.id.get,
     assetType = new AssetType(
       mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime"),
-    path = Util.randomStr(50),
+    fileName = Util.randomStr(50),
+    path = Some(Util.randomStr(50)),
     md5 = Util.randomStr(32),
     metadata = metadata,
     sizeBytes = 1L)

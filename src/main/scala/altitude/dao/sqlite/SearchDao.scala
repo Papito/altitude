@@ -10,6 +10,10 @@ class SearchDao(app: Altitude) extends altitude.dao.jdbc.SearchDao(app) with Sql
   private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def addSearchDocument(asset: Asset)(implicit ctx: Context, txId: TransactionId): Unit = {
+    require(asset.path.isEmpty)
+
+    val path = app.service.fileStore.getAssetPath(asset)
+
     val docSql =
       s"""
          INSERT INTO search_document (${C.Base.REPO_ID}, ${C.SearchToken.ASSET_ID}, body)
@@ -20,7 +24,7 @@ class SearchDao(app: Altitude) extends altitude.dao.jdbc.SearchDao(app) with Sql
       res ++ m._2
     }
 
-    val body = asset.path + ' ' +
+    val body = path + ' ' +
       metadataValues.mkString(" ") + ' ' +
       "" // body
 

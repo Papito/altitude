@@ -38,15 +38,13 @@ CREATE TABLE asset (
   metadata jsonb,
   extracted_metadata jsonb,
   raw_metadata jsonb,
-  path TEXT NOT NULL,
   folder_id CHAR(24) NOT NULL DEFAULT '1',
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
   is_recycled INT NOT NULL DEFAULT 0
 ) INHERITS (_core);#END
 CREATE UNIQUE INDEX asset_01 ON asset(repository_id, md5, is_recycled);#END
-CREATE UNIQUE INDEX asset_02 ON asset(repository_id, path, is_recycled);#END
-CREATE INDEX asset_03 ON asset(repository_id, folder_id, is_recycled);#END
+CREATE UNIQUE INDEX asset_02 ON asset(repository_id, folder_id, filename, is_recycled);#END
 
 CREATE TABLE metadata_field (
   id CHAR(24) PRIMARY KEY,

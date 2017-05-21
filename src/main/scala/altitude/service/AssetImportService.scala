@@ -54,7 +54,7 @@ class AssetImportService(app: Altitude) {
     val asset: Asset = Asset(
       userId = ctx.user.id.get,
       data = importAsset.data,
-      path = importAsset.path,
+      fileName = importAsset.fileName,
       md5 = getChecksum(importAsset),
       assetType = assetType,
       sizeBytes = importAsset.data.length,

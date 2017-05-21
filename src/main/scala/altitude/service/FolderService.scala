@@ -74,7 +74,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   override def getAll(implicit ctx: Context, txId: TransactionId = new TransactionId): List[JsObject] = {
     txManager.asReadOnly[List[JsObject]] {
      val wCounts = addAssetCount(DAO.getAll)
-     //val wPaths = addPaths(wCounts)
+     //TODO: val wPaths = addPaths(wCounts)
      val wPaths = wCounts
      wPaths
     }
@@ -353,7 +353,11 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   override def getById(id: String)
                       (implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
     val folder: Folder = if (isRootFolder(id)) getRootFolder else super.getById(id)
-    addPath(folder)
+    val ret = addPath(folder)
+
+    require(ret.path.isDefined)
+    require(ret.path.get.nonEmpty)
+    ret
   }
 
   /**
@@ -460,7 +464,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       val folderForUpdate = Folder(
         parentId = destFolderId,
         name = folderBeingMoved.name,
-        path = Some(app.service.fileStore.calculateFolderPath(folderBeingMoved.name, destFolderId)))
+        path = Some(app.service.fileStore.getFolderPath(folderBeingMoved.name, destFolderId)))
 
       try {
         updateById(folderBeingMovedId, folderForUpdate, List(C.Folder.PARENT_ID), Some(dupQuery))
@@ -491,7 +495,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
         folderForUpdate = Some(Folder(
           parentId = folder.parentId,
           name = newName,
-          path = Some(app.service.fileStore.calculateFolderPath(newName, folder.parentId))))
+          path = Some(app.service.fileStore.getFolderPath(newName, folder.parentId))))
 
         updateById(folderId, folderForUpdate.get, List(C.Folder.NAME, C.Folder.NAME_LC), Some(dupQuery))
       } catch {

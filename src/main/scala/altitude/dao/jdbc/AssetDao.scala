@@ -29,7 +29,7 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
     val model = new Asset(
       id = Some(rec.get(C.Base.ID).get.asInstanceOf[String]),
       userId = rec.get(C.Base.USER_ID).get.asInstanceOf[String],
-      path = rec.get(C.Asset.PATH).get.asInstanceOf[String],
+      fileName = rec.get(C.Asset.FILENAME).get.asInstanceOf[String],
       isRecycled = rec.get(C.Asset.IS_RECYCLED).get.asInstanceOf[Int] match {
         case 0 => false
         case 1 => true
@@ -78,16 +78,15 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
 
     val sql = s"""
         INSERT INTO $tableName (
-             $CORE_SQL_COLS_FOR_INSERT, ${C.Base.USER_ID}, ${C.Asset.PATH}, ${C.Asset.MD5},
+             $CORE_SQL_COLS_FOR_INSERT, ${C.Base.USER_ID}, ${C.Asset.MD5},
              ${C.Asset.FILENAME}, ${C.Asset.SIZE_BYTES},
              ${C.AssetType.MEDIA_TYPE}, ${C.AssetType.MEDIA_SUBTYPE}, ${C.AssetType.MIME_TYPE},
              ${C.Asset.FOLDER_ID}, ${C.Asset.METADATA}, ${C.Asset.EXTRACTED_METADATA})
-            VALUES( $CORE_SQL_VALS_FOR_INSERT, ?, ?, ?, ?, ?, ?, ?, ?, ?, $JSON_FUNC, $JSON_FUNC)
+            VALUES( $CORE_SQL_VALS_FOR_INSERT, ?, ?, ?, ?, ?, ?, ?, ?, $JSON_FUNC, $JSON_FUNC)
     """
 
     val sqlVals: List[Any] = List(
       asset.userId,
-      asset.path,
       asset.md5,
       asset.fileName,
       asset.sizeBytes.asInstanceOf[Object],

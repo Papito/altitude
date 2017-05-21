@@ -78,12 +78,12 @@ import org.scalatest.Matchers._
     var asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
     var updatedAsset: Asset = altitude.service.library.renameAsset(asset.id.get, "newName")
     updatedAsset.fileName shouldBe "newName"
-    updatedAsset.path.contains("newName") shouldBe true
+    updatedAsset.path.get should endWith("newName")
 
     // get the asset again to make sure it has been updated
     updatedAsset = altitude.service.library.getById(asset.id.get)
     updatedAsset.fileName shouldBe "newName"
-    updatedAsset.path.contains("newName") shouldBe true
+    updatedAsset.path.get should endWith("newName")
 
     // attempt to rename a recycled asset
     asset = altitude.service.library.recycleAsset(asset.id.get)

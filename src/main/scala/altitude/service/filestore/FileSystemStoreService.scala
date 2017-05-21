@@ -26,11 +26,11 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     }
     catch {
       case ex: IOException =>
-        throw new StorageException(s"Directory [$destFile] could not be created: $ex")
+        throw StorageException(s"Directory [$destFile] could not be created: $ex")
     }
 
     if (!(destFile.exists && destFile.isDirectory)) {
-      throw new StorageException(s"Directory [$destFile] could not be created")
+      throw StorageException(s"Directory [$destFile] could not be created")
     }
   }
 
@@ -49,11 +49,11 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     }
     catch {
       case ex: IOException =>
-        throw new StorageException(s"Directory [$destFile] could not be deleted: $ex")
+        throw StorageException(s"Directory [$destFile] could not be deleted: $ex")
     }
 
     if (destFile.exists || destFile.isDirectory) {
-      throw new StorageException(s"Directory [$destFile] could not be deleted")
+      throw StorageException(s"Directory [$destFile] could not be deleted")
     }
   }
 
@@ -64,7 +64,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     log.debug(s"Moving folder [$srcFile] to [$destFile]")
 
     if (destFile.exists) {
-      throw new StorageException(
+      throw StorageException(
         s"Cannot move [$srcFile] to [$destFile]: destination already exists")
     }
 
@@ -73,18 +73,19 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     }
     catch {
       case ex: IOException =>
-        throw new StorageException(s"Directory [$srcFile] could not be moved: $ex")
+        throw StorageException(s"Directory [$srcFile] could not be moved: $ex")
     }
 
     if (!(destFile.exists && destFile.isDirectory)) {
-      throw new StorageException(s"Directory [$srcFile] could not be moved")
+      throw StorageException(s"Directory [$srcFile] could not be moved")
     }
   }
 
   override def getById(id: String)
              (implicit ctx: Context, txId: TransactionId = new TransactionId): Data = {
     val asset: Asset = app.service.library.getById(id)
-    val srcFile: File = absoluteFile(asset.path)
+    val path = getAssetPath(asset)
+    val srcFile: File = absoluteFile(path)
 
     var byteArray: Option[Array[Byte]] = None
 
@@ -93,7 +94,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     }
     catch {
       case ex: IOException =>
-        throw new StorageException(s"Error reading file [${srcFile.getPath}: $ex]")
+        throw StorageException(s"Error reading file [${srcFile.getPath}: $ex]")
     }
 
     Data(
@@ -102,8 +103,9 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
       mimeType = "application/octet-stream")
   }
 
-  override def addAsset(asset: Asset)(implicit ctx: Context): Unit = {
-    val destFile = absoluteFile(asset.path)
+  override def addAsset(asset: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+    val path = getAssetPath(asset)
+    val destFile = absoluteFile(path)
     log.debug(s"Creating asset [$asset] on file system at [$destFile]")
 
     try {
@@ -111,22 +113,23 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     }
     catch {
       case ex: IOException =>
-        throw new StorageException(s"Error creating [$asset] @ [$destFile]: $ex]")
+        throw StorageException(s"Error creating [$asset] @ [$destFile]: $ex]")
     }
   }
 
-  override def moveAsset(asset: Asset, destPath: String)(implicit ctx: Context): Unit = {
-    val srcFile = absoluteFile(getAssetPath(asset))
-    val destFile = absoluteFile(destPath)
+  override def moveAsset(srcAsset: Asset, destAsset: Asset)
+                        (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+    val srcFile = absoluteFile(getAssetPath(srcAsset))
+    val destFile = absoluteFile(getAssetPath(destAsset))
 
-    log.debug(s"Moving asset [$asset] on file system from [$srcFile] to [$destFile]")
+    log.debug(s"Moving asset [$srcAsset] on file system from [$srcFile] to [$destFile]")
     moveFile(srcFile, destFile)
   }
 
-  override def recycleAsset(asset: Asset)(implicit ctx: Context) = {
+  override def recycleAsset(asset: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId) = {
     log.info(s"Recycling: [$asset]")
 
-    val srcFile = absoluteFile(asset.path)
+    val srcFile = absoluteFile(getAssetPath(asset))
     val relRecyclePath = getRecycledAssetPath(asset)
     val destFile = absoluteFile(relRecyclePath)
 
@@ -136,46 +139,46 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   override def restoreAsset(asset: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId) = {
     log.info(s"Restoring: [$asset]")
 
-    val srcFile = absoluteFile(getRecycledAssetPath(asset))
-    val destFile = absoluteFile(asset.path)
+    val relRecyclePath = getRecycledAssetPath(asset)
+    val srcFile = absoluteFile(relRecyclePath)
+    val destFile = absoluteFile(getAssetPath(asset))
 
     moveFile(srcFile, destFile)
   }
 
-  override def purgeAsset(asset: Asset)(implicit ctx: Context): Unit = {
+  override def purgeAsset(asset: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
 
   }
 
-  override def calculateFolderPath(name: String, parentId: String)
+  override def getFolderPath(name: String, parentId: String)
                                   (implicit ctx: Context, txId: TransactionId = new TransactionId): String = {
     val parent: Folder = app.service.folder.getById(parentId)
     new File(parent.path.get, name).getPath
   }
 
-  override def calculateAssetPath(asset: Asset, folder: Folder)
-                        (implicit ctx: Context, txId: TransactionId = new TransactionId): String = {
-        findNextAvailableFilename(new File(folder.path.get, asset.fileName))
+  override def calculateNextAvailableFilename(asset: Asset)
+                                             (implicit ctx: Context, txId: TransactionId): String = {
+    findNextAvailableFilename(new File(getAssetPath(asset)))
   }
 
-  override def calculateAssetPath(asset: Asset)(implicit ctx: Context): String = {
-    findNextAvailableFilename(new File(asset.path))
+  def getPathWithNewFilename(asset: Asset, newFilename: String)
+                                  (implicit ctx: Context, txId: TransactionId): String = {
+    val folder: Folder = app.service.folder.getById(asset.folderId)
+    FilenameUtils.concat(folder.path.get, newFilename)
   }
 
-  def calculatePathWithNewFilename(asset: Asset, newFilename: String)
-                                  (implicit ctx: Context): String = {
-    val path = FilenameUtils.getFullPath(asset.path)
-    FilenameUtils.concat(path, newFilename)
-  }
-
-  override def getAssetPath(asset: Asset)(implicit ctx: Context): String = {
+  override def getAssetPath(asset: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId): String = {
     asset.isRecycled match {
-      case false => asset.path
+      case false => {
+        val folder: Folder = app.service.folder.getById(asset.folderId)
+        FilenameUtils.concat(folder.path.get, asset.fileName)
+      }
       case true => getRecycledAssetPath(asset)
     }
   }
 
   override def getRecycledAssetPath(asset: Asset)(implicit ctx: Context): String = {
-    val ext = FilenameUtils.getExtension(asset.path)
+    val ext = FilenameUtils.getExtension(asset.fileName)
     new File(
       trashFolderPath,
       s"${asset.id.get}${FilenameUtils.EXTENSION_SEPARATOR}$ext").toString
@@ -255,18 +258,22 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
       fileToCheck = new File(path, filenameFromBaseAndExt(baseName, ext))
     }
 
-    fileToCheck.getPath
+    fileToCheck.getName
   }
 
-  private def moveFile(src: File, dest: File): Unit = {
-    log.debug(s"Moving [$src] to [$dest]")
+  private def moveFile(srcFile: File, destFile: File): Unit = {
+    log.info(s"Moving [$srcFile] to [$destFile]")
 
     try {
-      FileUtils.moveFile(src, dest)
+      if (destFile.exists) {
+        throw StorageException(s"Error moving [$srcFile] to [$destFile]: destination exists]")
+      }
+
+      FileUtils.moveFile(srcFile, destFile)
     }
     catch {
       case ex: IOException =>
-        throw new StorageException(s"Error moving [$dest] to [$dest]: $ex]")
+        throw StorageException(s"Error moving [$srcFile] to [$destFile]: $ex]")
     }
   }
 

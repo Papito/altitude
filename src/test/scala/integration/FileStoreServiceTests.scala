@@ -2,8 +2,8 @@ package integration
 
 import java.io.File
 
-import altitude.models.{Stats, Folder, Asset}
-import altitude.{Const => C, NotFoundException}
+import altitude.models.{Folder, Asset}
+import altitude.{Const => C, StorageException, NotFoundException}
 import org.apache.commons.io.{FileUtils, FilenameUtils}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
@@ -19,7 +19,17 @@ import org.scalatest.Matchers._
     relAssetPath = new File(folder.path.get, "1.jpg")
     var movedAsset = altitude.service.library.moveAssetToFolder(asset.id.get, folder.id.get)
     checkRepositoryFilePath(relAssetPath.getPath)
-    movedAsset.path shouldBe relAssetPath.getPath
+    movedAsset.path contains relAssetPath.getPath
+  }
+
+  test("move asset into conflicting file") {
+    val asset = importFile("images/1.jpg")
+    var relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
+    checkRepositoryFilePath(relAssetPath.getPath)
+
+    var folder: Folder = altitude.service.folder.addFolder("folder1")
+    relAssetPath = new File(folder.path.get, "1.jpg")
+    var movedAsset = altitude.service.library.moveAssetToFolder(asset.id.get, folder.id.get)
 
     // create a dummy file in place of destination
     folder  = altitude.service.folder.addFolder("folder2")
@@ -27,10 +37,9 @@ import org.scalatest.Matchers._
     FileUtils.writeByteArrayToFile(getAbsoluteFile(relAssetPath.getPath), new Array[Byte](0))
 
     // move the file again - into an existing file
-    movedAsset = altitude.service.library.moveAssetToFolder(movedAsset.id.get, folder.id.get)
-    relAssetPath = new File(folder.path.get, "1_1.jpg")
-    checkRepositoryFilePath(relAssetPath.getPath)
-    movedAsset.path shouldBe relAssetPath.getPath
+    intercept[StorageException] {
+      altitude.service.library.moveAssetToFolder(movedAsset.id.get, folder.id.get)
+    }
   }
 
   test("rename directory") {
@@ -39,16 +48,23 @@ import org.scalatest.Matchers._
     var asset1: Asset = altitude.service.library.add(makeAsset(folder1))
     val asset2: Asset = altitude.service.library.add(makeAsset(folder1))
 
-    checkRepositoryFilePath(asset1.path)
-    checkRepositoryFilePath(asset2.path)
+    asset1.path should not be None
+    asset2.path should not be None
+
+    checkRepositoryFilePath(asset1.path.get)
+    checkRepositoryFilePath(asset2.path.get)
 
     folder1 = altitude.service.library.renameFolder(folder1.id.get, "newName")
 
-    checkNoRepositoryFilePath(asset1.path)
-    checkNoRepositoryFilePath(asset2.path)
+    checkNoRepositoryFilePath(asset1.path.get)
+    checkNoRepositoryFilePath(asset2.path.get)
 
-    //asset1 = altitude.service.library.getById(asset1.id.get)
-    //asset1.path.contains("folder1") shouldBe false
+    asset1 = altitude.service.library.getById(asset1.id.get)
+    asset1.path should not be None
+    asset1.path.get should not be empty
+    asset1.path contains "newName"
+    asset1.path.get.endsWith(asset1.fileName) shouldBe true
+    checkRepositoryFilePath(asset1.path.get)
   }
 
   test("delete recursively") {
@@ -57,18 +73,35 @@ import org.scalatest.Matchers._
     val asset1: Asset = altitude.service.library.add(makeAsset(folder1))
     val asset2: Asset = altitude.service.library.add(makeAsset(folder1))
 
-    checkRepositoryFilePath(asset1.path)
-    checkRepositoryFilePath(asset2.path)
+    asset1.path should not be None
+    asset2.path should not be None
+
+    checkRepositoryFilePath(asset1.path.get)
+    checkRepositoryFilePath(asset2.path.get)
 
     altitude.service.folder.deleteById(folder1.id.get)
 
-    checkNoRepositoryFilePath(asset1.path)
-    checkNoRepositoryFilePath(asset2.path)
+    checkNoRepositoryFilePath(asset1.path.get)
+    checkNoRepositoryFilePath(asset2.path.get)
   }
 
   test("restore asset") {
     val asset1 = importFile("images/1.jpg")
-    var relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
+    val relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
+    checkRepositoryFilePath(relAssetPath.getPath)
+
+    // move asset to trash
+    altitude.service.library.recycleAsset(asset1.id.get)
+    checkNoRepositoryFilePath(relAssetPath.getPath)
+
+    // restore the asset
+    altitude.service.library.restoreRecycledAsset(asset1.id.get)
+    checkRepositoryFilePath(relAssetPath.getPath)
+  }
+
+  test("restore asset into conflicting file") {
+    val asset1 = importFile("images/1.jpg")
+    val relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
     checkRepositoryFilePath(relAssetPath.getPath)
 
     // move asset to trash
@@ -76,15 +109,29 @@ import org.scalatest.Matchers._
     checkNoRepositoryFilePath(relAssetPath.getPath)
 
     // create a dummy file in place of previously recycled asset
-    FileUtils.writeByteArrayToFile(getAbsoluteFile(asset1.path), new Array[Byte](0))
-
-    // restore the asset
-    altitude.service.library.restoreRecycledAsset(asset1.id.get)
-    relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1_1.jpg")
+    FileUtils.writeByteArrayToFile(getAbsoluteFile(asset1.path.get), new Array[Byte](0))
     checkRepositoryFilePath(relAssetPath.getPath)
+
+    intercept[StorageException] {
+      altitude.service.library.restoreRecycledAsset(asset1.id.get)
+    }
   }
 
   test("rename asset") {
+    var asset = importFile("images/1.jpg")
+    var relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
+    checkRepositoryFilePath(relAssetPath.getPath)
+
+    asset = altitude.service.library.renameAsset(asset.id.get, "2.jpg")
+    relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "2.jpg")
+    checkRepositoryFilePath(relAssetPath.getPath)
+
+    asset = altitude.service.library.renameAsset(asset.id.get, "3.jpg")
+    relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "3.jpg")
+    checkRepositoryFilePath(relAssetPath.getPath)
+  }
+
+  test("rename asset into existing file") {
     var asset = importFile("images/1.jpg")
     var relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
     checkRepositoryFilePath(relAssetPath.getPath)
@@ -97,9 +144,9 @@ import org.scalatest.Matchers._
     relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "3.jpg")
     FileUtils.writeByteArrayToFile(getAbsoluteFile(relAssetPath.getPath), new Array[Byte](0))
 
-    asset = altitude.service.library.renameAsset(asset.id.get, "3.jpg")
-    relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "3_1.jpg")
-    checkRepositoryFilePath(relAssetPath.getPath)
+    intercept[StorageException] {
+      asset = altitude.service.library.renameAsset(asset.id.get, "3.jpg")
+    }
   }
 
   test("manage folders") {

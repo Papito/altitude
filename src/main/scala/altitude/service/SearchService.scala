@@ -14,6 +14,7 @@ class SearchService(app: Altitude) {
 
 
   def indexAsset(asset: Asset)(implicit ctx: Context, txId: TransactionId) = {
+    require(asset.path.isEmpty)
     log.info(s"Indexing asset $asset")
     val metadataFields: Map[String, MetadataField] = app.service.metadata.getAllFields
     SEARCH_DAO.indexAsset(asset, metadataFields)

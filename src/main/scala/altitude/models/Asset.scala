@@ -11,7 +11,8 @@ object Asset {
       id = (json \ C.Base.ID).asOpt[String],
       userId = (json \ C.Base.USER_ID).as[String],
       assetType = json \ C.Asset.ASSET_TYPE,
-      path = (json \ C.Asset.PATH).as[String],
+      fileName = (json \ C.Asset.FILENAME).as[String],
+      path = (json \ C.Asset.PATH).asOpt[String],
       folderId = (json \ C.Asset.FOLDER_ID).as[String],
       md5 = (json \ C.Asset.MD5).as[String],
       sizeBytes = (json \ C.Asset.SIZE_BYTES).as[Long],
@@ -25,7 +26,8 @@ case class Asset(id: Option[String] = None,
                  userId: String,
                  data: Array[Byte] = new Array[Byte](0),
                  assetType: AssetType,
-                 path: String,
+                 fileName: String,
+                 path: Option[String] = None,
                  md5: String,
                  sizeBytes: Long,
                  folderId: String,
@@ -34,11 +36,9 @@ case class Asset(id: Option[String] = None,
                  extractedMetadata: Metadata = new Metadata())
   extends BaseModel {
 
-  val fileName: String = FilenameUtils.getName(path)
-
   override def toJson = Json.obj(
     C.Base.USER_ID -> userId,
-    C.Asset.PATH -> path,
+    C.Asset.PATH -> {if (path.isDefined) JsString(path.get) else JsNull},
     C.Asset.FOLDER_ID -> folderId,
     C.Asset.MD5 -> md5,
     C.Asset.FILENAME -> fileName,

@@ -17,7 +17,8 @@ import org.scalatest.Matchers._
     val asset = new Asset(
       userId = currentUser.id.get,
       assetType = mediaType,
-      path = "path",
+      fileName = "filename.ext",
+      path = Some("path"),
       md5 = "md5",
       folderId = ctx.repo.triageFolderId,
       sizeBytes = 1L)
@@ -32,7 +33,8 @@ import org.scalatest.Matchers._
     val asset = new Asset(
       userId = currentUser.id.get,
       assetType = mediaType,
-      path = "path",
+      fileName = "filename.ext",
+      path = Some("path"),
       md5 = "md5",
       folderId = ctx.repo.triageFolderId,
       sizeBytes = 1L)
@@ -65,7 +67,8 @@ import org.scalatest.Matchers._
       folderId = folder1_1.id.get.toString,
       userId = currentUser.id.get,
       assetType = mediaType,
-      path = Util.randomStr(30),
+      fileName = "filename.ext",
+      path = Some(Util.randomStr(30)),
       md5 = Util.randomStr(32),
       sizeBytes = 1L))
 
@@ -73,7 +76,8 @@ import org.scalatest.Matchers._
       folderId = folder1_2.id.get.toString,
       userId = currentUser.id.get,
       assetType = mediaType,
-      path = Util.randomStr(30),
+      fileName = "filename.ext",
+      path = Some(Util.randomStr(30)),
       md5 = Util.randomStr(32),
       sizeBytes = 1L))
 
@@ -81,7 +85,8 @@ import org.scalatest.Matchers._
       folderId = folder1.id.get.toString,
       userId = currentUser.id.get,
       assetType = mediaType,
-      path = Util.randomStr(30),
+      fileName = "filename.ext",
+      path = Some(Util.randomStr(30)),
       md5 = Util.randomStr(32),
       sizeBytes = 1L))
 
