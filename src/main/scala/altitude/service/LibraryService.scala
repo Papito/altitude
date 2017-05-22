@@ -379,6 +379,8 @@ class LibraryService(app: Altitude) {
 
         val asset: Asset = getById(assetId)
 
+        app.service.folder.incrAssetCount(asset.folderId)
+
         app.service.stats.incrementStat(Stats.TOTAL_ASSETS)
         app.service.stats.decrementStat(Stats.RECYCLED_ASSETS)
         app.service.stats.incrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)

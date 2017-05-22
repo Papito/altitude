@@ -82,7 +82,7 @@ import org.scalatest.Matchers._
     stats.getStatValue(Stats.RECYCLED_ASSETS) should be (0)
   }
 
-  test("test move recycled asset to same folder") {
+  test("test move recycled asset to original folder") {
     var folder1: Folder = altitude.service.folder.addFolder("folder1")
 
     val asset: Asset = altitude.service.library.add(makeAsset(folder1))
@@ -104,7 +104,7 @@ import org.scalatest.Matchers._
     stats.getStatValue(Stats.RECYCLED_ASSETS) should be (0)
   }
 
-  test("restore recycled asset") {
+  test("restore recycled asset to triage") {
     val asset: Asset = altitude.service.library.add(makeAsset(
       altitude.service.folder.getTriageFolder))
     val trashed: Asset = altitude.service.library.recycleAsset(asset.id.get)
@@ -128,5 +128,20 @@ import org.scalatest.Matchers._
       stats2.getStatValue(Stats.TOTAL_ASSETS)
     }
 
+  }
+
+  test("restore recycled asset to original folder") {
+    var folder1: Folder = altitude.service.folder.addFolder("folder1")
+
+    val asset: Asset = altitude.service.library.add(makeAsset(folder1))
+
+    val trashed: Asset = altitude.service.library.recycleAsset(asset.id.get)
+    folder1 = altitude.service.folder.getById(folder1.id.get)
+    folder1.numOfAssets shouldBe 0
+
+    altitude.service.library.restoreRecycledAsset(trashed.id.get)
+
+    folder1 = altitude.service.folder.getById(folder1.id.get)
+    folder1.numOfAssets shouldBe 1
   }
 }
