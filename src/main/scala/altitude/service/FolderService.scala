@@ -164,7 +164,8 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
         id = folder.id,
         name = folder.name,
         parentId = folder.parentId,
-        path = Some(relPath))
+        path = Some(relPath),
+        numOfAssets = folder.numOfAssets)
     }
   }
 
@@ -352,12 +353,15 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
 
   override def getById(id: String)
                       (implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
-    val folder: Folder = if (isRootFolder(id)) getRootFolder else super.getById(id)
-    val ret = addPath(folder)
 
-    require(ret.path.isDefined)
-    require(ret.path.get.nonEmpty)
-    ret
+    txManager.asReadOnly[JsObject] {
+      val folder: Folder = if (isRootFolder(id)) getRootFolder else super.getById(id)
+      val ret = addPath(folder)
+
+      require(ret.path.isDefined)
+      require(ret.path.get.nonEmpty)
+      ret
+    }
   }
 
   /**

@@ -57,15 +57,47 @@ import org.scalatest.Matchers._
     stats.getStatValue(Stats.TRIAGE_ASSETS) should be (1)
   }
 
-  test("test move recycled asset to folder") {
-    val asset: Asset = altitude.service.library.add(makeAsset(
-      altitude.service.folder.getTriageFolder))
+  test("test move recycled asset to new folder") {
+    var folder1: Folder = altitude.service.folder.addFolder("folder1")
+
+    val asset: Asset = altitude.service.library.add(makeAsset(folder1))
+
+    folder1 = altitude.service.folder.getById(folder1.id.get)
+    folder1.numOfAssets shouldBe 1
 
     altitude.service.library.recycleAsset(asset.id.get)
 
-    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+    var folder2: Folder = altitude.service.folder.addFolder("folder2")
+
+    altitude.service.library.moveAssetToFolder(asset.id.get, folder2.id.get)
+
+    folder1 = altitude.service.folder.getById(folder1.id.get)
+    folder1.numOfAssets shouldBe 0
+
+    folder2 = altitude.service.folder.getById(folder2.id.get)
+    folder2.numOfAssets shouldBe 1
+
+    val stats = altitude.service.stats.getStats
+    stats.getStatValue(Stats.TOTAL_ASSETS) should be (1)
+    stats.getStatValue(Stats.RECYCLED_ASSETS) should be (0)
+  }
+
+  test("test move recycled asset to same folder") {
+    var folder1: Folder = altitude.service.folder.addFolder("folder1")
+
+    val asset: Asset = altitude.service.library.add(makeAsset(folder1))
+
+    folder1 = altitude.service.folder.getById(folder1.id.get)
+    folder1.numOfAssets shouldBe 1
+
+    altitude.service.library.recycleAsset(asset.id.get)
+    folder1 = altitude.service.folder.getById(folder1.id.get)
+    folder1.numOfAssets shouldBe 0
 
     altitude.service.library.moveAssetToFolder(asset.id.get, folder1.id.get)
+
+    folder1 = altitude.service.folder.getById(folder1.id.get)
+    folder1.numOfAssets shouldBe 1
 
     val stats = altitude.service.stats.getStats
     stats.getStatValue(Stats.TOTAL_ASSETS) should be (1)

@@ -281,18 +281,18 @@ class LibraryService(app: Altitude) {
       }
   }
 
-  def moveAssetsToFolder(assetIds: Set[String], folderId: String)
+  def moveAssetsToFolder(assetIds: Set[String], destFolderId: String)
                         (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
 
     txManager.withTransaction {
       assetIds.foreach {assetId =>
         // cannot have assets in root folder - just other folders
-        if (app.service.folder.isRootFolder(folderId)) {
+        if (app.service.folder.isRootFolder(destFolderId)) {
           throw new IllegalOperationException("Cannot move assets to root folder")
         }
 
         // ensure the folder exists
-        app.service.folder.getById(folderId)
+        app.service.folder.getById(destFolderId)
 
         val asset: Asset = getById(assetId)
 
@@ -310,18 +310,22 @@ class LibraryService(app: Altitude) {
           app.service.asset.setAssetAsRecycled(assetId = assetId, isRecycled = false)
         }
 
-        app.service.folder.incrAssetCount(folderId)
-
         // point asset to the new folder and update the path
         val updatedAsset: Asset = asset ++ Json.obj(
-          C.Asset.FOLDER_ID -> folderId,
+          C.Asset.FOLDER_ID -> destFolderId,
           C.Asset.IS_RECYCLED -> false)
 
         app.service.asset.updateById(
           asset.id.get, updatedAsset,
           fields = List(C.Asset.FOLDER_ID))
 
-        app.service.folder.decrAssetCount(asset.folderId)
+        // update folder count
+        if (asset.isRecycled) {
+          app.service.folder.incrAssetCount(destFolderId)
+        } else {
+          app.service.folder.decrAssetCount(asset.folderId)
+          app.service.folder.incrAssetCount(destFolderId)
+        }
 
         app.service.fileStore.moveAsset(asset, updatedAsset)
       }
