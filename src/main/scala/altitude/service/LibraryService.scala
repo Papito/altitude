@@ -271,8 +271,8 @@ class LibraryService(app: Altitude) {
             app.service.stats.decrementStat(Stats.TRIAGE_ASSETS)
           }
 
-          app.service.stats.decrementStat(Stats.TOTAL_ASSETS, assetIds.size)
-          app.service.stats.incrementStat(Stats.RECYCLED_ASSETS, assetIds.size)
+          app.service.stats.decrementStat(Stats.TOTAL_ASSETS)
+          app.service.stats.incrementStat(Stats.RECYCLED_ASSETS)
           app.service.stats.decrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
           app.service.stats.incrementStat(Stats.RECYCLED_BYTES, asset.sizeBytes)
 

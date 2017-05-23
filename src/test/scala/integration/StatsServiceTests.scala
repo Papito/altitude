@@ -1,6 +1,7 @@
 package integration
 
 import altitude.models.{Asset, Folder, Stats}
+import altitude.util.Query
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 
@@ -24,16 +25,16 @@ import org.scalatest.Matchers._
     altitude.service.library.recycleAsset(assetToDelete2.id.get)
 
     val stats = altitude.service.stats.getStats
-    stats.getStatValue(Stats.TOTAL_ASSETS) should be (2)
-    stats.getStatValue(Stats.RECYCLED_ASSETS) should be (2)
-    stats.getStatValue(Stats.TRIAGE_ASSETS) should be (1)
+    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 2
+    stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 2
+    stats.getStatValue(Stats.TRIAGE_ASSETS) shouldBe 1
 
     altitude.service.library.moveAssetToFolder(triagedAsset.id.get, folder1.id.get)
 
     val stats2 = altitude.service.stats.getStats
-    stats2.getStatValue(Stats.TOTAL_ASSETS) should be (2)
-    stats2.getStatValue(Stats.RECYCLED_ASSETS) should be (2)
-    stats2.getStatValue(Stats.TRIAGE_ASSETS) should be (0)
+    stats2.getStatValue(Stats.TOTAL_ASSETS) shouldBe 2
+    stats2.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 2
+    stats2.getStatValue(Stats.TRIAGE_ASSETS) shouldBe 0
 
     SET_SECONDARY_REPO()
     val stats3 = altitude.service.stats.getStats
@@ -53,8 +54,8 @@ import org.scalatest.Matchers._
     altitude.service.library.moveAssetToTriage(asset.id.get)
 
     val stats = altitude.service.stats.getStats
-    stats.getStatValue(Stats.TOTAL_ASSETS) should be (1)
-    stats.getStatValue(Stats.TRIAGE_ASSETS) should be (1)
+    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 1
+    stats.getStatValue(Stats.TRIAGE_ASSETS) shouldBe 1
   }
 
   test("test move recycled asset to new folder") {
@@ -78,8 +79,8 @@ import org.scalatest.Matchers._
     folder2.numOfAssets shouldBe 1
 
     val stats = altitude.service.stats.getStats
-    stats.getStatValue(Stats.TOTAL_ASSETS) should be (1)
-    stats.getStatValue(Stats.RECYCLED_ASSETS) should be (0)
+    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 1
+    stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 0
   }
 
   test("test move recycled asset to original folder") {
@@ -100,8 +101,8 @@ import org.scalatest.Matchers._
     folder1.numOfAssets shouldBe 1
 
     val stats = altitude.service.stats.getStats
-    stats.getStatValue(Stats.TOTAL_ASSETS) should be (1)
-    stats.getStatValue(Stats.RECYCLED_ASSETS) should be (0)
+    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 1
+    stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 0
   }
 
   test("restore recycled asset to triage") {
@@ -117,8 +118,8 @@ import org.scalatest.Matchers._
     SET_PRIMARY_USER()
 
     val stats = altitude.service.stats.getStats
-    stats.getStatValue(Stats.TOTAL_ASSETS) should be (2)
-    stats.getStatValue(Stats.RECYCLED_ASSETS) should be (0)
+    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 2
+    stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 0
 
     SET_SECONDARY_REPO()
     val stats2 = altitude.service.stats.getStats
@@ -143,5 +144,25 @@ import org.scalatest.Matchers._
 
     folder1 = altitude.service.folder.getById(folder1.id.get)
     folder1.numOfAssets shouldBe 1
+  }
+
+  test("recycle multiple assets") {
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+
+    1 to 2 foreach { n =>
+      altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
+      altitude.service.library.add(makeAsset(folder1))
+    }
+
+    var stats = altitude.service.stats.getStats
+    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 4
+
+    val all: List[Asset] = altitude.service.asset.query(Query()).records.map(Asset.fromJson)
+
+    altitude.service.library.recycleAssets(all.map(_.id.get).toSet)
+
+    stats = altitude.service.stats.getStats
+    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 0
+    stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 4
   }
 }
