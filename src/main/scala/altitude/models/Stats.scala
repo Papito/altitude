@@ -6,7 +6,7 @@ object Stats {
   final val TOTAL_BYTES = "total_bytes"
   final val TRIAGE_ASSETS = "triage_assets"
   final val RECYCLED_ASSETS = "recycled_assets"
-  final val RECYCLED_BYTES = "recycles_bytes"
+  final val RECYCLED_BYTES = "recycled_bytes"
 }
 
 case class Stats(stats: List[Stat]) {

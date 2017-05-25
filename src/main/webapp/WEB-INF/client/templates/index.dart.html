@@ -1,0 +1,87 @@
+{% extends "./base.html" %}
+
+{% block title %} Browse {% endblock %}
+
+{% block assets %}
+  <script src="/static/js/app/assets.js"></script>
+  <script src="/static/js/app/browse.js"></script>
+{% endblock%}
+
+{% block body %}
+<div class="row">
+  <ol class="breadcrumb" data-bind="visible: currentFolderPath().length > 1, foreach: currentFolderPath" style="display: none">
+    <li><a href="#" data-bind="text: $data.name, click: function() {$root.goIntoFolder($data.id)}"></a></li>
+  </ol>
+</div>
+
+<div class="row">
+  <div class="col-md-2" id="left">
+    <div class="row">
+      <div id="folders">
+        <div>
+            <span class="header">
+              Folders
+            </span>
+            <span class="showAddFolder">
+            <button type="button" data-bind="click: showAddFolder" class="btn btn-default btn-xs">+ Add</button>
+            </span>
+
+          <div id="addFolder" data-bind="visible: _showAddFolder" style="display: none">
+            <form id="addFolderForm" class="form-inline">
+              <div class="form-group">
+                <label for="newFolderName" class="control-label"></label>
+                <div class="error"></div>
+                <input type="text" class="form-control" name="name" id="newFolderName" maxlength="255" placeholder="New folder name">
+              </div>
+            </form>
+
+            <div style="text-align: right">
+              <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+              <a href="#" data-bind="click: hideAddFolder">Cancel</a>
+            </div>
+          </div>
+        </div>
+
+        <ul data-bind="foreach: folders">
+          <li class="folder" data-bind="attr: {'folder_id': $data.id}, click: function() {$root.goIntoFolder($data.id)}">
+              <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+              &nbsp;
+              <a href="#" data-bind="text: name"></a>
+              <span data-bind="html: '<span class=folder-count>(' + numOfAssets + ')</span>'"></span>
+          </li>
+        </ul>
+      </div><!-- /folders -->
+    </div><!-- /row -->
+
+    <!--
+    system folders
+    -->
+    <div class="row">
+        {% include "./partials/system_folders.html" %}
+    </div>
+
+    <div class="row">
+        {% include "./partials/selection_tools.html" %}
+    </div>
+
+  </div>
+
+  <div class="col-md-10">
+    {% include "./partials/search_results.html" %}
+  </div>
+</div>
+
+<!-- MODALS -->
+{% include "./partials/modals.html" %}
+
+
+<script>
+  $(document).ready(function() {
+    var browseViewModel = new BrowseViewModel();
+    ko.applyBindings(browseViewModel);
+  });
+</script>
+{% endblock%}
+
+{% block footer %}
+{% endblock%}
