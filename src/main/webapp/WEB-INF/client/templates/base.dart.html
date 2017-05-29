@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 <head>
 
   <meta charset="utf-8">
@@ -279,25 +279,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         margin: 0;
         height: 100vh;
       }
-
-      /*******************************
-                  Other
-      *******************************/
-
-      html [segment],
-      html segment {
-        display: block;
-        position: relative;
-        -webkit-box-sizing: border-box;
-        -ms-box-sizing: border-box;
-        box-sizing: border-box;
-        margin: 1em 0.5em;
-        padding: 1em;
-        background-color: white;
-        -webkit-box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.1);
-        box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.1);
-        border-radius: 5px 5px 5px 5px;
-      }
     }
   </style>
   <style>
@@ -377,25 +358,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </style>
 
   <script src="/static/js/lib/vaadin/webcomponents-lite.js"></script>
+
   <link rel="import" href="/static/js/lib/vaadin/vaadin-split-layout.html">
 
-  <custom-style>
-    <style is="custom-style">
-      .vaadin-custom {
-      --vaadin-split-layout-splitter: {
-         min-width: 1px;
-         min-height: 1px;
-         background: var(--dark-theme-divider-color);
-         border: grove 5px transparent;
-         background-clip: content-box;
-         fill: none;
-       };
+  <style>
 
-      background: var(--dark-theme-background-color);
-      color: var(--dark-theme-text-color);
-      }
-    </style>
-  </custom-style>
+    .vaadin-split-layout-0 > #splitter.vaadin-split-layout {
+      background-color: #333;
+      color: #545454;
+      min-width: 1px;
+      min-height: 1px;
+      border: groove 1px #6d6d6d;
+      fill: #545454;
+    }
+
+  </style>
+
 </head>
 
 <body fullbleed="" layout="" vertical="">
@@ -404,8 +382,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </header>
 
 <section flex="" layout="" horizontal="">
-  <vaadin-split-layout class="vaadin-custom" style="width: 100%;">
-    <vaadin-split-layout class="vaadin-custom" style="width: 30%; min-width: 10%; max-width: 90%;" vertical>
+  <vaadin-split-layout style="width: 100%;">
+    <vaadin-split-layout vertical style="width: 25%; min-width: 10%; max-width: 90%;">
       <div style="max-height: 95%">Second content element</div>
       <div style="max-height: 95%">Third content element</div>
     </vaadin-split-layout>
