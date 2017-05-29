@@ -7,6 +7,6 @@ class IndexController extends BaseWebController {
   override def logRequestEnd() = Unit
 
   get("/") {
-    redirect("/client/index")
+    redirect("/client/index.dart")
   }
 }
