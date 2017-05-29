@@ -5,7 +5,39 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-  <title>DartPad</title>
+  <title>{{ Config["app.name"] }}: {% block title %} {% endblock %}</title>
+
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/bootstrap.min.css">
+  <!--link rel="stylesheet" type="text/css" href="/static/css/lib/select2.css"-->
+  <link rel="stylesheet" type="text/css" href="/static/css/app.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery.contextMenu.min.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery.contextMenu.min.css.map">
+
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.min.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.structure.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.structure.min.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.theme.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.theme.min.css">
+
+
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/jstree/themes/default/style.min.css">
+
+  <script src="/static/js/lib/jquery-2.1.1.min.js"></script>
+  <script src="/static/js/lib/jquery-ui.min.js"></script>
+  <script src="/static/js/lib/bootstrap.min.js"></script>
+  <script src="/static/js/lib/knockout-3.2.0.js"></script>
+  <script src="/static/js/lib/knockout-custom-bindings.js"></script>
+  <!--script src="/static/js/lib/modernizr.custom.js"></script-->
+  <!--script src="/static/js/lib/select2.min.js"></script-->
+  <script src="/static/js/lib/context-menu/jquery.contextMenu.min.js"></script>
+  <script src="/static/js/lib/context-menu/jquery.ui.position.min.js"></script>
+  <script src="/static/js/lib/mousetrap.min.js"></script>
+  <script src="/static/js/lib/Base.js"></script>
+  <script src="/static/js/app/utils.js?"></script>
+  <script src="/static/js/app/core.js?"></script>
+  <script src="/static/js/app/models.js"></script>
+
 
   <style>
     @media screen {/*
@@ -315,7 +347,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         box-shadow: rgba(255, 255, 255, 0.07) 0 1px 0;
         border-bottom: 4px solid #121212;
 
-        margin-bottom: 24px;
         text-shadow: rgba(0,0,0,0.75) 0 1px;
       }
 
@@ -327,17 +358,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         user-select: none;
       }
 
-      input {
-        background-color: #333;
-        color: #c6c6c6;
-        resize: none;
-        border: 1px solid #555;
-        padding: 0.5em;
-        margin: 0 0 8px 0;
-      }
-
       section {
-        padding: 0 24px 24px 24px;
+        padding: 0 .5em 0 .5em;
         position: relative;
 
         box-shadow: rgba(255, 255, 255, 0.07) 0 1px 0;
@@ -371,11 +393,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
   </style>
 
+  {% block assets %}
+  {% endblock %}
+
 </head>
 
 <body fullbleed="" layout="" vertical="">
 <header layout="" horizontal="">
-  <div class="header-title">DartPad</div>
+  <div class="header-title"><a href="/">{{ Config["app.name"] }}</a></div>
 </header>
 
 <section flex="" layout="" horizontal="">
@@ -384,22 +409,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div style="max-height: 95%">Second content element</div>
       <div style="max-height: 95%">Third content element</div>
     </vaadin-split-layout>
-    <div style="width: 75%;">First content element</div>
+    <div id="content" class="container-fluid" style="width: 75%;">
+      {% block body %}
+      {% endblock %}
+    </div>
   </vaadin-split-layout>
 </section>
 
 <footer layout="" horizontal="">
   <div id="keyboard-button" class="keyboard footer-item"></div>
   <div>
-    <a href="https://github.com/dart-lang/dart-pad/wiki/Privacy-Policy" target="repo" class="footer-item">Privacy policy</a>
-    <a href="https://github.com/dart-lang/dart-pad/issues" target="repo">Send feedback</a>
+    <div class="footer-item">Footer</div>
   </div>
   <div flex=""></div>
   <div>
-    <input type="checkbox" id="strongmode"> Strong mode
-    (<a href="https://github.com/dart-lang/dev_compiler/blob/master/STRONG_MODE.md" target="_blank">What's this?</a>)
+    <div class="footer-item">Footer</div>
   </div>
 </footer>
-
 
 </body></html>

@@ -63,17 +63,6 @@ html, body {
     overflow: hidden;
 }
 
-footer {
-    display: block;
-    position: absolute;
-    width: 100%;
-    bottom: .6em;
-    height: 2.5em;
-    padding-top: .2em;
-    border-top: 1px solid #494744;
-    background-color: #272b30;
-}
-
 #divider {
     border-bottom: 1px inset #494744;
     margin-bottom: 1em;
@@ -330,7 +319,6 @@ footer {
 }
 
 li.folder {
-    cursor: pointer;
     cursor: hand;
 }
 
