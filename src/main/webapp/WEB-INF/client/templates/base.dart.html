@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/html">
 <head>
 
@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
   <title>{{ Config["app.name"] }}: {% block title %} {% endblock %}</title>
+
 
   <link rel="stylesheet" type="text/css" href="/static/css/lib/bootstrap.min.css">
   <!--link rel="stylesheet" type="text/css" href="/static/css/lib/select2.css"-->
@@ -26,7 +27,7 @@
   <script src="/static/js/lib/jquery-2.1.1.min.js"></script>
   <script src="/static/js/lib/jquery-ui.min.js"></script>
   <script src="/static/js/lib/bootstrap.min.js"></script>
-  <script src="/static/js/lib/knockout-3.2.0.js"></script>
+  <script src="/static/js/lib/knockout-3.4.2.js"></script>
   <script src="/static/js/lib/knockout-custom-bindings.js"></script>
   <!--script src="/static/js/lib/modernizr.custom.js"></script-->
   <!--script src="/static/js/lib/select2.min.js"></script-->
@@ -384,12 +385,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <style>
     .vaadin-split-layout-0 > #splitter.vaadin-split-layout {
-      background-color: #333;
-      color: #545454;
       min-width: 1px;
       min-height: 1px;
-      border: solid 1px #424242;
+      border: 1px solid #2d2d2d;
       fill: #666666;
+      box-shadow: rgba(84, 84, 84, 0.07) 0 1px 0;
     }
   </style>
 
@@ -403,18 +403,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <div class="header-title"><a href="/">{{ Config["app.name"] }}</a></div>
 </header>
 
-<section flex="" layout="" horizontal="">
-  <vaadin-split-layout style="width: 100%;">
-    <vaadin-split-layout vertical style="width: 25%; min-width: 10%; max-width: 90%;">
-      <div style="max-height: 95%">Second content element</div>
-      <div style="max-height: 95%">Third content element</div>
-    </vaadin-split-layout>
-    <div id="content" class="container-fluid" style="width: 75%;">
-      {% block body %}
-      {% endblock %}
-    </div>
-  </vaadin-split-layout>
-</section>
+{% block body %}
+{% endblock %}
 
 <footer layout="" horizontal="">
   <div id="keyboard-button" class="keyboard footer-item"></div>

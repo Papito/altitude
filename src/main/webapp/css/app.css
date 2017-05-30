@@ -57,24 +57,15 @@ select {
 }
 
 /* GLOBAL */
-html, body {
-    height: 100%;
-    margin: 0;
-    overflow: hidden;
-}
 
 #divider {
     border-bottom: 1px inset #494744;
     margin-bottom: 1em;
 }
 
-#content {
-    height: calc(100% - 8em);
-    display:block;
-}
-
 #hud {
-    height: 2.4em;
+    max-height: 2.2em;
+    border-bottom: 1px solid #1d1d1d;
 }
 
 #warningMessage {
@@ -288,28 +279,14 @@ html, body {
 /* FOLDERS */
 
 #folders {
-    margin-top: -.3em;
-    padding-left: .4em;
+    padding-top: .5em;
+    padding-right: .5em;
 }
 
 #folders button {
-    line-height: 1.2em;
-}
-
-#folders .header {
-    width: 50%;
-    text-transform: uppercase;
-    font-weight: bold;
-    font-size: .9em;
-    color: #fff;
-}
-
-#folders .showAddFolder {
-    width: 50%;
-}
-
-#folders .showAddFolder button {
-    float: right;
+    line-height: .5em;
+    opacity: .6;
+    width: 6em;
 }
 
 #folders ul {
