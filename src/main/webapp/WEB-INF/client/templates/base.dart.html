@@ -14,14 +14,6 @@
   <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery.contextMenu.min.css">
   <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery.contextMenu.min.css.map">
 
-  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.css">
-  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.min.css">
-  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.structure.css">
-  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.structure.min.css">
-  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.theme.css">
-  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.theme.min.css">
-
-
   <link rel="stylesheet" type="text/css" href="/static/css/lib/jstree/themes/default/style.min.css">
 
   <script src="/static/js/lib/jquery-2.1.1.min.js"></script>
@@ -323,7 +315,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         margin: 0;
         padding: 0;
 
-        background-color: #333;
+        background-color: #3d3d3d;
         color: #c6c6c6;
 
         top: 0;
@@ -346,7 +338,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         vertical-align: middle;
 
         box-shadow: rgba(255, 255, 255, 0.07) 0 1px 0;
-        border-bottom: 4px solid #121212;
+        border-bottom: 4px solid #272727;
 
         text-shadow: rgba(0,0,0,0.75) 0 1px;
       }
@@ -360,11 +352,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       section {
-        padding: 0 .5em 0 .5em;
         position: relative;
 
         box-shadow: rgba(255, 255, 255, 0.07) 0 1px 0;
-        border-bottom: 4px solid #121212;
+        border-bottom: 4px solid #272727;
       }
 
       footer {
@@ -379,6 +370,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     }
   </style>
+
+  <script>
+    var supportsCustomElements = ('registerElement' in document);
+    if (!supportsCustomElements) {
+      console.log('No native support for custom elements. Loading web components.');
+      $.getScript( "/static/html/vaadin/webcomponents-lite.js", function() {
+        console.log('Web components loaded');
+      });
+    }
+  </script>
 
   <link rel="import" href="/static/html/vaadin/vaadin-split-layout.html">
 
