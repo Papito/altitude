@@ -163,10 +163,10 @@ BaseViewModel = Base.extend({
             for(var field in errz) {
               var errSelector = '[name=' + field + ']';
               var selector = errElId ? errElId + ' ' + errSelector : errSelector;
-              console.log("error selector:", selector);
-              $(selector)
-                  .parent().addClass('has-error').parent()
-                  .find('.error').text(errz[field]);
+              var errEl = $(selector).parent().addClass('has-error').parent().find('.error');
+              console.log(errEl);
+              errEl.text(errz[field]);
+              errEl.css('display', 'inline');
             }
           }
           else if (json.validation_error) {

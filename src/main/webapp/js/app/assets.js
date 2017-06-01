@@ -1059,7 +1059,7 @@ AssetsViewModel = BaseViewModel.extend({
     var self = this;
     self.resetAllMessages();
     this._showAddFolder(true);
-    $('#addFolder').find('input').attr("tabindex",-1).focus();
+    $('#addFolderForm').find('input').attr("tabindex",-1).focus();
   },
 
   hideAddFolder: function() {
@@ -1069,7 +1069,7 @@ AssetsViewModel = BaseViewModel.extend({
 
   resetAddFolderForm: function() {
     var form = $('#addFolderForm');
-    form.find('.has-error').removeClass('has-error').find('.error').text('');
+    form.find('.has-error').removeClass('has-error').find('.error').text('').hide();
     form.find('input').val('');
   },
 
@@ -1081,7 +1081,7 @@ AssetsViewModel = BaseViewModel.extend({
         self.hideAddFolder();
         self.loadFolders(self.currentFolderId());
       },
-      errorContainerId: 'addFolder',
+      errorContainerId: 'addFolderForm',
       data: {
         'name': $('#newFolderName').val(),
         'parent_id': self.currentFolderId()

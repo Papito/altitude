@@ -4,12 +4,21 @@
     height: 2.2em;
 }
 
+.has-error .form-control, .has-error .form-control:focus {
+    border: solid 2px #cc121a;
+    box-shadow: none;
+}
+
 .form-group .error {
     color: #ff544d;
     font-weight: normal;
-    margin-left: .5em;
+    margin-top: .2em;
+    padding: .2em .4em .2em .4em;
+    border-radius: .4em;
     font-size: .9em;
-    margin-bottom: .2em;
+    margin-left: .4em;
+    background-color: #2d2d2d;
+    display: none;
 }
 
 select {
@@ -360,12 +369,8 @@ select {
     text-align: center;
 }
 
-#addFolderForm input, #renameFolderForm input {
+#addFolderForm {
     width: 100%;
-}
-
-#addFolder {
-    margin-top: 1em;
 }
 
 .pager-button {

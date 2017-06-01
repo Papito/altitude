@@ -23,44 +23,53 @@
   <vaadin-split-layout style="width: 100%;">
     <vaadin-split-layout vertical style="width: 25%; min-width: 10%; max-width: 90%;">
 
-      <div style="max-height: 95%">
-        <div id="folders" layout="" vertical="">
+      <div class="row" style="max-height: 95%">
+        <div id="folders" class="col-md-12">
 
-          <div id="noFolders" data-bind="visible: folders().length === 0">No folders</div>
+          <div class="row">
+            <div id="noFolders" class="col-md-12" data-bind="visible: folders().length === 0">No folders</div>
+          </div>
 
-          <ul data-bind="foreach: folders, visible: folders().length > 0">
-            <li class="folder" data-bind="attr: {'folder_id': $data.id}, click: function() {$root.goIntoFolder($data.id)}">
-              <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
-              &nbsp;
-              <a href="#" data-bind="text: name"></a>
-              <span data-bind="html: '<span class=folder-count>(' + numOfAssets + ')</span>'"></span>
-            </li>
-          </ul>
-
-
-          <div id="addFolder" data-bind="visible: _showAddFolder" style="display: none">
-            <form id="addFolderForm" class="form-inline">
-              <div class="form-group">
-                <label for="newFolderName" class="control-label"></label>
-                <div class="error"></div>
-                <input type="text" class="form-control" name="name" id="newFolderName" maxlength="255" placeholder="New folder name">
-              </div>
-            </form>
-
-            <div style="text-align: right">
-              <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-              <a href="#" data-bind="click: hideAddFolder">Cancel</a>
+          <div class="row">
+            <div class="col-md-12">
+            <ul data-bind="foreach: folders, visible: folders().length > 0">
+              <li class="folder" data-bind="attr: {'folder_id': $data.id}, click: function() {$root.goIntoFolder($data.id)}">
+                <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+                &nbsp;
+                <a href="#" data-bind="text: name"></a>
+                <span data-bind="html: '<span class=folder-count>(' + numOfAssets + ')</span>'"></span>
+              </li>
+            </ul>
             </div>
+          </div>
+
+          <div class="row" data-bind="visible: _showAddFolder" style="display: none">
+            <form id="addFolderForm">
+              <div class="col-md-12">
+                <div class="pull-right">
+                  <button type="button" data-bind="click: hideAddFolder" class="col-md-2 flat-butt" style="background-color: transparent">
+                    <span class="glyphicon glyphicon-remove"></span></button>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="form-group">
+                  <input type="text" class="form-control" name="name" id="newFolderName" maxlength="255" placeholder="New folder name">
+                  <span class="error"></span>
+                </div>
+             </div>
+            </form>
           </div>
 
           <div id="showAddFolder">
               <button type="button" data-bind="click: showAddFolder" class="btn flat-butt">
                 <span class="glyphicon glyphicon-plus"></span></button>
           </div>
-        </div>
-      </div>
+        </div><!-- /#folders -->
+      </div><!-- /left top panel -->
 
-      <div style="max-height: 95%"></div>
+      <div style="max-height: 95%">
+
+      </div><!-- /left bottom panel -->
     </vaadin-split-layout>
 
     <div id="content" style="width: 75%;">
