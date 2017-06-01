@@ -410,7 +410,21 @@ select {
 /* FOLDERS */
 
 #folders {
-    padding-top: .5em;
+    margin-top: 1em;
+}
+
+#folders ul {
+    list-style-type: none;
+    -webkit-margin-before: 0em;
+    -webkit-margin-after: 0em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    -webkit-padding-start: 0;
+}
+
+#folders li {
+    padding-left: .5em;
+    list-style-type: none;
 }
 
 #noFolders {
@@ -428,9 +442,6 @@ select {
     width: 2em;
 }
 
-#folders ul {
-    list-style-type: none;
-}
 
 li.folder {
     cursor: hand;

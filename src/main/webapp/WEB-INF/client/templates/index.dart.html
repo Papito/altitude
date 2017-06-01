@@ -11,14 +11,6 @@
 {% block body %}
 
 
-<section flex="" layout="" horizontal="" id="hud">
-  <div class="row">
-    <ol class="breadcrumb" data-bind="visible: currentFolderPath().length > 1, foreach: currentFolderPath" style="display: none">
-      <li><a href="#" data-bind="text: $data.name, click: function() {$root.goIntoFolder($data.id)}"></a></li>
-    </ol>
-  </div>
-</section>
-
 <section flex="" layout="" horizontal="">
   <vaadin-split-layout style="width: 100%;">
     <vaadin-split-layout vertical style="width: 25%; min-width: 10%; max-width: 90%;">
@@ -27,19 +19,25 @@
         <div id="folders" class="col-md-12">
 
           <div class="row">
+            <ol class="breadcrumb col-md-12" data-bind="visible: currentFolderPath().length > 1, foreach: currentFolderPath" style="display: none">
+              <li><a href="#" data-bind="text: $data.name, click: function() {$root.goIntoFolder($data.id)}"></a></li>
+            </ol>
+          </div>
+
+          <div class="row">
             <div id="noFolders" class="col-md-12" data-bind="visible: folders().length === 0">No folders</div>
           </div>
 
           <div class="row">
             <div class="col-md-12">
-            <ul data-bind="foreach: folders, visible: folders().length > 0">
-              <li class="folder" data-bind="attr: {'folder_id': $data.id}, click: function() {$root.goIntoFolder($data.id)}">
-                <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
-                &nbsp;
-                <a href="#" data-bind="text: name"></a>
-                <span data-bind="html: '<span class=folder-count>(' + numOfAssets + ')</span>'"></span>
-              </li>
-            </ul>
+              <ul data-bind="foreach: folders, visible: folders().length > 0">
+                <li class="folder" data-bind="attr: {'folder_id': $data.id}, click: function() {$root.goIntoFolder($data.id)}">
+                  <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+                  &nbsp;
+                  <a href="#" data-bind="text: name"></a>
+                  <span data-bind="html: '<span class=folder-count>(' + numOfAssets + ')</span>'"></span>
+                </li>
+              </ul>
             </div>
           </div>
 
@@ -48,7 +46,7 @@
               <div class="col-md-12">
                 <div class="pull-right">
                   <button type="button" data-bind="click: hideAddFolder" class="col-md-2 flat-butt" style="background-color: transparent">
-                    <span class="glyphicon glyphicon-remove"></span></button>
+                    <span class="glyphicon glyphicon-remove-sign"></span></button>
                 </div>
               </div>
               <div class="col-md-12">
