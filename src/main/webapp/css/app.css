@@ -57,10 +57,8 @@ select {
     margin-bottom: 1em;
 }
 
-.selected-path .badge {
+.selected-path  {
     font-size: .8em;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: .5em;
 }
 
 .glyphicon {

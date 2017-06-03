@@ -22,8 +22,8 @@
                  style="display: none">
               <div data-bind="style: {marginLeft: ($data.depth / 2) - .5 + 'em'}">
                 <a href="#">
-                    <span data-bind="text: $data.name, click: function() {$root.goIntoFolder($data.id)}"
-                          class="badge"></span>
+                  <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+                  &nbsp;<span data-bind="text: $data.name, click: function() {$root.goIntoFolder($data.id)}"></span>
                 </a>
               </div>
             </div>
