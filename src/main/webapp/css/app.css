@@ -341,10 +341,11 @@ select {
 #searchResults {
     text-align: center;
     overflow: auto;
+    margin-top: 1em;
 }
 
 #searchResults .result-box {
-    border: solid 2px #212223;
+    border: solid 2px #4a4b4c;
     display: inline-block;
     padding: 5px;
 }
@@ -362,7 +363,6 @@ select {
 }
 
 #noResults {
-    margin: 10em;
     text-align: center;
 }
 
@@ -408,6 +408,10 @@ select {
 
 #folders {
     margin-top: 1em;
+}
+
+.folder .glyphicon {
+    color: #917c24;
 }
 
 #folders ul {

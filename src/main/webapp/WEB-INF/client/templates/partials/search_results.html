@@ -1,16 +1,20 @@
-<div class="row" data-bind="visible: searchResults()" style="display: none">
+<div class="container-fluid">
+  <div class="row" data-bind="visible: searchResults()" style="display: none">
 
-  <div class="col-md-12" data-bind="visible: searchResults().length > 0">
-    <div id="searchResults" data-bind="foreach: searchResults">
-      <div class="result-box"
-           data-bind="attr: {'asset_id': $data.id}, css: {'selected': selected}, click: {single: function(asset, event){$root.focusOrSelectAsset($root, asset, event)}, double: function(){$root.showAssetDetail($root, $data)}}">
-        <img src="#" data-bind="attr: {src: '/assets/'+ $data.id +'/preview'}" class="img-responsive">
+    <div class="col-md-12">
+      <div id="searchResults" data-bind="foreach: searchResults">
+        <div class="result-box"
+             data-bind="attr: {'asset_id': $data.id}, css: {'selected': selected}, click: {single: function(asset, event){$root.focusOrSelectAsset($root, asset, event)}, double: function(){$root.showAssetDetail($root, $data)}}">
+          <img src="#" data-bind="attr: {src: '/assets/'+ $data.id +'/preview'}" class="img-responsive">
+        </div>
       </div>
     </div>
+
   </div>
 
-  <div id="noResults" class="col-md-12" data-bind="visible: searchResults().length === 0" style="display: none">
-    <h3>No results</h3>
+  <div id="noResults" class="row" data-bind="visible: searchResults().length === 0" style="display: none">
+    <div class="col-md-12">
+      <h3>No results</h3>
+    </div>
   </div>
-
 </div>
