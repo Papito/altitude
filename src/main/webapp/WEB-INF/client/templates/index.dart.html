@@ -10,7 +10,7 @@
 
 {% block body %}
 <vaadin-split-layout horizontal style="width: 100%;">
-  <vaadin-split-layout vertical style="width: 25%; min-width: 10%; max-width: 90%;">
+  <vaadin-split-layout id="leftPanel" vertical style="width: 25%; min-width: 10%; max-width: 90%;">
 
     <div class="row" style="max-height: 95%">
       <div id="folders" class="col-md-12">
@@ -20,7 +20,8 @@
             <div class="selected-path"
                  data-bind="visible: currentFolderPath().length > 1, foreach: currentFolderPath"
                  style="display: none">
-              <div data-bind="style: {marginLeft: ($data.depth / 2) - .5 + 'em'}">
+              <div data-bind="style: {marginLeft: $data.depth / 2 + 'em'}">
+                <div class="corner">&nbsp;</div>
                 <a href="#">
                   <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
                   &nbsp;<span data-bind="text: $data.name, click: function() {$root.goIntoFolder($data.id)}"></span>
