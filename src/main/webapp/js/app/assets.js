@@ -1110,10 +1110,14 @@ AssetsViewModel = BaseViewModel.extend({
     var folderCallOpts = {
       'successCallback': function (json) {
         var folders = $.map(json['folders'], function(data) {
+          data['depth'] = 0;
           return new Folder(data);
         });
 
+        var depth = 0;
         var path = $.map(json['path'], function(data) {
+          depth += 1;
+          data['depth'] = depth;
           return new Folder(data);
         });
 

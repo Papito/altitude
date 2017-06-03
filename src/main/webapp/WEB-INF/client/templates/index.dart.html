@@ -19,9 +19,18 @@
         <div id="folders" class="col-md-12">
 
           <div class="row">
-            <ol class="breadcrumb col-md-12" data-bind="visible: currentFolderPath().length > 1, foreach: currentFolderPath" style="display: none">
-              <li><a href="#" data-bind="text: $data.name, click: function() {$root.goIntoFolder($data.id)}"></a></li>
-            </ol>
+            <div class="col-md-12">
+              <div class="selected-path"
+                   data-bind="visible: currentFolderPath().length > 1, foreach: currentFolderPath"
+                   style="display: none">
+                <div data-bind="style: {marginLeft: ($data.depth / 2) - .5 + 'em'}">
+                  <a href="#">
+                    <span data-bind="text: $data.name, click: function() {$root.goIntoFolder($data.id)}"
+                          class="badge"></span>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="row">

@@ -53,16 +53,14 @@ select {
     color: #FFF;
 }
 
-.breadcrumb {
-    border-radius: 0.2em;
+.selected-path {
     margin-bottom: 1em;
-    border-width: 2px;
-    border-left: None;
-    border-right: None;
-    border-top: 1px solid #3b3b3b;
-    border-bottom: 1px solid #3b3b3b;
-    padding: .4em;
-    background-image: none;
+}
+
+.selected-path .badge {
+    font-size: .8em;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: .5em;
 }
 
 .glyphicon {
