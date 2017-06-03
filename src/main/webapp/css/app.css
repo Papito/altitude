@@ -339,7 +339,6 @@ select {
 }
 
 #searchResults {
-    height: 100%;
     text-align: center;
     overflow: auto;
 }
@@ -418,6 +417,7 @@ select {
     -webkit-margin-start: 0px;
     -webkit-margin-end: 0px;
     -webkit-padding-start: 0;
+    padding-left: 0;
 }
 
 #folders li {
