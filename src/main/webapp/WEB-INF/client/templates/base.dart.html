@@ -400,8 +400,53 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </head>
 
 <body fullbleed="" layout="" vertical="">
-<header layout="" horizontal="">
-  <div class="header-title"><a href="/">{{ Config["app.name"] }}</a></div>
+
+<header layout="" horizontal="" style="padding: 0">
+  <div class="container-fluid" style="width: 100%">
+    <div class="row" id="navigation">
+      <div id="brand" class="col-md-2">
+        <h4>
+          <a href="/">{{ Config["app.name"] }}</a>
+        </h4>
+      </div>
+      <div class="col-md-4">
+        <div id="menulist">
+          <div class="row">
+            <div class="col-md-3">
+              <div class="btn-group">
+                <a href="#" data-toggle="dropdown">
+                  Import <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a href="#"
+                       data-bind="click: function(){getDirectoryNames(null)}"
+                       data-toggle="modal" data-target="#selectImportDirectoryModal">From folder</a>
+                  </li>
+
+                  <li role="separator" class="divider"></li>
+                  <li><a href="#">Upload</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="col-md-5">
+              <a href="#">Settings</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="screenTitle" class="col-md-4">
+        <h5>
+          {% block title %} {% endblock %}
+        </h5>
+      </div>
+      <div class="col-md-2">
+        <form id="search" method="GET" action="/client/search">
+          <input type="text" name="${C.Api.Search.QUERY_TEXT}" class="form-control" placeholder="Search..." maxlength="200">
+        </form>
+      </div>
+    </div>
+  </div>
 </header>
 
 <section flex="" layout="" horizontal="">

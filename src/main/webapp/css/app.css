@@ -26,11 +26,6 @@ select {
     background-color: #FFF;
 }
 
-.well-sm {
-    padding: .2em;
-    border-radius: .3em;
-}
-
 .modal-body {
     padding: 1em;
 }
@@ -91,17 +86,18 @@ select {
 #errorContainer h4 {
     margin: 0;
 }
+
+#leftPanel {
+    background-color: #2f2f2f;
+}
+
+
 /* NAV */
 
 #navigation {
-    padding-top: 0.8em;
-    background-color: #363d42;
 }
 
 #menulist {
-    border-radius: 0.3em;
-    border: 1px solid #272b30;
-    padding: 0.5em 0 0.5em 0;
     text-align: center;
 }
 
@@ -110,11 +106,10 @@ select {
 }
 
 #navigation .form-control {
-    width: 95%;
 }
 
 #brand {
-    text-align: center;
+    margin-top: .2em;
 }
 
 #brand a {
@@ -122,16 +117,12 @@ select {
 }
 
 #brand h4 {
-    padding-left: 1em;
     font-family: Helvetica, Arial, sans-serif;
 }
 
 #screenTitle {
-    border-top-left-radius: 0.3em;
-    border-top-right-radius: 0.3em;
-    background-color: #272b30;
-    text-align: center;
-    padding-top: 0.8em;
+    margin-top: .3em;
+    text-align: left;
 }
 
 #screenTitle, #brand {
@@ -142,9 +133,10 @@ select {
     font-weight: bolder;
 }
 
-#leftPanel {
-    background-color: #2f2f2f;
+#search {
+    margin-top: .6em;
 }
+
 
 /* IMPORT */
 #importControls {
@@ -220,10 +212,6 @@ select {
 
 
 /* ASSETS */
-
-#search {
-    margin-top: .1em;
-}
 
 #searchResults {
     text-align: center;
