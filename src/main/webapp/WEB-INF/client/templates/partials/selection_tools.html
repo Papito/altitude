@@ -1,5 +1,6 @@
-<div id="selectionTools" data-bind="visible: selectedCount()" style="display: none;">
-    <div class="btn-group btn-block">
+<div id="selectionTools" data-bind="visible: selectedCount()" class="row" style="display: none;">
+  <div class="col-md-12">
+    <div class="btn-group btn-block dropup">
       <button type="button" class="btn btn-success dropdown-toggle btn-block" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Selected <span class="badge" data-bind="html: selectedCount()"></span>
         <span class="caret caret-up"></span>
@@ -29,4 +30,5 @@
         </li>
       </ul>
     </div>
+  </div>
 </div>

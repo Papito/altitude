@@ -1,16 +1,14 @@
-<div id="systemFolders">
-  <div id="triage" class="system-folder">
-    <span class="header">
-      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-        <a href="/client/triage">Triage</a>
-        <span data-bind="html: '<span class=folder-count>(' + stats.triageAssets() + ')</span>'"></span>
-    </span>
-  </div>
-  <div id="trash" class="system-folder">
-    <span class="header">
+<div class="container-fluid" id="systemFolders">
+  <div class="row">
+    <div class="col-md-6 system-folder" id="triage">
+      <span class="glyphicon glyphicon-sort" aria-hidden="true"></span>
+      <a href="/client/triage">Triage</a>
+      <span data-bind="html: '<span class=folder-count>(' + stats.triageAssets() + ')</span>'"></span>
+    </div>
+    <div class="col-md-6 system-folder" id="trash">
       <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-        <a href="/client/trash">Trash</a>
-        <span data-bind="html: '<span class=folder-count>(' + stats.recycledAssets() + ')</span>'"></span>
-    </span>
+      <a href="/client/trash">Trash</a>
+      <span data-bind="html: '<span class=folder-count>(' + stats.recycledAssets() + ')</span>'"></span>
+    </div>
   </div>
 </div>

@@ -105,11 +105,9 @@ select {
     color: #bebebe;
 }
 
-#navigation .form-control {
-}
-
 #brand {
     margin-top: .2em;
+    text-align: center;
 }
 
 #brand a {
@@ -133,8 +131,13 @@ select {
     font-weight: bolder;
 }
 
-#search {
-    margin-top: .6em;
+#searchForm {
+    margin-top: .7em;
+    text-align: center;
+}
+
+#searchForm input {
+    width: 95%;
 }
 
 
@@ -282,7 +285,6 @@ select {
 /* FOLDERS */
 
 #folders {
-    margin-top: 1em;
 }
 
 #folders .glyphicon {
@@ -324,16 +326,18 @@ li.folder {
 }
 
 #systemFolders {
-    padding-left: .4em;
-    padding-top: .6em;
-    padding-bottom: .1em;
-    margin-left: 0.5em;
-    background-color: #363d42;
+    border-bottom: 1px solid #363636;
+    margin-bottom: 1em;
 }
 
-#systemFolders .system-folder {
-    padding-left: 0.8em;
-    margin-bottom: .4em;
+.system-folder {
+    padding-top: .5em;
+    padding-bottom: .5em;
+    text-align: center;
+}
+
+#triage {
+    border-right: 1px solid #363636;
 }
 
 #trash a {
