@@ -1,3 +1,107 @@
+/* SCAFFOLDING */
+
+@media screen {/*
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+
+    /*******************************
+              Flex Layout
+    *******************************/
+
+    html [layout][horizontal],
+    html [layout][vertical] {
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+    }
+
+    html [layout][horizontal] {
+        -ms-flex-direction: row;
+        -webkit-flex-direction: row;
+        flex-direction: row;
+    }
+
+    html [layout][vertical] {
+        -ms-flex-direction: column;
+        -webkit-flex-direction: column;
+        flex-direction: column;
+    }
+
+    html [flex] {
+        -ms-flex: 1 1 0.000000001px;
+        -webkit-flex: 1;
+        flex: 1;
+        -webkit-flex-basis: 0.000000001px;
+        flex-basis: 0.000000001px;
+    }
+}
+@media screen {/* Copyright (c) 2014, the Dart project authors.  Please see the AUTHORS file */
+    /* for details. All rights reserved. Use of this source code is governed by a */
+    /* BSD-style license that can be found in the LICENSE file. */
+
+    body {
+        margin: 0;
+        padding: 0;
+
+        background-color: #3d3d3d;
+        color: #c6c6c6;
+
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        position: absolute;
+
+        font-size: 14px;
+        line-height: 20px;
+
+        overflow: hidden;
+    }
+
+    header {
+        line-height: 48px;
+        padding: 0 24px;
+        color: #fff;
+        vertical-align: middle;
+
+        box-shadow: rgba(255, 255, 255, 0.07) 0 1px 0;
+        border-bottom: 4px solid #272727;
+
+        text-shadow: rgba(0,0,0,0.75) 0 1px;
+    }
+
+    section {
+        position: relative;
+
+        box-shadow: rgba(255, 255, 255, 0.07) 0 1px 0;
+        border-bottom: 4px solid #272727;
+    }
+
+    footer {
+        margin: 8px 24px;
+        font-size: 13px;
+        text-shadow: rgba(0,0,0,0.75) 0 1px;
+    }
+
+    .footer-item {
+        margin-right: 10px;
+    }
+
+}
+
+.vaadin-split-layout-0 > #splitter.vaadin-split-layout {
+    min-width: 1px;
+    min-height: 1px;
+    border: 1px solid #363636;
+    fill: #666666;
+    box-shadow: rgba(84, 84, 84, 0.07) 0 1px 0;
+}
+
 /* BS OVERRIDES */
 
 .form-control {
