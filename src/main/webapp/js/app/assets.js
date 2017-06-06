@@ -13,13 +13,6 @@ AssetsViewModel = BaseViewModel.extend({
     this.totalPages = ko.observable(0);
     this.totalRecords = ko.observable(0);
 
-    this.folders = ko.observableArray();
-    this.currentFolderPath = ko.observableArray();
-    this.currentFolderId = ko.observable("b10000000000000000000000");
-    this._showAddFolder = ko.observable(false);
-
-    this.detailAsset = ko.observable();
-
     this.stats = {};
     this.stats.totalAssets = ko.observable(0);
     this.stats.triageAssets = ko.observable(0);
@@ -58,13 +51,57 @@ AssetsViewModel = BaseViewModel.extend({
       return this.currentPage() < this.totalPages();
     }, this);
 
-    this.detailAssetDataUrl = ko.computed(function() {
-      return self.detailAsset() ? '/api/v1/assets/' + self.detailAsset().id + '/data' : null;
-    }, this);
+    /* system folders */
 
-    this.detailAssetSelected = ko.computed(function() {
-      return self.detailAsset() ? self.detailAsset().selected() : false;
-    }, this);
+    this.triageEl = $('#triage');
+    this.trashEl = $('#trash');
+
+    // triage
+    this.triageEl.droppable({
+      accept: ".result-box",
+      hoverClass: "highlight",
+      tolerance: "pointer"
+    });
+
+    this.triageEl.on("drop", function( event, ui ) {
+      self.resetAllMessages();
+      var assetId = $(ui.draggable.context).attr('asset_id');
+      self.moveToTriage(assetId);
+    });
+
+    // trash
+    this.trashEl.droppable({
+      accept: ".result-box",
+      hoverClass: "highlight",
+      tolerance: "pointer"
+    });
+
+    this.trashEl.on("drop", function( event, ui ) {
+      self.resetAllMessages();
+      var assetId = $(ui.draggable.context).attr('asset_id');
+      self.moveToTrash(assetId);
+    });
+
+    /* folder nav */
+    self.setupFolderNav();
+
+    /* asset nav */
+    self.setupAssetDetailNav();
+
+    /* right-click context */
+    self.setUpRightClickContext();
+
+    /* display */
+    this.search();
+  },
+
+  setupFolderNav: function() {
+    var self = this;
+
+    self.folders = ko.observableArray();
+    self.currentFolderPath = ko.observableArray();
+    self._showAddFolder = ko.observable(false);
+    self.currentFolderId = ko.observable("b10000000000000000000000");
 
     $('#renameFolderForm').on('submit', function(e) {
       self.resetAllMessages();
@@ -113,78 +150,55 @@ AssetsViewModel = BaseViewModel.extend({
       }
     });
 
-    self.setUpRightClickContext();
-
     // initialize commonly used elements
-    this.moveToFolderTreeEl = $('#folderSelModal-moveFolder-tree');
-    this.moveFolderEl = $('#folderSelModal-moveFolder-actionBtn');
+    self.moveToFolderTreeEl = $('#folderSelModal-moveFolder-tree');
+    self.moveFolderEl = $('#folderSelModal-moveFolder-actionBtn');
     // when a folder is selected, enable the "move" button
-    this.moveToFolderTreeEl.bind(
+    self.moveToFolderTreeEl.bind(
         "select_node.jstree", function(){
           self.moveFolderEl.removeAttr('disabled');
         }
     );
 
-    this.moveSelectedAssetsToFolderTreeEl = $('#folderSelModal-moveSelectedAssets-tree');
-    this.moveSelectedAssetsEl = $('#folderSelModal-moveSelectedAssets-actionBtn');
+    self.moveSelectedAssetsToFolderTreeEl = $('#folderSelModal-moveSelectedAssets-tree');
+    self.moveSelectedAssetsEl = $('#folderSelModal-moveSelectedAssets-actionBtn');
     // when a folder is selected, enable the "move" button
-    this.moveSelectedAssetsToFolderTreeEl.bind(
+    self.moveSelectedAssetsToFolderTreeEl.bind(
         "select_node.jstree", function(){
           self.moveSelectedAssetsEl.removeAttr('disabled');
         }
     );
 
-    this.moveAssetToFolderTreeEl = $('#folderSelModal-moveAsset-tree');
-    this.moveAssetEl = $('#folderSelModal-moveAsset-actionBtn');
+    self.moveAssetToFolderTreeEl = $('#folderSelModal-moveAsset-tree');
+    self.moveAssetEl = $('#folderSelModal-moveAsset-actionBtn');
     // when a folder is selected, enable the "move" button
-    this.moveAssetToFolderTreeEl.bind(
+    self.moveAssetToFolderTreeEl.bind(
         "select_node.jstree", function(){
           self.moveAssetEl.removeAttr('disabled');
         }
     );
 
-    this.triageEl = $('#triage');
-    this.trashEl = $('#trash');
+    this.loadFolders(self.currentFolderId());
+  },
 
-    /*
-     system folders
-     */
+  setupAssetDetailNav: function() {
+    var self = this;
 
-    // triage
-    this.triageEl.droppable({
-      accept: ".result-box",
-      hoverClass: "highlight",
-      tolerance: "pointer"
-    });
+    self.detailAsset = ko.observable();
 
-    this.triageEl.on("drop", function( event, ui ) {
-      self.resetAllMessages();
-      var assetId = $(ui.draggable.context).attr('asset_id');
-      self.moveToTriage(assetId);
-    });
+    self.detailAssetDataUrl = ko.computed(function() {
+      return self.detailAsset() ? '/api/v1/assets/' + self.detailAsset().id + '/data' : null;
+    }, this);
 
-    // trash
-    this.trashEl.droppable({
-      accept: ".result-box",
-      hoverClass: "highlight",
-      tolerance: "pointer"
-    });
-
-    this.trashEl.on("drop", function( event, ui ) {
-      self.resetAllMessages();
-      var assetId = $(ui.draggable.context).attr('asset_id');
-      self.moveToTrash(assetId);
-    });
+    self.detailAssetSelected = ko.computed(function() {
+      return self.detailAsset() ? self.detailAsset().selected() : false;
+    }, this);
 
     // when asset modal is closed
     $('#assetModal').on('hidden.bs.modal', function () {
       self.detailAsset(null);
       self.setupResultsHotkeys();
     });
-
-    // get the data
-    this.search();
-    this.loadFolders(self.currentFolderId());
   },
 
   setupResultsHotkeys: function() {

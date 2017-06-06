@@ -26,6 +26,12 @@ TrashViewModel = AssetsViewModel.extend({
 
   },
 
+  setupFolderNav: function() {
+    var self = this;
+    self.folders = ko.observableArray();
+  },
+
+
   setUpRightClickContext: function() {
     var self = this;
 

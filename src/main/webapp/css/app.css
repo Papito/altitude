@@ -556,7 +556,10 @@ select {
 }
 
 #noResults {
+    margin-top: 5em;
     text-align: center;
+    text-transform: uppercase;
+    letter-spacing: .2em;
 }
 
 #addFolderForm {
@@ -624,9 +627,12 @@ select {
 #noFolders {
     text-align: center;
     text-transform: uppercase;
-    font-size: .9em;
+    font-size: 1.2em;
     font-weight: bold;
     color: #677076;
+    margin-bottom: 2em;
+    margin-top: 2em;
+    letter-spacing: .1em;
 }
 
 #folders button {

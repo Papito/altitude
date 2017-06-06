@@ -6,5 +6,10 @@ TriageViewModel = AssetsViewModel.extend({
 
     this.base();
     console.log('Initializing triage view model');
+  },
+
+  setupFolderNav: function() {
+    var self = this;
+    self.folders = ko.observableArray();
   }
 });
