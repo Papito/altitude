@@ -225,13 +225,13 @@ ImportViewModel = BaseViewModel.extend({
   //FIXME: should display global error banner message and bail
   addCritical: function(asset, message) {
     $("#importedAssets").prepend(
-        '<div class="asset"><button type="button" class="btn btn-danger">' +
+        '<div class="result-box"><button type="button" class="btn btn-danger">' +
         message + '</button>&nbsp;&nbsp;</div>');
   },
 
   addSuccess: function(asset) {
     $("#importedAssets").html(
-        '<div class="asset">' +
+        '<div class="result-box">' +
         '<img src="/assets/' + asset.id + '/preview">' +
         '</div>');
     this.statsImported(this.statsImported() + 1);
