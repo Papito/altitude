@@ -1146,7 +1146,7 @@ AssetsViewModel = BaseViewModel.extend({
           tolerance: "pointer"
         });
 
-        elFolderTargets.on("drop", function( event, ui ) {
+        elFolderTargets.on("drop", function(event, ui) {
           self.resetAllMessages();
           var assetId = $(ui.draggable.context).attr('asset_id');
           var folderId = $(event.target).attr('folder_id');
