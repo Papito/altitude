@@ -74,7 +74,6 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   override def getAll(implicit ctx: Context, txId: TransactionId = new TransactionId): List[JsObject] = {
     txManager.asReadOnly[List[JsObject]] {
      val wCounts = addAssetCount(DAO.getAll)
-     //TODO: val wPaths = addPaths(wCounts)
      val wPaths = wCounts
      wPaths
     }
