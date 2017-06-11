@@ -6,6 +6,17 @@ if (!window.console) {
   };
 }
 
+
+function assert(condition, message) {
+  if (!condition) {
+    message = message || "Assertion failed";
+    if (typeof Error !== "undefined") {
+      throw new Error(message);
+    }
+    throw message; // Fallback
+  }
+}
+
 ko.bindingHandlers.click = {
   init: function(element, valueAccessor, allBindingsAccessor, viewModel, context) {
     var accessor = valueAccessor();

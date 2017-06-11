@@ -927,6 +927,7 @@ AssetsViewModel = BaseViewModel.extend({
   },
 
   showMoveAsset: function(assetId) {
+    assert(assetId);
     var self = this;
 
     if (!self.folders().length) {
@@ -961,12 +962,11 @@ AssetsViewModel = BaseViewModel.extend({
     self.moveAssetToFolder(assetId, moveToFolderId);
   },
 
-
-
   showMoveFolder: function(folderId) {
     var self = this;
 
     var successCallback = function() {
+      self.actionState = folderId;
       $('#folderSelModal-moveFolder').modal();
     };
 
@@ -1258,6 +1258,7 @@ AssetsViewModel = BaseViewModel.extend({
 
   moveFolder: function() {
     var self = this;
+    assert(self.actionState);
     var moveFolderId = self.actionState;
     var moveToFolderId = this.moveToFolderTreeEl.jstree('get_selected')[0];
     console.log('Moving', moveFolderId, 'to', moveToFolderId);

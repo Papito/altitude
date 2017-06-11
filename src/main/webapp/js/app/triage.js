@@ -50,13 +50,17 @@ TriageViewModel = AssetsViewModel.extend({
     var opts = {
       'successCallback': function (json) {
         var hierarchy = json.hierarchy;
-        self.folders(hierarchy);
+        self.folders.removeAll();
 
         // traverse the hierarchy and "massage" the tree. name -> text
         function _processFolderNode(node) {
+          // clone the node and add it to the folders observable array
+          self.folders.push($.extend({}, node));
+
           node.text = node.name;
           node.icon = "glyphicon glyphicon-folder-close";
           node.data = node.a_attr = {'folder_id': node.id};
+          node.li_attr = {'class': 'folder', 'folder_id': node.id};
           node.id = 'triage_node_' + node.id;
 
           for (var i = 0; i < node.children.length; ++i) {
@@ -83,6 +87,8 @@ TriageViewModel = AssetsViewModel.extend({
 
         self.treeEl.jstree(true).settings.core.data = hierarchy;
         self.treeEl.jstree(true).refresh();
+
+        console.log(self.folders());
       }
     };
 

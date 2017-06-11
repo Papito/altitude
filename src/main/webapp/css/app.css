@@ -622,6 +622,7 @@ select {
 #folders li {
     padding-left: .5em;
     list-style-type: none;
+    margin-top: .3em;
 }
 
 #noFolders {
