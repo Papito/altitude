@@ -602,14 +602,12 @@ select {
 
 /* FOLDERS */
 
-#folders {
-}
 
-#folders .glyphicon {
+.flat-folders .glyphicon {
     color: #917c24;
 }
 
-#folders ul {
+.flat-folders ul {
     list-style-type: none;
     -webkit-margin-before: 0em;
     -webkit-margin-after: 0em;
@@ -619,13 +617,13 @@ select {
     padding-left: 0;
 }
 
-#folders li {
+.flat-folders li {
     padding-left: .5em;
     list-style-type: none;
     margin-top: .3em;
 }
 
-#noFolders {
+.no-folders {
     text-align: center;
     text-transform: uppercase;
     font-size: 1.2em;
@@ -636,7 +634,7 @@ select {
     letter-spacing: .1em;
 }
 
-#folders button {
+.flat-folders button, .tree-folders button {
     line-height: .6em;
     font-size: .9em;
     background-color: transparent;
@@ -667,7 +665,7 @@ li.folder {
     font-weight: bold;
 }
 
-#folders .highlight, #systemFolders .highlight {
+.flat-folders .highlight, #systemFolders .highlight {
     background-color: #5a5855;
 }
 

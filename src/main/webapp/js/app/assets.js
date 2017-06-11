@@ -120,35 +120,7 @@ AssetsViewModel = BaseViewModel.extend({
       $('#renameFolderInput').focus().select();
     });
 
-    // register the folder context menu
-    $.contextMenu({
-      selector: 'li.folder',
-      items: {
-        rename: {
-          name: "Rename",
-          callback: function(key, opt){
-            self.resetAllMessages();
-            var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
-            self.showRenameFolder(folderId);
-          }
-        },
-        move: {
-          name: "Move",
-          callback: function(key, opt){
-            self.resetAllMessages();
-            var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
-            self.showMoveFolder(folderId);
-          }
-        },
-        delete: {
-          name: "Delete",
-          callback: function(key, opt){
-            var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
-            self.deleteFolder(folderId);
-          }
-        }
-      }
-    });
+    self._registerFolderContextMenu();
 
     // initialize commonly used elements
     self.moveToFolderTreeEl = $('#folderSelModal-moveFolder-tree');
@@ -179,6 +151,39 @@ AssetsViewModel = BaseViewModel.extend({
     );
 
     this.loadFolders(self.currentFolderId());
+  },
+
+  _registerFolderContextMenu: function() {
+    var self = this;
+
+    $.contextMenu({
+      selector: 'li.folder',
+      items: {
+        rename: {
+          name: "Rename folder",
+          callback: function(key, opt){
+            self.resetAllMessages();
+            var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
+            self.showRenameFolder(folderId);
+          }
+        },
+        move: {
+          name: "Move folder",
+          callback: function(key, opt){
+            self.resetAllMessages();
+            var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
+            self.showMoveFolder(folderId);
+          }
+        },
+        delete: {
+          name: "Delete folder",
+          callback: function(key, opt){
+            var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
+            self.deleteFolder(folderId);
+          }
+        }
+      }
+    });
   },
 
   setupAssetDetailNav: function() {

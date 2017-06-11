@@ -94,5 +94,47 @@ TriageViewModel = AssetsViewModel.extend({
 
     self.get('/api/v1/folders', opts);
 
+  },
+
+  _registerFolderContextMenu: function() {
+    var self = this;
+
+    $.contextMenu({
+      selector: 'li.folder',
+      items: {
+        add: {
+          name: "Add new folder",
+          callback: function(key, opt){
+            self.resetAllMessages();
+            var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
+            self.currentFolderId(folderId);
+            self._showAddFolder(true);
+          }
+        },
+        rename: {
+          name: "Rename folder",
+          callback: function(key, opt){
+            self.resetAllMessages();
+            var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
+            self.showRenameFolder(folderId);
+          }
+        },
+        move: {
+          name: "Move folder",
+          callback: function(key, opt){
+            self.resetAllMessages();
+            var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
+            self.showMoveFolder(folderId);
+          }
+        },
+        delete: {
+          name: "Delete folder",
+          callback: function(key, opt){
+            var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
+            self.deleteFolder(folderId);
+          }
+        }
+      }
+    });
   }
 });

@@ -13,7 +13,7 @@
   <vaadin-split-layout id="leftPanel" vertical style="width: 25%; min-width: 10%; max-width: 90%;">
 
     <div style="max-height: 95%">
-      <div id="folders">
+      <div class="flat-folders">
         {% include "./partials/system_folders.html" %}
 
         <div class="selected-path"
@@ -37,7 +37,7 @@
           </li>
         </ul>
 
-        <div id="noFolders" data-bind="visible: folders().length === 0">No folders</div>
+        <div class="no-folders" data-bind="visible: folders().length === 0">No folders</div>
 
         <div data-bind="visible: _showAddFolder" style="display: none">
           <form id="addFolderForm">
