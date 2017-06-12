@@ -103,12 +103,6 @@ AssetsViewModel = BaseViewModel.extend({
     self._showAddFolder = ko.observable(false);
     self.currentFolderId = ko.observable("b10000000000000000000000");
 
-    $('#renameFolderForm').on('submit', function(e) {
-      self.resetAllMessages();
-      e.preventDefault();
-      self.renameFolder();
-    });
-
     $('#addFolderForm').on('submit', function(e) {
       self.resetAllMessages();
       e.preventDefault();
@@ -118,6 +112,23 @@ AssetsViewModel = BaseViewModel.extend({
     $('#renameFolderModal').on('shown.bs.modal', function () {
       self.resetAllMessages();
       $('#renameFolderInput').focus().select();
+    });
+
+    $('#renameFolderForm').on('submit', function(e) {
+      self.resetAllMessages();
+      e.preventDefault();
+      self.renameFolder();
+    });
+
+    $('#newFolderModal').on('shown.bs.modal', function () {
+      self.resetAllMessages();
+      $('#newFolderModal\\.newFolderName').focus().select();
+    });
+
+    $('#newFolderModal\\.newFolderForm').on('submit', function(e) {
+      self.resetAllMessages();
+      e.preventDefault();
+      self.addFolderViaModal();
     });
 
     self._registerFolderContextMenu();
@@ -1095,8 +1106,7 @@ AssetsViewModel = BaseViewModel.extend({
   addFolder: function() {
     var self = this;
     var opts = {
-      'successCallback': function (json) {
-        console.log(json);
+      'successCallback': function() {
         self.hideAddFolder();
         self.loadFolders(self.currentFolderId());
       },
@@ -1104,6 +1114,23 @@ AssetsViewModel = BaseViewModel.extend({
       data: {
         'name': $('#newFolderName').val(),
         'parent_id': self.currentFolderId()
+      }
+    };
+
+    this.post('/api/v1/folders', opts);
+  },
+
+  addFolderViaModal: function() {
+    var self = this;
+    var opts = {
+      'successCallback': function() {
+        $('#newFolderModal').modal('hide');
+        self.loadFolders();
+      },
+      errorContainerId: 'newFolderModal\\.newFolderForm',
+      data: {
+        'name': $('#newFolderModal\\.newFolderName').val(),
+        'parent_id': self.actionState
       }
     };
 
@@ -1218,11 +1245,20 @@ AssetsViewModel = BaseViewModel.extend({
     var self = this;
     self.resetAllMessages();
     var modal = $('#renameFolderModal');
-    var folderToRename = $.grep(this.folders(), function(f){ return f.id == folderId; })[0];
+    var folderToRename = self.findFolderById(folderId);
     $('#renameFolderInput').val(folderToRename.name);
-    $('#renameFolderId').val(folderId);
-    modal.modal();
+    $('#renameFolderId').modal();
     self.resetFormErrors('#renameFolderForm');
+  },
+
+  showNewFolderModal: function() {
+    var self = this;
+    self.resetAllMessages();
+    var parentFolder = self.findFolderById(self.actionState);
+    $('#newFolderModal\\.parentFolderName').html(parentFolder.name);
+    $('#newFolderModal\\.newFolderName').val('');
+    $('#newFolderModal').modal();
+    self.resetFormErrors('#newFolderModal\\.newFolderForm');
   },
 
   deleteFolder: function(folderId) {
@@ -1285,10 +1321,6 @@ AssetsViewModel = BaseViewModel.extend({
     this.put('/api/v1/folders/' + moveFolderId, opts);
   },
 
-  showQuickSelectionView: function() {
-
-  },
-
   _removeFolder: function(id, hierarchy) {
     for(var i=0; i < hierarchy.length; ++i) {
       var o = hierarchy[i];
@@ -1304,6 +1336,18 @@ AssetsViewModel = BaseViewModel.extend({
         }
       }
     }
+  },
+
+  findFolderById: function(folderId) {
+    var self = this;
+    var res = $.grep(this.folders(), function(f){ return f.id == folderId; });
+
+    if (res.length != 1) {
+      console.log('CURRENT FOLDERS: ',  self.folders());
+      throw "Could not find folder id [" + folderId + "] in all viewable folders";
+    }
+
+    return res[0];
   },
 
   getDirectoryNames: function(path) {

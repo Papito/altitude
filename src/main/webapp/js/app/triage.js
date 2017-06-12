@@ -106,9 +106,8 @@ TriageViewModel = AssetsViewModel.extend({
           name: "Add new folder",
           callback: function(key, opt){
             self.resetAllMessages();
-            var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
-            self.currentFolderId(folderId);
-            self._showAddFolder(true);
+            self.actionState = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
+            self.showNewFolderModal();
           }
         },
         rename: {

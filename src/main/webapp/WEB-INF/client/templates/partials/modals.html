@@ -31,7 +31,7 @@
   </div>
 </div>
 
-<!-- Folder rename modal -->
+<!-- Rename folder -->
 <div class="modal fade" id="renameFolderModal" tabindex="-1" role="dialog" aria-labelledby="renameFolderLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -49,6 +49,36 @@
               <label for="renameFolderInput" class="control-label"></label>
               <div class="error"></div>
               <input id="renameFolderInput" name="name" type="text" class="form-control">
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- New folder -->
+<div class="modal fade" id="newFolderModal" tabindex="-1" role="dialog" aria-labelledby="newFolderLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="newFolderModal.newFolderForm">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title" id="newFolderLabel">
+            Make a new folder in "<span id="newFolderModal.parentFolderName"></span>"
+          </h4>
+        </div>
+        <div class="modal-body">
+          <form class="form-inline">
+            <div class="form-group">
+              <label for="newFolderModal.newFolderName" class="control-label"></label>
+              <div class="error"></div>
+              <input id="newFolderModal.newFolderName" name="name" type="text" class="form-control">
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
