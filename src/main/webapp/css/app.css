@@ -665,7 +665,7 @@ li.folder {
     font-weight: bold;
 }
 
-.flat-folders .highlight, #systemFolders .highlight {
+.flat-folders .highlight, .tree-folders .highlight, #systemFolders .highlight {
     background-color: #5a5855;
 }
 
