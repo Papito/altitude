@@ -850,10 +850,17 @@ AssetsViewModel = BaseViewModel.extend({
     self.post('/api/v1/trash/recycle', opts);
   },
 
-  _showFolderModal: function(treeEl, actionEl, successFn, showRoot, folderFilterFn) {
+  showFolderModal: function(args) {
     var self = this;
 
-    showRoot = showRoot || false;
+    assert(args.treeEl);
+    assert(args.successFn);
+
+    var treeEl = args.treeEl;
+    var actionEl = 'actionEl' in args ? args.actionEl : null;
+    var showRoot = 'showRoot' in args ? args.showRoot : false;
+    var successFn = args.successFn;
+    var folderFilterFn = 'folderFilterFn' in args ? args.folderFilterFn : null;
 
     var targetFolderSelected = typeof treeEl.jstree('get_selected')[0] === "string";
 
@@ -875,8 +882,8 @@ AssetsViewModel = BaseViewModel.extend({
 
         if (showRoot === true) {
           hierarchy.push({
-            'id': '0',
-            'name': 'Root',
+            'id': "b10000000000000000000000",
+            'name': 'Sorted',
             'children': allFolders
           });
         }
@@ -934,12 +941,13 @@ AssetsViewModel = BaseViewModel.extend({
       self._removeFolder(self.currentFolderId(), allFolders);
     };
 
-    self._showFolderModal(
-        self.moveSelectedAssetsToFolderTreeEl,
-        self.moveSelectedAssetsEl,
-        successCallback,
-        false, /* do not show root folder */
-        folderFilterFn);
+    self.showFolderModal({
+      treeEl: self.moveSelectedAssetsToFolderTreeEl,
+      actionEl: self.moveSelectedAssetsToFolderTreeEl,
+      successFn: successCallback,
+      showRoot: false,
+      folderFilterFn: folderFilterFn
+    });
   },
 
   showMoveAsset: function(assetId) {
@@ -960,12 +968,13 @@ AssetsViewModel = BaseViewModel.extend({
       self._removeFolder(self.currentFolderId(), allFolders);
     };
 
-    self._showFolderModal(
-        self.moveAssetToFolderTreeEl,
-        self.moveAssetEl,
-        successCallback,
-        false, /* do not show root folder */
-        folderFilterFn);
+    self.showFolderModal({
+      treeEl: self.moveAssetToFolderTreeEl,
+      actionEl: self.moveAssetEl,
+      successFn: successCallback,
+      showRoot: false,
+      folderFilterFn: folderFilterFn
+    });
   },
 
   moveAsset: function() {
@@ -990,12 +999,13 @@ AssetsViewModel = BaseViewModel.extend({
       self._removeFolder(folderId, allFolders);
     };
 
-    self._showFolderModal(
-        self.moveToFolderTreeEl,
-        self.moveFolderEl,
-        successCallback,
-        true, /* show root folder */
-        folderFilterFn);
+    self.showFolderModal({
+      treeEl: self.moveToFolderTreeEl,
+      actionEl: self.moveFolderEl,
+      successFn: successCallback,
+      showRoot: true,
+      folderFilterFn: folderFilterFn
+    });
   },
 
   moveSelectedAssets: function() {

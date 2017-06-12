@@ -89,11 +89,12 @@ TrashViewModel = AssetsViewModel.extend({
       $('#folderSelModal-moveSelectedAssetsFromTrash').modal();
     };
 
-
-    self._showFolderModal(
-        self.moveSelectedAssetsFromTrashTreeEl,
-        self.moveSelectedAssetsFromTrashEl,
-        successCallback);
+    self.showFolderModal({
+      treeEl: self.moveSelectedAssetsFromTrashTreeEl,
+      actionEl: self.moveSelectedAssetsFromTrashEl,
+      successFn: successCallback,
+      showRoot: false
+    });
   },
 
   showMoveAssetFromTrash: function(assetId) {
@@ -104,11 +105,12 @@ TrashViewModel = AssetsViewModel.extend({
       $('#folderSelModal-moveAssetFromTrash').modal();
     };
 
-
-    self._showFolderModal(
-        self.moveAssetFromTrashTreeEl,
-        self.moveAssetFromTrashEl,
-        successCallback);
+    self.showFolderModal({
+      treeEl: self.moveAssetFromTrashTreeEl,
+      actionEl: self.moveAssetFromTrashEl,
+      successFn: successCallback,
+      showRoot: false
+    });
   },
 
   moveAssetFromTrash: function() {
