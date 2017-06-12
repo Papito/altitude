@@ -103,23 +103,6 @@ AssetsViewModel = BaseViewModel.extend({
     self._showAddFolder = ko.observable(false);
     self.currentFolderId = ko.observable("b10000000000000000000000");
 
-    $('#addFolderForm').on('submit', function(e) {
-      self.resetAllMessages();
-      e.preventDefault();
-      self.addFolder();
-    });
-
-    $('#renameFolderModal').on('shown.bs.modal', function () {
-      self.resetAllMessages();
-      $('#renameFolderInput').focus().select();
-    });
-
-    $('#renameFolderForm').on('submit', function(e) {
-      self.resetAllMessages();
-      e.preventDefault();
-      self.renameFolder();
-    });
-
     $('#newFolderModal').on('shown.bs.modal', function () {
       self.resetAllMessages();
       $('#newFolderModal\\.newFolderName').focus().select();
@@ -132,16 +115,6 @@ AssetsViewModel = BaseViewModel.extend({
     });
 
     self._registerFolderContextMenu();
-
-    // initialize commonly used elements
-    self.moveToFolderTreeEl = $('#folderSelModal-moveFolder-tree');
-    self.moveFolderEl = $('#folderSelModal-moveFolder-actionBtn');
-    // when a folder is selected, enable the "move" button
-    self.moveToFolderTreeEl.bind(
-        "select_node.jstree", function(){
-          self.moveFolderEl.removeAttr('disabled');
-        }
-    );
 
     self.moveSelectedAssetsToFolderTreeEl = $('#folderSelModal-moveSelectedAssets-tree');
     self.moveSelectedAssetsEl = $('#folderSelModal-moveSelectedAssets-actionBtn');
@@ -175,7 +148,7 @@ AssetsViewModel = BaseViewModel.extend({
           callback: function(key, opt){
             self.resetAllMessages();
             var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
-            self.showRenameFolder(folderId);
+            self.showRenameFolderModal(folderId);
           }
         },
         move: {
@@ -990,9 +963,21 @@ AssetsViewModel = BaseViewModel.extend({
   showMoveFolder: function(folderId) {
     var self = this;
 
+    // initialize commonly used elements
+    var moveToFolderTreeEl = $('#moveFolderModal\\.tree');
+    moveToFolderTreeEl.unbind();
+    var moveFolderEl = $('#moveFolderModal\\.actionBtn');
+
+    // when a folder is selected, enable the "move" button
+    moveToFolderTreeEl.bind(
+        "select_node.jstree", function(){
+          moveFolderEl.removeAttr('disabled');
+        }
+    );
+
     var successCallback = function() {
       self.actionState = folderId;
-      $('#folderSelModal-moveFolder').modal();
+      $('#moveFolderModal').modal();
     };
 
     var folderFilterFn = function(allFolders) {
@@ -1000,8 +985,8 @@ AssetsViewModel = BaseViewModel.extend({
     };
 
     self.showFolderModal({
-      treeEl: self.moveToFolderTreeEl,
-      actionEl: self.moveFolderEl,
+      treeEl: moveToFolderTreeEl,
+      actionEl: moveFolderEl,
       successFn: successCallback,
       showRoot: true,
       folderFilterFn: folderFilterFn
@@ -1098,19 +1083,18 @@ AssetsViewModel = BaseViewModel.extend({
   showAddFolder: function() {
     var self = this;
     self.resetAllMessages();
+
+    var el = $('#addFolderForm');
+    el.unbind();
+
+    el.bind('submit', function(e) {
+      self.resetAllMessages();
+      e.preventDefault();
+      self.addFolder();
+    });
+
     this._showAddFolder(true);
-    $('#addFolderForm').find('input').attr("tabindex",-1).focus();
-  },
-
-  hideAddFolder: function() {
-    this.resetAddFolderForm();
-    this._showAddFolder(false);
-  },
-
-  resetAddFolderForm: function() {
-    var form = $('#addFolderForm');
-    form.find('.has-error').removeClass('has-error').find('.error').text('').hide();
-    form.find('input').val('');
+    el.find('input').attr("tabindex",-1).focus();
   },
 
   addFolder: function() {
@@ -1128,6 +1112,18 @@ AssetsViewModel = BaseViewModel.extend({
     };
 
     this.post('/api/v1/folders', opts);
+  },
+
+
+  hideAddFolder: function() {
+    this.resetAddFolderForm();
+    this._showAddFolder(false);
+  },
+
+  resetAddFolderForm: function() {
+    var form = $('#addFolderForm');
+    form.find('.has-error').removeClass('has-error').find('.error').text('').hide();
+    form.find('input').val('');
   },
 
   addFolderViaModal: function() {
@@ -1251,14 +1247,52 @@ AssetsViewModel = BaseViewModel.extend({
     self.search(callback);
   },
 
-  showRenameFolder: function(folderId) {
+  showRenameFolderModal: function(folderId) {
     var self = this;
     self.resetAllMessages();
-    var modal = $('#renameFolderModal');
+    self.resetFormErrors('#renameFolderModal\\.form');
+
+    self.actionState = folderId;
+
+    var modalEl = $('#renameFolderModal');
+
     var folderToRename = self.findFolderById(folderId);
-    $('#renameFolderInput').val(folderToRename.name);
-    $('#renameFolderId').modal();
-    self.resetFormErrors('#renameFolderForm');
+    $('#renameFolderModal\\.input').val(folderToRename.name);
+
+    modalEl.bind('shown.bs.modal', function () {
+      self.resetAllMessages();
+      $('#renameFolderModal\\.input').focus().select();
+    });
+
+    $('#renameFolderModal\\.form').unbind().bind('submit', function(e) {
+      self.resetAllMessages();
+      e.preventDefault();
+      self.renameFolder();
+    });
+
+    modalEl.modal();
+  },
+
+  renameFolder: function() {
+    var self = this;
+
+    var folderId = self.actionState;
+
+    var newFolderName = $('#renameFolderModal\\.input').val();
+    console.log('Renaming folder', folderId, 'with new name', newFolderName);
+
+    var opts = {
+      'successCallback': function() {
+        self.loadFolders(self.currentFolderId());
+        $('#renameFolderModal').modal('hide');
+      },
+      errorContainerId: 'renameFolderModal\\.form',
+      'data': {
+        'name': newFolderName
+      }
+    };
+
+    this.put('/api/v1/folders/' + folderId, opts);
   },
 
   showNewFolderModal: function() {
@@ -1287,31 +1321,12 @@ AssetsViewModel = BaseViewModel.extend({
     this.del('/api/v1/folders/' + folderId, opts);
   },
 
-  renameFolder: function() {
-    var self = this;
-    var folderId = $('#renameFolderId').val();
-    var newFolderName = $('#renameFolderInput').val();
-    console.log('Renaming folder', folderId, 'with new name', newFolderName);
-
-    var opts = {
-      'successCallback': function() {
-        self.loadFolders(self.currentFolderId());
-        $('#renameFolderModal').modal('hide');
-      },
-      errorContainerId: 'renameFolderForm',
-      'data': {
-        'name': newFolderName
-      }
-    };
-
-    this.put('/api/v1/folders/' + folderId, opts);
-  },
-
   moveFolder: function() {
     var self = this;
     assert(self.actionState);
     var moveFolderId = self.actionState;
-    var moveToFolderId = this.moveToFolderTreeEl.jstree('get_selected')[0];
+    var moveToFolderTreeEl = $('#moveFolderModal\\.tree');
+    var moveToFolderId = moveToFolderTreeEl.jstree('get_selected')[0];
     console.log('Moving', moveFolderId, 'to', moveToFolderId);
 
     var opts = {
@@ -1321,7 +1336,7 @@ AssetsViewModel = BaseViewModel.extend({
       },
       'finally': function() {
         self.actionState = null;
-        $('#folderSelModal-moveFolder').modal('hide');
+        $('#moveFolderModal').modal('hide');
       },
       'data': {
         'parent_id': moveToFolderId
@@ -1331,6 +1346,10 @@ AssetsViewModel = BaseViewModel.extend({
     this.put('/api/v1/folders/' + moveFolderId, opts);
   },
 
+  /**
+   * Removes a given folder ID from the passed hierarchy.
+   * Operates on the internal data structure, no external calls
+   */
   _removeFolder: function(id, hierarchy) {
     for(var i=0; i < hierarchy.length; ++i) {
       var o = hierarchy[i];

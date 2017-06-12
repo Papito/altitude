@@ -5,25 +5,6 @@ TrashViewModel = AssetsViewModel.extend({
 
     this.base();
     console.log('Initializing trash view model');
-
-    this.moveSelectedAssetsFromTrashTreeEl = $('#folderSelModal-moveSelectedAssetsFromTrash-tree');
-    this.moveSelectedAssetsFromTrashEl = $('#folderSelModal-moveSelectedAssetsFromTrash-actionBtn');
-    // when a folder is selected, enable the "move" button
-    this.moveSelectedAssetsFromTrashTreeEl.bind(
-        "select_node.jstree", function(){
-          self.moveSelectedAssetsFromTrashEl.removeAttr('disabled');
-        }
-    );
-
-    this.moveAssetFromTrashTreeEl = $('#folderSelModal-moveAssetFromTrash-tree');
-    this.moveAssetFromTrashEl = $('#folderSelModal-moveAssetFromTrash-actionBtn');
-    // when a folder is selected, enable the "move" button
-    this.moveAssetFromTrashTreeEl.bind(
-        "select_node.jstree", function(){
-          self.moveAssetFromTrashEl.removeAttr('disabled');
-        }
-    );
-
   },
 
   setupFolderNav: function() {
@@ -86,12 +67,23 @@ TrashViewModel = AssetsViewModel.extend({
     var self = this;
 
     var successCallback = function() {
-      $('#folderSelModal-moveSelectedAssetsFromTrash').modal();
+      $('#moveSelectedAssetsFromTrashModal').modal();
     };
 
+    var moveSelectedAssetsFromTrashTreeEl = $('#moveSelectedAssetsFromTrashModal\\.tree');
+    var moveSelectedAssetsFromTrashEl = $('#moveSelectedAssetsFromTrashModal\\.actionBtn');
+
+    // when a folder is selected, enable the "move" button
+    moveSelectedAssetsFromTrashTreeEl.unbind();
+    moveSelectedAssetsFromTrashTreeEl.bind(
+        "select_node.jstree", function(){
+          moveSelectedAssetsFromTrashEl.removeAttr('disabled');
+        }
+    );
+
     self.showFolderModal({
-      treeEl: self.moveSelectedAssetsFromTrashTreeEl,
-      actionEl: self.moveSelectedAssetsFromTrashEl,
+      treeEl: moveSelectedAssetsFromTrashTreeEl,
+      actionEl: moveSelectedAssetsFromTrashEl,
       successFn: successCallback,
       showRoot: false
     });
@@ -102,12 +94,23 @@ TrashViewModel = AssetsViewModel.extend({
 
     var successCallback = function() {
       self.actionState = assetId;
-      $('#folderSelModal-moveAssetFromTrash').modal();
+      $('#moveAssetFromTrashModal').modal();
     };
 
+    var moveAssetFromTrashTreeEl = $('#moveAssetFromTrashModal\\.tree');
+    var moveAssetFromTrashEl = $('#moveAssetFromTrashModal\\.actionBtn');
+    moveAssetFromTrashTreeEl.unbind();
+
+    // when a folder is selected, enable the "move" button
+    moveAssetFromTrashTreeEl.bind(
+        "select_node.jstree", function(){
+          moveAssetFromTrashEl.removeAttr('disabled');
+        }
+    );
+
     self.showFolderModal({
-      treeEl: self.moveAssetFromTrashTreeEl,
-      actionEl: self.moveAssetFromTrashEl,
+      treeEl: moveAssetFromTrashTreeEl,
+      actionEl: moveAssetFromTrashEl,
       successFn: successCallback,
       showRoot: false
     });
