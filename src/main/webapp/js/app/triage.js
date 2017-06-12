@@ -123,7 +123,7 @@ TriageViewModel = AssetsViewModel.extend({
           callback: function(key, opt){
             self.resetAllMessages();
             var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
-            self.showMoveFolder(folderId);
+            self.showMoveFolderModal(folderId);
           }
         },
         delete: {

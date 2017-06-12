@@ -37,7 +37,7 @@ TrashViewModel = AssetsViewModel.extend({
     });
   },
 
-  showAssetDetail: function(view, asset) {
+  showAssetDetailModal: function(view, asset) {
     console.log('Trash asset view not implemented');
   },
 
@@ -45,10 +45,10 @@ TrashViewModel = AssetsViewModel.extend({
     var self = this;
 
     if (self.selectedCount()) {
-      self.showMoveSelectedAssetsFromTrash();
+      self.showMoveSelectedAssetsFromTrashModal();
     }
     else {
-      self.showMoveAssetFromTrash(assetId);
+      self.showMoveAssetFromTrashModal(assetId);
     }
   },
 
@@ -63,7 +63,7 @@ TrashViewModel = AssetsViewModel.extend({
     }
   },
 
-  showMoveSelectedAssetsFromTrash: function() {
+  showMoveSelectedAssetsFromTrashModal: function() {
     var self = this;
 
     var successCallback = function() {
@@ -74,8 +74,8 @@ TrashViewModel = AssetsViewModel.extend({
     var moveSelectedAssetsFromTrashEl = $('#moveSelectedAssetsFromTrashModal\\.actionBtn');
 
     // when a folder is selected, enable the "move" button
-    moveSelectedAssetsFromTrashTreeEl.unbind();
-    moveSelectedAssetsFromTrashTreeEl.bind(
+    moveSelectedAssetsFromTrashTreeEl.off();
+    moveSelectedAssetsFromTrashTreeEl.on(
         "select_node.jstree", function(){
           moveSelectedAssetsFromTrashEl.removeAttr('disabled');
         }
@@ -89,7 +89,7 @@ TrashViewModel = AssetsViewModel.extend({
     });
   },
 
-  showMoveAssetFromTrash: function(assetId) {
+  showMoveAssetFromTrashModal: function(assetId) {
     var self = this;
 
     var successCallback = function() {
@@ -99,10 +99,10 @@ TrashViewModel = AssetsViewModel.extend({
 
     var moveAssetFromTrashTreeEl = $('#moveAssetFromTrashModal\\.tree');
     var moveAssetFromTrashEl = $('#moveAssetFromTrashModal\\.actionBtn');
-    moveAssetFromTrashTreeEl.unbind();
+    moveAssetFromTrashTreeEl.off();
 
     // when a folder is selected, enable the "move" button
-    moveAssetFromTrashTreeEl.bind(
+    moveAssetFromTrashTreeEl.on(
         "select_node.jstree", function(){
           moveAssetFromTrashEl.removeAttr('disabled');
         }

@@ -120,23 +120,24 @@
 
 <!-- Move assets -->
 <div class="modal fade"
-     id="folderSelModal-moveSelectedAssets"
+     id="moveSelectedAssetsModal"
      tabindex="-1"
      role="dialog"
-     aria-labelledby="folderSelModal-moveSelectedAssets-lbl">
+     aria-labelledby=moveSelectedAssetsModal.lbl">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <form>
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="folderSelModal-moveSelectedAssets-lbl">Select folder to move to</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="moveSelectedAssetsModal.lbl">Select folder to move to</h4>
         </div>
         <div class="modal-body">
-          <div id="folderSelModal-moveSelectedAssets-tree"></div>
+          <div id="moveSelectedAssetsModal.tree"></div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button id="folderSelModal-moveSelectedAssets-actionBtn"
+          <button id="moveSelectedAssetsModal.actionBtn"
                   type="button"
                   class="btn btn-warning"
                   data-bind="click: moveSelectedAssets">Move</button>
@@ -148,23 +149,24 @@
 
 <!-- Move a single asset -->
 <div class="modal fade"
-     id="folderSelModal-moveAsset"
+     id="moveAssetModal"
      tabindex="-1"
      role="dialog"
-     aria-labelledby="folderSelModal-moveAsset-lbl">
+     aria-labelledby="moveAssetModal.lbl">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <form>
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="folderSelModal-moveAsset-lbl">Select folder to move to</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="moveAssetModal.lbl">Select folder to move to</h4>
         </div>
         <div class="modal-body">
-          <div id="folderSelModal-moveAsset-tree"></div>
+          <div id="moveAssetModal.tree"></div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button id="folderSelModal-moveAsset-actionBtn"
+          <button id="moveAssetModal.actionBtn"
                   type="button"
                   class="btn btn-warning"
                   data-bind="click: moveAsset">Move</button>

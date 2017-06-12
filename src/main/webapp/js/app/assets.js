@@ -103,36 +103,7 @@ AssetsViewModel = BaseViewModel.extend({
     self._showAddFolder = ko.observable(false);
     self.currentFolderId = ko.observable("b10000000000000000000000");
 
-    $('#newFolderModal').on('shown.bs.modal', function () {
-      self.resetAllMessages();
-      $('#newFolderModal\\.newFolderName').focus().select();
-    });
-
-    $('#newFolderModal\\.newFolderForm').on('submit', function(e) {
-      self.resetAllMessages();
-      e.preventDefault();
-      self.addFolderViaModal();
-    });
-
     self._registerFolderContextMenu();
-
-    self.moveSelectedAssetsToFolderTreeEl = $('#folderSelModal-moveSelectedAssets-tree');
-    self.moveSelectedAssetsEl = $('#folderSelModal-moveSelectedAssets-actionBtn');
-    // when a folder is selected, enable the "move" button
-    self.moveSelectedAssetsToFolderTreeEl.bind(
-        "select_node.jstree", function(){
-          self.moveSelectedAssetsEl.removeAttr('disabled');
-        }
-    );
-
-    self.moveAssetToFolderTreeEl = $('#folderSelModal-moveAsset-tree');
-    self.moveAssetEl = $('#folderSelModal-moveAsset-actionBtn');
-    // when a folder is selected, enable the "move" button
-    self.moveAssetToFolderTreeEl.bind(
-        "select_node.jstree", function(){
-          self.moveAssetEl.removeAttr('disabled');
-        }
-    );
 
     this.loadFolders(self.currentFolderId());
   },
@@ -156,7 +127,7 @@ AssetsViewModel = BaseViewModel.extend({
           callback: function(key, opt){
             self.resetAllMessages();
             var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
-            self.showMoveFolder(folderId);
+            self.showMoveFolderModal(folderId);
           }
         },
         delete: {
@@ -182,12 +153,6 @@ AssetsViewModel = BaseViewModel.extend({
     self.detailAssetSelected = ko.computed(function() {
       return self.detailAsset() ? self.detailAsset().selected() : false;
     }, this);
-
-    // when asset modal is closed
-    $('#assetModal').on('hidden.bs.modal', function () {
-      self.detailAsset(null);
-      self.setupResultsHotkeys();
-    });
   },
 
   setupResultsHotkeys: function() {
@@ -247,7 +212,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     Mousetrap.bind('return', function() {
       var asset = self.getFocusedAsset();
-      self.showAssetDetail(self, asset);
+      self.showAssetDetailModal(self, asset);
     });
 
     Mousetrap.bind('esc', function() {
@@ -279,7 +244,7 @@ AssetsViewModel = BaseViewModel.extend({
 
       // if there is a selection, show the confirmation dialog
       if (self.selectedCount()) {
-        self.showMoveSelectedToTrash();
+        self.showMoveSelectedToTrashModal();
         return;
       }
 
@@ -347,7 +312,7 @@ AssetsViewModel = BaseViewModel.extend({
 
       // after we delete the asset, display the one focused in its place
       var cb = function() {
-        self.showAssetDetail(self, self.getFocusedAsset());
+        self.showAssetDetailModal(self, self.getFocusedAsset());
       };
 
       self.moveToTrash(self.detailAsset().id, cb);
@@ -383,10 +348,10 @@ AssetsViewModel = BaseViewModel.extend({
     var self = this;
 
     if (self.selectedCount()) {
-      self.showMoveSelectedAssets();
+      self.showMoveSelectedAssetsModal();
     }
     else {
-      self.showMoveAsset(assetId);
+      self.showMoveAssetModal(assetId);
     }
   },
 
@@ -794,7 +759,7 @@ AssetsViewModel = BaseViewModel.extend({
     focusedAsset.selected(false);
   },
 
-  showMoveSelectedToTrash: function() {
+  showMoveSelectedToTrashModal: function() {
     var self = this;
     $('#delSelectedAssetsModal').modal();
   },
@@ -898,7 +863,7 @@ AssetsViewModel = BaseViewModel.extend({
     self.get('/api/v1/folders', opts);
   },
 
-  showMoveSelectedAssets: function() {
+  showMoveSelectedAssetsModal: function() {
     var self = this;
 
     if (!self.folders().length) {
@@ -906,8 +871,20 @@ AssetsViewModel = BaseViewModel.extend({
       return;
     }
 
+    var modalEl = $('#moveSelectedAssetsModal');
+    var moveSelectedAssetsToFolderTreeEl = $('#moveSelectedAssetsModal\\.tree');
+    moveSelectedAssetsToFolderTreeEl.off();
+    var moveSelectedAssetsEl = $('#moveSelectedAssetsModal\\.actionBtn');
+
+    // when a folder is selected, enable the "move" button
+    moveSelectedAssetsToFolderTreeEl.on(
+        "select_node.jstree", function(){
+          moveSelectedAssetsEl.removeAttr('disabled');
+        }
+    );
+
     var successCallback = function() {
-      $('#folderSelModal-moveSelectedAssets').modal();
+      modalEl.modal();
     };
 
     var folderFilterFn = function(allFolders) {
@@ -915,15 +892,47 @@ AssetsViewModel = BaseViewModel.extend({
     };
 
     self.showFolderModal({
-      treeEl: self.moveSelectedAssetsToFolderTreeEl,
-      actionEl: self.moveSelectedAssetsToFolderTreeEl,
+      treeEl: moveSelectedAssetsToFolderTreeEl,
+      actionEl: moveSelectedAssetsEl,
       successFn: successCallback,
       showRoot: false,
       folderFilterFn: folderFilterFn
     });
   },
 
-  showMoveAsset: function(assetId) {
+  moveSelectedAssets: function() {
+    var self = this;
+
+    var moveSelectedAssetsToFolderTreeEl = $('#moveSelectedAssetsModal\\.tree');
+
+    var moveToFolderId = moveSelectedAssetsToFolderTreeEl.jstree('get_selected')[0];
+    console.log('move selected assets to ' + moveToFolderId);
+
+    var opts = {
+      'data': {
+        'asset_ids': self.selectedIds()
+      },
+      'successCallback': function() {
+        self.loadFolders();
+        self.clearSelection();
+        self.refreshResults();
+        if (self.currentFolderId() === '0') {
+          self.warning("Assets moved. They may still be visible since you are viewing all assets.");
+
+        } else {
+          self.success("Assets moved");
+        }
+      },
+      'finally': function() {
+        self.clearSelection();
+        $('#moveSelectedAssetsModal').modal('hide');
+      }
+    };
+
+    self.post('/api/v1/assets/move/to/' + moveToFolderId, opts);
+  },
+
+  showMoveAssetModal: function(assetId) {
     assert(assetId);
     var self = this;
 
@@ -932,9 +941,21 @@ AssetsViewModel = BaseViewModel.extend({
       return;
     }
 
+    var moveAssetToFolderTreeEl = $('#moveAssetModal\\.tree');
+    moveAssetToFolderTreeEl.off();
+
+    var moveAssetEl = $('#moveAssetModal\\.actionBtn');
+
+    // when a folder is selected, enable the "move" button
+    moveAssetToFolderTreeEl.on(
+        "select_node.jstree", function(){
+          moveAssetEl.removeAttr('disabled');
+        }
+    );
+
     var successCallback = function() {
       self.actionState = assetId;
-      $('#folderSelModal-moveAsset').modal();
+      $('#moveAssetModal').modal();
     };
 
     var folderFilterFn = function(allFolders) {
@@ -942,8 +963,8 @@ AssetsViewModel = BaseViewModel.extend({
     };
 
     self.showFolderModal({
-      treeEl: self.moveAssetToFolderTreeEl,
-      actionEl: self.moveAssetEl,
+      treeEl: moveAssetToFolderTreeEl,
+      actionEl: moveAssetEl,
       successFn: successCallback,
       showRoot: false,
       folderFilterFn: folderFilterFn
@@ -951,25 +972,23 @@ AssetsViewModel = BaseViewModel.extend({
   },
 
   moveAsset: function() {
-    /*
-    Move assets based on current state
-     */
     var self = this;
     var assetId = self.actionState;
-    var moveToFolderId = self.moveAssetToFolderTreeEl.jstree('get_selected')[0];
+    var moveToFolderId = $('#moveAssetModal\\.tree').jstree('get_selected')[0];
     self.moveAssetToFolder(assetId, moveToFolderId);
   },
 
-  showMoveFolder: function(folderId) {
+  showMoveFolderModal: function(folderId) {
     var self = this;
 
     // initialize commonly used elements
     var moveToFolderTreeEl = $('#moveFolderModal\\.tree');
-    moveToFolderTreeEl.unbind();
+    moveToFolderTreeEl.off();
+
     var moveFolderEl = $('#moveFolderModal\\.actionBtn');
 
     // when a folder is selected, enable the "move" button
-    moveToFolderTreeEl.bind(
+    moveToFolderTreeEl.on(
         "select_node.jstree", function(){
           moveFolderEl.removeAttr('disabled');
         }
@@ -991,35 +1010,6 @@ AssetsViewModel = BaseViewModel.extend({
       showRoot: true,
       folderFilterFn: folderFilterFn
     });
-  },
-
-  moveSelectedAssets: function() {
-    var self = this;
-    var moveToFolderId = self.moveSelectedAssetsToFolderTreeEl.jstree('get_selected')[0];
-    console.log('move selected assets to ' + moveToFolderId);
-
-    var opts = {
-      'data': {
-        'asset_ids': self.selectedIds()
-      },
-      'successCallback': function() {
-        self.loadFolders();
-        self.clearSelection();
-        self.refreshResults();
-        if (self.currentFolderId() === '0') {
-          self.warning("Assets moved. They may still be visible since you are viewing all assets.");
-
-        } else {
-          self.success("Assets moved");
-        }
-      },
-      'finally': function() {
-        self.clearSelection();
-        $('#folderSelModal-moveSelectedAssets').modal('hide');
-      }
-    };
-
-    self.post('/api/v1/assets/move/to/' + moveToFolderId, opts);
   },
 
   moveToTriage: function(assetId) {
@@ -1085,9 +1075,9 @@ AssetsViewModel = BaseViewModel.extend({
     self.resetAllMessages();
 
     var el = $('#addFolderForm');
-    el.unbind();
+    el.off();
 
-    el.bind('submit', function(e) {
+    el.on('submit', function(e) {
       self.resetAllMessages();
       e.preventDefault();
       self.addFolder();
@@ -1218,7 +1208,7 @@ AssetsViewModel = BaseViewModel.extend({
       },
       'finally': function() {
         self.actionState = null;
-        $('#folderSelModal-moveAsset').modal('hide');
+        $('#moveAssetModal').modal('hide');
       }
     };
 
@@ -1255,16 +1245,19 @@ AssetsViewModel = BaseViewModel.extend({
     self.actionState = folderId;
 
     var modalEl = $('#renameFolderModal');
+    modalEl.off();
 
     var folderToRename = self.findFolderById(folderId);
     $('#renameFolderModal\\.input').val(folderToRename.name);
 
-    modalEl.bind('shown.bs.modal', function () {
+    modalEl.on('shown.bs.modal', function () {
       self.resetAllMessages();
       $('#renameFolderModal\\.input').focus().select();
     });
 
-    $('#renameFolderModal\\.form').unbind().bind('submit', function(e) {
+    var formEl = $('#renameFolderModal\\.form');
+    formEl.off();
+    formEl.on('submit', function(e) {
       self.resetAllMessages();
       e.preventDefault();
       self.renameFolder();
@@ -1298,11 +1291,31 @@ AssetsViewModel = BaseViewModel.extend({
   showNewFolderModal: function() {
     var self = this;
     self.resetAllMessages();
+
     var parentFolder = self.findFolderById(self.actionState);
+
+    var modalEl = $('#newFolderModal');
+    modalEl.off();
+
     $('#newFolderModal\\.parentFolderName').html(parentFolder.name);
     $('#newFolderModal\\.newFolderName').val('');
-    $('#newFolderModal').modal();
+
+    modalEl.on('shown.bs.modal', function () {
+      self.resetAllMessages();
+      $('#newFolderModal\\.newFolderName').focus().select();
+    });
+
     self.resetFormErrors('#newFolderModal\\.newFolderForm');
+
+    var formEl = $('#newFolderModal\\.newFolderForm');
+    formEl.off();
+    formEl.on('submit', function(e) {
+      self.resetAllMessages();
+      e.preventDefault();
+      self.addFolderViaModal();
+    });
+
+    modalEl.modal();
   },
 
   deleteFolder: function(folderId) {
@@ -1457,17 +1470,28 @@ AssetsViewModel = BaseViewModel.extend({
     }
   },
 
-  showAssetDetail: function(view, asset) {
+  showAssetDetailModal: function(view, asset) {
     var self = view;
 
     if (!asset) {
       return;
     }
 
+    var el = $('#assetModal');
+    el.off();
+
+    el.on('hidden.bs.modal', function () {
+      self.detailAsset(null);
+      self.setupResultsHotkeys();
+    });
+
     var opts = {
       'successCallback': function (json) {
         self.detailAsset(new Asset(json.asset));
-        $('#assetModal').modal();
+
+        // when asset modal is closed
+
+        el.modal();
         self.focusAssetById(self.detailAsset().id);
         self.setupAssetDetailHotkeys();
 
@@ -1508,7 +1532,7 @@ AssetsViewModel = BaseViewModel.extend({
       var showNextAssetDetail = function() {
         var firstAsset = self.firstAsset();
         if (firstAsset) {
-          self.showAssetDetail(self, firstAsset);
+          self.showAssetDetailModal(self, firstAsset);
         }
       };
 
@@ -1519,7 +1543,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     var idx = self.getAssetIndex(self.detailAsset().id);
     var nextAsset = self.searchResults()[idx + 1];
-    self.showAssetDetail(self, nextAsset);
+    self.showAssetDetailModal(self, nextAsset);
   },
 
   gotoPrevAssetDetail: function() {
@@ -1538,7 +1562,7 @@ AssetsViewModel = BaseViewModel.extend({
       var showPrevAssetDetail = function() {
         var lastAsset = self.lastAsset();
         if (lastAsset) {
-          self.showAssetDetail(self, lastAsset);
+          self.showAssetDetailModal(self, lastAsset);
         }
       };
 
@@ -1549,6 +1573,6 @@ AssetsViewModel = BaseViewModel.extend({
 
     var idx = self.getAssetIndex(self.detailAsset().id);
     var prevAsset = self.searchResults()[idx - 1];
-    self.showAssetDetail(self, prevAsset);
+    self.showAssetDetailModal(self, prevAsset);
   }
 });
