@@ -872,11 +872,12 @@ AssetsViewModel = BaseViewModel.extend({
     }
 
     var modalEl = $('#moveSelectedAssetsModal');
-    var moveSelectedAssetsToFolderTreeEl = $('#moveSelectedAssetsModal\\.tree');
-    moveSelectedAssetsToFolderTreeEl.off();
-    var moveSelectedAssetsEl = $('#moveSelectedAssetsModal\\.actionBtn');
+    var moveSelectedAssetsToFolderTreeEl = $('#moveSelectedAssetsModal-tree');
+
+    var moveSelectedAssetsEl = $('#moveSelectedAssetsModal-actionBtn');
 
     // when a folder is selected, enable the "move" button
+    moveSelectedAssetsToFolderTreeEl.off("select_node.jstree");
     moveSelectedAssetsToFolderTreeEl.on(
         "select_node.jstree", function(){
           moveSelectedAssetsEl.removeAttr('disabled');
@@ -903,7 +904,7 @@ AssetsViewModel = BaseViewModel.extend({
   moveSelectedAssets: function() {
     var self = this;
 
-    var moveSelectedAssetsToFolderTreeEl = $('#moveSelectedAssetsModal\\.tree');
+    var moveSelectedAssetsToFolderTreeEl = $('#moveSelectedAssetsModal-tree');
 
     var moveToFolderId = moveSelectedAssetsToFolderTreeEl.jstree('get_selected')[0];
     console.log('move selected assets to ' + moveToFolderId);
@@ -936,17 +937,20 @@ AssetsViewModel = BaseViewModel.extend({
     assert(assetId);
     var self = this;
 
+/*
+    //FIXME: this does not work
     if (!self.folders().length) {
       self.warning('No folders created yet');
       return;
     }
+*/
 
-    var moveAssetToFolderTreeEl = $('#moveAssetModal\\.tree');
-    moveAssetToFolderTreeEl.off();
+    var moveAssetToFolderTreeEl = $('#moveAssetModal-tree');
 
-    var moveAssetEl = $('#moveAssetModal\\.actionBtn');
+    var moveAssetEl = $('#moveAssetModal-actionBtn');
 
     // when a folder is selected, enable the "move" button
+    moveAssetToFolderTreeEl.off("select_node.jstree");
     moveAssetToFolderTreeEl.on(
         "select_node.jstree", function(){
           moveAssetEl.removeAttr('disabled');
@@ -974,7 +978,7 @@ AssetsViewModel = BaseViewModel.extend({
   moveAsset: function() {
     var self = this;
     var assetId = self.actionState;
-    var moveToFolderId = $('#moveAssetModal\\.tree').jstree('get_selected')[0];
+    var moveToFolderId = $('#moveAssetModal-tree').jstree('get_selected')[0];
     self.moveAssetToFolder(assetId, moveToFolderId);
   },
 
@@ -982,12 +986,12 @@ AssetsViewModel = BaseViewModel.extend({
     var self = this;
 
     // initialize commonly used elements
-    var moveToFolderTreeEl = $('#moveFolderModal\\.tree');
-    moveToFolderTreeEl.off();
+    var moveToFolderTreeEl = $('#moveFolderModal-tree');
 
-    var moveFolderEl = $('#moveFolderModal\\.actionBtn');
+    var moveFolderEl = $('#moveFolderModal-actionBtn');
 
     // when a folder is selected, enable the "move" button
+    moveToFolderTreeEl.off("select_node.jstree");
     moveToFolderTreeEl.on(
         "select_node.jstree", function(){
           moveFolderEl.removeAttr('disabled');
@@ -1075,8 +1079,8 @@ AssetsViewModel = BaseViewModel.extend({
     self.resetAllMessages();
 
     var el = $('#addFolderForm');
-    el.off();
 
+    el.off('submit');
     el.on('submit', function(e) {
       self.resetAllMessages();
       e.preventDefault();
@@ -1123,9 +1127,9 @@ AssetsViewModel = BaseViewModel.extend({
         $('#newFolderModal').modal('hide');
         self.loadFolders();
       },
-      errorContainerId: 'newFolderModal\\.newFolderForm',
+      errorContainerId: 'newFolderModal-newFolderForm',
       data: {
-        'name': $('#newFolderModal\\.newFolderName').val(),
+        'name': $('#newFolderModal-newFolderName').val(),
         'parent_id': self.actionState
       }
     };
@@ -1240,23 +1244,23 @@ AssetsViewModel = BaseViewModel.extend({
   showRenameFolderModal: function(folderId) {
     var self = this;
     self.resetAllMessages();
-    self.resetFormErrors('#renameFolderModal\\.form');
+    self.resetFormErrors('#renameFolderModal-form');
 
     self.actionState = folderId;
 
     var modalEl = $('#renameFolderModal');
-    modalEl.off();
 
     var folderToRename = self.findFolderById(folderId);
-    $('#renameFolderModal\\.input').val(folderToRename.name);
+    $('#renameFolderModal-input').val(folderToRename.name);
 
+    modalEl.off('shown.bs.modal');
     modalEl.on('shown.bs.modal', function () {
       self.resetAllMessages();
-      $('#renameFolderModal\\.input').focus().select();
+      $('#renameFolderModal-input').focus().select();
     });
 
-    var formEl = $('#renameFolderModal\\.form');
-    formEl.off();
+    var formEl = $('#renameFolderModal-form');
+    formEl.off('submit');
     formEl.on('submit', function(e) {
       self.resetAllMessages();
       e.preventDefault();
@@ -1271,7 +1275,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     var folderId = self.actionState;
 
-    var newFolderName = $('#renameFolderModal\\.input').val();
+    var newFolderName = $('#renameFolderModal-input').val();
     console.log('Renaming folder', folderId, 'with new name', newFolderName);
 
     var opts = {
@@ -1279,7 +1283,7 @@ AssetsViewModel = BaseViewModel.extend({
         self.loadFolders(self.currentFolderId());
         $('#renameFolderModal').modal('hide');
       },
-      errorContainerId: 'renameFolderModal\\.form',
+      errorContainerId: 'renameFolderModal-form',
       'data': {
         'name': newFolderName
       }
@@ -1295,20 +1299,20 @@ AssetsViewModel = BaseViewModel.extend({
     var parentFolder = self.findFolderById(self.actionState);
 
     var modalEl = $('#newFolderModal');
-    modalEl.off();
 
-    $('#newFolderModal\\.parentFolderName').html(parentFolder.name);
-    $('#newFolderModal\\.newFolderName').val('');
+    $('#newFolderModal-parentFolderName').html(parentFolder.name);
+    $('#newFolderModal-newFolderName').val('');
 
+    modalEl.off('shown.bs.modal');
     modalEl.on('shown.bs.modal', function () {
       self.resetAllMessages();
-      $('#newFolderModal\\.newFolderName').focus().select();
+      $('#newFolderModal-newFolderName').focus().select();
     });
 
-    self.resetFormErrors('#newFolderModal\\.newFolderForm');
+    self.resetFormErrors('#newFolderModal-newFolderForm');
 
-    var formEl = $('#newFolderModal\\.newFolderForm');
-    formEl.off();
+    var formEl = $('#newFolderModal-newFolderForm');
+    formEl.off('submit');
     formEl.on('submit', function(e) {
       self.resetAllMessages();
       e.preventDefault();
@@ -1338,7 +1342,7 @@ AssetsViewModel = BaseViewModel.extend({
     var self = this;
     assert(self.actionState);
     var moveFolderId = self.actionState;
-    var moveToFolderTreeEl = $('#moveFolderModal\\.tree');
+    var moveToFolderTreeEl = $('#moveFolderModal-tree');
     var moveToFolderId = moveToFolderTreeEl.jstree('get_selected')[0];
     console.log('Moving', moveFolderId, 'to', moveToFolderId);
 
@@ -1478,8 +1482,8 @@ AssetsViewModel = BaseViewModel.extend({
     }
 
     var el = $('#assetModal');
-    el.off();
 
+    el.off('hidden.bs.modal');
     el.on('hidden.bs.modal', function () {
       self.detailAsset(null);
       self.setupResultsHotkeys();

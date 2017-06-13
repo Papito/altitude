@@ -32,22 +32,22 @@
 </div>
 
 <!-- Rename folder -->
-<div class="modal fade" id="renameFolderModal" tabindex="-1" role="dialog" aria-labelledby="renameFolderModal.lbl">
+<div class="modal fade" id="renameFolderModal" tabindex="-1" role="dialog" aria-labelledby="renameFolderModal-lbl">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <form id="renameFolderModal.form">
+      <form id="renameFolderModal-form">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
-          <h4 class="modal-title" id="renameFolderModal.lbl">Rename this folder</h4>
+          <h4 class="modal-title" id="renameFolderModal-lbl">Rename this folder</h4>
         </div>
         <div class="modal-body">
           <form class="form-inline">
             <div class="form-group">
-              <label for="renameFolderModal.input" class="control-label"></label>
+              <label for="renameFolderModal-input" class="control-label"></label>
               <div class="error"></div>
-              <input id="renameFolderModal.input" name="name" type="text" class="form-control">
+              <input id="renameFolderModal-input" name="name" type="text" class="form-control">
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -63,21 +63,21 @@
 <div class="modal fade" id="newFolderModal" tabindex="-1" role="dialog" aria-labelledby="newFolderLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <form id="newFolderModal.newFolderForm">
+      <form id="newFolderModal-newFolderForm">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
           <h4 class="modal-title" id="newFolderLabel">
-            Make a new folder in "<span id="newFolderModal.parentFolderName"></span>"
+            Make a new folder in "<span id="newFolderModal-parentFolderName"></span>"
           </h4>
         </div>
         <div class="modal-body">
           <form class="form-inline">
             <div class="form-group">
-              <label for="newFolderModal.newFolderName" class="control-label"></label>
+              <label for="newFolderModal-newFolderName" class="control-label"></label>
               <div class="error"></div>
-              <input id="newFolderModal.newFolderName" name="name" type="text" class="form-control">
+              <input id="newFolderModal-newFolderName" name="name" type="text" class="form-control">
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -96,7 +96,7 @@
      id="moveFolderModal"
      tabindex="-1"
      role="dialog"
-     aria-labelledby="moveFolderModal.lbl">
+     aria-labelledby="moveFolderModal-lbl">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <form>
@@ -104,14 +104,14 @@
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
-          <h4 class="modal-title" id="moveFolderModal.lbl">Select folder to move to</h4>
+          <h4 class="modal-title" id="moveFolderModal-lbl">Select folder to move to</h4>
         </div>
         <div class="modal-body">
-          <div id="moveFolderModal.tree"></div>
+          <div id="moveFolderModal-tree"></div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button id="moveFolderModal.actionBtn" type="button" class="btn btn-primary" data-bind="click: moveFolder">Move</button>
+          <button id="moveFolderModal-actionBtn" type="button" class="btn btn-primary" data-bind="click: moveFolder">Move</button>
         </div>
       </form>
     </div>
@@ -123,21 +123,21 @@
      id="moveSelectedAssetsModal"
      tabindex="-1"
      role="dialog"
-     aria-labelledby=moveSelectedAssetsModal.lbl">
+     aria-labelledby=moveSelectedAssetsModal-lbl">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <form>
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="moveSelectedAssetsModal.lbl">Select folder to move to</h4>
+          <h4 class="modal-title" id="moveSelectedAssetsModal-lbl">Select folder to move to</h4>
         </div>
         <div class="modal-body">
-          <div id="moveSelectedAssetsModal.tree"></div>
+          <div id="moveSelectedAssetsModal-tree"></div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button id="moveSelectedAssetsModal.actionBtn"
+          <button id="moveSelectedAssetsModal-actionBtn"
                   type="button"
                   class="btn btn-warning"
                   data-bind="click: moveSelectedAssets">Move</button>
@@ -152,21 +152,21 @@
      id="moveAssetModal"
      tabindex="-1"
      role="dialog"
-     aria-labelledby="moveAssetModal.lbl">
+     aria-labelledby="moveAssetModal-lbl">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <form>
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="moveAssetModal.lbl">Select folder to move to</h4>
+          <h4 class="modal-title" id="moveAssetModal-lbl">Select folder to move to</h4>
         </div>
         <div class="modal-body">
-          <div id="moveAssetModal.tree"></div>
+          <div id="moveAssetModal-tree"></div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button id="moveAssetModal.actionBtn"
+          <button id="moveAssetModal-actionBtn"
                   type="button"
                   class="btn btn-warning"
                   data-bind="click: moveAsset">Move</button>

@@ -74,7 +74,7 @@ TrashViewModel = AssetsViewModel.extend({
     var moveSelectedAssetsFromTrashEl = $('#moveSelectedAssetsFromTrashModal\\.actionBtn');
 
     // when a folder is selected, enable the "move" button
-    moveSelectedAssetsFromTrashTreeEl.off();
+    moveSelectedAssetsFromTrashTreeEl.off("select_node.jstree");
     moveSelectedAssetsFromTrashTreeEl.on(
         "select_node.jstree", function(){
           moveSelectedAssetsFromTrashEl.removeAttr('disabled');
@@ -99,9 +99,9 @@ TrashViewModel = AssetsViewModel.extend({
 
     var moveAssetFromTrashTreeEl = $('#moveAssetFromTrashModal\\.tree');
     var moveAssetFromTrashEl = $('#moveAssetFromTrashModal\\.actionBtn');
-    moveAssetFromTrashTreeEl.off();
 
     // when a folder is selected, enable the "move" button
+    moveAssetFromTrashTreeEl.off("select_node.jstree");
     moveAssetFromTrashTreeEl.on(
         "select_node.jstree", function(){
           moveAssetFromTrashEl.removeAttr('disabled');
