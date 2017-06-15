@@ -103,12 +103,12 @@ AssetsViewModel = BaseViewModel.extend({
     self._showAddFolder = ko.observable(false);
     self.currentFolderId = ko.observable("b10000000000000000000000");
 
-    self._registerFolderContextMenu();
+    self.registerFolderContextMenu();
 
     this.loadFolders(self.currentFolderId());
   },
 
-  _registerFolderContextMenu: function() {
+  registerFolderContextMenu: function() {
     var self = this;
 
     $.contextMenu({
@@ -788,24 +788,36 @@ AssetsViewModel = BaseViewModel.extend({
     self.post('/api/v1/trash/recycle', opts);
   },
 
-  showFolderModal: function(args) {
+  /**
+   * Show standardized folder tree in a specified element
+   * @param {Object} args.
+   * @param {string} args.treeEl - The tree element to paint the folder tree in.
+   * @param {string} [null] args.actionEl - The action element, enabled/disabled depending on selection state.
+   * @param {boolean} [false] args.showRoot - Show the Sorted node as the root of the tree.
+   * @param {function} [null] args.successFn - Success callback.
+   * @param {function} [null] args.folderFilterFn - The filter applied to the tree to hide nodes.
+   * @param {function} [null] args.folderAddedCb - Callback for each time a folder is added to hierarchy.
+   */
+  loadFolderTree: function(args) {
     var self = this;
 
     assert(args.treeEl);
-    assert(args.successFn);
 
     var treeEl = args.treeEl;
     var actionEl = 'actionEl' in args ? args.actionEl : null;
     var showRoot = 'showRoot' in args ? args.showRoot : false;
-    var successFn = args.successFn;
+    var successFn = 'successFn' in args ? args.successFn : null;
     var folderFilterFn = 'folderFilterFn' in args ? args.folderFilterFn : null;
+    var folderAddedFn = 'folderAddedFn' in args ? args.folderAddedFn : null;
 
     var targetFolderSelected = typeof treeEl.jstree('get_selected')[0] === "string";
 
-    if (targetFolderSelected) {
-      actionEl.removeAttr('disabled');
-    } else {
-      actionEl.attr('disabled','disabled');
+    if (actionEl) {
+      if (targetFolderSelected) {
+        actionEl.removeAttr('disabled');
+      } else {
+        actionEl.attr('disabled','disabled');
+      }
     }
 
     var opts = {
@@ -820,6 +832,7 @@ AssetsViewModel = BaseViewModel.extend({
 
         if (showRoot === true) {
           hierarchy.push({
+            //FIXME: hardcoded
             'id': "b10000000000000000000000",
             'name': 'Sorted',
             'children': allFolders
@@ -831,6 +844,12 @@ AssetsViewModel = BaseViewModel.extend({
 
         // traverse the hierarchy and "massage" the tree. name -> text
         function _processFolderNode(node) {
+          if (folderAddedFn) {
+            folderAddedFn(node);
+          }
+
+          node.icon = "glyphicon glyphicon-folder-close";
+
           node.text = node.name;
           for (var i = 0; i < node.children.length; ++i) {
             var child = node.children[i];
@@ -849,14 +868,17 @@ AssetsViewModel = BaseViewModel.extend({
           'core' : {
             "multiple" : false,
             "animation" : 0,
-            "check_callback": true},
+            "check_callback": true
+          },
           "plugins" : ["search"]
         });
 
         treeEl.jstree(true).settings.core.data = hierarchy;
         treeEl.jstree(true).refresh();
 
-        successFn(json);
+        if (successFn) {
+          successFn(json);
+        }
       }
     };
 
@@ -892,7 +914,7 @@ AssetsViewModel = BaseViewModel.extend({
       self._removeFolder(self.currentFolderId(), allFolders);
     };
 
-    self.showFolderModal({
+    self.loadFolderTree({
       treeEl: moveSelectedAssetsToFolderTreeEl,
       actionEl: moveSelectedAssetsEl,
       successFn: successCallback,
@@ -966,7 +988,7 @@ AssetsViewModel = BaseViewModel.extend({
       self._removeFolder(self.currentFolderId(), allFolders);
     };
 
-    self.showFolderModal({
+    self.loadFolderTree({
       treeEl: moveAssetToFolderTreeEl,
       actionEl: moveAssetEl,
       successFn: successCallback,
@@ -1007,7 +1029,7 @@ AssetsViewModel = BaseViewModel.extend({
       self._removeFolder(folderId, allFolders);
     };
 
-    self.showFolderModal({
+    self.loadFolderTree({
       treeEl: moveToFolderTreeEl,
       actionEl: moveFolderEl,
       successFn: successCallback,
