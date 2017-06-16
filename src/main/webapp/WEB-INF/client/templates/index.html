@@ -12,8 +12,9 @@
 <vaadin-split-layout horizontal style="width: 100%;">
   <vaadin-split-layout id="leftPanel" vertical style="width: 25%; min-width: 10%; max-width: 90%;">
 
-    <div style="max-height: 95%">
+    <div id="sortedLeftPanel" style="max-height: 95%">
       <div class="flat-folders">
+
         {% include "./partials/system_folders.html" %}
 
         <div class="selected-path"

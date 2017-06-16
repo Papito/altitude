@@ -1211,6 +1211,12 @@ AssetsViewModel = BaseViewModel.extend({
 
     self.get('/api/v1/folders/' + folderId + "/children", folderCallOpts);
 
+    self.loadStats();
+  },
+
+  loadStats: function() {
+    var self = this;
+
     var statsCallOpts = {
       'successCallback': function (json) {
         var stats = json['stats'];

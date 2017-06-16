@@ -73,6 +73,8 @@ TriageViewModel = AssetsViewModel.extend({
       successFn: successFn,
       folderAddedFn: folderAddedFn
     });
+
+    self.loadStats();
   },
 
   registerFolderContextMenu: function() {

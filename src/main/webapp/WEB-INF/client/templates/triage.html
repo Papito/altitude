@@ -11,8 +11,10 @@
 <vaadin-split-layout horizontal style="width: 100%;">
   <vaadin-split-layout id="leftPanel" vertical style="width: 30%; min-width: 10%; max-width: 90%;">
 
-    <div style="max-height: 95%">
+    <div id="triageLeftPanel" style="max-height: 95%">
       <div class="tree-folders">
+
+        {% include "./partials/system_folders.html" %}
 
         <div class="no-folders" data-bind="visible: folders().length === 0">No folders</div>
 

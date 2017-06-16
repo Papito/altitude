@@ -602,11 +602,6 @@ select {
 
 /* FOLDERS */
 
-
-.flat-folders .glyphicon {
-    color: #917c24;
-}
-
 .flat-folders ul {
     list-style-type: none;
     -webkit-margin-before: 0em;
@@ -645,26 +640,6 @@ li.folder {
     cursor: hand;
 }
 
-#systemFolders {
-    border-bottom: 1px solid #363636;
-    margin-bottom: 1em;
-}
-
-.system-folder {
-    padding-top: .5em;
-    padding-bottom: .5em;
-    text-align: center;
-}
-
-#triage {
-    border-right: 1px solid #363636;
-}
-
-#trash a {
-    color: #ff4e41;
-    font-weight: bold;
-}
-
 .flat-folders .highlight, .tree-folders .highlight, #systemFolders .highlight {
     background-color: #5a5855;
 }
@@ -679,6 +654,59 @@ li.folder {
     padding: .2em 0 .2em .5em;
     border-top: 1px solid #363636;
     border-bottom: 1px solid #363636;
+}
+
+/* SYSTEM FOLDERS */
+
+#systemFolders {
+    border-bottom: 1px solid #363636;
+    margin-bottom: 1em;
+}
+
+.system-folder {
+    padding-top: .5em;
+    padding-bottom: .5em;
+    text-align: center;
+}
+
+.system-folder .glyphicon {
+    color: #917c24;
+}
+
+#sortedLeftPanel #triage, #trashLeftPanel #triage {
+    border-right: 1px solid #363636;
+}
+
+#triageLeftPanel #sorted, #triageLeftPanel #sorted {
+    border-right: 1px solid #363636;
+}
+
+.system-folder.attn .glyphicon {
+    color: #917c24;
+}
+
+.system-folder.attn a {
+    color: #ff4e41;
+}
+
+.system-folder.disregard .glyphicon {
+    color: #5f5c58;
+}
+
+.system-folder.disregard a {
+    color: #5f5c58;
+}
+
+#sortedLeftPanel #systemFolders #sorted {
+    display: none;
+}
+
+#triageLeftPanel #systemFolders #triage {
+    display: none;
+}
+
+#trashLeftPanel #systemFolders #trash {
+    display: none;
 }
 
 /* PATH (BREADCRUMBS) */
