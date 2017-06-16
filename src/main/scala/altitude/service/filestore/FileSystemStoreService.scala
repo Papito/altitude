@@ -18,8 +18,11 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   final override def landfillFolderPath(implicit ctx: Context): String = C.Path.LANDFILL
 
   override def addFolder(folder: Folder)(implicit ctx: Context): Unit = {
+    require(folder.path.isDefined)
+    require(folder.path.get.nonEmpty)
+
     val destFile = absoluteFile(folder.path.get)
-    log.debug(s"Adding FS folder [$destFile]")
+    log.info(s"Adding FS folder [$destFile]")
 
     try {
       FileUtils.forceMkdir(destFile)
@@ -35,8 +38,11 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   }
 
   override def deleteFolder(folder: Folder)(implicit ctx: Context): Unit = {
+    require(folder.path.isDefined)
+    require(folder.path.get.nonEmpty)
+
     val destFile = absoluteFile(folder.path.get)
-    log.debug(s"Removing FS folder [$destFile]")
+    log.info(s"Removing FS folder [$destFile]")
 
     // ignore if not here anymore
     if (!destFile.exists) {
@@ -58,10 +64,13 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   }
 
   override def moveFolder(folder: Folder, newName: String)(implicit ctx: Context): Unit = {
+    require(folder.path.isDefined)
+    require(folder.path.get.nonEmpty)
+
     val srcFile = absoluteFile(folder.path.get)
     val newPath = FilenameUtils.concat(srcFile.getParent, newName)
     val destFile = new File(newPath)
-    log.debug(s"Moving folder [$srcFile] to [$destFile]")
+    log.info(s"Moving folder [$srcFile] to [$destFile]")
 
     if (destFile.exists) {
       throw StorageException(

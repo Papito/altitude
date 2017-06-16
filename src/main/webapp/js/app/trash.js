@@ -5,26 +5,13 @@ TrashViewModel = AssetsViewModel.extend({
 
     this.base();
     console.log('Initializing trash view model');
-
-    this.moveSelectedAssetsFromTrashTreeEl = $('#folderSelModal-moveSelectedAssetsFromTrash-tree');
-    this.moveSelectedAssetsFromTrashEl = $('#folderSelModal-moveSelectedAssetsFromTrash-actionBtn');
-    // when a folder is selected, enable the "move" button
-    this.moveSelectedAssetsFromTrashTreeEl.bind(
-        "select_node.jstree", function(){
-          self.moveSelectedAssetsFromTrashEl.removeAttr('disabled');
-        }
-    );
-
-    this.moveAssetFromTrashTreeEl = $('#folderSelModal-moveAssetFromTrash-tree');
-    this.moveAssetFromTrashEl = $('#folderSelModal-moveAssetFromTrash-actionBtn');
-    // when a folder is selected, enable the "move" button
-    this.moveAssetFromTrashTreeEl.bind(
-        "select_node.jstree", function(){
-          self.moveAssetFromTrashEl.removeAttr('disabled');
-        }
-    );
-
   },
+
+  setupFolderNav: function() {
+    var self = this;
+    self.loadStats();
+  },
+
 
   setUpRightClickContext: function() {
     var self = this;
@@ -50,7 +37,7 @@ TrashViewModel = AssetsViewModel.extend({
     });
   },
 
-  showAssetDetail: function(view, asset) {
+  showAssetDetailModal: function(view, asset) {
     console.log('Trash asset view not implemented');
   },
 
@@ -58,10 +45,10 @@ TrashViewModel = AssetsViewModel.extend({
     var self = this;
 
     if (self.selectedCount()) {
-      self.showMoveSelectedAssetsFromTrash();
+      self.showMoveSelectedAssetsFromTrashModal();
     }
     else {
-      self.showMoveAssetFromTrash(assetId);
+      self.showMoveAssetFromTrashModal(assetId);
     }
   },
 
@@ -76,33 +63,57 @@ TrashViewModel = AssetsViewModel.extend({
     }
   },
 
-  showMoveSelectedAssetsFromTrash: function() {
+  showMoveSelectedAssetsFromTrashModal: function() {
     var self = this;
 
     var successCallback = function() {
-      $('#folderSelModal-moveSelectedAssetsFromTrash').modal();
+      $('#moveSelectedAssetsFromTrashModal').modal();
     };
 
+    var moveSelectedAssetsFromTrashTreeEl = $('#moveSelectedAssetsFromTrashModal\\.tree');
+    var moveSelectedAssetsFromTrashEl = $('#moveSelectedAssetsFromTrashModal\\.actionBtn');
 
-    self._showFolderModal(
-        self.moveSelectedAssetsFromTrashTreeEl,
-        self.moveSelectedAssetsFromTrashEl,
-        successCallback);
+    // when a folder is selected, enable the "move" button
+    moveSelectedAssetsFromTrashTreeEl.off("select_node.jstree");
+    moveSelectedAssetsFromTrashTreeEl.on(
+        "select_node.jstree", function(){
+          moveSelectedAssetsFromTrashEl.removeAttr('disabled');
+        }
+    );
+
+    self.showFolderModal({
+      treeEl: moveSelectedAssetsFromTrashTreeEl,
+      actionEl: moveSelectedAssetsFromTrashEl,
+      successFn: successCallback,
+      showRoot: false
+    });
   },
 
-  showMoveAssetFromTrash: function(assetId) {
+  showMoveAssetFromTrashModal: function(assetId) {
     var self = this;
 
     var successCallback = function() {
       self.actionState = assetId;
-      $('#folderSelModal-moveAssetFromTrash').modal();
+      $('#moveAssetFromTrashModal').modal();
     };
 
+    var moveAssetFromTrashTreeEl = $('#moveAssetFromTrashModal\\.tree');
+    var moveAssetFromTrashEl = $('#moveAssetFromTrashModal\\.actionBtn');
 
-    self._showFolderModal(
-        self.moveAssetFromTrashTreeEl,
-        self.moveAssetFromTrashEl,
-        successCallback);
+    // when a folder is selected, enable the "move" button
+    moveAssetFromTrashTreeEl.off("select_node.jstree");
+    moveAssetFromTrashTreeEl.on(
+        "select_node.jstree", function(){
+          moveAssetFromTrashEl.removeAttr('disabled');
+        }
+    );
+
+    self.showFolderModal({
+      treeEl: moveAssetFromTrashTreeEl,
+      actionEl: moveAssetFromTrashEl,
+      successFn: successCallback,
+      showRoot: false
+    });
   },
 
   moveAssetFromTrash: function() {

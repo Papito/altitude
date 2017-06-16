@@ -1,24 +1,18 @@
-<div id="selectionTools" data-bind="visible: selectedCount()" style="display: none;">
-    <div class="btn-group btn-block">
+<div id="selectionTools" data-bind="visible: selectedCount()" class="row" style="display: none;">
+  <div class="col-md-12">
+    <div class="btn-group btn-block dropup">
       <button type="button" class="btn btn-success dropdown-toggle btn-block" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Selected <span class="badge" data-bind="html: selectedCount()"></span>
         <span class="caret caret-up"></span>
       </button>
       <ul class="dropdown-menu">
-        <!--
-                  <li data-bind="click: showQuickSelectionView">
-                    <a href="#"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>&nbsp;&nbsp;Quick view</a>
-                  </li>
-                  <li role="separator" class="divider"></li>
-        -->
-
-        <li data-bind="click: showMoveSelectedToTrash">
+        <li data-bind="click: showMoveSelectedToTrashModal">
           <a href="#"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span>&nbsp;&nbsp;Move to Trash</a>
         </li>
 
         <li role="separator" class="divider"></li>
 
-        <li data-bind="click: showMoveSelectedAssets">
+        <li data-bind="click: showMoveSelectedAssetsModal">
           <a href="#"><span class="glyphicon glyphicon-move" aria-hidden="true"></span>&nbsp;&nbsp;Move</a>
         </li>
 
@@ -29,4 +23,5 @@
         </li>
       </ul>
     </div>
+  </div>
 </div>

@@ -74,7 +74,6 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   override def getAll(implicit ctx: Context, txId: TransactionId = new TransactionId): List[JsObject] = {
     txManager.asReadOnly[List[JsObject]] {
      val wCounts = addAssetCount(DAO.getAll)
-     //TODO: val wPaths = addPaths(wCounts)
      val wPaths = wCounts
      wPaths
     }
@@ -266,12 +265,8 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     }
 
     txManager.withTransaction[Int] {
-      val res: Option[JsObject] = DAO.getById(id)
 
-      val folder: Folder = res.isDefined match {
-        case true => res.get
-        case false => throw NotFoundException(s"Cannot find folder ID '$id'")
-      }
+      val folder: Folder = getById(id)
 
       log.info(s"Deleting folder $folder")
 

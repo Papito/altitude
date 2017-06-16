@@ -8,74 +8,48 @@
 {% endblock %}
 
 {% block body %}
-<div class="row">
-  <ol class="breadcrumb" data-bind="visible: currentFolderPath().length > 1, foreach: currentFolderPath" style="display: none">
-    <li><a href="#" data-bind="text: $data.name, click: function() {$root.goIntoFolder($data.id)}"></a></li>
-  </ol>
+<vaadin-split-layout horizontal style="width: 100%;">
+  <vaadin-split-layout id="leftPanel" vertical style="width: 30%; min-width: 10%; max-width: 90%;">
 
-  <div class="col-md-2" id="left">
-    <div class="row">
-      <div id="folders">
-        <div>
-        <span class="header">
-        Move to Folders
-        </span>
-        <span class="showAddFolder">
-        <button type="button" data-bind="click: showAddFolder" class="btn btn-default btn-xs">+ Add</button>
-        </span>
+    <div id="triageLeftPanel" style="max-height: 95%">
+      <div class="tree-folders">
 
-          <div id="addFolder" data-bind="visible: _showAddFolder" style="display: none">
-            <form id="addFolderForm" class="form-inline">
-              <div class="form-group">
-                <label for="newFolderName" class="control-label"></label>
-                <div class="error"></div>
-                <input type="text" class="form-control" name="name" id="newFolderName" maxlength="255" placeholder="New folder name">
+        {% include "./partials/system_folders.html" %}
+
+        <div class="no-folders" data-bind="visible: folders().length === 0">No folders</div>
+
+        <div id="triageFolderTree"></div>
+
+        <div data-bind="visible: _showAddFolder" style="display: none">
+          <form id="addFolderForm">
+            <div class="col-md-12">
+              <div class="pull-right">
+                <button type="button" data-bind="click: hideAddFolder" class="btn">
+                  <span class="glyphicon glyphicon-remove-sign"></span></button>
               </div>
-            </form>
-
-            <div style="text-align: right">
-              <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-              <a href="#" data-bind="click: hideAddFolder">Cancel</a>
             </div>
-          </div>
+            <div class="col-md-12">
+              <div class="form-group">
+                <input type="text" class="form-control" name="name" id="newFolderName" maxlength="255" placeholder="New folder name">
+                <span class="error"></span>
+              </div>
+            </div>
+          </form>
         </div>
 
-        <ul data-bind="foreach: folders">
-          <li class="folder" data-bind="attr: {'folder_id': $data.id}">
-            <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
-            &nbsp;
-            <a href="#" data-bind="text: name, click: function() {$root.loadFolders($data.id)}"></a>
-            <span data-bind="html: '<span class=folder-count>(' + numOfAssets + ')</span>'"></span>
-          </li>
-        </ul>
-      </div><!-- /folders -->
-    </div><!-- /row -->
+      </div><!-- /#folders -->
+    </div><!-- /left top panel -->
 
-    <!--
-    system folders
-    -->
-    <div class="row">
-      <div id="systemFolders">
-        <div id="trash" class="system-folder">
-          <span class="header">
-            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-              <a href="/client/trash">Trash</a>
-              <span data-bind="html: '<span class=folder-count>(' + stats.recycledAssets()  + ')</span>'"></span>
-          </span>
-        </div>
-      </div>    </div>
+    <div style="max-height: 95%">
 
-    <div class="row">
-      <div class="col-md-12">
-        {% include "./partials/selection_tools.html" %}
-      </div>
-    </div>
-  </div>
+    </div><!-- /left bottom panel -->
+  </vaadin-split-layout>
 
-  <div class="col-md-10">
+  <div style="width: 70%; min-width: 10%; max-width: 90%;">
     {% include "./partials/search_results.html" %}
   </div>
-</div>
+
+</vaadin-split-layout>
 
 <!-- MODALS -->
 {% include "./partials/modals.html" %}

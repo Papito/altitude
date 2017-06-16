@@ -1,25 +1,366 @@
+/* SCAFFOLDING */
+
+@media screen {/*
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+*/
+
+    /*******************************
+              Flex Layout
+    *******************************/
+
+    html [layout][horizontal],
+    html [layout][vertical] {
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+    }
+
+    html [layout][horizontal][inline],
+    html [layout][vertical][inline] {
+        display: -ms-inline-flexbox;
+        display: -webkit-inline-flex;
+        display: inline-flex;
+    }
+
+    html [layout][horizontal] {
+        -ms-flex-direction: row;
+        -webkit-flex-direction: row;
+        flex-direction: row;
+    }
+
+    html [layout][horizontal][reverse] {
+        -ms-flex-direction: row-reverse;
+        -webkit-flex-direction: row-reverse;
+        flex-direction: row-reverse;
+    }
+
+    html [layout][vertical] {
+        -ms-flex-direction: column;
+        -webkit-flex-direction: column;
+        flex-direction: column;
+    }
+
+    html [layout][vertical][reverse] {
+        -ms-flex-direction: column-reverse;
+        -webkit-flex-direction: column-reverse;
+        flex-direction: column-reverse;
+    }
+
+    html [layout][wrap] {
+        -ms-flex-wrap: wrap;
+        -webkit-flex-wrap: wrap;
+        flex-wrap: wrap;
+    }
+
+    html [layout][wrap-reverse] {
+        -ms-flex-wrap: wrap-reverse;
+        -webkit-flex-wrap: wrap-reverse;
+        flex-wrap: wrap-reverse;
+    }
+
+    html [flex] {
+        -ms-flex: 1 1 0.000000001px;
+        -webkit-flex: 1;
+        flex: 1;
+        -webkit-flex-basis: 0.000000001px;
+        flex-basis: 0.000000001px;
+    }
+
+    html [vertical][layout] > [flex][auto-vertical],
+    html [vertical][layout]::shadow [flex][auto-vertical] {
+        -ms-flex: 1 1 auto;
+        -webkit-flex-basis: auto;
+        flex-basis: auto;
+    }
+
+    html [flex][auto] {
+        -ms-flex: 1 1 auto;
+        -webkit-flex-basis: auto;
+        flex-basis: auto;
+    }
+
+    html [flex][none] {
+        -ms-flex: none;
+        -webkit-flex: none;
+        flex: none;
+    }
+
+    html [flex][one] {
+        -ms-flex: 1;
+        -webkit-flex: 1;
+        flex: 1;
+    }
+
+    html [flex][two] {
+        -ms-flex: 2;
+        -webkit-flex: 2;
+        flex: 2;
+    }
+
+    html [flex][three] {
+        -ms-flex: 3;
+        -webkit-flex: 3;
+        flex: 3;
+    }
+
+    html [flex][four] {
+        -ms-flex: 4;
+        -webkit-flex: 4;
+        flex: 4;
+    }
+
+    html [flex][five] {
+        -ms-flex: 5;
+        -webkit-flex: 5;
+        flex: 5;
+    }
+
+    html [flex][six] {
+        -ms-flex: 6;
+        -webkit-flex: 6;
+        flex: 6;
+    }
+
+    html [flex][seven] {
+        -ms-flex: 7;
+        -webkit-flex: 7;
+        flex: 7;
+    }
+
+    html [flex][eight] {
+        -ms-flex: 8;
+        -webkit-flex: 8;
+        flex: 8;
+    }
+
+    html [flex][nine] {
+        -ms-flex: 9;
+        -webkit-flex: 9;
+        flex: 9;
+    }
+
+    html [flex][ten] {
+        -ms-flex: 10;
+        -webkit-flex: 10;
+        flex: 10;
+    }
+
+    html [flex][eleven] {
+        -ms-flex: 11;
+        -webkit-flex: 11;
+        flex: 11;
+    }
+
+    html [flex][twelve] {
+        -ms-flex: 12;
+        -webkit-flex: 12;
+        flex: 12;
+    }
+
+    /* alignment in cross axis */
+
+    html [layout][start] {
+        -ms-flex-align: start;
+        -webkit-align-items: flex-start;
+        align-items: flex-start;
+    }
+
+    html [layout][center],
+    html [layout][center-center] {
+        -ms-flex-align: center;
+        -webkit-align-items: center;
+        align-items: center;
+    }
+
+    html [layout][end] {
+        -ms-flex-align: end;
+        -webkit-align-items: flex-end;
+        align-items: flex-end;
+    }
+
+    /* alignment in main axis */
+
+    html [layout][start-justified] {
+        -ms-flex-pack: start;
+        -webkit-justify-content: flex-start;
+        justify-content: flex-start;
+    }
+
+    html [layout][center-justified],
+    html [layout][center-center] {
+        -ms-flex-pack: center;
+        -webkit-justify-content: center;
+        justify-content: center;
+    }
+
+    html [layout][end-justified] {
+        -ms-flex-pack: end;
+        -webkit-justify-content: flex-end;
+        justify-content: flex-end;
+    }
+
+    html [layout][around-justified] {
+        -ms-flex-pack: distribute;
+        -webkit-justify-content: space-around;
+        justify-content: space-around;
+    }
+
+    html [layout][justified] {
+        -ms-flex-pack: justify;
+        -webkit-justify-content: space-between;
+        justify-content: space-between;
+    }
+
+    /* self alignment */
+
+    html [self-start] {
+        -ms-align-self: flex-start;
+        -webkit-align-self: flex-start;
+        align-self: flex-start;
+    }
+
+    html [self-center] {
+        -ms-align-self: center;
+        -webkit-align-self: center;
+        align-self: center;
+    }
+
+    html [self-end] {
+        -ms-align-self: flex-end;
+        -webkit-align-self: flex-end;
+        align-self: flex-end;
+    }
+
+    html [self-stretch] {
+        -ms-align-self: stretch;
+        -webkit-align-self: stretch;
+        align-self: stretch;
+    }
+
+    /*******************************
+              Other Layout
+    *******************************/
+
+    html [block] {
+        display: block;
+    }
+
+    /* ie support for hidden */
+    html [hidden] {
+        display: none !important;
+    }
+
+    html [relative] {
+        position: relative;
+    }
+
+    html [fit] {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+
+    body[fullbleed] {
+        margin: 0;
+        height: 100vh;
+    }
+}
+
+@media screen {/* Copyright (c) 2014, the Dart project authors.  Please see the AUTHORS file */
+    /* for details. All rights reserved. Use of this source code is governed by a */
+    /* BSD-style license that can be found in the LICENSE file. */
+
+    body {
+        margin: 0;
+        padding: 0;
+
+        background-color: #3d3d3d;
+        color: #c6c6c6;
+
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        position: absolute;
+
+        font-size: 14px;
+        line-height: 20px;
+
+        overflow: hidden;
+    }
+
+    header {
+        line-height: 48px;
+        padding: 0 24px;
+        color: #fff;
+        vertical-align: middle;
+
+        box-shadow: rgba(255, 255, 255, 0.07) 0 1px 0;
+        border-bottom: 4px solid #272727;
+
+        text-shadow: rgba(0,0,0,0.75) 0 1px;
+    }
+
+    section {
+        position: relative;
+
+        box-shadow: rgba(255, 255, 255, 0.07) 0 1px 0;
+        border-bottom: 4px solid #272727;
+    }
+
+    footer {
+        margin: 8px 24px;
+        font-size: 13px;
+        text-shadow: rgba(0,0,0,0.75) 0 1px;
+    }
+
+    .footer-item {
+        margin-right: 10px;
+    }
+
+}
+
+.vaadin-split-layout-0 > #splitter.vaadin-split-layout {
+    min-width: 1px;
+    min-height: 1px;
+    border: 1px solid #363636;
+    fill: #666666;
+    box-shadow: rgba(84, 84, 84, 0.07) 0 1px 0;
+}
+
 /* BS OVERRIDES */
 
 .form-control {
     height: 2.2em;
 }
 
+.has-error .form-control, .has-error .form-control:focus {
+    border: solid 2px #cc121a;
+    box-shadow: none;
+}
+
 .form-group .error {
     color: #ff544d;
     font-weight: normal;
-    margin-left: .5em;
+    margin-top: .2em;
+    padding: .2em .4em .2em .4em;
+    border-radius: .4em;
     font-size: .9em;
-    margin-bottom: .2em;
+    margin-left: .4em;
+    background-color: #2d2d2d;
+    display: none;
 }
 
 select {
     color: #000;
     background-color: #FFF;
-}
-
-.well-sm {
-    padding: .2em;
-    border-radius: .3em;
 }
 
 .modal-body {
@@ -44,48 +385,35 @@ select {
     color: #FFF;
 }
 
-.breadcrumb {
-    border-radius: 0.2em;
+.selected-path {
     margin-bottom: 1em;
-    border-width: 2px;
-    border-left: None;
-    border-right: None;
-    border-top: 1px solid #3b3b3b;
-    border-bottom: 1px solid #3b3b3b;
-    padding: .4em;
-    background-image: none;
+    font-size: .8em;
 }
+
+.selected-path .corner {
+    display: inline-block;
+    width: .4em;
+    height: .9em;
+    border-left: 1px solid #666666;
+    border-bottom: 1px solid #666666;
+}
+
+.glyphicon {
+    position: relative;
+    top: 0;
+}
+
 
 /* GLOBAL */
-html, body {
-    height: 100%;
-    margin: 0;
-    overflow: hidden;
-}
-
-footer {
-    display: block;
-    position: absolute;
-    width: 100%;
-    bottom: .6em;
-    height: 2.5em;
-    padding-top: .2em;
-    border-top: 1px solid #494744;
-    background-color: #272b30;
-}
 
 #divider {
     border-bottom: 1px inset #494744;
     margin-bottom: 1em;
 }
 
-#content {
-    height: calc(100% - 8em);
-    display:block;
-}
-
 #hud {
-    height: 2.4em;
+    max-height: 2.2em;
+    border-bottom: 1px solid #1d1d1d;
 }
 
 #warningMessage {
@@ -95,17 +423,18 @@ footer {
 #errorContainer h4 {
     margin: 0;
 }
+
+#leftPanel {
+    background-color: #2f2f2f;
+}
+
+
 /* NAV */
 
 #navigation {
-    padding-top: 0.8em;
-    background-color: #363d42;
 }
 
 #menulist {
-    border-radius: 0.3em;
-    border: 1px solid #272b30;
-    padding: 0.5em 0 0.5em 0;
     text-align: center;
 }
 
@@ -113,11 +442,8 @@ footer {
     color: #bebebe;
 }
 
-#navigation .form-control {
-    width: 95%;
-}
-
 #brand {
+    margin-top: .2em;
     text-align: center;
 }
 
@@ -126,16 +452,13 @@ footer {
 }
 
 #brand h4 {
-    padding-left: 1em;
     font-family: Helvetica, Arial, sans-serif;
 }
 
 #screenTitle {
-    border-top-left-radius: 0.3em;
-    border-top-right-radius: 0.3em;
-    background-color: #272b30;
-    text-align: center;
-    padding-top: 0.8em;
+    margin-top: .3em;
+    text-align: left;
+    letter-spacing: .15em;
 }
 
 #screenTitle, #brand {
@@ -146,10 +469,21 @@ footer {
     font-weight: bolder;
 }
 
+#searchForm {
+    margin-top: .7em;
+    text-align: center;
+}
+
+#searchForm input {
+    width: 95%;
+}
+
+
 /* IMPORT */
+
 #importControls {
-    border-bottom: 1px solid #1c1e22;
-    padding-bottom: 0.8em;
+    width: 100%;
+    margin-top: 1em;
 }
 
 #selectImportMode .large {
@@ -158,49 +492,25 @@ footer {
 
 #importControls .progress {
     height: 2.8em;
-    margin-bottom: 0;
 }
 
-#importControls .progress h4 {
-    height: 2.8em;
-    padding-top: .05em;
+#collectingInfo {
+    text-align: left;
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
-#importControls #startStop{
-    margin: 2em;
-}
-
-#importControls .tab-pane {
-    margin: 1em;
-}
-
-#importControls .asset {
-    padding: 1em;
-    background: -moz-linear-gradient(top, rgba(216,224,222,0.3) 0%, rgba(174,191,188,0.3) 22%, rgba(153,175,171,0.3) 33%, rgba(142,166,162,0.3) 50%, rgba(130,157,152,0.3) 67%, rgba(78,92,90,0.3) 82%, rgba(14,14,14,0.3) 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(216,224,222,0.3)), color-stop(22%,rgba(174,191,188,0.3)), color-stop(33%,rgba(153,175,171,0.3)), color-stop(50%,rgba(142,166,162,0.3)), color-stop(67%,rgba(130,157,152,0.3)), color-stop(82%,rgba(78,92,90,0.3)), color-stop(100%,rgba(14,14,14,0.3))); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top, rgba(216,224,222,0.3) 0%,rgba(174,191,188,0.3) 22%,rgba(153,175,171,0.3) 33%,rgba(142,166,162,0.3) 50%,rgba(130,157,152,0.3) 67%,rgba(78,92,90,0.3) 82%,rgba(14,14,14,0.3) 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top, rgba(216,224,222,0.3) 0%,rgba(174,191,188,0.3) 22%,rgba(153,175,171,0.3) 33%,rgba(142,166,162,0.3) 50%,rgba(130,157,152,0.3) 67%,rgba(78,92,90,0.3) 82%,rgba(14,14,14,0.3) 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top, rgba(216,224,222,0.3) 0%,rgba(174,191,188,0.3) 22%,rgba(153,175,171,0.3) 33%,rgba(142,166,162,0.3) 50%,rgba(130,157,152,0.3) 67%,rgba(78,92,90,0.3) 82%,rgba(14,14,14,0.3) 100%); /* IE10+ */
-    background: linear-gradient(to bottom, rgba(216,224,222,0.3) 0%,rgba(174,191,188,0.3) 22%,rgba(153,175,171,0.3) 33%,rgba(142,166,162,0.3) 50%,rgba(130,157,152,0.3) 67%,rgba(78,92,90,0.3) 82%,rgba(14,14,14,0.3) 100%); /* W3C */
-    border-radius: 8px;
-}
-
-#importControls #startStop button {
-    width: 90%;
+#importStatus {
+    margin-top: 2em;
 }
 
 #readyToImport {
-    margin-bottom: 1em;
     text-align: center;
 }
 
 #importedAssets {
-    margin-top: 1.5em;
-}
-
-#importedAssets .asset {
-    float: left;
-    margin: 1em;
+    margin-top: 3em;
+    text-align: center;
 }
 
 #importControls #warnings strong {
@@ -221,18 +531,14 @@ footer {
 
 /* ASSETS */
 
-#search {
-    margin-top: .1em;
-}
-
 #searchResults {
-    height: 100%;
     text-align: center;
     overflow: auto;
+    margin-top: 1em;
 }
 
-#searchResults .result-box {
-    border: solid 2px #212223;
+#searchResults .result-box, #importControls .result-box {
+    border: solid 2px #4a4b4c;
     display: inline-block;
     padding: 5px;
 }
@@ -250,16 +556,14 @@ footer {
 }
 
 #noResults {
-    margin: 10em;
+    margin-top: 5em;
     text-align: center;
+    text-transform: uppercase;
+    letter-spacing: .2em;
 }
 
-#addFolderForm input, #renameFolderForm input {
+#addFolderForm {
     width: 100%;
-}
-
-#addFolder {
-    margin-top: 1em;
 }
 
 .pager-button {
@@ -298,67 +602,111 @@ footer {
 
 /* FOLDERS */
 
-#folders {
-    margin-top: -.3em;
-    padding-left: .4em;
-}
-
-#folders button {
-    line-height: 1.2em;
-}
-
-#folders .header {
-    width: 50%;
-    text-transform: uppercase;
-    font-weight: bold;
-    font-size: .9em;
-    color: #fff;
-}
-
-#folders .showAddFolder {
-    width: 50%;
-}
-
-#folders .showAddFolder button {
-    float: right;
-}
-
-#folders ul {
-    margin-top: 0.5em;
+.flat-folders ul {
     list-style-type: none;
-    padding-left: 0.7em;
+    -webkit-margin-before: 0em;
+    -webkit-margin-after: 0em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    -webkit-padding-start: 0;
+    padding-left: 0;
 }
+
+.flat-folders li {
+    padding-left: .5em;
+    list-style-type: none;
+    margin-top: .3em;
+}
+
+.no-folders {
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #677076;
+    margin-bottom: 2em;
+    margin-top: 2em;
+    letter-spacing: .1em;
+}
+
+.flat-folders button, .tree-folders button {
+    line-height: .6em;
+    font-size: .9em;
+    background-color: transparent;
+}
+
 
 li.folder {
-    cursor: pointer;
     cursor: hand;
 }
 
-#systemFolders {
-    padding-left: .4em;
-    padding-top: .6em;
-    padding-bottom: .1em;
-    margin-left: 0.5em;
-    background-color: #363d42;
-}
-
-#systemFolders .system-folder {
-    padding-left: 0.8em;
-    margin-bottom: .4em;
-}
-
-#trash a {
-    color: #ff4e41;
-    font-weight: bold;
-}
-
-#folders .highlight, #systemFolders .highlight {
+.flat-folders .highlight, .tree-folders .highlight, #systemFolders .highlight {
     background-color: #5a5855;
 }
 
 .folder-count {
     color: #5f5c58;
     font-size: .9em;
+}
+
+#showAddFolder {
+    margin-top: .5em;
+    padding: .2em 0 .2em .5em;
+    border-top: 1px solid #363636;
+    border-bottom: 1px solid #363636;
+}
+
+/* SYSTEM FOLDERS */
+
+#systemFolders {
+    border-bottom: 1px solid #363636;
+    margin-bottom: 1em;
+}
+
+.system-folder {
+    padding-top: .5em;
+    padding-bottom: .5em;
+    text-align: center;
+}
+
+.system-folder .glyphicon {
+    color: #917c24;
+}
+
+#sortedLeftPanel #triage, #trashLeftPanel #triage {
+    border-right: 1px solid #363636;
+}
+
+#triageLeftPanel #sorted, #trashLeftPanel #sorted {
+    border-right: 1px solid #363636;
+}
+
+.system-folder.attn .glyphicon {
+    color: #917c24;
+}
+
+.system-folder.attn a {
+    color: #ff4e41;
+}
+
+.system-folder.disregard .glyphicon {
+    color: #5f5c58;
+}
+
+.system-folder.disregard a {
+    color: #5f5c58;
+}
+
+#sortedLeftPanel #systemFolders #sorted {
+    display: none;
+}
+
+#triageLeftPanel #systemFolders #triage {
+    display: none;
+}
+
+#trashLeftPanel #systemFolders #trash {
+    display: none;
 }
 
 /* PATH (BREADCRUMBS) */
@@ -396,7 +744,6 @@ li.folder {
 
 #selectionTools {
     margin-top: 1em;
-    margin-left: .5em;
 }
 
 /* FULL SCREEN MODAL */

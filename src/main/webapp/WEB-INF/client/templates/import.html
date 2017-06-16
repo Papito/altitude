@@ -8,8 +8,23 @@
 {% endblock%}
 
 {% block body %}
-<div class="row" id="importControls">
-  <div class="col-md-12">
+<div id="importControls">
+  <div class="container-fluid">
+
+    <div class="row">
+      <div class="col-md-12" id="readyToImport" style="display: none" data-bind="visible: importMode() == $root.IMPORT_MODE.DIRECTORY && isImporting() == false">
+        <div class="panel panel-success">
+          <div class="panel-heading">
+            <h3 class="panel-title">Ready to import</h3>
+          </div>
+          <div class="panel-body">
+          <strong>Source:</strong>&nbsp;<span data-bind="text: importDirectoryPath()"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
     <div class="row">
       <div class="col-md-12">
         <div class="progress" style="display: none" data-bind="visible: isImporting() && assetsProcessedCnt() > 0">
@@ -18,12 +33,11 @@
             <h4><span data-bind="html: '&nbsp;&nbsp;' + assetsProcessedCnt() + '/' + totalAssetsCnt()"></span></h4>
           </div>
         </div>
-        <div class="col-md-12" style="display: none; text-align: center; margin: 1em" data-bind="visible: isImporting() && assetsProcessedCnt() == 0">
-          Collecting asset info
+        <div class="col-md-12" id="collectingInfo" style="display: none" data-bind="visible: isImporting() && assetsProcessedCnt() == 0">
+          Collecting asset info...
         </div>
       </div>
     </div>
-
     <!-- Import profiles
     <div class="row well" id="importProfiles" style="display: none" data-bind="visible: importMode() && !isImporting()">
         <div class="col-md-12">
@@ -48,15 +62,10 @@
         </div>
     </div>-->
 
-    <div class="row">
-      <div id="readyToImport" class="col-md-12" style="display: none" data-bind="visible: importMode() == $root.IMPORT_MODE.DIRECTORY && isImporting() == false">
-        <span data-bind="html: 'Ready to import from <strong>' + importDirectoryPath() + '</strong>'"></span>
-      </div>
-    </div>
 
     <div class="row">
-      <div class="col-md-4 col-md-offset-4" data-bind="visible: importMode()">
-        <div id="startStop">
+      <div class="col-md-12" data-bind="visible: importMode()">
+        <div id="startStop" class="pull-right">
           <button id="start" style="display: none" type="button" data-bind="visible: !isImporting(), click: importAssets" class="btn btn-success">Start Import</button>
           <button id="stop" style="display: none" type="button" data-bind=" visible: isImporting(), click: cancelImport" class="btn btn-danger">
             <span data-bind="if: !isStopping()">STOP</span>
@@ -66,24 +75,28 @@
       </div>
     </div>
 
-    <div class="row">
-      <!-- Nav tabs -->
-      <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active"><a href="#importedAssets" aria-controls="imported" role="tab" data-toggle="tab" data-bind="text: 'Imported (' + statsImported() + ')'"></a></li>
-        <li role="presentation"><a href="#warnings" aria-controls="warnings" role="tab" data-toggle="tab" data-bind="text: 'Warnings (' + statsWarnings() + ')'"></a></li>
-        <li role="presentation"><a href="#errors" aria-controls="errors" role="tab" data-toggle="tab" data-bind="text: 'Errors (' + statsErrors() + ')'"></a></li>
-      </ul>
+    <div id="importStatus">
+      <div class="row">
+        <div class="col-md-12">
+          <!-- Nav tabs -->
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#importedAssets" aria-controls="imported" role="tab" data-toggle="tab" data-bind="text: 'Imported (' + statsImported() + ')'"></a></li>
+            <li role="presentation"><a href="#warnings" aria-controls="warnings" role="tab" data-toggle="tab" data-bind="text: 'Warnings (' + statsWarnings() + ')'"></a></li>
+            <li role="presentation"><a href="#errors" aria-controls="errors" role="tab" data-toggle="tab" data-bind="text: 'Errors (' + statsErrors() + ')'"></a></li>
+          </ul>
+        </div>
 
-      <!-- Tab panes -->
-      <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="importedAssets"></div>
-        <div role="tabpanel" class="tab-pane" id="warnings"></div>
-        <div role="tabpanel" class="tab-pane" id="errors"></div>
+        <!-- Tab panes -->
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="importedAssets"></div>
+          <div role="tabpanel" class="tab-pane" id="warnings"></div>
+          <div role="tabpanel" class="tab-pane" id="errors"></div>
+        </div>
       </div>
     </div>
   </div>
-
 </div>
+
 
 
 <!-- MODALS -->
@@ -133,4 +146,7 @@
     ko.applyBindings(importViewModel);
   });
 </script>
+{% endblock%}
+
+{% block footer %}
 {% endblock%}

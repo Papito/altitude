@@ -16,6 +16,11 @@ class StaticAssetController extends BaseWebController {
     serveFile("/i/")
   }
 
+  get("/html/*") {
+    contentType = "text/html"
+    serveFile("/html/")
+  }
+
   get("/css/*") {
     contentType = "text/css"
     serveFile("/css/")

@@ -1,27 +1,26 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/html">
 <head>
-  <title>{% block title %} {% endblock %}</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>{{ Config["app.name"] }}: {% block title %} {% endblock %}</title>
+
 
   <link rel="stylesheet" type="text/css" href="/static/css/lib/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/lib/bootstrap-theme.min.css">
   <!--link rel="stylesheet" type="text/css" href="/static/css/lib/select2.css"-->
   <link rel="stylesheet" type="text/css" href="/static/css/app.css">
   <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery.contextMenu.min.css">
   <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery.contextMenu.min.css.map">
-
-  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.css">
-  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.min.css">
-  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.structure.css">
-  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.structure.min.css">
-  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.theme.css">
-  <link rel="stylesheet" type="text/css" href="/static/css/lib/jquery-ui.theme.min.css">
-
 
   <link rel="stylesheet" type="text/css" href="/static/css/lib/jstree/themes/default/style.min.css">
 
   <script src="/static/js/lib/jquery-2.1.1.min.js"></script>
   <script src="/static/js/lib/jquery-ui.min.js"></script>
   <script src="/static/js/lib/bootstrap.min.js"></script>
-  <script src="/static/js/lib/knockout-3.2.0.js"></script>
+  <script src="/static/js/lib/knockout-3.4.2.js"></script>
   <script src="/static/js/lib/knockout-custom-bindings.js"></script>
   <!--script src="/static/js/lib/modernizr.custom.js"></script-->
   <!--script src="/static/js/lib/select2.min.js"></script-->
@@ -33,91 +32,87 @@
   <script src="/static/js/app/core.js?"></script>
   <script src="/static/js/app/models.js"></script>
 
-</head>
-<body>
-<header>
-  <div class="row" id="navigation">
-    <div id="brand" class="col-md-2">
-      <h4>
-        <a href="/">{{ Config["app.name"] }}</a>
-      </h4>
-    </div>
-    <div class="col-md-5">
-      <div id="menulist">
-        <div class="row">
-          <div class="col-md-3">
-            <div class="btn-group">
-              <a href="#" data-toggle="dropdown">
-                Import <span class="caret"></span>
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <a href="#"
-                     data-bind="click: function(){getDirectoryNames(null)}"
-                     data-toggle="modal" data-target="#selectImportDirectoryModal">From folder</a>
-                </li>
+  <script>
+    var supportsCustomElements = ('registerElement' in document);
+    if (!supportsCustomElements) {
+      console.log('No native support for custom elements. Loading web components.');
+      $.getScript( "/static/html/vaadin/webcomponents-lite.js", function() {
+        console.log('Web components loaded');
+      });
+    }
+  </script>
 
-                <li role="separator" class="divider"></li>
-                <li><a href="#">Upload</a></li>
-              </ul>
+  <link rel="import" href="/static/html/vaadin/vaadin-split-layout.html">
+
+  {% block assets %}
+  {% endblock %}
+
+</head>
+
+<body fullbleed="" layout="" vertical="">
+
+<header layout="" horizontal="" style="padding: 0">
+  <div class="container-fluid" style="width: 100%">
+    <div class="row" id="navigation">
+      <div id="brand" class="col-md-2">
+        <h4>
+          <a href="/">{{ Config["app.name"] }}</a>
+        </h4>
+      </div>
+      <div class="col-md-4">
+        <div id="menulist">
+          <div class="row">
+            <div class="col-md-3">
+              <div class="btn-group">
+                <a href="#" data-toggle="dropdown">
+                  Import <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a href="#"
+                       data-bind="click: function(){getDirectoryNames(null)}"
+                       data-toggle="modal" data-target="#selectImportDirectoryModal">From folder</a>
+                  </li>
+
+                  <li role="separator" class="divider"></li>
+                  <li><a href="#">Upload</a></li>
+                </ul>
+              </div>
             </div>
-          </div>
-          <div class="col-md-3">
-            <a href="#">Settings</a>
+            <div class="col-md-5">
+              <a href="#">Settings</a>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div id="screenTitle" class="col-md-2">
-      <h5>
-        {% block title %} {% endblock %}
-      </h5>
-    </div>
-    <div class="col-md-3">
-      <form id="search" method="GET" action="/client/search">
-        <input type="text" name="${C.Api.Search.QUERY_TEXT}" class="form-control" placeholder="Search..." maxlength="200">
-      </form>
-    </div>
-  </div>
-  <div id="hud">
-    <div id="successMessage" class="alert alert-success" style="display: none" role="alert"
-         data-bind="text: successMessage, visible: successMessage">
-    </div>
-    <div id="infoMessage" class="alert alert-info" style="display: none" role="alert"
-         data-bind="text: infoMessage, visible: infoMessage">
-    </div>
-    <div id="warningMessage" class="alert alert-warning" style="display: none" role="alert"
-         data-bind="text: warningMessage, visible: warningMessage">
+      <div id="screenTitle" class="col-md-4">
+        <h5>
+          {% block title %} {% endblock %}
+        </h5>
+      </div>
+      <div class="col-md-2">
+        <form id="searchForm" method="GET" action="/client/search">
+          <input type="text" name="${C.Api.Search.QUERY_TEXT}" class="form-control" placeholder="Search..." maxlength="200">
+        </form>
+      </div>
     </div>
   </div>
 </header>
 
-<div id="content" class="container-fluid">
-  <div id="errorContainer" class="alert alert-danger alert-dismissible fade in" role="alert" style="display: none">
-    <button type="button" class="close" aria-label=Close data-bind="click: dismissError"><span aria-hidden=true>&times;</span></button>
-    <h4 data-bind="visible: errorMessage">
-      <span data-bind="text: errorMessage, visible: errorMessage"></span>
-    </h4>
-    <div data-bind="visible: errorStacktrace" style="margin-top: 2em">
-      <p>
-        <button type="button" class="btn btn-info" data-bind="click: reportError">Send anonymous error report (pretty please?)</button>
-        <button type="button" class="btn btn-default" data-bind="click: dismissError">Dismiss</button>
-      </p>
-      <h4 style="margin-top: 2em">Detail</h4>
-      <p data-bind="text: errorStacktrace"></p>
-    </div>
+<section flex="" layout="" horizontal="">
+{% block body %}
+{% endblock %}
+</section>
+
+<footer layout="" horizontal="">
+  <div id="keyboard-button" class="keyboard footer-item"></div>
+  <div>
+    <div class="footer-item">Footer</div>
   </div>
-
-  {% block body %}
-  {% endblock %}
-</div>
-
-<footer>
-  {% block footer %}
-  {% endblock %}
+  <div flex=""></div>
+  <div>
+    <div class="footer-item">Footer</div>
+  </div>
 </footer>
 
-{% block assets %}
-{% endblock %}
-</body>
-</html>
+</body></html>

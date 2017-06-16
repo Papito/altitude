@@ -67,7 +67,13 @@ import org.scalatest.Matchers._
     checkRepositoryFilePath(asset1.path.get)
   }
 
-  test("delete recursively") {
+  test("delete folder") {
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+    altitude.service.folder.deleteById(folder1.id.get)
+    checkRepositoryDirPath("")
+  }
+
+  test("delete folder and assets") {
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
     val asset1: Asset = altitude.service.library.add(makeAsset(folder1))
