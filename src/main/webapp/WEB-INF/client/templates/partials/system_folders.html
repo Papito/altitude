@@ -3,7 +3,7 @@
     <div class="col-md-6 system-folder" id="sorted">
       <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
       &nbsp;<a href="/">Sorted</a>
-      <span data-bind="html: '<span class=folder-count>(' + stats.totalAssets() + ')</span>'"></span>
+      <span data-bind="html: '<span class=folder-count>(' + stats.sortedAssets() + ')</span>'"></span>
     </div>
     <div class="col-md-6 system-folder" id="triage" data-bind="css: {attn: stats.triageAssets() > 0, disregard: stats.triageAssets() == 0}">
       <span class="glyphicon glyphicon-random" aria-hidden="true"></span>

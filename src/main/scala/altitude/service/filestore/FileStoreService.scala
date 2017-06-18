@@ -24,7 +24,9 @@ trait FileStoreService {
 
   def deleteFolder(folder: Folder)(implicit ctx: Context)
 
-  def moveFolder(folder: Folder, newName: String)(implicit ctx: Context)
+  def renameFolder(folder: Folder, newName: String)(implicit ctx: Context)
+
+  def moveFolder(folder: Folder, newParent: Folder)(implicit ctx: Context)
 
   def getFolderPath(name: String, parentId: String)
                          (implicit ctx: Context, txId: TransactionId = new TransactionId): String

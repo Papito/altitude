@@ -63,14 +63,42 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     }
   }
 
-  override def moveFolder(folder: Folder, newName: String)(implicit ctx: Context): Unit = {
+  override def renameFolder(folder: Folder, newName: String)(implicit ctx: Context): Unit = {
     require(folder.path.isDefined)
     require(folder.path.get.nonEmpty)
 
     val srcFile = absoluteFile(folder.path.get)
     val newPath = FilenameUtils.concat(srcFile.getParent, newName)
     val destFile = new File(newPath)
-    log.info(s"Moving folder [$srcFile] to [$destFile]")
+    log.info(s"Renaming folder [$srcFile] to [$destFile]")
+
+    if (destFile.exists) {
+      throw StorageException(
+        s"Cannot rename [$srcFile] to [$destFile]: destination already exists")
+    }
+
+    try {
+      FileUtils.moveDirectory(srcFile, destFile)
+    }
+    catch {
+      case ex: IOException =>
+        throw StorageException(s"Directory [$srcFile] could not be renamed: $ex")
+    }
+
+    if (!(destFile.exists && destFile.isDirectory)) {
+      throw StorageException(s"Directory [$srcFile] could not be renamed")
+    }
+  }
+
+  def moveFolder(folder: Folder, newParent: Folder)(implicit ctx: Context): Unit = {
+    require(folder.path.isDefined)
+    require(newParent.path.get.nonEmpty)
+
+    val srcFile = absoluteFile(folder.path.get)
+    val newPath = FilenameUtils.concat(newParent.path.get, folder.name)
+
+    val destFile = absoluteFile(newPath)
+    log.info(s"Move folder [$srcFile] to [$destFile]")
 
     if (destFile.exists) {
       throw StorageException(

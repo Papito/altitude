@@ -22,6 +22,22 @@ import org.scalatest.Matchers._
     movedAsset.path contains relAssetPath.getPath
   }
 
+  test("move folder") {
+    var folder1: Folder = altitude.service.folder.addFolder("folder1")
+    var asset1: Asset = altitude.service.library.add(makeAsset(folder1))
+    val folder2: Folder = altitude.service.folder.addFolder("folder2")
+    val asset2: Asset = altitude.service.library.add(makeAsset(folder2))
+
+    altitude.service.folder.move(folder1.id.get, folder2.id.get)
+    checkNoRepositoryDirPath(folder1.path.get)
+
+    folder1 = altitude.service.folder.getById(folder1.id.get)
+    checkRepositoryDirPath(folder1.path.get)
+
+    asset1 = altitude.app.service.library.getById(asset1.id.get)
+    checkRepositoryFilePath(asset1.path.get)
+  }
+
   test("move asset into conflicting file") {
     val asset = importFile("images/1.jpg")
     var relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
@@ -29,7 +45,7 @@ import org.scalatest.Matchers._
 
     var folder: Folder = altitude.service.folder.addFolder("folder1")
     relAssetPath = new File(folder.path.get, "1.jpg")
-    var movedAsset = altitude.service.library.moveAssetToFolder(asset.id.get, folder.id.get)
+    val movedAsset = altitude.service.library.moveAssetToFolder(asset.id.get, folder.id.get)
 
     // create a dummy file in place of destination
     folder  = altitude.service.folder.addFolder("folder2")

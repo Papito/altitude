@@ -471,6 +471,8 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
         case ex: DuplicateException => throw ValidationException(
           s"Cannot move to '${destFolder.get.name}' as a folder by this name already exists")
       }
+
+      app.service.fileStore.moveFolder(folderBeingMoved, destFolder.get)
     }
   }
 
@@ -504,7 +506,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
           throw ex
       }
 
-      app.service.fileStore.moveFolder(folder, newName)
+      app.service.fileStore.renameFolder(folder, newName)
 
       /*
         FIXME: this does not update paths for assets, until dynamic paths are implemented
