@@ -18,10 +18,13 @@ class StatsService(app: Altitude) {
       val stats: List[Stat] = DAO.query(Query()).records.map(Stat.fromJson)
 
       val totalAssetsDims = Stats.SORTED_ASSETS :: Stats.RECYCLED_ASSETS :: Stats.TRIAGE_ASSETS :: Nil
-      val totalBytesDims = Stats.SORTED_BYTES :: Stats.RECYCLED_BYTES :: Stats.TRIAGE_BYTES :: Nil
       val totalAssets = stats.filter(stat => totalAssetsDims.contains(stat.dimension)).map(_.dimVal).sum
+
+      val totalBytesDims = Stats.SORTED_BYTES :: Stats.RECYCLED_BYTES :: Stats.TRIAGE_BYTES :: Nil
       val totalBytes = stats.filter(stat => totalBytesDims.contains(stat.dimension)).map(_.dimVal).sum
+
       val wTotals = Stat(Stats.TOTAL_ASSETS, totalAssets) ::  Stat(Stats.TOTAL_BYTES, totalBytes) :: stats
+
       Stats(wTotals)
     }
   }
