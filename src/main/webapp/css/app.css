@@ -669,7 +669,7 @@ li.folder {
     text-align: center;
 }
 
-.system-folder .glyphicon {
+.system-folder .glyphicon, .flat-folders .glyphicon {
     color: #917c24;
 }
 
