@@ -46,7 +46,9 @@ import org.scalatest.Matchers._
 
     // check counts
     val systemFolders = altitude.service.folder.getSysFolders()
-    systemFolders(ctx.repo.triageFolderId).numOfAssets should be (2)
+
+    // we do not increment triage folder - this is recorded in Stats
+    systemFolders(ctx.repo.triageFolderId).numOfAssets should be (0)
 
     // prefetch all folders for speed
     val all = altitude.service.folder.getUserFolders()

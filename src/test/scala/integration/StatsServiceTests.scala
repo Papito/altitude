@@ -7,6 +7,8 @@ import org.scalatest.Matchers._
 
 @DoNotDiscover class StatsServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
+  val ASSET_SIZE = 1000
+
   test("test totals") {
     // create an asset in a folder
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
@@ -25,23 +27,36 @@ import org.scalatest.Matchers._
     altitude.service.library.recycleAsset(assetToDelete2.id.get)
 
     val stats = altitude.service.stats.getStats
-    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 2
+    stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 1
+    stats.getStatValue(Stats.SORTED_BYTES) shouldBe
+      stats.getStatValue(Stats.SORTED_ASSETS) * ASSET_SIZE
     stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 2
+    stats.getStatValue(Stats.RECYCLED_BYTES) shouldBe
+      stats.getStatValue(Stats.RECYCLED_ASSETS) * ASSET_SIZE
     stats.getStatValue(Stats.TRIAGE_ASSETS) shouldBe 1
+    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 4
+    stats.getStatValue(Stats.TOTAL_BYTES) shouldBe
+      stats.getStatValue(Stats.TOTAL_ASSETS) * ASSET_SIZE
 
     altitude.service.library.moveAssetToFolder(triagedAsset.id.get, folder1.id.get)
 
     val stats2 = altitude.service.stats.getStats
-    stats2.getStatValue(Stats.TOTAL_ASSETS) shouldBe 2
-    stats2.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 2
+    stats2.getStatValue(Stats.SORTED_ASSETS) shouldBe 2
+    stats.getStatValue(Stats.SORTED_BYTES) shouldBe
+      stats.getStatValue(Stats.SORTED_ASSETS) * ASSET_SIZE
     stats2.getStatValue(Stats.TRIAGE_ASSETS) shouldBe 0
+    stats.getStatValue(Stats.TRIAGE_BYTES) shouldBe
+      stats.getStatValue(Stats.TRIAGE_ASSETS) * ASSET_SIZE
+    stats2.getStatValue(Stats.TOTAL_ASSETS) shouldBe 4
+    stats.getStatValue(Stats.TOTAL_BYTES) shouldBe
+      stats.getStatValue(Stats.TOTAL_ASSETS) * ASSET_SIZE
 
     SET_SECONDARY_REPO()
     val stats3 = altitude.service.stats.getStats
 
     // this will be passing later
     intercept[RuntimeException] {
-      stats3.getStatValue(Stats.TOTAL_ASSETS)
+      stats3.getStatValue(Stats.SORTED_ASSETS)
     }
   }
 
@@ -54,8 +69,11 @@ import org.scalatest.Matchers._
     altitude.service.library.moveAssetToTriage(asset.id.get)
 
     val stats = altitude.service.stats.getStats
-    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 1
+    stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 0
+    stats.getStatValue(Stats.SORTED_BYTES) shouldBe 0
     stats.getStatValue(Stats.TRIAGE_ASSETS) shouldBe 1
+    stats.getStatValue(Stats.TRIAGE_BYTES) shouldBe
+      stats.getStatValue(Stats.TRIAGE_ASSETS) * ASSET_SIZE
   }
 
   test("test move recycled asset to new folder") {
@@ -79,8 +97,11 @@ import org.scalatest.Matchers._
     folder2.numOfAssets shouldBe 1
 
     val stats = altitude.service.stats.getStats
-    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 1
+    stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 1
+    stats.getStatValue(Stats.SORTED_BYTES) shouldBe
+      stats.getStatValue(Stats.SORTED_ASSETS) * ASSET_SIZE
     stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 0
+    stats.getStatValue(Stats.RECYCLED_BYTES) shouldBe 0
   }
 
   test("test move recycled asset to original folder") {
@@ -101,8 +122,11 @@ import org.scalatest.Matchers._
     folder1.numOfAssets shouldBe 1
 
     val stats = altitude.service.stats.getStats
-    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 1
+    stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 1
+    stats.getStatValue(Stats.SORTED_BYTES) shouldBe
+      stats.getStatValue(Stats.SORTED_ASSETS) * ASSET_SIZE
     stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 0
+    stats.getStatValue(Stats.RECYCLED_BYTES) shouldBe 0
   }
 
   test("restore recycled asset to triage") {
@@ -118,15 +142,17 @@ import org.scalatest.Matchers._
     SET_PRIMARY_USER()
 
     val stats = altitude.service.stats.getStats
-    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 2
+    stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 0
+    stats.getStatValue(Stats.SORTED_BYTES) shouldBe 0
     stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 0
+    stats.getStatValue(Stats.RECYCLED_BYTES) shouldBe 0
 
     SET_SECONDARY_REPO()
     val stats2 = altitude.service.stats.getStats
 
     // this will be passing later
     intercept[RuntimeException] {
-      stats2.getStatValue(Stats.TOTAL_ASSETS)
+      stats2.getStatValue(Stats.SORTED_ASSETS)
     }
 
   }
@@ -155,14 +181,19 @@ import org.scalatest.Matchers._
     }
 
     var stats = altitude.service.stats.getStats
-    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 4
+    stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 2
+    stats.getStatValue(Stats.SORTED_BYTES) shouldBe
+      stats.getStatValue(Stats.SORTED_ASSETS) * ASSET_SIZE
 
     val all: List[Asset] = altitude.service.asset.query(Query()).records.map(Asset.fromJson)
 
     altitude.service.library.recycleAssets(all.map(_.id.get).toSet)
 
     stats = altitude.service.stats.getStats
-    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 0
+    stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 0
+    stats.getStatValue(Stats.SORTED_BYTES) shouldBe 0
     stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 4
+    stats.getStatValue(Stats.RECYCLED_BYTES) shouldBe
+      stats.getStatValue(Stats.RECYCLED_ASSETS) * ASSET_SIZE
   }
 }

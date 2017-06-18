@@ -70,14 +70,7 @@ class LibraryService(app: Altitude) {
       /**
       * Update repository counters
       */
-      app.service.folder.incrAssetCount(assetIn.folderId)
-      app.service.stats.incrementStat(Stats.TOTAL_ASSETS)
-      app.service.stats.incrementStat(Stats.TOTAL_BYTES, storedAsset.sizeBytes)
-
-      // if there is no folder, increment the triage counter
-      if (ctx.repo.triageFolderId == assetIn.folderId) {
-        app.service.stats.incrementStat(Stats.TRIAGE_ASSETS)
-      }
+      app.service.stats.addAsset(assetToAdd)
 
       // add preview data
       addPreview(assetToAdd)
@@ -91,18 +84,7 @@ class LibraryService(app: Altitude) {
   }
 
   def deleteById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId) = {
-    txManager.withTransaction {
-      val asset: Asset = getById(id)
-
-      // of this asset is still in triage, update the stat
-      if (ctx.repo.triageFolderId == asset.folderId) {
-        app.service.stats.decrementStat(Stats.TRIAGE_ASSETS)
-      }
-      app.service.stats.decrementStat(Stats.TOTAL_ASSETS)
-      app.service.stats.decrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
-
-      app.service.asset.deleteById(id)
-    }
+    throw new NotImplementedError
   }
 
   def getById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
@@ -244,7 +226,6 @@ class LibraryService(app: Altitude) {
                                (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
     txManager.withTransaction {
       moveAssetsToFolder(assetIds, ctx.repo.triageFolderId)
-      app.service.stats.incrementStat(Stats.TRIAGE_ASSETS, assetIds.size)
     }
   }
 
@@ -262,20 +243,10 @@ class LibraryService(app: Altitude) {
 
       assetIds.foreach { assetId =>
         txManager.withTransaction {
-          val asset: Asset = getById(assetId)
+          val asset = getById(assetId)
           app.service.asset.setAssetAsRecycled(assetId, isRecycled = true)
-          app.service.folder.decrAssetCount(asset.folderId)
-
-          // if recycling from triage - decrement the corresponding counter
-          if (app.service.folder.getTriageFolder.id.contains(asset.folderId)) {
-            app.service.stats.decrementStat(Stats.TRIAGE_ASSETS)
-          }
-
-          app.service.stats.decrementStat(Stats.TOTAL_ASSETS)
-          app.service.stats.incrementStat(Stats.RECYCLED_ASSETS)
-          app.service.stats.decrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
-          app.service.stats.incrementStat(Stats.RECYCLED_BYTES, asset.sizeBytes)
-
+          val recycledAsset = getById(assetId)
+          app.service.stats.recycleAsset(recycledAsset)
           app.service.fileStore.recycleAsset(asset)
         }
       }
@@ -296,17 +267,10 @@ class LibraryService(app: Altitude) {
 
         val asset: Asset = getById(assetId)
 
-        // if moving from triage, decrement that stat
-        if (asset.folderId == ctx.repo.triageFolderId) {
-          app.service.stats.decrementStat(Stats.TRIAGE_ASSETS)
-        }
+        app.service.stats.moveAsset(asset, destFolderId)
 
         // if it's a recycled asset, we are adding it back to the general population
         if (asset.isRecycled) {
-          app.service.stats.incrementStat(Stats.TOTAL_ASSETS)
-          app.service.stats.decrementStat(Stats.RECYCLED_ASSETS)
-          app.service.stats.incrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
-          app.service.stats.decrementStat(Stats.RECYCLED_BYTES, asset.sizeBytes)
           app.service.asset.setAssetAsRecycled(assetId = assetId, isRecycled = false)
         }
 
@@ -318,14 +282,6 @@ class LibraryService(app: Altitude) {
         app.service.asset.updateById(
           asset.id.get, updatedAsset,
           fields = List(C.Asset.FOLDER_ID))
-
-        // update folder count
-        if (asset.isRecycled) {
-          app.service.folder.incrAssetCount(destFolderId)
-        } else {
-          app.service.folder.decrAssetCount(asset.folderId)
-          app.service.folder.incrAssetCount(destFolderId)
-        }
 
         app.service.fileStore.moveAsset(asset, updatedAsset)
       }
@@ -376,17 +332,9 @@ class LibraryService(app: Altitude) {
     txManager.withTransaction {
       assetIds.foreach { assetId =>
         app.service.asset.setAssetAsRecycled(assetId, isRecycled = false)
-
-        val asset: Asset = getById(assetId)
-
-        app.service.folder.incrAssetCount(asset.folderId)
-
-        app.service.stats.incrementStat(Stats.TOTAL_ASSETS)
-        app.service.stats.decrementStat(Stats.RECYCLED_ASSETS)
-        app.service.stats.incrementStat(Stats.TOTAL_BYTES, asset.sizeBytes)
-        app.service.stats.decrementStat(Stats.RECYCLED_BYTES, asset.sizeBytes)
-
-        app.service.fileStore.restoreAsset(asset)
+        val restoredAsset: Asset = getById(assetId)
+        app.service.stats.restoreAsset(restoredAsset)
+        app.service.fileStore.restoreAsset(restoredAsset)
       }
     }
   }

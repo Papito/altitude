@@ -126,7 +126,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     path = Some(Util.randomStr(50)),
     md5 = Util.randomStr(32),
     metadata = metadata,
-    sizeBytes = 1L)
+    sizeBytes = 1000L)
 
   // test count - we use it as a request ID for our logging environment
   private var count = 0

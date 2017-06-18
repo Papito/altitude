@@ -15,6 +15,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     this.stats = {};
     this.stats.totalAssets = ko.observable(0);
+    this.stats.sortedAssets = ko.observable(0);
     this.stats.triageAssets = ko.observable(0);
     this.stats.recycledAssets = ko.observable(0);
 
@@ -1221,6 +1222,7 @@ AssetsViewModel = BaseViewModel.extend({
       'successCallback': function (json) {
         var stats = json['stats'];
         self.stats.totalAssets(stats.total_assets);
+        self.stats.sortedAssets(stats.sorted_assets);
         self.stats.triageAssets(stats.triage_assets);
         self.stats.recycledAssets(stats.recycled_assets);
       }

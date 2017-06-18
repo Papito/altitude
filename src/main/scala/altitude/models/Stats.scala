@@ -4,7 +4,10 @@ package altitude.models
 object Stats {
   final val TOTAL_ASSETS = "total_assets"
   final val TOTAL_BYTES = "total_bytes"
+  final val SORTED_ASSETS = "sorted_assets"
+  final val SORTED_BYTES = "sorted_bytes"
   final val TRIAGE_ASSETS = "triage_assets"
+  final val TRIAGE_BYTES = "triage_bytes"
   final val RECYCLED_ASSETS = "recycled_assets"
   final val RECYCLED_BYTES = "recycled_bytes"
 }
