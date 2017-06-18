@@ -17,13 +17,14 @@ class StatsService(app: Altitude) {
     txManager.asReadOnly[Stats] {
       val stats: List[Stat] = DAO.query(Query()).records.map(Stat.fromJson)
 
+      // Assemble the total stats on-the-fly
       val totalAssetsDims = Stats.SORTED_ASSETS :: Stats.RECYCLED_ASSETS :: Stats.TRIAGE_ASSETS :: Nil
       val totalAssets = stats.filter(stat => totalAssetsDims.contains(stat.dimension)).map(_.dimVal).sum
 
       val totalBytesDims = Stats.SORTED_BYTES :: Stats.RECYCLED_BYTES :: Stats.TRIAGE_BYTES :: Nil
       val totalBytes = stats.filter(stat => totalBytesDims.contains(stat.dimension)).map(_.dimVal).sum
 
-      val wTotals = Stat(Stats.TOTAL_ASSETS, totalAssets) ::  Stat(Stats.TOTAL_BYTES, totalBytes) :: stats
+      val wTotals = Stat(Stats.TOTAL_ASSETS, totalAssets) :: Stat(Stats.TOTAL_BYTES, totalBytes) :: stats
 
       Stats(wTotals)
     }
