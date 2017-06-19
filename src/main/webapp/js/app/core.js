@@ -51,21 +51,62 @@ BaseViewModel = Base.extend({
     console.log('Initializing base view model');
     this.base();
 
-    this.successMessage = ko.observable();
-    this.successEl = $('#successMessage');
-
-    this.infoMessage = ko.observable();
-    this.infoEl = $('#infoMessage');
-
-    this.warningMessage = ko.observable();
-    this.warningEl = $('#warningMessage');
-
-    this.errorMessage = ko.observable();
-    this.errorStacktrace = ko.observable();
-
     this.keys = [];
+
     window.onkeyup = function(e) {self.keys[e.keyCode]=false;};
-    window.onkeydown = function(e) {self.keys[e.keyCode]=true;}
+    window.onkeydown = function(e) {self.keys[e.keyCode]=true;};
+
+    document.addEventListener('requestMade', function (data) {
+      self.resetAllMessages();
+    }, false);
+
+    document.addEventListener('showInlineDialog', function (data) {
+      console.log('Handling: showInlineDialog');
+      self.resetAllMessages();
+    }, false);
+
+    document.addEventListener('showModalDialog', function (data) {
+      console.log('Handling: showModalDialog');
+      self.resetAllMessages();
+    }, false);
+
+    document.addEventListener('successMsg', function (data) {
+      $.toast({
+        heading: 'Success',
+        text: data.detail.msg,
+        showHideTransition: 'fade',
+        icon: 'success',
+        loader: false,
+        stack: 2,
+        position: 'bottom-right'
+      });
+    }, false);
+
+    document.addEventListener('infoMsg', function (data) {
+      $.toast({
+        heading: 'Info',
+        text: data.detail.msg,
+        showHideTransition: 'fade',
+        icon: 'info',
+        loader: false,
+        stack: 2,
+        position: 'bottom-right'
+
+      });
+    }, false);
+
+    document.addEventListener('warningMsg', function (data) {
+      $.toast({
+        heading: 'Warning',
+        text: data.detail.msg,
+        showHideTransition: 'fade',
+        icon: 'warning',
+        loader: false,
+        stack: 2,
+        position: 'bottom-right'
+
+      });
+    }, false);
   },
 
   isKeyPressed: function(key) {
@@ -74,17 +115,17 @@ BaseViewModel = Base.extend({
   // ----------------------------------------------------------------
 
   success: function(msg) {
-    this.successMessage(msg);
+    this.fireEvent('successMsg', {detail: {msg: msg}});
   },
   // ----------------------------------------------------------------
 
   info: function(msg) {
-    this.infoMessage(msg);
+    this.fireEvent('infoMsg', {detail: {msg: msg}});
   },
   // ----------------------------------------------------------------
 
   warning: function(msg) {
-    this.warningMessage(msg);
+    this.fireEvent('warningMsg', {detail: {msg: msg}});
   },
   // ----------------------------------------------------------------
 
@@ -114,12 +155,7 @@ BaseViewModel = Base.extend({
   // ----------------------------------------------------------------
 
   resetAllMessages: function() {
-    this.successMessage(null);
-    this.infoMessage(null);
-    this.warningMessage(null);
-    this.errorMessage(null);
-    this.errorStacktrace(null);
-    this.dismissError();
+    $.toast().reset('all');
   },
   // ----------------------------------------------------------------
 
@@ -131,7 +167,7 @@ BaseViewModel = Base.extend({
   restRequest : function(url, method, opts) {
     var self = this;
 
-    self.resetAllMessages();
+    self.fireEvent('requestMade', {url: url, method: method});
 
     method = method.toUpperCase();
 
@@ -223,15 +259,9 @@ BaseViewModel = Base.extend({
     });
   },
 
-  reportError: function() {
-    console.log("error report placeholder");
-  },
-
-  showError: function() {
-    $('#errorContainer').show();
-  },
-
-  dismissError: function() {
-    $('#errorContainer').hide();
+  fireEvent: function(eventName, data) {
+    console.log('Firing event', eventName, data);
+    var e = new CustomEvent(eventName, data);
+    document.dispatchEvent(e);
   }
 });

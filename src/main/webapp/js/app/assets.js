@@ -65,7 +65,7 @@ AssetsViewModel = BaseViewModel.extend({
     });
 
     this.triageEl.on("drop", function( event, ui ) {
-      self.resetAllMessages();
+      self.fireEvent('targetDrop');
       var assetId = $(ui.draggable.context).attr('asset_id');
       self.moveToTriage(assetId);
     });
@@ -78,7 +78,7 @@ AssetsViewModel = BaseViewModel.extend({
     });
 
     this.trashEl.on("drop", function( event, ui ) {
-      self.resetAllMessages();
+      self.fireEvent('targetDrop');
       var assetId = $(ui.draggable.context).attr('asset_id');
       self.moveToTrash(assetId);
     });
@@ -118,7 +118,7 @@ AssetsViewModel = BaseViewModel.extend({
         rename: {
           name: "Rename folder",
           callback: function(key, opt){
-            self.resetAllMessages();
+            self.fireEvent('contextMenuClick');
             var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
             self.showRenameFolderModal(folderId);
           }
@@ -126,7 +126,7 @@ AssetsViewModel = BaseViewModel.extend({
         move: {
           name: "Move folder",
           callback: function(key, opt){
-            self.resetAllMessages();
+            self.fireEvent('contextMenuClick');
             var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
             self.showMoveFolderModal(folderId);
           }
@@ -134,6 +134,7 @@ AssetsViewModel = BaseViewModel.extend({
         delete: {
           name: "Delete folder",
           callback: function(key, opt){
+            self.fireEvent('contextMenuClick');
             var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
             self.deleteFolder(folderId);
           }
@@ -162,86 +163,87 @@ AssetsViewModel = BaseViewModel.extend({
     Mousetrap.reset();
 
     Mousetrap.bind(['.', 'pagedown'], function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.gotoNextPage();
     }, 'keyup');
 
     Mousetrap.bind([',', 'pageup'], function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.gotoPrevPage();
     }, 'keyup');
 
     Mousetrap.bind('right', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.focusRight();
     }, 'keyup');
 
     Mousetrap.bind('left', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.focusLeft();
     }, 'keyup');
 
     Mousetrap.bind('up', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.focusUp();
     }, 'keyup');
 
     Mousetrap.bind('down', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.focusDown();
     }, 'keyup');
 
     Mousetrap.bind('shift+right', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.selectRight();
     });
 
     Mousetrap.bind('shift+left', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.selectLeft();
     });
 
     Mousetrap.bind('shift+up', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.selectUp();
     });
 
     Mousetrap.bind('shift+down', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.selectDown();
     });
 
     Mousetrap.bind('return', function() {
+      self.fireEvent('mousetrap');
       var asset = self.getFocusedAsset();
       self.showAssetDetailModal(self, asset);
     });
 
     Mousetrap.bind('esc', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
     });
 
     Mousetrap.bind('s', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.selectFocused();
     });
 
     Mousetrap.bind('d', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.deselectFocused();
     });
 
     Mousetrap.bind('shift+s', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.selectAllOnPage();
     });
 
     Mousetrap.bind('shift+d', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.deselectAllOnPage();
     });
 
     Mousetrap.bind('del', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
 
       // if there is a selection, show the confirmation dialog
       if (self.selectedCount()) {
@@ -267,49 +269,49 @@ AssetsViewModel = BaseViewModel.extend({
     Mousetrap.reset();
 
     Mousetrap.bind(['.', 'pagedown'], function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.gotoNextAssetDetail();
     }, 'keyup');
 
     Mousetrap.bind([',', 'pageup'], function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.gotoPrevAssetDetail();
     }, 'keyup');
 
     Mousetrap.bind('right', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.gotoNextAssetDetail();
     }, 'keyup');
 
     Mousetrap.bind('left', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.gotoPrevAssetDetail();
     }, 'keyup');
 
     Mousetrap.bind('up', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.gotoPrevAssetDetail();
     }, 'keyup');
 
     Mousetrap.bind('down', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.gotoNextAssetDetail();
     }, 'keyup');
 
     Mousetrap.bind('s', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.selectFocused();
       self.detailAsset().selected(true);
     });
 
     Mousetrap.bind('d', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
       self.deselectFocused();
       self.detailAsset().selected(false);
     });
 
     Mousetrap.bind('del', function() {
-      self.resetAllMessages();
+      self.fireEvent('mousetrap');
 
       // after we delete the asset, display the one focused in its place
       var cb = function() {
@@ -762,6 +764,7 @@ AssetsViewModel = BaseViewModel.extend({
 
   showMoveSelectedToTrashModal: function() {
     var self = this;
+    self.fireEvent('showModalDialog');
     $('#delSelectedAssetsModal').modal();
   },
 
@@ -777,7 +780,7 @@ AssetsViewModel = BaseViewModel.extend({
       'successCallback': function() {
         self.loadFolders();
         self.refreshResults();
-        self.warning("Assets moved to trash");
+        self.warning(assetIds.length + " assets moved to trash");
         self.clearSelection();
       },
       'finally': function() {
@@ -908,6 +911,7 @@ AssetsViewModel = BaseViewModel.extend({
     );
 
     var successCallback = function() {
+      self.fireEvent('showModalDialog');
       modalEl.modal();
     };
 
@@ -937,15 +941,11 @@ AssetsViewModel = BaseViewModel.extend({
         'asset_ids': self.selectedIds()
       },
       'successCallback': function() {
+        var sizeOfSelection = self.selectedIds().length;
         self.loadFolders();
         self.clearSelection();
         self.refreshResults();
-        if (self.currentFolderId() === '0') {
-          self.warning("Assets moved. They may still be visible since you are viewing all assets.");
-
-        } else {
-          self.success("Assets moved");
-        }
+        self.success(sizeOfSelection + " assets moved");
       },
       'finally': function() {
         self.clearSelection();
@@ -982,6 +982,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     var successCallback = function() {
       self.actionState = assetId;
+      self.fireEvent('showModalDialog');
       $('#moveAssetModal').modal();
     };
 
@@ -1023,6 +1024,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     var successCallback = function() {
       self.actionState = folderId;
+      self.fireEvent('showModalDialog');
       $('#moveFolderModal').modal();
     };
 
@@ -1099,13 +1101,12 @@ AssetsViewModel = BaseViewModel.extend({
 
   showAddFolder: function() {
     var self = this;
-    self.resetAllMessages();
+    self.fireEvent('showInlineDialog');
 
     var el = $('#addFolderForm');
 
     el.off('submit');
     el.on('submit', function(e) {
-      self.resetAllMessages();
       e.preventDefault();
       self.addFolder();
     });
@@ -1202,7 +1203,6 @@ AssetsViewModel = BaseViewModel.extend({
         });
 
         elFolderTargets.on("drop", function(event, ui) {
-          self.resetAllMessages();
           var assetId = $(ui.draggable.context).attr('asset_id');
           var folderId = $(event.target).attr('folder_id');
           self.moveAssetToFolder(assetId, folderId);
@@ -1273,9 +1273,6 @@ AssetsViewModel = BaseViewModel.extend({
 
   showRenameFolderModal: function(folderId) {
     var self = this;
-    self.resetAllMessages();
-    self.resetFormErrors('#renameFolderModal-form');
-
     self.actionState = folderId;
 
     var modalEl = $('#renameFolderModal');
@@ -1285,18 +1282,17 @@ AssetsViewModel = BaseViewModel.extend({
 
     modalEl.off('shown.bs.modal');
     modalEl.on('shown.bs.modal', function () {
-      self.resetAllMessages();
       $('#renameFolderModal-input').focus().select();
     });
 
     var formEl = $('#renameFolderModal-form');
     formEl.off('submit');
     formEl.on('submit', function(e) {
-      self.resetAllMessages();
       e.preventDefault();
       self.renameFolder();
     });
 
+    self.fireEvent('showModalDialog');
     modalEl.modal();
   },
 
@@ -1324,7 +1320,6 @@ AssetsViewModel = BaseViewModel.extend({
 
   showNewFolderModal: function() {
     var self = this;
-    self.resetAllMessages();
 
     var parentFolder = self.findFolderById(self.actionState);
 
@@ -1335,7 +1330,6 @@ AssetsViewModel = BaseViewModel.extend({
 
     modalEl.off('shown.bs.modal');
     modalEl.on('shown.bs.modal', function () {
-      self.resetAllMessages();
       $('#newFolderModal-newFolderName').focus().select();
     });
 
@@ -1344,11 +1338,11 @@ AssetsViewModel = BaseViewModel.extend({
     var formEl = $('#newFolderModal-newFolderForm');
     formEl.off('submit');
     formEl.on('submit', function(e) {
-      self.resetAllMessages();
       e.preventDefault();
       self.addFolderViaModal();
     });
 
+    self.fireEvent('showModalDialog');
     modalEl.modal();
   },
 
@@ -1523,8 +1517,7 @@ AssetsViewModel = BaseViewModel.extend({
       'successCallback': function (json) {
         self.detailAsset(new Asset(json.asset));
 
-        // when asset modal is closed
-
+        self.fireEvent('showModalDialog');
         el.modal();
         self.focusAssetById(self.detailAsset().id);
         self.setupAssetDetailHotkeys();
