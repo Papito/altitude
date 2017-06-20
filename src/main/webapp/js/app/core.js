@@ -53,6 +53,7 @@ BaseViewModel = Base.extend({
 
     this.keys = [];
 
+    // for finding which key is currently pressed
     window.onkeyup = function(e) {self.keys[e.keyCode]=false;};
     window.onkeydown = function(e) {self.keys[e.keyCode]=true;};
 
@@ -77,8 +78,8 @@ BaseViewModel = Base.extend({
         showHideTransition: 'fade',
         icon: 'success',
         loader: false,
-        stack: 2,
-        position: 'bottom-right'
+        position: 'bottom-right',
+        stack: 1
       });
     }, false);
 
@@ -89,8 +90,8 @@ BaseViewModel = Base.extend({
         showHideTransition: 'fade',
         icon: 'info',
         loader: false,
-        stack: 2,
-        position: 'bottom-right'
+        position: 'bottom-right',
+        stack: 1
 
       });
     }, false);
@@ -102,10 +103,36 @@ BaseViewModel = Base.extend({
         showHideTransition: 'fade',
         icon: 'warning',
         loader: false,
-        stack: 2,
-        position: 'bottom-right'
+        position: 'bottom-right',
+        stack: 1
 
       });
+    }, false);
+
+    this.stacktraceMessage = ko.observable();
+    this.stacktraceDetail = ko.observable();
+    this.stacktraceCount = 0; // to avoid applying the bindings
+    document.addEventListener('stacktrace', function (data) {
+      self.stacktraceMessage(data.detail.msg);
+      self.stacktraceDetail(data.detail.stacktrace);
+
+      $.toast({
+        heading: 'Critical Error!',
+        text: '<a id="stacktraceDetailsLink" href="#" data-bind="click: function(){$root.showStacktraceDetailModal()}">CLICK HERE</a> to review error details',
+        showHideTransition: 'fade',
+        hideAfter: false,
+        icon: 'error',
+        loader: false,
+        position: 'top-left',
+        stack: 1
+      });
+
+      if (self.stacktraceCount === 0) {
+        ko.applyBindings(new BaseViewModel(), $('#stacktraceDetailsLink').get(0));
+      }
+
+      self.stacktraceCount++;
+
     }, false);
   },
 
@@ -129,6 +156,11 @@ BaseViewModel = Base.extend({
   },
   // ----------------------------------------------------------------
 
+  stacktrace: function(msg, stacktrace) {
+    this.fireEvent('stacktrace', {detail: {msg: msg, stacktrace: stacktrace}});
+  },
+  // ----------------------------------------------------------------
+
   post : function(url, opts) {
     return this.restRequest(url, 'POST', opts);
   },
@@ -144,8 +176,21 @@ BaseViewModel = Base.extend({
   },
   // ----------------------------------------------------------------
 
+  showStacktraceDetailModal: function() {
+    var self = this;
+    console.log(self.stacktraceDetail());
+    self.fireEvent('showModalDialog');
+    self.fireEvent('showStacktraceModalDialog');
+    $('#stacktraceModal').modal()
+  },
+
   get : function(url, opts) {
     return this.restRequest(url, 'GET', opts);
+  },
+  // ----------------------------------------------------------------
+
+  submitStacktrace: function() {
+
   },
   // ----------------------------------------------------------------
 
@@ -193,9 +238,7 @@ BaseViewModel = Base.extend({
           console.log(jqXHR.responseText);
           var msg = jqXHR.responseJSON ? jqXHR.responseJSON.error : jqXHR.responseText;
           var stacktrace = jqXHR.responseJSON ? jqXHR.responseJSON.stacktrace : jqXHR.responseText;
-          self.showError();
-          self.errorMessage(msg);
-          self.errorStacktrace(stacktrace);
+          self.stacktrace(msg, stacktrace);
         }
 
         // validation errors

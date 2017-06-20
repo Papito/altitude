@@ -403,6 +403,16 @@ select {
     top: 0;
 }
 
+/* JQuery toast override */
+.jq-toast-wrap {
+    width: auto;
+    min-width: 300px;
+    font-size: 1em;
+}
+
+.jq-toast-single {
+    font-size: 1em;
+}
 
 /* GLOBAL */
 
@@ -807,5 +817,16 @@ li.folder {
     margin-bottom: 1em;
     padding-left: 4em;
     padding-right: 4em;
+}
+
+#stacktraceModal {
+    background-color: #a94442;
+    color: #FFF;
+}
+
+#stacktraceModal-message {
+    margin-bottom: 2em;
+    font-size: 1.1em;
+    font-weight: bold;
 }
 
