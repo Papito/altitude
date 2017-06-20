@@ -797,7 +797,7 @@ AssetsViewModel = BaseViewModel.extend({
    * @param {Object} args.
    * @param {string} args.treeEl - The tree element to paint the folder tree in.
    * @param {string} [null] args.actionEl - The action element, enabled/disabled depending on selection state.
-   * @param {boolean} [false] args.showRoot - Show the Sorted node as the root of the tree.
+   * @param {boolean} [false] args.showRoot - Show the root (Sorted) node as the root of the tree.
    * @param {function} [null] args.successFn - Success callback.
    * @param {function} [null] args.folderFilterFn - The filter applied to the tree to hide nodes.
    * @param {function} [null] args.folderAddedCb - Callback for each time a folder is added to hierarchy.
@@ -838,7 +838,8 @@ AssetsViewModel = BaseViewModel.extend({
           hierarchy.push({
             //FIXME: hardcoded
             'id': "b10000000000000000000000",
-            'name': 'Sorted',
+            'isRoot': true,
+            'name': '/',
             'children': allFolders
           });
         }

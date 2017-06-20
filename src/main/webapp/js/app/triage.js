@@ -14,7 +14,7 @@ TriageViewModel = AssetsViewModel.extend({
   _setupDragDrop: function(startElId) {
     var self = this;
 
-    var elFolderTargets = $('#' + startElId + ' .jstree-anchor');
+    var elFolderTargets = $('#' + startElId + ' .jstree-anchor').not('.root');
     elFolderTargets.droppable({
       accept: ".result-box",
       hoverClass: "highlight",
@@ -22,7 +22,6 @@ TriageViewModel = AssetsViewModel.extend({
     });
 
     elFolderTargets.on("drop", function(event, ui) {
-      self.resetAllMessages();
       var assetId = $(ui.draggable.context).attr('asset_id');
       var folderId = $(event.target).attr('folder_id');
       self.moveAssetToFolder(assetId, folderId);
@@ -61,7 +60,16 @@ TriageViewModel = AssetsViewModel.extend({
       self.folders.push($.extend({}, node));
       node.icon = "glyphicon glyphicon-folder-close";
       node.data = node.a_attr = {'folder_id': node.id};
-      node.li_attr = {'class': 'folder', 'folder_id': node.id};
+
+      if (node.isRoot) {
+        node.state = {'opened' : true};
+        node.li_attr = {'class': 'folder root', 'folder_id': node.id};
+        node.a_attr = {'class': 'root'};
+      }
+      else {
+        node.li_attr = {'class': 'folder', 'folder_id': node.id};
+      }
+
       node.id = 'triage_node_' + node.id;
     };
 
@@ -69,7 +77,7 @@ TriageViewModel = AssetsViewModel.extend({
 
     self.loadFolderTree({
       treeEl: treeEl,
-      showRoot: false,
+      showRoot: true,
       successFn: successFn,
       folderAddedFn: folderAddedFn
     });
@@ -77,6 +85,7 @@ TriageViewModel = AssetsViewModel.extend({
     self.loadStats();
   },
 
+  //FIXME: move to base class, specifying array of supported actions as strings
   registerFolderContextMenu: function() {
     var self = this;
 
