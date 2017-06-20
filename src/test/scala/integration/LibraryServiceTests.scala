@@ -151,6 +151,22 @@ import org.scalatest.Matchers._
     ).isEmpty shouldBe true
   }
 
+  test("move asset to same folder", CurrentTag) {
+    /*
+    folder1
+    folder2
+    */
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+
+    val asset: Asset = altitude.service.library.add(makeAsset(folder1))
+
+    altitude.service.library.moveAssetToFolder(asset.id.get, folder1.id.get)
+
+    // same but recycled
+    altitude.service.library.recycleAsset(asset.id.get)
+    altitude.service.library.moveAssetToFolder(asset.id.get, folder1.id.get)
+  }
+
   test("recycle asset") {
     altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
 

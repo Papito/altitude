@@ -252,38 +252,48 @@ class LibraryService(app: Altitude) {
       }
   }
 
+  //FIXME: optimize. Query assets at once
   def moveAssetsToFolder(assetIds: Set[String], destFolderId: String)
                         (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
 
+    def move(asset: Asset): Unit = {
+      // cannot move to the same folder
+      if (!asset.isRecycled && asset.folderId == destFolderId) {
+        return
+      }
+
+      app.service.stats.moveAsset(asset, destFolderId)
+
+      // if it's a recycled asset, we are adding it back to the general population
+      if (asset.isRecycled) {
+        app.service.asset.setAssetAsRecycled(assetId = asset.id.get, isRecycled = false)
+      }
+
+      // point asset to the new folder
+      val updatedAsset: Asset = asset ++ Json.obj(
+        C.Asset.FOLDER_ID -> destFolderId,
+        C.Asset.IS_RECYCLED -> false)
+
+      app.service.asset.updateById(
+        asset.id.get, updatedAsset,
+        fields = List(C.Asset.FOLDER_ID))
+
+      app.service.fileStore.moveAsset(asset, updatedAsset)
+    }
+
     txManager.withTransaction {
+      // ensure the folder exists
+      app.service.folder.getById(destFolderId)
+
       assetIds.foreach {assetId =>
         // cannot have assets in root folder - just other folders
         if (app.service.folder.isRootFolder(destFolderId)) {
           throw new IllegalOperationException("Cannot move assets to root folder")
         }
 
-        // ensure the folder exists
-        app.service.folder.getById(destFolderId)
-
         val asset: Asset = getById(assetId)
 
-        app.service.stats.moveAsset(asset, destFolderId)
-
-        // if it's a recycled asset, we are adding it back to the general population
-        if (asset.isRecycled) {
-          app.service.asset.setAssetAsRecycled(assetId = assetId, isRecycled = false)
-        }
-
-        // point asset to the new folder and update the path
-        val updatedAsset: Asset = asset ++ Json.obj(
-          C.Asset.FOLDER_ID -> destFolderId,
-          C.Asset.IS_RECYCLED -> false)
-
-        app.service.asset.updateById(
-          asset.id.get, updatedAsset,
-          fields = List(C.Asset.FOLDER_ID))
-
-        app.service.fileStore.moveAsset(asset, updatedAsset)
+        move(asset)
       }
     }
   }
