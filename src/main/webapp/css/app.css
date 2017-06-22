@@ -624,7 +624,7 @@ select {
 }
 
 .flat-folders li {
-    padding-left: .5em;
+    padding-left: .8em;
     list-style-type: none;
     margin-top: .3em;
 }
@@ -662,7 +662,7 @@ li.folder {
 
 #showAddFolder {
     margin-top: .5em;
-    padding: .2em 0 .2em .5em;
+    padding: .2em 0 .2em 0em;
     border-top: 1px solid #363636;
     border-bottom: 1px solid #363636;
 }
