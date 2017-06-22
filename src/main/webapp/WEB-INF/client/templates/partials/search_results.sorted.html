@@ -1,0 +1,34 @@
+<div class="container-fluid">
+  <div class="row" data-bind="visible: searchResults()" style="display: none">
+
+    <div class="col-md-12">
+      <div id="searchResults" data-bind="foreach: searchResults">
+        <div class="result-box"
+             data-bind="attr: {'asset_id': $data.id}, css: {'selected': selected}, click: {single: function(asset, event){$root.focusOrSelectAsset($root, asset, event)}, double: function(){$root.showAssetDetailModal($root, $data)}}">
+          <img src="#" data-bind="attr: {src: '/assets/'+ $data.id +'/preview'}" class="img-responsive">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="noResults" class="row" data-bind="visible: searchResults().length === 0" style="display: none">
+    <div class="col-md-12">
+      <h3>No results</h3>
+
+      <div class="triaged-assets-available" data-bind="visible: stats.triageAssets() > 0">
+        But there are <span class="num" data-bind="text: stats.triageAssets()"></span>
+        assets awaiting in <a href="/client/triage">Triage</a>
+      </div>
+
+      <div class="import-new-assets" data-bind="visible: stats.triageAssets() == 0">
+        Try importing some assets first <a href="#"
+           data-bind="click: function(){getDirectoryNames(null)}"
+           data-toggle="modal" data-target="#selectImportDirectoryModal">from a folder</a>
+      </div>
+
+    </div>
+  </div>
+
+  {% include "./selection_tools.html" %}
+</div>

@@ -1,6 +1,6 @@
 <div class="container-fluid" id="systemFolders">
   <div class="row">
-    <div class="col-md-6 system-folder" id="sorted">
+    <div class="col-md-6 system-folder" id="sorted" data-bind="css: {attn: stats.sortedAssets() > 0, disregard: stats.sortedAssets() == 0}">
       <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
       &nbsp;<a href="/">Sorted</a>
       <span data-bind="html: '<span class=folder-count>(' + stats.sortedAssets() + ')</span>'"></span>

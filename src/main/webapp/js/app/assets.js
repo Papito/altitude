@@ -536,7 +536,13 @@ AssetsViewModel = BaseViewModel.extend({
   focusLast: function() {
     var self = this;
     console.log('focusing last');
-    var el = $("[asset_id='" + self.lastAsset().id + "']");
+    var lastAsset = self.lastAsset();
+
+    if (!lastAsset) {
+      console.log('NO LAST');
+      return;
+    }
+    var el = $("[asset_id='" + lastAsset.id + "']");
     el.addClass('focused');
     el.focus();
   },
@@ -1043,13 +1049,41 @@ AssetsViewModel = BaseViewModel.extend({
   },
 
   moveToTriage: function(assetId) {
+    var self = this;
+
     console.log(assetId, 'to triage');
 
-    var self = this;
+    var assetIdx = self.getAssetIndex(assetId);
+
     var opts = {
       'successCallback': function() {
+        delete self.selectedAssetsMap[assetId];
+        self.selectedIds.remove(assetId);
+
+        self.searchResults.remove(function(asset) {
+          return asset.id === assetId;
+        });
+
+        var cb = null;
+
+        if (self.searchResults().length) {
+          cb = function() {
+            // focus on asset in place of deleted one
+            var assetInPlace = assetIdx + 1 > self.searchResults().length ? self.lastAsset() : self.searchResults()[assetIdx];
+            self.focusAssetById(assetInPlace.id);
+          };
+        }
+        else {
+          // focus the last asset of reloaded results for seamless focusing
+          cb = function() {
+            self.focusLast();
+          };
+        }
+
+        self.refreshResults(cb);
         self.loadFolders(self.currentFolderId());
-        self.success("Asset folder cleared");
+
+        self.warning('Moved asset back to Triage!');
       }
     };
 

@@ -572,6 +572,15 @@ select {
     letter-spacing: .2em;
 }
 
+#noResults a {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+#noResults span.num {
+    font-weight: bold;
+}
+
 #addFolderForm {
     width: 100%;
     margin-top: 1em;
@@ -697,7 +706,6 @@ li.folder {
 }
 
 .system-folder.attn a {
-    color: #ff4e41;
 }
 
 .system-folder.disregard .glyphicon {

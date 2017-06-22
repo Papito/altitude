@@ -3,7 +3,6 @@ TriageViewModel = AssetsViewModel.extend({
     "use strict";
 
     var self = this;
-    this.queryString = 'folders=c10000000000000000000000';
 
     this.base();
     console.log('Initializing triage view model');
@@ -26,6 +25,11 @@ TriageViewModel = AssetsViewModel.extend({
       var folderId = $(event.target).attr('folder_id');
       self.moveAssetToFolder(assetId, folderId);
     });
+  },
+
+  getUrl: function() {
+    var self = this;
+    return '/api/v1/query/triage/p/' +  self.currentPage() + '/rpp/' + self.resultsPerPage() + '?' + self.queryString
   },
 
   loadFolders: function() {

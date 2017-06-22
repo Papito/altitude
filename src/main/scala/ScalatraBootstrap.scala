@@ -24,6 +24,7 @@ class ScalatraBootstrap extends LifeCycle with SingleApplication {
     context.mount(new api.FolderController, "/api/v1/folders/*")
     context.mount(new TrashController, "/api/v1/trash/*")
     context.mount(new StatsController, "/api/v1/stats/*")
+
     //context.mount(new api.ImportProfileController, "/api/v1/ip/*")
     //context.mount(new api.TagConfigController, "/api/v1/tagconfig/*")
 
