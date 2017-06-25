@@ -770,7 +770,7 @@ AssetsViewModel = BaseViewModel.extend({
 
   showMoveSelectedToTrashModal: function() {
     var self = this;
-    self.fireEvent('showModalDialog');
+    self.fireEvent('showModalDialog', {detail: {modalId: '#delSelectedAssetsModal'}});
     $('#delSelectedAssetsModal').modal();
   },
 
@@ -925,7 +925,7 @@ AssetsViewModel = BaseViewModel.extend({
     );
 
     var successCallback = function() {
-      self.fireEvent('showModalDialog');
+      self.fireEvent('showModalDialog', {detail: {modalId: '#moveSelectedAssetsModal'}});
       modalEl.modal();
     };
 
@@ -996,7 +996,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     var successCallback = function() {
       self.actionState = assetId;
-      self.fireEvent('showModalDialog');
+      self.fireEvent('showModalDialog', {detail: {modalId: '#moveAssetModal'}});
       $('#moveAssetModal').modal();
     };
 
@@ -1038,7 +1038,7 @@ AssetsViewModel = BaseViewModel.extend({
 
     var successCallback = function() {
       self.actionState = folderId;
-      self.fireEvent('showModalDialog');
+      self.fireEvent('showModalDialog', {detail: {modalId: '#moveFolderModal'}});
       $('#moveFolderModal').modal();
     };
 
@@ -1143,7 +1143,7 @@ AssetsViewModel = BaseViewModel.extend({
 
   showAddFolder: function() {
     var self = this;
-    self.fireEvent('showInlineDialog');
+    self.fireEvent('showInlineDialog', {detail: {modalId: '#addFolderForm'}});
 
     var el = $('#addFolderForm');
 
@@ -1338,7 +1338,7 @@ AssetsViewModel = BaseViewModel.extend({
       self.renameFolder();
     });
 
-    self.fireEvent('showModalDialog');
+    self.fireEvent('showModalDialog', {detail: {modalId: '#renameFolderModal'}});
     modalEl.modal();
   },
 
@@ -1378,8 +1378,6 @@ AssetsViewModel = BaseViewModel.extend({
     modalEl.on('shown.bs.modal', function () {
       $('#newFolderModal-newFolderName').focus().select();
     });
-
-    self.resetFormErrors('#newFolderModal-newFolderForm');
 
     var formEl = $('#newFolderModal-newFolderForm');
     formEl.off('submit');
@@ -1563,7 +1561,7 @@ AssetsViewModel = BaseViewModel.extend({
       'successCallback': function (json) {
         self.detailAsset(new Asset(json.asset));
 
-        self.fireEvent('showModalDialog');
+        self.fireEvent('showModalDialog', {detail: {modalId: '#assetModal'}});
         el.modal();
         self.focusAssetById(self.detailAsset().id);
         self.setupAssetDetailHotkeys();

@@ -63,12 +63,14 @@ BaseViewModel = Base.extend({
 
     document.addEventListener('showInlineDialog', function (data) {
       console.log('Handling: showInlineDialog');
+      self.resetFormErrors(data.detail.modalId);
       self.resetAllMessages();
     }, false);
 
     document.addEventListener('showModalDialog', function (data) {
       console.log('Handling: showModalDialog');
       self.resetAllMessages();
+      self.resetFormErrors(data.detail.modalId);
     }, false);
 
     document.addEventListener('successMsg', function (data) {
@@ -195,7 +197,7 @@ BaseViewModel = Base.extend({
   // ----------------------------------------------------------------
 
   resetFormErrors: function(el) {
-    $(el).find('.has-error').removeClass('has-error').parent().find('.error').text('');
+    $(el).find('.has-error').removeClass('has-error').parent().find('.error').text('').css('display', 'none');
   },
   // ----------------------------------------------------------------
 
