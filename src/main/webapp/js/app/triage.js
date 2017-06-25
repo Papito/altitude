@@ -23,7 +23,7 @@ TriageViewModel = AssetsViewModel.extend({
     elFolderTargets.on("drop", function(event, ui) {
       var assetId = $(ui.draggable.context).attr('asset_id');
       var folderId = $(event.target).attr('folder_id');
-      self.moveAssetToFolder(assetId, folderId);
+      self.moveAssetToFolder(assetId, folderId, false /* do not reload folders */);
     });
   },
 
@@ -32,7 +32,7 @@ TriageViewModel = AssetsViewModel.extend({
     return '/api/v1/query/triage/p/' +  self.currentPage() + '/rpp/' + self.resultsPerPage() + '?' + self.queryString
   },
 
-  loadFolders: function() {
+  loadFolders: function(nodeIdToExpand) {
     var self = this;
 
     var treeEl = $('#triageFolderTree');
@@ -51,6 +51,10 @@ TriageViewModel = AssetsViewModel.extend({
       treeEl.off('refresh.jstree');
       treeEl.on('refresh.jstree', function () {
         self._setupDragDrop(treeEl.attr('id'));
+
+        if (nodeIdToExpand) {
+          treeEl.jstree("open_node", $('#triage_node_' + nodeIdToExpand));
+        }
       });
 
       treeEl.off('open_node.jstree');
@@ -88,6 +92,28 @@ TriageViewModel = AssetsViewModel.extend({
 
     self.loadStats();
   },
+
+  addFolderViaModal: function() {
+    var self = this;
+
+    var parentId = self.actionState;
+    var modalEl = $('#newFolderModal');
+
+    var opts = {
+      'successCallback': function() {
+        modalEl.modal('hide');
+        self.loadFolders(parentId);
+      },
+      errorContainerId: 'newFolderModal-newFolderForm',
+      data: {
+        'name': $('#newFolderModal-newFolderName').val(),
+        'parent_id': parentId
+      }
+    };
+
+    this.post('/api/v1/folders', opts);
+  },
+
 
   //FIXME: move to base class, specifying array of supported actions as strings
   registerFolderContextMenu: function() {

@@ -1273,12 +1273,16 @@ AssetsViewModel = BaseViewModel.extend({
     self.get('/api/v1/stats', statsCallOpts);
   },
 
-  moveAssetToFolder: function(assetId, folderId) {
+  moveAssetToFolder: function(assetId, folderId, reloadFolders) {
     var self = this;
+
+    reloadFolders = reloadFolders || true;
 
     var opts = {
       'successCallback': function() {
-        self.loadFolders(self.currentFolderId());
+        if (reloadFolders) {
+          self.loadFolders(self.currentFolderId());
+        }
         self.refreshResults();
         self.success("Asset moved");
       },
@@ -1384,7 +1388,7 @@ AssetsViewModel = BaseViewModel.extend({
       self.addFolderViaModal();
     });
 
-    self.fireEvent('showModalDialog');
+    self.fireEvent('showModalDialog', {detail: {modalId: '#newFolderModal'}});
     modalEl.modal();
   },
 
