@@ -845,7 +845,7 @@ AssetsViewModel = BaseViewModel.extend({
             //FIXME: hardcoded
             'id': "b10000000000000000000000",
             'isRoot': true,
-            'name': '/',
+            'name': 'Root',
             'children': allFolders
           });
         }
@@ -886,6 +886,13 @@ AssetsViewModel = BaseViewModel.extend({
 
         treeEl.jstree(true).settings.core.data = hierarchy;
         treeEl.jstree(true).refresh();
+
+
+        treeEl.off('click', '.jstree-anchor');
+        treeEl.on('click', '.jstree-anchor', function (e) {
+          console.log('here');
+          treeEl.jstree(true).toggle_node(e.target);
+        });
 
         if (successFn) {
           successFn(json);
