@@ -177,8 +177,9 @@ TrashViewModel = AssetsViewModel.extend({
       },
       'successCallback': function() {
         self.refreshResults();
-        self.success("Assets restored");
         self.clearSelection();
+        self.loadStats();
+        self.success("Assets restored");
       },
       'finally': function() {
         self.clearSelection();
@@ -196,6 +197,7 @@ TrashViewModel = AssetsViewModel.extend({
     var opts = {
       'successCallback': function() {
         self.refreshResults();
+        self.loadStats();
         self.success("Asset restored");
       },
       'finally': function() {
