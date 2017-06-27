@@ -100,9 +100,8 @@ AssetsViewModel = BaseViewModel.extend({
     var self = this;
 
     self.folders = ko.observableArray();
-    self.currentFolderPath = ko.observableArray();
     self._showAddFolder = ko.observable(false);
-    self.currentFolderId = ko.observable("b10000000000000000000000");
+    self.currentFolderId = ko.observable("root");
 
     self.registerFolderContextMenu();
 
@@ -842,8 +841,7 @@ AssetsViewModel = BaseViewModel.extend({
 
         if (showRoot === true) {
           hierarchy.push({
-            //FIXME: hardcoded
-            'id': "b10000000000000000000000",
+            'id': "root",
             'isRoot': true,
             'name': 'Root',
             'children': allFolders
@@ -1205,6 +1203,7 @@ AssetsViewModel = BaseViewModel.extend({
 
   goIntoFolder: function(folderId) {
     var self = this;
+    console.log('INTO FOLDER', folderId);
 
     self.loadFolders(folderId);
     this.searchResults([]);
@@ -1217,44 +1216,83 @@ AssetsViewModel = BaseViewModel.extend({
   loadFolders: function(folderId) {
     var self = this;
 
-    folderId = folderId || self.currentFolderId();
-
     var folderCallOpts = {
-      'successCallback': function (json) {
+      'successCallback': function(json) {
+
+        // load top folders
         var folders = $.map(json['folders'], function(data) {
           data['depth'] = 0;
           return new Folder(data);
         });
 
-        var depth = 0;
-        var path = $.map(json['path'], function(data) {
-          depth += 1;
-          data['depth'] = depth;
-          return new Folder(data);
-        });
-
-        self.currentFolderId(folderId);
         self.folders(folders);
-        self.currentFolderPath(path);
 
-        var elFolderTargets = $(".folder");
-        elFolderTargets.droppable({
-          accept: ".result-box",
-          hoverClass: "highlight",
-          tolerance: "pointer"
-        });
+        // if only top level requested - we are done
+        if (folderId === "root") {
+          self._setFolderDropTargets();
+          return;
+        }
 
-        elFolderTargets.on("drop", function(event, ui) {
-          var assetId = $(ui.draggable.context).attr('asset_id');
-          var folderId = $(event.target).attr('folder_id');
-          self.moveAssetToFolder(assetId, folderId);
-        });
+        // load the child folders and the current path (breadcrumbs)
+        var folderCallOpts2 = {
+          'successCallback': function (json) {
+            var depth = -1; // we will remove the root breadcrumb
+
+            var path = $.map(json['path'], function(data) {
+              depth += 1;
+              data['depth'] = depth;
+              return new Folder(data);
+            });
+
+            // remove root from path
+            path.shift();
+
+            var folders = $.map(json['folders'], function(data) {
+              data['depth'] = depth;
+              return new Folder(data);
+            });
+
+            var parentFolder = self.findFolderById(path[0].id);
+            parentFolder.children(folders);
+            console.log('PATH', path);
+            console.log('FOLDERS', folders);
+            path.shift();
+            console.log('PATH', path);
+            parentFolder.path(path);
+
+            // remove top level folder from path - we already have it
+
+            // add the child folders to the global folder array as they have to be searchable
+            self.folders(self.folders().concat(folders));
+
+            self.currentFolderId(folderId);
+
+            self._setFolderDropTargets();
+          }
+        };
+
+        self.get('/api/v1/folders/' + folderId + "/children", folderCallOpts2);
       }
     };
 
-    self.get('/api/v1/folders/' + folderId + "/children", folderCallOpts);
+    self.get('/api/v1/folders/root/children', folderCallOpts);
 
     self.loadStats();
+  },
+
+  _setFolderDropTargets: function() {
+    var elFolderTargets = $(".folder");
+    elFolderTargets.droppable({
+      accept: ".result-box",
+      hoverClass: "highlight",
+      tolerance: "pointer"
+    });
+
+    elFolderTargets.on("drop", function(event, ui) {
+      var assetId = $(ui.draggable.context).attr('asset_id');
+      var folderId = $(event.target).attr('folder_id');
+      self.moveAssetToFolder(assetId, folderId);
+    });
   },
 
   loadStats: function() {
@@ -1454,7 +1492,9 @@ AssetsViewModel = BaseViewModel.extend({
 
   findFolderById: function(folderId) {
     var self = this;
-    var res = $.grep(this.folders(), function(f){ return f.id == folderId; });
+    var res = $.grep(this.folders(), function(f){
+      return f.id == folderId;
+    });
 
     if (res.length != 1) {
       console.log('CURRENT FOLDERS: ',  self.folders());
