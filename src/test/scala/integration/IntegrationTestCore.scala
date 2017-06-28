@@ -83,8 +83,8 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
 
   private val repo2 = new Repository(name = "Repository 2",
     id = Some("a20000000000000000000000"),
-    rootFolderId  = "b20000000000000000000000",
-    triageFolderId = "c20000000000000000000000",
+    rootFolderId  = C.Folder.IDs.ROOT,
+    triageFolderId = C.Folder.IDs.TRIAGE,
     fileStoreType = FileStoreType.FS,
     fileStoreConfig = Map(C.Repository.Config.PATH -> dataPath2))
   var currentRepo = repo

@@ -204,12 +204,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         justify-content: flex-end;
     }
 
-    html [layout][around-justified] {
-        -ms-flex-pack: distribute;
-        -webkit-justify-content: space-around;
-        justify-content: space-around;
-    }
-
     html [layout][justified] {
         -ms-flex-pack: justify;
         -webkit-justify-content: space-between;
@@ -383,19 +377,6 @@ select {
 
 .alert .close {
     color: #FFF;
-}
-
-.selected-path {
-    margin-bottom: 1em;
-    font-size: .9em;
-}
-
-.selected-path .corner {
-    display: inline-block;
-    width: .4em;
-    height: .9em;
-    border-left: 1px solid #666666;
-    border-bottom: 1px solid #666666;
 }
 
 .glyphicon {
@@ -638,17 +619,6 @@ select {
     margin-top: .3em;
 }
 
-.no-folders {
-    text-align: center;
-    text-transform: uppercase;
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #677076;
-    margin-bottom: 2em;
-    margin-top: 2em;
-    letter-spacing: .1em;
-}
-
 .flat-folders button, .tree-folders button {
     line-height: .6em;
     font-size: .9em;
@@ -667,6 +637,42 @@ li.folder {
 .folder-count {
     color: #5f5c58;
     font-size: .9em;
+}
+
+.flat-folders .folder .glyphicon {
+    /*color: #917c24;*/
+}
+
+.flat-folders .folder.active .glyphicon {
+    color: #917c24;
+}
+
+.flat-folders .folder .folder-children {
+    margin-bottom: 1em;
+}
+
+.selected-path {
+    margin-bottom: 1em;
+    font-size: .9em;
+}
+
+.selected-path .corner {
+    display: inline-block;
+    width: .4em;
+    height: .9em;
+    border-left: 1px solid #666666;
+    border-bottom: 1px solid #666666;
+}
+
+.no-folders {
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #677076;
+    margin-bottom: 2em;
+    margin-top: 2em;
+    letter-spacing: .1em;
 }
 
 #showAddFolder {
@@ -689,7 +695,7 @@ li.folder {
     text-align: center;
 }
 
-.system-folder .glyphicon, .flat-folders .glyphicon {
+.system-folder .glyphicon {
     color: #917c24;
 }
 

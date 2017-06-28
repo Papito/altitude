@@ -23,11 +23,7 @@ class FolderController extends BaseApiController {
   }
 
   get("/:id") {
-    val id = params.get(C.Api.ID) match {
-      case Some("root") => repository.rootFolderId
-      case _ => params.get(C.Api.ID).get
-    }
-
+    val id = params.get(C.Api.ID).get
     val folder: Folder = app.service.folder.getById(id)
 
     Ok(Json.obj(
@@ -36,13 +32,7 @@ class FolderController extends BaseApiController {
   }
 
   get(s"/:${C.Api.Folder.PARENT_ID}/children") {
-    val parentIdArg = params.getAs[String](C.Api.Folder.PARENT_ID).get
-
-    val parentId = parentIdArg match {
-      case "root" => repository.rootFolderId
-      case _ => parentIdArg
-    }
-
+    val parentId = params.getAs[String](C.Api.Folder.PARENT_ID).get
     val all = app.service.folder.getAll
     val folders = app.service.folder.immediateChildren(parentId, all = all)
     val sysFolders = app.service.folder.getSysFolders(all = all)

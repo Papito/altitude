@@ -12,7 +12,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   private final val log = LoggerFactory.getLogger(getClass)
 
   final override val pathSeparator = File.separator
-  final override def sortedFolderPath(implicit ctx: Context): String = C.Path.SORTED
+  final override def sortedFolderPath(implicit ctx: Context): String = C.Path.ROOT
   final override def triageFolderPath(implicit ctx: Context): String = C.Path.TRIAGE
   final override def trashFolderPath(implicit ctx: Context): String = C.Path.TRASH
   final override def landfillFolderPath(implicit ctx: Context): String = C.Path.LANDFILL

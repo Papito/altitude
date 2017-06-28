@@ -47,8 +47,8 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
 
   final val REPO = new Repository(name = "Repository",
     id = Some("a10000000000000000000000"),
-    rootFolderId  = "b10000000000000000000000",
-    triageFolderId = "c10000000000000000000000",
+    rootFolderId  = C.Folder.IDs.ROOT,
+    triageFolderId = C.Folder.IDs.TRIAGE,
     fileStoreType = FileStoreType.FS,
     fileStoreConfig = Map(C.Repository.Config.PATH -> dataPath))
 

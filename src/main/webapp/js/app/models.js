@@ -11,4 +11,5 @@ function Folder(data) {
   this.depth = data ? data.depth : 0;
   this.path = ko.observableArray();
   this.children = ko.observableArray();
+  this.active = ko.observable(false);
 }

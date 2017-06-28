@@ -18,35 +18,37 @@
         {% include "./partials/system_folders.html" %}
 
         <ul data-bind="foreach: folders, visible: folders().length > 0">
-          <li class="folder" data-bind="if: depth === 0, attr: {'folder_id': id}">
-            <div data-bind="click: function() {$root.goIntoFolder(id)}">
-              <span class="glyphicon glyphicon-folder-close" aria-hidden="true"></span>&nbsp;
-              <a href="#" data-bind="text: name"></a>
+          <li class="folder" data-bind="if: depth === 0, attr: {'folder_id': id}, css: {active: active()}">
+            <a href="#" data-bind="click: function() {$root.goIntoFolder(id)}">
+              <span class="glyphicon" aria-hidden="true" data-bind="css: {'glyphicon-folder-open': active(), 'glyphicon-folder-close': !active()}"></span>&nbsp;
+              <span data-bind="text: name"></span>
               <span data-bind="html: '<span class=folder-count>(' + numOfAssets + ')</span>'"></span>
-            </div>
-
-            <div class="selected-path" data-bind="visible: path().length > 0, foreach: path">
-              <div data-bind="style: {marginLeft: depth / 2 + 'em'}">
-                <div class="corner">&nbsp;</div>
-                <a href="#">
-                  <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
-                  &nbsp;<span data-bind="text: name, click: function() {$root.goIntoFolder($data.id)}"></span>
-                </a>
-              </div>
-            </div>
-
-            <!-- ko if: children().length > 0 -->
-            <ul data-bind="foreach: children">
-              <li class="folder" data-bind="attr: {'folder_id': id}">
-                <div data-bind="click: function() {$root.goIntoFolder(id)}">
-                <span class="glyphicon glyphicon-folder-close" aria-hidden="true"></span>&nbsp;
-                <a href="#" data-bind="text: name"></a>
-                <span data-bind="html: '<span class=folder-count>(' + numOfAssets + ')</span>'"></span>
-                </div>
-              </li>
-            </ul>
-            <!-- /ko -->
+            </a>
           </li>
+
+          <ul class="selected-path" data-bind="visible: path().length > 0, foreach: path">
+            <li class="folder" data-bind="attr: {'folder_id': id}">
+              <a href="#" data-bind="click: function() {$root.goIntoFolder(id)}">
+                <div data-bind="style: {marginLeft: depth / 2 + 'em'}">
+                  <div class="corner">&nbsp;</div>
+                    <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+                    &nbsp;<span data-bind="text: name"></span>
+                </div>
+              </a>
+            </li>
+          </ul>
+
+          <!-- ko if: children().length > 0 -->
+          <ul data-bind="foreach: children" class="folder-children">
+            <li class="folder" data-bind="attr: {'folder_id': id}, style: {marginLeft: depth + 'em'}">
+              <a href="#" data-bind="click: function() {$root.goIntoFolder(id)}">
+                <span class="glyphicon glyphicon-folder-close" aria-hidden="true"></span>&nbsp;
+                <span data-bind="text: name"></span>
+                <span data-bind="html: '<span class=folder-count>(' + numOfAssets + ')</span>'"></span>
+              </a>
+            </li>
+          </ul>
+          <!-- /ko -->
 
         </ul>
 

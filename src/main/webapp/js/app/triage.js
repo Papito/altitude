@@ -10,7 +10,7 @@ TriageViewModel = AssetsViewModel.extend({
     this.folders = ko.observableArray();
   },
 
-  _setupDragDrop: function(startElId) {
+  _setFolderDropTargets: function(startElId) {
     var self = this;
 
     var elFolderTargets = $('#' + startElId + ' .jstree-anchor').not('.root');
@@ -23,7 +23,7 @@ TriageViewModel = AssetsViewModel.extend({
     elFolderTargets.on("drop", function(event, ui) {
       var assetId = $(ui.draggable.context).attr('asset_id');
       var folderId = $(event.target).attr('folder_id');
-      self.moveAssetToFolder(assetId, folderId, false /* do not reload folders */);
+      self.moveAssetToFolder(assetId, folderId);
     });
   },
 
@@ -31,6 +31,25 @@ TriageViewModel = AssetsViewModel.extend({
     var self = this;
     return '/api/v1/query/triage/p/' +  self.currentPage() + '/rpp/' + self.resultsPerPage() + '?' + self.queryString
   },
+
+  moveAssetToFolder: function(assetId, folderId, reloadFolders) {
+    var self = this;
+
+    var opts = {
+      'successCallback': function() {
+        self.refreshResults();
+        self.loadStats();
+        self.success("Asset moved");
+      },
+      'finally': function() {
+        self.actionState = null;
+        $('#moveAssetModal').modal('hide');
+      }
+    };
+
+    this.post('/api/v1/assets/' + assetId + '/move/' + folderId, opts);
+  },
+
 
   loadFolders: function(nodeIdToExpand) {
     var self = this;
@@ -50,7 +69,7 @@ TriageViewModel = AssetsViewModel.extend({
 
       treeEl.off('refresh.jstree');
       treeEl.on('refresh.jstree', function () {
-        self._setupDragDrop(treeEl.attr('id'));
+        self._setFolderDropTargets(treeEl.attr('id'));
 
         if (nodeIdToExpand) {
           treeEl.jstree("open_node", $('#triage_node_' + nodeIdToExpand));
@@ -59,11 +78,11 @@ TriageViewModel = AssetsViewModel.extend({
 
       treeEl.off('open_node.jstree');
       treeEl.on('open_node.jstree', function (e, node) {
-        self._setupDragDrop(node.node.id);
+        self._setFolderDropTargets(node.node.id);
       });
     };
 
-    folderAddedFn = function(node) {
+    var folderAddedFn = function(node) {
       // clone the node and add it to the folders observable array
       self.folders.push($.extend({}, node));
       node.icon = "glyphicon glyphicon-folder-close";

@@ -79,7 +79,12 @@ object Const {
     val IS_ROOT = "is_root"
 
     object Names {
-      val ROOT = "sorted"
+      val ROOT = "root"
+      val TRIAGE = "triage"
+    }
+
+    object IDs{
+      val ROOT = "root"
       val TRIAGE = "triage"
     }
   }
@@ -209,7 +214,7 @@ object Const {
    * Paths for major data partitions, relative to root path
    */
   object Path {
-    val SORTED = "sorted"
+    val ROOT = "root"
     val TRIAGE = "triage"
     val TRASH = "trash"
     val LANDFILL = "landfill"

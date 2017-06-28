@@ -396,17 +396,6 @@ AssetsViewModel = BaseViewModel.extend({
           opacity: 0.4
         });
 
-        // configure the slider
-        $("#slider").slider({
-          min: 1,
-          max: self.totalPages(),
-          value: self.currentPage(),
-          slide: function( event, ui ) {
-            self.currentPage(ui.value);
-            self.search();
-          }
-        });
-
         // restore selection
         for (var i = 0; i < self.searchResults().length; i++) {
           var asset = self.searchResults()[i];
@@ -1203,7 +1192,6 @@ AssetsViewModel = BaseViewModel.extend({
 
   goIntoFolder: function(folderId) {
     var self = this;
-    console.log('INTO FOLDER', folderId);
 
     self.loadFolders(folderId);
     this.searchResults([]);
@@ -1222,7 +1210,10 @@ AssetsViewModel = BaseViewModel.extend({
         // load top folders
         var folders = $.map(json['folders'], function(data) {
           data['depth'] = 0;
-          return new Folder(data);
+          var folder = new Folder(data);
+          // if root folder, highlight, as we are seeing ALL data
+          folder.active(folderId === "root");
+          return folder;
         });
 
         self.folders(folders);
@@ -1244,7 +1235,7 @@ AssetsViewModel = BaseViewModel.extend({
               return new Folder(data);
             });
 
-            // remove root from path
+            // remove root folder from path
             path.shift();
 
             var folders = $.map(json['folders'], function(data) {
@@ -1254,10 +1245,9 @@ AssetsViewModel = BaseViewModel.extend({
 
             var parentFolder = self.findFolderById(path[0].id);
             parentFolder.children(folders);
-            console.log('PATH', path);
-            console.log('FOLDERS', folders);
+            parentFolder.active(true);
+            // remove the top level folder from the path (it's redundant)
             path.shift();
-            console.log('PATH', path);
             parentFolder.path(path);
 
             // remove top level folder from path - we already have it
@@ -1281,6 +1271,8 @@ AssetsViewModel = BaseViewModel.extend({
   },
 
   _setFolderDropTargets: function() {
+    var self = this;
+
     var elFolderTargets = $(".folder");
     elFolderTargets.droppable({
       accept: ".result-box",
@@ -1311,16 +1303,12 @@ AssetsViewModel = BaseViewModel.extend({
     self.get('/api/v1/stats', statsCallOpts);
   },
 
-  moveAssetToFolder: function(assetId, folderId, reloadFolders) {
+  moveAssetToFolder: function(assetId, folderId) {
     var self = this;
-
-    reloadFolders = reloadFolders || true;
 
     var opts = {
       'successCallback': function() {
-        if (reloadFolders) {
-          self.loadFolders(self.currentFolderId());
-        }
+        self.loadFolders(self.currentFolderId());
         self.refreshResults();
         self.success("Asset moved");
       },
