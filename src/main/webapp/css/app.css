@@ -567,40 +567,6 @@ select {
     margin-top: 1em;
 }
 
-.pager-button {
-    height: 100%;
-}
-
-.pager-button:hover {
-    background: #232628;
-    text-decoration: none;
-    color: #2980b9;
-}
-
-.pager-button:focus {
-    text-decoration: none;
-}
-
-#slider {
-    margin-bottom: 0.8em;
-}
-
-#slider  {
-    background: #363d42;
-}
-
-#slider .ui-slider-handle {
-    background: #677076;
-    border-color: #212223;
-}
-
-#pageCounter {
-    text-align: center;
-    padding-bottom: 0.8em;
-    font-weight: bold;
-    color: #677076;
-}
-
 /* FOLDERS */
 
 .flat-folders ul {
@@ -647,13 +613,34 @@ li.folder {
     color: #917c24;
 }
 
-.flat-folders .folder .folder-children {
+.flat-folders .folder-children {
     margin-bottom: 1em;
+    background-color: #3d3d3d;
+}
+
+.flat-folders .folder-children .glyphicon {
+    color: #917c24;
+    margin-top: .2em;
+}
+
+.flat-folders .no-child-folders {
+    text-align: center;
+    text-transform: uppercase;
+    color: #677076;
+    font-size: .9em;
+    margin-top: .5em;
+    margin-bottom: 1em;
+    letter-spacing: .1em;
+    background-color: #3d3d3d;
 }
 
 .selected-path {
     margin-bottom: 1em;
     font-size: .9em;
+}
+
+.selected-path .glyphicon {
+    color: #917c24;
 }
 
 .selected-path .corner {

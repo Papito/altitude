@@ -50,6 +50,13 @@
           </ul>
           <!-- /ko -->
 
+          <!-- ko if: $root.currentFolderId() != "root" && active() && children().length === 0 -->
+          <div class="no-child-folders">
+            No Folders
+            <div data-bind="text: $root.totalRecords() + ' assets here'"></div>
+          </div>
+          <!-- /ko -->
+
         </ul>
 
         <div class="no-folders" data-bind="visible: folders().length === 0">
