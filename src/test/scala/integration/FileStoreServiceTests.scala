@@ -171,7 +171,7 @@ import org.scalatest.Matchers._
     }
   }
 
-  test("manage folders") {
+  test("manage folders", CurrentTag) {
     /*
       folder1
       folder2
@@ -183,13 +183,13 @@ import org.scalatest.Matchers._
     val folder1: Folder = altitude.service.folder.addFolder(
       name = "folder1")
 
-    var relativePath = FilenameUtils.concat(C.Path.SORTED, folder1.name)
+    var relativePath = FilenameUtils.concat(C.Path.ROOT, folder1.name)
     checkRepositoryDirPath(relativePath)
 
     val folder2: Folder = altitude.service.folder.addFolder(
       name = "folder2")
 
-    relativePath = FilenameUtils.concat(C.Path.SORTED, folder2.name)
+    relativePath = FilenameUtils.concat(C.Path.ROOT, folder2.name)
     checkRepositoryDirPath(relativePath)
 
     val folder2_1: Folder = altitude.service.folder.addFolder(
@@ -212,12 +212,12 @@ import org.scalatest.Matchers._
 
     // delete the empty folder
     altitude.service.folder.deleteById(folder1.id.get)
-    relativePath = FilenameUtils.concat(C.Path.SORTED, folder1.name)
+    relativePath = FilenameUtils.concat(C.Path.ROOT, folder1.name)
     checkNoRepositoryDirPath(relativePath)
 
     // delete the folder with children
     altitude.service.folder.deleteById(folder2.id.get)
-    relativePath = FilenameUtils.concat(C.Path.SORTED, folder2.name)
+    relativePath = FilenameUtils.concat(C.Path.ROOT, folder2.name)
     checkNoRepositoryDirPath(relativePath)
 
     // doing so again is a not found
@@ -232,9 +232,9 @@ import org.scalatest.Matchers._
       name = "folder3_3", parentId = folder3.id)
 
     altitude.service.folder.rename(folder3.id.get, "folder3_new")
-    relativePath = FilenameUtils.concat(C.Path.SORTED, folder3_3.name)
+    relativePath = FilenameUtils.concat(C.Path.ROOT, folder3_3.name)
     checkNoRepositoryDirPath(relativePath)
-    relativePath = FilenameUtils.concat(C.Path.SORTED, "folder3_new")
+    relativePath = FilenameUtils.concat(C.Path.ROOT, "folder3_new")
     checkRepositoryDirPath(relativePath)
   }
 
