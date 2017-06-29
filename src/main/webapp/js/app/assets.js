@@ -1137,14 +1137,14 @@ AssetsViewModel = BaseViewModel.extend({
     el.off('submit');
     el.on('submit', function(e) {
       e.preventDefault();
-      self.addFolder();
+      self.addRootFolder();
     });
 
     this._showAddFolder(true);
     el.find('input').attr("tabindex",-1).focus();
   },
 
-  addFolder: function() {
+  addRootFolder: function() {
     var self = this;
     var opts = {
       'successCallback': function() {
@@ -1154,7 +1154,7 @@ AssetsViewModel = BaseViewModel.extend({
       errorContainerId: 'addFolderForm',
       data: {
         'name': $('#newFolderName').val(),
-        'parent_id': self.currentFolderId()
+        'parent_id': 'root'
       }
     };
 
@@ -1203,6 +1203,8 @@ AssetsViewModel = BaseViewModel.extend({
 
   loadFolders: function(folderId) {
     var self = this;
+
+    folderId = folderId || self.currentFolderId();
 
     var folderCallOpts = {
       'successCallback': function(json) {
@@ -1390,14 +1392,14 @@ AssetsViewModel = BaseViewModel.extend({
     this.put('/api/v1/folders/' + folderId, opts);
   },
 
-  showNewFolderModal: function() {
+  showNewFolderModal: function(parent_id) {
     var self = this;
 
-    var parentFolder = self.findFolderById(self.actionState);
-
+    if (parent_id) {
+      self.actionState = parent_id;
+    }
     var modalEl = $('#newFolderModal');
 
-    $('#newFolderModal-parentFolderName').html(parentFolder.name);
     $('#newFolderModal-newFolderName').val('');
 
     modalEl.off('shown.bs.modal');
@@ -1485,7 +1487,6 @@ AssetsViewModel = BaseViewModel.extend({
     });
 
     if (res.length != 1) {
-      console.log('CURRENT FOLDERS: ',  self.folders());
       throw "Could not find folder id [" + folderId + "] in all viewable folders";
     }
 

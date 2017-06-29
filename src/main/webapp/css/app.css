@@ -562,11 +562,6 @@ select {
     font-weight: bold;
 }
 
-#addFolderForm {
-    width: 100%;
-    margin-top: 1em;
-}
-
 /* FOLDERS */
 
 .flat-folders ul {
@@ -606,7 +601,7 @@ li.folder {
 }
 
 .flat-folders .folder .glyphicon {
-    /*color: #917c24;*/
+    color: #bebebe;
 }
 
 .flat-folders .folder.active .glyphicon {
@@ -614,6 +609,7 @@ li.folder {
 }
 
 .flat-folders .folder-children {
+    padding-top: .2em;
     margin-bottom: 1em;
     background-color: #3d3d3d;
 }
@@ -621,6 +617,27 @@ li.folder {
 .flat-folders .folder-children .glyphicon {
     color: #917c24;
     margin-top: .2em;
+}
+
+.folder-children li.add-new-subfolder {
+    font-size: .7em;
+    text-transform: uppercase;
+}
+
+.folder-children li.add-new-subfolder .glyphicon {
+    color: #bebebe;
+    margin-right: .8em;
+    font-size: .7em;
+}
+
+.no-child-folders span.add-new-subfolder {
+    margin-left: 1em;
+    font-size: .8em;
+    color: #bebebe;
+}
+
+.no-child-folders span.add-new-subfolder .glyphicon {
+    margin-right: .5em;
 }
 
 .flat-folders .no-child-folders {
@@ -639,8 +656,12 @@ li.folder {
     font-size: .9em;
 }
 
-.selected-path .glyphicon {
+.selected-path .folder .glyphicon {
     color: #917c24;
+}
+
+.selected-path .current .glyphicon {
+    color: #bebebe;
 }
 
 .selected-path .corner {
@@ -663,17 +684,27 @@ li.folder {
 }
 
 #showAddFolder {
-    margin-top: .5em;
-    padding: .2em 0 .2em 0em;
-    border-top: 1px solid #363636;
-    border-bottom: 1px solid #363636;
+    padding: .5em 0 .5em 0;
 }
+
+#showAddFolder {
+    font-size: .9em;
+}
+
+#showAddFolder .glyphicon {
+    font-size: .8em;
+    margin-right: .6em;
+}
+
+#addFolderForm {
+    width: 100%;
+}
+
 
 /* SYSTEM FOLDERS */
 
 #systemFolders {
     border-bottom: 1px solid #363636;
-    margin-bottom: 1em;
 }
 
 .system-folder {
