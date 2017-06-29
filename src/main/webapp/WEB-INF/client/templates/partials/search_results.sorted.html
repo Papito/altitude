@@ -14,17 +14,22 @@
 
   <div id="noResults" class="row" data-bind="visible: searchResults().length === 0" style="display: none">
     <div class="col-md-12">
-      <h3>No results</h3>
 
-      <div class="triaged-assets-available" data-bind="visible: stats.triageAssets() > 0">
-        But there are <span class="num" data-bind="text: stats.triageAssets()"></span>
-        assets awaiting in <a href="/client/triage">Triage</a>
-      </div>
+      <h3 data-bind="visible: $root.currentFolderId() === 'root'">No results</h3>
+      <h3 data-bind="visible: $root.currentFolderId() != 'root'">[EMPTY]</h3>
 
-      <div class="import-new-assets" data-bind="visible: stats.triageAssets() == 0">
-        Try importing some assets first <a href="#"
-           data-bind="click: function(){getDirectoryNames(null)}"
-           data-toggle="modal" data-target="#selectImportDirectoryModal">from a folder</a>
+      <div data-bind="visible: $root.currentFolderId() === 'root'">
+        <div class="triaged-assets-available" data-bind="visible: stats.triageAssets() > 0">
+          But there are <span class="num" data-bind="text: stats.triageAssets()"></span>
+          assets awaiting in <a href="/client/triage">Triage</a>
+        </div>
+
+        <div class="import-new-assets" data-bind="visible: stats.triageAssets() == 0">
+          Try importing some assets first
+          <a href="#"
+             data-bind="click: function(){getDirectoryNames(null)}"
+             data-toggle="modal" data-target="#selectImportDirectoryModal">from a folder</a>
+        </div>
       </div>
 
     </div>
