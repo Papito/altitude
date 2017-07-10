@@ -620,24 +620,29 @@ li.folder {
 }
 
 .folder-children li.add-new-subfolder {
-    font-size: .7em;
     text-transform: uppercase;
+    padding-left: .8em;
 }
 
 .folder-children li.add-new-subfolder .glyphicon {
     color: #bebebe;
     margin-right: .8em;
-    font-size: .7em;
+    font-size: .8em;
+}
+
+.folder-children li.add-new-subfolder a {
+    font-size: .8em;
 }
 
 .no-child-folders span.add-new-subfolder {
-    margin-left: 1em;
-    font-size: .8em;
     color: #bebebe;
+    font-size: .8em;
 }
 
 .no-child-folders span.add-new-subfolder .glyphicon {
     margin-right: .5em;
+    margin-left: .5em;
+    font-size: .8em;
 }
 
 .flat-folders .no-child-folders {
