@@ -133,8 +133,6 @@ TriageViewModel = AssetsViewModel.extend({
     this.post('/api/v1/folders', opts);
   },
 
-
-  //FIXME: move to base class, specifying array of supported actions as strings
   registerFolderContextMenu: function() {
     var self = this;
 

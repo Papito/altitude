@@ -753,6 +753,14 @@ li.folder {
     display: none;
 }
 
+#triageFolderInfo {
+    background-color: #6f5f1c;
+    font-size: .9em;
+    padding: .4em;
+    border-top: 1px solid #CCC;
+    border-bottom: 1px solid #CCC;
+}
+
 #trashLeftPanel #systemFolders #trash {
     display: none;
 }

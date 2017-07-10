@@ -877,7 +877,6 @@ AssetsViewModel = BaseViewModel.extend({
 
         treeEl.off('click', '.jstree-anchor');
         treeEl.on('click', '.jstree-anchor', function (e) {
-          console.log('here');
           treeEl.jstree(true).toggle_node(e.target);
         });
 

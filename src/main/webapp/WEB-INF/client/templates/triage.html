@@ -16,6 +16,11 @@
 
         {% include "./partials/system_folders.html" %}
 
+        <div id="triageFolderInfo">
+          You can only manage folders and drop assets into them in Triage -
+          but not navigate into folders. Right-click on a folder to add a new one, or for other actions.
+        </div>
+
         <div data-bind="visible: _showAddFolder" style="display: none">
           <form id="addFolderForm">
               <div class="pull-right">
