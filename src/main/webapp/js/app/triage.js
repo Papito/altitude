@@ -104,7 +104,7 @@ TriageViewModel = AssetsViewModel.extend({
 
     self.loadFolderTree({
       treeEl: treeEl,
-      showRoot: true,
+      showRoot: false,
       successFn: successFn,
       folderAddedFn: folderAddedFn
     });
