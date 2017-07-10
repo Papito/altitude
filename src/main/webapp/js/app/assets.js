@@ -1193,6 +1193,13 @@ AssetsViewModel = BaseViewModel.extend({
   goIntoFolder: function(folderId) {
     var self = this;
 
+
+    // if already IN this folder - close it (go to top)
+    if (self.currentFolderId() === folderId) {
+      self.currentFolderId('root');
+      folderId = self.currentFolderId();
+    }
+
     self.loadFolders(folderId);
     this.searchResults([]);
 
