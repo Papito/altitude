@@ -14,8 +14,8 @@ CREATE TABLE repository(
   id CHAR(24) PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   description TEXT,
-  root_folder_id CHAR(24) NOT NULL,
-  triage_folder_id CHAR(24) NOT NULL,
+  root_folder_id VARCHAR(24) NOT NULL,
+  triage_folder_id VARCHAR(24) NOT NULL,
   file_store_type VARCHAR NOT NULL
 ) INHERITS (_core);#END
 
@@ -38,7 +38,7 @@ CREATE TABLE asset (
   metadata jsonb,
   extracted_metadata jsonb,
   raw_metadata jsonb,
-  folder_id CHAR(24) NOT NULL DEFAULT '1',
+  folder_id VARCHAR(24) NOT NULL DEFAULT '1',
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
   is_recycled INT NOT NULL DEFAULT 0
@@ -57,11 +57,11 @@ CREATE INDEX metadata_field_01 ON metadata_field(repository_id);#END
 CREATE UNIQUE INDEX metadata_field_02 ON metadata_field(repository_id, name_lc);#END
 
 CREATE TABLE folder (
-  id CHAR(24) PRIMARY KEY,
+  id VARCHAR(24) PRIMARY KEY,
   repository_id CHAR(24) NOT NULL,
   name VARCHAR(255) NOT NULL,
   name_lc VARCHAR(255) NOT NULL,
-  parent_id CHAR(24) NOT NULL,
+  parent_id VARCHAR(24) NOT NULL,
   num_of_assets INTEGER NOT NULL DEFAULT 0
 ) INHERITS (_core);#END
 CREATE INDEX folder_01 ON folder(repository_id, parent_id);#END
