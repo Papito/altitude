@@ -814,7 +814,7 @@ AssetsViewModel = BaseViewModel.extend({
       if (targetFolderSelected) {
         actionEl.removeAttr('disabled');
       } else {
-        actionEl.attr('disabled','disabled');
+        actionEl.attr('disabled', 'disabled');
       }
     }
 
@@ -832,7 +832,7 @@ AssetsViewModel = BaseViewModel.extend({
           hierarchy.push({
             'id': "root",
             'isRoot': true,
-            'name': 'Root',
+            'name': 'Top Level',
             'children': allFolders
           });
         }
@@ -875,9 +875,10 @@ AssetsViewModel = BaseViewModel.extend({
         treeEl.jstree(true).refresh();
 
 
-        treeEl.off('click', '.jstree-anchor');
+        //treeEl.off('click', '.jstree-anchor');
         treeEl.on('click', '.jstree-anchor', function (e) {
           treeEl.jstree(true).toggle_node(e.target);
+          treeEl.jstree(true).select_node(e.target);
         });
 
         if (successFn) {
@@ -960,22 +961,13 @@ AssetsViewModel = BaseViewModel.extend({
     assert(assetId);
     var self = this;
 
-/*
-    //FIXME: this does not work
-    if (!self.folders().length) {
-      self.warning('No folders created yet');
-      return;
-    }
-*/
-
     var moveAssetToFolderTreeEl = $('#moveAssetModal-tree');
 
     var moveAssetEl = $('#moveAssetModal-actionBtn');
 
     // when a folder is selected, enable the "move" button
     moveAssetToFolderTreeEl.off("select_node.jstree");
-    moveAssetToFolderTreeEl.on(
-        "select_node.jstree", function(){
+    moveAssetToFolderTreeEl.on("select_node.jstree", function() {
           moveAssetEl.removeAttr('disabled');
         }
     );
