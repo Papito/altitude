@@ -154,8 +154,7 @@ import org.scalatest.Matchers._
     val folder1_2: Folder = altitude.service.folder.addFolder(
       name = "folder1_2", parentId = folder1.id)
 
-    val deleted = altitude.service.folder.deleteById(folder1.id.get)
-    deleted shouldBe 6
+    altitude.service.library.deleteFolderById(folder1.id.get)
 
     intercept[NotFoundException] {
       altitude.service.folder.getById(folder1.id.get)
@@ -184,20 +183,20 @@ import org.scalatest.Matchers._
 
   test("delete bad folder") {
     intercept[NotFoundException] {
-      altitude.service.folder.deleteById("bogus")
+      altitude.service.library.deleteFolderById("bogus")
     }
   }
 
   test("delete root folder") {
     intercept[IllegalOperationException] {
-      altitude.service.folder.deleteById(ctx.repo.rootFolderId)
+      altitude.service.library.deleteFolderById(ctx.repo.rootFolderId)
     }
   }
 
   test("delete sys folder") {
     altitude.service.folder.getSystemFolders.foreach { sysFolder =>
       intercept[IllegalOperationException] {
-        altitude.service.folder.deleteById(sysFolder.id.get)
+        altitude.service.library.deleteFolderById(sysFolder.id.get)
       }
     }
   }

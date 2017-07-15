@@ -85,7 +85,7 @@ import org.scalatest.Matchers._
 
   test("delete folder") {
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
-    altitude.service.folder.deleteById(folder1.id.get)
+    altitude.service.library.deleteFolderById(folder1.id.get)
     checkRepositoryDirPath("")
   }
 
@@ -101,7 +101,7 @@ import org.scalatest.Matchers._
     checkRepositoryFilePath(asset1.path.get)
     checkRepositoryFilePath(asset2.path.get)
 
-    altitude.service.folder.deleteById(folder1.id.get)
+    altitude.service.library.deleteFolderById(folder1.id.get)
 
     checkNoRepositoryFilePath(asset1.path.get)
     checkNoRepositoryFilePath(asset2.path.get)
@@ -211,18 +211,18 @@ import org.scalatest.Matchers._
     checkRepositoryDirPath(relativePath)
 
     // delete the empty folder
-    altitude.service.folder.deleteById(folder1.id.get)
+    altitude.service.library.deleteFolderById(folder1.id.get)
     relativePath = FilenameUtils.concat(C.Path.ROOT, folder1.name)
     checkNoRepositoryDirPath(relativePath)
 
     // delete the folder with children
-    altitude.service.folder.deleteById(folder2.id.get)
+    altitude.service.library.deleteFolderById(folder2.id.get)
     relativePath = FilenameUtils.concat(C.Path.ROOT, folder2.name)
     checkNoRepositoryDirPath(relativePath)
 
     // doing so again is a not found
     intercept[NotFoundException] {
-        altitude.service.folder.deleteById(folder2.id.get)
+        altitude.service.library.deleteFolderById(folder2.id.get)
     }
 
     val folder3: Folder = altitude.service.folder.addFolder(

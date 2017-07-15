@@ -154,7 +154,6 @@ import org.scalatest.Matchers._
     intercept[RuntimeException] {
       stats2.getStatValue(Stats.SORTED_ASSETS)
     }
-
   }
 
   test("restore recycled asset to original folder") {
@@ -195,5 +194,8 @@ import org.scalatest.Matchers._
     stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 4
     stats.getStatValue(Stats.RECYCLED_BYTES) shouldBe
       stats.getStatValue(Stats.RECYCLED_ASSETS) * ASSET_SIZE
+  }
+
+  test("recycle a folder") {
   }
 }

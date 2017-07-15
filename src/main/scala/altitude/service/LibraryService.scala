@@ -223,7 +223,7 @@ class LibraryService(app: Altitude) {
   }
 
   def moveAssetsToTriage(assetIds: Set[String])
-                               (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
+                               (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
     txManager.withTransaction {
       moveAssetsToFolder(assetIds, ctx.repo.triageFolderId)
     }
@@ -239,7 +239,7 @@ class LibraryService(app: Altitude) {
   }
 
   def recycleAssets(assetIds: Set[String])
-                   (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
+                   (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
 
       assetIds.foreach { assetId =>
         txManager.withTransaction {
@@ -251,6 +251,41 @@ class LibraryService(app: Altitude) {
         }
       }
   }
+
+  /**
+   * Delete a folder by ID, including its children. Does not allow deleting the root folder,
+   * or any system folders.
+   *
+   * Recycle all the assets in the tree.
+   */
+  def deleteFolderById(id: String)
+                  (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+    if (app.service.folder.isRootFolder(id)) {
+      throw new IllegalOperationException("Cannot delete the root folder")
+    }
+
+    if (app.service.folder.isSystemFolder(Some(id))) {
+      throw new IllegalOperationException("Cannot delete system folder")
+    }
+
+    txManager.withTransaction {
+      val folder: Folder = app.service.folder.getById(id)
+
+      log.info(s"Deleting folder $folder")
+
+      // get the list of tuples - (depth, id), with most-deep first
+      val childrenAndDepths: List[(Int, String)] =
+        app.service.folder.flatChildrenIdsWithDepths(id, app.service.folder.getUserFolders()).sortBy(_._1).reverse
+                                                        /* ^^^ sort by depth */
+
+      // now delete the children, most-deep first
+      childrenAndDepths.foreach {t =>
+        val folderId = t._2
+        app.service.folder.deleteById(folderId)}
+
+      app.service.fileStore.deleteFolder(folder)
+    }
+}
 
   //FIXME: optimize. Query assets at once
   def moveAssetsToFolder(assetIds: Set[String], destFolderId: String)

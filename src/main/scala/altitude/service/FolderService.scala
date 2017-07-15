@@ -250,42 +250,9 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     }
   }
 
-  /**
-   * Delete a folder by ID, including its children. Does not allow deleting the root folder,
-   * or any system folders.
-   */
   override def deleteById(id: String)
-                         (implicit ctx: Context, txId: TransactionId = new TransactionId): Int = {
-    if (isRootFolder(id)) {
-      throw new IllegalOperationException("Cannot delete the root folder")
-    }
-
-    if (isSystemFolder(Some(id))) {
-      throw new IllegalOperationException("Cannot delete system folder")
-    }
-
-    txManager.withTransaction[Int] {
-
-      val folder: Folder = getById(id)
-
-      log.info(s"Deleting folder $folder")
-
-      // get the list of tuples - (depth, id), with most-deep first
-      val childrenAndDepths: List[(Int, String)] =
-        flatChildrenIdsWithDepths(id, getUserFolders()).sortBy(_._1).reverse
-                                                        /* ^^^ sort by depth */
-
-      // now delete the children, most-deep first
-      txManager.withTransaction[Int] {
-        childrenAndDepths.foreach{t =>
-          val folderId = t._2
-          DAO.deleteById(folderId)}
-
-        app.service.fileStore.deleteFolder(folder)
-        // return number of folders deleted
-        childrenAndDepths.length
-      }
-    }
+                         (implicit ctx: Context, txId: TransactionId): Int = {
+    DAO.deleteById(id)
   }
 
   override def deleteByQuery(query: Query)

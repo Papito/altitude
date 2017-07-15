@@ -62,7 +62,7 @@ class FolderController extends BaseApiController {
   delete("/:id") {
     val id = params.get(C.Api.ID).get
     log.info(s"Deleting folder $id")
-    app.service.folder.deleteById(id)
+    app.service.library.deleteFolderById(id)
 
     OK
   }
