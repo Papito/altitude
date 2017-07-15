@@ -140,7 +140,7 @@ TriageViewModel = AssetsViewModel.extend({
       selector: 'li.folder',
       items: {
         add: {
-          name: "Add new folder",
+          name: "New subfolder",
           callback: function(key, opt){
             self.resetAllMessages();
             self.actionState = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
@@ -148,7 +148,7 @@ TriageViewModel = AssetsViewModel.extend({
           }
         },
         rename: {
-          name: "Rename folder",
+          name: "Rename",
           callback: function(key, opt){
             self.resetAllMessages();
             var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
@@ -156,7 +156,7 @@ TriageViewModel = AssetsViewModel.extend({
           }
         },
         move: {
-          name: "Move folder",
+          name: "Move",
           callback: function(key, opt){
             self.resetAllMessages();
             var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
@@ -164,7 +164,7 @@ TriageViewModel = AssetsViewModel.extend({
           }
         },
         delete: {
-          name: "Delete folder",
+          name: "Delete",
           callback: function(key, opt){
             var folderId = opt.$trigger.context.attributes.getNamedItem('folder_id').nodeValue;
             self.deleteFolder(folderId);

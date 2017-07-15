@@ -336,7 +336,7 @@ AssetsViewModel = BaseViewModel.extend({
           }
         },
         delete: {
-          name: "Move to Trash",
+          name: "Delete",
           callback: function(key, opt){
             var assetId = opt.$trigger.context.attributes.getNamedItem('asset_id').nodeValue;
             self.moveAssetOrSelectedToTrash(assetId)
