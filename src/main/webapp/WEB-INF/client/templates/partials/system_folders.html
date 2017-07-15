@@ -1,18 +1,22 @@
 <div class="container-fluid" id="systemFolders">
   <div class="row">
     <div class="col-md-6 system-folder" id="sorted" data-bind="css: {attn: stats.sortedAssets() > 0, disregard: stats.sortedAssets() == 0}">
-      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-      &nbsp;<a href="/">Sorted</a>
+      <a href="/">
+        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+        &nbsp;Sorted
+      </a>
       <span data-bind="html: '<span class=folder-count>(' + stats.sortedAssets() + ')</span>'"></span>
     </div>
     <div class="col-md-6 system-folder" id="triage" data-bind="css: {attn: stats.triageAssets() > 0, disregard: stats.triageAssets() == 0}">
-      <span class="glyphicon glyphicon-random" aria-hidden="true"></span>
-      &nbsp;<a href="/client/triage">Triage</a>
+      <a href="/client/triage">
+        <span class="glyphicon glyphicon-random" aria-hidden="true"></span>
+        &nbsp;Triage</a>
       <span data-bind="html: '<span class=folder-count>(' + stats.triageAssets() + ')</span>'"></span>
     </div>
     <div class="col-md-6 system-folder" id="trash" data-bind="css: {disregard: stats.recycledAssets() == 0}">
-      <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-      &nbsp;<a href="/client/trash">Trash</a>
+      <a href="/client/trash">
+        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+        &nbsp;Trash</a>
       <span data-bind="html: '<span class=folder-count>(' + stats.recycledAssets() + ')</span>'"></span>
     </div>
   </div>
