@@ -197,5 +197,25 @@ import org.scalatest.Matchers._
   }
 
   test("recycle a folder") {
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+    val folder2: Folder = altitude.service.folder.addFolder("folder2")
+
+    1 to 2 foreach { n =>
+      altitude.service.library.add(makeAsset(folder1))
+      altitude.service.library.add(makeAsset(folder2))
+    }
+
+    var stats = altitude.service.stats.getStats
+    stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 4
+
+    altitude.service.library.deleteFolderById(folder1.id.get)
+
+    stats = altitude.service.stats.getStats
+    stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 2
+    stats.getStatValue(Stats.SORTED_BYTES) shouldBe
+      stats.getStatValue(Stats.SORTED_ASSETS) * ASSET_SIZE
+    stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 2
+    stats.getStatValue(Stats.RECYCLED_BYTES) shouldBe
+      stats.getStatValue(Stats.RECYCLED_ASSETS) * ASSET_SIZE
   }
 }

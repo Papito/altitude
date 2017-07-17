@@ -151,7 +151,7 @@ import org.scalatest.Matchers._
     ).isEmpty shouldBe true
   }
 
-  test("move asset to same folder", CurrentTag) {
+  test("move asset to same folder") {
     /*
     folder1
     folder2
@@ -205,6 +205,39 @@ import org.scalatest.Matchers._
 
     intercept[NotFoundException] {
       altitude.service.library.moveAssetToFolder(asset.id.get, "bad")
+    }
+  }
+
+  test("recycle folder assets") {
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+
+    val folder2: Folder = altitude.service.folder.addFolder("folder2")
+
+    val folder2_1: Folder = altitude.service.folder.addFolder(
+      name = "folder2_1", parentId = folder2.id)
+
+    var asset1: Asset = altitude.service.library.add(makeAsset(folder1))
+    var asset2: Asset = altitude.service.library.add(makeAsset(folder2))
+    var asset3: Asset = altitude.service.library.add(makeAsset(folder2_1))
+
+    altitude.service.library.deleteFolderById(folder1.id.get)
+    altitude.service.library.deleteFolderById(folder2.id.get)
+
+    asset1 = altitude.service.library.getById(asset1.id.get)
+    asset2 = altitude.service.library.getById(asset2.id.get)
+    asset3 = altitude.service.library.getById(asset3.id.get)
+
+    asset1.isRecycled shouldBe true
+    asset2.isRecycled shouldBe true
+    asset3.isRecycled shouldBe true
+  }
+
+  test("recycle non-existent folder") {
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+    altitude.service.library.deleteFolderById(folder1.id.get)
+
+    intercept[NotFoundException] {
+      altitude.service.library.deleteFolderById(folder1.id.get)
     }
   }
 }

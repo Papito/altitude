@@ -117,7 +117,6 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
 
   override def setAssetAsRecycled(assetId: String, isRecycled: Boolean)
                             (implicit ctx: Context, txId: TransactionId) = {
-    // FIXME: do via update
     val sql = s"""
         UPDATE $tableName
            SET ${C.Base.UPDATED_AT} = $CURRENT_TIME_FUNC,
@@ -132,5 +131,4 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with alt
     val runner: QueryRunner = new QueryRunner()
     runner.update(conn, sql, updateValues:_*)
   }
-
 }

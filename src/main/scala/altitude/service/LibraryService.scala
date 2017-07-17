@@ -281,13 +281,22 @@ class LibraryService(app: Altitude) {
       // now delete the children, most-deep first
       childrenAndDepths.foreach {t =>
         val folderId = t._2
+        // set all the assets as recycled
+        val folderAssetsQuery = Query(
+          params = Map(C.Api.Folder.QUERY_ARG_NAME -> folderId))
+
+        val results: QueryResult = app.service.library.query(folderAssetsQuery)
+
+        results.records.foreach { record =>
+          val assetId = (record \ C.Asset.ID).as[String]
+          this.recycleAsset(assetId)
+        }
         app.service.folder.deleteById(folderId)}
 
       app.service.fileStore.deleteFolder(folder)
     }
-}
+ }
 
-  //FIXME: optimize. Query assets at once
   def moveAssetsToFolder(assetIds: Set[String], destFolderId: String)
                         (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
 

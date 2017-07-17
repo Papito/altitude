@@ -171,7 +171,7 @@ import org.scalatest.Matchers._
     }
   }
 
-  test("manage folders", CurrentTag) {
+  test("manage folders") {
     /*
       folder1
       folder2
