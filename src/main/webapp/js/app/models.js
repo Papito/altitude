@@ -2,6 +2,8 @@ function Asset(data) {
   this.id = data ? data.id : null;
   this.selected = ko.observable(false);
   this.fileName = data ? data.filename : null;
+  this.extractedMetadata = data ? data.extracted_metadata : ko.observable();
+  this.metadata = data ? data.metadata : ko.observable();
 }
 
 function Folder(data) {

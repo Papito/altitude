@@ -21,12 +21,10 @@ AssetsViewModel = BaseViewModel.extend({
 
     this.selectedAssetsMap = {};
     this.selectedIds = ko.observableArray();
+    this.currentAsset = ko.observable();
 
     this.directoryNames = ko.observableArray();
     this.currentPath = ko.observable();
-    this.osDirSeparator = ko.observable();
-    this.disableDoubleClick = false;
-
 
     this.selectedCount = ko.computed(function() {
       return this.selectedIds().length;
@@ -51,6 +49,9 @@ AssetsViewModel = BaseViewModel.extend({
     this.nextPageVisible = ko.computed(function() {
       return this.currentPage() < this.totalPages();
     }, this);
+
+    this.osDirSeparator = ko.observable();
+    this.disableDoubleClick = false;
 
     /* system folders */
 
@@ -92,7 +93,6 @@ AssetsViewModel = BaseViewModel.extend({
     /* right-click context */
     self.setUpRightClickContext();
 
-    /* display */
     this.search();
   },
 
@@ -489,7 +489,7 @@ AssetsViewModel = BaseViewModel.extend({
 
   getFocusedEl: function() {
     var focusedSel = $('.result-box.focused');
-    console.log('Focused element', focusedSel);
+    console.log('Focused element: ', focusedSel);
     return focusedSel.length ? $(focusedSel[0]) : null;
   },
 
@@ -515,10 +515,7 @@ AssetsViewModel = BaseViewModel.extend({
   focusFirst: function() {
     var self = this;
     console.log('focusing first');
-    var el = $("[asset_id='" + self.firstAsset().id + "']");
-    console.log('first element', el);
-    el.addClass('focused');
-    el.focus();
+    self.focusAssetById(self.firstAsset().id);
   },
 
   focusLast: function() {
@@ -530,9 +527,7 @@ AssetsViewModel = BaseViewModel.extend({
       console.log('NO LAST');
       return;
     }
-    var el = $("[asset_id='" + lastAsset.id + "']");
-    el.addClass('focused');
-    el.focus();
+    self.focusAssetById(lastAsset.id);
   },
 
   firstAsset: function() {
@@ -559,7 +554,6 @@ AssetsViewModel = BaseViewModel.extend({
     var self = this;
 
     var currentPos = curEl.position();
-    console.log('current');
     console.log(currentPos);
     var height = curEl.height();
     var offset = curEl.offset();
@@ -573,7 +567,6 @@ AssetsViewModel = BaseViewModel.extend({
         newPos.left = offset.left + 30;
         newPos.top  = offset.top  + height + 30;
         elem = document.elementFromPoint(newPos.left, newPos.top);
-        console.log('element', elem);
         assetId = $(elem).parent().attr('asset_id');
         console.log('asset id', assetId);
         break;
@@ -636,16 +629,21 @@ AssetsViewModel = BaseViewModel.extend({
     }
 
     // deselect old and select new
-    var newFocusedEl = $("[asset_id='" + assetId + "']");
-    newFocusedEl.addClass('focused');
-    newFocusedEl.focus();
-    curEl.removeClass('focused');
+    self.focusAssetById(assetId);
   },
 
-  defocusAssetById: function(id) {
-    var el = $("[asset_id='" + id + "']");
+  defocusCurrentAsset: function(id) {
+    var self = this;
+
+    if (!self.currentAsset()) {
+      return;
+    }
+
+    var currentAssetId = self.currentAsset().id;
+    var el = $("[asset_id='" + currentAssetId + "']");
     el.removeClass('focused');
     el.focus();
+    self.currentAsset(null);
   },
 
   focusAssetById: function(id) {
@@ -655,9 +653,11 @@ AssetsViewModel = BaseViewModel.extend({
       return;
     }
 
-    self.clearFocusing();
+    self.defocusCurrentAsset();
 
-    var el = $("[asset_id='" + id + "']");
+    var focusedAsset = self.getAssetOnPageById(id);
+    self.currentAsset(focusedAsset);
+    el = $("[asset_id='" + focusedAsset.id + "']");
     el.addClass('focused');
     el.focus();
   },

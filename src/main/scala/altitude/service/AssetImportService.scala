@@ -4,7 +4,7 @@ import java.io.InputStream
 
 import altitude.models._
 import altitude.transactions.TransactionId
-import altitude.{Const => C, MetadataExtractorException, FormatException, Altitude, Context}
+import altitude.{MetadataExtractorException, FormatException, Altitude, Context}
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}

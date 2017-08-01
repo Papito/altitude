@@ -112,7 +112,10 @@
     </div><!-- /left top panel -->
 
     <div style="max-height: 95%">
-
+      <!-- ko if: currentAsset -->
+      <div data-bind="text: currentAsset().id">
+      </div>
+      <!-- /ko -->
     </div><!-- /left bottom panel -->
   </vaadin-split-layout>
 
