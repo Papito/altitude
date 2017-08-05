@@ -1,9 +1,19 @@
+function mapDictionaryToArray(dictionary) {
+  var result = [];
+  for (var key in dictionary) {
+    if (dictionary.hasOwnProperty(key)) {
+      result.push({ key: key, value: dictionary[key] });
+    }
+  }
+
+  return result;
+}
 function Asset(data) {
   this.id = data ? data.id : null;
   this.selected = ko.observable(false);
   this.fileName = data ? data.filename : null;
-  this.extractedMetadata = data ? data.extracted_metadata : ko.observable();
-  this.metadata = data ? data.metadata : ko.observable();
+  this.extractedMetadata = data ? ko.observableArray(mapDictionaryToArray(data.extracted_metadata)) : ko.observableArray();
+  this.metadata = data ? ko.observableArray(mapDictionaryToArray(data.metadata)) : ko.observableArray();
 }
 
 function Folder(data) {

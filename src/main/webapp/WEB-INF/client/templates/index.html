@@ -113,7 +113,13 @@
 
     <div style="max-height: 95%">
       <!-- ko if: currentAsset -->
-      <div data-bind="text: currentAsset().id">
+      <div class="read-only-metadata" data-bind="foreach: currentAsset().extractedMetadata">
+        <div class="row">
+          <div class="col-md-6 field" data-bind="text: $data.key"></div>
+          <div class="col-md-6 values" data-bind="foreach: $data.value">
+            <span class="value" data-bind="text: $data"></span>
+          </div>
+        </div>
       </div>
       <!-- /ko -->
     </div><!-- /left bottom panel -->
