@@ -1,0 +1,29 @@
+{% extends "./../base.html" %}
+
+{% block title %} Administration {% endblock %}
+
+{% block assets %}
+<script src="/static/js/app/admin.js"></script>
+{% endblock%}
+
+{% block body %}
+<div id="adminMetadata">
+  <div class="container-fluid">
+
+    <div class="row">
+      <div class="col-md-12">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function() {
+    var adminViewModel = new AdminViewModel();
+    ko.applyBindings(adminViewModel);
+  });
+</script>
+{% endblock%}
+
+{% block footer %}
+{% endblock%}

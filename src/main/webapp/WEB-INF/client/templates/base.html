@@ -62,7 +62,7 @@
           <a href="/">{{ Config["app.name"] }}</a>
         </h4>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-5">
         <div id="menulist">
           <div class="row">
             <div class="col-md-3">
@@ -82,13 +82,26 @@
                 </ul>
               </div>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-3">
               <a href="#">Settings</a>
+            </div>
+            <div class="col-md-4">
+              <div class="btn-group">
+                <a href="#" data-toggle="dropdown">
+                  Administration <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a href="/client/admin/metadata">Metadata</a>
+                  </li>
+
+                </ul>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div id="screenTitle" class="col-md-4">
+      <div id="screenTitle" class="col-md-3">
         <h5>
           {% block title %} {% endblock %}
         </h5>
