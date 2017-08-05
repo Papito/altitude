@@ -332,7 +332,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 /* BS OVERRIDES */
 
 .form-control {
-    height: 2.2em;
+    /*height: 2.2em;*/
 }
 
 .has-error .form-control, .has-error .form-control:focus {
@@ -876,6 +876,14 @@ li.folder {
     margin: 0;
     padding-right: .1em;
 }
+
+/* ADMIN */
+
+#adminMetadata {
+    width: 100%;
+    margin-top: 1em;
+}
+
 
 /* MISC */
 #selectImportDirectoryModal select, #importProfiles select, #selectAssetMoveDirectoryModal select {

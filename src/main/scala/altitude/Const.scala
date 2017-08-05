@@ -188,6 +188,15 @@ object Const {
     object Stats {
       val STATS = "stats"
     }
+
+    object Metadata {
+      val FIELDS = "fields"
+
+      object Field {
+        val NAME = "name"
+        val TYPE = "type"
+      }
+    }
   }
 
   object Msg {

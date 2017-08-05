@@ -236,6 +236,23 @@ import org.scalatest.Matchers._
         }
   }
 
+  test("add empty field name", CurrentTag) {
+    intercept[ValidationException] {
+          altitude.service.metadata.addField(
+            MetadataField(name = "  ", fieldType = FieldType.KEYWORD))
+    }
+
+    intercept[ValidationException] {
+          altitude.service.metadata.addField(
+            MetadataField(name = "\t\n\r   ", fieldType = FieldType.KEYWORD))
+    }
+
+    intercept[ValidationException] {
+          altitude.service.metadata.addField(
+            MetadataField(name = "", fieldType = FieldType.KEYWORD))
+    }
+  }
+
   test("metadata added initially") {
     val field = altitude.service.metadata.addField(
       MetadataField(

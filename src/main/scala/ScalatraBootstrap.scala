@@ -1,6 +1,7 @@
 import javax.servlet.ServletContext
 
 import altitude.controllers._
+import altitude.controllers.api.admin.MetadataController
 import altitude.controllers.api.{StatsController, TrashController}
 import altitude.controllers.web.{AssetController, StaticAssetController}
 import altitude.{Environment, SingleApplication}
@@ -25,8 +26,7 @@ class ScalatraBootstrap extends LifeCycle with SingleApplication {
     context.mount(new TrashController, "/api/v1/trash/*")
     context.mount(new StatsController, "/api/v1/stats/*")
 
-    //context.mount(new api.ImportProfileController, "/api/v1/ip/*")
-    //context.mount(new api.TagConfigController, "/api/v1/tagconfig/*")
+    context.mount(new MetadataController, "/api/v1/admin/metadata/*")
 
     context.initParameters("org.scalatra.environment") = Environment.ENV match {
       case Environment.DEV => "development"

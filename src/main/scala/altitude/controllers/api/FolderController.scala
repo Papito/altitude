@@ -61,7 +61,7 @@ class FolderController extends BaseApiController {
 
   delete("/:id") {
     val id = params.get(C.Api.ID).get
-    log.info(s"Deleting folder $id")
+    log.info(s"Deleting folder: $id")
     app.service.library.deleteFolderById(id)
 
     OK
@@ -69,6 +69,7 @@ class FolderController extends BaseApiController {
 
   put("/:id") {
     val id = params.get(C.Api.ID).get
+    log.info(s"Updating folder: $id")
     val newName = (requestJson.get \ C.Api.Folder.NAME).asOpt[String]
     val newParentId = (requestJson.get \ C.Api.Folder.PARENT_ID).asOpt[String]
 
