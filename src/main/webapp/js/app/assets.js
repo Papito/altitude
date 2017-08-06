@@ -26,6 +26,8 @@ AssetsViewModel = BaseViewModel.extend({
     this.directoryNames = ko.observableArray();
     this.currentPath = ko.observable();
 
+    this.metadataConfig = {};
+
     this.selectedCount = ko.computed(function() {
       return this.selectedIds().length;
     }, this);
@@ -93,7 +95,8 @@ AssetsViewModel = BaseViewModel.extend({
     /* right-click context */
     self.setUpRightClickContext();
 
-    this.search();
+    /* load metadata config and perform default search */
+    this.getMetadataFields();
   },
 
   setupFolderNav: function() {
@@ -379,7 +382,29 @@ AssetsViewModel = BaseViewModel.extend({
     var opts = {
       'successCallback': function (json) {
         var assets = $.map(json['assets'], function(data) {
-          return new Asset(data);
+          asset = new Asset(data);
+
+          // add user metadata fields not found in this asset but present in metadata config
+          var presentMetaFieldIds = new Set();
+
+          var i = 0;
+          for (i; i < asset.metadata().length; ++i) {
+            var field = asset.metadata()[i];
+            presentMetaFieldIds.add(field.id);
+          }
+
+          for (var fieldId in self.metadataConfig) {
+            if (self.metadataConfig.hasOwnProperty(fieldId)) {
+              if (!presentMetaFieldIds.has(fieldId)) {
+                field = {};
+                field[fieldId] = [];
+                asset.metadata.push(field);
+              }
+            }
+          }
+
+          console.log(asset.metadata());
+          return asset;
         });
 
         // remember the focused asset
@@ -1672,5 +1697,26 @@ AssetsViewModel = BaseViewModel.extend({
     var idx = self.getAssetIndex(self.detailAsset().id);
     var prevAsset = self.searchResults()[idx - 1];
     self.showAssetDetailModal(self, prevAsset);
+  },
+
+  getMetadataFields: function() {
+    var self = this;
+
+    var opts = {
+      'successCallback': function(json) {
+        var i = 0;
+        for (i; i < json.fields.length; ++i) {
+          var fieldConfig = json.fields[i];
+          self.metadataConfig[fieldConfig.id] = fieldConfig;
+        }
+
+        console.log(self.metadataConfig);
+
+        self.search();
+      }
+    };
+
+    self.get('/api/v1/metadata', opts);
   }
+
 });

@@ -23,11 +23,11 @@ class Metadata(val data: Map[String, Set[String]] = Map[String, Set[String]]())
   def isEmpty = data.isEmpty
 
   override val toJson = data.foldLeft(Json.obj()) { (res, m) =>
-    val fieldName = m._1
+    val fieldId = m._1
 
     val valuesJsArray: JsArray = JsArray(m._2.toSeq.map(JsString))
 
     // append to the resulting JSON object
-    res ++ Json.obj(fieldName -> valuesJsArray)
+    res ++ Json.obj(fieldId -> valuesJsArray)
   }
 }

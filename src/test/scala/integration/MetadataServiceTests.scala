@@ -260,10 +260,10 @@ import org.scalatest.Matchers._
     }
   }
 
-  test("metadata added initially") {
+  test("metadata added initially should be present") {
     val field = altitude.service.metadata.addField(
       MetadataField(
-        name = "number field",
+        name = "keyword field",
         fieldType = FieldType.KEYWORD))
 
     val data = Map[String, Set[String]](field.id.get -> Set("one", "two"))
@@ -272,10 +272,37 @@ import org.scalatest.Matchers._
     val asset: Asset = altitude.service.library.add(
       makeAsset(altitude.service.folder.getTriageFolder, metadata = metadata))
 
-    val storedAsset: Asset = altitude.service.asset.getById(asset.id.get)
+    val storedAsset: Asset = altitude.service.library.getById(asset.id.get)
 
     storedAsset.metadata.isEmpty shouldBe false
-    //storedAsset.extractedMetadata.isEmpty shouldBe false
   }
 
+  test("not defined user metadata values should not return") {
+    val field1 = altitude.service.metadata.addField(
+      MetadataField(
+        name = "keyword field",
+        fieldType = FieldType.KEYWORD))
+
+    val field2 = altitude.service.metadata.addField(
+      MetadataField(
+        name = "number field",
+        fieldType = FieldType.NUMBER))
+
+    val field3 = altitude.service.metadata.addField(
+      MetadataField(
+        name = "text field",
+        fieldType = FieldType.TEXT))
+
+
+    val data = Map[String, Set[String]](field3.id.get -> Set("this is some text"))
+    val metadata = new Metadata(data)
+
+    val asset: Asset = altitude.service.library.add(
+      makeAsset(altitude.service.folder.getTriageFolder, metadata = metadata))
+
+    val storedAsset: Asset = altitude.service.library.getById(asset.id.get)
+
+    storedAsset.metadata.isEmpty shouldBe false
+    storedAsset.metadata.data.size shouldBe 1
+  }
 }
