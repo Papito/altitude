@@ -236,7 +236,14 @@ import org.scalatest.Matchers._
         }
   }
 
-  test("add empty field name", CurrentTag) {
+  test("clean") {
+    val metadataField = altitude.service.metadata.addField(
+      MetadataField(name = " new field\n ", fieldType = FieldType.NUMBER))
+
+    metadataField.name shouldBe "new field"
+  }
+
+  test("validate") {
     intercept[ValidationException] {
           altitude.service.metadata.addField(
             MetadataField(name = "  ", fieldType = FieldType.KEYWORD))

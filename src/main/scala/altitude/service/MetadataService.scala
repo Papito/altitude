@@ -1,5 +1,6 @@
 package altitude.service
 
+import altitude.Validators.ModelDataValidator
 import altitude.dao.{AssetDao, MetadataFieldDao}
 import altitude.models.{FieldType, Metadata, MetadataField}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
@@ -11,8 +12,15 @@ import play.api.libs.json.JsObject
 
 import scala.util.control.Breaks._
 
+object MetadataService {
+  class MetadataFieldValidator
+    extends ModelDataValidator(
+      required = Some(
+        List(C.MetadataField.NAME, C.MetadataField.FIELD_TYPE)))
+}
 
-class MetadataService(val app: Altitude) {
+
+class MetadataService(val app: Altitude) extends ModelValidation {
   private final val log = LoggerFactory.getLogger(getClass)
 
   protected val txManager = app.injector.instance[AbstractTransactionManager]
@@ -20,20 +28,27 @@ class MetadataService(val app: Altitude) {
   protected val ASSET_DAO = app.injector.instance[AssetDao]
   private final val VALID_BOOLEAN_VALUES = Set("0", "1", "true", "false")
 
+  final val METADATA_FIELD_VALIDATOR = new MetadataService.MetadataFieldValidator
+  val METADATA_FIELD_CLEANER = Cleaners.Cleaner(
+    trim = Some(List(C.MetadataField.NAME, C.MetadataField.FIELD_TYPE)))
+
   def addField(metadataField: MetadataField)
               (implicit ctx: Context, txId: TransactionId = new TransactionId): MetadataField = {
 
     txManager.withTransaction[MetadataField] {
+      val cleaned: MetadataField = cleanAndValidate(
+        metadataField, Some(METADATA_FIELD_CLEANER), Some(METADATA_FIELD_VALIDATOR))
+
       val existing = METADATA_FIELD_DAO.query(Query(Map(
-        C.MetadataField.NAME_LC -> metadataField.nameLowercase
+        C.MetadataField.NAME_LC -> cleaned.nameLowercase
       )))
 
       if (existing.nonEmpty) {
-        log.debug(s"Duplicate found for field [${metadataField.name}]")
-        throw DuplicateException(metadataField, existing.records.head)
+        log.debug(s"Duplicate found for field [${cleaned.name}]")
+        throw DuplicateException(cleaned, existing.records.head)
       }
 
-      METADATA_FIELD_DAO.add(metadataField)
+      METADATA_FIELD_DAO.add(cleaned)
     }
   }
 

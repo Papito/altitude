@@ -1,7 +1,5 @@
 package altitude.service
 
-import altitude.Cleaners.Cleaner
-import altitude.Validators.ModelDataValidator
 import altitude.dao.BaseDao
 import altitude.models.BaseModel
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
@@ -13,16 +11,11 @@ import play.api.libs.json.JsObject
 
 import scala.language.implicitConversions
 
-abstract class BaseService[Model <: BaseModel] {
+abstract class BaseService[Model <: BaseModel] extends ModelValidation {
   protected val app: Altitude
   private final val log = LoggerFactory.getLogger(getClass)
   protected val DAO: BaseDao
   protected val txManager = app.injector.instance[AbstractTransactionManager]
-
-  // object cleaner
-  protected val CLEANER: Option[Cleaner] = None
-  // object validator, invoked AFTER the cleaner
-  protected val VALIDATOR: Option[ModelDataValidator] = None
 
   /**
    * Add a single document
@@ -96,27 +89,6 @@ abstract class BaseService[Model <: BaseModel] {
 
     txManager.withTransaction[Int] {
       DAO.updateByQuery(query, data, fields)
-    }
-  }
-
-  /**
-   * User the service class-wide definitions of data cleaner and validator
-   *
-   * @param objIn object t clean and validate
-   *
-   * @return copy of the original document, cleaned and validated, if any of those steps are defined
-   */
-  def cleanAndValidate(objIn: Model): JsObject = {
-    val cleaned = CLEANER match {
-      case Some(cleaner) => cleaner.clean(objIn.toJson)
-      case None => objIn.toJson
-    }
-
-    VALIDATOR match {
-      case Some(validator) =>
-        validator.validate(cleaned)
-        cleaned
-      case None => cleaned
     }
   }
 

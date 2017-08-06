@@ -21,11 +21,9 @@ object MetadataField {
     ).withCoreAttr(json)
 }
 
-case class MetadataField(
-                  id: Option[String] = None,
-                  name: String,
-                  fieldType: FieldType.Value) extends BaseModel {
-
+case class MetadataField(id: Option[String] = None,
+                         name: String,
+                         fieldType: FieldType.Value) extends BaseModel {
   val nameLowercase = name.toLowerCase
 
   override def toJson = Json.obj(
