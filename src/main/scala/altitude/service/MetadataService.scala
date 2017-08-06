@@ -19,7 +19,6 @@ object MetadataService {
         List(C.MetadataField.NAME, C.MetadataField.FIELD_TYPE)))
 }
 
-
 class MetadataService(val app: Altitude) extends ModelValidation {
   private final val log = LoggerFactory.getLogger(getClass)
 

@@ -255,7 +255,7 @@ BaseViewModel = Base.extend({
             for(var field in errz) {
               var errSelector = '[name=' + field + ']';
               var selector = errElId ? errElId + ' ' + errSelector : errSelector;
-              var errEl = $(selector).parent().addClass('has-error').parent().find('.error');
+              var errEl = $(selector).parent().addClass('has-error').find('.error');
               console.log(errEl);
               errEl.text(errz[field]);
               errEl.css('display', 'inline');

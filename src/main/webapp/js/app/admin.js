@@ -1,3 +1,10 @@
+function MetadataField(data) {
+  this.id = data ? data.id : null;
+  this.name = data ? ko.observable(data.name) : ko.observable();
+  this.type = data ? ko.observable(data.field_type) : ko.observable();
+}
+
+
 AdminViewModel = BaseViewModel.extend({
   constructor : function() {
     "use strict";
@@ -6,6 +13,9 @@ AdminViewModel = BaseViewModel.extend({
 
     this.base();
     console.log('Initializing admin view model');
+
+    self.metadataFields = ko.observableArray();
+    self.getMetadataFields();
   },
 
   showAddMetadataField: function() {
@@ -35,10 +45,26 @@ AdminViewModel = BaseViewModel.extend({
       errorContainerId: 'addMetadataFieldModal-form',
       'successCallback': function() {
         $('#addMetadataFieldModal').modal('hide');
+        self.getMetadataFields();
       }
     };
 
     self.post('/api/v1/admin/metadata', opts);
+  },
 
+  getMetadataFields: function() {
+    var self = this;
+
+    var opts = {
+      'successCallback': function(json) {
+        var fields = $.map(json['fields'], function(data) {
+          return new MetadataField(data);
+        });
+
+        self.metadataFields(fields);
+      }
+    };
+
+    self.get('/api/v1/admin/metadata', opts);
   }
 });

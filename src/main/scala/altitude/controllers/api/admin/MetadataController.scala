@@ -1,6 +1,7 @@
 package altitude.controllers.api.admin
 
 import altitude.controllers.api.BaseApiController
+import altitude.models.{FieldType, MetadataField}
 import altitude.{Const => C}
 import org.scalatra.Ok
 import org.slf4j.LoggerFactory
@@ -21,6 +22,10 @@ class MetadataController extends BaseApiController {
     val name = (requestJson.get \ C.Api.Metadata.Field.NAME).as[String]
     val fieldType = (requestJson.get \ C.Api.Metadata.Field.TYPE).as[String]
     log.info(s"Adding metadata field [$name] of type [$fieldType]")
+
+    val newField = MetadataField(name = name, fieldType = FieldType.withName(fieldType.toUpperCase))
+
+    app.service.metadata.addField(newField)
 
     OK
   }

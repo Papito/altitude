@@ -15,11 +15,20 @@
         <a href="#" data-bind="click: showAddMetadataField">Add Field</a>
       </div>
     </div>
+
+    <div id="metadataFields" data-bind="foreach: metadataFields">
+      <div class="row">
+        <div class="col-md-6" data-bind="text: name">
+        </div>
+        <div class="col-md-6" data-bind="text: type">
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<!-- Rename folder -->
-<div class="modal fade" id="addMetadataFieldModal" tabindex="-1" role="dialog" aria-labelledby="renameFolderModal-lbl">
+<div class="modal fade" id="addMetadataFieldModal" tabindex="-1" role="dialog" aria-labelledby="addMetadataFieldModal-lbl">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <form id="addMetadataFieldModal-form">
@@ -40,7 +49,7 @@
               <label for="addMetadataFieldModal-type" class="control-label"></label>
               <div class="error"></div>
               <select id="addMetadataFieldModal-type"
-                      name="name" class="form-control">
+                      name="type" class="form-control">
                 <option value="keyword">Keyword</option>
                 <option value="text">Text</option>
                 <option value="number">Number</option>
@@ -49,8 +58,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-              <button id="renameFolderModal-actionBtn"
-                      type="button"
+              <button type="button"
                       class="btn btn-primary"
                       data-bind="click: addMetadataField">Create</button>
             </div>
