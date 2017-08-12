@@ -1,11 +1,12 @@
 package altitude.controllers.api
 
 import altitude.Validators.ApiRequestValidator
-import altitude.models.Data
+import altitude.controllers.Utils
+import altitude.models.{MetadataField, Asset, Data}
 import altitude.{Const => C, NotFoundException}
 import org.scalatra.Ok
 import org.slf4j.LoggerFactory
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 
 class AssetController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -13,8 +14,10 @@ class AssetController extends BaseApiController {
   get(s"/:${C.Api.ID}") {
     val id = params.get(C.Api.ID).get
 
+    val asset: Asset = app.service.library.getById(id)
+
     Ok(Json.obj(
-      C.Api.Asset.ASSET -> app.service.library.getById(id)
+      C.Api.Asset.ASSET -> Utils.formatMetadata(app, asset)
     ))
   }
 
@@ -29,6 +32,10 @@ class AssetController extends BaseApiController {
     catch {
       case ex: NotFoundException => redirect("/i/1x1.png")
     }
+  }
+
+  get(s"/:${C.Api.ID}/metadata") {
+    val id = params.get(C.Api.ID).get
   }
 
   post(s"/:${C.Api.ID}/move/:${C.Api.Asset.FOLDER_ID}") {

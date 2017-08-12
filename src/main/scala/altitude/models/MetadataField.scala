@@ -9,7 +9,7 @@ object FieldType extends Enumeration {
   val KEYWORD = Value("KEYWORD")
   val TEXT = Value("TEXT")
   val NUMBER = Value("NUMBER")
-  val BOOL = Value("BOOL")
+  val BOOL = Value("BOOLEAN")
 }
 
 object MetadataField {

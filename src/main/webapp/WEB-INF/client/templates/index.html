@@ -119,6 +119,21 @@
 
     <div style="max-height: 95%">
       <!-- ko if: currentAsset -->
+      <div class="user-metadata" data-bind="foreach: currentAsset().metadata">
+        <div class="row">
+          <div class="col-md-6 field" data-bind="text: $data.name"></div>
+          <div class="col-md-6 values">
+            <input class="new-metadata-value"
+                   type="text"
+                   name="new-metadata-value"
+                   autocomplete="off"
+                   data-bind="attr: {id: 'metadata-field-' + $data.id}, valueUpdate: 'afterkeydown', event: {keyup: function(data, event){ $root.addMetadataValue(data, event, $data.id) }}">
+            <div data-bind="foreach: $data.value">
+              <div class="value" data-bind="text: $data"></div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="read-only-metadata" data-bind="foreach: currentAsset().extractedMetadata">
         <div class="row">
           <div class="col-md-6 field" data-bind="text: $data.key"></div>

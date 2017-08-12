@@ -2,13 +2,13 @@ package altitude.service
 
 import altitude.Validators.ModelDataValidator
 import altitude.dao.{AssetDao, MetadataFieldDao}
-import altitude.models.{FieldType, Metadata, MetadataField}
+import altitude.models.{Asset, FieldType, Metadata, MetadataField}
 import altitude.transactions.{AbstractTransactionManager, TransactionId}
 import altitude.util.Query
 import altitude.{Const => C, _}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
-import play.api.libs.json.JsObject
+import play.api.libs.json.{JsString, JsArray, Json, JsObject}
 
 import scala.util.control.Breaks._
 
@@ -249,5 +249,40 @@ class MetadataService(val app: Altitude) extends ModelValidation {
       throw ex
 
     new Metadata(cleanData)
+  }
+
+  /*
+    Presentation-level JSON transformer for metadata. This augments the limiting metadata JSON object to supply
+    the names of fields, pulled from field configuration that the Metadata domain object is not aware of.
+
+    On the way in we get:
+      field id -> values
+      field id -> values
+
+    We get out:
+      ID -> field id  NAME -> field name  VALUES -> values
+      ID -> field id  NAME -> field name  VALUES -> values TYPE -> type
+   */
+  def toJson(metadata: Metadata, allMetadataFields: Option[Map[String, MetadataField]] = None)
+  (implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
+    txManager.asReadOnly[JsObject] {
+
+      val allFields = allMetadataFields.isDefined match {
+        case true => allMetadataFields.get
+        case false => getAllFields
+      }
+
+      metadata.data.foldLeft(Json.obj()) { (res, m) =>
+        val fieldId = m._1
+        val field: Option[MetadataField] = allFields.get(fieldId)
+
+        res ++ Json.obj(
+          C.MetadataField.ID -> fieldId,
+          C.MetadataField.NAME -> field.get.name,
+          C.MetadataField.FIELD_TYPE -> field.get.fieldType.toString,
+          C.MetadataField.VALUES -> JsArray(m._2.toSeq.map(JsString))
+        )
+      }
+    }
   }
 }

@@ -396,14 +396,16 @@ AssetsViewModel = BaseViewModel.extend({
           for (var fieldId in self.metadataConfig) {
             if (self.metadataConfig.hasOwnProperty(fieldId)) {
               if (!presentMetaFieldIds.has(fieldId)) {
-                field = {};
-                field[fieldId] = [];
-                asset.metadata.push(field);
+                field = self.metadataConfig[fieldId];
+                asset.metadata.push({
+                  id: field.id,
+                  name: field.name,
+                  values: []
+                });
               }
             }
           }
 
-          console.log(asset.metadata());
           return asset;
         });
 
@@ -1717,6 +1719,30 @@ AssetsViewModel = BaseViewModel.extend({
     };
 
     self.get('/api/v1/metadata', opts);
-  }
+  },
 
+  addMetadataValue: function(data , event, fieldId){
+    if (event.which != 13) {
+      return;
+    }
+
+    var valueEl = $('#metadata-field-' + fieldId);
+    var value = valueEl.val();
+
+    var opts = {
+      'successCallback': function(json) {
+        var i = 0;
+        for (i; i < json.fields.length; ++i) {
+          var fieldConfig = json.fields[i];
+          self.metadataConfig[fieldConfig.id] = fieldConfig;
+        }
+
+        console.log(self.metadataConfig);
+
+        self.search();
+      }
+    };
+
+    self.get('/api/v1/metadata', opts);
+  }
 });

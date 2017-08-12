@@ -1,6 +1,8 @@
 package altitude.controllers.api
 
 import altitude.Validators.ApiRequestValidator
+import altitude.controllers.Utils
+import altitude.models.Asset
 import altitude.util.Query
 import altitude.{Const => C}
 import org.scalatra.Ok
@@ -89,7 +91,10 @@ class TrashController extends BaseApiController {
     val results = app.service.library.queryRecycled(q)
 
     Ok(Json.obj(
-      C.Api.Search.ASSETS -> results.records,
+      C.Api.Search.ASSETS -> results.records.map { x =>
+        val asset = x: Asset
+        Utils.formatMetadata(app, asset)
+      },
       C.Api.TOTAL_RECORDS -> results.total,
       C.Api.CURRENT_PAGE -> q.page,
       C.Api.TOTAL_PAGES -> results.totalPages,

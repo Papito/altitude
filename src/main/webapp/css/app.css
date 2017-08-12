@@ -877,6 +877,30 @@ li.folder {
     padding-right: .1em;
 }
 
+.user-metadata {
+    margin-top: .8em;
+}
+
+.user-metadata .row {
+    margin-left: .5em;
+    margin-right: .5em;
+    border-bottom: 1px solid #3d3d3d;
+}
+
+.user-metadata .field {
+    margin: 0;
+    padding: 0;
+    border-right: 1px solid #3d3d3d;
+    font-weight: bold;
+    font-size: .9em;
+}
+
+input.new-metadata-value {
+    width: 100%;
+    border-radius: .4em;
+    color: rgba(0, 0, 0, 0.81);
+}
+
 /* ADMIN */
 
 #adminMetadata {
