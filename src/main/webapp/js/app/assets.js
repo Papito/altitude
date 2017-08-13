@@ -383,29 +383,7 @@ AssetsViewModel = BaseViewModel.extend({
       'successCallback': function (json) {
         var assets = $.map(json['assets'], function(data) {
           asset = new Asset(data);
-
-          // add user metadata fields not found in this asset but present in metadata config
-          var presentMetaFieldIds = new Set();
-
-          var i = 0;
-          for (i; i < asset.metadata().length; ++i) {
-            var field = asset.metadata()[i];
-            presentMetaFieldIds.add(field.id);
-          }
-
-          for (var fieldId in self.metadataConfig) {
-            if (self.metadataConfig.hasOwnProperty(fieldId)) {
-              if (!presentMetaFieldIds.has(fieldId)) {
-                field = self.metadataConfig[fieldId];
-                asset.metadata.push({
-                  id: field.id,
-                  name: field.name,
-                  values: []
-                });
-              }
-            }
-          }
-
+          asset.metadata(self.addEmptyMetadataFields(asset.metadata()));
           return asset;
         });
 
@@ -444,6 +422,37 @@ AssetsViewModel = BaseViewModel.extend({
     };
 
     self.get(self.getUrl(), opts);
+  },
+
+  /*
+  Add metadata fields from config to an asset, if the fields are not defined in the asset
+   */
+  addEmptyMetadataFields: function(metadata) {
+    var self = this;
+
+    var presentMetaFieldIds = new Set();
+
+    var i = 0;
+    for (i; i < metadata.length; ++i) {
+      var field = metadata[i];
+      presentMetaFieldIds.add(field.id);
+    }
+
+    for (var fieldId in self.metadataConfig) {
+      if (self.metadataConfig.hasOwnProperty(fieldId)) {
+        if (!presentMetaFieldIds.has(fieldId)) {
+          field = self.metadataConfig[fieldId];
+          metadata.push({
+            id: field.id,
+            name: field.name,
+            field_type: field.field_type,
+            values: []
+          });
+        }
+      }
+    }
+
+    return metadata;
   },
 
   gotoPrevPage: function(callback) {
@@ -1722,6 +1731,10 @@ AssetsViewModel = BaseViewModel.extend({
   },
 
   addMetadataValue: function(data , event, fieldId){
+    var self = this;
+
+    assert(fieldId, 'Field ID is not defined');
+
     if (event.which != 13) {
       return;
     }
@@ -1730,19 +1743,17 @@ AssetsViewModel = BaseViewModel.extend({
     var value = valueEl.val();
 
     var opts = {
-      'successCallback': function(json) {
-        var i = 0;
-        for (i; i < json.fields.length; ++i) {
-          var fieldConfig = json.fields[i];
-          self.metadataConfig[fieldConfig.id] = fieldConfig;
-        }
-
-        console.log(self.metadataConfig);
-
-        self.search();
+      data: {
+        value: value
+      },
+      successCallback: function(json) {
+        var metadata = self.addEmptyMetadataFields(json.metadata);
+        self.currentAsset().metadata(metadata);
       }
     };
 
-    self.get('/api/v1/metadata', opts);
+    var assetId = self.currentAsset().id;
+
+    self.post('/api/v1/assets/' + assetId + '/metadata/' + fieldId, opts);
   }
 });

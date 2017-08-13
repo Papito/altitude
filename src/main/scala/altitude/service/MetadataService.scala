@@ -8,8 +8,9 @@ import altitude.util.Query
 import altitude.{Const => C, _}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsString, JsArray, Json, JsObject}
+import play.api.libs.json._
 
+import scala.collection.mutable.ArrayBuffer
 import scala.util.control.Breaks._
 
 object MetadataService {
@@ -264,25 +265,27 @@ class MetadataService(val app: Altitude) extends ModelValidation {
       ID -> field id  NAME -> field name  VALUES -> values TYPE -> type
    */
   def toJson(metadata: Metadata, allMetadataFields: Option[Map[String, MetadataField]] = None)
-  (implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
-    txManager.asReadOnly[JsObject] {
+  (implicit ctx: Context, txId: TransactionId = new TransactionId): JsArray = {
 
+    txManager.asReadOnly[JsArray] {
       val allFields = allMetadataFields.isDefined match {
         case true => allMetadataFields.get
         case false => getAllFields
       }
 
-      metadata.data.foldLeft(Json.obj()) { (res, m) =>
+      val res = metadata.data.foldLeft(scala.collection.immutable.Stack[JsValue]()) { (res, m) =>
         val fieldId = m._1
         val field: Option[MetadataField] = allFields.get(fieldId)
 
-        res ++ Json.obj(
+        res :+ Json.obj(
           C.MetadataField.ID -> fieldId,
           C.MetadataField.NAME -> field.get.name,
           C.MetadataField.FIELD_TYPE -> field.get.fieldType.toString,
           C.MetadataField.VALUES -> JsArray(m._2.toSeq.map(JsString))
         )
       }
+
+      JsArray(res)
     }
   }
 }

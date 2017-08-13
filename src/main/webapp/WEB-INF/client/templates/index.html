@@ -128,7 +128,7 @@
                    name="new-metadata-value"
                    autocomplete="off"
                    data-bind="attr: {id: 'metadata-field-' + $data.id}, valueUpdate: 'afterkeydown', event: {keyup: function(data, event){ $root.addMetadataValue(data, event, $data.id) }}">
-            <div data-bind="foreach: $data.value">
+            <div data-bind="foreach: $data.values">
               <div class="value" data-bind="text: $data"></div>
             </div>
           </div>

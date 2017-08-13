@@ -1,6 +1,6 @@
 package altitude.controllers.api
 
-import altitude.controllers.Utils
+import altitude.controllers.Util
 import altitude.models.Asset
 import altitude.util.Query
 import altitude.{Const => C}
@@ -57,7 +57,7 @@ class QueryController extends BaseApiController {
     Ok(Json.obj(
       C.Api.Search.ASSETS -> results.records.map { x =>
         val asset = x: Asset
-        Utils.formatMetadata(app, asset)
+        Util.withFormattedMetadata(app, asset)
       },
       C.Api.TOTAL_RECORDS -> results.total,
       C.Api.CURRENT_PAGE -> q.page,
@@ -79,7 +79,7 @@ class QueryController extends BaseApiController {
     Ok(Json.obj(
       C.Api.Search.ASSETS -> results.records.map { x =>
         val asset = x: Asset
-        Utils.formatMetadata(app, asset)
+        Util.withFormattedMetadata(app, asset)
       },
       C.Api.TOTAL_RECORDS -> results.total,
       C.Api.CURRENT_PAGE -> q.page,

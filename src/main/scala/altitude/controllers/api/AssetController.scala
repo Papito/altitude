@@ -1,8 +1,8 @@
 package altitude.controllers.api
 
 import altitude.Validators.ApiRequestValidator
-import altitude.controllers.Utils
-import altitude.models.{MetadataField, Asset, Data}
+import altitude.controllers.Util
+import altitude.models.{Metadata, MetadataField, Asset, Data}
 import altitude.{Const => C, NotFoundException}
 import org.scalatra.Ok
 import org.slf4j.LoggerFactory
@@ -17,7 +17,7 @@ class AssetController extends BaseApiController {
     val asset: Asset = app.service.library.getById(id)
 
     Ok(Json.obj(
-      C.Api.Asset.ASSET -> Utils.formatMetadata(app, asset)
+      C.Api.Asset.ASSET -> Util.withFormattedMetadata(app, asset)
     ))
   }
 
@@ -34,8 +34,21 @@ class AssetController extends BaseApiController {
     }
   }
 
-  get(s"/:${C.Api.ID}/metadata") {
-    val id = params.get(C.Api.ID).get
+  post(s"/:${C.Api.ID}/metadata/:${C.Api.Asset.METADATA_FIELD_ID}") {
+    val assetId = params.get(C.Api.ID).get
+    val metadataFieldId = params.get(C.Api.Asset.METADATA_FIELD_ID).get
+    val newValue = (requestJson.get \ C.Api.Metadata.VALUE).as[String]
+    log.info(s"Updating meta field [$metadataFieldId] for asset [$assetId] with new value [$newValue]")
+
+    val data = Map[String, Set[String]](metadataFieldId -> Set(newValue))
+
+    app.service.metadata.updateMetadata(assetId, new Metadata(data))
+
+    val updatedAsset: Asset = app.service.library.getById(assetId)
+
+    Ok(Json.obj(
+      C.Api.Asset.METADATA -> app.service.metadata.toJson(updatedAsset.metadata)
+    ))
   }
 
   post(s"/:${C.Api.ID}/move/:${C.Api.Asset.FOLDER_ID}") {

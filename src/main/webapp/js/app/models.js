@@ -13,7 +13,7 @@ function Asset(data) {
   this.selected = ko.observable(false);
   this.fileName = data ? data.filename : null;
   this.extractedMetadata = data ? ko.observableArray(mapDictionaryToArray(data.extracted_metadata)) : ko.observableArray();
-  this.metadata = data ? ko.observableArray(mapDictionaryToArray(data.metadata)) : ko.observableArray();
+  this.metadata = data ? ko.observableArray(data.metadata) : ko.observableArray();
 }
 
 function Folder(data) {

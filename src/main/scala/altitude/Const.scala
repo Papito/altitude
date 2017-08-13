@@ -157,6 +157,8 @@ object Const {
       val ASSET = "asset"
       val FOLDER_ID = "folder_id"
       val ASSETS = "assets"
+      val METADATA = "metadata"
+      val METADATA_FIELD_ID = "metadata_field_id"
     }
 
     object Search {
@@ -191,6 +193,7 @@ object Const {
 
     object Metadata {
       val FIELDS = "fields"
+      val VALUE = "value"
 
       object Field {
         val NAME = "name"
