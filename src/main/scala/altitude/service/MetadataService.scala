@@ -119,6 +119,36 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     }
   }
 
+  def addFieldValue(assetId: String, fieldId: String, newValue: String)
+                    (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
+    log.info(s"Updating meta field [$fieldId] for asset [$assetId] with new value [$newValue]")
+
+    txManager.withTransaction {
+      val currentMetadata = app.service.metadata.getMetadata(assetId)
+
+      val currentValues = currentMetadata.get(fieldId).isEmpty  match {
+        case true => Set[String]()
+        case false => currentMetadata.get(fieldId).get
+      }
+
+      val newValues = currentValues + newValue
+      val data = Map[String, Set[String]](fieldId -> newValues)
+
+      app.service.metadata.updateMetadata(assetId, new Metadata(data))
+    }
+  }
+
+  def replaceFieldValues(assetId: String, fieldId: String, newValue: String)
+                   (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
+    log.info(s"Updating meta field [$fieldId] for asset [$assetId] with new value [$newValue]")
+
+    txManager.withTransaction {
+      val data = Map[String, Set[String]](fieldId -> Set(newValue))
+
+      app.service.metadata.updateMetadata(assetId, new Metadata(data))
+    }
+  }
+
   /**
    * Makes sure the metadata fields are configured in this system after common-sense data
    * hygiene. Validates correct type for anything
@@ -212,7 +242,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
       breakable {
         // booleans cannot have multiple values
         if (field.fieldType == FieldType.BOOL && values.size > 1) {
-          ex.errors += (field.id.get -> C.Msg.Warn.INCORRECT_VALUE_TYPE)
+          ex.errors += (field.id.get -> C.Msg.Warn.INCORRECT_VALUE_TYPE.format(field.name))
           break()
         }
 

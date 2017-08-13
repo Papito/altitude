@@ -38,19 +38,8 @@ class AssetController extends BaseApiController {
     val assetId = params.get(C.Api.ID).get
     val fieldId = params.get(C.Api.Asset.METADATA_FIELD_ID).get
     val newValue = (requestJson.get \ C.Api.Metadata.VALUE).as[String]
-    log.info(s"Updating meta field [$fieldId] for asset [$assetId] with new value [$newValue]")
 
-    val currentMetadata = app.service.metadata.getMetadata(assetId)
-
-    val currentValues = currentMetadata.get(fieldId).isEmpty  match {
-      case true => Set[String]()
-      case false => currentMetadata.get(fieldId).get
-    }
-
-    val newValues = currentValues + newValue
-    val data = Map[String, Set[String]](fieldId -> newValues)
-
-    app.service.metadata.updateMetadata(assetId, new Metadata(data))
+    app.service.metadata.addFieldValue(assetId, fieldId, newValue)
 
     val newMetadata = app.service.metadata.getMetadata(assetId)
 
