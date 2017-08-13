@@ -36,18 +36,26 @@ class AssetController extends BaseApiController {
 
   post(s"/:${C.Api.ID}/metadata/:${C.Api.Asset.METADATA_FIELD_ID}") {
     val assetId = params.get(C.Api.ID).get
-    val metadataFieldId = params.get(C.Api.Asset.METADATA_FIELD_ID).get
+    val fieldId = params.get(C.Api.Asset.METADATA_FIELD_ID).get
     val newValue = (requestJson.get \ C.Api.Metadata.VALUE).as[String]
-    log.info(s"Updating meta field [$metadataFieldId] for asset [$assetId] with new value [$newValue]")
+    log.info(s"Updating meta field [$fieldId] for asset [$assetId] with new value [$newValue]")
 
-    val data = Map[String, Set[String]](metadataFieldId -> Set(newValue))
+    val currentMetadata = app.service.metadata.getMetadata(assetId)
+
+    val currentValues = currentMetadata.get(fieldId).isEmpty  match {
+      case true => Set[String]()
+      case false => currentMetadata.get(fieldId).get
+    }
+
+    val newValues = currentValues + newValue
+    val data = Map[String, Set[String]](fieldId -> newValues)
 
     app.service.metadata.updateMetadata(assetId, new Metadata(data))
 
-    val updatedAsset: Asset = app.service.library.getById(assetId)
+    val newMetadata = app.service.metadata.getMetadata(assetId)
 
     Ok(Json.obj(
-      C.Api.Asset.METADATA -> app.service.metadata.toJson(updatedAsset.metadata)
+      C.Api.Asset.METADATA -> app.service.metadata.toJson(newMetadata)
     ))
   }
 
