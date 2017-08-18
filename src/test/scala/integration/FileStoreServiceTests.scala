@@ -2,8 +2,8 @@ package integration
 
 import java.io.File
 
-import altitude.models.{Folder, Asset}
-import altitude.{Const => C, StorageException, NotFoundException}
+import software.altitude.core.models.{Folder, Asset}
+import software.altitude.core.{Const => C, StorageException, NotFoundException}
 import org.apache.commons.io.{FileUtils, FilenameUtils}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._

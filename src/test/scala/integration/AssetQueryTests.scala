@@ -1,8 +1,9 @@
 package integration
 
-import altitude.models.{Asset, AssetType, Folder}
-import altitude.util.Query
-import altitude.{Const => C, Util}
+import software.altitude.core.models.{Asset, AssetType, Folder}
+import software.altitude.core.util.Query
+import software.altitude.core.{Const => C}
+import software.altitude.core.Util
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 

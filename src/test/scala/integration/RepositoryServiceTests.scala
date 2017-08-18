@@ -1,10 +1,10 @@
 package integration
 
-import altitude.Util
-import altitude.models.{BaseModel, Repository}
-import altitude.{Const => C}
+import software.altitude.core.models.{BaseModel, Repository}
+import software.altitude.core.{Const => C}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
+import software.altitude.core.Util
 
 @DoNotDiscover class RepositoryServiceTests (val config: Map[String, Any]) extends IntegrationTestCore {
 

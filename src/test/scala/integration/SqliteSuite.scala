@@ -2,7 +2,7 @@ package integration
 
 import java.sql.DriverManager
 
-import altitude.{Altitude, Configuration, Environment, Const => C}
+import software.altitude.core.{Altitude, Configuration, Environment, Const => C}
 import org.scalatest.BeforeAndAfterAll
 import org.slf4j.LoggerFactory
 

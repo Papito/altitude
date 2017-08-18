@@ -1,9 +1,9 @@
 package unit
 
-import altitude.Util
-import altitude.models.{BaseModel, Folder}
+import software.altitude.core.models.{BaseModel, Folder}
 import org.scalatest.FunSuite
 import org.scalatest.Matchers._
+import software.altitude.core.Util
 
 class FolderModelTests extends FunSuite {
 

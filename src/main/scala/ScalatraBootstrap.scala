@@ -1,10 +1,10 @@
 import javax.servlet.ServletContext
 
-import altitude.controllers._
-import altitude.controllers.api.admin.{MetadataController => AdminMetadataController}
-import altitude.controllers.api.{MetadataController, StatsController, TrashController}
-import altitude.controllers.web.{AssetController, StaticAssetController}
-import altitude.{Environment, SingleApplication}
+import software.altitude.core.controllers._
+import software.altitude.core.controllers.api.admin.{MetadataController => AdminMetadataController}
+import software.altitude.core.controllers.api.{MetadataController, StatsController, TrashController}
+import software.altitude.core.controllers.web.{AssetController, StaticAssetController}
+import software.altitude.core.{Environment, SingleApplication}
 import org.scalatra._
 import org.slf4j.LoggerFactory
 
@@ -20,7 +20,7 @@ class ScalatraBootstrap extends LifeCycle with SingleApplication {
 
     context.mount(new StaticAssetController, "/static/*")
 
-    context.mount(new altitude.controllers.api.AssetController, "/api/v1/assets/*")
+    context.mount(new software.altitude.core.controllers.api.AssetController, "/api/v1/assets/*")
     context.mount(new api.QueryController, "/api/v1/query/*")
     context.mount(new api.FolderController, "/api/v1/folders/*")
     context.mount(new TrashController, "/api/v1/trash/*")

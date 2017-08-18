@@ -2,8 +2,8 @@ package integration
 
 import java.io.File
 
-import altitude.DuplicateException
-import altitude.models.{Asset, Preview}
+import software.altitude.core.DuplicateException
+import software.altitude.core.models.{Asset, Preview}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 

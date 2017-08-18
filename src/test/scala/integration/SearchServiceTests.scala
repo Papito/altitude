@@ -1,7 +1,7 @@
 package integration
 
-import altitude.models._
-import altitude.util.QueryResult
+import software.altitude.core.models._
+import software.altitude.core.util.QueryResult
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 

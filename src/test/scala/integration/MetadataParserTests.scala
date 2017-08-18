@@ -2,7 +2,7 @@ package integration
 
 import java.io.File
 
-import altitude.models.Metadata
+import software.altitude.core.models.Metadata
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 

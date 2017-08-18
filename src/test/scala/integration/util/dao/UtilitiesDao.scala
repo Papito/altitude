@@ -1,6 +1,6 @@
 package integration.util.dao
 
-import altitude.transactions.TransactionId
+import software.altitude.core.transactions.TransactionId
 
 trait UtilitiesDao {
   def migrateDatabase(): Unit

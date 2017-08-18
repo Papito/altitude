@@ -1,7 +1,7 @@
 package unit
 
-import altitude.models.BaseModel
-import altitude.{Const => C}
+import software.altitude.core.models.BaseModel
+import software.altitude.core.{Const => C}
 import org.scalatest._
 import play.api.libs.json._
 

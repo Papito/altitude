@@ -1,6 +1,6 @@
 package integration
 
-import altitude.{Const => C}
+import software.altitude.core.{Const => C}
 import org.scalatest.DoNotDiscover
 
 @DoNotDiscover class ImportProfileTests(val config: Map[String, String]) extends IntegrationTestCore {

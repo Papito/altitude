@@ -2,10 +2,10 @@ package integration
 
 import java.io.File
 
-import altitude.Const.FileStoreType
-import altitude.models._
-import altitude.transactions.TransactionId
-import altitude.{Const => C, _}
+import software.altitude.core.Const.FileStoreType
+import software.altitude.core.models._
+import software.altitude.core.transactions.TransactionId
+import software.altitude.core.{Const => C, _}
 import com.google.inject.{AbstractModule, Guice}
 import integration.util.dao
 import integration.util.dao.UtilitiesDao
