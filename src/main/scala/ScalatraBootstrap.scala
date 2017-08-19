@@ -20,7 +20,7 @@ class ScalatraBootstrap extends LifeCycle with SingleApplication {
 
     context.mount(new StaticAssetController, "/static/*")
 
-    context.mount(new software.altitude.core.controllers.api.AssetController, "/api/v1/assets/*")
+    context.mount(new AssetController, "/api/v1/assets/*")
     context.mount(new api.QueryController, "/api/v1/query/*")
     context.mount(new api.FolderController, "/api/v1/folders/*")
     context.mount(new TrashController, "/api/v1/trash/*")
