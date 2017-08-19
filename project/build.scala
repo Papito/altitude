@@ -32,7 +32,6 @@ object AltitudeBuild extends Build {
     libraryDependencies ++= Seq(
       "org.scalatra"                %% "scalatra"              % ScalatraVersion,
       "org.scalatra"                %% "scalatra-atmosphere"   % ScalatraVersion,
-      "com.mitchellbosecke"          % "pebble"                % "2.3.0",
       "org.scalatra"                %% "scalatra-scalatest"    % ScalatraVersion % "test",
       "org.json4s"                  %% "json4s-jackson"        % json4sversion,
       "org.json4s"                  %% "json4s-mongo"          % json4sversion,
@@ -58,25 +57,8 @@ object AltitudeBuild extends Build {
      .map(_.exclude("org.apache.cxf", "cxf-core"))
      .map(_.exclude("org.apache.cxf", "cxf-cxf-rt-transports-http"))
   )
-  val scalateSettings =
-    ScalatePlugin.scalateSettings ++ Seq(
-      scalateTemplateConfig in Compile <<= (sourceDirectory in Compile) { base =>
-        Seq(
-          TemplateConfig(
-            base / "webapp" / "WEB-INF" / "templates",
-            Seq.empty, /* default imports should be added here */
-            Seq(
-              Binding("context", "_root_.org.scalatra.scalate.ScalatraRenderContext", importMembers = true, isImplicit = true)
-            ), /* add extra bindings here */
-            Some("templates")
-          )
-        )
-      }
-    )
-
   assemblyMergeStrategy in assembly := {
     case x if x.startsWith("META-INF") => MergeStrategy.discard
-    case x if x.endsWith(".html") => MergeStrategy.discard
     case x =>
       val oldStrategy = (assemblyMergeStrategy in assembly).value
       oldStrategy(x)
