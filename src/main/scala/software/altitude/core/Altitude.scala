@@ -17,27 +17,11 @@ import net.codingwell.scalaguice.ScalaModule
 import org.apache.commons.io.{FilenameUtils, FileUtils}
 import org.slf4j.LoggerFactory
 
-class Altitude(configOverride: Map[String, Any] = Map()) {
+class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp  {
   private final val log = LoggerFactory.getLogger(getClass)
+  log.info(s"Initializing Altitude Server application instance with ID $id")
+
   final val app: Altitude = this
-
-  // ID for this application - which we may have multiple of in the same environment
-  final val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
-  log.info(s"Initializing Altitude application instance with ID $id")
-
-  // this is the environment we are running in
-  final val environment = Environment.ENV match {
-    case Environment.DEV => "development"
-    case Environment.PROD => "production"
-    case Environment.TEST => "test"
-  }
-  log.info(s"Environment is: $environment")
-
-  final val config = new Configuration(
-    configOverride = configOverride)
-
-  final val dataSourceType = config.datasourceType
-  log.info(s"Datasource type: $dataSourceType")
 
   // TEMPORARY constants for user and repo IDS
   val workPath = System.getProperty("user.dir")
@@ -153,6 +137,5 @@ class Altitude(configOverride: Map[String, Any] = Map()) {
     txManager.freeResources()
   }
 
-
-  log.info(s"Altitude instance initialized")
+  log.info(s"Altitude Server instance initialized")
 }

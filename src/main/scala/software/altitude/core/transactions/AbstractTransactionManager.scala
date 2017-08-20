@@ -1,6 +1,6 @@
 package software.altitude.core.transactions
 
-import software.altitude.core.Altitude
+import software.altitude.core.{AltitudeCoreApp, Altitude}
 
 /**
  * The transaction manager, created for each specific type of database, and if supported,
@@ -22,8 +22,8 @@ import software.altitude.core.Altitude
  * </code>
  *
  * The scope is important: a write transaction that is nested within another write transaction
- * will NOT commit. Only the outer most withTransaction{} block can commit, and so the caller
- * that initiates the transaction first is the only one that can commit it.
+ * will NOT commit. Only the outer-most withTransaction{} block will commit, and so the caller
+ * that initiates the transaction first is the only one that can end it.
  *
  * <code>
  * withTransaction[T] {
@@ -33,7 +33,7 @@ import software.altitude.core.Altitude
  * </code>
  */
 abstract class AbstractTransactionManager {
-  val app: Altitude
+  val app: AltitudeCoreApp
 
   /** Transaction counters.
     * We use these for sanity checks during tests or for runtime stats.
