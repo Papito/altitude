@@ -2,11 +2,10 @@ package software.altitude.core.dao
 
 import java.util.regex.Pattern
 
-import software.altitude.core.models.BaseModel
+import play.api.libs.json.JsObject
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.{Query, QueryResult}
 import software.altitude.core.{Altitude, Const => C, Context}
-import play.api.libs.json.JsObject
 
 object BaseDao {
   // this is the valid ID pattern

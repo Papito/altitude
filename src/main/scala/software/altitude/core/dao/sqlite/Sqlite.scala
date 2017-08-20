@@ -1,9 +1,9 @@
 package software.altitude.core.dao.sqlite
 
-import software.altitude.core.models.BaseModel
-import software.altitude.core.{Const => C}
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import org.joda.time.{DateTime, DateTimeZone}
+import software.altitude.core.models.BaseModel
+import software.altitude.core.{Const => C}
 
 trait Sqlite {
   protected def DEFAULT_SQL_COLS_FOR_SELECT = s"""

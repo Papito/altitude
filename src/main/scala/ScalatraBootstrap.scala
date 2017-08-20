@@ -1,8 +1,8 @@
 import javax.servlet.ServletContext
 
-import software.altitude.core.{Environment, SingleApplication}
 import org.scalatra._
 import org.slf4j.LoggerFactory
+import software.altitude.core.{Environment, SingleApplication}
 
 class ScalatraBootstrap extends LifeCycle with SingleApplication {
   private final val log = LoggerFactory.getLogger(getClass)

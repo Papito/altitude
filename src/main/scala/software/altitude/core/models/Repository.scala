@@ -1,7 +1,7 @@
 package software.altitude.core.models
 
-import software.altitude.core.{Const => C}
 import play.api.libs.json._
+import software.altitude.core.{Const => C}
 
 import scala.collection.immutable.HashMap
 import scala.language.implicitConversions

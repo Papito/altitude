@@ -2,8 +2,8 @@ package software.altitude.core.transactions
 
 import java.sql.{Connection, SQLException}
 
-import software.altitude.core.{Const => C}
 import org.slf4j.LoggerFactory
+import software.altitude.core.{Const => C}
 
 /**
  * JDBC transaction object. It is important to note that most/all methods here should NOT THROW.

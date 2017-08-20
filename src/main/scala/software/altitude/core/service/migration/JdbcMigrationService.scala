@@ -1,7 +1,7 @@
 package software.altitude.core.service.migration
 
-import software.altitude.core.Altitude
 import org.slf4j.LoggerFactory
+import software.altitude.core.Altitude
 
 abstract class JdbcMigrationService(app: Altitude) extends MigrationService(app) {
   private final val log = LoggerFactory.getLogger(getClass)

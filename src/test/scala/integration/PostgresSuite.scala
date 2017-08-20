@@ -3,9 +3,9 @@ package integration
 import java.sql.DriverManager
 import java.util.Properties
 
-import software.altitude.core.{Const  => C, Altitude, Configuration, Environment}
 import org.scalatest.BeforeAndAfterAll
 import org.slf4j.LoggerFactory
+import software.altitude.core.{Altitude, Configuration, Const => C, Environment}
 
 object PostgresSuite {
   val app = new Altitude(Map("datasource" ->C.DatasourceType.POSTGRES))

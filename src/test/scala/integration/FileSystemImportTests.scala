@@ -2,10 +2,10 @@ package integration
 
 import java.io.File
 
-import software.altitude.core.DuplicateException
-import software.altitude.core.models.{Asset, Preview}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
+import software.altitude.core.DuplicateException
+import software.altitude.core.models.{Asset, Preview}
 
 @DoNotDiscover class FileSystemImportTests(val config: Map[String, Any]) extends IntegrationTestCore {
 

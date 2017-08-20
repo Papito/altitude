@@ -1,10 +1,10 @@
 package software.altitude.core.dao.jdbc
 
+import org.slf4j.LoggerFactory
 import software.altitude.core.dao.QueryParser
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.Query
 import software.altitude.core.{Const => C, Context}
-import org.slf4j.LoggerFactory
 
 /**
  * This is no substitute for a real ORM query generator, but more of a helper stitching

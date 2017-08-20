@@ -1,12 +1,12 @@
 package software.altitude.core.controllers.api
 
-import software.altitude.core.Validators.ApiRequestValidator
-import software.altitude.core.controllers.Util
-import software.altitude.core.models.{Metadata, MetadataField, Asset, Data}
-import software.altitude.core.{Const => C, NotFoundException}
 import org.scalatra.Ok
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.Json
+import software.altitude.core.Validators.ApiRequestValidator
+import software.altitude.core.controllers.Util
+import software.altitude.core.models.{Asset, Data}
+import software.altitude.core.{Const => C, NotFoundException}
 
 class AssetController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)

@@ -2,20 +2,20 @@ package software.altitude.core
 
 import java.sql.DriverManager
 
+import com.google.inject.{AbstractModule, Guice}
+import net.codingwell.scalaguice.InjectorExtensions._
+import net.codingwell.scalaguice.ScalaModule
+import org.apache.commons.io.FilenameUtils
+import org.slf4j.LoggerFactory
 import software.altitude.core.Const.FileStoreType
 import software.altitude.core.dao._
-import software.altitude.core.models.{User, Repository}
+import software.altitude.core.models.{Repository, User}
 import software.altitude.core.service._
 import software.altitude.core.service.filestore.{FileStoreService, FileSystemStoreService}
 import software.altitude.core.service.migration.{PostgresMigrationService, SqliteMigrationService}
 import software.altitude.core.service.sources.FileSystemSourceService
 import software.altitude.core.transactions._
 import software.altitude.core.{Const => C}
-import com.google.inject.{AbstractModule, Guice}
-import net.codingwell.scalaguice.InjectorExtensions._
-import net.codingwell.scalaguice.ScalaModule
-import org.apache.commons.io.{FilenameUtils, FileUtils}
-import org.slf4j.LoggerFactory
 
 class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp  {
   private final val log = LoggerFactory.getLogger(getClass)

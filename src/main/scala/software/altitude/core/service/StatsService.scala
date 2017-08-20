@@ -1,12 +1,12 @@
 package software.altitude.core.service
 
+import net.codingwell.scalaguice.InjectorExtensions._
+import org.slf4j.LoggerFactory
 import software.altitude.core.dao.StatDao
-import software.altitude.core.models.{Folder, Asset, Stat, Stats}
+import software.altitude.core.models.{Asset, Stat, Stats}
 import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
 import software.altitude.core.util.Query
 import software.altitude.core.{Altitude, Context}
-import net.codingwell.scalaguice.InjectorExtensions._
-import org.slf4j.LoggerFactory
 
 class StatsService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)

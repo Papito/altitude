@@ -2,9 +2,9 @@ package software.altitude.core.dao.postgres
 
 import java.sql.Timestamp
 
+import org.joda.time.DateTime
 import software.altitude.core.models.BaseModel
 import software.altitude.core.{Const => C}
-import org.joda.time.DateTime
 
 
 trait Postgres {

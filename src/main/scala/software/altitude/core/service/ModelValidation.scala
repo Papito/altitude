@@ -1,8 +1,8 @@
 package software.altitude.core.service
 
+import play.api.libs.json.JsObject
 import software.altitude.core.Cleaners.Cleaner
 import software.altitude.core.Validators.ModelDataValidator
-import play.api.libs.json.JsObject
 
 trait ModelValidation {
   // object cleaner

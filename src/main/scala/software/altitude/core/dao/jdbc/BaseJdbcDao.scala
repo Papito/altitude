@@ -2,18 +2,17 @@ package software.altitude.core.dao.jdbc
 
 import java.sql.Connection
 
-import software.altitude.core.dao.BaseDao
-import software.altitude.core.models.BaseModel
-import software.altitude.core.transactions.{JdbcTransactionManager, TransactionId}
-import software.altitude.core.util.{Query, QueryResult}
-import software.altitude.core.{Const => C, ConstraintException, Context}
-import software.altitude.core.Util
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.apache.commons.dbutils.QueryRunner
 import org.apache.commons.dbutils.handlers.{MapListHandler, ScalarHandler}
 import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
+import software.altitude.core.dao.BaseDao
+import software.altitude.core.models.BaseModel
+import software.altitude.core.transactions.{JdbcTransactionManager, TransactionId}
+import software.altitude.core.util.{Query, QueryResult}
+import software.altitude.core.{Const => C, ConstraintException, Context, Util}
 
 import scala.collection.JavaConversions._
 

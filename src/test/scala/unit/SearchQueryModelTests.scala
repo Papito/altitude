@@ -1,8 +1,8 @@
 package unit
 
+import org.scalatest.FunSuite
 import software.altitude.core.models.{BaseModel, User}
 import software.altitude.core.util.Query
-import org.scalatest.FunSuite
 
 class SearchQueryModelTests extends FunSuite {
 

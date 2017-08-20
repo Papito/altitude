@@ -1,7 +1,8 @@
 package software.altitude.core
 
-import scala.collection.immutable.HashMap
 import software.altitude.core.{Const => C}
+
+import scala.collection.immutable.HashMap
 
 class Configuration(configOverride: Map[String, Any] = new HashMap()) {
   def getString(key: String) = data.getOrElse(key, "").asInstanceOf[String]

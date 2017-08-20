@@ -1,16 +1,14 @@
 package software.altitude.core.service
 
-import software.altitude.core.Validators.ModelDataValidator
-import software.altitude.core.dao.{AssetDao, MetadataFieldDao}
-import software.altitude.core.models.{Asset, FieldType, Metadata, MetadataField}
-import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
-import software.altitude.core.util.Query
-import software.altitude.core.{Const => C, _}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
-import software.altitude.core.Const
-import software.altitude.core.models.MetadataField
+import software.altitude.core.Validators.ModelDataValidator
+import software.altitude.core.dao.{AssetDao, MetadataFieldDao}
+import software.altitude.core.models.{FieldType, Metadata, MetadataField}
+import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
+import software.altitude.core.util.Query
+import software.altitude.core.{Const => C, _}
 
 import scala.util.control.Breaks._
 
@@ -18,7 +16,7 @@ object MetadataService {
   class MetadataFieldValidator
     extends ModelDataValidator(
       required = Some(
-        List(C.MetadataField.NAME, Const.MetadataField.FIELD_TYPE)))
+        List(C.MetadataField.NAME, C.MetadataField.FIELD_TYPE)))
 }
 
 class MetadataService(val app: Altitude) extends ModelValidation {

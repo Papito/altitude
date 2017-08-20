@@ -1,10 +1,10 @@
 package software.altitude.core.dao.sqlite
 
+import org.slf4j.LoggerFactory
 import software.altitude.core.models.Asset
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.QueryResult
 import software.altitude.core.{Altitude, Const => C, Context}
-import org.slf4j.LoggerFactory
 
 class SearchDao(app: Altitude) extends software.altitude.core.dao.jdbc.SearchDao(app) with Sqlite {
   private final val log = LoggerFactory.getLogger(getClass)

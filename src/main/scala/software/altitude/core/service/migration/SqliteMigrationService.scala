@@ -1,9 +1,9 @@
 package software.altitude.core.service.migration
 
+import org.slf4j.LoggerFactory
 import software.altitude.core.dao.sqlite
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Altitude, Context}
-import org.slf4j.LoggerFactory
 
 class SqliteMigrationService(app: Altitude) extends JdbcMigrationService(app) {
   private final val log = LoggerFactory.getLogger(getClass)

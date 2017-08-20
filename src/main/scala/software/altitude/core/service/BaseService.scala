@@ -1,13 +1,13 @@
 package software.altitude.core.service
 
+import net.codingwell.scalaguice.InjectorExtensions._
+import org.slf4j.LoggerFactory
+import play.api.libs.json.JsObject
 import software.altitude.core.dao.BaseDao
 import software.altitude.core.models.BaseModel
 import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
 import software.altitude.core.util.{Query, QueryResult}
-import software.altitude.core.{NotFoundException, DuplicateException, Altitude, Context}
-import net.codingwell.scalaguice.InjectorExtensions._
-import org.slf4j.LoggerFactory
-import play.api.libs.json.JsObject
+import software.altitude.core.{Altitude, Context, DuplicateException, NotFoundException}
 
 import scala.language.implicitConversions
 

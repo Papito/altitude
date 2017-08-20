@@ -1,11 +1,11 @@
 package software.altitude.core.service
 
+import net.codingwell.scalaguice.InjectorExtensions._
 import software.altitude.core.dao.AssetDao
 import software.altitude.core.models.Asset
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.{Query, QueryResult}
 import software.altitude.core.{Altitude, Context}
-import net.codingwell.scalaguice.InjectorExtensions._
 
 /**
  * This is a "dumb" service - meaning it delegates everything to to the base service implementation

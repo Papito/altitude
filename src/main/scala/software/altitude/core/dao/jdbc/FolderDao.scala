@@ -1,13 +1,9 @@
 package software.altitude.core.dao.jdbc
 
-import software.altitude.core.models.Folder
-import software.altitude.core.transactions.TransactionId
-import software.altitude.core.{Altitude, Const => C, Context}
 import play.api.libs.json.JsObject
 import software.altitude.core.models.Folder
 import software.altitude.core.transactions.TransactionId
-import software.altitude.core.{Const, Context}
-import software.altitude.core.models.Folder
+import software.altitude.core.{Altitude, Const => C, Context}
 
 abstract class FolderDao(val app: Altitude) extends BaseJdbcDao("folder") with software.altitude.core.dao.FolderDao {
 
@@ -27,7 +23,7 @@ abstract class FolderDao(val app: Altitude) extends BaseJdbcDao("folder") with s
     val sql = s"""
         INSERT INTO $tableName (
              $CORE_SQL_COLS_FOR_INSERT,
-             ${Const.Folder.NAME}, ${Const.Folder.NAME_LC}, ${Const.Folder.PARENT_ID})
+             ${C.Folder.NAME}, ${C.Folder.NAME_LC}, ${C.Folder.PARENT_ID})
             VALUES ($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?)
     """
 

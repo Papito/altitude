@@ -2,11 +2,11 @@ package software.altitude.core.service.sources
 
 import java.io.File
 
-import software.altitude.core.models._
-import software.altitude.core.{Altitude, Const => C}
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
 import org.slf4j.LoggerFactory
+import software.altitude.core.models._
+import software.altitude.core.{Altitude, Const => C}
 
 class FileSystemSourceService(app: Altitude) extends AssetSourceService {
   private final val log = LoggerFactory.getLogger(getClass)

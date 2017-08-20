@@ -4,8 +4,6 @@ import java.io.{File, PrintWriter, StringWriter}
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
-import software.altitude.core.models.{Asset, ImportAsset}
-import software.altitude.core.{Const => C, AllDone, MetadataExtractorException, DuplicateException, Context}
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.{DefaultFormats, Formats, JValue, _}
 import org.scalatra.atmosphere._
@@ -14,6 +12,8 @@ import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintE
 import org.scalatra.{SessionSupport, _}
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
+import software.altitude.core.models.{Asset, ImportAsset}
+import software.altitude.core.{AllDone, Const => C, Context, DuplicateException, MetadataExtractorException}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}

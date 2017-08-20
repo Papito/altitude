@@ -3,9 +3,9 @@ package software.altitude.core.transactions
 import java.sql.{Connection, DriverManager}
 import java.util.concurrent.locks.ReentrantLock
 
-import software.altitude.core.{AltitudeCoreApp, Altitude, Configuration}
 import org.slf4j.LoggerFactory
 import org.sqlite.SQLiteConfig
+import software.altitude.core.{AltitudeCoreApp, Configuration}
 
 object SqliteTransactionManager {
   private val config = new Configuration()

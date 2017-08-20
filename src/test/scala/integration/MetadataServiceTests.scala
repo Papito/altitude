@@ -1,9 +1,9 @@
 package integration
 
-import software.altitude.core.{DuplicateException, NotFoundException, ValidationException}
-import software.altitude.core.models._
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
+import software.altitude.core.models._
+import software.altitude.core.{DuplicateException, NotFoundException, ValidationException}
 
 
 @DoNotDiscover class MetadataServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {

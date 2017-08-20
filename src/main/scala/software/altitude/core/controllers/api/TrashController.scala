@@ -1,16 +1,15 @@
 package software.altitude.core.controllers.api
 
+import org.scalatra.Ok
+import org.slf4j.LoggerFactory
+import play.api.libs.json.Json
+import software.altitude.core.Const.Api
+import software.altitude.core.Const.Api.{Folder, Search, Trash}
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.Util
 import software.altitude.core.models.Asset
 import software.altitude.core.util.Query
 import software.altitude.core.{Const => C}
-import org.scalatra.Ok
-import org.slf4j.LoggerFactory
-import play.api.libs.json.Json
-import software.altitude.core.Const
-import software.altitude.core.Const.Api
-import software.altitude.core.Const.Api.{Search, Trash, Asset, Folder}
 
 class TrashController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -38,7 +37,7 @@ class TrashController extends BaseApiController {
   }
 
   post(s"/:id/move/:${C.Asset.FOLDER_ID}") {
-    val id = params.get(Const.Api.ID).get
+    val id = params.get(C.Api.ID).get
     val folderId = params.get(Api.Asset.FOLDER_ID).get
     log.info(s"Moving recycled asset $id to $folderId")
 

@@ -1,7 +1,5 @@
 package software.altitude.core
 
-import software.altitude.core.models.{Repository, User}
-
 
 object Const {
 

@@ -2,10 +2,10 @@ package software.altitude.core.controllers
 
 import java.io.{PrintWriter, StringWriter}
 
-import software.altitude.core.models.{Repository, User}
-import software.altitude.core.{Const => C, Context, SingleApplication}
 import org.scalatra.InternalServerError
 import org.slf4j.{LoggerFactory, MDC}
+import software.altitude.core.models.{Repository, User}
+import software.altitude.core.{Const => C, Context, SingleApplication}
 
 import scala.compat.Platform
 

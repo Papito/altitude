@@ -1,7 +1,7 @@
 package software.altitude.core.service.filestore
 
 import software.altitude.core.Context
-import software.altitude.core.models.{Preview, Data, Asset, Folder}
+import software.altitude.core.models.{Asset, Data, Folder, Preview}
 import software.altitude.core.transactions.TransactionId
 
 trait FileStoreService {

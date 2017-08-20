@@ -1,7 +1,6 @@
 package software.altitude.core
 
 import software.altitude.core.models.{Repository, User}
-import software.altitude.core.models.User
 
 /**
  * The Context is the object that is implicitly passed from the service layer

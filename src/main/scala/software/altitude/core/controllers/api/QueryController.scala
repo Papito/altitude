@@ -1,12 +1,12 @@
 package software.altitude.core.controllers.api
 
+import org.scalatra.{ActionResult, Ok}
+import org.slf4j.LoggerFactory
+import play.api.libs.json.Json
 import software.altitude.core.controllers.Util
 import software.altitude.core.models.Asset
 import software.altitude.core.util.Query
 import software.altitude.core.{Const => C}
-import org.scalatra.{ActionResult, Ok}
-import org.slf4j.LoggerFactory
-import play.api.libs.json.Json
 
 class QueryController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)

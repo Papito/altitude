@@ -2,19 +2,18 @@ package integration
 
 import java.io.File
 
-import software.altitude.core.Const.FileStoreType
-import software.altitude.core.models._
-import software.altitude.core.transactions.TransactionId
-import software.altitude.core.{Const => C, _}
 import com.google.inject.{AbstractModule, Guice}
 import integration.util.dao
 import integration.util.dao.UtilitiesDao
 import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
-import org.apache.commons.io.{FilenameUtils, FileUtils}
-import org.scalatest.Matchers._
-import org.scalatest.{Tag, BeforeAndAfter, BeforeAndAfterEach, FunSuite}
+import org.apache.commons.io.{FileUtils, FilenameUtils}
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach, FunSuite, Tag}
 import org.slf4j.{LoggerFactory, MDC}
+import software.altitude.core.Const.FileStoreType
+import software.altitude.core.models._
+import software.altitude.core.transactions.TransactionId
+import software.altitude.core.{Const => C, _}
 
 abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with BeforeAndAfterEach {
   val log =  LoggerFactory.getLogger(getClass)

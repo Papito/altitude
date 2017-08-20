@@ -1,7 +1,7 @@
 package software.altitude.core
 
-import software.altitude.core.{Const => C}
 import play.api.libs.json.JsObject
+import software.altitude.core.{Const => C}
 
 object Validators {
 

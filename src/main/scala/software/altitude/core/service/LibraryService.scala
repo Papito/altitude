@@ -5,20 +5,16 @@ import java.awt.{AlphaComposite, Graphics2D}
 import java.io._
 import javax.imageio.ImageIO
 
-import software.altitude.core.models._
-import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
-import software.altitude.core.util.{Query, QueryResult}
-import software.altitude.core.{Const => C, _}
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.imgscalr.Scalr
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, Json}
 import software.altitude.core.Const.Api
 import software.altitude.core.Const.Api.Folder
-import software.altitude.core.util.{QueryResult, Query}
-import software.altitude.core.{Const, Context, Altitude}
 import software.altitude.core.models._
-import software.altitude.core.transactions.{TransactionId, AbstractTransactionManager}
+import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
+import software.altitude.core.util.{Query, QueryResult}
+import software.altitude.core.{Altitude, Const => C, Context, _}
 
 class LibraryService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -33,7 +29,7 @@ class LibraryService(app: Altitude) {
       throw new IllegalOperationException("Cannot have assets in root folder")
     }
 
-    val qForExisting = Query(Map(Const.Asset.MD5 -> assetIn.md5))
+    val qForExisting = Query(Map(C.Asset.MD5 -> assetIn.md5))
 
     txManager.withTransaction[JsObject] {
       val existing = app.service.asset.query(qForExisting)
@@ -85,7 +81,7 @@ class LibraryService(app: Altitude) {
 
       val path = app.service.fileStore.getAssetPath(assetToAdd)
 
-      storedAsset ++ Json.obj(Const.Asset.PATH -> path)
+      storedAsset ++ Json.obj(C.Asset.PATH -> path)
     }
   }
 
@@ -97,7 +93,7 @@ class LibraryService(app: Altitude) {
     txManager.asReadOnly[JsObject] {
       val asset: Asset = app.service.asset.getById(id)
       val path = app.service.fileStore.getAssetPath(asset)
-      asset.toJson ++ Json.obj(Const.Asset.PATH -> path)
+      asset.toJson ++ Json.obj(C.Asset.PATH -> path)
     }
   }
 
@@ -130,7 +126,7 @@ class LibraryService(app: Altitude) {
           // repackage the query to include all folders (they will have to be re-parsed again)
           Query(
             params = query.params
-              ++ Map(Api.Folder.QUERY_ARG_NAME -> allFolderIds.mkString(Const.Api.MULTI_VALUE_DELIM)),
+              ++ Map(Api.Folder.QUERY_ARG_NAME -> allFolderIds.mkString(C.Api.MULTI_VALUE_DELIM)),
             page = query.page, rpp = query.rpp)
       }
 
@@ -294,7 +290,7 @@ class LibraryService(app: Altitude) {
         val results: QueryResult = app.service.library.query(folderAssetsQuery)
 
         results.records.foreach { record =>
-          val assetId = (record \ Const.Asset.ID).as[String]
+          val assetId = (record \ C.Asset.ID).as[String]
           this.recycleAsset(assetId)
         }
         app.service.folder.deleteById(folderId)}
@@ -321,12 +317,12 @@ class LibraryService(app: Altitude) {
 
       // point asset to the new folder
       val updatedAsset: Asset = asset ++ Json.obj(
-        Const.Asset.FOLDER_ID -> destFolderId,
-        Const.Asset.IS_RECYCLED -> false)
+        C.Asset.FOLDER_ID -> destFolderId,
+        C.Asset.IS_RECYCLED -> false)
 
       app.service.asset.updateById(
         asset.id.get, updatedAsset,
-        fields = List(Const.Asset.FOLDER_ID))
+        fields = List(C.Asset.FOLDER_ID))
 
       app.service.fileStore.moveAsset(asset, updatedAsset)
     }
@@ -359,12 +355,12 @@ class LibraryService(app: Altitude) {
       }
 
       val updatedAsset: Asset = asset ++ Json.obj(
-          Const.Asset.FILENAME -> newFilename,
-          Const.Asset.PATH -> app.service.fileStore.getPathWithNewFilename(asset, newFilename))
+          C.Asset.FILENAME -> newFilename,
+          C.Asset.PATH -> app.service.fileStore.getPathWithNewFilename(asset, newFilename))
 
       app.service.asset.updateById(
         asset.id.get, updatedAsset,
-        fields = List(Const.Asset.FILENAME))
+        fields = List(C.Asset.FILENAME))
 
       app.service.fileStore.moveAsset(asset, updatedAsset)
 

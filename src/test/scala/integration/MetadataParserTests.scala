@@ -2,9 +2,9 @@ package integration
 
 import java.io.File
 
-import software.altitude.core.models.Metadata
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
+import software.altitude.core.models.Metadata
 
 @DoNotDiscover class MetadataParserTests(val config: Map[String, Any]) extends IntegrationTestCore {
 

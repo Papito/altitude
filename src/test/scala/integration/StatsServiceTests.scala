@@ -1,9 +1,9 @@
 package integration
 
-import software.altitude.core.models.{Asset, Folder, Stats}
-import software.altitude.core.util.Query
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
+import software.altitude.core.models.{Asset, Folder, Stats}
+import software.altitude.core.util.Query
 
 @DoNotDiscover class StatsServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 

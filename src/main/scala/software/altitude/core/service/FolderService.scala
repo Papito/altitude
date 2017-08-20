@@ -1,14 +1,14 @@
 package software.altitude.core.service
 
+import net.codingwell.scalaguice.InjectorExtensions._
+import org.slf4j.LoggerFactory
+import play.api.libs.json._
 import software.altitude.core.Validators.ModelDataValidator
 import software.altitude.core.dao.FolderDao
 import software.altitude.core.models.Folder
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.Query
 import software.altitude.core.{Const => C, _}
-import net.codingwell.scalaguice.InjectorExtensions._
-import org.slf4j.LoggerFactory
-import play.api.libs.json._
 
 object FolderService {
   class FolderValidator

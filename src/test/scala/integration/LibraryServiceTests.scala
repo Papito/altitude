@@ -1,10 +1,10 @@
 package integration
 
+import org.scalatest.DoNotDiscover
+import org.scalatest.Matchers._
 import software.altitude.core.models.{Asset, Folder}
 import software.altitude.core.util.Query
 import software.altitude.core.{Const => C, IllegalOperationException, NotFoundException}
-import org.scalatest.DoNotDiscover
-import org.scalatest.Matchers._
 
 @DoNotDiscover class LibraryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 

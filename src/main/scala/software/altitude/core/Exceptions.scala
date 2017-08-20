@@ -1,7 +1,7 @@
 package software.altitude.core
 
-import software.altitude.core.models.Asset
 import play.api.libs.json.JsObject
+import software.altitude.core.models.Asset
 
 import scala.collection.mutable
 

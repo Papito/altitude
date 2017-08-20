@@ -1,12 +1,12 @@
 package software.altitude.core.dao.jdbc
 
+import org.apache.commons.dbutils.QueryRunner
+import org.slf4j.LoggerFactory
+import play.api.libs.json._
 import software.altitude.core.models.{Asset, AssetType, Metadata}
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.{Query, QueryResult}
 import software.altitude.core.{Altitude, Const => C, Context}
-import org.apache.commons.dbutils.QueryRunner
-import org.slf4j.LoggerFactory
-import play.api.libs.json._
 
 abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with software.altitude.core.dao.AssetDao {
   private final val log = LoggerFactory.getLogger(getClass)

@@ -2,14 +2,14 @@ package software.altitude.core.service
 
 import java.io.InputStream
 
-import software.altitude.core.models._
-import software.altitude.core.transactions.TransactionId
-import software.altitude.core.{MetadataExtractorException, FormatException, Altitude, Context}
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsValue, Json}
+import software.altitude.core.models._
+import software.altitude.core.transactions.TransactionId
+import software.altitude.core.{Altitude, Context, FormatException, MetadataExtractorException}
 
 class AssetImportService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)

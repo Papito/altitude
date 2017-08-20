@@ -1,12 +1,12 @@
 package software.altitude.core.service
 
+import net.codingwell.scalaguice.InjectorExtensions._
+import org.slf4j.LoggerFactory
 import software.altitude.core.dao.SearchDao
 import software.altitude.core.models.{Asset, MetadataField}
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.QueryResult
 import software.altitude.core.{Altitude, Context}
-import net.codingwell.scalaguice.InjectorExtensions._
-import org.slf4j.LoggerFactory
 
 class SearchService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)

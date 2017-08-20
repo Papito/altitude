@@ -1,10 +1,9 @@
 package software.altitude.core.models
 
-import software.altitude.core.{Const => C}
-import software.altitude.core.Util
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json._
+import software.altitude.core.{Const => C, Util}
 
 import scala.language.implicitConversions
 

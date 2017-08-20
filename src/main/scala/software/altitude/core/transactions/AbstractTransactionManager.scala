@@ -1,6 +1,6 @@
 package software.altitude.core.transactions
 
-import software.altitude.core.{AltitudeCoreApp, Altitude}
+import software.altitude.core.AltitudeCoreApp
 
 /**
  * The transaction manager, created for each specific type of database, and if supported,

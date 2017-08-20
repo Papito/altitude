@@ -1,9 +1,9 @@
 package integration
 
-import software.altitude.core.models._
-import software.altitude.core.util.QueryResult
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
+import software.altitude.core.models._
+import software.altitude.core.util.QueryResult
 
 @DoNotDiscover class SearchServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 

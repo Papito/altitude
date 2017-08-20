@@ -1,9 +1,9 @@
 package software.altitude.core.dao.jdbc
 
+import play.api.libs.json.JsObject
 import software.altitude.core.models.{FieldType, MetadataField}
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Altitude, Const => C, Context}
-import play.api.libs.json.JsObject
 
 abstract class MetadataFieldDao (val app: Altitude)
   extends BaseJdbcDao("metadata_field") with software.altitude.core.dao.MetadataFieldDao {

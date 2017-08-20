@@ -1,11 +1,11 @@
 package software.altitude.core.service.migration
 
+import net.codingwell.scalaguice.InjectorExtensions._
+import org.slf4j.LoggerFactory
 import software.altitude.core.dao.MigrationDao
 import software.altitude.core.models.Stats
 import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
 import software.altitude.core.{Altitude, Const => C, Context}
-import net.codingwell.scalaguice.InjectorExtensions._
-import org.slf4j.LoggerFactory
 
 import scala.io.Source
 
