@@ -19,7 +19,7 @@ import software.altitude.core.{Const => C}
 
 class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp  {
   private final val log = LoggerFactory.getLogger(getClass)
-  log.info(s"Initializing Altitude Server application instance with ID $id")
+  log.info(s"Initializing Altitude Server application instance with ID [$id]")
 
   final val app: Altitude = this
 
@@ -128,7 +128,7 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
           bind[SearchDao].toInstance(new sqlite.SearchDao(app))
 
         case _ =>
-          throw new IllegalArgumentException(s"Do not know of datasource $dataSourceType")
+          throw new IllegalArgumentException(s"Do not know of datasource [$dataSourceType]")
       }
     }
   }
