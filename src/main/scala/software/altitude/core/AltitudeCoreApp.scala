@@ -2,7 +2,7 @@ package software.altitude.core
 
 import org.slf4j.LoggerFactory
 
-class AltitudeCoreApp(configOverride: Map[String, Any] = Map()) {
+trait AltitudeCoreApp {
   private final val log = LoggerFactory.getLogger(getClass)
 
   // ID for this application - which we may have multiple of in the same environment
@@ -16,6 +16,7 @@ class AltitudeCoreApp(configOverride: Map[String, Any] = Map()) {
   }
   log.info(s"Environment is: $environment")
 
+  private val configOverride: Map[String, Any] = Map()
   final val config = new Configuration(
     configOverride = configOverride)
 
