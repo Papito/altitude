@@ -17,10 +17,8 @@ trait AltitudeCoreApp {
   log.info(s"Environment is: $environment")
 
   private val configOverride: Map[String, Any] = Map()
-  final val config = new Configuration(
-    configOverride = configOverride)
+  final val config = new Configuration(configOverride = configOverride)
 
   final val dataSourceType = config.datasourceType
   log.info(s"Datasource type: $dataSourceType")
-
 }
