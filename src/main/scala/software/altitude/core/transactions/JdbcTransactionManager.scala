@@ -97,7 +97,7 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
       // actual function call
       val res: A = f
 
-      // level down - if the transaction is not nested and after this - it will be committed
+      // level down - if the transaction is not nested after this - it will be committed
       tx.down()
 
       // commit exiting transactions
@@ -120,9 +120,9 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
       // clean up, if we are done with this transaction
       if (!tx.hasParents) {
         log.debug(s"Closing: ${tx.id}", C.LogTag.DB)
+        txRegistry.remove(txId.id)
         closeTransaction(tx)
         transactions.CLOSED += 1
-        txRegistry.remove(txId.id)
       }
       unlock(tx)
     }
@@ -148,9 +148,9 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
       if (!tx.hasParents) {
         log.debug(s"End: ${tx.id}", C.LogTag.DB)
         log.debug(s"Closing: ${tx.id}", C.LogTag.DB)
+        txRegistry.remove(txId.id)
         closeTransaction(tx)
         transactions.CLOSED += 1
-        txRegistry.remove(txId.id)
       }
     }
   }
