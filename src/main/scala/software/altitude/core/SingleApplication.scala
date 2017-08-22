@@ -14,7 +14,7 @@ import software.altitude.core.controllers.ImportController
 object SingleApplication {
   private final val log = LoggerFactory.getLogger(getClass)
   log.info("Initializing single application... ")
-  private val app: Altitude = new Altitude
+  val app: Altitude = new Altitude
 
   def mountEndpoints(context: ServletContext): Unit = {
     context.mount(new ImportController, "/import/*")

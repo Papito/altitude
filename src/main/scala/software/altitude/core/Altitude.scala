@@ -83,13 +83,6 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
     }
   }
 
-  if (service.migration.migrationRequired) {
-    log.warn("Migration is required!")
-    if (Environment.ENV != Environment.TEST) {
-      service.migration.migrate()
-    }
-  }
-
   /**
    * Inject dependencies
    */
@@ -135,6 +128,15 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
 
   def freeResources(): Unit = {
     txManager.freeResources()
+  }
+
+  override def runMigrations(): Unit = {
+    if (service.migration.migrationRequired) {
+      log.warn("Migration is required!")
+      if (Environment.ENV != Environment.TEST) {
+        service.migration.migrate()
+      }
+    }
   }
 
   log.info(s"Altitude Server instance initialized")

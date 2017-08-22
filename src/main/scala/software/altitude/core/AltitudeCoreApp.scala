@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory
 trait AltitudeCoreApp {
   private final val log = LoggerFactory.getLogger(getClass)
 
+  def runMigrations(): Unit
+
   // ID for this application - which we may have multiple of in the same environment
   final val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
 

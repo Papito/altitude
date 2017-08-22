@@ -9,7 +9,7 @@ import software.altitude.core.{Altitude, Context}
 abstract class MigrationDao(val app: Altitude) extends BaseJdbcDao("repository") with software.altitude.core.dao.MigrationDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  protected val SYSTEM_TABLE = "system"
+  val SYSTEM_TABLE = "system"
 
   /**
    * Get current version of the schema
