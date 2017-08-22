@@ -9,12 +9,11 @@ import software.altitude.core.{Altitude, Const => C, Context}
 
 import scala.io.Source
 
-abstract class MigrationService(app: Altitude) extends CoreMigrationService(app) {
+trait ServerMigrations {
   private final val log = LoggerFactory.getLogger(getClass)
+  val app: Altitude
 
-  override protected val ROOT_MIGRATIONS_PATH = "/migrations/"
-
-  override def migrateVersion(ctx: Context, version: Int)(implicit txId: TransactionId = new TransactionId): Unit = {
+  def migrateVersion(ctx: Context, version: Int)(implicit txId: TransactionId = new TransactionId): Unit = {
       version match {
         case 1 => v1(ctx)
       }

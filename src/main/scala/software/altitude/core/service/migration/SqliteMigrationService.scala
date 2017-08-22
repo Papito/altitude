@@ -5,7 +5,7 @@ import software.altitude.core.dao.sqlite
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Altitude, Context}
 
-class SqliteMigrationService(app: Altitude) extends JdbcMigrationService(app) {
+class SqliteMigrationService(val app: Altitude) extends JdbcMigrationService(app) with ServerMigrations {
   private final val log = LoggerFactory.getLogger(getClass)
 
   val MIGRATIONS_DIR = "sqlite/"

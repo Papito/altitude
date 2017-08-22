@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
 import software.altitude.core.dao.postgres
 
-class PostgresMigrationService(app: Altitude) extends JdbcMigrationService(app) {
+class PostgresMigrationService(val app: Altitude) extends JdbcMigrationService(app) with ServerMigrations {
   private final val log = LoggerFactory.getLogger(getClass)
 
   val MIGRATIONS_DIR = "postgres/"
