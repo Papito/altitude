@@ -5,7 +5,7 @@ import javax.servlet.ServletContext
 import org.scalatra.servlet.ServletApiImplicits._
 import org.slf4j.LoggerFactory
 import software.altitude.core.controllers.api._
-import software.altitude.core.controllers.{ImportController, web}
+import software.altitude.core.controllers.ImportController
 
 /**
  * The singleton that makes sure we are only launching one instance of the app,
@@ -17,7 +17,6 @@ object SingleApplication {
   private val app: Altitude = new Altitude
 
   def mountEndpoints(context: ServletContext): Unit = {
-    context.mount(new web.AssetController, "/assets/*")
     context.mount(new ImportController, "/import/*")
 
     context.mount(new AssetController, "/api/v1/assets/*")

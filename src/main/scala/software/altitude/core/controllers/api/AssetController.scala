@@ -3,10 +3,13 @@ package software.altitude.core.controllers.api
 import org.scalatra.Ok
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
+import software.altitude.core.Const.Api
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.Util
-import software.altitude.core.models.{Asset, Data}
+import software.altitude.core.models.{Preview, Asset, Data}
 import software.altitude.core.{Const => C, NotFoundException}
+
+import scala.compat.Platform
 
 class AssetController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -96,5 +99,32 @@ class AssetController extends BaseApiController {
     app.service.library.moveAssetsToTriage(assetIds)
 
     OK
+  }
+
+  get("/:id/preview") {
+    val id = params(Api.ID)
+
+    try {
+      val preview: Preview = app.service.library.getPreview(id)
+      this.contentType = preview.mimeType
+      preview.data
+    }
+    catch {
+      case ex: NotFoundException => redirect("/i/1x1.png")
+    }
+  }
+
+  override def logRequestStart() = {
+    request.getRequestURI.endsWith("/preview") match {
+      case true =>
+      case false => super.logRequestStart()
+    }
+  }
+
+  override def logRequestEnd() = {
+    request.getRequestURI.endsWith("/preview") match {
+      case true =>
+      case false => super.logRequestEnd()
+    }
   }
 }
