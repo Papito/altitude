@@ -97,7 +97,7 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
           bind[AbstractTransactionManager].toInstance(jdbcTxManager)
           bind[JdbcTransactionManager].toInstance(jdbcTxManager)
 
-          bind[MigrationDao].toInstance(new postgres.MigrationDao(app))
+          bind[MigrationDao].toInstance(new postgres.MigrationDao(app, "system"))
           bind[RepositoryDao].toInstance(new postgres.RepositoryDao(app))
           bind[AssetDao].toInstance(new postgres.AssetDao(app))
           bind[FolderDao].toInstance(new postgres.FolderDao(app))
@@ -112,7 +112,7 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
           bind[AbstractTransactionManager].toInstance(jdbcTxManager)
           bind[JdbcTransactionManager].toInstance(jdbcTxManager)
 
-          bind[MigrationDao].toInstance(new sqlite.MigrationDao(app))
+          bind[MigrationDao].toInstance(new sqlite.MigrationDao(app, "system"))
           bind[RepositoryDao].toInstance(new sqlite.RepositoryDao(app))
           bind[AssetDao].toInstance(new sqlite.AssetDao(app))
           bind[FolderDao].toInstance(new sqlite.FolderDao(app))

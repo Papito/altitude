@@ -6,12 +6,12 @@ import play.api.libs.json.JsObject
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{AltitudeCoreApp, Altitude, Context}
 
-abstract class MigrationDao(val app: AltitudeCoreApp)
+abstract class MigrationDao(val app: AltitudeCoreApp, systemTable: String)
   extends BaseJdbcDao("repository") with software.altitude.core.dao.MigrationDao {
 
   private final val log = LoggerFactory.getLogger(getClass)
 
-  val SYSTEM_TABLE = "system"
+  protected val SYSTEM_TABLE = systemTable
 
   /**
    * Get current version of the schema

@@ -6,7 +6,8 @@ class FolderDao(app: Altitude) extends software.altitude.core.dao.jdbc.FolderDao
 
 class MetadataFieldDao(app: Altitude) extends software.altitude.core.dao.jdbc.MetadataFieldDao(app) with Sqlite
 
-class MigrationDao(app: AltitudeCoreApp) extends software.altitude.core.dao.jdbc.MigrationDao(app) with Sqlite
+class MigrationDao(app: AltitudeCoreApp, systemTable: String)
+  extends software.altitude.core.dao.jdbc.MigrationDao(app, systemTable) with Sqlite
 
 class RepositoryDao(app: Altitude) extends software.altitude.core.dao.jdbc.RepositoryDao(app) with Sqlite
 
