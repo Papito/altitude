@@ -10,7 +10,7 @@ import software.altitude.core.{Const => C, AltitudeCoreApp, Altitude, Context}
 trait StatDao extends BaseJdbcDao with software.altitude.core.dao.StatDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override lazy val TABLE_NAME = "stats"
+  override final val TABLE_NAME = "stats"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = Stat(
     rec.get(C.Stat.DIMENSION).get.asInstanceOf[String],

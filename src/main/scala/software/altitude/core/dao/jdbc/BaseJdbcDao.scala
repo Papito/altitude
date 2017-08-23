@@ -17,8 +17,9 @@ import software.altitude.core.{Const => C, ConstraintException, Context, Util}
 import scala.collection.JavaConversions._
 
 abstract class BaseJdbcDao extends BaseDao {
-  lazy val TABLE_NAME: String = ""
   private final val log = LoggerFactory.getLogger(getClass)
+
+  val TABLE_NAME: String
 
   protected final def txManager = app.injector.instance[JdbcTransactionManager]
 

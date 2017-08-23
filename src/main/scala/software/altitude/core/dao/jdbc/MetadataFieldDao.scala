@@ -6,12 +6,12 @@ import software.altitude.core.models.{FieldType, MetadataField}
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C, AltitudeCoreApp, Altitude, Context}
 
-abstract class MetadataFieldDao(val app: AltitudeCoreApp)
+trait MetadataFieldDao
   extends BaseJdbcDao with software.altitude.core.dao.MetadataFieldDao {
 
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override lazy val TABLE_NAME = "metadata_field"
+  override final val TABLE_NAME = "metadata_field"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val model = MetadataField(

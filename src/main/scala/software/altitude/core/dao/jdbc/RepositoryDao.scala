@@ -6,10 +6,10 @@ import software.altitude.core.models.Repository
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C, AltitudeCoreApp, Altitude, Context}
 
-abstract class RepositoryDao(val app: AltitudeCoreApp) extends BaseJdbcDao with software.altitude.core.dao.RepositoryDao {
+trait RepositoryDao extends BaseJdbcDao with software.altitude.core.dao.RepositoryDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override lazy val TABLE_NAME = "repository"
+  override final val TABLE_NAME = "repository"
 
   // this is the same as the base one - minus the repository ID, which is model does not have
   override protected val ONE_SQL = s"""
