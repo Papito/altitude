@@ -7,11 +7,8 @@ import software.altitude.core.models.Stats
 import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
 import software.altitude.core.{Altitude, Const => C, Context}
 
-import scala.io.Source
-
-trait ServerMigrations {
-  private final val log = LoggerFactory.getLogger(getClass)
-  val app: Altitude
+abstract class ServerMigrations(val app: Altitude) extends CoreMigrationService {
+  protected final val log = LoggerFactory.getLogger(getClass)
 
   def migrateVersion(ctx: Context, version: Int)(implicit txId: TransactionId = new TransactionId): Unit = {
       version match {

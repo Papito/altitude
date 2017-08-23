@@ -1,12 +1,12 @@
 package software.altitude.core.dao.sqlite
 
-import software.altitude.core.Altitude
+import software.altitude.core.{AltitudeCoreApp, Altitude}
 
 class FolderDao(app: Altitude) extends software.altitude.core.dao.jdbc.FolderDao(app) with Sqlite
 
 class MetadataFieldDao(app: Altitude) extends software.altitude.core.dao.jdbc.MetadataFieldDao(app) with Sqlite
 
-class MigrationDao(app: Altitude) extends software.altitude.core.dao.jdbc.MigrationDao(app) with Sqlite
+class MigrationDao(app: AltitudeCoreApp) extends software.altitude.core.dao.jdbc.MigrationDao(app) with Sqlite
 
 class RepositoryDao(app: Altitude) extends software.altitude.core.dao.jdbc.RepositoryDao(app) with Sqlite
 

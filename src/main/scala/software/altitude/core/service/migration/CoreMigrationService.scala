@@ -1,16 +1,17 @@
 package software.altitude.core.service.migration
 
 import org.slf4j.LoggerFactory
-import software.altitude.core.{Context, Altitude}
+import software.altitude.core.{AltitudeCoreApp, Context, Altitude}
 import software.altitude.core.dao.MigrationDao
 import software.altitude.core.transactions.{TransactionId, AbstractTransactionManager}
 import net.codingwell.scalaguice.InjectorExtensions._
 
 import scala.io.Source
 
-abstract class CoreMigrationService(app: Altitude) {
+abstract class CoreMigrationService {
   private final val log = LoggerFactory.getLogger(getClass)
 
+  protected val app: AltitudeCoreApp
   protected val DAO: MigrationDao = app.injector.instance[MigrationDao]
   protected val txManager = app.injector.instance[AbstractTransactionManager]
 
@@ -22,7 +23,7 @@ abstract class CoreMigrationService(app: Altitude) {
   def migrateVersion(ctx: Context, version: Int)(implicit txId: TransactionId = new TransactionId): Unit
 
   def runMigration(version: Int)
-                  (implicit ctx: Context = new Context(repo = app.REPO, user = app.USER),
+                  (implicit ctx: Context = new Context(repo = null, user = null),
                    txId: TransactionId = new TransactionId) = {
     val migrationCommands = parseMigrationCommands(version)
 
@@ -41,7 +42,7 @@ abstract class CoreMigrationService(app: Altitude) {
   }
 
 
-  def existingVersion(implicit ctx: Context = new Context(repo = app.REPO, user = app.USER),
+  def existingVersion(implicit ctx: Context = new Context(repo = null, user = null),
                       txId: TransactionId = new TransactionId): Int = {
     txManager.asReadOnly[Int] {
       DAO.currentVersion

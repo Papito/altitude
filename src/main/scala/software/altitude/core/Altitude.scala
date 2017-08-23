@@ -12,7 +12,7 @@ import software.altitude.core.dao._
 import software.altitude.core.models.{Repository, User}
 import software.altitude.core.service._
 import software.altitude.core.service.filestore.{FileStoreService, FileSystemStoreService}
-import software.altitude.core.service.migration.{PostgresMigrationService, SqliteMigrationService}
+import software.altitude.core.service.migration._
 import software.altitude.core.service.sources.FileSystemSourceService
 import software.altitude.core.transactions._
 import software.altitude.core.{Const => C}
@@ -78,8 +78,8 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
     }
 
     val migration = dataSourceType match {
-      case C.DatasourceType.SQLITE => new SqliteMigrationService(app)
-      case C.DatasourceType.POSTGRES => new PostgresMigrationService(app)
+      case C.DatasourceType.SQLITE => new ServerMigrations(app) with JdbcMigrationService with Sqlite
+      case C.DatasourceType.POSTGRES => new ServerMigrations(app) with JdbcMigrationService with Postgres
     }
   }
 
