@@ -1,12 +1,17 @@
 package software.altitude.core.dao.jdbc
 
+import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.models.{FieldType, MetadataField}
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C, AltitudeCoreApp, Altitude, Context}
 
-abstract class MetadataFieldDao (val app: AltitudeCoreApp)
-  extends BaseJdbcDao("metadata_field") with software.altitude.core.dao.MetadataFieldDao {
+abstract class MetadataFieldDao(val app: AltitudeCoreApp)
+  extends BaseJdbcDao with software.altitude.core.dao.MetadataFieldDao {
+
+  private final val log = LoggerFactory.getLogger(getClass)
+
+  override lazy val TABLE_NAME = "metadata_field"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val model = MetadataField(

@@ -7,9 +7,11 @@ import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{AltitudeCoreApp, Altitude, Context}
 
 abstract class MigrationDao(val app: AltitudeCoreApp, systemTable: String)
-  extends BaseJdbcDao("repository") with software.altitude.core.dao.MigrationDao {
+  extends BaseJdbcDao with software.altitude.core.dao.MigrationDao {
 
   private final val log = LoggerFactory.getLogger(getClass)
+
+  override lazy val TABLE_NAME = "repository"
 
   protected val SYSTEM_TABLE = systemTable
 

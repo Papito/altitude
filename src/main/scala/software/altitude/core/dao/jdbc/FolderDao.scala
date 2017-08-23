@@ -1,11 +1,15 @@
 package software.altitude.core.dao.jdbc
 
+import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.models.Folder
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C, AltitudeCoreApp, Altitude, Context}
 
-abstract class FolderDao(val app: AltitudeCoreApp) extends BaseJdbcDao("folder") with software.altitude.core.dao.FolderDao {
+abstract class FolderDao(val app: AltitudeCoreApp) extends BaseJdbcDao with software.altitude.core.dao.FolderDao {
+  private final val log = LoggerFactory.getLogger(getClass)
+
+  override lazy val TABLE_NAME = "folder"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val model = Folder(
