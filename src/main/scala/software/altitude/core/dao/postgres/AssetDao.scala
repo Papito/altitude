@@ -3,7 +3,7 @@ package software.altitude.core.dao.postgres
 import play.api.libs.json.{JsObject, Json}
 import software.altitude.core.models.Metadata
 import software.altitude.core.transactions.TransactionId
-import software.altitude.core.{Altitude, Const => C, Context}
+import software.altitude.core.{Const => C, AltitudeCoreApp, Altitude, Context}
 
 object AssetDao {
     val DEFAULT_SQL_COLS_FOR_SELECT = s"""
@@ -15,13 +15,13 @@ object AssetDao {
     """
 }
 
-class AssetDao(app: Altitude) extends software.altitude.core.dao.jdbc.AssetDao(app) with Postgres {
+class AssetDao(app: AltitudeCoreApp) extends software.altitude.core.dao.jdbc.AssetDao(app) with Postgres {
   override protected def DEFAULT_SQL_COLS_FOR_SELECT = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT
 
   override def getMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Option[Metadata] = {
     val sql = s"""
       SELECT (${C.Asset.METADATA}#>>'{}')::text as ${C.Asset.METADATA}
-         FROM $tableName
+         FROM $TABLE_NAME
        WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
       """
 

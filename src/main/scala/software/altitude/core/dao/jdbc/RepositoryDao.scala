@@ -4,15 +4,15 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.models.Repository
 import software.altitude.core.transactions.TransactionId
-import software.altitude.core.{Altitude, Const => C, Context}
+import software.altitude.core.{Const => C, AltitudeCoreApp, Altitude, Context}
 
-abstract class RepositoryDao(val app: Altitude) extends BaseJdbcDao("repository") with software.altitude.core.dao.RepositoryDao {
+abstract class RepositoryDao(val app: AltitudeCoreApp) extends BaseJdbcDao("repository") with software.altitude.core.dao.RepositoryDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
   // this is the same as the base one - minus the repository ID, which is model does not have
   override protected val ONE_SQL = s"""
       SELECT $DEFAULT_SQL_COLS_FOR_SELECT
-        FROM $tableName
+        FROM $TABLE_NAME
        WHERE ${C.Base.ID} = ?"""
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
@@ -30,7 +30,7 @@ abstract class RepositoryDao(val app: Altitude) extends BaseJdbcDao("repository"
   }
 
   override def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
-    log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
+    log.debug(s"Getting by ID '$id' from '$TABLE_NAME'", C.LogTag.DB)
     val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(ONE_SQL, List(id))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
@@ -39,7 +39,7 @@ abstract class RepositoryDao(val app: Altitude) extends BaseJdbcDao("repository"
     val repo = jsonIn: Repository
 
     val sql = s"""
-        INSERT INTO $tableName (
+        INSERT INTO $TABLE_NAME (
              ${C.Base.ID}, ${C.Repository.NAME}, ${C.Repository.FILE_STORE_TYPE},
              ${C.Repository.ROOT_FOLDER_ID}, ${C.Repository.TRIAGE_FOLDER_ID})
             VALUES (?, ?, ?, ?, ?)

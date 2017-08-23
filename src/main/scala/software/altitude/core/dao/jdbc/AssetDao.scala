@@ -6,9 +6,9 @@ import play.api.libs.json._
 import software.altitude.core.models.{Asset, AssetType, Metadata}
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.{Query, QueryResult}
-import software.altitude.core.{Altitude, Const => C, Context}
+import software.altitude.core.{Const => C, AltitudeCoreApp, Altitude, Context}
 
-abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with software.altitude.core.dao.AssetDao {
+abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao("asset") with software.altitude.core.dao.AssetDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
@@ -44,19 +44,19 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with sof
     addCoreAttrs(model, rec)
   }
 
-  protected lazy val NOT_RECYCLED_QUERY_BUILDER = new NotRecycledQueryBuilder(DEFAULT_SQL_COLS_FOR_SELECT, tableName)
+  protected lazy val NOT_RECYCLED_QUERY_BUILDER = new NotRecycledQueryBuilder(DEFAULT_SQL_COLS_FOR_SELECT, TABLE_NAME)
   override def queryNotRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
     this.query(q, NOT_RECYCLED_QUERY_BUILDER)
 
 
-  protected lazy val RECYCLED_QUERY_BUILDER = new RecycledQueryBuilder(DEFAULT_SQL_COLS_FOR_SELECT, tableName)
+  protected lazy val RECYCLED_QUERY_BUILDER = new RecycledQueryBuilder(DEFAULT_SQL_COLS_FOR_SELECT, TABLE_NAME)
   override def queryRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
     this.query(q, RECYCLED_QUERY_BUILDER)
 
   override def getMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Option[Metadata] = {
     val sql = s"""
       SELECT ${C.Asset.METADATA}
-         FROM $tableName
+         FROM $TABLE_NAME
        WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
       """
 
@@ -77,7 +77,7 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with sof
     val extractedMetadata: String = asset.extractedMetadata.toString().replaceAll("\\\\u0000", "")
 
     val sql = s"""
-        INSERT INTO $tableName (
+        INSERT INTO $TABLE_NAME (
              $CORE_SQL_COLS_FOR_INSERT, ${C.Base.USER_ID}, ${C.Asset.MD5},
              ${C.Asset.FILENAME}, ${C.Asset.SIZE_BYTES},
              ${C.AssetType.MEDIA_TYPE}, ${C.AssetType.MEDIA_SUBTYPE}, ${C.AssetType.MIME_TYPE},
@@ -103,7 +103,7 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with sof
   override def setMetadata(assetId: String, metadata: Metadata)
                           (implicit ctx: Context, txId: TransactionId) = {
     val sql = s"""
-      UPDATE $tableName
+      UPDATE $TABLE_NAME
          SET ${C.Base.UPDATED_AT} = $CURRENT_TIME_FUNC, ${C.Asset.METADATA} = $JSON_FUNC
        WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
       """
@@ -118,7 +118,7 @@ abstract class AssetDao(val app: Altitude) extends BaseJdbcDao("asset") with sof
   override def setAssetAsRecycled(assetId: String, isRecycled: Boolean)
                             (implicit ctx: Context, txId: TransactionId) = {
     val sql = s"""
-        UPDATE $tableName
+        UPDATE $TABLE_NAME
            SET ${C.Base.UPDATED_AT} = $CURRENT_TIME_FUNC,
                ${C.Asset.IS_RECYCLED} = ?
          WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?

@@ -3,9 +3,9 @@ package software.altitude.core.dao.jdbc
 import play.api.libs.json.JsObject
 import software.altitude.core.models.Folder
 import software.altitude.core.transactions.TransactionId
-import software.altitude.core.{Altitude, Const => C, Context}
+import software.altitude.core.{Const => C, AltitudeCoreApp, Altitude, Context}
 
-abstract class FolderDao(val app: Altitude) extends BaseJdbcDao("folder") with software.altitude.core.dao.FolderDao {
+abstract class FolderDao(val app: AltitudeCoreApp) extends BaseJdbcDao("folder") with software.altitude.core.dao.FolderDao {
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val model = Folder(
@@ -21,7 +21,7 @@ abstract class FolderDao(val app: Altitude) extends BaseJdbcDao("folder") with s
     val folder = jsonIn: Folder
 
     val sql = s"""
-        INSERT INTO $tableName (
+        INSERT INTO $TABLE_NAME (
              $CORE_SQL_COLS_FOR_INSERT,
              ${C.Folder.NAME}, ${C.Folder.NAME_LC}, ${C.Folder.PARENT_ID})
             VALUES ($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?)

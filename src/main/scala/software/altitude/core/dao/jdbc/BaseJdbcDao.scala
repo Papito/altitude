@@ -16,7 +16,7 @@ import software.altitude.core.{Const => C, ConstraintException, Context, Util}
 
 import scala.collection.JavaConversions._
 
-abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
+abstract class BaseJdbcDao(val TABLE_NAME: String) extends BaseDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
   protected final def txManager = app.injector.instance[JdbcTransactionManager]
@@ -49,24 +49,24 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   protected def dtAsJsString(dt: DateTime) = JsString(Util.isoDateTime(Some(dt)))
 
   // table-specific SQL query builder
-  protected lazy val SQL_QUERY_BUILDER = new SqlQueryBuilder(DEFAULT_SQL_COLS_FOR_SELECT, tableName)
+  protected lazy val SQL_QUERY_BUILDER = new SqlQueryBuilder(DEFAULT_SQL_COLS_FOR_SELECT, TABLE_NAME)
 
   // SQL to select the whole record, in very simple cases
   protected val ONE_SQL = s"""
       SELECT $DEFAULT_SQL_COLS_FOR_SELECT
-        FROM $tableName
+        FROM $TABLE_NAME
        WHERE ${C.Base.ID} = ? AND ${C.Base.REPO_ID} = ?"""
 
   override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
     val sql: String =s"""
-      INSERT INTO $tableName ($CORE_SQL_COLS_FOR_INSERT)
+      INSERT INTO $TABLE_NAME ($CORE_SQL_COLS_FOR_INSERT)
            VALUES ($CORE_SQL_VALS_FOR_INSERT)"""
 
     addRecord(jsonIn, sql, List[Any]())
   }
 
   override def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
-    log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
+    log.debug(s"Getting by ID '$id' from '$TABLE_NAME'", C.LogTag.DB)
     val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(ONE_SQL, List(id, ctx.repo.id.get))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
@@ -77,7 +77,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
 
     val sql = s"""
       DELETE
-        FROM $tableName
+        FROM $TABLE_NAME
        WHERE ${C.Base.REPO_ID} = ? AND ${fieldPlaceholders.mkString(",")}
       """
 
@@ -217,7 +217,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     val placeholders = ids.toSeq.map(x => "?")
     val sql = s"""
       SELECT $DEFAULT_SQL_COLS_FOR_SELECT
-        FROM $tableName
+        FROM $TABLE_NAME
        WHERE ${C.Base.REPO_ID} = ? AND id IN (${placeholders.mkString(",")})
       """
 
@@ -242,7 +242,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
     }.toList
 
     val sql = s"""
-      UPDATE $tableName
+      UPDATE $TABLE_NAME
          SET ${C.Base.UPDATED_AT} = $CURRENT_TIME_FUNC, ${updateFieldPlaceholders.mkString(", ")}
        WHERE ${C.Base.REPO_ID} = ? AND ${queryFieldPlaceholders.mkString(",")}
       """
@@ -264,7 +264,7 @@ abstract class BaseJdbcDao(val tableName: String) extends BaseDao {
   override def increment(id: String, field: String, count: Int = 1)
                         (implicit ctx: Context, txId: TransactionId) = {
     val sql = s"""
-      UPDATE $tableName
+      UPDATE $TABLE_NAME
          SET $field = $field + $count
        WHERE ${C.Base.REPO_ID} = ? AND id = ?
       """

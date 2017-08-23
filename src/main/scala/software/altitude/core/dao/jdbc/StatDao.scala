@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.models.Stat
 import software.altitude.core.transactions.TransactionId
-import software.altitude.core.{Altitude, Const => C, Context}
+import software.altitude.core.{Const => C, AltitudeCoreApp, Altitude, Context}
 
-abstract class StatDao (val app: Altitude) extends BaseJdbcDao("stats") with software.altitude.core.dao.StatDao {
+abstract class StatDao (val app: AltitudeCoreApp) extends BaseJdbcDao("stats") with software.altitude.core.dao.StatDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = Stat(
@@ -16,7 +16,7 @@ abstract class StatDao (val app: Altitude) extends BaseJdbcDao("stats") with sof
 
   override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
     val sql: String =s"""
-      INSERT INTO $tableName (${C.Base.REPO_ID}, ${C.Stat.DIMENSION})
+      INSERT INTO $TABLE_NAME (${C.Base.REPO_ID}, ${C.Stat.DIMENSION})
            VALUES (? ,?)"""
 
     val stat: Stat = jsonIn
@@ -41,7 +41,7 @@ abstract class StatDao (val app: Altitude) extends BaseJdbcDao("stats") with sof
   def incrementStat(statName: String, count: Long = 1)
                    (implicit ctx: Context, txId: TransactionId): Unit = {
     val sql = s"""
-      UPDATE $tableName
+      UPDATE $TABLE_NAME
          SET ${C.Stat.DIM_VAL} = ${C.Stat.DIM_VAL} + $count
        WHERE ${C.Base.REPO_ID} = ? and ${C.Stat.DIMENSION} = ?
       """
