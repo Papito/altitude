@@ -10,7 +10,7 @@ object AssetDao {
     """
 }
 
-class AssetDao(app: AltitudeCoreApp) extends software.altitude.core.dao.jdbc.AssetDao(app) with Sqlite {
+class AssetDao(val app: AltitudeCoreApp) extends software.altitude.core.dao.jdbc.AssetDao with Sqlite {
   override protected def DEFAULT_SQL_COLS_FOR_SELECT = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT
 }
 

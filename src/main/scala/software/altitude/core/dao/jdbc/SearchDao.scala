@@ -10,7 +10,7 @@ import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.QueryResult
 import software.altitude.core.{Altitude, Const => C, Context}
 
-abstract class SearchDao(override val app: Altitude) extends AssetDao(app) with software.altitude.core.dao.SearchDao {
+abstract class SearchDao(override val app: Altitude) extends AssetDao with software.altitude.core.dao.SearchDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override def search(textQuery: String)(implicit ctx: Context, txId: TransactionId): QueryResult =
