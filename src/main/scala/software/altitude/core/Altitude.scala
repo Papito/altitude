@@ -2,7 +2,7 @@ package software.altitude.core
 
 import java.sql.DriverManager
 
-import com.google.inject.{AbstractModule, Guice}
+import com.google.inject.{Injector, AbstractModule, Guice}
 import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
 import org.apache.commons.io.FilenameUtils
@@ -47,12 +47,12 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
    * transaction manager we are using for the data sources of choice, load the drivers,
    * etc.
    */
-  final val injector = Guice.createInjector(new InjectionModule)
+  override val injector: Injector = Guice.createInjector(new InjectionModule)
 
   /**
    * This is our injected transaction manager, determined based on our database.
    */
-  final val txManager = app.injector.instance[AbstractTransactionManager]
+  override val txManager = app.injector.instance[AbstractTransactionManager]
 
   /**
    * This is all of the services the app will be using

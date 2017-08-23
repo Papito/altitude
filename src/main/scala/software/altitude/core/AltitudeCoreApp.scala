@@ -1,11 +1,25 @@
 package software.altitude.core
 
+import com.google.inject.Injector
 import org.slf4j.LoggerFactory
+import software.altitude.core.transactions.AbstractTransactionManager
 
 trait AltitudeCoreApp {
   private final val log = LoggerFactory.getLogger(getClass)
 
   def runMigrations(): Unit
+
+  /**
+   * At this point determine which data access classes we are loading, which
+   * transaction manager we are using for the data sources of choice, load the drivers,
+   * etc.
+   */
+  val injector: Injector
+
+  /**
+   * This is our injected transaction manager, determined based on our database.
+   */
+  val txManager: AbstractTransactionManager
 
   // ID for this application - which we may have multiple of in the same environment
   final val id = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
