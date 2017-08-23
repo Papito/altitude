@@ -26,7 +26,7 @@ object BaseDao {
 }
 
 trait BaseDao {
-  val app: Altitude
+  val app: AltitudeCoreApp
   protected val MAX_RECORDS = app.config.getInt("db.max_records")
 
   /**

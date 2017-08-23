@@ -6,7 +6,7 @@ import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.QueryResult
 import software.altitude.core.{Altitude, Const => C, Context}
 
-class SearchDao(app: Altitude) extends software.altitude.core.dao.jdbc.SearchDao(app) with Postgres {
+class SearchDao(override val app: Altitude) extends software.altitude.core.dao.jdbc.SearchDao(app) with Postgres {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def addSearchDocument(asset: Asset)(implicit ctx: Context, txId: TransactionId): Unit = {
