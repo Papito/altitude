@@ -10,7 +10,3 @@ class MigrationDao(val app: AltitudeCoreApp, val SYSTEM_TABLE: String)
   extends software.altitude.core.dao.jdbc.MigrationDao with Postgres
 
 class MetadataFieldDao(val app: AltitudeCoreApp) extends software.altitude.core.dao.jdbc.MetadataFieldDao with Postgres
-
-class StatDao(val app: AltitudeCoreApp) extends software.altitude.core.dao.jdbc.StatDao with Postgres {
-  override def DEFAULT_SQL_COLS_FOR_SELECT = "*"
-}

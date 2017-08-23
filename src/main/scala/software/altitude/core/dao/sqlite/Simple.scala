@@ -11,6 +11,4 @@ class MigrationDao(val app: AltitudeCoreApp, val SYSTEM_TABLE: String)
 
 class RepositoryDao(val app: AltitudeCoreApp) extends software.altitude.core.dao.jdbc.RepositoryDao with Sqlite
 
-class StatDao(val app: AltitudeCoreApp) extends software.altitude.core.dao.jdbc.StatDao with Sqlite {
-  override def DEFAULT_SQL_COLS_FOR_SELECT = "*"
-}
+

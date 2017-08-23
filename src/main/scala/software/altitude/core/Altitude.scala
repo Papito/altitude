@@ -101,7 +101,9 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
           bind[RepositoryDao].toInstance(new postgres.RepositoryDao(app))
           bind[AssetDao].toInstance(new postgres.AssetDao(app))
           bind[FolderDao].toInstance(new postgres.FolderDao(app))
-          bind[StatDao].toInstance(new postgres.StatDao(app))
+          bind[StatDao].toInstance(new jdbc.StatDao(app) with dao.postgres.Postgres {
+            override protected def DEFAULT_SQL_COLS_FOR_SELECT = "*"
+          })
           bind[MetadataFieldDao].toInstance(new postgres.MetadataFieldDao(app))
           bind[SearchDao].toInstance(new postgres.SearchDao(app))
 
@@ -116,7 +118,9 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
           bind[RepositoryDao].toInstance(new sqlite.RepositoryDao(app))
           bind[AssetDao].toInstance(new sqlite.AssetDao(app))
           bind[FolderDao].toInstance(new sqlite.FolderDao(app))
-          bind[StatDao].toInstance(new sqlite.StatDao(app))
+          bind[StatDao].toInstance(new jdbc.StatDao(app) with dao.sqlite.Sqlite {
+            override protected def DEFAULT_SQL_COLS_FOR_SELECT = "*"
+          })
           bind[MetadataFieldDao].toInstance(new sqlite.MetadataFieldDao(app))
           bind[SearchDao].toInstance(new sqlite.SearchDao(app))
 
