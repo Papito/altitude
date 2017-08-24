@@ -88,8 +88,8 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
    */
   class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
-      dataSourceType match {
 
+      dataSourceType match {
         case C.DatasourceType.POSTGRES =>
           DriverManager.registerDriver(new org.postgresql.Driver)
 
@@ -97,14 +97,16 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
           bind[AbstractTransactionManager].toInstance(jdbcTxManager)
           bind[JdbcTransactionManager].toInstance(jdbcTxManager)
 
-          bind[MigrationDao].toInstance(new postgres.MigrationDao(app, "system"))
-          bind[RepositoryDao].toInstance(new postgres.RepositoryDao(app))
-          bind[AssetDao].toInstance(new postgres.AssetDao(app))
-          bind[FolderDao].toInstance(new postgres.FolderDao(app))
+          bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.postgres.Postgres {
+            override val SYSTEM_TABLE = "system"
+          })
+          bind[RepositoryDao].toInstance(new jdbc.RepositoryDao(app) with dao.postgres.Postgres)
+          bind[AssetDao].toInstance(new jdbc.AssetDao(app) with dao.postgres.Postgres)
+          bind[FolderDao].toInstance(new jdbc.FolderDao(app) with dao.postgres.Postgres)
           bind[StatDao].toInstance(new jdbc.StatDao(app) with dao.postgres.Postgres {
             override protected def DEFAULT_SQL_COLS_FOR_SELECT = "*"
           })
-          bind[MetadataFieldDao].toInstance(new postgres.MetadataFieldDao(app))
+          bind[MetadataFieldDao].toInstance(new jdbc.MetadataFieldDao(app) with dao.sqlite.Sqlite)
           bind[SearchDao].toInstance(new postgres.SearchDao(app))
 
         case C.DatasourceType.SQLITE =>
@@ -114,14 +116,16 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
           bind[AbstractTransactionManager].toInstance(jdbcTxManager)
           bind[JdbcTransactionManager].toInstance(jdbcTxManager)
 
-          bind[MigrationDao].toInstance(new sqlite.MigrationDao(app, "system"))
-          bind[RepositoryDao].toInstance(new sqlite.RepositoryDao(app))
-          bind[AssetDao].toInstance(new sqlite.AssetDao(app))
-          bind[FolderDao].toInstance(new sqlite.FolderDao(app))
+          bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.sqlite.Sqlite {
+            override val SYSTEM_TABLE = "system"
+          })
+          bind[RepositoryDao].toInstance(new jdbc.RepositoryDao(app) with dao.sqlite.Sqlite)
+          bind[AssetDao].toInstance(new jdbc.AssetDao(app) with dao.sqlite.Sqlite)
+          bind[FolderDao].toInstance(new jdbc.FolderDao(app) with dao.sqlite.Sqlite)
           bind[StatDao].toInstance(new jdbc.StatDao(app) with dao.sqlite.Sqlite {
             override protected def DEFAULT_SQL_COLS_FOR_SELECT = "*"
           })
-          bind[MetadataFieldDao].toInstance(new sqlite.MetadataFieldDao(app))
+          bind[MetadataFieldDao].toInstance(new jdbc.MetadataFieldDao(app) with dao.sqlite.Sqlite)
           bind[SearchDao].toInstance(new sqlite.SearchDao(app))
 
         case _ =>

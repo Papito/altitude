@@ -6,7 +6,7 @@ import play.api.libs.json.JsObject
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{AltitudeCoreApp, Altitude, Context}
 
-trait MigrationDao
+abstract class MigrationDao(val app: AltitudeCoreApp)
   extends BaseJdbcDao with software.altitude.core.dao.MigrationDao {
 
   private final val log = LoggerFactory.getLogger(getClass)

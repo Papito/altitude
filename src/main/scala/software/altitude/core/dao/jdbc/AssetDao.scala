@@ -8,7 +8,7 @@ import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.{Query, QueryResult}
 import software.altitude.core.{Const => C, AltitudeCoreApp, Altitude, Context}
 
-trait AssetDao extends BaseJdbcDao with software.altitude.core.dao.AssetDao {
+abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao with software.altitude.core.dao.AssetDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override final val TABLE_NAME = "asset"

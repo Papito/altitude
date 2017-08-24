@@ -9,7 +9,7 @@ import software.altitude.core.util.Query
 
   val ASSET_SIZE = 1000
 
-  test("test totals") {
+  test("test totals", CurrentTag) {
     // create an asset in a folder
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
 

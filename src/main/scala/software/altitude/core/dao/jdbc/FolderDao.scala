@@ -6,7 +6,7 @@ import software.altitude.core.models.Folder
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C, AltitudeCoreApp, Altitude, Context}
 
-trait FolderDao extends BaseJdbcDao with software.altitude.core.dao.FolderDao {
+abstract class FolderDao(val app: AltitudeCoreApp) extends BaseJdbcDao with software.altitude.core.dao.FolderDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override final val TABLE_NAME = "folder"
