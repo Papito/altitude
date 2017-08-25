@@ -2,7 +2,7 @@ package software.altitude.core
 
 import java.sql.DriverManager
 
-import com.google.inject.{Injector, AbstractModule, Guice}
+import com.google.inject.{AbstractModule, Guice, Injector}
 import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
 import org.apache.commons.io.FilenameUtils

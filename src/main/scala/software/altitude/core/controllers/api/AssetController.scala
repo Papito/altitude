@@ -6,10 +6,8 @@ import play.api.libs.json.Json
 import software.altitude.core.Const.Api
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.Util
-import software.altitude.core.models.{Preview, Asset, Data}
+import software.altitude.core.models.{Asset, Data, Preview}
 import software.altitude.core.{Const => C, NotFoundException}
-
-import scala.compat.Platform
 
 class AssetController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)

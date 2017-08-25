@@ -1,7 +1,7 @@
 package software.altitude.core.service.migration
 
 import org.slf4j.LoggerFactory
-import software.altitude.core.{AltitudeCoreApp, Altitude}
+import software.altitude.core.AltitudeCoreApp
 
 trait JdbcMigrationService {
   val app: AltitudeCoreApp

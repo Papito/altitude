@@ -6,7 +6,7 @@ import play.api.libs.json._
 import software.altitude.core.models.{Asset, AssetType, Metadata}
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.{Query, QueryResult}
-import software.altitude.core.{Const => C, AltitudeCoreApp, Altitude, Context}
+import software.altitude.core.{AltitudeCoreApp, Const => C, Context}
 
 abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao with software.altitude.core.dao.AssetDao {
   private final val log = LoggerFactory.getLogger(getClass)
