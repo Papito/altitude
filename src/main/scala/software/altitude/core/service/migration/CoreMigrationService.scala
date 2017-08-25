@@ -12,7 +12,7 @@ abstract class CoreMigrationService {
   private final val log = LoggerFactory.getLogger(getClass)
 
   protected val app: AltitudeCoreApp
-  protected val ROOT_MIGRATIONS_PATH = "/migrations/"
+  protected val ROOT_MIGRATIONS_PATH: String
   protected val DAO: MigrationDao = app.injector.instance[MigrationDao]
   protected val txManager = app.injector.instance[AbstractTransactionManager]
   protected val CURRENT_VERSION = 1

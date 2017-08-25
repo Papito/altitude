@@ -8,6 +8,8 @@ import software.altitude.core.{Altitude, Const => C, Context}
 abstract class ServerMigrations(val app: Altitude) extends CoreMigrationService {
   protected final val log = LoggerFactory.getLogger(getClass)
 
+  override protected val ROOT_MIGRATIONS_PATH = "/migrations/"
+
   def migrateVersion(ctx: Context, version: Int)(implicit txId: TransactionId = new TransactionId): Unit = {
       version match {
         case 1 => v1(ctx)
