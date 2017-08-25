@@ -1,10 +1,8 @@
 package software.altitude.core.service.migration
 
-import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
-import software.altitude.core.dao.MigrationDao
 import software.altitude.core.models.Stats
-import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
+import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Altitude, Const => C, Context}
 
 abstract class ServerMigrations(val app: Altitude) extends CoreMigrationService {

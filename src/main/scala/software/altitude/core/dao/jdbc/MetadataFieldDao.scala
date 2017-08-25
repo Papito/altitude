@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.models.{FieldType, MetadataField}
 import software.altitude.core.transactions.TransactionId
-import software.altitude.core.{Const => C, AltitudeCoreApp, Altitude, Context}
+import software.altitude.core.{AltitudeCoreApp, Const => C, Context}
 
 abstract class MetadataFieldDao(val app: AltitudeCoreApp)
   extends BaseJdbcDao with software.altitude.core.dao.MetadataFieldDao {

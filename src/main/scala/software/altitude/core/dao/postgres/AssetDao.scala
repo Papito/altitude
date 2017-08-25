@@ -3,7 +3,7 @@ package software.altitude.core.dao.postgres
 import play.api.libs.json.{JsObject, Json}
 import software.altitude.core.models.Metadata
 import software.altitude.core.transactions.TransactionId
-import software.altitude.core.{Const => C, AltitudeCoreApp, Altitude, Context}
+import software.altitude.core.{AltitudeCoreApp, Const => C, Context}
 
 object AssetDao {
     val DEFAULT_SQL_COLS_FOR_SELECT = s"""

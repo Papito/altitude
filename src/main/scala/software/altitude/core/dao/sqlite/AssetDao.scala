@@ -1,6 +1,6 @@
 package software.altitude.core.dao.sqlite
 
-import software.altitude.core.{AltitudeCoreApp, Altitude}
+import software.altitude.core.AltitudeCoreApp
 
 object AssetDao {
   val DEFAULT_SQL_COLS_FOR_SELECT = s"""

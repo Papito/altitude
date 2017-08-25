@@ -4,8 +4,8 @@ import javax.servlet.ServletContext
 
 import org.scalatra.servlet.ServletApiImplicits._
 import org.slf4j.LoggerFactory
-import software.altitude.core.controllers.api._
 import software.altitude.core.controllers.ImportController
+import software.altitude.core.controllers.api._
 
 /**
  * The singleton that makes sure we are only launching one instance of the app,

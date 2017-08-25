@@ -1,7 +1,7 @@
 package integration.util.dao.jdbc
 
 import net.codingwell.scalaguice.InjectorExtensions._
-import software.altitude.core.{AltitudeCoreApp, Altitude}
+import software.altitude.core.AltitudeCoreApp
 import software.altitude.core.transactions.{JdbcTransactionManager, TransactionId}
 
 class UtilitiesDao(app: AltitudeCoreApp) extends integration.util.dao.UtilitiesDao {
