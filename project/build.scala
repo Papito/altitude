@@ -1,3 +1,10 @@
+import com.mojolly.scalate.ScalatePlugin._
+import org.scalatra.sbt._
+import sbt.Keys._
+import sbtassembly.AssemblyKeys._
+import sbtassembly.AssemblyPlugin._
+import sbtassembly.MergeStrategy
+
 import sbt._
 
 object AltitudeBuild extends Build {
@@ -49,6 +56,7 @@ object AltitudeBuild extends Build {
      .map(_.exclude("org.apache.cxf", "cxf-core"))
      .map(_.exclude("org.apache.cxf", "cxf-cxf-rt-transports-http"))
   )
+
   assemblyMergeStrategy in assembly := {
     case x if x.startsWith("META-INF") => MergeStrategy.discard
     case x =>
