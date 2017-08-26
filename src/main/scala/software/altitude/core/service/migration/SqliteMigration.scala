@@ -5,7 +5,7 @@ import software.altitude.core.dao.MigrationDao
 import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
 import software.altitude.core.{AltitudeCoreApp, Context}
 
-trait SqliteMigration { this: CoreMigrationService => // can only be mixed into the subclasses of this
+trait SqliteMigration { this: CoreMigrationService =>
   private final val log = LoggerFactory.getLogger(getClass)
 
   protected val MIGRATIONS_DIR = "sqlite/"

@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory
 import software.altitude.core.AltitudeCoreApp
 import software.altitude.core.dao.MigrationDao
 
-trait PostgresMigration { this: CoreMigrationService => // can only be mixed into the subclasses of this
+trait PostgresMigration { this: CoreMigrationService =>
   protected val app: AltitudeCoreApp
 
   private final val log = LoggerFactory.getLogger(getClass)

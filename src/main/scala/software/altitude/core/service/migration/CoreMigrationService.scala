@@ -15,7 +15,7 @@ abstract class CoreMigrationService {
   protected val ROOT_MIGRATIONS_PATH: String
   protected val DAO: MigrationDao = app.injector.instance[MigrationDao]
   protected val txManager = app.injector.instance[AbstractTransactionManager]
-  protected val CURRENT_VERSION = 1
+  protected val CURRENT_VERSION: Int
 
   protected val MIGRATIONS_DIR: String
   protected val FILE_EXTENSION: String

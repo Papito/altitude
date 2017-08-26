@@ -50,13 +50,10 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
   override val injector: Injector = Guice.createInjector(new InjectionModule)
 
   /**
-   * This is our injected transaction manager, determined based on our database.
+   * Injected transaction manager, determined based on our database.
    */
   override val txManager = app.injector.instance[AbstractTransactionManager]
 
-  /**
-   * This is all of the services the app will be using
-   */
   object service {
     val repository = new RepositoryService(app)
     val assetImport = new AssetImportService(app)
@@ -78,8 +75,12 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
     }
 
     val migration = dataSourceType match {
-      case C.DatasourceType.SQLITE => new ServerMigrations(app) with JdbcMigrationService with SqliteMigration
-      case C.DatasourceType.POSTGRES => new ServerMigrations(app) with JdbcMigrationService with PostgresMigration
+      case C.DatasourceType.SQLITE => new MigrationService(app) with JdbcMigrationService with SqliteMigration {
+        override final val CURRENT_VERSION = 1
+      }
+      case C.DatasourceType.POSTGRES => new MigrationService(app) with JdbcMigrationService with PostgresMigration {
+        override final val CURRENT_VERSION = 1
+      }
     }
   }
 
@@ -97,15 +98,11 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
           bind[AbstractTransactionManager].toInstance(jdbcTxManager)
           bind[JdbcTransactionManager].toInstance(jdbcTxManager)
 
-          bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.postgres.Postgres {
-            override val SYSTEM_TABLE = "system"
-          })
+          bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.postgres.Postgres)
           bind[RepositoryDao].toInstance(new jdbc.RepositoryDao(app) with dao.postgres.Postgres)
           bind[AssetDao].toInstance(new jdbc.AssetDao(app) with dao.postgres.Postgres)
           bind[FolderDao].toInstance(new jdbc.FolderDao(app) with dao.postgres.Postgres)
-          bind[StatDao].toInstance(new jdbc.StatDao(app) with dao.postgres.Postgres {
-            override protected def DEFAULT_SQL_COLS_FOR_SELECT = "*"
-          })
+          bind[StatDao].toInstance(new jdbc.StatDao(app) with dao.postgres.Postgres with dao.jdbc.Stats)
           bind[MetadataFieldDao].toInstance(new jdbc.MetadataFieldDao(app) with dao.sqlite.Sqlite)
           bind[SearchDao].toInstance(new postgres.SearchDao(app))
 
@@ -116,15 +113,11 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
           bind[AbstractTransactionManager].toInstance(jdbcTxManager)
           bind[JdbcTransactionManager].toInstance(jdbcTxManager)
 
-          bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.sqlite.Sqlite {
-            override val SYSTEM_TABLE = "system"
-          })
+          bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.sqlite.Sqlite)
           bind[RepositoryDao].toInstance(new jdbc.RepositoryDao(app) with dao.sqlite.Sqlite)
           bind[AssetDao].toInstance(new jdbc.AssetDao(app) with dao.sqlite.Sqlite)
           bind[FolderDao].toInstance(new jdbc.FolderDao(app) with dao.sqlite.Sqlite)
-          bind[StatDao].toInstance(new jdbc.StatDao(app) with dao.sqlite.Sqlite {
-            override protected def DEFAULT_SQL_COLS_FOR_SELECT = "*"
-          })
+          bind[StatDao].toInstance(new jdbc.StatDao(app) with dao.sqlite.Sqlite with dao.jdbc.Stats)
           bind[MetadataFieldDao].toInstance(new jdbc.MetadataFieldDao(app) with dao.sqlite.Sqlite)
           bind[SearchDao].toInstance(new sqlite.SearchDao(app))
 

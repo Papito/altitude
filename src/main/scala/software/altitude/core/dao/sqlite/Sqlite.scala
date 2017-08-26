@@ -6,7 +6,7 @@ import software.altitude.core.dao.jdbc.BaseJdbcDao
 import software.altitude.core.models.BaseModel
 import software.altitude.core.{Const => C}
 
-trait Sqlite { this: BaseJdbcDao => // can only be mixed into the subclasses of this
+trait Sqlite { this: BaseJdbcDao =>
 
   override protected def DEFAULT_SQL_COLS_FOR_SELECT = s"""
       ${C.Base.ID}, *,
