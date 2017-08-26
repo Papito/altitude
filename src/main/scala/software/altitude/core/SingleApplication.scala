@@ -4,7 +4,6 @@ import javax.servlet.ServletContext
 
 import org.scalatra.servlet.ServletApiImplicits._
 import org.slf4j.LoggerFactory
-import software.altitude.core.controllers.ImportController
 import software.altitude.core.controllers.api._
 
 /**
@@ -17,8 +16,6 @@ object SingleApplication {
   val app: Altitude = new Altitude
 
   def mountEndpoints(context: ServletContext): Unit = {
-    context.mount(new ImportController, "/import/*")
-
     context.mount(new AssetController, "/api/v1/assets/*")
     context.mount(new QueryController, "/api/v1/query/*")
     context.mount(new FolderController, "/api/v1/folders/*")

@@ -13,7 +13,7 @@ import software.altitude.core.models.{Repository, User}
 import software.altitude.core.service._
 import software.altitude.core.service.filestore.{FileStoreService, FileSystemStoreService}
 import software.altitude.core.service.migration._
-import software.altitude.core.service.sources.FileSystemSourceService
+import software.altitude.client.service.sources.FileSystemSourceService
 import software.altitude.core.transactions._
 import software.altitude.core.{Const => C}
 
@@ -64,10 +64,6 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
     val asset = new AssetService(app)
     val folder = new FolderService(app)
     val stats = new StatsService(app)
-
-    object source {
-      val fileSystem = new FileSystemSourceService(app)
-    }
 
     val fileStore: FileStoreService = fileStoreType match {
       case C.FileStoreType.FS => new FileSystemStoreService(app)
