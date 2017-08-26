@@ -14,6 +14,8 @@ class ScalatraBootstrap extends LifeCycle with SingleApplication {
       case Environment.DEV => "development"
       case Environment.PROD => "production"
     }
+
+    SingleApplication.app.runMigrations()
   }
 
   override def destroy(context: ServletContext) {
