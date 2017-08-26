@@ -6,10 +6,6 @@ import software.altitude.core.transactions.{AbstractTransactionManager, Transact
 import software.altitude.core.{AltitudeCoreApp, Context}
 
 trait SqliteMigration { this: CoreMigrationService =>
-  private final val log = LoggerFactory.getLogger(getClass)
-
-  protected val MIGRATIONS_DIR = "sqlite/"
-
   protected val app: AltitudeCoreApp
   protected val DAO: MigrationDao
   protected val txManager: AbstractTransactionManager

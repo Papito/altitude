@@ -1,5 +1,7 @@
 package software.altitude.core.service.migration
 
+import java.io.File
+
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import software.altitude.core.dao.MigrationDao
@@ -12,7 +14,6 @@ abstract class CoreMigrationService {
   private final val log = LoggerFactory.getLogger(getClass)
 
   protected val app: AltitudeCoreApp
-  protected val ROOT_MIGRATIONS_PATH: String
   protected val DAO: MigrationDao = app.injector.instance[MigrationDao]
   protected val txManager = app.injector.instance[AbstractTransactionManager]
   protected val CURRENT_VERSION: Int
@@ -41,7 +42,6 @@ abstract class CoreMigrationService {
     }
   }
 
-
   def existingVersion(implicit ctx: Context = new Context(repo = null, user = null),
                       txId: TransactionId = new TransactionId): Int = {
     txManager.asReadOnly[Int] {
@@ -68,8 +68,11 @@ abstract class CoreMigrationService {
   }
 
   def parseMigrationCommands(version: Int): List[String] = {
-    log.info(s"RUNNING MIGRATION TO VERSION $version")
-    val path = s"$ROOT_MIGRATIONS_PATH$MIGRATIONS_DIR$version$FILE_EXTENSION"
+    log.info(s"RUNNING MIGRATION TO VERSION ^^$version^^")
+
+    val path = new File(MIGRATIONS_DIR, s"$version$FILE_EXTENSION").toString
+    log.info(s"PATH: $path")
+
     val r = getClass.getResource(path)
     Source.fromURL(r).mkString.split("#END").map(_.trim).toList.filter(_.nonEmpty)
   }
