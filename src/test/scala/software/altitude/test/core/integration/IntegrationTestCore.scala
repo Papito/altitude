@@ -13,6 +13,7 @@ import software.altitude.core.Const.FileStoreType
 import software.altitude.core.models._
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C, _}
+import software.altitude.test.core.suites.{PostgresSuite, SqliteSuite}
 
 abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with BeforeAndAfterEach {
   val log =  LoggerFactory.getLogger(getClass)
@@ -24,7 +25,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   Environment.ENV = Environment.TEST
 
   val datasource = config.get("datasource").get.asInstanceOf[C.DatasourceType.Value]
-  protected def altitude: Altitude = datasource match {
+  protected def altitude = datasource match {
     case C.DatasourceType.POSTGRES => PostgresSuite.app
     case C.DatasourceType.SQLITE => SqliteSuite.app
     case _ => throw new IllegalArgumentException(s"Do not know of datasource: $datasource")

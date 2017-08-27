@@ -7,35 +7,28 @@ import org.scalatest.Matchers._
 import software.altitude.core.DuplicateException
 import software.altitude.core.models.{Asset, Preview}
 
-@DoNotDiscover class FileSystemImportTests(val config: Map[String, Any]) extends IntegrationTestCore {
+@DoNotDiscover class ImportTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
-/*
   test("import duplicate") {
     importFile("images/1.jpg")
-    val path = getClass.getResource(s"../import/images/1.jpg").getPath
-    val importAsset = altitude.service.source.fileSystem.fileToImportAsset(new File(path))
+    val path = getClass.getResource(s"/import/images/1.jpg").getPath
+    val importAsset = fileToImportAsset(new File(path))
 
     intercept[DuplicateException] {
       altitude.service.assetImport.importAsset(importAsset)
     }
   }
 
-  test("import image (JPEG)") {
+  test("import image") {
     val asset = importFile("images/1.jpg")
     val preview: Preview = altitude.service.library.getPreview(asset.id.get)
     preview.mimeType should equal("application/octet-stream")
     preview.data.length should not be 0
   }
 
-  test("import file list") {
-    val incomingPath = getClass.getResource("../import").getPath
-    val assets = altitude.service.source.fileSystem.assetIterator(path=incomingPath)
-    assets should not be empty
-  }
-
   private def importFile(path: String): Asset = {
-    val _path = getClass.getResource(s"../import/$path").getPath
-    val fileImportAsset = altitude.service.source.fileSystem.fileToImportAsset(new File(_path))
+    val _path = getClass.getResource(s"/import/$path").getPath
+    val fileImportAsset = fileToImportAsset(new File(_path))
     val importedAsset = altitude.service.assetImport.importAsset(fileImportAsset).get
     importedAsset.assetType should equal(importedAsset.assetType)
     importedAsset.path should not be empty
@@ -48,6 +41,5 @@ import software.altitude.core.models.{Asset, Preview}
     asset.sizeBytes should not be 0
     asset
   }
-*/
 
 }

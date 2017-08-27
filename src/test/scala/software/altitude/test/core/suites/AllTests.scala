@@ -1,7 +1,8 @@
-package software.altitude.test.core.integration
+package software.altitude.test.core.suites
 
 import org.scalatest.Suites
-import software.altitude.test.core.unit.{ModelTests, FolderModelTests, SearchQueryModelTests}
+import software.altitude.test.core.integration._
+import software.altitude.test.core.unit.{FolderModelTests, ModelTests, SearchQueryModelTests}
 
 abstract class AllTests(val config: Map[String, Any]) extends Suites(
     new ModelTests,
@@ -12,7 +13,7 @@ abstract class AllTests(val config: Map[String, Any]) extends Suites(
     new AssetQueryTests(config),
     new SearchServiceTests(config),
     new RepositoryServiceTests(config),
-    new FileSystemImportTests(config),
+    new ImportTests(config),
     new FolderModelTests,
     new FolderServiceTests(config),
     new FileStoreServiceTests(config),
