@@ -126,6 +126,16 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     metadata = metadata,
     sizeBytes = 1000L)
 
+  /**
+   * Convert a file system resource to an import asset
+   */
+  def fileToImportAsset(file: File): ImportAsset = new ImportAsset(
+    fileName = file.getName,
+    path = file.getAbsolutePath,
+    sourceType = C.FileStoreType.FS,
+    data =  FileUtils.readFileToByteArray(file),
+    metadata = new Metadata())
+
   // test count - we use it as a request ID for our logging environment
   private var count = 0
 

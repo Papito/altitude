@@ -10,7 +10,6 @@ import software.altitude.core.{Const => C, NotFoundException, StorageException}
 
 @DoNotDiscover class FileStoreServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
-/*
   test("move asset") {
     val asset = importFile("images/1.jpg")
     var relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
@@ -270,8 +269,8 @@ import software.altitude.core.{Const => C, NotFoundException, StorageException}
   }
 
   private def importFile(path: String): Asset = {
-    val _path = getClass.getResource(s"../import/$path").getPath
-    val fileImportAsset = altitude.service.source.fileSystem.fileToImportAsset(new File(_path))
+    val _path = getClass.getResource(s"/import/$path").getPath
+    val fileImportAsset = fileToImportAsset(new File(_path))
     val importedAsset = altitude.service.assetImport.importAsset(fileImportAsset).get
     importedAsset.assetType should equal(importedAsset.assetType)
     importedAsset.path should not be empty
@@ -284,5 +283,4 @@ import software.altitude.core.{Const => C, NotFoundException, StorageException}
     asset.sizeBytes should not be 0
     asset
   }
-*/
 }

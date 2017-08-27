@@ -27,8 +27,6 @@ import software.altitude.core.models.{Asset, Preview}
     preview.data.length should not be 0
   }
 
-
-
   test("import file list") {
     val incomingPath = getClass.getResource("../import").getPath
     val assets = altitude.service.source.fileSystem.assetIterator(path=incomingPath)
