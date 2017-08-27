@@ -1,4 +1,4 @@
-package integration.util.dao
+package software.altitude.test.core.integration.util.dao
 
 import software.altitude.core.transactions.TransactionId
 

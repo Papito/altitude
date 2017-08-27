@@ -1,4 +1,4 @@
-package unit
+package software.altitude.test.core.unit
 
 import org.scalatest._
 import play.api.libs.json._

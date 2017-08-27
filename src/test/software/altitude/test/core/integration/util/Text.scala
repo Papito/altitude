@@ -1,4 +1,4 @@
-package integration.util
+package software.altitude.test.core.integration.util
 
 object Text {
   def randomStr(size: Int = 10) = scala.util.Random.alphanumeric.take(size).mkString

@@ -1,4 +1,4 @@
-package integration
+package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
 import software.altitude.core.{Const => C}

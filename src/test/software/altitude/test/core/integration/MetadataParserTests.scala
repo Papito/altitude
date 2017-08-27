@@ -1,4 +1,4 @@
-package integration
+package software.altitude.test.core.integration
 
 import java.io.File
 
@@ -8,6 +8,7 @@ import software.altitude.core.models.Metadata
 
 @DoNotDiscover class MetadataParserTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
+/*
   test("normalize metadata") {
     val metadata = getMetadata("images/6.jpg")
 
@@ -43,4 +44,5 @@ import software.altitude.core.models.Metadata
     val mediaType = altitude.service.assetImport.detectAssetType(importAsset)
     altitude.service.metadataExtractor.extract(importAsset, mediaType)
   }
+*/
 }

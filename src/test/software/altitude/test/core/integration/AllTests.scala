@@ -1,7 +1,7 @@
-package integration
+package software.altitude.test.core.integration
 
 import org.scalatest.Suites
-import unit.{FolderModelTests, ModelTests, SearchQueryModelTests}
+import software.altitude.test.core.unit.{ModelTests, FolderModelTests, SearchQueryModelTests}
 
 abstract class AllTests(val config: Map[String, Any]) extends Suites(
     new ModelTests,

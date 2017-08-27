@@ -1,10 +1,9 @@
-package integration
+package software.altitude.test.core.integration
 
 import java.io.File
 
 import com.google.inject.{AbstractModule, Guice}
-import integration.util.dao
-import integration.util.dao.UtilitiesDao
+import software.altitude.test.core.integration.util.dao.{jdbc, UtilitiesDao}
 import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
 import org.apache.commons.io.{FileUtils, FilenameUtils}
@@ -173,7 +172,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
 
       altitude.dataSourceType match {
         case C.DatasourceType.POSTGRES | C.DatasourceType.SQLITE =>
-          bind[UtilitiesDao].toInstance(new dao.jdbc.UtilitiesDao(altitude))
+          bind[UtilitiesDao].toInstance(new jdbc.UtilitiesDao(altitude))
         case _ => throw new IllegalArgumentException(s"Do not know of datasource: ${altitude.dataSourceType}")
       }
     }

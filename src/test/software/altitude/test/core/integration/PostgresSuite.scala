@@ -1,4 +1,4 @@
-package integration
+package software.altitude.test.core.integration
 
 import java.sql.DriverManager
 import java.util.Properties

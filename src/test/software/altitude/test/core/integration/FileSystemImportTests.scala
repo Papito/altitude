@@ -1,4 +1,4 @@
-package integration
+package software.altitude.test.core.integration
 
 import java.io.File
 
@@ -9,6 +9,7 @@ import software.altitude.core.models.{Asset, Preview}
 
 @DoNotDiscover class FileSystemImportTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
+/*
   test("import duplicate") {
     importFile("images/1.jpg")
     val path = getClass.getResource(s"../import/images/1.jpg").getPath
@@ -49,5 +50,6 @@ import software.altitude.core.models.{Asset, Preview}
     asset.sizeBytes should not be 0
     asset
   }
+*/
 
 }

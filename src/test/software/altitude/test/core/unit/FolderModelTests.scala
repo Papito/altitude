@@ -1,4 +1,4 @@
-package unit
+package software.altitude.test.core.unit
 
 import org.scalatest.FunSuite
 import org.scalatest.Matchers._

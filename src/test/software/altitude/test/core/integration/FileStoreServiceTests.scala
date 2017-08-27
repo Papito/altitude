@@ -1,4 +1,4 @@
-package integration
+package software.altitude.test.core.integration
 
 import java.io.File
 
@@ -10,6 +10,7 @@ import software.altitude.core.{Const => C, NotFoundException, StorageException}
 
 @DoNotDiscover class FileStoreServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
+/*
   test("move asset") {
     val asset = importFile("images/1.jpg")
     var relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
@@ -283,5 +284,5 @@ import software.altitude.core.{Const => C, NotFoundException, StorageException}
     asset.sizeBytes should not be 0
     asset
   }
-
+*/
 }
