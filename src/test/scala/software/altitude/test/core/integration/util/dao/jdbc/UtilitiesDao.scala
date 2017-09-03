@@ -9,8 +9,6 @@ class UtilitiesDao(app: AltitudeCoreApp) extends dao.UtilitiesDao {
 
   protected final def txManager = app.injector.instance[JdbcTransactionManager]
 
-  override def migrateDatabase() = {}
-
   override def rollback() = {
 
     txManager.txRegistry.foreach(tx => {

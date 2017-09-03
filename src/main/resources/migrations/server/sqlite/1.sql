@@ -5,6 +5,12 @@ CREATE TABLE system (
 CREATE UNIQUE INDEX system_01 ON system(id);#END
 INSERT INTO system(id, version) VALUES(0, 0);#END
 
+CREATE TABLE repository_user(
+  id CHAR(24) PRIMARY KEY,
+  created_at DATE DEFAULT (datetime('now', 'utc')),
+  updated_at DATE DEFAULT NULL
+);#END
+
 CREATE TABLE repository(
   id CHAR(24) PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
@@ -12,13 +18,14 @@ CREATE TABLE repository(
   root_folder_id CHAR(24) NOT NULL,
   triage_folder_id CHAR(24) NOT NULL,
   file_store_type VARCHAR NOT NULL,
+  file_store_config TEXT NOT NULL,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );#END
 
 CREATE TABLE stats (
   repository_id CHAR(24) NOT NULL,
-  dimension VARCHAR(60) PRIMARY KEY,
+  dimension VARCHAR(60),
   dim_val INT NOT NULL DEFAULT 0
 );#END
 CREATE INDEX stats_01 ON stats(repository_id);#END

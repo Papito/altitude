@@ -2,6 +2,10 @@ package software.altitude.core
 
 import software.altitude.core.models.{Repository, User}
 
+
+object Context {
+  val EMPTY = new Context(repo = null, user = null)
+}
 /**
  * The Context is the object that is implicitly passed from the service layer
  * (or test layer) to other services and ultimately the data access layer,

@@ -16,17 +16,5 @@ abstract class MigrationService(val app: Altitude) extends CoreMigrationService 
 
   private def v1(context: Context)
                 (implicit txId: TransactionId = new TransactionId) = {
-
-    implicit val ctx: Context = new Context(user = app.USER, repo = app.REPO)
-
-    val triageFolder = app.service.folder.getTriageFolder
-    app.service.folder.add(triageFolder)
-
-    app.service.stats.createStat(Stats.SORTED_ASSETS)
-    app.service.stats.createStat(Stats.SORTED_BYTES)
-    app.service.stats.createStat(Stats.TRIAGE_ASSETS)
-    app.service.stats.createStat(Stats.TRIAGE_BYTES)
-    app.service.stats.createStat(Stats.RECYCLED_ASSETS)
-    app.service.stats.createStat(Stats.RECYCLED_BYTES)
   }
 }

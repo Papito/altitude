@@ -5,8 +5,8 @@ import java.io.File
 import org.apache.commons.io.{FileUtils, FilenameUtils}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
-import software.altitude.core.models.{Asset, Folder}
-import software.altitude.core.{Const => C, NotFoundException, StorageException}
+import software.altitude.core.models.{BaseModel, Repository, Asset, Folder}
+import software.altitude.core.{Const => C, Util, NotFoundException, StorageException}
 
 @DoNotDiscover class FileStoreServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
@@ -236,6 +236,13 @@ import software.altitude.core.{Const => C, NotFoundException, StorageException}
     checkNoRepositoryDirPath(relativePath)
     relativePath = FilenameUtils.concat(C.Path.ROOT, "folder3_new")
     checkRepositoryDirPath(relativePath)
+  }
+
+  test("Creating new repository sets up the folder tree", CurrentTag) {
+    val repository: Repository = altitude.service.repository.addRepository(
+      name = Util.randomStr(),
+      fileStoreType = C.FileStoreType.FS,
+      user = this.currentUser)
   }
 
   private def checkRepositoryDirPath(path: String) = {

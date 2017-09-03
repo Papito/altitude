@@ -6,10 +6,9 @@ import com.google.inject.{AbstractModule, Guice}
 import software.altitude.test.core.integration.util.dao.{jdbc, UtilitiesDao}
 import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
-import org.apache.commons.io.{FileUtils, FilenameUtils}
+import org.apache.commons.io.FileUtils
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach, FunSuite, Tag}
 import org.slf4j.{LoggerFactory, MDC}
-import software.altitude.core.Const.FileStoreType
 import software.altitude.core.models._
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C, _}
@@ -25,6 +24,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   Environment.ENV = Environment.TEST
 
   val datasource = config.get("datasource").get.asInstanceOf[C.DatasourceType.Value]
+
   protected def altitude = datasource match {
     case C.DatasourceType.POSTGRES => PostgresSuite.app
     case C.DatasourceType.SQLITE => SqliteSuite.app
@@ -56,17 +56,21 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
    * To run:
    *
    * sbt> test-only -- -n Current
-   * sbt> test-only integration.SqliteSuite -- -n Current
+   *
+   * For specific DB suite:
+   *
+   * sbt> test-only software.altitude.test.core.suites.SqliteSuite -- -n Current
    */
   object CurrentTag extends Tag("Current")
 
 
   /**
    * Our test users. We may alternate between them to make sure there is proper
-   * separation.
+   * separation between data users are allowed to see.
    */
-  private final val user: User = altitude.USER
-  private final val anotherUser: User = User(id = Some("a22222222222222222222222"))
+  private var user: User = null
+  private var anotherUser: User = null
+
   var currentUser = user
 
   /**
@@ -74,18 +78,9 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
    * bounds are not broken. Normally, no request should ever be able to peek into
    * data from other repositories. This is enforced in the DAO layer.
    */
-  private val repo = altitude.REPO
+  private var repo: Repository = null
+  private var anotherRepo: Repository = null
 
-  private val workPath = FileUtils.getUserDirectory.getAbsolutePath
-  private val dataDir = altitude.config.getString("dataDir")
-  private val dataPath2 = FilenameUtils.concat(FilenameUtils.concat(workPath, dataDir), "2")
-
-  private val repo2 = new Repository(name = "Repository 2",
-    id = Some("a20000000000000000000000"),
-    rootFolderId  = C.Folder.IDs.ROOT,
-    triageFolderId = C.Folder.IDs.TRIAGE,
-    fileStoreType = FileStoreType.FS,
-    fileStoreConfig = Map(C.Repository.Config.PATH -> dataPath2))
   var currentRepo = repo
 
   /**
@@ -110,7 +105,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   }
 
   def SET_SECONDARY_REPO() = {
-    currentRepo = repo2
+    currentRepo = anotherRepo
   }
 
   /**
@@ -146,12 +141,11 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     count = count + 1
     MDC.put("REQUEST_ID", s"[TEST: $count]")
 
-    // FIXME: should be in settings
     val testDir = new File("tmp/test/data")
     FileUtils.cleanDirectory(testDir)
     FileUtils.forceMkdir(testDir)
 
-    dbUtilities.migrateDatabase()
+    createFixtures()
 
     // keep transaction stats clean after DB migration dirties them
     altitude.txManager.transactions.reset()
@@ -187,5 +181,20 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
         case _ => throw new IllegalArgumentException(s"Do not know of datasource: ${altitude.dataSourceType}")
       }
     }
+  }
+
+  def createFixtures(): Unit = {
+    user = altitude.service.user.add(User())
+    anotherUser = altitude.service.user.add(User())
+
+    repo = altitude.service.repository.addRepository(
+      name = "Test Repository 1",
+      fileStoreType = C.FileStoreType.FS,
+      user = user)
+
+    anotherRepo = altitude.service.repository.addRepository(
+      name = "Test Repository 2",
+      fileStoreType = C.FileStoreType.FS,
+      user = anotherUser)
   }
 }

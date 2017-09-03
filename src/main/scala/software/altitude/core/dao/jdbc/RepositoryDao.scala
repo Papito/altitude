@@ -1,7 +1,7 @@
 package software.altitude.core.dao.jdbc
 
 import org.slf4j.LoggerFactory
-import play.api.libs.json.JsObject
+import play.api.libs.json.{Json, JsObject}
 import software.altitude.core.models.Repository
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{AltitudeCoreApp, Const => C, Context}
@@ -11,24 +11,27 @@ abstract class RepositoryDao(val app: AltitudeCoreApp) extends BaseJdbcDao with 
 
   override final val TABLE_NAME = "repository"
 
-  // this is the same as the base one - minus the repository ID, which is model does not have
+  // this is the same as the base one - minus the repository ID, which this model does not have
   override protected val ONE_SQL = s"""
       SELECT $DEFAULT_SQL_COLS_FOR_SELECT
         FROM $TABLE_NAME
        WHERE ${C.Base.ID} = ?"""
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
+    val fileStoreConfigCol = rec.get(C.Repository.FILES_STORE_CONFIG).get
+    val fileStoreConfigJsonStr: String = if (fileStoreConfigCol == null) "{}" else fileStoreConfigCol.asInstanceOf[String]
+    val fileStoreConfigJson = Json.parse(fileStoreConfigJsonStr).as[JsObject]
+
     val model = Repository(
       id = Some(rec.get(C.Base.ID).get.asInstanceOf[String]),
       name = rec.get(C.Repository.NAME).get.asInstanceOf[String],
       rootFolderId = rec.get(C.Repository.ROOT_FOLDER_ID).get.asInstanceOf[String],
       triageFolderId = rec.get(C.Repository.TRIAGE_FOLDER_ID).get.asInstanceOf[String],
-      fileStoreType = C.FileStoreType.withName(
-        rec.get(C.Repository.FILE_STORE_TYPE).get.asInstanceOf[String]),
-      fileStoreConfig = Map()
+      fileStoreType = C.FileStoreType.withName(rec.get(C.Repository.FILE_STORE_TYPE).get.asInstanceOf[String]),
+      fileStoreConfig = fileStoreConfigJson.as[Map[String, String]]
     )
 
-    model
+    addCoreAttrs(model, rec)
   }
 
   override def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
@@ -43,20 +46,22 @@ abstract class RepositoryDao(val app: AltitudeCoreApp) extends BaseJdbcDao with 
     val sql = s"""
         INSERT INTO $TABLE_NAME (
              ${C.Base.ID}, ${C.Repository.NAME}, ${C.Repository.FILE_STORE_TYPE},
-             ${C.Repository.ROOT_FOLDER_ID}, ${C.Repository.TRIAGE_FOLDER_ID})
-            VALUES (?, ?, ?, ?, ?)
+             ${C.Repository.ROOT_FOLDER_ID}, ${C.Repository.TRIAGE_FOLDER_ID},
+             ${C.Repository.FILES_STORE_CONFIG})
+            VALUES (?, ?, ?, ?, ?, $JSON_FUNC)
     """
 
     val sqlVals: List[Any] = List(
       repo.name,
       repo.fileStoreType.toString,
       repo.rootFolderId,
-      repo.triageFolderId)
+      repo.triageFolderId,
+      Json.toJson(repo.fileStoreConfig).toString())
 
     addRecord(jsonIn, sql, sqlVals)
   }
 
-  // we do not use repository ID here
+  // we do not use repository ID
   override protected def combineInsertValues(id: String, vals: List[Any])(implicit  ctx: Context) =
     id :: vals
 }

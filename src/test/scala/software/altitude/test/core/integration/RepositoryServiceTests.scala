@@ -7,17 +7,16 @@ import software.altitude.core.{Const => C, Util}
 
 @DoNotDiscover class RepositoryServiceTests (val config: Map[String, Any]) extends IntegrationTestCore {
 
-  test("create repository") {
-    val r = Repository(
+  test("create repository", CurrentTag) {
+    val r1: Repository = altitude.service.repository.addRepository(
       name = Util.randomStr(),
-      rootFolderId = BaseModel.genId,
-      triageFolderId = BaseModel.genId,
       fileStoreType = C.FileStoreType.FS,
-      fileStoreConfig = Map()
-    )
+      user = this.currentUser)
 
-    val r1: Repository = altitude.service.repository.add(r)
-    val r2: Repository = altitude.service.repository.getById(r1.id.get)
-    r2.name shouldEqual r.name
+    r1.fileStoreConfig.keys should contain(C.Repository.Config.PATH)
+
+    val r2: Repository = altitude.service.repository.getRepositoryById(r1.id.get)
+    r2.name shouldEqual r1.name
+    r2.fileStoreConfig.keys should contain(C.Repository.Config.PATH)
   }
 }

@@ -15,7 +15,7 @@ class QueryController extends BaseApiController {
     val foldersQuery = params.getOrElse(C.Api.Search.FOLDERS, "")
 
     val folderId = foldersQuery.isEmpty match {
-      case true => app.REPO.rootFolderId
+      case true => repository.rootFolderId
       case false => foldersQuery
     }
 
@@ -23,7 +23,7 @@ class QueryController extends BaseApiController {
   }
 
   get("/triage") {
-    defaultQuery(app.REPO.triageFolderId)
+    defaultQuery(repository.triageFolderId)
   }
 
   get(s"/p/:${C.Api.Search.PAGE}/rpp/:${C.Api.Search.RESULTS_PER_PAGE}") {
@@ -33,7 +33,7 @@ class QueryController extends BaseApiController {
     val foldersQuery = params.getOrElse(C.Api.Search.FOLDERS, "")
 
     val folderId = foldersQuery.isEmpty match {
-      case true => app.REPO.rootFolderId
+      case true => repository.rootFolderId
       case false => foldersQuery
     }
 
@@ -44,7 +44,7 @@ class QueryController extends BaseApiController {
     val rpp = params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, C.DEFAULT_RPP).toInt
     val page = params.getOrElse(C.Api.Search.PAGE, "1").toInt
 
-    query(app.REPO.triageFolderId, page, rpp)
+    query(repository.triageFolderId, page, rpp)
   }
 
   private def defaultQuery(folderId: String): ActionResult = {
