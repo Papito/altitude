@@ -80,7 +80,7 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeCor
           bind[UserDao].toInstance(new jdbc.UserDao(app) with dao.postgres.Postgres)
           bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.postgres.Postgres)
           bind[RepositoryDao].toInstance(new postgres.RepositoryDao(app))
-          bind[AssetDao].toInstance(new jdbc.AssetDao(app) with dao.postgres.Postgres)
+          bind[AssetDao].toInstance(new postgres.AssetDao(app) with dao.postgres.Postgres)
           bind[FolderDao].toInstance(new jdbc.FolderDao(app) with dao.postgres.Postgres)
           bind[StatDao].toInstance(new jdbc.StatDao(app) with dao.postgres.Postgres with dao.jdbc.Stats)
           bind[MetadataFieldDao].toInstance(new jdbc.MetadataFieldDao(app) with dao.postgres.Postgres)

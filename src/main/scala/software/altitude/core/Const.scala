@@ -80,11 +80,6 @@ object Const {
       val ROOT = "root"
       val TRIAGE = "triage"
     }
-
-    object IDs{
-      val ROOT = "root"
-      val TRIAGE = "triage"
-    }
   }
 
   object Preview {

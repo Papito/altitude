@@ -64,7 +64,6 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     val folder = Folder(
       name = name,
       parentId = _parentId)
-
     add(folder)
   }
 
@@ -127,25 +126,6 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     }
   }
 
-  /**
-   * Given a list of folders, calculate and append the folder paths
-   */
-  private def addPaths(folders: List[JsObject])
-                      (implicit ctx: Context, txId: TransactionId): List[JsObject] = {
-
-    txManager.asReadOnly[List[JsObject]] {
-    /*
-        folders.filter {
-          json => (json \ C.Base.ID).as[String] == _parentId }.map { json =>
-          // get parent ID (it already has the path calculated)
-          val parentFolder = get
-          json ++ Json.obj(C.Folder.PATH -> JsNumber(assetCount))
-        }
-    */
-    List()
-    }
-  }
-
   private def addPath(folder: Folder)(implicit ctx: Context, txId: TransactionId): Folder = {
     if (isRootFolder(folder.id.get)) {
       return getRootFolder
@@ -178,7 +158,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
 
       _all.filter(json => {
         val id = (json \ C.Base.ID).asOpt[String]
-        !isSystemFolder(id)
+        !isSystemFolder(id) && !isRootFolder(id.get)
       })
     }
   }
@@ -374,6 +354,10 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
    */
   def flatChildren(parentId: String, all: List[JsObject], depth: Int = 0)
                   (implicit ctx: Context): Set[Folder]  = {
+    if (isSystemFolder(Some(parentId)) || isRootFolder(parentId)) {
+      return Set()
+    }
+
     val parentElements = all filter (json => (json \ C.Base.ID).as[String] == parentId)
 
     if (parentElements.isEmpty) {
@@ -477,7 +461,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
 
       /*
         FIXME: this does not update paths for assets, until dynamic paths are implemented
-       */
+     `  */
 
       folderForUpdate.get
     }

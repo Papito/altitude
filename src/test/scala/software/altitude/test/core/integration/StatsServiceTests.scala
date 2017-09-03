@@ -54,10 +54,15 @@ import software.altitude.core.util.Query
     SET_SECONDARY_REPO()
     val stats3 = altitude.service.stats.getStats
 
-    // this will be passing later
-    intercept[RuntimeException] {
-      stats3.getStatValue(Stats.SORTED_ASSETS)
-    }
+    stats3.getStatValue(Stats.SORTED_ASSETS) shouldBe 0
+    stats3.getStatValue(Stats.SORTED_BYTES) shouldBe
+      stats3.getStatValue(Stats.SORTED_ASSETS) * ASSET_SIZE
+    stats2.getStatValue(Stats.TRIAGE_ASSETS) shouldBe 0
+    stats3.getStatValue(Stats.TRIAGE_BYTES) shouldBe
+      stats3.getStatValue(Stats.TRIAGE_ASSETS) * ASSET_SIZE
+    stats3.getStatValue(Stats.TOTAL_ASSETS) shouldBe 0
+    stats3.getStatValue(Stats.TOTAL_BYTES) shouldBe
+      stats3.getStatValue(Stats.TOTAL_ASSETS) * ASSET_SIZE
   }
 
   test("test triage") {
@@ -142,18 +147,25 @@ import software.altitude.core.util.Query
     SET_PRIMARY_USER()
 
     val stats = altitude.service.stats.getStats
+    stats.getStatValue(Stats.TRIAGE_ASSETS) shouldBe 1
+    stats.getStatValue(Stats.TRIAGE_BYTES) shouldBe
+      stats.getStatValue(Stats.TRIAGE_ASSETS) * ASSET_SIZE
     stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 0
     stats.getStatValue(Stats.SORTED_BYTES) shouldBe 0
     stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 0
     stats.getStatValue(Stats.RECYCLED_BYTES) shouldBe 0
 
     SET_SECONDARY_REPO()
+
     val stats2 = altitude.service.stats.getStats
 
-    // this will be passing later
-    intercept[RuntimeException] {
-      stats2.getStatValue(Stats.SORTED_ASSETS)
-    }
+    stats2.getStatValue(Stats.TRIAGE_ASSETS) shouldBe 0
+    stats2.getStatValue(Stats.TRIAGE_BYTES) shouldBe
+      stats2.getStatValue(Stats.TRIAGE_ASSETS) * ASSET_SIZE
+    stats2.getStatValue(Stats.SORTED_ASSETS) shouldBe 0
+    stats2.getStatValue(Stats.SORTED_BYTES) shouldBe 0
+    stats2.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 0
+    stats2.getStatValue(Stats.RECYCLED_BYTES) shouldBe 0
   }
 
   test("restore recycled asset to original folder") {

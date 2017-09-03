@@ -15,9 +15,9 @@ import software.altitude.core.{Const => C, Util, NotFoundException, StorageExcep
     var relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
     checkRepositoryFilePath(relAssetPath.getPath)
 
-    var folder: Folder = altitude.service.folder.addFolder("folder1")
+    val folder: Folder = altitude.service.folder.addFolder("folder1")
     relAssetPath = new File(folder.path.get, "1.jpg")
-    var movedAsset = altitude.service.library.moveAssetToFolder(asset.id.get, folder.id.get)
+    val movedAsset = altitude.service.library.moveAssetToFolder(asset.id.get, folder.id.get)
     checkRepositoryFilePath(relAssetPath.getPath)
     movedAsset.path contains relAssetPath.getPath
   }
@@ -26,7 +26,7 @@ import software.altitude.core.{Const => C, Util, NotFoundException, StorageExcep
     var folder1: Folder = altitude.service.folder.addFolder("folder1")
     var asset1: Asset = altitude.service.library.add(makeAsset(folder1))
     val folder2: Folder = altitude.service.folder.addFolder("folder2")
-    val asset2: Asset = altitude.service.library.add(makeAsset(folder2))
+    altitude.service.library.add(makeAsset(folder2))
 
     altitude.service.folder.move(folder1.id.get, folder2.id.get)
     checkNoRepositoryDirPath(folder1.path.get)
@@ -238,7 +238,7 @@ import software.altitude.core.{Const => C, Util, NotFoundException, StorageExcep
     checkRepositoryDirPath(relativePath)
   }
 
-  test("Creating new repository sets up the folder tree", CurrentTag) {
+  test("Creating new repository sets up the folder tree") {
     val repository: Repository = altitude.service.repository.addRepository(
       name = Util.randomStr(),
       fileStoreType = C.FileStoreType.FS,
