@@ -491,32 +491,29 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     }
   }
 
-  def getSysFolders(all: List[JsObject] = List())
+  /**
+   * Get the id -> folder map of system folders
+   */
+  def sysFoldersByIdMap(all: List[JsObject] = List())
                    (implicit ctx: Context, txId: TransactionId = new TransactionId): Map[String, Folder] = {
+
     txManager.asReadOnly[Map[String, Folder]] {
-      all.isEmpty match {
+      val allSysFolders = all.isEmpty match {
         case true =>
           val sysFolderIds: Set[String] = systemFolders.map(_.id.get).toSet
-          val allSysFolders = DAO.getByIds(sysFolderIds)
-          getSystemFolderLookup(allSysFolders)
+          DAO.getByIds(sysFolderIds)
         case false =>
-          val allSysFolders = all.filter(json => {
+          all.filter(json => {
             val id = (json \ C.Base.ID).asOpt[String]
               isSystemFolder(id)
           })
-          getSystemFolderLookup(allSysFolders)
       }
-    }
-  }
 
-  /**
-   * Given a list of system folders, create a lookup-by-folder-id map
-   */
-  private def getSystemFolderLookup(allSysFolders: List[JsObject]): Map[String, Folder] = {
-    allSysFolders.map(j => {
-      val id = (j \ C.Base.ID).as[String]
-      val folder = Folder.fromJson(j)
-      id -> folder
-    }).toMap
+      allSysFolders.map(j => {
+        val id = (j \ C.Base.ID).as[String]
+        val folder = Folder.fromJson(j)
+        id -> folder}
+      ).toMap
+    }
   }
 }

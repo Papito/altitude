@@ -45,7 +45,7 @@ import software.altitude.core.{Const => C, IllegalOperationException, NotFoundEx
     }
 
     // check counts
-    val systemFolders = altitude.service.folder.getSysFolders()
+    val systemFolders = altitude.service.folder.sysFoldersByIdMap()
 
     // we do not increment triage folder - this is recorded in Stats
     systemFolders(ctx.repo.triageFolderId).numOfAssets should be (0)
