@@ -138,7 +138,7 @@ import software.altitude.core.{Const => C, Util}
 
   test("pagination") {
     1 to 6 foreach { n =>
-      altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
+      altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
     }
 
     val q = Query(rpp = 2, page = 1)

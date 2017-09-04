@@ -5,40 +5,21 @@ import java.sql.DriverManager
 import com.google.inject.{AbstractModule, Guice, Injector}
 import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
-import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
-import software.altitude.core.Const.FileStoreType
 import software.altitude.core.dao._
-import software.altitude.core.models.{Repository, User}
 import software.altitude.core.service._
 import software.altitude.core.service.filestore.{FileStoreService, FileSystemStoreService}
 import software.altitude.core.service.migration._
 import software.altitude.core.transactions._
 import software.altitude.core.{Const => C}
 
-class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp  {
+class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp  {
   private final val log = LoggerFactory.getLogger(getClass)
   log.info(s"Initializing Altitude Server application instance with ID [$id]")
 
   final val app: Altitude = this
 
-  // TEMPORARY constants for user and repo IDS
-  val workPath = System.getProperty("user.dir")
-  val dataDir = config.getString("dataDir")
-  val dataPath = FilenameUtils.concat(workPath, dataDir)
-  log.info(s"Data path is '$dataPath'")
-
-  final val REPO = new Repository(name = "Repository",
-    id = Some("a10000000000000000000000"),
-    rootFolderId  = C.Folder.IDs.ROOT,
-    triageFolderId = C.Folder.IDs.TRIAGE,
-    fileStoreType = FileStoreType.FS,
-    fileStoreConfig = Map(C.Repository.Config.PATH -> dataPath))
-
-  final val USER = new User(Some("a11111111111111111111111"))
-  // end TEMP definitions
-
-  final val fileStoreType = REPO.fileStoreType
+  final val fileStoreType = config.fileStoreType
   log.info(s"File store type: $fileStoreType")
 
   /**
@@ -54,6 +35,7 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
   override val txManager = app.injector.instance[AbstractTransactionManager]
 
   object service {
+    val user = new UserService(app)
     val repository = new RepositoryService(app)
     val assetImport = new AssetImportService(app)
     val metadataExtractor = new TikaMetadataExtractionService
@@ -97,12 +79,13 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
           bind[AbstractTransactionManager].toInstance(jdbcTxManager)
           bind[JdbcTransactionManager].toInstance(jdbcTxManager)
 
+          bind[UserDao].toInstance(new jdbc.UserDao(app) with dao.postgres.Postgres)
           bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.postgres.Postgres)
-          bind[RepositoryDao].toInstance(new jdbc.RepositoryDao(app) with dao.postgres.Postgres)
-          bind[AssetDao].toInstance(new jdbc.AssetDao(app) with dao.postgres.Postgres)
+          bind[RepositoryDao].toInstance(new postgres.RepositoryDao(app))
+          bind[AssetDao].toInstance(new postgres.AssetDao(app) with dao.postgres.Postgres)
           bind[FolderDao].toInstance(new jdbc.FolderDao(app) with dao.postgres.Postgres)
           bind[StatDao].toInstance(new jdbc.StatDao(app) with dao.postgres.Postgres with dao.jdbc.Stats)
-          bind[MetadataFieldDao].toInstance(new jdbc.MetadataFieldDao(app) with dao.sqlite.Sqlite)
+          bind[MetadataFieldDao].toInstance(new jdbc.MetadataFieldDao(app) with dao.postgres.Postgres)
           bind[SearchDao].toInstance(new postgres.SearchDao(app))
 
         case C.DatasourceType.SQLITE =>
@@ -112,6 +95,7 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
           bind[AbstractTransactionManager].toInstance(jdbcTxManager)
           bind[JdbcTransactionManager].toInstance(jdbcTxManager)
 
+          bind[UserDao].toInstance(new jdbc.UserDao(app) with dao.sqlite.Sqlite)
           bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.sqlite.Sqlite)
           bind[RepositoryDao].toInstance(new jdbc.RepositoryDao(app) with dao.sqlite.Sqlite)
           bind[AssetDao].toInstance(new jdbc.AssetDao(app) with dao.sqlite.Sqlite)

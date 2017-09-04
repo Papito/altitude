@@ -10,18 +10,23 @@ CREATE TABLE system (
 CREATE UNIQUE INDEX system_01 ON system(id);#END
 INSERT INTO system(id, version) VALUES(0, 0);#END
 
+CREATE TABLE repository_user(
+  id CHAR(24) PRIMARY KEY
+)INHERITS (_core);#END
+
 CREATE TABLE repository(
   id CHAR(24) PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   description TEXT,
-  root_folder_id VARCHAR(24) NOT NULL,
-  triage_folder_id VARCHAR(24) NOT NULL,
-  file_store_type VARCHAR NOT NULL
+  root_folder_id CHAR(24) NOT NULL,
+  triage_folder_id CHAR(24) NOT NULL,
+  file_store_type VARCHAR NOT NULL,
+  file_store_config jsonb
 ) INHERITS (_core);#END
 
 CREATE TABLE stats (
   repository_id CHAR(24) NOT NULL,
-  dimension VARCHAR(60) PRIMARY KEY,
+  dimension VARCHAR(60),
   dim_val INT NOT NULL DEFAULT 0
 );#END
 CREATE INDEX stats_01 ON stats(repository_id);#END
@@ -38,7 +43,7 @@ CREATE TABLE asset (
   metadata jsonb,
   extracted_metadata jsonb,
   raw_metadata jsonb,
-  folder_id VARCHAR(24) NOT NULL DEFAULT '1',
+  folder_id CHAR(24) NOT NULL DEFAULT '1',
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
   is_recycled INT NOT NULL DEFAULT 0
@@ -57,7 +62,7 @@ CREATE INDEX metadata_field_01 ON metadata_field(repository_id);#END
 CREATE UNIQUE INDEX metadata_field_02 ON metadata_field(repository_id, name_lc);#END
 
 CREATE TABLE folder (
-  id VARCHAR(24) PRIMARY KEY,
+  id CHAR(24) PRIMARY KEY,
   repository_id CHAR(24) NOT NULL,
   name VARCHAR(255) NOT NULL,
   name_lc VARCHAR(255) NOT NULL,

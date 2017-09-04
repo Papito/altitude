@@ -71,7 +71,7 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
         path(1).id shouldBe folder2.id
         path.last.id shouldBe folder2_1_1.id
 
-        SET_SECONDARY_REPO()
+        SET_SECOND_REPO()
 
         val hierarchy2 = altitude.service.folder.hierarchy()
         hierarchy2 shouldBe empty
@@ -194,7 +194,7 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
   }
 
   test("delete sys folder") {
-    altitude.service.folder.getSystemFolders.foreach { sysFolder =>
+    altitude.service.folder.systemFolders.foreach { sysFolder =>
       intercept[IllegalOperationException] {
         altitude.service.library.deleteFolderById(sysFolder.id.get)
       }
@@ -202,7 +202,7 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
   }
 
   test("add a child to a sys folder") {
-    altitude.service.folder.getSystemFolders.foreach { sysFolder =>
+    altitude.service.folder.systemFolders.foreach { sysFolder =>
       intercept[IllegalOperationException] {
         altitude.service.folder.addFolder(name = "folder1", parentId = sysFolder.id)
         }

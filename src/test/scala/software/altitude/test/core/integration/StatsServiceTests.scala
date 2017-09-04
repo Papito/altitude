@@ -17,13 +17,13 @@ import software.altitude.core.util.Query
 
     // create a triaged asset
     val triagedAsset: Asset = altitude.service.library.add(makeAsset(
-      altitude.service.folder.getTriageFolder))
+      altitude.service.folder.triageFolder))
 
     // create an asset and delete it
     val assetToDelete1: Asset = altitude.service.library.add(makeAsset(folder1))
     altitude.service.library.recycleAsset(assetToDelete1.id.get)
     val assetToDelete2: Asset = altitude.service.library.add(makeAsset(
-      altitude.service.folder.getTriageFolder))
+      altitude.service.folder.triageFolder))
     altitude.service.library.recycleAsset(assetToDelete2.id.get)
 
     val stats = altitude.service.stats.getStats
@@ -51,13 +51,18 @@ import software.altitude.core.util.Query
     stats.getStatValue(Stats.TOTAL_BYTES) shouldBe
       stats.getStatValue(Stats.TOTAL_ASSETS) * ASSET_SIZE
 
-    SET_SECONDARY_REPO()
+    SET_SECOND_REPO()
     val stats3 = altitude.service.stats.getStats
 
-    // this will be passing later
-    intercept[RuntimeException] {
-      stats3.getStatValue(Stats.SORTED_ASSETS)
-    }
+    stats3.getStatValue(Stats.SORTED_ASSETS) shouldBe 0
+    stats3.getStatValue(Stats.SORTED_BYTES) shouldBe
+      stats3.getStatValue(Stats.SORTED_ASSETS) * ASSET_SIZE
+    stats2.getStatValue(Stats.TRIAGE_ASSETS) shouldBe 0
+    stats3.getStatValue(Stats.TRIAGE_BYTES) shouldBe
+      stats3.getStatValue(Stats.TRIAGE_ASSETS) * ASSET_SIZE
+    stats3.getStatValue(Stats.TOTAL_ASSETS) shouldBe 0
+    stats3.getStatValue(Stats.TOTAL_BYTES) shouldBe
+      stats3.getStatValue(Stats.TOTAL_ASSETS) * ASSET_SIZE
   }
 
   test("test triage") {
@@ -131,29 +136,36 @@ import software.altitude.core.util.Query
 
   test("restore recycled asset to triage") {
     val asset: Asset = altitude.service.library.add(makeAsset(
-      altitude.service.folder.getTriageFolder))
+      altitude.service.folder.triageFolder))
     val trashed: Asset = altitude.service.library.recycleAsset(asset.id.get)
     altitude.service.library.restoreRecycledAsset(trashed.id.get)
 
-    SET_SECONDARY_USER()
+    SET_SECOND_USER()
     altitude.service.library.add(makeAsset(
-      altitude.service.folder.getTriageFolder))
+      altitude.service.folder.triageFolder))
 
-    SET_PRIMARY_USER()
+    SET_FIRST_USER()
 
     val stats = altitude.service.stats.getStats
+    stats.getStatValue(Stats.TRIAGE_ASSETS) shouldBe 1
+    stats.getStatValue(Stats.TRIAGE_BYTES) shouldBe
+      stats.getStatValue(Stats.TRIAGE_ASSETS) * ASSET_SIZE
     stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 0
     stats.getStatValue(Stats.SORTED_BYTES) shouldBe 0
     stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 0
     stats.getStatValue(Stats.RECYCLED_BYTES) shouldBe 0
 
-    SET_SECONDARY_REPO()
+    SET_SECOND_REPO()
+
     val stats2 = altitude.service.stats.getStats
 
-    // this will be passing later
-    intercept[RuntimeException] {
-      stats2.getStatValue(Stats.SORTED_ASSETS)
-    }
+    stats2.getStatValue(Stats.TRIAGE_ASSETS) shouldBe 0
+    stats2.getStatValue(Stats.TRIAGE_BYTES) shouldBe
+      stats2.getStatValue(Stats.TRIAGE_ASSETS) * ASSET_SIZE
+    stats2.getStatValue(Stats.SORTED_ASSETS) shouldBe 0
+    stats2.getStatValue(Stats.SORTED_BYTES) shouldBe 0
+    stats2.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 0
+    stats2.getStatValue(Stats.RECYCLED_BYTES) shouldBe 0
   }
 
   test("restore recycled asset to original folder") {
@@ -175,7 +187,7 @@ import software.altitude.core.util.Query
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
     1 to 2 foreach { n =>
-      altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
+      altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
       altitude.service.library.add(makeAsset(folder1))
     }
 

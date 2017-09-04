@@ -3,6 +3,7 @@ package software.altitude.core.dao
 import java.util.regex.Pattern
 
 import play.api.libs.json.JsObject
+import software.altitude.core.models.BaseModel
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.{Query, QueryResult}
 import software.altitude.core.{AltitudeCoreApp, Const => C, Context}
@@ -17,6 +18,10 @@ object BaseDao {
   def verifyId(id: String) = {
     if (id == null) {
       throw new IllegalArgumentException("ID is not defined")
+    }
+
+    if (id.length != BaseModel.ID_LEN) {
+      throw new IllegalArgumentException(s"ID length should be ${BaseModel.ID_LEN}. Was: [${id.length}]")
     }
 
     if (!VALID_ID_PATTERN.matcher(id).find()) {

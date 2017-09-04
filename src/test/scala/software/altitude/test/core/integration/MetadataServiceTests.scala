@@ -13,7 +13,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
       MetadataField(
         name = "number field",
         fieldType = FieldType.NUMBER))
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
 
     var data = Map[String, Set[String]](field.id.get -> Set("one"))
     intercept[ValidationException] {
@@ -35,7 +35,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
       MetadataField(
         name = "boolean field",
         fieldType = FieldType.BOOL))
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
 
     var data = Map[String, Set[String]](field.id.get -> Set("one"))
     intercept[ValidationException] {
@@ -80,7 +80,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
         name = "number field",
         fieldType = FieldType.NUMBER))
 
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
 
     // add a field we do not expect
     val badData = Map[String, Set[String]](
@@ -124,7 +124,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
         name = "field 2",
         fieldType = FieldType.NUMBER))
 
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
 
     var data = Map[String, Set[String]](
       field1.id.get -> Set("one", "two", "three"),
@@ -156,7 +156,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
         name = "field 2",
         fieldType = FieldType.NUMBER))
 
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
 
     var data = Map[String, Set[String]](
         field1.id.get -> Set("one", "two", "three"),
@@ -214,14 +214,14 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
     altitude.service.metadata.addField(
       MetadataField(name = "field name 2", fieldType = FieldType.KEYWORD))
 
-    SET_SECONDARY_USER()
+    SET_SECOND_USER()
     altitude.service.metadata.addField(
       MetadataField(name = "field name 3", fieldType = FieldType.KEYWORD))
 
-    SET_PRIMARY_USER()
+    SET_FIRST_USER()
     altitude.service.metadata.getAllFields.size shouldBe 3
 
-    SET_SECONDARY_USER()
+    SET_SECOND_USER()
     altitude.service.metadata.getAllFields.size shouldBe 3
   }
 
@@ -270,7 +270,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
     val metadata = new Metadata(data)
 
     val asset: Asset = altitude.service.library.add(
-      makeAsset(altitude.service.folder.getTriageFolder, metadata = metadata))
+      makeAsset(altitude.service.folder.triageFolder, metadata = metadata))
 
     val storedAsset: Asset = altitude.service.library.getById(asset.id.get)
 
@@ -298,7 +298,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
     val metadata = new Metadata(data)
 
     val asset: Asset = altitude.service.library.add(
-      makeAsset(altitude.service.folder.getTriageFolder, metadata = metadata))
+      makeAsset(altitude.service.folder.triageFolder, metadata = metadata))
 
     val storedAsset: Asset = altitude.service.library.getById(asset.id.get)
 

@@ -9,6 +9,7 @@ class Configuration(configOverride: Map[String, Any] = new HashMap()) {
   def getFlag(key: String) = data.getOrElse(key, false).asInstanceOf[Boolean]
   def getInt(key: String) = data.getOrElse(key, 0).asInstanceOf[Int]
   def datasourceType = data.get("datasource").get.asInstanceOf[C.DatasourceType.Value]
+  def fileStoreType = data.get("filestore").get.asInstanceOf[C.FileStoreType.Value]
 
   private val default = HashMap(
     "app.name" -> "Altitude",

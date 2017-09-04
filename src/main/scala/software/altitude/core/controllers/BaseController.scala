@@ -5,7 +5,7 @@ import java.io.{PrintWriter, StringWriter}
 import org.scalatra.InternalServerError
 import org.slf4j.{LoggerFactory, MDC}
 import software.altitude.core.models.{Repository, User}
-import software.altitude.core.{Const => C, Context, SingleApplication}
+import software.altitude.core.{Context, SingleApplication}
 
 import scala.compat.Platform
 
@@ -24,6 +24,7 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
     MDC.put("REQUEST_ID", s"[$requestId]")
     request.setAttribute("startTime", Platform.currentTime)
     setUser()
+    setRepository()
     logRequestStart()
   }
 
@@ -42,9 +43,17 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
   }
 
   protected def setUser() = {
-    request.setAttribute("user", app.USER)
-    MDC.put("USER", s"[${app.USER.toString}]")
-    request.setAttribute("repository", app.REPO)
+    val userId = params("user_id")
+    val user: User = app.service.user.getById(userId)
+    MDC.put("USER", s"[$user]")
+    request.setAttribute("user", user)
+  }
+
+  protected def setRepository() = {
+    val repositoryId = params("repository_id")
+    val repository: Repository = app.service.repository.getRepositoryById(repositoryId)
+    MDC.put("REPO", s"[$repository]")
+    request.setAttribute("repository", repository)
   }
 
   error {
