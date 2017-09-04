@@ -55,8 +55,8 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
     implicit val ctx = new Context(repo = repo, user = user)
 
     log.info(s"Creating repository [${ctx.repo.name}] system folders")
-    app.service.folder.add(app.service.folder.getRootFolder)
-    app.service.folder.add(app.service.folder.getTriageFolder)
+    app.service.folder.add(app.service.folder.rootFolder)
+    app.service.folder.add(app.service.folder.triageFolder)
 
     log.info(s"Setting up repository [${ctx.repo.name}] statistics")
     app.service.stats.createStat(Stats.SORTED_ASSETS)

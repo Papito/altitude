@@ -35,7 +35,7 @@ import software.altitude.core.{Const => C, IllegalOperationException, NotFoundEx
 
     // fill up the hierarchy with assets x times over
     1 to 2 foreach {n =>
-      altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
+      altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
       altitude.service.library.add(makeAsset(folder1))
       altitude.service.library.add(makeAsset(folder2))
       altitude.service.library.add(makeAsset(folder2_1))
@@ -51,7 +51,7 @@ import software.altitude.core.{Const => C, IllegalOperationException, NotFoundEx
     systemFolders(ctx.repo.triageFolderId).numOfAssets should be (0)
 
     // prefetch all folders for speed
-    val all = altitude.service.folder.getUserFolders()
+    val all = altitude.service.folder.repositoryFolders()
 
     // test counts for individual folders
     (altitude.service.folder.getByIdWithChildAssetCounts(folder1.id.get, all): Folder).numOfAssets should be (2)
@@ -77,7 +77,7 @@ import software.altitude.core.{Const => C, IllegalOperationException, NotFoundEx
   }
 
   test("rename asset") {
-    var asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
+    var asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
     var updatedAsset: Asset = altitude.service.library.renameAsset(asset.id.get, "newName")
     updatedAsset.fileName shouldBe "newName"
     updatedAsset.path.get should endWith("newName")
@@ -96,7 +96,7 @@ import software.altitude.core.{Const => C, IllegalOperationException, NotFoundEx
   }
 
   test("move recycled asset to folder") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
     altitude.service.asset.query(Query()).records.length shouldBe 1
     altitude.service.asset.queryRecycled(Query()).records.length shouldBe 0
     altitude.service.library.recycleAsset(asset.id.get)
@@ -112,7 +112,7 @@ import software.altitude.core.{Const => C, IllegalOperationException, NotFoundEx
       Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
     ).records.length shouldBe 1
 
-    val all = altitude.service.folder.getUserFolders()
+    val all = altitude.service.folder.repositoryFolders()
 
     (altitude.service.folder.getByIdWithChildAssetCounts(folder1.id.get, all): Folder).numOfAssets should be (1)
   }
@@ -168,10 +168,10 @@ import software.altitude.core.{Const => C, IllegalOperationException, NotFoundEx
   }
 
   test("recycle asset") {
-    altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
+    altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
 
     SET_SECOND_USER()
-    altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
+    altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
 
     SET_FIRST_USER()
     altitude.service.asset.query(Query()).records.length shouldBe 2
@@ -188,19 +188,19 @@ import software.altitude.core.{Const => C, IllegalOperationException, NotFoundEx
   }
 
   test("get recycled asset") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
     altitude.service.library.recycleAsset(asset.id.get)
   }
 
   test("restore recycled asset") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
     val trashed: Asset = altitude.service.library.recycleAsset(asset.id.get)
     altitude.service.library.restoreRecycledAsset(trashed.id.get)
     altitude.service.asset.query(Query()).isEmpty shouldBe false
   }
 
   test("restore recycled asset to non-existing folder") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
     altitude.service.library.recycleAsset(asset.id.get)
 
     intercept[NotFoundException] {

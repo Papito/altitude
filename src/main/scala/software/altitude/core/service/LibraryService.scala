@@ -277,7 +277,7 @@ class LibraryService(app: Altitude) {
 
       // get the list of tuples - (depth, id), with most-deep first
       val childrenAndDepths: List[(Int, String)] =
-        app.service.folder.flatChildrenIdsWithDepths(id, app.service.folder.getUserFolders()).sortBy(_._1).reverse
+        app.service.folder.flatChildrenIdsWithDepths(id, app.service.folder.repositoryFolders()).sortBy(_._1).reverse
                                                         /* ^^^ sort by depth */
 
       // now delete the children, most-deep first

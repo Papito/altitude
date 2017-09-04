@@ -17,13 +17,13 @@ import software.altitude.core.util.Query
 
     // create a triaged asset
     val triagedAsset: Asset = altitude.service.library.add(makeAsset(
-      altitude.service.folder.getTriageFolder))
+      altitude.service.folder.triageFolder))
 
     // create an asset and delete it
     val assetToDelete1: Asset = altitude.service.library.add(makeAsset(folder1))
     altitude.service.library.recycleAsset(assetToDelete1.id.get)
     val assetToDelete2: Asset = altitude.service.library.add(makeAsset(
-      altitude.service.folder.getTriageFolder))
+      altitude.service.folder.triageFolder))
     altitude.service.library.recycleAsset(assetToDelete2.id.get)
 
     val stats = altitude.service.stats.getStats
@@ -136,13 +136,13 @@ import software.altitude.core.util.Query
 
   test("restore recycled asset to triage") {
     val asset: Asset = altitude.service.library.add(makeAsset(
-      altitude.service.folder.getTriageFolder))
+      altitude.service.folder.triageFolder))
     val trashed: Asset = altitude.service.library.recycleAsset(asset.id.get)
     altitude.service.library.restoreRecycledAsset(trashed.id.get)
 
     SET_SECOND_USER()
     altitude.service.library.add(makeAsset(
-      altitude.service.folder.getTriageFolder))
+      altitude.service.folder.triageFolder))
 
     SET_FIRST_USER()
 
@@ -187,7 +187,7 @@ import software.altitude.core.util.Query
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
     1 to 2 foreach { n =>
-      altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
+      altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
       altitude.service.library.add(makeAsset(folder1))
     }
 

@@ -42,7 +42,7 @@ import software.altitude.core.util.QueryResult
         ),
         field3.id.get -> Set("Lindsay Lohan", "Conan O'Brien", "Teri Hatcher", "Sam Rockwell"))
 
-    val assetData1 = makeAsset(altitude.service.folder.getTriageFolder, new Metadata(data))
+    val assetData1 = makeAsset(altitude.service.folder.triageFolder, new Metadata(data))
     val asset1: Asset = altitude.service.library.add(assetData1)
 
     data = Map[String, Set[String]](
@@ -60,7 +60,7 @@ import software.altitude.core.util.QueryResult
         ),
         field3.id.get -> Set("Keanu Reeves", "Sandra Bullock", "Dennis Hopper", "Teri Hatcher"))
 
-    val assetData2 = makeAsset(altitude.service.folder.getTriageFolder, new Metadata(data))
+    val assetData2 = makeAsset(altitude.service.folder.triageFolder, new Metadata(data))
     val asset2: Asset = altitude.service.library.add(assetData2)
 
     var results: QueryResult = altitude.service.search.search("keanu")
