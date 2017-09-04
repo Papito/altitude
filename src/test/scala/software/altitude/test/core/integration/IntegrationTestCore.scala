@@ -69,7 +69,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
    * separation between data users are allowed to see.
    */
   private var user: User = null
-  private var anotherUser: User = null
+  private var secondUser: User = null
 
   var currentUser = user
 
@@ -79,7 +79,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
    * data from other repositories. This is enforced in the DAO layer.
    */
   private var repo: Repository = null
-  private var anotherRepo: Repository = null
+  private var secondRepo: Repository = null
 
   var currentRepo = repo
 
@@ -93,19 +93,19 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   /**
    * Methods to toggle between different user and repositories.
    */
-  def SET_PRIMARY_USER() = {
+  def SET_FIRST_USER() = {
     currentUser = user
   }
-  def SET_SECONDARY_USER() = {
-    currentUser = anotherUser
+  def SET_SECOND_USER() = {
+    currentUser = secondUser
   }
 
-  def SET_PRIMARY_REPO() = {
+  def SET_FIRST_REPO() = {
     currentRepo = repo
   }
 
-  def SET_SECONDARY_REPO() = {
-    currentRepo = anotherRepo
+  def SET_SECOND_REPO() = {
+    currentRepo = secondRepo
   }
 
   /**
@@ -150,11 +150,10 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     // keep transaction stats clean after DB migration dirties them
     altitude.txManager.transactions.reset()
 
-
     dbUtilities.createTransaction(txId)
 
-    SET_PRIMARY_USER()
-    SET_PRIMARY_REPO()
+    SET_FIRST_USER()
+    SET_FIRST_REPO()
   }
 
   override def afterEach() {
@@ -185,16 +184,16 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
 
   def createFixtures(): Unit = {
     user = altitude.service.user.add(User())
-    anotherUser = altitude.service.user.add(User())
+    secondUser = altitude.service.user.add(User())
 
     repo = altitude.service.repository.addRepository(
       name = "Test Repository 1",
       fileStoreType = C.FileStoreType.FS,
       user = user)
 
-    anotherRepo = altitude.service.repository.addRepository(
+    secondRepo = altitude.service.repository.addRepository(
       name = "Test Repository 2",
       fileStoreType = C.FileStoreType.FS,
-      user = anotherUser)
+      user = secondUser)
   }
 }

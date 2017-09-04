@@ -51,7 +51,7 @@ import software.altitude.core.util.Query
     stats.getStatValue(Stats.TOTAL_BYTES) shouldBe
       stats.getStatValue(Stats.TOTAL_ASSETS) * ASSET_SIZE
 
-    SET_SECONDARY_REPO()
+    SET_SECOND_REPO()
     val stats3 = altitude.service.stats.getStats
 
     stats3.getStatValue(Stats.SORTED_ASSETS) shouldBe 0
@@ -140,11 +140,11 @@ import software.altitude.core.util.Query
     val trashed: Asset = altitude.service.library.recycleAsset(asset.id.get)
     altitude.service.library.restoreRecycledAsset(trashed.id.get)
 
-    SET_SECONDARY_USER()
+    SET_SECOND_USER()
     altitude.service.library.add(makeAsset(
       altitude.service.folder.getTriageFolder))
 
-    SET_PRIMARY_USER()
+    SET_FIRST_USER()
 
     val stats = altitude.service.stats.getStats
     stats.getStatValue(Stats.TRIAGE_ASSETS) shouldBe 1
@@ -155,7 +155,7 @@ import software.altitude.core.util.Query
     stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 0
     stats.getStatValue(Stats.RECYCLED_BYTES) shouldBe 0
 
-    SET_SECONDARY_REPO()
+    SET_SECOND_REPO()
 
     val stats2 = altitude.service.stats.getStats
 

@@ -214,14 +214,14 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
     altitude.service.metadata.addField(
       MetadataField(name = "field name 2", fieldType = FieldType.KEYWORD))
 
-    SET_SECONDARY_USER()
+    SET_SECOND_USER()
     altitude.service.metadata.addField(
       MetadataField(name = "field name 3", fieldType = FieldType.KEYWORD))
 
-    SET_PRIMARY_USER()
+    SET_FIRST_USER()
     altitude.service.metadata.getAllFields.size shouldBe 3
 
-    SET_SECONDARY_USER()
+    SET_SECOND_USER()
     altitude.service.metadata.getAllFields.size shouldBe 3
   }
 

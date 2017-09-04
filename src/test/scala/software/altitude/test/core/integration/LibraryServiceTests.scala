@@ -142,7 +142,7 @@ import software.altitude.core.{Const => C, IllegalOperationException, NotFoundEx
       Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2.id.get))
     ).records.length shouldBe 1
 
-    SET_SECONDARY_REPO()
+    SET_SECOND_REPO()
 
     altitude.service.library.query(Query()).isEmpty shouldBe true
 
@@ -170,10 +170,10 @@ import software.altitude.core.{Const => C, IllegalOperationException, NotFoundEx
   test("recycle asset") {
     altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
 
-    SET_SECONDARY_USER()
+    SET_SECOND_USER()
     altitude.service.library.add(makeAsset(altitude.service.folder.getTriageFolder))
 
-    SET_PRIMARY_USER()
+    SET_FIRST_USER()
     altitude.service.asset.query(Query()).records.length shouldBe 2
 
     val asset: Asset = altitude.service.asset.query(Query()).records.head
@@ -182,7 +182,7 @@ import software.altitude.core.{Const => C, IllegalOperationException, NotFoundEx
     altitude.service.asset.query(Query()).records.length shouldBe 1
     altitude.service.asset.queryRecycled(Query()).records.length shouldBe 1
 
-    SET_SECONDARY_REPO()
+    SET_SECOND_REPO()
 
     altitude.service.asset.queryRecycled(Query()).records.length shouldBe 0
   }
