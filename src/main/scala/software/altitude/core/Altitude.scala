@@ -69,13 +69,15 @@ class Altitude(configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp
       case _ => throw new NotImplementedError
     }
 
+    final val SCHEMA_VERSION = 1
+
     val migration = dataSourceType match {
       case C.DatasourceType.SQLITE => new MigrationService(app) with JdbcMigrationService with SqliteMigration {
-        override final val CURRENT_VERSION = 1
+        override final val CURRENT_VERSION = SCHEMA_VERSION
         override final val MIGRATIONS_DIR = "/migrations/server/sqlite"
       }
       case C.DatasourceType.POSTGRES => new MigrationService(app) with JdbcMigrationService with PostgresMigration {
-        override final val CURRENT_VERSION = 1
+        override final val CURRENT_VERSION = SCHEMA_VERSION
         override final val MIGRATIONS_DIR = "/migrations/server/postgres"
       }
     }
