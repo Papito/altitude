@@ -18,5 +18,6 @@ import software.altitude.core.{Const => C, Util}
     val r2: Repository = altitude.service.repository.getRepositoryById(r1.id.get)
     r2.name shouldEqual r1.name
     r2.fileStoreConfig.keys should contain(C.Repository.Config.PATH)
+    r2.createdAt should not be None
   }
 }

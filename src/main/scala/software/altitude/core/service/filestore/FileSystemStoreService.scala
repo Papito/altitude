@@ -17,11 +17,8 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   final override def trashFolderPath(implicit ctx: Context): String = C.Path.TRASH
   final override def landfillFolderPath(implicit ctx: Context): String = C.Path.LANDFILL
 
-  override def addFolder(folder: Folder)(implicit ctx: Context): Unit = {
-    require(folder.path.isDefined)
-    require(folder.path.get.nonEmpty)
-
-    val destFile = absoluteFile(folder.path.get)
+  override def createPath(relPath: String)(implicit ctx: Context): Unit = {
+    val destFile = absoluteFile(relPath)
     log.info(s"Adding FS folder [$destFile]")
 
     try {
@@ -35,6 +32,12 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     if (!(destFile.exists && destFile.isDirectory)) {
       throw StorageException(s"Directory [$destFile] could not be created")
     }
+  }
+
+  override def addFolder(folder: Folder)(implicit ctx: Context): Unit = {
+    require(folder.path.isDefined)
+    require(folder.path.get.nonEmpty)
+    createPath(folder.path.get)
   }
 
   override def deleteFolder(folder: Folder)(implicit ctx: Context): Unit = {

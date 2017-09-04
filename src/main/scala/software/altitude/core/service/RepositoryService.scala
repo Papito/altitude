@@ -58,6 +58,9 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
     app.service.folder.add(app.service.folder.rootFolder)
     app.service.folder.add(app.service.folder.triageFolder)
 
+    // trash does not have an explicit folder record - just the storage location
+    app.service.fileStore.createPath(app.service.fileStore.trashFolderPath)
+
     log.info(s"Setting up repository [${ctx.repo.name}] statistics")
     app.service.stats.createStat(Stats.SORTED_ASSETS)
     app.service.stats.createStat(Stats.SORTED_BYTES)

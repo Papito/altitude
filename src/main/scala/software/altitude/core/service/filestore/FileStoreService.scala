@@ -10,6 +10,8 @@ trait FileStoreService {
   def getById(id: String)
              (implicit ctx: Context, txId: TransactionId = new TransactionId): Data
 
+  def createPath(relPath: String)(implicit ctx: Context)
+
   def addAsset(asset: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId)
 
   def purgeAsset(asset: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId)

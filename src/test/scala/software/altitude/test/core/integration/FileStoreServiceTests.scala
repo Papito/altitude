@@ -243,6 +243,10 @@ import software.altitude.core.{Const => C, Util, NotFoundException, StorageExcep
       name = Util.randomStr(),
       fileStoreType = C.FileStoreType.FS,
       user = this.currentUser)
+
+    checkRepositoryDirPath(C.Path.ROOT)
+    checkRepositoryDirPath(C.Path.TRIAGE)
+    checkRepositoryDirPath(C.Path.TRASH)
   }
 
   private def checkRepositoryDirPath(path: String) = {
