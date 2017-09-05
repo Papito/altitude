@@ -26,8 +26,6 @@ abstract class UserDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softwa
   }
 
   override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
-    val user = jsonIn: User
-
     val sql = s"""
         INSERT INTO $TABLE_NAME (${C.Base.ID})
              VALUES (?)

@@ -12,7 +12,7 @@ INSERT INTO system(id, version) VALUES(0, 0);#END
 
 CREATE TABLE repository_user(
   id CHAR(24) PRIMARY KEY
-)INHERITS (_core);#END
+) INHERITS (_core);#END
 
 CREATE TABLE repository(
   id CHAR(24) PRIMARY KEY,

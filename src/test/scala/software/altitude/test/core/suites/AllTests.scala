@@ -18,6 +18,7 @@ abstract class AllTests(val config: Map[String, Any]) extends Suites(
     new FolderServiceTests(config),
     new FileStoreServiceTests(config),
     new LibraryServiceTests(config),
-    new StatsServiceTests(config)
+    new StatsServiceTests(config),
+    new UserServiceTests(config)
 )
 
