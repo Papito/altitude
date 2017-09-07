@@ -84,7 +84,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   def rootFolder(implicit ctx: Context, txId: TransactionId = new TransactionId) = Folder(
     id = Some(ctx.repo.rootFolderId),
     parentId = ctx.repo.rootFolderId,
-    name = C.Folder.Names.ROOT,
+    name = C.Folder.Name.ROOT,
     path = Some(app.service.fileStore.sortedFolderPath)
   )
 
@@ -94,7 +94,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   def triageFolder(implicit ctx: Context, txId: TransactionId = new TransactionId) = Folder(
     id = Some(ctx.repo.triageFolderId),
     parentId = ctx.repo.rootFolderId,
-    name = C.Folder.Names.TRIAGE,
+    name = C.Folder.Name.TRIAGE,
     path = Some(app.service.fileStore.triageFolderPath)
   )
 
@@ -168,6 +168,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
    */
   def hierarchy(rootId: Option[String] = None, allRepoFolders: List[JsObject] = List())
                (implicit ctx: Context, txId: TransactionId = new TransactionId): List[Folder] = {
+
     val _rootId = if (rootId.isDefined) rootId.get else ctx.repo.rootFolderId
 
     txManager.asReadOnly {

@@ -4,10 +4,11 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 import software.altitude.core.models.Folder
 import software.altitude.core.{IllegalOperationException, NotFoundException, ValidationException}
+import software.altitude.core.{Const => C}
 
 @DoNotDiscover class FolderServiceTests (val config: Map[String, Any]) extends IntegrationTestCore {
 
-  test("hierarchy") {
+  test("Folder hierarchy should contain all top level and child folders") {
     /*
       folder1
         folder1_1
@@ -77,24 +78,24 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
         hierarchy2 shouldBe empty
   }
 
-  test("bad hierarchy root") {
+  test("Hierarchy for a bad root ID should fail") {
     intercept[NotFoundException] {
       altitude.service.folder.hierarchy(rootId = Some("bogus"))
     }
   }
 
-  test("root path") {
+  test("Root folder path should be empty") {
     val path: List[Folder] = altitude.app.service.folder.pathComponents(folderId = ctx.repo.rootFolderId)
     path.length should equal(0)
   }
 
-  test("bad path") {
+  test("Getting the path for a bad folder should fail") {
     intercept[NotFoundException] {
       altitude.app.service.folder.pathComponents(folderId = "bogus")
     }
   }
 
-  test("duplicate") {
+  test("Adding a duplicate folder under the same parent should fail") {
     val folder: Folder = altitude.service.folder.addFolder("folder1")
 
     intercept[ValidationException] {
@@ -105,7 +106,7 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     folders.length shouldBe 1
   }
 
-  test("validate") {
+  test("Invalid folder names should fail") {
     intercept[ValidationException] {
       altitude.service.folder.addFolder("")
     }
@@ -120,7 +121,7 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     }
   }
 
-  test("sanitize") {
+  test("New folders  should be free of user-entered space characters") {
     val folder1: Folder = altitude.service.folder.addFolder(" folder  ")
     folder1.name shouldEqual "folder"
 
@@ -128,7 +129,7 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     folder2.name shouldEqual "Folder one"
   }
 
-  test("delete folder") {
+  test("Deleting a folder should also remove all children") {
     /*
   folder1
     folder1_1
@@ -181,19 +182,19 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     }
   }
 
-  test("delete bad folder") {
+  test("Deleting a non-exisiting folder should fail with a NOT FOUND") {
     intercept[NotFoundException] {
       altitude.service.library.deleteFolderById("bogus")
     }
   }
 
-  test("delete root folder") {
+  test("Deleting the root folder should fail") {
     intercept[IllegalOperationException] {
       altitude.service.library.deleteFolderById(ctx.repo.rootFolderId)
     }
   }
 
-  test("delete sys folder") {
+  test("Deleting a system folder should fail") {
     altitude.service.folder.systemFolders.foreach { sysFolder =>
       intercept[IllegalOperationException] {
         altitude.service.library.deleteFolderById(sysFolder.id.get)
@@ -201,15 +202,15 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     }
   }
 
-  test("add a child to a sys folder") {
+  test("Adding a child folder to a system folder shoul fail") {
     altitude.service.folder.systemFolders.foreach { sysFolder =>
       intercept[IllegalOperationException] {
         altitude.service.folder.addFolder(name = "folder1", parentId = sysFolder.id)
-        }
+       }
     }
   }
 
-  test("move folder") {
+  test("Moving a folder") {
     /*
   folder1
     folder1_1
@@ -244,7 +245,7 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     altitude.app.service.folder.immediateChildren(rootId = folder1_1.id.get).length should be (0)
   }
 
-  test("move folder to root") {
+  test("Moving a folder to repository root should work") {
     /*
   folder1
     folder1_1
@@ -271,7 +272,7 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     altitude.app.service.folder.immediateChildren(rootId = ctx.repo.rootFolderId).length should be (4)
   }
 
-  test("illegal move") {
+  test("Illegal folder move actions should throw") {
     /*
     folder1
       folder1_1
@@ -327,7 +328,7 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     }
   }
 
-  test("rename") {
+  test("Rename a folder") {
     val folder1: Folder = altitude.service.folder.addFolder("folder")
 
     altitude.service.library.renameFolder(folder1.id.get, "newName")
@@ -336,7 +337,11 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     renamedFolder.name shouldEqual "newName"
   }
 
-  test("illegal rename") {
+  test("Rename a folder to a different casing") {
+    //FIXME
+  }
+
+  test("Illegal rename actions should throw") {
     val folder1: Folder = altitude.service.folder.addFolder("folder")
 
     intercept[ValidationException] {

@@ -76,7 +76,11 @@ object Const {
     val CHILDREN = "children"
     val IS_ROOT = "is_root"
 
-    object Names {
+    object Name {
+      val ROOT = "root"
+      val TRIAGE = "triage"
+    }
+    object Alias {
       val ROOT = "root"
       val TRIAGE = "triage"
     }
