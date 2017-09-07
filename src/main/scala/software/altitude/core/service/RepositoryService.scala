@@ -22,7 +22,6 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
 
   def getRepositoryById(id: String)(implicit txId: TransactionId = new TransactionId): Repository = {
     txManager.asReadOnly[JsObject] {
-
       implicit val context = Context.EMPTY
 
       DAO.getById(id) match {
@@ -31,7 +30,8 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
       }
     }
   }
-  def addRepository(name: String, fileStoreType: C.FileStoreType.Value, user: User, queryForDup: Option[Query] = None)
+
+  def addRepository(name: String, fileStoreType: C.FileStoreType.Value, user: User, id: Option[String] = None)
          (implicit txId: TransactionId = new TransactionId): JsObject = {
 
     log.info(s"Creating repository [$name]")
@@ -45,31 +45,34 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
     log.info(s"Data path: [$dataPath]")
 
     val repoToSave = Repository(
+      id = id,
       name = name,
       rootFolderId = BaseModel.genId,
       triageFolderId = BaseModel.genId,
       fileStoreType = fileStoreType,
       fileStoreConfig = Map(C.Repository.Config.PATH -> dataPath))
 
-    val repo: Repository = super.add(repoToSave, queryForDup)(txId = txId, ctx = new Context(repo = null, user = user))
-    implicit val ctx = new Context(repo = repo, user = user)
+    txManager.withTransaction[JsObject] {
+      val repo: Repository = super.add(repoToSave)(txId = txId, ctx = new Context(repo = null, user = user))
+      implicit val ctx = new Context(repo = repo, user = user)
 
-    log.info(s"Creating repository [${ctx.repo.name}] system folders")
-    app.service.folder.add(app.service.folder.rootFolder)
-    app.service.folder.add(app.service.folder.triageFolder)
+      log.info(s"Creating repository [${ctx.repo.name}] system folders")
+      app.service.folder.add(app.service.folder.rootFolder)
+      app.service.folder.add(app.service.folder.triageFolder)
 
-    // trash does not have an explicit folder record - just the storage location
-    app.service.fileStore.createPath(app.service.fileStore.trashFolderPath)
+      // trash does not have an explicit folder record - just the storage location
+      app.service.fileStore.createPath(app.service.fileStore.trashFolderPath)
 
-    log.info(s"Setting up repository [${ctx.repo.name}] statistics")
-    app.service.stats.createStat(Stats.SORTED_ASSETS)
-    app.service.stats.createStat(Stats.SORTED_BYTES)
-    app.service.stats.createStat(Stats.TRIAGE_ASSETS)
-    app.service.stats.createStat(Stats.TRIAGE_BYTES)
-    app.service.stats.createStat(Stats.RECYCLED_ASSETS)
-    app.service.stats.createStat(Stats.RECYCLED_BYTES)
+      log.info(s"Setting up repository [${ctx.repo.name}] statistics")
+      app.service.stats.createStat(Stats.SORTED_ASSETS)
+      app.service.stats.createStat(Stats.SORTED_BYTES)
+      app.service.stats.createStat(Stats.TRIAGE_ASSETS)
+      app.service.stats.createStat(Stats.TRIAGE_BYTES)
+      app.service.stats.createStat(Stats.RECYCLED_ASSETS)
+      app.service.stats.createStat(Stats.RECYCLED_BYTES)
 
-    repo
+      repo
+    }
   }
 }
 
