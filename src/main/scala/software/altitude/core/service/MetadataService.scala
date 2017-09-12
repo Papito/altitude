@@ -62,6 +62,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
           val field: MetadataField = fieldOpt.get
 
           val ret = MetadataField(
+            id = Some(id),
             name = field.name,
             fieldType = field.fieldType)
 
