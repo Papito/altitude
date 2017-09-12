@@ -6,9 +6,7 @@ import software.altitude.core.{Const => C}
 object Validators {
 
   /**
-   * Base validator implementation that is used by services.
-   * This makes sure that that JSON passed in - to be converted into a model -
-   * has everything required and set in order to make the conversion valid.
+   * Base model validator implementation that is used by services.
    */
   case class ModelDataValidator(required: Option[List[String]] = None,
                        maxLengths: Option[Map[String, Int]] = None) {
@@ -43,10 +41,11 @@ object Validators {
 
   /**
    * Validator used in the API controller layer to validate requests.
-   * It's not a definitive validation - it will just make sure the request
-   * is not missing obvious requirements. It's still up to model data
-   * validators to run a comprehensive validation of that. The services
-   * are better equipped to do that, as doing this here would be redundant.
+   * This will validate that the data can be safely cast into a model,
+   * at which point model validators take over.
+   *
+   * API layer validation is blissfully unaware of more complex
+   * business-level logic.
    */
   case class ApiRequestValidator(required: List[String]) {
     def validate(json: JsObject): Unit = {
