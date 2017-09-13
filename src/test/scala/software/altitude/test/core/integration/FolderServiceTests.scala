@@ -64,7 +64,7 @@ import software.altitude.core.{Const => C}
 
         // check immediate children of the second folder
         val immediateChildren = altitude.app.service.folder.immediateChildren(rootId = folder2_1.id.get)
-        immediateChildren.length should be (1)
+        immediateChildren.length shouldBe 1
 
         // check breadcrumb
         val path = altitude.app.service.folder.pathComponents(folderId = folder2_1_1.id.get)
@@ -233,16 +233,16 @@ import software.altitude.core.{Const => C}
 
     // assert initial state
     // target
-    altitude.app.service.folder.immediateChildren(rootId = folder2.id.get).length should be (0)
+    altitude.app.service.folder.immediateChildren(rootId = folder2.id.get).length shouldBe 0
     // source
-    altitude.app.service.folder.immediateChildren(rootId = folder1_1.id.get).length should be (1)
+    altitude.app.service.folder.immediateChildren(rootId = folder1_1.id.get).length shouldBe 1
 
     // move folder1_1_1 to folder2
     altitude.service.folder.move(folder1_1_1.id.get, folder2.id.get)
     // target
-    altitude.app.service.folder.immediateChildren(rootId = folder2.id.get).length should be (1)
+    altitude.app.service.folder.immediateChildren(rootId = folder2.id.get).length shouldBe 1
     // source
-    altitude.app.service.folder.immediateChildren(rootId = folder1_1.id.get).length should be (0)
+    altitude.app.service.folder.immediateChildren(rootId = folder1_1.id.get).length shouldBe 0
   }
 
   test("Moving a folder to repository root should work") {
@@ -263,13 +263,13 @@ import software.altitude.core.{Const => C}
     val folder2: Folder = altitude.service.folder.addFolder("folder2")
 
     // assert initial state
-    altitude.app.service.folder.immediateChildren(rootId = ctx.repo.rootFolderId).length should be (2)
+    altitude.app.service.folder.immediateChildren(rootId = ctx.repo.rootFolderId).length shouldBe 2
 
     altitude.service.folder.move(folder1_1_1.id.get, ctx.repo.rootFolderId)
-    altitude.app.service.folder.immediateChildren(rootId = ctx.repo.rootFolderId).length should be (3)
+    altitude.app.service.folder.immediateChildren(rootId = ctx.repo.rootFolderId).length shouldBe 3
 
     altitude.service.folder.move(folder1_1.id.get, ctx.repo.rootFolderId)
-    altitude.app.service.folder.immediateChildren(rootId = ctx.repo.rootFolderId).length should be (4)
+    altitude.app.service.folder.immediateChildren(rootId = ctx.repo.rootFolderId).length shouldBe 4
   }
 
   test("Illegal folder move actions should throw") {
