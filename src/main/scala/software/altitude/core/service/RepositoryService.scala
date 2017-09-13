@@ -5,11 +5,10 @@ import net.codingwell.scalaguice.InjectorExtensions._
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
-import software.altitude.core.{Const => C, NotFoundException, Context, Altitude}
 import software.altitude.core.dao.RepositoryDao
-import software.altitude.core.models.{User, BaseModel, Stats, Repository}
-import software.altitude.core.transactions.{TransactionId, AbstractTransactionManager}
-import software.altitude.core.util.Query
+import software.altitude.core.models.{BaseModel, Repository, Stats, User}
+import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
+import software.altitude.core.{Altitude, Const => C, Context, NotFoundException}
 
 class RepositoryService(val app: Altitude) extends BaseService[Repository] {
   private final val log = LoggerFactory.getLogger(getClass)

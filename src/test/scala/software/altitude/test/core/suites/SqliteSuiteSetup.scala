@@ -2,7 +2,7 @@ package software.altitude.test.core.suites
 
 import java.sql.DriverManager
 
-import org.scalatest.{Suite, BeforeAndAfterAll}
+import org.scalatest.{BeforeAndAfterAll, Suite}
 import org.slf4j.LoggerFactory
 import software.altitude.core.{Configuration, Environment}
 

@@ -3,8 +3,7 @@ package software.altitude.test.core.integration
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 import software.altitude.core.models.Folder
-import software.altitude.core.{IllegalOperationException, NotFoundException, ValidationException}
-import software.altitude.core.{Const => C}
+import software.altitude.core.{Const => C, IllegalOperationException, NotFoundException, ValidationException}
 
 @DoNotDiscover class FolderServiceTests (val config: Map[String, Any]) extends IntegrationTestCore {
 

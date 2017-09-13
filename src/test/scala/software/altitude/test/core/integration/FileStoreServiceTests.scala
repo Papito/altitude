@@ -5,8 +5,8 @@ import java.io.File
 import org.apache.commons.io.{FileUtils, FilenameUtils}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
-import software.altitude.core.models.{BaseModel, Repository, Asset, Folder}
-import software.altitude.core.{Const => C, Util, NotFoundException, StorageException}
+import software.altitude.core.models.{Asset, Folder, Repository}
+import software.altitude.core.{Const => C, NotFoundException, StorageException, Util}
 
 @DoNotDiscover class FileStoreServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 

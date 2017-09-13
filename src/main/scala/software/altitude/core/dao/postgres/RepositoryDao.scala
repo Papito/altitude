@@ -1,7 +1,7 @@
 package software.altitude.core.dao.postgres
 
-import software.altitude.core.{Const => C, AltitudeCoreApp}
 import software.altitude.core.dao.jdbc
+import software.altitude.core.{AltitudeCoreApp, Const => C}
 
 class RepositoryDao(app: AltitudeCoreApp) extends jdbc.RepositoryDao(app) with Postgres {
   override protected def DEFAULT_SQL_COLS_FOR_SELECT = s"""

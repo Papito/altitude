@@ -3,7 +3,6 @@ package software.altitude.test.core.integration
 import java.io.File
 
 import com.google.inject.{AbstractModule, Guice}
-import software.altitude.test.core.integration.util.dao.{jdbc, UtilitiesDao}
 import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
 import org.apache.commons.io.FileUtils
@@ -12,6 +11,7 @@ import org.slf4j.{LoggerFactory, MDC}
 import software.altitude.core.models._
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C, _}
+import software.altitude.test.core.integration.util.dao.{UtilitiesDao, jdbc}
 import software.altitude.test.core.suites.{PostgresSuite, SqliteSuite}
 
 abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with BeforeAndAfterEach with OptionValues {

@@ -1,12 +1,12 @@
 package software.altitude.core.service
 
+import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core._
 import software.altitude.core.dao.UserDao
 import software.altitude.core.models.User
-import software.altitude.core.transactions.{TransactionId, AbstractTransactionManager}
-import net.codingwell.scalaguice.InjectorExtensions._
+import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
 
 class UserService(val app: Altitude) extends BaseService[User] {
   private final val log = LoggerFactory.getLogger(getClass)
