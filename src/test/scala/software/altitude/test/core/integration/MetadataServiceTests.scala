@@ -192,9 +192,10 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
     val metadataField = altitude.service.metadata.addField(
       MetadataField(name = "field name", fieldType = FieldType.KEYWORD))
 
-    val storedField = altitude.service.metadata.getFieldById(metadataField.id.get)
-    storedField  should not be None
-    (storedField.get: MetadataField).fieldType shouldBe FieldType.KEYWORD
+    val _storedField = altitude.service.metadata.getFieldById(metadataField.id.get)
+    _storedField should not be None
+    val storedField: MetadataField = _storedField.get
+    storedField.fieldType shouldBe FieldType.KEYWORD
   }
 
   test("Delete metadata field") {
