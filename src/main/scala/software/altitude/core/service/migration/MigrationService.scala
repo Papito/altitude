@@ -1,7 +1,6 @@
 package software.altitude.core.service.migration
 
 import org.slf4j.LoggerFactory
-import software.altitude.core.models.Stats
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Altitude, Const => C, Context}
 

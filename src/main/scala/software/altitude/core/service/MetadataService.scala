@@ -17,6 +17,12 @@ object MetadataService {
     extends ModelDataValidator(
       required = Some(
         List(C.MetadataField.NAME, C.MetadataField.FIELD_TYPE)))
+
+  final val METADATA_FIELD_VALIDATOR = new MetadataService.MetadataFieldValidator
+  val METADATA_FIELD_CLEANER = Cleaners.Cleaner(
+    trim = Some(List(C.MetadataField.NAME, C.MetadataField.FIELD_TYPE)))
+
+  final val VALID_BOOLEAN_VALUES = Set("0", "1", "true", "false")
 }
 
 class MetadataService(val app: Altitude) extends ModelValidation {
@@ -25,18 +31,13 @@ class MetadataService(val app: Altitude) extends ModelValidation {
   protected val txManager = app.injector.instance[AbstractTransactionManager]
   protected val METADATA_FIELD_DAO = app.injector.instance[MetadataFieldDao]
   protected val ASSET_DAO = app.injector.instance[AssetDao]
-  private final val VALID_BOOLEAN_VALUES = Set("0", "1", "true", "false")
-
-  final val METADATA_FIELD_VALIDATOR = new MetadataService.MetadataFieldValidator
-  val METADATA_FIELD_CLEANER = Cleaners.Cleaner(
-    trim = Some(List(C.MetadataField.NAME, C.MetadataField.FIELD_TYPE)))
 
   def addField(metadataField: MetadataField)
               (implicit ctx: Context, txId: TransactionId = new TransactionId): MetadataField = {
 
     txManager.withTransaction[MetadataField] {
       val cleaned: MetadataField = cleanAndValidate(
-        metadataField, Some(METADATA_FIELD_CLEANER), Some(METADATA_FIELD_VALIDATOR))
+        metadataField, Some(MetadataService.METADATA_FIELD_CLEANER), Some(MetadataService.METADATA_FIELD_VALIDATOR))
 
       val existing = METADATA_FIELD_DAO.query(Query(Map(
         C.MetadataField.NAME_LC -> cleaned.nameLowercase
@@ -61,6 +62,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
           val field: MetadataField = fieldOpt.get
 
           val ret = MetadataField(
+            id = Some(id),
             name = field.name,
             fieldType = field.fieldType)
 
@@ -123,7 +125,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     log.info(s"Updating meta field [$fieldId] for asset [$assetId] with new value [$newValue]")
 
     txManager.withTransaction {
-      val currentMetadata = app.service.metadata.getMetadata(assetId)
+      val currentMetadata = getMetadata(assetId)
 
       val currentValues = currentMetadata.get(fieldId).isEmpty  match {
         case true => Set[String]()
@@ -133,7 +135,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
       val newValues = currentValues + newValue
       val data = Map[String, Set[String]](fieldId -> newValues)
 
-      app.service.metadata.updateMetadata(assetId, new Metadata(data))
+      updateMetadata(assetId, new Metadata(data))
     }
   }
 
@@ -144,7 +146,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     txManager.withTransaction {
       val data = Map[String, Set[String]](fieldId -> Set(newValue))
 
-      app.service.metadata.updateMetadata(assetId, new Metadata(data))
+      updateMetadata(assetId, new Metadata(data))
     }
   }
 
@@ -257,7 +259,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
             case FieldType.KEYWORD => None
             case FieldType.TEXT => None
             case FieldType.BOOL =>
-              if (VALID_BOOLEAN_VALUES.contains(value.toLowerCase)) {
+              if (MetadataService.VALID_BOOLEAN_VALUES.contains(value.toLowerCase)) {
                 None
               }
               else {
@@ -286,15 +288,24 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     the names of fields, pulled from field configuration that the Metadata domain object is not aware of.
 
     On the way in we get:
+    {
       field id -> values
       field id -> values
+    }
 
     We get out:
-      ID -> field id  NAME -> field name  VALUES -> values
-      ID -> field id  NAME -> field name  VALUES -> values TYPE -> type
+    [
+      ID -> field id
+      NAME -> field name
+      VALUES -> values
+
+      ID -> field id
+      NAME -> field name
+      VALUES -> values TYPE -> type
+    ]
    */
   def toJson(metadata: Metadata, allMetadataFields: Option[Map[String, MetadataField]] = None)
-  (implicit ctx: Context, txId: TransactionId = new TransactionId): JsArray = {
+            (implicit ctx: Context, txId: TransactionId = new TransactionId): JsArray = {
 
     txManager.asReadOnly[JsArray] {
       val allFields = allMetadataFields.isDefined match {

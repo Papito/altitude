@@ -3,15 +3,15 @@ package software.altitude.test.core.integration
 import java.io.File
 
 import com.google.inject.{AbstractModule, Guice}
-import software.altitude.test.core.integration.util.dao.{jdbc, UtilitiesDao}
 import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
 import org.apache.commons.io.FileUtils
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach, FunSuite, Tag}
+import org.scalatest._
 import org.slf4j.{LoggerFactory, MDC}
 import software.altitude.core.models._
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C, _}
+import software.altitude.test.core.integration.util.dao.{UtilitiesDao, jdbc}
 import software.altitude.test.core.suites.{PostgresSuite, SqliteSuite}
 
 object IntegrationTestCore {
@@ -38,7 +38,7 @@ object IntegrationTestCore {
   }
 }
 
-abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with BeforeAndAfterEach {
+abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with BeforeAndAfterEach with OptionValues {
   val log =  LoggerFactory.getLogger(getClass)
 
   // Stores test app config overrides, since we run same tests with a different app setup.

@@ -1,6 +1,5 @@
 package software.altitude.core.service.migration
 
-import org.slf4j.LoggerFactory
 import software.altitude.core.dao.MigrationDao
 import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
 import software.altitude.core.{AltitudeCoreApp, Context}

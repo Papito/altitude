@@ -8,6 +8,7 @@ log
 logs
 project/project
 project/target
+test-data
 target
 dist
 *.iml

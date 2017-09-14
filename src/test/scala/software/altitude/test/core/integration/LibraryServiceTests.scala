@@ -48,18 +48,18 @@ import software.altitude.core.{Const => C, IllegalOperationException, NotFoundEx
     val systemFolders = altitude.service.folder.sysFoldersByIdMap()
 
     // we do not increment triage folder - this is recorded in Stats
-    systemFolders(ctx.repo.triageFolderId).numOfAssets should be (0)
+    systemFolders(ctx.repo.triageFolderId).numOfAssets shouldBe 0
 
     // prefetch all folders for speed
     val all = altitude.service.folder.repositoryFolders()
 
     // test counts for individual folders
-    (altitude.service.folder.getByIdWithChildAssetCounts(folder1.id.get, all): Folder).numOfAssets should be (2)
-    (altitude.service.folder.getByIdWithChildAssetCounts(folder2_2_1.id.get, all): Folder).numOfAssets should be (2)
-    (altitude.service.folder.getByIdWithChildAssetCounts(folder2_2_2.id.get, all): Folder).numOfAssets should be (2)
-    (altitude.service.folder.getByIdWithChildAssetCounts(folder2_2.id.get, all): Folder).numOfAssets should be (6)
-    (altitude.service.folder.getByIdWithChildAssetCounts(folder2_1.id.get, all): Folder).numOfAssets should be (2)
-    (altitude.service.folder.getByIdWithChildAssetCounts(folder2.id.get, all): Folder).numOfAssets should be (10)
+    (altitude.service.folder.getByIdWithChildAssetCounts(folder1.id.get, all): Folder).numOfAssets shouldBe 2
+    (altitude.service.folder.getByIdWithChildAssetCounts(folder2_2_1.id.get, all): Folder).numOfAssets shouldBe 2
+    (altitude.service.folder.getByIdWithChildAssetCounts(folder2_2_2.id.get, all): Folder).numOfAssets shouldBe 2
+    (altitude.service.folder.getByIdWithChildAssetCounts(folder2_2.id.get, all): Folder).numOfAssets shouldBe 6
+    (altitude.service.folder.getByIdWithChildAssetCounts(folder2_1.id.get, all): Folder).numOfAssets shouldBe 2
+    (altitude.service.folder.getByIdWithChildAssetCounts(folder2.id.get, all): Folder).numOfAssets shouldBe 10
 
     // test counts for immediate children
     val rootChildren = altitude.service.folder.immediateChildren(ctx.repo.rootFolderId, all)
@@ -114,7 +114,7 @@ import software.altitude.core.{Const => C, IllegalOperationException, NotFoundEx
 
     val all = altitude.service.folder.repositoryFolders()
 
-    (altitude.service.folder.getByIdWithChildAssetCounts(folder1.id.get, all): Folder).numOfAssets should be (1)
+    (altitude.service.folder.getByIdWithChildAssetCounts(folder1.id.get, all): Folder).numOfAssets shouldBe 1
   }
 
   test("move asset to a different folder") {

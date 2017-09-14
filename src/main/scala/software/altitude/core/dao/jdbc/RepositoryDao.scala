@@ -1,7 +1,7 @@
 package software.altitude.core.dao.jdbc
 
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{Json, JsObject}
+import play.api.libs.json.{JsObject, Json}
 import software.altitude.core.models.Repository
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{AltitudeCoreApp, Const => C, Context}
