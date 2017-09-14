@@ -32,15 +32,16 @@ class Configuration(configOverride: Map[String, Any] = new HashMap()) {
   )
 
   private val test = default ++ HashMap(
-    "testDir" -> "tmp/test",
-    "dataDir" -> "tmp/test/data/1",
+    "testDir" -> "./test-data",
+    "fileStoreDir" -> "./test-data/file-store",
+    "dataDir" -> "./test-data/file-store/1",
     "importMode" -> C.ImportMode.COPY,
     "filestore" -> C.FileStoreType.FS,
 
     "db.postgres.url" -> "jdbc:postgresql://localhost/altitude-test",
     "db.postgres.user" -> "altitude-test",
 
-    "db.sqlite.url" -> "jdbc:sqlite:tmp/test/test.sqlite.db"
+    "db.sqlite.url" -> "jdbc:sqlite:./test-data/test.sqlite.db"
   )
 
   private val prod = default ++ HashMap()

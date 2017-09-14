@@ -5,12 +5,15 @@ import java.sql.DriverManager
 import org.scalatest.{Suite, BeforeAndAfterAll}
 import org.slf4j.LoggerFactory
 import software.altitude.core.{Configuration, Environment}
+import software.altitude.test.core.integration.IntegrationTestCore
 
 trait SqliteSuiteSetup extends Suite with BeforeAndAfterAll {
   Environment.ENV = Environment.TEST
   val log =  LoggerFactory.getLogger(getClass)
 
   override def beforeAll(): Unit = {
+    IntegrationTestCore.createTestDir(SqliteSuite.app)
+
     log.info("TEST. Resetting DB schema once")
     val url: String = new Configuration().getString("db.sqlite.url")
     DriverManager.registerDriver(new org.sqlite.JDBC)

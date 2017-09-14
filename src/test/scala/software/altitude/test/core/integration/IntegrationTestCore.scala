@@ -14,6 +14,30 @@ import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C, _}
 import software.altitude.test.core.suites.{PostgresSuite, SqliteSuite}
 
+object IntegrationTestCore {
+  def createTestDir(altitude: AltitudeCoreApp): Unit = {
+    val testDir = new File(altitude.config.getString("testDir"))
+
+    if (testDir.exists()) {
+      FileUtils.cleanDirectory(testDir)
+    }
+    else {
+      FileUtils.forceMkdir(testDir)
+    }
+  }
+
+  def createFileStoreDir(altitude: AltitudeCoreApp): Unit = {
+    val testDir = new File(altitude.config.getString("fileStoreDir"))
+
+    if (testDir.exists()) {
+      FileUtils.cleanDirectory(testDir)
+    }
+    else {
+      FileUtils.forceMkdir(testDir)
+    }
+  }
+}
+
 abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with BeforeAndAfterEach {
   val log =  LoggerFactory.getLogger(getClass)
 
@@ -141,10 +165,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     count = count + 1
     MDC.put("REQUEST_ID", s"[TEST: $count]")
 
-    val testDir = new File("tmp/test/data")
-    FileUtils.cleanDirectory(testDir)
-    FileUtils.forceMkdir(testDir)
-
+    IntegrationTestCore.createFileStoreDir(altitude)
     createFixtures()
 
     // keep transaction stats clean after DB migration dirties them

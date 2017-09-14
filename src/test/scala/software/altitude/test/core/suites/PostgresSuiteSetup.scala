@@ -6,12 +6,15 @@ import java.util.Properties
 import org.scalatest.{Suite, BeforeAndAfterAll}
 import org.slf4j.LoggerFactory
 import software.altitude.core.{Configuration, Environment}
+import software.altitude.test.core.integration.IntegrationTestCore
 
 trait PostgresSuiteSetup extends Suite with BeforeAndAfterAll {
   Environment.ENV = Environment.TEST
   val log =  LoggerFactory.getLogger(getClass)
 
   override def beforeAll(): Unit = {
+    IntegrationTestCore.createTestDir(PostgresSuite.app)
+
     log.info("TEST. Resetting DB schema once")
     DriverManager.registerDriver(new org.postgresql.Driver)
     val appConfig = new Configuration()

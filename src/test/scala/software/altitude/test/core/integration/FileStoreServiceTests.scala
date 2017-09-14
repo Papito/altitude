@@ -5,7 +5,7 @@ import java.io.File
 import org.apache.commons.io.{FileUtils, FilenameUtils}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
-import software.altitude.core.models.{BaseModel, Repository, Asset, Folder}
+import software.altitude.core.models.{Repository, Asset, Folder}
 import software.altitude.core.{Const => C, Util, NotFoundException, StorageException}
 
 @DoNotDiscover class FileStoreServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
@@ -58,7 +58,7 @@ import software.altitude.core.{Const => C, Util, NotFoundException, StorageExcep
     }
   }
 
-  test("rename directory") {
+  test("rename directory", CurrentTag) {
     var folder1: Folder = altitude.service.folder.addFolder("folder1")
 
     var asset1: Asset = altitude.service.library.add(makeAsset(folder1))
