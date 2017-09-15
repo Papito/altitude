@@ -5,8 +5,8 @@ import java.io.File
 import org.apache.commons.io.{FileUtils, FilenameUtils}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
-import software.altitude.core.models.{Repository, Asset, Folder}
-import software.altitude.core.{Const => C, Util, NotFoundException, StorageException}
+import software.altitude.core.models.{Asset, Folder, Repository}
+import software.altitude.core.{Const => C, NotFoundException, StorageException, Util}
 
 @DoNotDiscover class FileStoreServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
@@ -19,7 +19,7 @@ import software.altitude.core.{Const => C, Util, NotFoundException, StorageExcep
     relAssetPath = new File(folder.path.get, "1.jpg")
     val movedAsset = altitude.service.library.moveAssetToFolder(asset.id.get, folder.id.get)
     checkRepositoryFilePath(relAssetPath.getPath)
-    movedAsset.path contains relAssetPath.getPath
+    movedAsset.path contains relAssetPath.getPath shouldBe true
   }
 
   test("move folder") {
@@ -58,7 +58,7 @@ import software.altitude.core.{Const => C, Util, NotFoundException, StorageExcep
     }
   }
 
-  test("rename directory", CurrentTag) {
+  test("rename directory") {
     var folder1: Folder = altitude.service.folder.addFolder("folder1")
 
     var asset1: Asset = altitude.service.library.add(makeAsset(folder1))
@@ -77,8 +77,8 @@ import software.altitude.core.{Const => C, Util, NotFoundException, StorageExcep
 
     asset1 = altitude.service.library.getById(asset1.id.get)
     asset1.path should not be None
-    asset1.path.get should not be empty
-    asset1.path contains "newName"
+    asset1.path.value should not be empty
+    asset1.path.get contains "newName" shouldBe true
     asset1.path.get.endsWith(asset1.fileName) shouldBe true
     checkRepositoryFilePath(asset1.path.get)
   }
