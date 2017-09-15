@@ -18,10 +18,7 @@ object IntegrationTestCore {
   def createTestDir(altitude: AltitudeCoreApp): Unit = {
     val testDir = new File(altitude.config.getString("testDir"))
 
-    if (testDir.exists()) {
-      FileUtils.cleanDirectory(testDir)
-    }
-    else {
+    if (!testDir.exists()) {
       FileUtils.forceMkdir(testDir)
     }
   }
