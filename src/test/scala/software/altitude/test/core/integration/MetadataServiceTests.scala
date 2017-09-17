@@ -3,7 +3,7 @@ package software.altitude.test.core.integration
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 import software.altitude.core.models._
-import software.altitude.core.{DuplicateException, NotFoundException, ValidationException}
+import software.altitude.core.{Util, DuplicateException, NotFoundException, ValidationException}
 
 
 @DoNotDiscover class MetadataServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
@@ -11,7 +11,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
   test("Number field type can be added") {
     val field = altitude.service.metadata.addField(
       MetadataField(
-        name = "number field",
+        name = Util.randomStr(),
         fieldType = FieldType.NUMBER))
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
 
@@ -33,7 +33,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
   test("Boolean field type can be added") {
     val field = altitude.service.metadata.addField(
       MetadataField(
-        name = "boolean field",
+        name = Util.randomStr(),
         fieldType = FieldType.BOOL))
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
 
@@ -72,12 +72,12 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
   test("Setting metadata values") {
     val keywordMetadataField = altitude.service.metadata.addField(
       MetadataField(
-        name = "keyword field",
+        name = Util.randomStr(),
         fieldType = FieldType.KEYWORD))
 
     val numberMetadataField = altitude.service.metadata.addField(
       MetadataField(
-        name = "number field",
+        name = Util.randomStr(),
         fieldType = FieldType.NUMBER))
 
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
@@ -116,12 +116,12 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
   test("Test/update empty value sets") {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
-        name = "field 1",
+        name = Util.randomStr(),
         fieldType = FieldType.KEYWORD))
 
     val field2 = altitude.service.metadata.addField(
       MetadataField(
-        name = "field 2",
+        name = Util.randomStr(),
         fieldType = FieldType.NUMBER))
 
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
@@ -148,12 +148,12 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
   test("Update metadata values") {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
-        name = "field 1",
+        name = Util.randomStr(),
         fieldType = FieldType.KEYWORD))
 
     val field2 = altitude.service.metadata.addField(
       MetadataField(
-        name = "field 2",
+        name = Util.randomStr(),
         fieldType = FieldType.NUMBER))
 
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
@@ -170,7 +170,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
 
     val field3 = altitude.service.metadata.addField(
       MetadataField(
-        name = "field 3",
+        name = Util.randomStr(),
         fieldType = FieldType.KEYWORD))
 
     data = Map[String, Set[String]](
@@ -199,7 +199,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
   test("Delete metadata field") {
     val metadataField = altitude.service.metadata.addField(
       MetadataField(
-        name = "fieldName",
+        name = Util.randomStr(),
         fieldType = FieldType.KEYWORD))
 
     altitude.service.metadata.getFieldById(metadataField.id.get)
@@ -213,13 +213,13 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
 
   test("Get all fields for a repo") {
     altitude.service.metadata.addField(
-      MetadataField(name = "field name 1", fieldType = FieldType.KEYWORD))
+      MetadataField(name = Util.randomStr(), fieldType = FieldType.KEYWORD))
     altitude.service.metadata.addField(
-      MetadataField(name = "field name 2", fieldType = FieldType.KEYWORD))
+      MetadataField(name = Util.randomStr(), fieldType = FieldType.KEYWORD))
 
     SET_SECOND_USER()
     altitude.service.metadata.addField(
-      MetadataField(name = "field name 3", fieldType = FieldType.KEYWORD))
+      MetadataField(name = Util.randomStr(), fieldType = FieldType.KEYWORD))
 
     SET_FIRST_USER()
     altitude.service.metadata.getAllFields.size shouldBe 3
@@ -266,7 +266,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
   test("Metadata added initially should be present") {
     val field = altitude.service.metadata.addField(
       MetadataField(
-        name = "keyword field",
+        name = Util.randomStr(),
         fieldType = FieldType.KEYWORD))
 
     val data = Map[String, Set[String]](field.id.get -> Set("one", "two"))
@@ -283,17 +283,17 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
   test("Not defined user metadata values should not return") {
     altitude.service.metadata.addField(
       MetadataField(
-        name = "keyword field",
+        name = Util.randomStr(),
         fieldType = FieldType.KEYWORD))
 
     altitude.service.metadata.addField(
       MetadataField(
-        name = "number field",
+        name = Util.randomStr(),
         fieldType = FieldType.NUMBER))
 
     val field3 = altitude.service.metadata.addField(
       MetadataField(
-        name = "text field",
+        name = Util.randomStr(),
         fieldType = FieldType.TEXT))
 
 

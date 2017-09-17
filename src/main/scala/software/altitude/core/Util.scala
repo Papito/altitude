@@ -30,10 +30,4 @@ object Util {
   }
 
   def randomStr(size: Int = 10) = scala.util.Random.alphanumeric.take(size).mkString
-
-  /*
-    private val DELIM_REGEX = List(" ",",").mkString("|").r
-    def parseKeywords(s: String): Set[String] =
-      DELIM_REGEX.split(s).toSeq.map(_.trim.toLowerCase).filter(_.nonEmpty).toSet
-  */
 }
