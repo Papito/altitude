@@ -103,7 +103,7 @@ abstract class BaseService[Model <: BaseModel] extends ModelValidation {
     txManager.asReadOnly[JsObject] {
       DAO.getById(id) match {
         case Some(obj) => obj
-        case None => throw NotFoundException(s"Cannot find ID '$id'")
+        case None => throw NotFoundException(s"Cannot find ID [$id]")
       }
     }
   }

@@ -52,24 +52,6 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     }
   }
 
-  def getFieldById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Option[JsObject] =
-    txManager.asReadOnly[Option[JsObject]] {
-      val fieldOpt = METADATA_FIELD_DAO.getById(id)
-
-      fieldOpt match {
-        case None => None
-        case _ =>
-          val field: MetadataField = fieldOpt.get
-
-          val ret = MetadataField(
-            id = Some(id),
-            name = field.name,
-            fieldType = field.fieldType)
-
-          Some(ret)
-      }
-    }
-
   /**
    * Returns a lookup map (by ID) of all configured fields in this repository
    */
@@ -79,6 +61,14 @@ class MetadataService(val app: Altitude) extends ModelValidation {
         val metadataField: MetadataField = res
         metadataField.id.get -> metadataField
       }.toMap
+    }
+
+  def getFieldById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject =
+    txManager.asReadOnly[JsObject] {
+      METADATA_FIELD_DAO.getById(id) match {
+        case Some(obj) => obj
+        case None => throw NotFoundException(s"Cannot find field by ID [$id]")
+      }
     }
 
   def deleteFieldById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Int =

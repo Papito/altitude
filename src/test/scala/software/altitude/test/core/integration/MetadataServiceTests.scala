@@ -192,9 +192,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
     val metadataField = altitude.service.metadata.addField(
       MetadataField(name = "field name", fieldType = FieldType.KEYWORD))
 
-    val _storedField = altitude.service.metadata.getFieldById(metadataField.id.get)
-    _storedField should not be None
-    val storedField: MetadataField = _storedField.get
+    val storedField: MetadataField = altitude.service.metadata.getFieldById(metadataField.id.get)
     storedField.fieldType shouldBe FieldType.KEYWORD
   }
 
@@ -204,9 +202,13 @@ import software.altitude.core.{DuplicateException, NotFoundException, Validation
         name = "fieldName",
         fieldType = FieldType.KEYWORD))
 
-    altitude.service.metadata.getAllFields.size shouldBe 1
+    altitude.service.metadata.getFieldById(metadataField.id.get)
+
     altitude.service.metadata.deleteFieldById(metadataField.id.get)
-    altitude.service.metadata.getAllFields shouldBe empty
+
+    intercept[NotFoundException] {
+      altitude.service.metadata.getFieldById(metadataField.id.get)
+    }
   }
 
   test("Get all fields for a repo") {
