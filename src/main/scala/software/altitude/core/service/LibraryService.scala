@@ -42,7 +42,7 @@ class LibraryService(app: Altitude) {
       /**
       * Process metadata and append it to the asset
       */
-      val metadata = app.service.metadata.cleanAndValidateMetadata(assetIn.metadata)
+      val metadata = app.service.metadata.cleanAndValidate(assetIn.metadata)
 
       val assetId = BaseModel.genId
 

@@ -89,7 +89,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     log.info(s"Setting metadata for asset [$assetId]: $metadata")
 
     txManager.withTransaction {
-      val cleanMetadata = cleanAndValidateMetadata(metadata)
+      val cleanMetadata = cleanAndValidate(metadata)
       ASSET_DAO.setMetadata(assetId = assetId, metadata = cleanMetadata)
     }
   }
@@ -99,7 +99,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     log.info(s"Updating metadata for asset [$assetId]: $metadata")
 
     txManager.withTransaction {
-      val cleanMetadata = cleanAndValidateMetadata(metadata)
+      val cleanMetadata = cleanAndValidate(metadata)
 
       /**
        * If the cleaned metadata does not have fields found in the original -
@@ -140,14 +140,9 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     }
   }
 
-  /**
-   * Makes sure the metadata fields are configured in this system after common-sense data
-   * hygiene. Validates correct type for anything
-   *
-   * @return clean, de-duplicated copy of the metadata
-   */
-  def cleanAndValidateMetadata(metadata: Metadata)
-                              (implicit ctx: Context, txId: TransactionId): Metadata = {
+  def clean(metadata: Metadata)
+           (implicit ctx: Context, txId: TransactionId): Metadata = {
+
     if (metadata.data.isEmpty) {
       return metadata
     }
@@ -200,12 +195,27 @@ class MetadataService(val app: Altitude) extends ModelValidation {
         res
     }
 
+    val cleanMetadata = new Metadata(data = cleanData)
+    cleanMetadata.isClean = true
+    cleanMetadata
+  }
+
+  def validate(metadata: Metadata)
+              (implicit ctx: Context, txId: TransactionId): Unit = {
+
+    if (metadata.data.isEmpty) {
+      return
+    }
+
+    // get all metadata fields configured for this repository
+    val fields = getAllFields
+
     /**
      * Validate for duplicates in passed data
      */
     val ex = ValidationException()
 
-    cleanData.foreach { m =>
+    metadata.data.foreach { m =>
       val fieldId = m._1
       val values: Set[String] = m._2
       val valuesLower = values.map(_.toLowerCase)
@@ -225,7 +235,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
      */
 
     // for each field
-    cleanData.foreach { m =>
+    metadata.data.foreach { m =>
       val fieldId = m._1
       val field: MetadataField = fields(fieldId)
       val values: Set[String] = m._2
@@ -246,9 +256,9 @@ class MetadataService(val app: Altitude) extends ModelValidation {
             } catch {
               case _: Throwable => Some(value)
             }
-            case FieldType.KEYWORD => None
-            case FieldType.TEXT => None
-            case FieldType.BOOL =>
+            case FieldType.KEYWORD => None // everything is allowed
+            case FieldType.TEXT => None // everything is allowed
+            case FieldType.BOOL => // only values that we recognize as booleans
               if (MetadataService.VALID_BOOLEAN_VALUES.contains(value.toLowerCase)) {
                 None
               }
@@ -269,8 +279,19 @@ class MetadataService(val app: Altitude) extends ModelValidation {
 
     if (ex.nonEmpty)
       throw ex
+  }
 
-    new Metadata(cleanData)
+  /**
+   * Makes sure the metadata fields are configured in this system after common-sense data
+   * hygiene. Validates correct type for anything
+   *
+   * @return clean, de-duplicated copy of the metadata
+   */
+  def cleanAndValidate(metadata: Metadata)
+                      (implicit ctx: Context, txId: TransactionId): Metadata = {
+    val cleanMetadata = clean(metadata)
+    validate(cleanMetadata)
+    cleanMetadata
   }
 
   /*

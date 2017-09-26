@@ -44,15 +44,27 @@ abstract class BaseModel {
     _updatedAt = Some(arg)
   }
 
-  // is clean (for validation)
+  // is clean (for validation) - mutable, but can only be set once
   protected var _isClean = false
 
   def isClean = _isClean
 
   def isClean_= (arg: Boolean): Boolean = {
-    // if object is not clean, set as clean, otherwise, move along
     if (!_isClean && arg) {
       _isClean = true
+    }
+
+    isClean
+  }
+
+  // is validated - mutable, but can only be set once
+  protected var _isValidated = false
+
+  def isValidated = _isValidated
+
+  def isValidated_= (arg: Boolean): Boolean = {
+    if (!_isValidated && arg) {
+      _isValidated = true
     }
 
     isClean
