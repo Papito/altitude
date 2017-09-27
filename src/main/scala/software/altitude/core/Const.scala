@@ -206,6 +206,7 @@ object Const {
       val DUPLICATE_FIELD_VALUE = "Duplicate values in [%s]"
       val REQUIRED = "This field is required"
       val INCORRECT_VALUE_TYPE = "Incorrect value type for [%s]"
+      val NOT_MULTI_VALUE = "The field [%s] does not accept multiple values"
       val VALUES_TOO_LONG = "Values are too long [%s]"
     }
 
