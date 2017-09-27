@@ -207,7 +207,8 @@ object Const {
       val REQUIRED = "This field is required"
       val INCORRECT_VALUE_TYPE = "Incorrect value type for [%s]"
       val NOT_MULTI_VALUE = "The field [%s] does not accept multiple values"
-      val VALUES_TOO_LONG = "Values are too long [%s]"
+      val VALUES_TOO_LONG = "Values are too long: [%s]"
+      val NOT_IN_CONSTRAINT_LIST = "Some values are not in the field constraint list: [%s]"
     }
 
     object Err {
