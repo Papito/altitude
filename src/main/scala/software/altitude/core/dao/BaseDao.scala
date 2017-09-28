@@ -49,6 +49,13 @@ trait BaseDao {
   def deleteByQuery(query: Query)(implicit ctx: Context, txId: TransactionId): Int
 
   /**
+   * Delete bt SQL.
+   *
+   * @return number of documents deleted
+   */
+  def deleteBySql(sql: String, bindValues: List[Object])(implicit ctx: Context, txId: TransactionId): Int
+
+  /**
    * Gert a single record by ID
    *
    * @param id record id as string

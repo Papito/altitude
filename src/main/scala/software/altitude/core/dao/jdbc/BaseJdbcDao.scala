@@ -91,6 +91,15 @@ abstract class BaseJdbcDao extends BaseDao {
     numDeleted
   }
 
+  override def deleteBySql(sql: String, bindValues: List[Object])(implicit ctx: Context, txId: TransactionId): Int = {
+    log.debug(s"Deleting records by SQL")
+    log.debug(s"Delete SQL: $sql, with values: $bindValues")
+    val runner: QueryRunner = new QueryRunner()
+    val numDeleted = runner.update(conn, sql, bindValues:_*)
+    log.debug(s"Deleted records: $numDeleted")
+    numDeleted
+  }
+
   override def query(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
     this.query(q, SQL_QUERY_BUILDER)
 
