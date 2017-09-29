@@ -9,6 +9,12 @@ case class ValidationException(message: String = "") extends Exception {
   val errors: mutable.Map[String, String] = mutable.Map()
   final def isEmpty = message.isEmpty && errors.isEmpty
   final def nonEmpty = !isEmpty
+
+  def trigger(): Unit = {
+    if (nonEmpty) {
+      throw this
+    }
+  }
 }
 
 // All-purpose event to get out of loops with user interrupts or conditionals

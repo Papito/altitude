@@ -227,8 +227,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
       }
     }
 
-    if (ex.nonEmpty)
-      throw ex
+    ex.trigger()
 
     /**
      * Validate based on field type
@@ -277,8 +276,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
       }
     }
 
-    if (ex.nonEmpty)
-      throw ex
+    ex.trigger()
   }
 
   /**

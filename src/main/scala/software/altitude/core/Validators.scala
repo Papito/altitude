@@ -58,7 +58,7 @@ object Validators {
         }
       }
 
-      if (ex.nonEmpty) throw ex
+      ex.trigger()
     }
   }
 }
