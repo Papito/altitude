@@ -230,7 +230,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
       breakable {
         // booleans cannot have multiple values
         if (field.fieldType == FieldType.BOOL && values.size > 1) {
-          ex.errors += (field.id.get -> C.Msg.Warn.INCORRECT_VALUE_TYPE.format(field.name))
+          ex.errors += (field.id.get -> C.Msg.Err.INCORRECT_VALUE_TYPE.format(field.name))
           break()
         }
 
@@ -259,7 +259,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
         // add to the validation exception if any
         if (illegalValues.nonEmpty) {
           ex.errors += (field.id.get ->
-            C.Msg.Warn.INCORRECT_VALUE_TYPE.format(field.name, illegalValues.mkString(", ")))
+            C.Msg.Err.INCORRECT_VALUE_TYPE.format(field.name, illegalValues.mkString(", ")))
         }
       }
     }

@@ -27,10 +27,10 @@ object Validators {
       required.getOrElse(List[String]()) foreach { field =>
         json.keys.contains(field) match {
           // see of the value is defined
-          case false => ex.errors += (field -> C.Msg.Warn.REQUIRED)
+          case false => ex.errors += (field -> C.Msg.Err.REQUIRED)
           case _ => (json \ field).asOpt[String] match {
             // see if the value is an empty string
-            case Some("") => ex.errors += (field -> C.Msg.Warn.REQUIRED)
+            case Some("") => ex.errors += (field -> C.Msg.Err.REQUIRED)
             case _ =>
           }
         }
@@ -53,7 +53,7 @@ object Validators {
 
       required foreach { field =>
         json.keys.contains(field) match {
-          case false => ex.errors += (field -> C.Msg.Warn.REQUIRED)
+          case false => ex.errors += (field -> C.Msg.Err.REQUIRED)
           case _ =>
         }
       }

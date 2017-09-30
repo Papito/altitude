@@ -202,13 +202,6 @@ object Const {
   object Msg {
 
     object Warn {
-      val DUPLICATE = "Duplicate"
-      val DUPLICATE_FIELD_VALUE = "Duplicate values in [%s]"
-      val REQUIRED = "This field is required"
-      val INCORRECT_VALUE_TYPE = "Incorrect value type for [%s]"
-      val NOT_MULTI_VALUE = "The field [%s] does not accept multiple values"
-      val VALUES_TOO_LONG = "Values are too long: [%s]"
-      val NOT_IN_CONSTRAINT_LIST = "Some values are not in the field constraint list: [%s]"
     }
 
     object Err {
@@ -219,6 +212,13 @@ object Const {
       val WRONG_TYPE = "This field does not match the required type (%s)"
       val WRONG_VALUE = "This is not an allowed value. Allowed values are: %s"
       val EMPTY_REQUEST_BODY = "Empty request body"
+      val DUPLICATE = "Duplicate"
+      val DUPLICATE_FIELD_VALUE = "Duplicate values in [%s]"
+      val REQUIRED = "This field is required"
+      val INCORRECT_VALUE_TYPE = "Incorrect value type for [%s]"
+      val NOT_MULTI_VALUE = "The field [%s] does not accept multiple values"
+      val VALUES_TOO_LONG = "Values are too long: [%s]"
+      val NOT_IN_CONSTRAINT_LIST = "Some values are not in the field constraint list: [%s]"
     }
   }
 

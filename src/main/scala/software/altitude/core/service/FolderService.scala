@@ -48,7 +48,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       } catch {
         case _: DuplicateException => {
           val ex = ValidationException()
-          ex.errors += (C.Folder.NAME -> C.Msg.Warn.DUPLICATE)
+          ex.errors += (C.Folder.NAME -> C.Msg.Err.DUPLICATE)
           throw ex
         }
       }
@@ -452,7 +452,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       } catch {
         case _: DuplicateException =>
           val ex = ValidationException()
-          ex.errors += C.Folder.NAME -> C.Msg.Warn.DUPLICATE
+          ex.errors += C.Folder.NAME -> C.Msg.Err.DUPLICATE
           throw ex
       }
 
