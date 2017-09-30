@@ -3,6 +3,7 @@ package software.altitude.core.service
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
+import software.altitude.client.models.ClientFieldType
 import software.altitude.core.Validators.ModelDataValidator
 import software.altitude.core.dao.{AssetDao, MetadataFieldDao}
 import software.altitude.core.models.{FieldType, Metadata, MetadataField}
@@ -210,12 +211,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     // get all metadata fields configured for this repository
     val fields = getAllFields
 
-    /**
-     * Validate for duplicates in passed data
-     */
     val ex = ValidationException()
-
-    ex.trigger()
 
     /**
      * Validate based on field type
@@ -234,27 +230,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
           break()
         }
 
-        // gather illegal values
-        val illegalValues: Set[Option[String]] = values.map { value =>
-          field.fieldType match {
-            case FieldType.NUMBER => try {
-              value.toDouble
-              None
-            } catch {
-              case _: Throwable => Some(value)
-            }
-            case FieldType.KEYWORD => None // everything is allowed
-            case FieldType.TEXT => None // everything is allowed
-            case FieldType.BOOL => // only values that we recognize as booleans
-              if (MetadataService.VALID_BOOLEAN_VALUES.contains(value.toLowerCase)) {
-                None
-              }
-              else {
-                Some(value)
-              }
-          }
-          // get rid of None's - those are good
-        }.filter(_.isDefined)
+        val illegalValues = collectInvalidTypeValues(field.fieldType, values)
 
         // add to the validation exception if any
         if (illegalValues.nonEmpty) {
@@ -325,4 +301,36 @@ class MetadataService(val app: Altitude) extends ModelValidation {
       JsArray(res)
     }
   }
+
+  /**
+   * Given a field type and a set values, collect all the values that DO NOT pass
+   * type checks.
+   *
+   * @param fieldType The type of field values for each we are validating
+   * @param values Values that may or may note pass type validation
+   * @return All values that FAIL type validation
+   */
+  def collectInvalidTypeValues(fieldType: FieldType.Value, values: Set[String]): Set[String] = {
+    values.map { value =>
+      fieldType match {
+        case FieldType.NUMBER => try {
+          value.toDouble
+          None
+        } catch {
+          case _: Throwable => Some(value)
+        }
+        case FieldType.KEYWORD => None // everything is allowed
+        case FieldType.TEXT => None // everything is allowed
+        case FieldType.BOOL => // only values that we recognize as booleans
+          if (MetadataService.VALID_BOOLEAN_VALUES.contains(value.toLowerCase)) {
+            None
+          }
+          else {
+            Some(value)
+          }
+      }
+      // get rid of None's - those are valid values
+    }.filter(_.isDefined).map(_.get)
+  }
+
 }
