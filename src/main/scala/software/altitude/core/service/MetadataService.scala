@@ -215,18 +215,6 @@ class MetadataService(val app: Altitude) extends ModelValidation {
      */
     val ex = ValidationException()
 
-    metadata.data.foreach { m =>
-      val fieldId = m._1
-      val values: Set[String] = m._2
-      val valuesLower = values.map(_.toLowerCase)
-
-      if (values.size != valuesLower.size) {
-        val field: MetadataField = fields(fieldId)
-        ex.errors += (field.id.get ->
-          C.Msg.Warn.DUPLICATE_FIELD_VALUE.format(values.mkString(", ")))
-      }
-    }
-
     ex.trigger()
 
     /**
