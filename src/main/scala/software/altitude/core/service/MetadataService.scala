@@ -20,7 +20,8 @@ object MetadataService {
         List(C.MetadataField.NAME, C.MetadataField.FIELD_TYPE)))
 
   final val METADATA_FIELD_VALIDATOR = new MetadataService.MetadataFieldValidator
-  val METADATA_FIELD_CLEANER = Cleaners.Cleaner(
+
+  final val METADATA_FIELD_CLEANER = Cleaners.Cleaner(
     trim = Some(List(C.MetadataField.NAME, C.MetadataField.FIELD_TYPE)))
 
   final val VALID_BOOLEAN_VALUES = Set("0", "1", "true", "false")
