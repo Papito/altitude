@@ -214,10 +214,6 @@ class MetadataService(val app: Altitude) extends ModelValidation {
 
     val ex = ValidationException()
 
-    /**
-     * Validate based on field type
-     */
-
     // for each field
     metadata.data.foreach { m =>
       val fieldId = m._1
