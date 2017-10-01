@@ -3,7 +3,6 @@ package software.altitude.core.service
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
-import software.altitude.client.models.ClientFieldType
 import software.altitude.core.Validators.ModelDataValidator
 import software.altitude.core.dao.{AssetDao, MetadataFieldDao}
 import software.altitude.core.models.{FieldType, Metadata, MetadataField}
