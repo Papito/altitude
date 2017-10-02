@@ -143,11 +143,6 @@ class MetadataService(val app: Altitude) extends ModelValidation {
 
   def clean(metadata: Metadata)
            (implicit ctx: Context, txId: TransactionId): Metadata = {
-
-    if (metadata.data.isEmpty) {
-      return metadata
-    }
-
     // get all metadata fields configured for this repository
     val fields = getAllFields
 
@@ -171,7 +166,8 @@ class MetadataService(val app: Altitude) extends ModelValidation {
       val values: Set[String] = m._2
 
       val trimmed = field.fieldType match {
-        case FieldType.KEYWORD => values
+        case FieldType.KEYWORD => {
+          values
           // trim leading/trailing
           .map(_.trim)
           // compact multiple space characters into one
@@ -180,12 +176,15 @@ class MetadataService(val app: Altitude) extends ModelValidation {
           .map(_.replaceAll("\\s", " "))
           // and lose the blanks
           .filter(_.nonEmpty)
+        }
 
-        case FieldType.NUMBER | FieldType.BOOL => values
+        case FieldType.NUMBER | FieldType.BOOL => {
+          values
           // trim leading/trailing
           .map(_.trim)
           // and lose the blanks
           .filter(_.nonEmpty)
+        }
 
         case FieldType.TEXT => values.map(_.trim)
       }

@@ -8,7 +8,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
 
 @DoNotDiscover class MetadataServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
-  test("Number field type can be added", CurrentTag) {
+  test("Number field type can be added") {
     val field = altitude.service.metadata.addField(
       MetadataField(
         name = Util.randomStr(),
@@ -30,7 +30,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
       field.id.get -> Set("000.", "0", "", "0000.00123", ".000", "36352424", "234324221"))
   }
 
-  test("Boolean field type can be added", CurrentTag) {
+  test("Boolean field type can be added") {
     val field = altitude.service.metadata.addField(
       MetadataField(
         name = Util.randomStr(),
