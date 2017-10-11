@@ -39,7 +39,7 @@ class MetadataController extends BaseApiController {
 
   put("/:id") {
     val id = params.get(C.Api.ID).get
-    log.info(s"Deleting metadata field: $id")
+    log.info(s"Updating metadata field: $id")
 
     OK
   }
