@@ -205,6 +205,7 @@ object Const {
     }
 
     object Err {
+      val REQUIRED = "This field is required"
       val CANNOT_BE_EMPTY = "This field cannot be empty"
       val VALUE_TOO_LONG = "The value cannot be more than %s characters long"
       val VALIDATION_ERROR = "Validation error"
@@ -214,11 +215,11 @@ object Const {
       val EMPTY_REQUEST_BODY = "Empty request body"
       val DUPLICATE = "Duplicate"
       val DUPLICATE_FIELD_VALUE = "Duplicate values in [%s]"
-      val REQUIRED = "This field is required"
       val INCORRECT_VALUE_TYPE = "Incorrect value type for [%s]"
-      val NOT_MULTI_VALUE = "The field [%s] does not accept multiple values"
       val VALUES_TOO_LONG = "Values are too long: [%s]"
       val NOT_IN_CONSTRAINT_LIST = "Some values are not in the field constraint list: [%s]"
+      val META_FIELD_DOES_NOT_SUPPORT_MULTIVALUE = "The field [%s] does not accept multiple values"
+      val META_FIELD_DOES_NOT_SUPPORT_CONSTRAINTS = "The field does not support constraints"
     }
   }
 
