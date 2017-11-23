@@ -14,4 +14,4 @@ $ ./sbt
 
 ## Running a tagged test(s):
     sbt> test-only -- -n Current
-    sbt> test-only test-only software.altitude.test.core.suites.SqliteSuite -- -n Current
+    sbt> test-only software.altitude.test.core.suites.SqliteSuite -- -n Current
