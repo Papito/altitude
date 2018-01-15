@@ -18,15 +18,12 @@ object ScalatraLauncher extends App  with SingleApplication {
   connector.setPort(port)
   server.addConnector(connector)
 
-  val staticContext = new WebAppContext(Environment.root + "static", "/static/")
-  staticContext.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false")
-  staticContext.addServlet(classOf[DefaultServlet],"/")
 
   val context = new WebAppContext(getClass.getClassLoader.getResource("webapp").toExternalForm, "/")
   context.setEventListeners(Array(new ScalatraListener))
 
   val contexts = new ContextHandlerCollection()
-  contexts.setHandlers(List[Handler](staticContext, context).toArray)
+  contexts.setHandlers(List[Handler](context).toArray)
 
   server.setHandler(contexts)
 

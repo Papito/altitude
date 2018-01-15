@@ -9,7 +9,7 @@ import software.altitude.core.{Const => C, NotFoundException, ValidationExceptio
 
 import scala.compat.Platform
 
-class BaseApiController extends BaseController with GZipSupport {
+class BaseApiController extends BaseController with ContentEncodingSupport {
   private final val log = LoggerFactory.getLogger(getClass)
 
   val OK = Ok("{}")
