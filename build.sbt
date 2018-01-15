@@ -12,8 +12,8 @@ libraryDependencies ++= Seq(
 
   "org.scalatra"                %% "scalatra"            % ScalatraVersion,
   "org.scalatra"                %% "scalatra-scalate"    % ScalatraVersion,
-  "org.scalatra"                %% "scalatra-specs2"     % ScalatraVersion % Test,
   "org.scalatra"                %% "scalatra-atmosphere" % ScalatraVersion,
+  "org.scalatra"                %% "scalatra-scalatest"    % ScalatraVersion % Test,
 
   "com.typesafe.play"           %% "play-json"             % "2.3.10",
 
@@ -25,13 +25,14 @@ libraryDependencies ++= Seq(
   "org.postgresql"               % "postgresql"            % "9.4-1201-jdbc41",
   "org.xerial"                   % "sqlite-jdbc"           % "3.15.1",
 
-  "net.codingwell"              %% "scala-guice"           % "4.1.0",
+  "com.google.guava"             % "guava"                 % "19.0",
+  "net.codingwell"              %% "scala-guice"           % "4.1.1",
   "org.imgscalr"                 % "imgscalr-lib"          % "4.2",
 
   "ch.qos.logback"               % "logback-classic"       % "1.1.2" % "runtime",
 
-  "org.eclipse.jetty"           %  "jetty-webapp"        % jettyVersion % "container;compile",
-  "javax.servlet"               %  "javax.servlet-api"   % "3.1.0" % Provided
+  "org.eclipse.jetty"            % "jetty-webapp"        % jettyVersion % "container;compile",
+  "javax.servlet"                % "javax.servlet-api"   % "3.1.0" % Provided
 ).map(_.exclude("commons-logging", "commons-logging"))
  .map(_.exclude("org.apache.cxf", "cxf-core"))
  .map(_.exclude("org.apache.cxf", "cxf-cxf-rt-transports-http"))
