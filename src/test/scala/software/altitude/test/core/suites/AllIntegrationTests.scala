@@ -4,7 +4,7 @@ import org.scalatest.Suites
 import software.altitude.test.core.integration._
 import software.altitude.test.core.unit.{FolderModelTests, ModelTests, SearchQueryModelTests}
 
-abstract class AllTests(val config: Map[String, Any]) extends Suites(
+abstract class AllIntegrationTests(val config: Map[String, Any]) extends Suites(
     new ModelTests,
     new SearchQueryModelTests,
     new AssetServiceTests(config),
