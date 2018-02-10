@@ -21,7 +21,7 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
        """
 
     val metadataValues = asset.metadata.data.foldLeft(Set[String]()) { (res, m) =>
-      res ++ m._2
+      res ++ m._2.map(_.value)
     }
 
     val body = path + ' ' +

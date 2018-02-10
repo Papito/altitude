@@ -9,7 +9,7 @@ import software.altitude.core.models.Metadata
 @DoNotDiscover class MetadataParserTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
   test("normalize metadata") {
-    val metadata = getMetadata("images/6.jpg")
+    val metadata: Metadata = getMetadata("images/6.jpg")
 
     val verify = Map(
       "Exposure Mode" -> "Auto exposure",
@@ -28,13 +28,13 @@ import software.altitude.core.models.Metadata
 
     verify.foreach { case (k, v) =>
       metadata.data.keys.toSeq should contain(k)
-      metadata(k) should contain (v)
+      metadata(k).map(_.value) should contain (v)
     }
 
     metadata.get("X Resolution") shouldNot be(None)
-    metadata("X Resolution") should contain ("72 dots per inch")
+    metadata("X Resolution").map(_.value) should contain ("72 dots per inch")
     metadata.get("Y Resolution") shouldNot be(None)
-    metadata("Y Resolution") should contain ("72 dots per inch")
+    metadata("Y Resolution").map(_.value) should contain ("72 dots per inch")
   }
 
   private def getMetadata(p: String): Metadata = {

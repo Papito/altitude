@@ -30,9 +30,9 @@ case class Asset(id: Option[String] = None,
                  md5: String,
                  sizeBytes: Long,
                  folderId: String,
-                 metadata: Metadata = new Metadata(),
+                 metadata: Metadata = Metadata(),
                  isRecycled: Boolean = false,
-                 extractedMetadata: Metadata = new Metadata())
+                 extractedMetadata: Metadata = Metadata())
   extends BaseModel {
 
   override def toJson = Json.obj(

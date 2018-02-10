@@ -9,5 +9,13 @@ object QueryResult {
 case class QueryResult(records: List[JsObject], total: Int, query: Option[Query]) {
   val nonEmpty = records.nonEmpty
   val isEmpty = records.isEmpty
-  val totalPages: Int = if (query.isDefined) Math.ceil(total / query.get.rpp.toDouble).toInt else 0
+
+  val totalPages: Int = query match {
+    case Some(q) if isEmpty => 0
+    case None if isEmpty => 0
+    case None if nonEmpty => 1
+    case Some(q) if q.rpp == 0 && nonEmpty => 1
+    case Some(q) if q.rpp > 0 => Math.ceil(total / query.get.rpp.toDouble).toInt
+    case _ => throw new IllegalStateException
+  }
 }

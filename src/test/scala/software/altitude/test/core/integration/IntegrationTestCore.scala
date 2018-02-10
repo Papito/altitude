@@ -132,7 +132,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   /**
    * A helper method to quickly cook a test asset
    */
-  protected def makeAsset(folder: Folder, metadata: Metadata = new Metadata()) = Asset(
+  protected def makeAsset(folder: Folder, metadata: Metadata = Metadata()) = Asset(
     userId = currentUser.id.get,
     folderId = folder.id.get,
     assetType = new AssetType(
@@ -151,7 +151,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
     path = file.getAbsolutePath,
     sourceType = C.FileStoreType.FS,
     data =  FileUtils.readFileToByteArray(file),
-    metadata = new Metadata())
+    metadata = Metadata())
 
   // test count - we use it as a request ID for our logging environment
   private var count = 0

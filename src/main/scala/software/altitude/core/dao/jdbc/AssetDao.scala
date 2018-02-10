@@ -75,7 +75,9 @@ abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softw
   override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
     val asset = jsonIn: Asset
 
-    val metadata: String = asset.metadata.toString().replaceAll("\\\\u0000", "")
+    val metadataWithIds = Metadata.withIds(asset.metadata)
+
+    val metadata: String = metadataWithIds.toString().replaceAll("\\\\u0000", "")
     val extractedMetadata: String = asset.extractedMetadata.toString().replaceAll("\\\\u0000", "")
 
     val sql = s"""
@@ -104,13 +106,16 @@ abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softw
 
   override def setMetadata(assetId: String, metadata: Metadata)
                           (implicit ctx: Context, txId: TransactionId) = {
+
+    val metadataWithIds = Metadata.withIds(metadata)
+
     val sql = s"""
       UPDATE $TABLE_NAME
          SET ${C.Base.UPDATED_AT} = $CURRENT_TIME_FUNC, ${C.Asset.METADATA} = $JSON_FUNC
        WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
       """
 
-    val updateValues = List(metadata.toString, ctx.repo.id.get, assetId)
+    val updateValues = List(metadataWithIds.toString, ctx.repo.id.get, assetId)
     log.debug(s"Update SQL: [$sql] with values: $updateValues")
     val runner: QueryRunner = new QueryRunner()
 

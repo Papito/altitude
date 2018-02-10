@@ -50,7 +50,7 @@ class QueryController extends BaseApiController {
   private def defaultQuery(folderId: String): ActionResult = {
     val q = Query(
       params = Map(C.Api.Folder.QUERY_ARG_NAME -> folderId),
-      rpp = 20, page = 1)
+      rpp = C.DEFAULT_RPP.toInt, page = 1)
 
     val results = app.service.library.query(q)
 
@@ -67,9 +67,6 @@ class QueryController extends BaseApiController {
   }
 
   private def query(folderId: String, page: Int, rpp: Int): ActionResult = {
-    val rpp = params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, C.DEFAULT_RPP).toInt
-    val page = params.getOrElse(C.Api.Search.PAGE, "1").toInt
-
     val q = Query(
       params = Map(C.Api.Folder.QUERY_ARG_NAME -> folderId),
       rpp = rpp, page = page)

@@ -40,6 +40,8 @@ class AssetController extends BaseApiController {
     val fieldId = params.get(C.Api.Asset.METADATA_FIELD_ID).get
     val newValue = (requestJson.get \ C.Api.Metadata.VALUE).as[String]
 
+    log.info(s"Adding metadata value [$newValue] for field [$fieldId] on asset [$assetId]")
+
     app.service.metadata.addFieldValue(assetId, fieldId, newValue)
 
     val newMetadata = app.service.metadata.getMetadata(assetId)
@@ -49,6 +51,38 @@ class AssetController extends BaseApiController {
     ))
   }
 
+  put(s"/:${C.Api.ID}/metadata/value/:${C.Api.Asset.METADATA_VALUE_ID}") {
+    val assetId = params.get(C.Api.ID).get
+    val valueId = params.get(C.Api.Asset.METADATA_VALUE_ID).get
+    val newValue = (requestJson.get \ C.Api.Metadata.VALUE).as[String]
+
+    log.info(s"Updating metadata value [$newValue] for value ID [$valueId] on asset [$assetId]")
+
+    app.service.metadata.updateFieldValue(assetId, valueId, newValue)
+
+    val newMetadata = app.service.metadata.getMetadata(assetId)
+
+    Ok(Json.obj(
+      C.Api.Asset.METADATA -> app.service.metadata.toJson(newMetadata)
+    ))
+  }
+
+  delete(s"/:${C.Api.ID}/metadata/value/:${C.Api.Asset.METADATA_VALUE_ID}") {
+    val assetId = params.get(C.Api.ID).get
+    val valueId = params.get(C.Api.Asset.METADATA_VALUE_ID).get
+
+    log.info(s"Removing metadata value [$valueId] on asset [$assetId]")
+
+    app.service.metadata.deleteFieldValue(assetId, valueId)
+
+    val newMetadata = app.service.metadata.getMetadata(assetId)
+
+    Ok(Json.obj(
+      C.Api.Asset.METADATA -> app.service.metadata.toJson(newMetadata)
+    ))
+  }
+
+  // FIXME: PUT
   post(s"/:${C.Api.ID}/move/:${C.Api.Asset.FOLDER_ID}") {
     val id = params.get(C.Api.ID).get
     val folderId = params.get(C.Api.Asset.FOLDER_ID).get
@@ -59,6 +93,7 @@ class AssetController extends BaseApiController {
     OK
   }
 
+  // FIXME: PUT
   post(s"/move/to/:${C.Api.Asset.FOLDER_ID}") {
     val folderId = params.get(C.Api.Asset.FOLDER_ID).get
 
@@ -76,6 +111,7 @@ class AssetController extends BaseApiController {
     OK
   }
 
+  // FIXME: PUT
   post(s"/:${C.Api.ID}/move/to/triage") {
     val id = params.get(C.Api.ID).get
     log.info(s"Moving $id to TRIAGE")
@@ -84,6 +120,7 @@ class AssetController extends BaseApiController {
     OK
   }
 
+  // FIXME: PUT
   post(s"/move/to/triage") {
     log.info(s"Clearing category")
 

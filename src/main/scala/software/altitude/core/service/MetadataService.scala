@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json._
 import software.altitude.core.Validators.ModelDataValidator
 import software.altitude.core.dao.{AssetDao, MetadataFieldDao}
-import software.altitude.core.models.{FieldType, Metadata, MetadataField}
+import software.altitude.core.models._
 import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
 import software.altitude.core.util.Query
 import software.altitude.core.{Const => C, _}
@@ -82,7 +82,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     // return the metadata or a new empty one if blank
     ASSET_DAO.getMetadata(assetId) match {
       case Some(metadata) => metadata
-      case None => new Metadata()
+      case None => Metadata()
     }
 
   def setMetadata(assetId: String, metadata: Metadata)
@@ -91,53 +91,159 @@ class MetadataService(val app: Altitude) extends ModelValidation {
 
     txManager.withTransaction {
       val cleanMetadata = cleanAndValidate(metadata)
+
       ASSET_DAO.setMetadata(assetId = assetId, metadata = cleanMetadata)
     }
   }
 
+  // OPTIMIZE: this cleans and validates existing values (the ones that have IDs)
   def updateMetadata(assetId: String, metadata: Metadata)
                  (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
     log.info(s"Updating metadata for asset [$assetId]: $metadata")
 
     txManager.withTransaction {
       val cleanMetadata = cleanAndValidate(metadata)
-
       /**
        * If the cleaned metadata does not have fields found in the original -
        * those are empty and should be deleted
        */
       val deletedFields = metadata.data.keys.filterNot(cleanMetadata.data.keys.toSet.contains).toSet
+
       ASSET_DAO.updateMetadata(assetId, cleanMetadata, deletedFields)
     }
   }
 
   def addFieldValue(assetId: String, fieldId: String, newValue: String)
                     (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
-    log.info(s"Updating meta field [$fieldId] for asset [$assetId] with new value [$newValue]")
+    log.info(s"Adding value [$newValue] for field [$fieldId] on asset [$assetId] ")
+
+    txManager.withTransaction {
+      val metadata = Metadata(Map(fieldId -> Set(MetadataValue(newValue))))
+      val cleanMetadata = cleanAndValidate(metadata)
+
+      // if after cleaning the value is not there - it's empty
+      if (!cleanMetadata.contains(fieldId)) {
+        val ex = ValidationException()
+        ex.errors += (fieldId -> C.Msg.Err.CANNOT_BE_EMPTY)
+        ex.trigger()
+      }
+
+      val cleanValue = cleanMetadata.get(fieldId).get.head
+
+      // cannot add a second value to a single-value field
+      val field: MetadataField = getFieldById(fieldId)
+      val currentMetadata = app.service.metadata.getMetadata(assetId)
+      val existingValues = currentMetadata.get(fieldId).getOrElse(Set[MetadataValue]())
+
+      if (field.fieldType != FieldType.BOOL) {
+        // check duplicate
+        if (existingValues.contains(cleanValue)) {
+          val ex = ValidationException()
+          ex.errors += (fieldId -> C.Msg.Err.DUPLICATE)
+          ex.trigger()
+        }
+      }
+
+      val currentValues: Set[MetadataValue] = currentMetadata.get(fieldId).isEmpty  match {
+        case true => Set[MetadataValue]()
+        case false => currentMetadata.get(fieldId).get
+      }
+
+      // boolean values replaces each other
+      val newValues = field.fieldType match {
+        case FieldType.BOOL => Set(cleanValue)
+        case _ => currentValues + cleanValue
+      }
+      val data = Map[String, Set[MetadataValue]](fieldId -> newValues)
+
+      updateMetadata(assetId, Metadata(data))
+    }
+  }
+
+  def deleteFieldValue(assetId: String, valueId: String)
+                      (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
+    log.info(s"Deleting value [$valueId] for on asset [$assetId] ")
 
     txManager.withTransaction {
       val currentMetadata = getMetadata(assetId)
 
-      val currentValues = currentMetadata.get(fieldId).isEmpty  match {
-        case true => Set[String]()
-        case false => currentMetadata.get(fieldId).get
+      // find the field that has the value and filter it out
+      val newData = currentMetadata.data.map { item =>
+        val oldValues = item._2
+        item._1 -> oldValues.filterNot(_.id.contains(valueId))
       }
 
-      val newValues = currentValues + newValue
-      val data = Map[String, Set[String]](fieldId -> newValues)
+      // FIXME: NotFound
+      require(newData.nonEmpty)
 
-      updateMetadata(assetId, new Metadata(data))
+      updateMetadata(assetId, Metadata(newData))
     }
   }
 
-  def replaceFieldValues(assetId: String, fieldId: String, newValue: String)
-                   (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
-    log.info(s"Updating meta field [$fieldId] for asset [$assetId] with new value [$newValue]")
+  def updateFieldValue(assetId: String, valueId: String, newValue: String)
+                      (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+
+    log.info(s"Updating value [$valueId] for on asset [$assetId] with [$newValue] ")
 
     txManager.withTransaction {
-      val data = Map[String, Set[String]](fieldId -> Set(newValue))
+      val currentMetadata = getMetadata(assetId)
 
-      updateMetadata(assetId, new Metadata(data))
+      val newMvalue = MetadataValue(id = Some(valueId), value = newValue)
+      // find the field that has the value by ID
+      val search = currentMetadata.data.filter(_._2/*values*/.exists(_.id.contains(valueId)))
+
+      // FIXME: NotFound
+      require(search.size == 1)
+
+      val (fieldId, currentMvalues) = search.head
+
+      val metadata = Metadata(Map(fieldId -> Set(MetadataValue(newValue))))
+      val cleanMetadata = cleanAndValidate(metadata)
+
+      // if after cleaning the value is not there - it's empty
+      if (!cleanMetadata.contains(fieldId)) {
+        val ex = ValidationException()
+        ex.errors += (fieldId -> C.Msg.Err.CANNOT_BE_EMPTY)
+        ex.trigger()
+      }
+
+      val cleanMvalue = cleanMetadata.get(fieldId).get.head
+
+      val existingMvalue = currentMvalues.find(_.id.contains(valueId))
+
+      // FIXME: NotFound
+      require(existingMvalue.nonEmpty)
+
+      // bail if the new values is identical to the old one
+      if (existingMvalue.get.value == newMvalue.value) {
+        return
+      }
+
+      // when checking for existing values, ignore the current ID
+      if (currentMvalues.filterNot(_.id.contains(valueId)).contains(cleanMvalue)) {
+        val ex = ValidationException()
+        ex.errors += (fieldId -> C.Msg.Err.DUPLICATE)
+        ex.trigger()
+      }
+
+      val newData = currentMetadata.data.map { item =>
+        val fId = item._1
+        val mValues = item._2
+
+        // return all values as is, only replacing the one value we are working on
+        val newMvalues = if (fId == fieldId) {
+          mValues.map { v =>
+            if (v.id.get == valueId) newMvalue else v
+          }
+        }
+        else {
+          mValues
+        }
+
+        fId -> newMvalues
+      }
+
+      updateMetadata(assetId, Metadata(newData))
     }
   }
 
@@ -160,54 +266,56 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     /**
      * Clean the metadata to be ready for validation
      */
-    val cleanData = metadata.data.foldLeft(Map[String, Set[String]]()) { (res, m) =>
+    val cleanData = metadata.data.foldLeft(Map[String, Set[MetadataValue]]()) { (res, m) =>
       val fieldId = m._1
       val field: MetadataField = fields(fieldId)
-      val values: Set[String] = m._2
+      val mValues: Set[MetadataValue] = m._2
 
-      val trimmed = field.fieldType match {
+      val trimmed: Set[MetadataValue] = field.fieldType match {
         case FieldType.KEYWORD => {
-          values
+          mValues
           // trim leading/trailing
-          .map(_.trim)
+          .map{ mValue => MetadataValue(mValue.id, mValue.value.trim) }
           // compact multiple space characters into one
-          .map(_.replaceAll("[\\s]{2,}", " ")) // match two or more spaces and make it one
+          .map{ mValue => MetadataValue(mValue.id, mValue.value.replaceAll("[\\s]{2,}", " "))}
           // force a space character to be vanilla whitespace
-          .map(_.replaceAll("\\s", " "))
+          .map{ mValue => MetadataValue(mValue.id, mValue.value.replaceAll("\\s", " ")) }
+          // and lose the blanks
+          .filter(_.nonEmpty)
+        }
+
+        case FieldType.TEXT => {
+          mValues
+          // trim leading/trailing
+          .map{ mValue => MetadataValue(mValue.id, mValue.value.trim) }
           // and lose the blanks
           .filter(_.nonEmpty)
         }
 
         case FieldType.NUMBER | FieldType.BOOL => {
-          values
+          mValues
           // trim leading/trailing
-          .map(_.trim)
+          .map{ mValue => MetadataValue(mValue.id, mValue.value.trim) }
           // and lose the blanks
           .filter(_.nonEmpty)
         }
-
-        case FieldType.TEXT => values.map(_.trim)
       }
 
-      if (trimmed.nonEmpty)
-        res + (fieldId -> trimmed)
-      else
-        res
+      if (trimmed.nonEmpty) res + (fieldId -> trimmed) else res
     }
 
-    val cleanMetadata = new Metadata(data = cleanData)
+    val cleanMetadata = Metadata(data = cleanData)
     cleanMetadata.isClean = true
     cleanMetadata
   }
 
-  def validate(metadata: Metadata)
-              (implicit ctx: Context, txId: TransactionId): Unit = {
-
+  def validate(metadata: Metadata)(implicit ctx: Context, txId: TransactionId): Unit = {
     if (metadata.data.isEmpty) {
       return
     }
 
     // get all metadata fields configured for this repository
+    // OPTIMIZE: only get the fields in the metadata
     val fields = getAllFields
 
     val ex = ValidationException()
@@ -216,7 +324,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     metadata.data.foreach { m =>
       val fieldId = m._1
       val field: MetadataField = fields(fieldId)
-      val values: Set[String] = m._2
+      val values: Set[MetadataValue] = m._2
 
       breakable {
         // booleans cannot have multiple values
@@ -263,13 +371,17 @@ class MetadataService(val app: Altitude) extends ModelValidation {
 
     We get out:
     [
-      ID -> field id
-      NAME -> field name
-      VALUES -> values
+      VALUES -> values[]
+      FIELD_TYPE ->
+        ID -> field id
+        NAME -> field name
+        FIELD_TYPE -> field type
 
-      ID -> field id
-      NAME -> field name
-      VALUES -> values TYPE -> type
+      VALUES -> values[]
+      FIELD_TYPE ->
+        ID -> field id
+        NAME -> field name
+        FIELD_TYPE -> field type
     ]
    */
   def toJson(metadata: Metadata, allMetadataFields: Option[Map[String, MetadataField]] = None)
@@ -281,19 +393,37 @@ class MetadataService(val app: Altitude) extends ModelValidation {
         case false => getAllFields
       }
 
-      val res = metadata.data.foldLeft(scala.collection.immutable.Stack[JsValue]()) { (res, m) =>
-        val fieldId = m._1
-        val field: Option[MetadataField] = allFields.get(fieldId)
-
-        res :+ Json.obj(
-          C.MetadataField.ID -> fieldId,
-          C.MetadataField.NAME -> field.get.name,
-          C.MetadataField.FIELD_TYPE -> field.get.fieldType.toString,
-          C.MetadataField.VALUES -> JsArray(m._2.toSeq.map(JsString))
+      def toJson(field: MetadataField, mValues: Set[MetadataValue]): JsObject = {
+        Json.obj(
+          C.MetadataField.FIELD -> (field.toJson -
+            C.Base.UPDATED_AT -
+            C.Base.CREATED_AT -
+            C.MetadataField.NAME_LC),
+          C.MetadataField.VALUES -> JsArray(mValues.toSeq.map(_.toJson))
         )
       }
 
-      JsArray(res)
+      val res = metadata.data.foldLeft(scala.collection.immutable.Stack[JsValue]()) { (res, m) =>
+        val fieldId = m._1
+        val field: MetadataField = allFields.get(fieldId).get
+        res :+ toJson(field, m._2)
+      }
+
+      // add the missing fields that have no values
+      val emptyFields = allFields.filterNot { case (fieldId, _) =>
+        metadata.contains(fieldId)
+      }.map { case (fieldId, _) =>
+        val field: MetadataField = allFields.get(fieldId).get
+        toJson(field, Set[MetadataValue]())
+      }
+
+      val sorted = (res ++ emptyFields).sortWith{ (left, right) =>
+        val leftFieldName: String = (left \ C.MetadataField.FIELD \ C.MetadataField.NAME).as[String]
+        val rightFieldName: String = (right \ C.MetadataField.FIELD \ C.MetadataField.NAME).as[String]
+        leftFieldName.compareToIgnoreCase(rightFieldName) < 1
+      }
+
+      JsArray(sorted)
     }
   }
 
@@ -305,23 +435,23 @@ class MetadataService(val app: Altitude) extends ModelValidation {
    * @param values Values that may or may note pass type validation
    * @return All values that FAIL type validation
    */
-  def collectInvalidTypeValues(fieldType: FieldType.Value, values: Set[String]): Set[String] = {
-    values.map { value =>
+  def collectInvalidTypeValues(fieldType: FieldType.Value, values: Set[MetadataValue]): Set[String] = {
+    values.map { mValue =>
       fieldType match {
         case FieldType.NUMBER => try {
-          value.toDouble
+          mValue.value.toDouble
           None
         } catch {
-          case _: Throwable => Some(value)
+          case _: Throwable => Some(mValue.value)
         }
         case FieldType.KEYWORD => None // everything is allowed
         case FieldType.TEXT => None // everything is allowed
         case FieldType.BOOL => // only values that we recognize as booleans
-          if (MetadataService.VALID_BOOLEAN_VALUES.contains(value.toLowerCase)) {
+          if (MetadataService.VALID_BOOLEAN_VALUES.contains(mValue.value.toLowerCase)) {
             None
           }
           else {
-            Some(value)
+            Some(mValue.value)
           }
       }
       // get rid of None's - those are valid values

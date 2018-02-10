@@ -34,7 +34,7 @@ trait AssetDao extends BaseDao {
      */
     val existingMetadata = getMetadata(assetId) match {
       case Some(m) => m
-      case None => new Metadata
+      case None => Metadata()
     }
 
     log.debug(s"Updating $existingMetadata with $metadata")
