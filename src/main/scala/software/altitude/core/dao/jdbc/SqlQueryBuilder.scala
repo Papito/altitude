@@ -61,7 +61,7 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) extends Query
     }
 
     val bindValues = sqlValues.toList ::: folderIds.toList
-    //log.debug(s"SQL QUERY: $sql with $bindValues")
+    log.debug(s"SQL QUERY: $sql with $bindValues")
     SqlQuery(sql, bindValues)
   }
 

@@ -13,7 +13,7 @@ import org.apache.tika.parser.jpeg.JpegParser
 import org.apache.tika.parser.mp3.Mp3Parser
 import org.slf4j.LoggerFactory
 import org.xml.sax.helpers.DefaultHandler
-import software.altitude.core.models.{AssetType, ImportAsset, Metadata}
+import software.altitude.core.models.{MetadataValue, AssetType, ImportAsset, Metadata}
 import software.altitude.core.{AllDone, Const => C}
 
 class TikaMetadataExtractionService extends MetadataExtractionService {
@@ -50,7 +50,7 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
 
   private def rawToMetadata(raw: Option[TikaMetadata]): Metadata = {
     if (raw.isEmpty) {
-      return new Metadata()
+      return Metadata()
     }
 
     val data = scala.collection.mutable.Map[String, Set[String]]()
@@ -59,7 +59,7 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
       data(name) = Set(raw.get.get(name).trim)
     }
 
-    new Metadata(data.toMap)
+    Metadata(data.toMap)
   }
 
   private def extractMetadata(importAsset: ImportAsset, parsers: List[AbstractParser]): Option[TikaMetadata]  = {
@@ -98,7 +98,7 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
   }
 
   private def normalize(metadata: Metadata): Metadata = {
-    val normalizedData = scala.collection.mutable.Map[String, Set[String]]()
+    val normalizedData = scala.collection.mutable.Map[String, Set[MetadataValue]]()
 
     FIELD_BIBLE.foreach { case (destField, srcFields) =>
       srcFields.isEmpty match {
@@ -115,7 +115,7 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
           }
       }
     }
-    new Metadata(normalizedData.toMap)
+    Metadata(normalizedData.toMap)
   }
 
   def detectAssetTypeFromStream(is: InputStream): AssetType = {

@@ -134,7 +134,12 @@ class StatsService(app: Altitude) {
     app.service.stats.decrementStat(Stats.RECYCLED_ASSETS)
     app.service.stats.decrementStat(Stats.RECYCLED_BYTES, asset.sizeBytes)
 
-    if (!app.service.folder.isSystemFolder(Some(destFolderId))) {
+    if (app.service.folder.isTriageFolder(destFolderId)) {
+      log.debug(s"Asset [${asset.id}] moving TO triage. Incrementing TRIAGE")
+      app.service.stats.incrementStat(Stats.TRIAGE_ASSETS)
+      app.service.stats.incrementStat(Stats.TRIAGE_BYTES, asset.sizeBytes)
+    }
+    else if(!app.service.folder.isSystemFolder(Some(destFolderId))) {
       log.debug(s"Recycled asset [${asset.id}] moving TO sorted. Incrementing SORTED")
       app.service.stats.incrementStat(Stats.SORTED_ASSETS)
       app.service.stats.incrementStat(Stats.SORTED_BYTES, asset.sizeBytes)

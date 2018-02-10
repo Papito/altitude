@@ -25,7 +25,9 @@ object Const {
     val ID = "id"
     val REPO_ID = "repository_id"
     val USER_ID = "user_id"
+    val VALUE = "value"
     val VALUES = "values"
+    val CHECKSUM = "checksum"
     val DATA = "data"
     val CREATED_AT = "created_at"
     val UPDATED_AT = "updated_at"
@@ -107,6 +109,7 @@ object Const {
     val NAME = "name"
     val NAME_LC = "name_lc"
     val FIELD_TYPE = "field_type"
+    val FIELD = "field"
   }
 
   object SearchToken extends Common {
@@ -156,6 +159,7 @@ object Const {
       val ASSETS = "assets"
       val METADATA = "metadata"
       val METADATA_FIELD_ID = "metadata_field_id"
+      val METADATA_VALUE_ID = "metadata_value_id"
     }
 
     object Search {
@@ -205,20 +209,22 @@ object Const {
     }
 
     object Err {
-      val CANNOT_BE_EMPTY = "This field cannot be empty"
-      val VALUE_TOO_LONG = "The value cannot be more than %s characters long"
+      val REQUIRED = "Required"
+      val CANNOT_BE_EMPTY = "Cannot be empty"
+      val VALUE_TOO_LONG = "Cannot be more than %s characters long"
       val VALIDATION_ERROR = "Validation error"
       val VALIDATION_ERRORS = "There are validation errors in: %s"
-      val WRONG_TYPE = "This field does not match the required type (%s)"
-      val WRONG_VALUE = "This is not an allowed value. Allowed values are: %s"
+      val WRONG_TYPE = "Does not match required type (%s)"
+      val WRONG_VALUE = "Not an allowed value. Allowed values are: %s"
       val EMPTY_REQUEST_BODY = "Empty request body"
       val DUPLICATE = "Duplicate"
       val DUPLICATE_FIELD_VALUE = "Duplicate values in [%s]"
-      val REQUIRED = "This field is required"
-      val INCORRECT_VALUE_TYPE = "Incorrect value type for [%s]"
-      val NOT_MULTI_VALUE = "The field [%s] does not accept multiple values"
+      val INCORRECT_VALUE_TYPE = "Incorrect value type"
       val VALUES_TOO_LONG = "Values are too long: [%s]"
       val NOT_IN_CONSTRAINT_LIST = "Some values are not in the field constraint list: [%s]"
+      val META_FIELD_DOES_NOT_SUPPORT_MULTIVALUE = "The field [%s] does not accept multiple values"
+      val DOES_NOT_SUPPORT_MULTIVALUE = "Cannot add multiple values"
+      val META_FIELD_DOES_NOT_SUPPORT_CONSTRAINTS = "The field does not support constraints"
     }
   }
 
@@ -233,7 +239,7 @@ object Const {
   }
 
   // default results per page
-  final val DEFAULT_RPP = "20"
+  final val DEFAULT_RPP = "15"
 
   object LogTag {
     val APP     = "APP"

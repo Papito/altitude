@@ -36,5 +36,7 @@ case class Repository(id: Option[String] = None,
       C.Repository.FILES_STORE_CONFIG -> Json.toJson(fileStoreConfig)
     ) ++ coreJsonAttrs
   }
+
+  override def toString = s"<repo> ${id.getOrElse("NO ID")}: $name"
 }
 

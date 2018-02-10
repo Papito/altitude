@@ -71,7 +71,7 @@ abstract class BaseModel {
   }
 
   /**
-   * Returns core JSON attributes that every model should have
+   * Returns core JSON attributes that most models should have
    */
   protected def coreJsonAttrs = JsObject(Map(
     C.Base.ID -> {id match {

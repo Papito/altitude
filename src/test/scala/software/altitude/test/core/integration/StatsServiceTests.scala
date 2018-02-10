@@ -9,7 +9,7 @@ import software.altitude.core.util.Query
 
   val ASSET_SIZE = 1000
 
-  test("test totals") {
+  test("Test totals (simple cases)") {
     // create an asset in a folder
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
@@ -65,7 +65,7 @@ import software.altitude.core.util.Query
       stats3.getStatValue(Stats.TOTAL_ASSETS) * ASSET_SIZE
   }
 
-  test("test triage") {
+  test("Test triage") {
     // create an asset in a folder
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
@@ -81,7 +81,7 @@ import software.altitude.core.util.Query
       stats.getStatValue(Stats.TRIAGE_ASSETS) * ASSET_SIZE
   }
 
-  test("test move recycled asset to new folder") {
+  test("Test move recycled asset to new folder") {
     var folder1: Folder = altitude.service.folder.addFolder("folder1")
 
     val asset: Asset = altitude.service.library.add(makeAsset(folder1))
@@ -109,7 +109,7 @@ import software.altitude.core.util.Query
     stats.getStatValue(Stats.RECYCLED_BYTES) shouldBe 0
   }
 
-  test("test move recycled asset to original folder") {
+  test("Test move recycled asset to original folder") {
     var folder1: Folder = altitude.service.folder.addFolder("folder1")
 
     val asset: Asset = altitude.service.library.add(makeAsset(folder1))
@@ -134,20 +134,24 @@ import software.altitude.core.util.Query
     stats.getStatValue(Stats.RECYCLED_BYTES) shouldBe 0
   }
 
-  test("restore recycled asset to triage") {
-    val asset: Asset = altitude.service.library.add(makeAsset(
-      altitude.service.folder.triageFolder))
+  test("Restore recycled asset to triage") {
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+
+    // second asset for some chaos
+    altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+
     val trashed: Asset = altitude.service.library.recycleAsset(asset.id.get)
     altitude.service.library.restoreRecycledAsset(trashed.id.get)
 
-    SET_SECOND_USER()
-    altitude.service.library.add(makeAsset(
-      altitude.service.folder.triageFolder))
+    SET_SECOND_REPO()
 
-    SET_FIRST_USER()
+    altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+
+    SET_FIRST_REPO()
 
     val stats = altitude.service.stats.getStats
-    stats.getStatValue(Stats.TRIAGE_ASSETS) shouldBe 1
+    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 2
+    stats.getStatValue(Stats.TRIAGE_ASSETS) shouldBe 2
     stats.getStatValue(Stats.TRIAGE_BYTES) shouldBe
       stats.getStatValue(Stats.TRIAGE_ASSETS) * ASSET_SIZE
     stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 0
@@ -159,7 +163,8 @@ import software.altitude.core.util.Query
 
     val stats2 = altitude.service.stats.getStats
 
-    stats2.getStatValue(Stats.TRIAGE_ASSETS) shouldBe 0
+    stats2.getStatValue(Stats.TOTAL_ASSETS) shouldBe 1
+    stats2.getStatValue(Stats.TRIAGE_ASSETS) shouldBe 1
     stats2.getStatValue(Stats.TRIAGE_BYTES) shouldBe
       stats2.getStatValue(Stats.TRIAGE_ASSETS) * ASSET_SIZE
     stats2.getStatValue(Stats.SORTED_ASSETS) shouldBe 0
@@ -168,7 +173,7 @@ import software.altitude.core.util.Query
     stats2.getStatValue(Stats.RECYCLED_BYTES) shouldBe 0
   }
 
-  test("restore recycled asset to original folder") {
+  test("Restore recycled asset to original folder") {
     var folder1: Folder = altitude.service.folder.addFolder("folder1")
 
     val asset: Asset = altitude.service.library.add(makeAsset(folder1))
@@ -183,7 +188,7 @@ import software.altitude.core.util.Query
     folder1.numOfAssets shouldBe 1
   }
 
-  test("recycle multiple assets") {
+  test("Recycle multiple assets") {
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
     1 to 2 foreach { n =>
@@ -208,7 +213,7 @@ import software.altitude.core.util.Query
       stats.getStatValue(Stats.RECYCLED_ASSETS) * ASSET_SIZE
   }
 
-  test("recycle a folder") {
+  test("Recycle a folder") {
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
     val folder2: Folder = altitude.service.folder.addFolder("folder2")
 

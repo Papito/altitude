@@ -17,12 +17,12 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
 
     var data = Map[String, Set[String]](field.id.get -> Set("one"))
     intercept[ValidationException] {
-      altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+      altitude.service.metadata.setMetadata(asset.id.get, Metadata(data))
     }
 
     data = Map[String, Set[String]](field.id.get -> Set("."))
     intercept[ValidationException] {
-      altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+      altitude.service.metadata.setMetadata(asset.id.get, Metadata(data))
     }
 
     // these should be ok
@@ -39,34 +39,37 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
 
     var data = Map[String, Set[String]](field.id.get -> Set("one"))
     intercept[ValidationException] {
-      altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+      altitude.service.metadata.setMetadata(asset.id.get, Metadata(data))
     }
 
     data = Map[String, Set[String]](field.id.get -> Set("on"))
     intercept[ValidationException] {
-      altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+      altitude.service.metadata.setMetadata(asset.id.get, Metadata(data))
     }
 
     // cannot have conflicting boolean values
     data = Map[String, Set[String]](field.id.get -> Set("TRUE", "FALSE"))
     intercept[ValidationException] {
-      altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+      altitude.service.metadata.setMetadata(asset.id.get, Metadata(data))
     }
     // ... but non-conflicting duplicates are ok
     data = Map[String, Set[String]](field.id.get -> Set("TRUE", "TRUE"))
 
     // these should be ok
     data = Map[String, Set[String]](field.id.get -> Set("TRUE"))
-    altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+    altitude.service.metadata.setMetadata(asset.id.get, Metadata(data))
 
     data = Map[String, Set[String]](field.id.get -> Set("FALSE"))
-    altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+    altitude.service.metadata.setMetadata(asset.id.get, Metadata(data))
 
     data = Map[String, Set[String]](field.id.get -> Set("true"))
-    altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+    altitude.service.metadata.setMetadata(asset.id.get, Metadata(data))
 
     data = Map[String, Set[String]](field.id.get -> Set("False"))
-    altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+    altitude.service.metadata.setMetadata(asset.id.get, Metadata(data))
+
+    data = Map[String, Set[String]](field.id.get -> Set("False"))
+    altitude.service.metadata.setMetadata(asset.id.get, Metadata(data))
   }
 
   test("Setting metadata values") {
@@ -88,7 +91,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
         BaseModel.genId -> Set("four"))
 
     intercept[NotFoundException] {
-        altitude.service.metadata.setMetadata(asset.id.get, new Metadata(badData))
+        altitude.service.metadata.setMetadata(asset.id.get, Metadata(badData))
       }
 
     // valid
@@ -96,7 +99,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
         keywordMetadataField.id.get -> Set("one", "two", "three"),
         numberMetadataField.id.get -> Set("1", "2", "3.002", "14.1", "1.25", "123456789"))
 
-    altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+    altitude.service.metadata.setMetadata(asset.id.get, Metadata(data))
 
     val storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
 
@@ -122,7 +125,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
       field1.id.get -> Set("one", "two", "three"),
       field2.id.get -> Set())
 
-    altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+    altitude.service.metadata.setMetadata(asset.id.get, Metadata(data))
 
     var storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
     storedMetadata.data.keys should contain(field1.id.get)
@@ -131,7 +134,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
     // update with nothing
     data = Map[String, Set[String]](field1.id.get -> Set())
 
-    altitude.service.metadata.updateMetadata(asset.id.get, new Metadata(data))
+    altitude.service.metadata.updateMetadata(asset.id.get, Metadata(data))
 
     storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
     storedMetadata.data shouldBe empty
@@ -154,7 +157,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
         field1.id.get -> Set("one", "two", "three"),
         field2.id.get -> Set("1", "2", "3.002", "14.1", "1.25", "123456789"))
 
-    altitude.service.metadata.setMetadata(asset.id.get, new Metadata(data))
+    altitude.service.metadata.setMetadata(asset.id.get, Metadata(data))
 
     var storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
     storedMetadata.data.keys should contain(field1.id.get)
@@ -169,7 +172,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
         field3.id.get -> Set("test 1", "test 2"),
         field2.id.get -> Set("3.002", "14.1", "1.25", "123456789"))
 
-    altitude.service.metadata.updateMetadata(asset.id.get, new Metadata(data))
+    altitude.service.metadata.updateMetadata(asset.id.get, Metadata(data))
 
     storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
     storedMetadata.data.keys should contain(field1.id.get)
@@ -262,7 +265,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
         fieldType = FieldType.KEYWORD))
 
     val data = Map[String, Set[String]](field.id.get -> Set("one", "two"))
-    val metadata = new Metadata(data)
+    val metadata = Metadata(data)
 
     val asset: Asset = altitude.service.library.add(
       makeAsset(altitude.service.folder.triageFolder, metadata = metadata))
@@ -290,7 +293,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
 
 
     val data = Map[String, Set[String]](field3.id.get -> Set("this is some text"))
-    val metadata = new Metadata(data)
+    val metadata = Metadata(data)
 
     val asset: Asset = altitude.service.library.add(
       makeAsset(altitude.service.folder.triageFolder, metadata = metadata))
@@ -299,5 +302,232 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
 
     storedAsset.metadata.isEmpty shouldBe false
     storedAsset.metadata.data.size shouldBe 1
+  }
+
+  test("Delete metadata value") {
+    val field = altitude.service.metadata.addField(
+      MetadataField(
+        name = Util.randomStr(),
+        fieldType = FieldType.KEYWORD))
+
+    val data = Map[String, Set[String]](field.id.get -> Set("1", "2", "3"))
+    val metadata = Metadata(data)
+
+    val asset: Asset = altitude.service.library.add(
+      makeAsset(altitude.service.folder.triageFolder, metadata = metadata))
+
+    var storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
+    storedMetadata.get(field.id.get).value.size shouldBe 3
+    val values: List[MetadataValue] = storedMetadata.get(field.id.get).value.toList
+
+    altitude.service.metadata.deleteFieldValue(asset.id.get, values.head.id.get)
+    altitude.service.metadata.deleteFieldValue(asset.id.get, values.last.id.get)
+
+    storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
+
+    storedMetadata.get(field.id.get).value.size shouldBe 1
+  }
+
+  test("Metadata IDs should be created and not overwritten") {
+    val field1 = altitude.service.metadata.addField(
+      MetadataField(
+        name = Util.randomStr(),
+        fieldType = FieldType.KEYWORD))
+
+    val field2 = altitude.service.metadata.addField(
+      MetadataField(
+        name = Util.randomStr(),
+        fieldType = FieldType.NUMBER))
+
+    var asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+
+    val data = Map[String, Set[String]](field1.id.get -> Set("1"))
+    val metadata = Metadata(data)
+
+    altitude.service.metadata.setMetadata(asset.id.get, metadata)
+
+    var storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
+    storedMetadata.get(field1.id.get) should not be None
+
+    val field_1_valueId = storedMetadata.get(field1.id.get).get.head.id
+    field_1_valueId should not be None
+
+    altitude.service.metadata.addFieldValue(asset.id.get, field2.id.get, "2")
+
+    storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
+
+    storedMetadata.get(field1.id.get).get.head.id should not be None
+    storedMetadata.get(field1.id.get).get.head.id shouldBe field_1_valueId
+
+
+    // now set the metadata on asset creation and make sure the auto-generated IDs are there
+    asset = altitude.service.library.add(
+      makeAsset(altitude.service.folder.triageFolder, metadata = metadata))
+
+    storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
+    storedMetadata.get(field1.id.get).get.head.id should not be None
+  }
+
+  test("Adding empty keyword value should be explicitly not allowed") {
+    val _metadataField = MetadataField(
+      name = Util.randomStr(),
+      fieldType = FieldType.KEYWORD
+    )
+
+    val metadataField = altitude.service.metadata.addField(_metadataField)
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+
+    intercept[ValidationException] {
+      altitude.service.metadata.addFieldValue(asset.id.get, metadataField.id.get, "")
+    }
+
+    intercept[ValidationException] {
+      altitude.service.metadata.addFieldValue(asset.id.get, metadataField.id.get, "   ")
+    }
+
+    intercept[ValidationException] {
+      altitude.service.metadata.addFieldValue(asset.id.get, metadataField.id.get, "  \t \n ")
+    }
+  }
+
+  test("Boolean values should replace each other with no errors") {
+    val _metadataField = MetadataField(
+      name = Util.randomStr(),
+      fieldType = FieldType.BOOL
+    )
+
+    val metadataField = altitude.service.metadata.addField(_metadataField)
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+
+    altitude.service.metadata.addFieldValue(asset.id.get, metadataField.id.get, "true")
+    altitude.service.metadata.addFieldValue(asset.id.get, metadataField.id.get, "true")
+    altitude.service.metadata.addFieldValue(asset.id.get, metadataField.id.get, "false")
+
+    val metadata = altitude.service.metadata.getMetadata(asset.id.get)
+    metadata.get(metadataField.id.get).get.size shouldBe 1
+  }
+
+
+  test("Text fields cannot be blank") {
+    val field = altitude.service.metadata.addField(
+      MetadataField(
+        name = Util.randomStr(),
+        fieldType = FieldType.TEXT))
+
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+
+    val data = Map[String, Set[String]](field.id.get -> Set("\n\n\r"))
+    val metadata = Metadata(data)
+
+    intercept[ValidationException] {
+      altitude.service.metadata.addFieldValue(asset.id.value, field.id.value, "   ")
+    }
+  }
+
+  test("Update value by ID") {
+    val field = altitude.service.metadata.addField(
+      MetadataField(
+        name = Util.randomStr(),
+        fieldType = FieldType.TEXT))
+
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+
+    val data = Map[String, Set[String]](field.id.get -> Set("Some text"))
+    val metadata = Metadata(data)
+
+    altitude.service.metadata.setMetadata(asset.id.get, metadata)
+
+    var storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
+    var storedValue = storedMetadata.get(field.id.get).get.head
+    val oldValueId = storedValue.id
+
+    val newValue = "Some updated text"
+
+    altitude.service.metadata.updateFieldValue(asset.id.get, storedValue.id.get, newValue)
+
+    storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
+    storedValue = storedMetadata.get(field.id.get).get.head
+
+    storedValue.id shouldBe oldValueId
+    storedValue.value shouldBe newValue
+  }
+
+  test("Updating value by ID should work case-insensitively") {
+    val field = altitude.service.metadata.addField(
+      MetadataField(
+        name = Util.randomStr(),
+        fieldType = FieldType.KEYWORD))
+
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+
+    val oldValue = "tag1"
+    val data = Map[String, Set[String]](field.id.get -> Set(oldValue))
+    val metadata = Metadata(data)
+
+    altitude.service.metadata.setMetadata(asset.id.get, metadata)
+
+    var storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
+    var storedValue = storedMetadata.get(field.id.get).get.head
+    val oldValueId = storedValue.id
+
+    val newValue = oldValue.toUpperCase
+
+    altitude.service.metadata.updateFieldValue(asset.id.get, storedValue.id.get, newValue)
+
+    storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
+    storedValue = storedMetadata.get(field.id.get).get.head
+
+    storedValue.id shouldBe oldValueId
+    storedValue.value shouldBe newValue
+  }
+
+  test("Updating value by ID with the same value should not raise exceptions") {
+    val field = altitude.service.metadata.addField(
+      MetadataField(
+        name = Util.randomStr(),
+        fieldType = FieldType.KEYWORD))
+
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+
+    val oldValue = "tag1"
+    val data = Map[String, Set[String]](field.id.get -> Set(oldValue))
+    val metadata = Metadata(data)
+
+    altitude.service.metadata.setMetadata(asset.id.get, metadata)
+
+    var storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
+    var storedValue = storedMetadata.get(field.id.get).get.head
+    val oldValueId = storedValue.id
+
+    altitude.service.metadata.updateFieldValue(asset.id.get, storedValue.id.get, oldValue)
+
+    storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
+    storedValue = storedMetadata.get(field.id.get).get.head
+
+    storedValue.id shouldBe oldValueId
+    storedValue.value shouldBe oldValue
+  }
+
+  test("Updating value by ID with empty value should raise") {
+    val field = altitude.service.metadata.addField(
+      MetadataField(
+        name = Util.randomStr(),
+        fieldType = FieldType.KEYWORD))
+
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+
+    val oldValue = "tag1"
+    val data = Map[String, Set[String]](field.id.get -> Set(oldValue))
+    val metadata = Metadata(data)
+
+    altitude.service.metadata.setMetadata(asset.id.get, metadata)
+
+    var storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
+    var storedValue = storedMetadata.get(field.id.get).get.head
+    val oldValueId = storedValue.id
+
+    intercept[ValidationException] {
+      altitude.service.metadata.updateFieldValue(asset.id.get, storedValue.id.get, "  \t  ")
+    }
   }
 }

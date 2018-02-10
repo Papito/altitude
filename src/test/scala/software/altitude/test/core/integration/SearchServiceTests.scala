@@ -7,7 +7,7 @@ import software.altitude.core.util.QueryResult
 
 @DoNotDiscover class SearchServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
-  test("index and search by term") {
+  test("Index and search by term", CurrentTag) {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "keywords",
@@ -42,8 +42,8 @@ import software.altitude.core.util.QueryResult
         ),
         field3.id.get -> Set("Lindsay Lohan", "Conan O'Brien", "Teri Hatcher", "Sam Rockwell"))
 
-    val assetData1 = makeAsset(altitude.service.folder.triageFolder, new Metadata(data))
-    val asset1: Asset = altitude.service.library.add(assetData1)
+    val assetData1 = makeAsset(altitude.service.folder.triageFolder, Metadata(data))
+    altitude.service.library.add(assetData1)
 
     data = Map[String, Set[String]](
         field1.id.get -> Set("tree", "shoe", "desert", "California"),
@@ -60,8 +60,8 @@ import software.altitude.core.util.QueryResult
         ),
         field3.id.get -> Set("Keanu Reeves", "Sandra Bullock", "Dennis Hopper", "Teri Hatcher"))
 
-    val assetData2 = makeAsset(altitude.service.folder.triageFolder, new Metadata(data))
-    val asset2: Asset = altitude.service.library.add(assetData2)
+    val assetData2 = makeAsset(altitude.service.folder.triageFolder, Metadata(data))
+    altitude.service.library.add(assetData2)
 
     var results: QueryResult = altitude.service.search.search("keanu")
     results.nonEmpty shouldBe true
