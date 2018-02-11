@@ -9,7 +9,7 @@ object Asset {
   implicit def fromJson(json: JsValue): Asset = Asset(
       id = (json \ C.Base.ID).asOpt[String],
       userId = (json \ C.Base.USER_ID).as[String],
-      assetType = json \ C.Asset.ASSET_TYPE,
+      assetType = (json \ C.Asset.ASSET_TYPE).get,
       fileName = (json \ C.Asset.FILENAME).as[String],
       path = (json \ C.Asset.PATH).asOpt[String],
       folderId = (json \ C.Asset.FOLDER_ID).as[String],

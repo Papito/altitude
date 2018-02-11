@@ -250,7 +250,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     val repoFolders = repositoryFolders(allRepoFolders)
     val immediateChildren = this.immediateChildren(parentId, repoFolders)
 
-    val folders = for (folder <- immediateChildren) yield  {
+    val folders = for (folder <- immediateChildren.map(_.toJson)) yield  {
       val id: String = (folder \ C.Base.ID).as[String]
       val name = (folder \ C.Folder.NAME).as[String]
       val path = (folder \ C.Folder.PATH).as[String]
