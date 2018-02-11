@@ -15,7 +15,7 @@ abstract class BaseService[Model <: BaseModel] extends ModelValidation {
   protected val app: Altitude
   private final val log = LoggerFactory.getLogger(getClass)
   protected val DAO: BaseDao
-  protected val txManager = app.injector.instance[AbstractTransactionManager]
+  protected val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
 
   /**
    * Add a single document

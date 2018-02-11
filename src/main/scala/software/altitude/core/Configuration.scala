@@ -5,11 +5,11 @@ import software.altitude.core.{Const => C}
 import scala.collection.immutable.HashMap
 
 class Configuration(configOverride: Map[String, Any] = new HashMap()) {
-  def getString(key: String) = data.getOrElse(key, "").asInstanceOf[String]
-  def getFlag(key: String) = data.getOrElse(key, false).asInstanceOf[Boolean]
-  def getInt(key: String) = data.getOrElse(key, 0).asInstanceOf[Int]
-  def datasourceType = data.get("datasource").get.asInstanceOf[C.DatasourceType.Value]
-  def fileStoreType = data.get("filestore").get.asInstanceOf[C.FileStoreType.Value]
+  def getString(key: String): String = data.getOrElse(key, "").asInstanceOf[String]
+  def getFlag(key: String): Boolean = data.getOrElse(key, false).asInstanceOf[Boolean]
+  def getInt(key: String): Int = data.getOrElse(key, 0).asInstanceOf[Int]
+  def datasourceType: C.DatasourceType.Value = data("datasource").asInstanceOf[C.DatasourceType.Value]
+  def fileStoreType: C.FileStoreType.Value = data("filestore").asInstanceOf[C.FileStoreType.Value]
 
   private val default = HashMap(
     "app.name" -> "Altitude",
