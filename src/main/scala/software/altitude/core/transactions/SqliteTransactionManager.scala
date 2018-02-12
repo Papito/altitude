@@ -9,7 +9,7 @@ import software.altitude.core.{AltitudeCoreApp, Configuration}
 
 object SqliteTransactionManager {
   private val config = new Configuration()
-  val url = config.getString("db.sqlite.url")
+  val url: String = config.getString("db.sqlite.url")
   private val LOCK = new ReentrantLock()
 
   val sqliteConfig: SQLiteConfig = new SQLiteConfig()
@@ -24,10 +24,10 @@ class SqliteTransactionManager(app: AltitudeCoreApp)
   private final val log = LoggerFactory.getLogger(getClass)
 
   override def connection(readOnly: Boolean = false): Connection = {
-    val conn = readOnly match {
-      case true => SqliteTransactionManager.roConnection
-      case false => SqliteTransactionManager.wConnection
-    }
+    val conn = if (readOnly)
+      SqliteTransactionManager.roConnection
+    else
+      SqliteTransactionManager.wConnection
 
     log.debug(s"Getting connection $conn. Read-only: $readOnly")
     conn
@@ -53,6 +53,6 @@ class SqliteTransactionManager(app: AltitudeCoreApp)
     SqliteTransactionManager.LOCK.unlock()
   }
 
-  override def closeTransaction(tx: JdbcTransaction) = {}
-  override def closeConnection(conn: Connection) = {}
+  override def closeTransaction(tx: JdbcTransaction): Unit = {}
+  override def closeConnection(conn: Connection): Unit = {}
 }

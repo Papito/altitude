@@ -33,7 +33,7 @@ trait Sqlite { this: BaseJdbcDao =>
   }
 
   override protected def GET_DATETIME_FROM_REC(field: String, rec: Map[String, AnyRef]): Option[DateTime] = {
-    val timestamp: String = rec.get(field).get.asInstanceOf[String]
+    val timestamp: String = rec(field).asInstanceOf[String]
     val formatter: DateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
     val dt: DateTime = formatter.withZone(DateTimeZone.forID("UTC")).parseDateTime(timestamp)
     Some(dt)

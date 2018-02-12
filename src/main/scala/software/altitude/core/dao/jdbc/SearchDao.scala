@@ -42,16 +42,16 @@ abstract class SearchDao(override val app: Altitude) extends AssetDao(app) with 
     asset.metadata.data.foreach { m =>
       val fieldId = m._1
 
-      metadataFields.contains(fieldId) match {
-        case false =>
-          log.error(s"Asset $asset contains metadata field ID [$fieldId] that is not part of field configuration!")
+      if (!metadataFields.contains(fieldId)) {
+        log.error(s"Asset $asset contains metadata field ID [$fieldId] that is not part of field configuration!")
+        return
+      }
 
-        case true =>
-          val field = metadataFields(fieldId)
-          val values = m._2
-          log.debug(s"Processing field [${field.nameLowercase}] with values [$values]")
+      val field = metadataFields(fieldId)
+      val values = m._2
+      log.debug(s"Processing field [${field.nameLowercase}] with values [$values]")
 
-          val sql =  s"""
+      val sql =  s"""
             INSERT INTO search_parameter (
                         ${C.SearchToken.REPO_ID}, ${C.SearchToken.ASSET_ID},
                         ${C.SearchToken.FIELD_ID},
@@ -61,37 +61,36 @@ abstract class SearchDao(override val app: Altitude) extends AssetDao(app) with 
                  VALUES (?, ?, ?, ?, ?, ?)
             """
 
-          log.debug(s"INSERT SQL: $sql. ARGS: ${values.toString()}")
+      log.debug(s"INSERT SQL: $sql. ARGS: ${values.toString()}")
 
-          val preparedStatement: PreparedStatement = conn.prepareStatement(sql)
+      val preparedStatement: PreparedStatement = conn.prepareStatement(sql)
 
-          values.foreach { mValue =>
-            preparedStatement.clearParameters()
-            preparedStatement.setString(1, ctx.repo.id.get)
-            preparedStatement.setString(2, asset.id.get)
-            preparedStatement.setString(3, field.id.get)
+      values.foreach { mValue =>
+        preparedStatement.clearParameters()
+        preparedStatement.setString(1, ctx.repo.id.get)
+        preparedStatement.setString(2, asset.id.get)
+        preparedStatement.setString(3, field.id.get)
 
-            // keyword
-            if (field.fieldType == FieldType.KEYWORD) {
-              preparedStatement.setString(4, mValue.value.toLowerCase)
-            } else {
-              preparedStatement.setNull(4, Types.VARCHAR)
-            }
-            // number
-            if (field.fieldType == FieldType.NUMBER) {
-              preparedStatement.setDouble(5, mValue.value.toDouble)
-            } else {
-              preparedStatement.setNull(5, Types.DOUBLE)
-            }
-            // boolean
-            if (field.fieldType == FieldType.BOOL) {
-              preparedStatement.setBoolean(6, mValue.value.toBoolean)
-            } else {
-              preparedStatement.setNull(6, Types.BOOLEAN)
-            }
+        // keyword
+        if (field.fieldType == FieldType.KEYWORD) {
+          preparedStatement.setString(4, mValue.value.toLowerCase)
+        } else {
+          preparedStatement.setNull(4, Types.VARCHAR)
+        }
+        // number
+        if (field.fieldType == FieldType.NUMBER) {
+          preparedStatement.setDouble(5, mValue.value.toDouble)
+        } else {
+          preparedStatement.setNull(5, Types.DOUBLE)
+        }
+        // boolean
+        if (field.fieldType == FieldType.BOOL) {
+          preparedStatement.setBoolean(6, mValue.value.toBoolean)
+        } else {
+          preparedStatement.setNull(6, Types.BOOLEAN)
+        }
 
-            preparedStatement.execute()
-          }
+        preparedStatement.execute()
       }
     }
   }

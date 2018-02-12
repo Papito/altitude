@@ -1,7 +1,7 @@
 package software.altitude.core.models
 
 import org.apache.commons.codec.binary.Base64
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import software.altitude.core.{Const => C}
 
 import scala.language.implicitConversions
@@ -22,7 +22,7 @@ case class Preview(assetId: String,
                    mimeType: String,
                    data: Array[Byte]) extends BaseModel with NoId {
 
-  override def toJson = {
+  override def toJson: JsObject = {
     Json.obj(
       C.Preview.ASSET_ID -> assetId,
       C.Preview.MIME_TYPE -> mimeType,

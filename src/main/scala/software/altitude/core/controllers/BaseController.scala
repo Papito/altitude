@@ -12,11 +12,11 @@ import scala.compat.Platform
 abstract class BaseController extends AltitudeStack with SingleApplication {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  final def user = request.getAttribute("user").asInstanceOf[User]
+  final def user: User = request.getAttribute("user").asInstanceOf[User]
 
-  final def repository = request.getAttribute("repository").asInstanceOf[Repository]
+  final def repository: Repository = request.getAttribute("repository").asInstanceOf[Repository]
 
-  implicit lazy val context = new Context(repo = repository, user = user)
+  implicit lazy val context: Context = new Context(repo = repository, user = user)
 
   before() {
     val requestId = software.altitude.core.Util.randomStr(size = 6)
@@ -33,16 +33,16 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
     MDC.clear()
   }
 
-  protected def logRequestStart() = {
+  protected def logRequestStart(): Unit = {
     log.info(s"Request START: ${request.getRequestURI} args: {${request.getParameterMap}}")
   }
 
-  protected def logRequestEnd() = {
+  protected def logRequestEnd(): Unit = {
     val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
     log.info(s"Request END: ${request.getRequestURI} in ${Platform.currentTime - startTime}ms")
   }
 
-  protected def setUser() = {
+  protected def setUser(): Unit = {
     val userId =
       Option(request.getAttribute("user_id").asInstanceOf[String]) orElse params.get("user_id")
 
@@ -57,7 +57,7 @@ abstract class BaseController extends AltitudeStack with SingleApplication {
     request.setAttribute("user", user)
   }
 
-  protected def setRepository() = {
+  protected def setRepository(): Unit = {
     val repositoryId =
       Option(request.getAttribute("repository_id").asInstanceOf[String]) orElse params.get("repository_id")
 

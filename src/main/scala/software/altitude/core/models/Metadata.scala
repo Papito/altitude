@@ -54,10 +54,10 @@ case class Metadata(data: Map[String, Set[MetadataValue]])
 
   def get(key: String): Option[Set[MetadataValue]] = data.get(key)
   def apply(key: String) = data(key)
-  def contains(key: String) = data.keys.toSeq.contains(key)
-  def isEmpty = data.isEmpty
+  def contains(key: String): Boolean = data.keys.toSeq.contains(key)
+  def isEmpty: Boolean = data.isEmpty
 
-  override val toJson = data.foldLeft(Json.obj()) { (res, m) =>
+  override val toJson: JsObject = data.foldLeft(Json.obj()) { (res, m) =>
     val fieldId = m._1
 
     val valuesJsArray: JsArray = JsArray(m._2.toSeq.map(_.toJson))

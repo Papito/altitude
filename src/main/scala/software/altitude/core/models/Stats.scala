@@ -22,6 +22,6 @@ case class Stats(stats: List[Stat]) {
       throw new RuntimeException(s"No stats for '$key'")
     }
 
-    lookup.get(key).get.dimVal
+    lookup(key).dimVal
   }
 }

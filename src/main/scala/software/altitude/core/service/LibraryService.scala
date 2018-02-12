@@ -18,15 +18,15 @@ import software.altitude.core.{Altitude, Const => C, Context, _}
 
 class LibraryService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
-  protected val txManager = app.injector.instance[AbstractTransactionManager]
+  protected val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
 
-  val PREVIEW_BOX_SIZE = app.config.getInt("preview.box.pixels")
+  val PREVIEW_BOX_SIZE: Int = app.config.getInt("preview.box.pixels")
 
   def add(assetIn: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
     log.info(s"Preparing to add asset [$assetIn]")
 
     if (app.service.folder.isRootFolder(assetIn.folderId)) {
-      throw new IllegalOperationException("Cannot have assets in root folder")
+      throw IllegalOperationException("Cannot have assets in root folder")
     }
 
     val qForExisting = Query(Map(C.Asset.MD5 -> assetIn.md5))
@@ -85,7 +85,7 @@ class LibraryService(app: Altitude) {
     }
   }
 
-  def deleteById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId) = {
+  def deleteById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
     throw new NotImplementedError
   }
 
@@ -115,19 +115,21 @@ class LibraryService(app: Altitude) {
     log.debug(s"${folderIds.size} folder ids: $folderIds")
 
     txManager.asReadOnly[QueryResult] {
-      val _query: Query = folderIds.isEmpty match {
+      val _query: Query = if (folderIds.isEmpty) {
         // no folder filtering, query as is
-        case true => query
+        query
+      }
+      else {
         // create a new query that includes folder children, since we are searching the hierarchy
-        case false =>
-          val allFolderIds = app.service.folder.flatChildrenIds(parentIds = folderIds)
-          log.debug(s"Expanded folder ids: $allFolderIds")
+        val allFolderIds = app.service.folder.flatChildrenIds(parentIds = folderIds)
+        log.debug(s"Expanded folder ids: $allFolderIds")
 
-          // repackage the query to include all folders (they will have to be re-parsed again)
-          Query(
-            params = query.params
-              ++ Map(Api.Folder.QUERY_ARG_NAME -> allFolderIds.mkString(C.Api.MULTI_VALUE_DELIM)),
-            page = query.page, rpp = query.rpp)
+        // repackage the query to include all folders (they will have to be re-parsed again)
+        Query(
+          params = query.params
+            ++ Map(Api.Folder.QUERY_ARG_NAME -> allFolderIds.mkString(C.Api.MULTI_VALUE_DELIM)),
+          page = query.page, rpp = query.rpp)
+
       }
 
       log.info("SEARCH QUERY: " + _query)
@@ -179,15 +181,9 @@ class LibraryService(app: Altitude) {
       val height: Int = scaledImage.getHeight
       val width: Int = scaledImage.getWidth
 
-      val x: Int = height > width match {
-        case true => (PREVIEW_BOX_SIZE - width) / 2
-        case false => 0
-      }
+      val x: Int = if (height > width) (PREVIEW_BOX_SIZE - width) / 2 else 0
 
-      val y: Int = height < width match {
-        case true => (PREVIEW_BOX_SIZE - height) / 2
-        case false => 0
-      }
+      val y: Int = if (height < width) (PREVIEW_BOX_SIZE - height) / 2 else 0
 
       val COMPOSITE_IMAGE: BufferedImage =
         new BufferedImage(PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE, BufferedImage.TYPE_INT_ARGB)
@@ -218,7 +214,7 @@ class LibraryService(app: Altitude) {
   }
 
   def moveAssetToTriage(assetId: String)
-                              (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
+                              (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
     txManager.withTransaction {
       moveAssetsToTriage(Set(assetId))
     }
@@ -263,11 +259,11 @@ class LibraryService(app: Altitude) {
   def deleteFolderById(id: String)
                   (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
     if (app.service.folder.isRootFolder(id)) {
-      throw new IllegalOperationException("Cannot delete the root folder")
+      throw IllegalOperationException("Cannot delete the root folder")
     }
 
     if (app.service.folder.isSystemFolder(Some(id))) {
-      throw new IllegalOperationException("Cannot delete system folder")
+      throw IllegalOperationException("Cannot delete system folder")
     }
 
     txManager.withTransaction {
@@ -300,7 +296,7 @@ class LibraryService(app: Altitude) {
  }
 
   def moveAssetsToFolder(assetIds: Set[String], destFolderId: String)
-                        (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
+                        (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
 
     def move(asset: Asset): Unit = {
       // cannot move to the same folder
@@ -334,7 +330,7 @@ class LibraryService(app: Altitude) {
       assetIds.foreach {assetId =>
         // cannot have assets in root folder - just other folders
         if (app.service.folder.isRootFolder(destFolderId)) {
-          throw new IllegalOperationException("Cannot move assets to root folder")
+          throw IllegalOperationException("Cannot move assets to root folder")
         }
 
         val asset: Asset = getById(assetId)
@@ -351,7 +347,7 @@ class LibraryService(app: Altitude) {
       val asset: Asset = getById(assetId)
 
       if (asset.isRecycled) {
-        throw new IllegalOperationException(s"Cannot rename a recycled asset: [$asset]")
+        throw IllegalOperationException(s"Cannot rename a recycled asset: [$asset]")
       }
 
       val updatedAsset: Asset = asset ++ Json.obj(
@@ -384,7 +380,7 @@ class LibraryService(app: Altitude) {
   }
 
   def restoreRecycledAssets(assetIds: Set[String])
-                           (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
+                           (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
     txManager.withTransaction {
       assetIds.foreach { assetId =>
         app.service.asset.setAssetAsRecycled(assetId, isRecycled = false)

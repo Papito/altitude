@@ -2,7 +2,7 @@ package software.altitude.core.service.migration
 
 import org.slf4j.LoggerFactory
 import software.altitude.core.transactions.TransactionId
-import software.altitude.core.{Altitude, Const => C, Context}
+import software.altitude.core.{Altitude, Context}
 
 abstract class MigrationService(val app: Altitude) extends CoreMigrationService {
   protected final val log = LoggerFactory.getLogger(getClass)
@@ -13,7 +13,6 @@ abstract class MigrationService(val app: Altitude) extends CoreMigrationService 
       }
   }
 
-  private def v1(context: Context)
-                (implicit txId: TransactionId = new TransactionId) = {
+  private def v1(context: Context)(implicit txId: TransactionId = new TransactionId): Unit = {
   }
 }

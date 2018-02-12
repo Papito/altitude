@@ -2,6 +2,7 @@ package software.altitude.core.service
 
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
+import play.api.libs.json.JsObject
 import software.altitude.core.dao.StatDao
 import software.altitude.core.models.{Asset, Stat, Stats}
 import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
@@ -10,8 +11,8 @@ import software.altitude.core.{Altitude, Context}
 
 class StatsService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
-  protected val DAO = app.injector.instance[StatDao]
-  protected val txManager = app.injector.instance[AbstractTransactionManager]
+  protected val DAO: StatDao = app.injector.instance[StatDao]
+  protected val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
 
   def getStats(implicit ctx: Context, txId: TransactionId = new TransactionId): Stats = {
     txManager.asReadOnly[Stats] {
@@ -41,7 +42,7 @@ class StatsService(app: Altitude) {
   }
 
   def createStat(dimension: String)
-                (implicit ctx: Context, txId: TransactionId = new TransactionId) = {
+                (implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
     txManager.withTransaction {
       val stat = Stat(dimension, 0)
       DAO.add(stat)

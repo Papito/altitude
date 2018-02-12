@@ -15,7 +15,7 @@ abstract class CoreMigrationService {
 
   protected val app: AltitudeCoreApp
   protected val DAO: MigrationDao = app.injector.instance[MigrationDao]
-  protected val txManager = app.injector.instance[AbstractTransactionManager]
+  protected val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
   protected val CURRENT_VERSION: Int
 
   protected val MIGRATIONS_DIR: String
@@ -25,7 +25,7 @@ abstract class CoreMigrationService {
 
   def runMigration(version: Int)
                   (implicit ctx: Context = new Context(repo = null, user = null),
-                   txId: TransactionId = new TransactionId) = {
+                   txId: TransactionId = new TransactionId): Unit = {
     val migrationCommands = parseMigrationCommands(version)
 
     txManager.withTransaction {
@@ -58,7 +58,7 @@ abstract class CoreMigrationService {
     isRequired
   }
 
-  def migrate() = {
+  def migrate(): Unit = {
     val oldVersion = existingVersion
     log.warn("!!!! MIGRATING !!!!")
     log.info(s"From version $oldVersion to $CURRENT_VERSION")

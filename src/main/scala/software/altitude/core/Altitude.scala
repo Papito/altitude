@@ -32,7 +32,7 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeCor
   /**
    * Injected transaction manager, determined based on our database.
    */
-  override val txManager = app.injector.instance[AbstractTransactionManager]
+  override val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
 
   object service {
     val user = new UserService(app)
@@ -53,7 +53,7 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeCor
 
     final val SCHEMA_VERSION = 1
 
-    val migration = dataSourceType match {
+    val migrationService: MigrationService = dataSourceType match {
       case C.DatasourceType.SQLITE => new MigrationService(app) with JdbcMigrationService with SqliteMigration {
         override final val CURRENT_VERSION = SCHEMA_VERSION
         override final val MIGRATIONS_DIR = "/migrations/server/sqlite"
@@ -115,10 +115,10 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeCor
   }
 
   override def runMigrations(): Unit = {
-    if (service.migration.migrationRequired) {
+    if (service.migrationService.migrationRequired) {
       log.warn("Migration is required!")
       if (Environment.ENV != Environment.TEST) {
-        service.migration.migrate()
+        service.migrationService.migrate()
       }
     }
   }

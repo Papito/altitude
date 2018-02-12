@@ -53,7 +53,7 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
 
     txManager.withTransaction[JsObject] {
       val repo: Repository = super.add(repoToSave)(txId = txId, ctx = new Context(repo = null, user = user))
-      implicit val ctx = new Context(repo = repo, user = user)
+      implicit val ctx: Context = new Context(repo = repo, user = user)
 
       log.info(s"Creating repository [${ctx.repo.name}] system folders")
       app.service.folder.add(app.service.folder.rootFolder)

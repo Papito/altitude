@@ -7,11 +7,11 @@ object QueryResult {
 }
 
 case class QueryResult(records: List[JsObject], total: Int, query: Option[Query]) {
-  val nonEmpty = records.nonEmpty
-  val isEmpty = records.isEmpty
+  val nonEmpty: Boolean = records.nonEmpty
+  val isEmpty: Boolean = records.isEmpty
 
   val totalPages: Int = query match {
-    case Some(q) if isEmpty => 0
+    case Some(_) if isEmpty => 0
     case None if isEmpty => 0
     case None if nonEmpty => 1
     case Some(q) if q.rpp == 0 && nonEmpty => 1

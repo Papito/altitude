@@ -36,28 +36,33 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) extends Query
       case _ => s"""WHERE ${whereClauses.mkString(" AND ")}"""
     }
 
-    val folderClause = folderIds.nonEmpty match {
-      case true => whereClause.isEmpty match {
-        case false => s" AND ${C.Asset.FOLDER_ID} in (" + folderIds.toSeq.map(x => "?").mkString(",") + ")"
-        case true => s"WHERE ${C.Asset.FOLDER_ID} in (" + folderIds.toSeq.map(x => "?").mkString(",") + ")"
+    val folderClause = if (folderIds.nonEmpty) {
+      if (whereClause.isEmpty) {
+        s"WHERE ${C.Asset.FOLDER_ID} in (" + folderIds.toSeq.map(x => "?").mkString(",") + ")"
       }
-      case false => ""
+      else {
+        s" AND ${C.Asset.FOLDER_ID} in (" + folderIds.toSeq.map(x => "?").mkString(",") + ")"
+      }
+    }
+    else {
+      ""
     }
 
     val whereSegment = s"$whereClause $folderClause"
 
-    val sql = countOnly match {
-      case false => assembleQuery(
+    val sql = if (countOnly) {
+      assembleQuery(
+        select = "count(*) AS count",
+        from = tableName,
+        where = whereSegment)
+    }
+    else {
+      assembleQuery(
         select = sqlColsForSelect,
         from = tableName,
         where = whereSegment,
         rpp = query.rpp,
         page = query.page)
-      case true => assembleQuery(
-        select = "count(*) AS count",
-        from = tableName,
-        where = whereSegment,
-        rpp = 0)
     }
 
     val bindValues = sqlValues.toList ::: folderIds.toList

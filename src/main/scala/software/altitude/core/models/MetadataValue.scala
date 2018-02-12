@@ -1,7 +1,8 @@
 package software.altitude.core.models
 
-import play.api.libs.json.{JsString, JsNull, JsValue, Json}
+import play.api.libs.json._
 import software.altitude.core.{Const => C}
+
 import scala.language.implicitConversions
 
 object MetadataValue {
@@ -18,11 +19,11 @@ object MetadataValue {
 case class MetadataValue(id: Option[String] = None,
                          value: String) extends BaseModel {
   private val md = java.security.MessageDigest.getInstance("SHA-1")
-  val checksum = new sun.misc.BASE64Encoder().encode(md.digest(value.toLowerCase.getBytes("UTF-8")))
+  val checksum: String = new sun.misc.BASE64Encoder().encode(md.digest(value.toLowerCase.getBytes("UTF-8")))
 
   override def canEqual(other: Any): Boolean = other.isInstanceOf[MetadataValue]
 
-  final def nonEmpty = value.nonEmpty
+  final def nonEmpty: Boolean = value.nonEmpty
 
   override def equals( that: Any): Boolean = that match {
     case that: MetadataValue if !that.canEqual( this) => false
@@ -30,7 +31,7 @@ case class MetadataValue(id: Option[String] = None,
     case _ => false
   }
 
-  override def toJson = Json.obj(
+  override def toJson: JsObject = Json.obj(
     C.Base.VALUE -> value,
     C.Base.ID -> {id match {
       case None => JsNull

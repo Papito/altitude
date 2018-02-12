@@ -13,8 +13,8 @@ abstract class StatDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softwa
   override final val TABLE_NAME = "stats"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = Stat(
-    rec.get(C.Stat.DIMENSION).get.asInstanceOf[String],
-    rec.get(C.Stat.DIM_VAL).get.asInstanceOf[Int])
+    rec(C.Stat.DIMENSION).asInstanceOf[String],
+    rec(C.Stat.DIM_VAL).asInstanceOf[Int])
 
   override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
     val sql: String =s"""

@@ -1,7 +1,6 @@
 package software.altitude.core.service
 
 import net.codingwell.scalaguice.InjectorExtensions._
-import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core._
 import software.altitude.core.dao.UserDao
@@ -9,9 +8,8 @@ import software.altitude.core.models.User
 import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
 
 class UserService(val app: Altitude) extends BaseService[User] {
-  private final val log = LoggerFactory.getLogger(getClass)
-  protected val DAO = app.injector.instance[UserDao]
-  override protected val txManager = app.injector.instance[AbstractTransactionManager]
+  protected val DAO: UserDao = app.injector.instance[UserDao]
+  override protected val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
 
   override def getById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
     throw new NotImplementedError
@@ -19,7 +17,7 @@ class UserService(val app: Altitude) extends BaseService[User] {
 
   def getUserById(id: String)(implicit txId: TransactionId = new TransactionId): User = {
     txManager.asReadOnly[JsObject] {
-      implicit val context = Context.EMPTY
+      implicit val context: Context = Context.EMPTY
 
       DAO.getById(id) match {
         case Some(obj) => obj
@@ -30,7 +28,7 @@ class UserService(val app: Altitude) extends BaseService[User] {
 
   def addUser(user: User)(implicit txId: TransactionId = new TransactionId): JsObject = {
     txManager.withTransaction[JsObject] {
-      implicit val context = Context.EMPTY
+      implicit val context: Context = Context.EMPTY
       super.add(user)
     }
   }

@@ -166,7 +166,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     moveFile(srcFile, destFile)
   }
 
-  override def recycleAsset(asset: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId) = {
+  override def recycleAsset(asset: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
     log.info(s"Recycling: [$asset]")
 
     val srcFile = absoluteFile(getAssetPath(asset))
@@ -176,7 +176,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     moveFile(srcFile, destFile)
   }
 
-  override def restoreAsset(asset: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId) = {
+  override def restoreAsset(asset: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
     log.info(s"Restoring: [$asset]")
 
     val relRecyclePath = getRecycledAssetPath(asset)
@@ -208,12 +208,12 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   }
 
   override def getAssetPath(asset: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId): String = {
-    asset.isRecycled match {
-      case false => {
-        val folder: Folder = app.service.folder.getById(asset.folderId)
-        FilenameUtils.concat(folder.path.get, asset.fileName)
-      }
-      case true => getRecycledAssetPath(asset)
+    if (asset.isRecycled) {
+      getRecycledAssetPath(asset)
+    }
+    else {
+      val folder: Folder = app.service.folder.getById(asset.folderId)
+      FilenameUtils.concat(folder.path.get, asset.fileName)
     }
   }
 
@@ -238,7 +238,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
       FileUtils.writeByteArrayToFile(new File(destFilePath), preview.data)
     }
     catch {
-      case ex: IOException => log.error(s"Could not save preview data to [$destFilePath]")
+      case _: IOException => log.error(s"Could not save preview data to [$destFilePath]")
     }
   }
 
@@ -318,9 +318,6 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   }
 
   private def filenameFromBaseAndExt(baseName: String, ext: String): String = {
-    ext.isEmpty match {
-      case false => baseName + "." + ext
-      case true => baseName
-    }
+    if (ext.isEmpty) baseName else baseName + "." + ext
   }
 }

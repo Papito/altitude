@@ -1,6 +1,6 @@
 package software.altitude.core.models
 
-import play.api.libs.json.{JsArray, JsString, JsValue, Json}
+import play.api.libs.json._
 import software.altitude.core.{Const => C}
 
 import scala.language.implicitConversions
@@ -27,9 +27,9 @@ case class Folder(id: Option[String] = None,
                   children: List[Folder] = List(),
                   numOfAssets: Int = 0) extends BaseModel {
 
-  val nameLowercase = name.toLowerCase
+  val nameLowercase: String = name.toLowerCase
 
-  override def toJson = {
+  override def toJson: JsObject = {
     val childrenJson: List[JsValue] = children.map(_.toJson)
     Json.obj(
       C.Folder.NAME -> name,

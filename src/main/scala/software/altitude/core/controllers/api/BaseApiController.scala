@@ -22,7 +22,7 @@ class BaseApiController extends BaseController with ContentEncodingSupport {
     if (request.body.isEmpty) Json.obj() else Json.parse(request.body).as[JsObject]
   )
 
-  def requestMethod = request.getMethod.toLowerCase
+  def requestMethod: String = request.getMethod.toLowerCase
 
   before() {
     // verify that requests with request body are not empty
@@ -32,21 +32,21 @@ class BaseApiController extends BaseController with ContentEncodingSupport {
     Process all validators that may be set for this controller/method.
      */
     HTTP_POST_VALIDATOR match {
-      case Some(ApiRequestValidator(required)) if requestMethod == "post" => HTTP_POST_VALIDATOR.get.validate(requestJson.get)
+      case Some(ApiRequestValidator(_)) if requestMethod == "post" => HTTP_POST_VALIDATOR.get.validate(requestJson.get)
       case _ if requestMethod == "post" =>
         log.debug(s"No POST validator specified for ${this.getClass.getName}")
       case _ =>
     }
 
     HTTP_DELETE_VALIDATOR match {
-      case Some(ApiRequestValidator(fields)) if requestMethod == "delete" => HTTP_DELETE_VALIDATOR.get.validate(requestJson.get)
+      case Some(ApiRequestValidator(_)) if requestMethod == "delete" => HTTP_DELETE_VALIDATOR.get.validate(requestJson.get)
       case _ if requestMethod == "delete" =>
         log.debug(s"No DELETE validator specified for ${this.getClass.getName}")
       case _ =>
     }
 
     HTTP_UPDATE_VALIDATOR match {
-      case Some(ApiRequestValidator(required)) if requestMethod == "put" => HTTP_UPDATE_VALIDATOR.get.validate(requestJson.get)
+      case Some(ApiRequestValidator(_)) if requestMethod == "put" => HTTP_UPDATE_VALIDATOR.get.validate(requestJson.get)
       case _ if requestMethod == "update"  =>
         log.debug(s"No PUT validator specified for ${this.getClass.getName}")
       case _ =>
@@ -56,12 +56,12 @@ class BaseApiController extends BaseController with ContentEncodingSupport {
     contentType = "application/json; charset=UTF-8"
   }
 
-  override def logRequestStart() = {
+  override def logRequestStart(): Unit = {
     log.info(
       s"API ${request.getRequestURI} ${requestMethod.toUpperCase} with {${request.body}} and ${request.getParameterMap}")
   }
 
-  override def logRequestEnd() = {
+  override def logRequestEnd(): Unit = {
     val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
     log.info(s"API request END: ${request.getRequestURI} in ${Platform.currentTime - startTime}ms")
   }
@@ -85,7 +85,7 @@ class BaseApiController extends BaseController with ContentEncodingSupport {
         C.Api.VALIDATION_ERRORS -> (if (ex.errors.isEmpty) JsNull else jsonErrors)
       ))
     }
-    case ex: NotFoundException => {
+    case _: NotFoundException => {
       NotFound(Json.obj())
     }
     case ex: Exception => {

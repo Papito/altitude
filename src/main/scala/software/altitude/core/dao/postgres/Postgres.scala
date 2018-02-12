@@ -35,7 +35,7 @@ trait Postgres { this: BaseJdbcDao =>
   }
 
   override protected def GET_DATETIME_FROM_REC(field: String, rec: Map[String, AnyRef]): Option[DateTime] = {
-    val timestamp: Timestamp = rec.get(field).get.asInstanceOf[Timestamp]
+    val timestamp: Timestamp = rec(field).asInstanceOf[Timestamp]
     val dt = new DateTime(timestamp.getTime).withMillisOfSecond(0)
     Some(dt)
   }

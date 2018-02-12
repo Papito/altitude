@@ -26,7 +26,7 @@ case class Repository(id: Option[String] = None,
                       fileStoreType: C.FileStoreType.Value,
                       fileStoreConfig: Map[String, String]) extends BaseModel {
 
-  def toJson = {
+  def toJson: JsObject = {
     Json.obj(
       C.Repository.ID -> id,
       C.Repository.NAME -> name,

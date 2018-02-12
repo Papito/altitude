@@ -35,7 +35,7 @@ case class Asset(id: Option[String] = None,
                  extractedMetadata: Metadata = Metadata())
   extends BaseModel {
 
-  override def toJson = Json.obj(
+  override def toJson: JsObject = Json.obj(
     C.Base.USER_ID -> userId,
     C.Asset.PATH -> {if (path.isDefined) JsString(path.get) else JsNull},
     C.Asset.FOLDER_ID -> folderId,

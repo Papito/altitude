@@ -15,33 +15,33 @@ abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softw
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val assetType = new AssetType(
-      mediaType = rec.get(C.AssetType.MEDIA_TYPE).get.asInstanceOf[String],
-      mediaSubtype = rec.get(C.AssetType.MEDIA_SUBTYPE).get.asInstanceOf[String],
-      mime = rec.get(C.AssetType.MIME_TYPE).get.asInstanceOf[String])
+      mediaType = rec(C.AssetType.MEDIA_TYPE).asInstanceOf[String],
+      mediaSubtype = rec(C.AssetType.MEDIA_SUBTYPE).asInstanceOf[String],
+      mime = rec(C.AssetType.MIME_TYPE).asInstanceOf[String])
 
-    val metadataCol = rec.get(C.Asset.METADATA).get
+    val metadataCol = rec(C.Asset.METADATA)
     val metadataJsonStr: String = if (metadataCol == null) "{}" else metadataCol.asInstanceOf[String]
     val metadataJson = Json.parse(metadataJsonStr).as[JsObject]
 
-    val extractedMetadataCol = rec.get(C.Asset.EXTRACTED_METADATA).get
+    val extractedMetadataCol = rec(C.Asset.EXTRACTED_METADATA)
     val extractedMetadataJsonStr: String =
       if (extractedMetadataCol == null) "{}" else extractedMetadataCol.asInstanceOf[String]
     val extractedMetadataJson = Json.parse(extractedMetadataJsonStr).as[JsObject]
 
     val model = new Asset(
-      id = Some(rec.get(C.Base.ID).get.asInstanceOf[String]),
-      userId = rec.get(C.Base.USER_ID).get.asInstanceOf[String],
-      fileName = rec.get(C.Asset.FILENAME).get.asInstanceOf[String],
-      isRecycled = rec.get(C.Asset.IS_RECYCLED).get.asInstanceOf[Int] match {
+      id = Some(rec(C.Base.ID).asInstanceOf[String]),
+      userId = rec(C.Base.USER_ID).asInstanceOf[String],
+      fileName = rec(C.Asset.FILENAME).asInstanceOf[String],
+      isRecycled = rec(C.Asset.IS_RECYCLED).asInstanceOf[Int] match {
         case 0 => false
         case 1 => true
       },
-      md5 = rec.get(C.Asset.MD5).get.asInstanceOf[String],
+      md5 = rec(C.Asset.MD5).asInstanceOf[String],
       assetType = assetType,
-      sizeBytes = rec.get(C.Asset.SIZE_BYTES).get.asInstanceOf[Int],
+      sizeBytes = rec(C.Asset.SIZE_BYTES).asInstanceOf[Int],
       metadata = metadataJson: Metadata,
       extractedMetadata = extractedMetadataJson: Metadata,
-      folderId = rec.get(C.Asset.FOLDER_ID).get.asInstanceOf[String])
+      folderId = rec(C.Asset.FOLDER_ID).asInstanceOf[String])
 
     addCoreAttrs(model, rec)
   }
@@ -105,7 +105,7 @@ abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softw
   }
 
   override def setMetadata(assetId: String, metadata: Metadata)
-                          (implicit ctx: Context, txId: TransactionId) = {
+                          (implicit ctx: Context, txId: TransactionId): Unit = {
 
     val metadataWithIds = Metadata.withIds(metadata)
 
@@ -123,7 +123,7 @@ abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softw
   }
 
   override def setAssetAsRecycled(assetId: String, isRecycled: Boolean)
-                            (implicit ctx: Context, txId: TransactionId) = {
+                            (implicit ctx: Context, txId: TransactionId): Unit = {
     val sql = s"""
         UPDATE $TABLE_NAME
            SET ${C.Base.UPDATED_AT} = $CURRENT_TIME_FUNC,

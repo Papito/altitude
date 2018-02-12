@@ -1,7 +1,6 @@
 package software.altitude.core.controllers.api
 
 import org.scalatra.{ActionResult, Ok}
-import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 import software.altitude.core.controllers.Util
 import software.altitude.core.models.Asset
@@ -9,15 +8,11 @@ import software.altitude.core.util.Query
 import software.altitude.core.{Const => C}
 
 class QueryController extends BaseApiController {
-  private final val log = LoggerFactory.getLogger(getClass)
 
   get("/") {
     val foldersQuery = params.getOrElse(C.Api.Search.FOLDERS, "")
 
-    val folderId = foldersQuery.isEmpty match {
-      case true => repository.rootFolderId
-      case false => foldersQuery
-    }
+    val folderId = if (foldersQuery.isEmpty) repository.rootFolderId else foldersQuery
 
     defaultQuery(folderId)
   }
@@ -32,10 +27,7 @@ class QueryController extends BaseApiController {
 
     val foldersQuery = params.getOrElse(C.Api.Search.FOLDERS, "")
 
-    val folderId = foldersQuery.isEmpty match {
-      case true => repository.rootFolderId
-      case false => foldersQuery
-    }
+    val folderId = if (foldersQuery.isEmpty) repository.rootFolderId else foldersQuery
 
     query(folderId, page, rpp)
   }
@@ -50,7 +42,7 @@ class QueryController extends BaseApiController {
   private def defaultQuery(folderId: String): ActionResult = {
     val q = Query(
       params = Map(C.Api.Folder.QUERY_ARG_NAME -> folderId),
-      rpp = C.DEFAULT_RPP.toInt, page = 1)
+      rpp = C.DEFAULT_RPP.toInt)
 
     val results = app.service.library.query(q)
 

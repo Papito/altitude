@@ -1,6 +1,6 @@
 package software.altitude.core.models
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import software.altitude.core.{Const => C}
 
 import scala.language.implicitConversions
@@ -13,15 +13,15 @@ object AssetType {
 }
 
 case class AssetType(mediaType: String, mediaSubtype: String, mime: String) extends BaseModel with NoId {
-  override def toString = List(mediaType, mediaSubtype, mime).mkString(":")
+  override def toString: String = List(mediaType, mediaSubtype, mime).mkString(":")
 
-  override val toJson =  Json.obj(
+  override val toJson: JsObject =  Json.obj(
     C.AssetType.MIME_TYPE -> mime,
     C.AssetType.MEDIA_TYPE ->  mediaType,
     C.AssetType.MEDIA_SUBTYPE -> mediaSubtype
   )
 
-  override def equals(other: Any) = other match {
+  override def equals(other: Any): Boolean = other match {
     case that: AssetType =>
       that.mime == this.mime &&
       that.mediaType == this.mediaType &&

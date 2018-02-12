@@ -91,7 +91,7 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
       }
     }
     catch {
-      case ex: AllDone =>
+      case _: AllDone =>
     }
 
     metadata
@@ -101,18 +101,16 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
     val normalizedData = scala.collection.mutable.Map[String, Set[MetadataValue]]()
 
     FIELD_BIBLE.foreach { case (destField, srcFields) =>
-      srcFields.isEmpty match {
-        // if the destination field is the same as the source
-        case true if metadata.contains(destField) =>
-          normalizedData(destField) = metadata.data(destField)
-
-        case _ =>
-          // find all the fields that exist in metadata
-          val existingSrcFields = srcFields.filter(metadata.contains)
-          // the field on TOP is it
-          if (existingSrcFields.nonEmpty) {
-            normalizedData(destField) = metadata.data(existingSrcFields.head)
-          }
+      if (srcFields.isEmpty && metadata.contains(destField)) {
+        normalizedData(destField) = metadata.data(destField)
+      }
+      else {
+        // find all the fields that exist in metadata
+        val existingSrcFields = srcFields.filter(metadata.contains)
+        // the field on TOP is it
+        if (existingSrcFields.nonEmpty) {
+          normalizedData(destField) = metadata.data(existingSrcFields.head)
+        }
       }
     }
     Metadata(normalizedData.toMap)

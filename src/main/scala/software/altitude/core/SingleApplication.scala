@@ -27,6 +27,6 @@ object SingleApplication {
 }
 
 trait SingleApplication {
-  val app = SingleApplication.app
+  val app: Altitude = SingleApplication.app
 
 }

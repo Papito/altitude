@@ -39,7 +39,7 @@ trait SqliteSuiteSetup extends Suite with BeforeAndAfterAll {
       if (conn != null) conn.close()
     }
 
-    SqliteSuite.app.service.migration.migrate()
+    SqliteSuite.app.service.migrationService.migrate()
     log.info("END SETUP")
   }
 }

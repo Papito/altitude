@@ -25,7 +25,7 @@ abstract class BaseModel {
   // created at - mutable, but can only be set once
   protected var _createdAt: Option[DateTime] = None
 
-  def createdAt = _createdAt
+  def createdAt: Option[DateTime] = _createdAt
 
   def createdAt_= (arg: DateTime): Unit = {
     if (_createdAt.isDefined)
@@ -36,7 +36,7 @@ abstract class BaseModel {
   // updated at - mutable, but can only be set once
   protected var _updatedAt: Option[DateTime] = None
 
-  def updatedAt = _updatedAt
+  def updatedAt: Option[DateTime] = _updatedAt
 
   def updatedAt_= (arg: DateTime): Unit = {
     if (_updatedAt.isDefined)
@@ -47,7 +47,7 @@ abstract class BaseModel {
   // is clean (for validation) - mutable, but can only be set once
   protected var _isClean = false
 
-  def isClean = _isClean
+  def isClean: Boolean = _isClean
 
   def isClean_= (arg: Boolean): Boolean = {
     if (!_isClean && arg) {
@@ -60,7 +60,7 @@ abstract class BaseModel {
   // is validated - mutable, but can only be set once
   protected var _isValidated = false
 
-  def isValidated = _isValidated
+  def isValidated: Boolean = _isValidated
 
   def isValidated_= (arg: Boolean): Boolean = {
     if (!_isValidated && arg) {
@@ -108,5 +108,5 @@ abstract class BaseModel {
     this
   }
 
-  override def toString = toJson.toString()
+  override def toString: String = toJson.toString()
 }

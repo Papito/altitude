@@ -17,7 +17,7 @@ object Stat {
 
 case class Stat(dimension: String, dimVal: Int) {
 
-  def toJson = {
+  def toJson: JsObject = {
     Json.obj(
       C.Stat.DIMENSION -> dimension,
       C.Stat.DIM_VAL -> dimVal)

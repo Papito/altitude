@@ -6,10 +6,10 @@ import software.altitude.core.{Const => C}
 import scala.language.implicitConversions
 
 object FieldType extends Enumeration {
-  val KEYWORD = Value("KEYWORD")
-  val TEXT = Value("TEXT")
-  val NUMBER = Value("NUMBER")
-  val BOOL = Value("BOOLEAN")
+  val KEYWORD: Value = Value("KEYWORD")
+  val TEXT: Value = Value("TEXT")
+  val NUMBER: Value = Value("NUMBER")
+  val BOOL: Value = Value("BOOLEAN")
 }
 
 object MetadataField {
@@ -24,9 +24,9 @@ object MetadataField {
 case class MetadataField(id: Option[String] = None,
                          name: String,
                          fieldType: FieldType.Value) extends BaseModel {
-  val nameLowercase = name.toLowerCase
+  val nameLowercase: String = name.toLowerCase
 
-  override def toJson = Json.obj(
+  override def toJson: JsObject = Json.obj(
       C.MetadataField.NAME -> name,
       C.MetadataField.NAME_LC -> nameLowercase,
       C.MetadataField.FIELD_TYPE -> fieldType.toString

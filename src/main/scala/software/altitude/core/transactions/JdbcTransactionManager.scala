@@ -13,7 +13,8 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
    * This transaction registry is the heart of it all - we use it to keep track of existing
    * transactions, creating new ones, and cleaning up after a transaction ends.
    */
-  val txRegistry = scala.collection.mutable.Map[Int, JdbcTransaction]()
+  val txRegistry: scala.collection.mutable.Map[Int, JdbcTransaction] =
+    scala.collection.mutable.Map[Int, JdbcTransaction]()
 
   /**
    *  Get an existing transaction if we are already within a transaction context, else,
@@ -25,7 +26,7 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
     // see if we already have a transaction ID defined
     if (txRegistry.contains(txId.id)) {
       // we do - do nothing, return the transaction
-      return txRegistry.get(txId.id).get
+      return txRegistry(txId.id)
     }
 
     // get a connection and a new transaction, read-only if so requested
@@ -48,7 +49,7 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
     conn.close()
   }
 
-  def closeTransaction(tx: JdbcTransaction) = {
+  def closeTransaction(tx: JdbcTransaction): Unit = {
     tx.close()
   }
 
@@ -65,11 +66,12 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
     val conn = DriverManager.getConnection(url, props)
     log.info(s"Opening connection $conn. Read-only: $readOnly")
 
-    readOnly match {
-      case true => conn.setReadOnly(true)
-      case false =>
-        conn.setReadOnly(false)
-        conn.setAutoCommit(false)
+    if (readOnly) {
+      conn.setReadOnly(true)
+    }
+    else {
+      conn.setReadOnly(false)
+      conn.setAutoCommit(false)
     }
 
     conn
@@ -81,9 +83,9 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
   protected def lock(tx: Transaction): Unit = {}
   protected def unlock(tx: Transaction): Unit = {}
 
-  override def withTransaction[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
+  override def withTransaction[A](f: => A)(implicit txId: TransactionId = new TransactionId): A = {
     log.debug("WRITE transaction")
-    val tx = transaction(readOnly = false)
+    val tx = transaction()
 
     if (tx.isReadOnly) {
       throw new IllegalStateException("The parent for this transaction is read-only!")
@@ -128,7 +130,7 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
     }
   }
 
-  override def asReadOnly[A](f: => A)(implicit txId: TransactionId = new TransactionId) = {
+  override def asReadOnly[A](f: => A)(implicit txId: TransactionId = new TransactionId): A = {
     log.debug("READ transaction")
     val tx = transaction(readOnly = true)
 

@@ -1,6 +1,6 @@
 package software.altitude.core.models
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import software.altitude.core.{Const => C}
 
 import scala.language.implicitConversions
@@ -13,7 +13,7 @@ object User {
 
 case class User(id: Option[String] = None) extends BaseModel {
 
-  override def toJson = Json.obj(
+  override def toJson: JsObject = Json.obj(
     C.Base.ID -> id
   ) ++ coreJsonAttrs
 

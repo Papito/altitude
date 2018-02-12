@@ -18,16 +18,16 @@ abstract class RepositoryDao(val app: AltitudeCoreApp) extends BaseJdbcDao with 
        WHERE ${C.Base.ID} = ?"""
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
-    val fileStoreConfigCol = rec.get(C.Repository.FILES_STORE_CONFIG).get
+    val fileStoreConfigCol = rec(C.Repository.FILES_STORE_CONFIG)
     val fileStoreConfigJsonStr: String = if (fileStoreConfigCol == null) "{}" else fileStoreConfigCol.asInstanceOf[String]
     val fileStoreConfigJson = Json.parse(fileStoreConfigJsonStr).as[JsObject]
 
     val model = Repository(
-      id = Some(rec.get(C.Base.ID).get.asInstanceOf[String]),
-      name = rec.get(C.Repository.NAME).get.asInstanceOf[String],
-      rootFolderId = rec.get(C.Repository.ROOT_FOLDER_ID).get.asInstanceOf[String],
-      triageFolderId = rec.get(C.Repository.TRIAGE_FOLDER_ID).get.asInstanceOf[String],
-      fileStoreType = C.FileStoreType.withName(rec.get(C.Repository.FILE_STORE_TYPE).get.asInstanceOf[String]),
+      id = Some(rec(C.Base.ID).asInstanceOf[String]),
+      name = rec(C.Repository.NAME).asInstanceOf[String],
+      rootFolderId = rec(C.Repository.ROOT_FOLDER_ID).asInstanceOf[String],
+      triageFolderId = rec(C.Repository.TRIAGE_FOLDER_ID).asInstanceOf[String],
+      fileStoreType = C.FileStoreType.withName(rec(C.Repository.FILE_STORE_TYPE).asInstanceOf[String]),
       fileStoreConfig = fileStoreConfigJson.as[Map[String, String]]
     )
 
@@ -62,6 +62,6 @@ abstract class RepositoryDao(val app: AltitudeCoreApp) extends BaseJdbcDao with 
   }
 
   // we do not use repository ID
-  override protected def combineInsertValues(id: String, vals: List[Any])(implicit  ctx: Context) =
+  override protected def combineInsertValues(id: String, vals: List[Any])(implicit  ctx: Context): List[Any] =
     id :: vals
 }

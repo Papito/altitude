@@ -1,6 +1,6 @@
 package software.altitude.core.models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import software.altitude.core.{Const => C}
 
 class ImportAsset(val path: String,
@@ -10,7 +10,7 @@ class ImportAsset(val path: String,
                   val metadata: Metadata)
   extends BaseModel with NoId {
 
-  override val toJson = Json.obj(
+  override val toJson: JsObject = Json.obj(
     "fileName" -> fileName,
     "path" -> path,
     "sourceType" -> sourceType.toString

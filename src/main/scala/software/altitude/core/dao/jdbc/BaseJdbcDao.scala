@@ -21,7 +21,7 @@ abstract class BaseJdbcDao extends BaseDao {
 
   val TABLE_NAME: String
 
-  protected final def txManager = app.injector.instance[JdbcTransactionManager]
+  protected final def txManager: JdbcTransactionManager = app.injector.instance[JdbcTransactionManager]
 
   protected def conn(implicit ctx: Context, txId: TransactionId): Connection = {
     // get the connection associated with this transaction
@@ -45,7 +45,7 @@ abstract class BaseJdbcDao extends BaseDao {
   protected def CORE_SQL_VALS_FOR_INSERT: String = "?, ?"
 
   // how we get current timestamp
-  protected def utcNow = Util.utcNow
+  protected def utcNow: DateTime = Util.utcNow
 
   // datetime as a JSON value
   protected def dtAsJsString(dt: DateTime) = JsString(Util.isoDateTime(Some(dt)))
@@ -172,9 +172,9 @@ abstract class BaseJdbcDao extends BaseDao {
    *
    * @param id is always required
    * @param vals any arbitrary values
-   * @return array of values to be bound to columbs
+   * @return array of values to be bound to columns
    */
-  protected def combineInsertValues(id: String, vals: List[Any])(implicit  ctx: Context) =
+  protected def combineInsertValues(id: String, vals: List[Any])(implicit  ctx: Context): List[Any] =
     id :: ctx.repo.id.get :: vals
 
   /**
@@ -215,7 +215,7 @@ abstract class BaseJdbcDao extends BaseDao {
       return None
 
     if (res.size() > 1)
-      throw new ConstraintException("getById should return only a single result")
+      throw ConstraintException("getById should return only a single result")
 
     val rec = res.head
 
@@ -225,7 +225,7 @@ abstract class BaseJdbcDao extends BaseDao {
 
   override def getByIds(ids: Set[String])
                        (implicit ctx: Context, txId: TransactionId): List[JsObject] = {
-    val placeholders = ids.toSeq.map(x => "?")
+    val placeholders = ids.toSeq.map(_ => "?")
     val sql = s"""
       SELECT $DEFAULT_SQL_COLS_FOR_SELECT
         FROM $TABLE_NAME
@@ -273,7 +273,7 @@ abstract class BaseJdbcDao extends BaseDao {
   }
 
   override def increment(id: String, field: String, count: Int = 1)
-                        (implicit ctx: Context, txId: TransactionId) = {
+                        (implicit ctx: Context, txId: TransactionId): Unit = {
     val sql = s"""
       UPDATE $TABLE_NAME
          SET $field = $field + $count
@@ -286,14 +286,14 @@ abstract class BaseJdbcDao extends BaseDao {
   }
 
   override def decrement(id: String,  field: String, count: Int = 1)
-                        (implicit ctx: Context, txId: TransactionId) = {
+                        (implicit ctx: Context, txId: TransactionId): Unit = {
     increment(id, field, -count)
   }
 
   /**
    * Make a string of SQL placeholders for a list - such as "? , ? ,?, ?"
    */
-  protected def makeSqlPlaceholders(s: Seq[AnyRef]): String = s.map(x => "?").mkString(",")
+  protected def makeSqlPlaceholders(s: Seq[AnyRef]): String = s.map(_ => "?").mkString(",")
 
   /**
    * Implementations should define this method, which returns an optional

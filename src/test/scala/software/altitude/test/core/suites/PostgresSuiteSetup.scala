@@ -38,7 +38,7 @@ trait PostgresSuiteSetup extends Suite with BeforeAndAfterAll {
       if (conn != null) conn.close()
     }
 
-    PostgresSuite.app.service.migration.migrate()
+    PostgresSuite.app.service.migrationService.migrate()
     log.info("END SETUP")
   }
 }

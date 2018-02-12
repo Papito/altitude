@@ -15,7 +15,7 @@ object BaseDao {
   /**
    * Verify that a DB id to be used is valid
    */
-  def verifyId(id: String) = {
+  def verifyId(id: String): Unit = {
     if (id == null) {
       throw new IllegalArgumentException("ID is not defined")
     }
@@ -32,7 +32,7 @@ object BaseDao {
 
 trait BaseDao {
   val app: AltitudeCoreApp
-  protected val MAX_RECORDS = app.config.getInt("db.max_records")
+  protected val MAX_RECORDS: Int = app.config.getInt("db.max_records")
 
   /**
    * Add a single record

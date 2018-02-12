@@ -46,15 +46,15 @@ object Query {
   def OR(values: List[Any]) = new QueryParam(values, ParamType.OR)
   def NOT_OR(values: List[Any]) = new QueryParam(values, ParamType.OR, negate = true)
 
-  def IN(values: List[Any], negate: Boolean = false) = {
+  def IN(values: List[Any], negate: Boolean = false): QueryParam = {
     // if only one value given - simplify this to be just an equals
-    if (values.size == 1) {
+    if (values.lengthCompare(1) == 0) {
       new QueryParam(values.head, negate)
     } else {
       new QueryParam(values, ParamType.IN, negate)
     }
   }
-  def NOT_IN(values: List[Any]) = IN(values, negate = true)
+  def NOT_IN(values: List[Any]): QueryParam  = IN(values, negate = true)
 
   def CONTAINS (value: Any) = new QueryParam(value, ParamType.CONTAINS)
   def NOT_CONTAINS(value: Any) = new QueryParam(value, ParamType.CONTAINS, negate = true)

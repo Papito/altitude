@@ -12,7 +12,7 @@ trait AssetDao extends BaseDao {
 
   def getMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Option[Metadata]
 
-  def setMetadata(assetId: String, metadata: Metadata)(implicit ctx: Context, txId: TransactionId)
+  def setMetadata(assetId: String, metadata: Metadata)(implicit ctx: Context, txId: TransactionId): Unit
 
   def setAssetAsRecycled(assetId: String, isRecycled: Boolean)(implicit ctx: Context, txId: TransactionId)
 
@@ -27,7 +27,7 @@ trait AssetDao extends BaseDao {
     throw new NotImplementedError
 
   def updateMetadata(assetId: String, metadata: Metadata, deletedFields: Set[String])
-                             (implicit ctx: Context, txId: TransactionId) = {
+                             (implicit ctx: Context, txId: TransactionId): Unit = {
     /**
      * Pedestrian version of this just overwrites fields for old metadata and re-sets it on the asset.
      * A better implementation - for advanced engines - updates only the metadata fields of interest.

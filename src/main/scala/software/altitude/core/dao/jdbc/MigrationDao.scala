@@ -26,7 +26,7 @@ abstract class MigrationDao(val app: AltitudeCoreApp)
     }
     catch {
       // table does not exist
-      case ex: java.sql.SQLException => 0
+      case _: java.sql.SQLException => 0
     }
     version
   }

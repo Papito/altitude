@@ -25,14 +25,15 @@ object Validators {
 
     protected def checkRequired(json: JsObject, ex: ValidationException): ValidationException = {
       required.getOrElse(List[String]()) foreach { field =>
-        json.keys.contains(field) match {
-          // see of the value is defined
-          case false => ex.errors += (field -> C.Msg.Err.REQUIRED)
-          case _ => (json \ field).asOpt[String] match {
+        if (json.keys.contains(field)) {
+          (json \ field).asOpt[String] match {
             // see if the value is an empty string
             case Some("") => ex.errors += (field -> C.Msg.Err.REQUIRED)
             case _ =>
           }
+        }
+        else {
+          ex.errors += (field -> C.Msg.Err.REQUIRED)
         }
       }
       ex
@@ -52,9 +53,8 @@ object Validators {
       val ex: ValidationException = ValidationException()
 
       required foreach { field =>
-        json.keys.contains(field) match {
-          case false => ex.errors += (field -> C.Msg.Err.REQUIRED)
-          case _ =>
+        if (!json.keys.contains(field)) {
+          ex.errors += (field -> C.Msg.Err.REQUIRED)
         }
       }
 

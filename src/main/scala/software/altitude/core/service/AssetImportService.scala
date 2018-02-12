@@ -67,7 +67,7 @@ class AssetImportService(app: Altitude) {
       res = Some(app.service.library.add(asset))
     }
     catch {
-      case ex: FormatException =>
+      case _: FormatException =>
         return None
     }
 

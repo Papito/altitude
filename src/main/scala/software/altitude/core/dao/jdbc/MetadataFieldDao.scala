@@ -1,6 +1,5 @@
 package software.altitude.core.dao.jdbc
 
-import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.models.{FieldType, MetadataField}
 import software.altitude.core.transactions.TransactionId
@@ -9,16 +8,14 @@ import software.altitude.core.{AltitudeCoreApp, Const => C, Context}
 abstract class MetadataFieldDao(val app: AltitudeCoreApp)
   extends BaseJdbcDao with software.altitude.core.dao.MetadataFieldDao {
 
-  private final val log = LoggerFactory.getLogger(getClass)
-
   override final val TABLE_NAME = "metadata_field"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val model = MetadataField(
-      id = Some(rec.get(C.Base.ID).get.asInstanceOf[String]),
-      name = rec.get(C.MetadataField.NAME).get.asInstanceOf[String],
+      id = Some(rec(C.Base.ID).asInstanceOf[String]),
+      name = rec(C.MetadataField.NAME).asInstanceOf[String],
       fieldType = FieldType.withName(
-        rec.get(C.MetadataField.FIELD_TYPE).get.asInstanceOf[String])
+        rec(C.MetadataField.FIELD_TYPE).asInstanceOf[String])
     )
     addCoreAttrs(model, rec)
   }

@@ -19,7 +19,7 @@ abstract class UserDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softwa
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val model = User(
-      id = Some(rec.get(C.Base.ID).get.asInstanceOf[String])
+      id = Some(rec(C.Base.ID).asInstanceOf[String])
     )
 
     addCoreAttrs(model, rec)
@@ -40,6 +40,6 @@ abstract class UserDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softwa
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
 
-  override protected def combineInsertValues(id: String, vals: List[Any])(implicit  ctx: Context) =
+  override protected def combineInsertValues(id: String, vals: List[Any])(implicit  ctx: Context): List[Any] =
     id :: vals
 }

@@ -18,7 +18,7 @@ class JdbcTransaction(private val conn: Connection, val isReadOnly: Boolean) ext
 
   def getConnection: Connection = conn
 
-  override def close() = {
+  override def close(): Unit = {
     if (!hasParents) {
       log.debug(s"Closing connection for transaction $id", C.LogTag.DB)
       try {

@@ -29,5 +29,5 @@ object Util {
     if (dt.isDefined) ISODateTimeFormat.dateTime().print(dt.get) else ""
   }
 
-  def randomStr(size: Int = 10) = scala.util.Random.alphanumeric.take(size).mkString
+  def randomStr(size: Int = 10): String = scala.util.Random.alphanumeric.take(size).mkString
 }
