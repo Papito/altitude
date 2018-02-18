@@ -4,13 +4,13 @@ import java.sql.DriverManager
 import java.util.Properties
 
 import org.scalatest.{BeforeAndAfterAll, Suite}
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 import software.altitude.core.{Configuration, Environment}
 import software.altitude.test.core.integration.IntegrationTestCore
 
 trait PostgresSuiteSetup extends Suite with BeforeAndAfterAll {
   Environment.ENV = Environment.TEST
-  val log =  LoggerFactory.getLogger(getClass)
+  val log: Logger =  LoggerFactory.getLogger(getClass)
 
   override def beforeAll(): Unit = {
     IntegrationTestCore.createTestDir(PostgresSuite.app)
