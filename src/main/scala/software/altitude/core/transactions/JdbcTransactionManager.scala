@@ -39,7 +39,7 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
 
     // assign the integer transaction ID to the mutable transaction id "carrier" object
     txId.id = tx.id
-    log.info(s"CREATING TRANSACTION ${txId.id}")
+    log.debug(s"CREATING TRANSACTION ${txId.id}")
     transactions.CREATED += 1
     tx
   }
