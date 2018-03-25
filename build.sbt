@@ -15,7 +15,7 @@ libraryDependencies ++= Seq(
   "org.scalatra"                %% "scalatra-atmosphere" % ScalatraVersion,
   "org.scalatra"                %% "scalatra-scalatest"    % ScalatraVersion % Test,
 
-  "com.typesafe.play"           %% "play-json"             % "2.3.10",
+  "com.typesafe.play"           %% "play-json"             % "2.6.8",
 
   "org.apache.tika"              % "tika-parsers"          % "1.14",
   "org.apache.tika"              % "tika-serialization"    % "1.14",

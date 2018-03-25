@@ -7,7 +7,7 @@ import software.altitude.core.util.QueryResult
 
 @DoNotDiscover class SearchServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
-  test("Index and search by term", CurrentTag) {
+  test("Index and search by term") {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "keywords",
