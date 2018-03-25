@@ -11,11 +11,10 @@
     <appender-ref ref="STDOUT" />
   </root>
 
-  <logger name="altitude" level="DEBUG" />
-  <logger name="altitude.transactions" level="WARN" />
-  <logger name="org.fusesource.scalate" level="WARN" />
-  <logger name="org.atmosphere" level="WARN" />
+  <logger name="software.altitude" level="DEBUG" />
+  <logger name="software.altitude.core.transactions" level="INFO" />
+  <logger name="software.altitude.core.dao" level="INFO" />
+  <logger name="software.altitude.client.dao" level="INFO" />
   <logger name="org.scalatra.servlet" level="INFO" />
   <logger name="org.eclipse.jetty" level="INFO" />
-  <logger name="com.mitchellbosecke.pebble" level="INFO" />
 </configuration>
