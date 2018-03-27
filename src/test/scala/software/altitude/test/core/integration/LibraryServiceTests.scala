@@ -240,4 +240,13 @@ import software.altitude.core.{Const => C, IllegalOperationException, NotFoundEx
       altitude.service.library.deleteFolderById(folder1.id.get)
     }
   }
+
+  test("Recycle asset twice", focused) {
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+    var asset1: Asset = altitude.service.library.add(makeAsset(folder1))
+    var asset2: Asset = altitude.service.library.add(makeAsset(folder1))
+
+    altitude.service.library.recycleAsset(asset1.id.get)
+    altitude.service.library.recycleAsset(asset1.id.get)
+  }
 }
