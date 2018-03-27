@@ -49,13 +49,13 @@ assemblyMergeStrategy in assembly := {
 }
 
 commands += Command.command("testFocused") { state =>
-  "testOnly -- -n Current" :: state
+  "testOnly -- -n focused" :: state
 }
 commands += Command.command("testFocusedSqlite") { state =>
-  "testOnly software.altitude.test.core.suites.SqliteSuite -- -n Current" :: state
+  "testOnly software.altitude.test.core.suites.SqliteSuite -- -n focused" :: state
 }
 commands += Command.command("testFocusedPostgres") { state =>
-  "testOnly software.altitude.test.core.suites.PostgresSuite -- -n Current" :: state
+  "testOnly software.altitude.test.core.suites.PostgresSuite -- -n focused" :: state
 }
 commands += Command.command("testSqlite") { state =>
   "testOnly software.altitude.test.core.suites.SqliteSuite" :: state

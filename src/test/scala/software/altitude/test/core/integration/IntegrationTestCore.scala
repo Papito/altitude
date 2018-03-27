@@ -70,7 +70,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   /**
    * Scalatest tag to run a specific test[s]
    *
-   * test("work in progress", CurrentTag) {
+   * test("work in progress", focused) {
    *
    * }
    *
@@ -82,7 +82,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
    *
    * sbt> test-only software.altitude.test.core.suites.SqliteSuite -- -n Current
    */
-  object CurrentTag extends Tag("Current")
+  object focused extends Tag("focused")
 
 
   /**

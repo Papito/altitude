@@ -13,5 +13,5 @@ $ ./sbt
     sbt> testOnly software.altitude.test.core.suites.[SqliteSuite|PostgresSuite]
 
 ## Running a tagged test(s):
-    sbt> testOnly -- -n Current
-    sbt> testOnly software.altitude.test.core.suites.SqliteSuite -- -n Current
+    sbt> testOnly -- -n focused
+    sbt> testOnly software.altitude.test.core.suites.SqliteSuite -- -n focused
