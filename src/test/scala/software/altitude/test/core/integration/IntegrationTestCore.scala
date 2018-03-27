@@ -76,11 +76,11 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
    *
    * To run:
    *
-   * sbt> test-only -- -n Current
+   * sbt> test-only -- -n focused
    *
    * For specific DB suite:
    *
-   * sbt> test-only software.altitude.test.core.suites.SqliteSuite -- -n Current
+   * sbt> test-only software.altitude.test.core.suites.SqliteSuite -- -n focused
    */
   object focused extends Tag("focused")
 
