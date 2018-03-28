@@ -10,10 +10,11 @@ val jettyVersion = "9.4.7.v20170914"
 libraryDependencies ++= Seq(
   "org.json4s"                  %% "json4s-jackson"      % "3.5.3",
 
-  "org.scalatra"                %% "scalatra"            % ScalatraVersion,
-  "org.scalatra"                %% "scalatra-scalate"    % ScalatraVersion,
-  "org.scalatra"                %% "scalatra-atmosphere" % ScalatraVersion,
+  "org.scalatra"                %% "scalatra"              % ScalatraVersion,
+  "org.scalatra"                %% "scalatra-scalate"      % ScalatraVersion,
+  "org.scalatra"                %% "scalatra-atmosphere"   % ScalatraVersion,
   "org.scalatra"                %% "scalatra-scalatest"    % ScalatraVersion % Test,
+  "org.mockito"                  % "mockito-core"          % "2.17.0" % Test,
 
   "com.typesafe.play"           %% "play-json"             % "2.6.8",
 
@@ -31,8 +32,8 @@ libraryDependencies ++= Seq(
 
   "ch.qos.logback"               % "logback-classic"       % "1.1.2" % "runtime",
 
-  "org.eclipse.jetty"            % "jetty-webapp"        % jettyVersion % "container;compile",
-  "javax.servlet"                % "javax.servlet-api"   % "3.1.0" % Provided
+  "org.eclipse.jetty"            % "jetty-webapp"          % jettyVersion % "container;compile",
+  "javax.servlet"                % "javax.servlet-api"     % "3.1.0" % Provided
 ).map(_.exclude("commons-logging", "commons-logging"))
  .map(_.exclude("org.apache.cxf", "cxf-core"))
  .map(_.exclude("org.apache.cxf", "cxf-cxf-rt-transports-http"))

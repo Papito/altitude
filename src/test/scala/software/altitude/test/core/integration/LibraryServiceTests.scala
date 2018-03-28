@@ -1,12 +1,17 @@
 package software.altitude.test.core.integration
 
+import org.mockito.Mockito
+import org.mockito.ArgumentMatchers.any
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
+import org.scalatest.mockito.MockitoSugar
 import software.altitude.core.models.{Asset, Folder}
+import software.altitude.core.service.filestore.FileStoreService
+import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.Query
-import software.altitude.core.{Const => C, IllegalOperationException, NotFoundException}
+import software.altitude.core.{Context, IllegalOperationException, NotFoundException, StorageException, Const => C}
 
-@DoNotDiscover class LibraryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
+@DoNotDiscover class LibraryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore with MockitoSugar {
 
   test("folder counts") {
     /*
@@ -243,10 +248,18 @@ import software.altitude.core.{Const => C, IllegalOperationException, NotFoundEx
 
   test("Recycle asset twice", focused) {
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
-    var asset1: Asset = altitude.service.library.add(makeAsset(folder1))
-    var asset2: Asset = altitude.service.library.add(makeAsset(folder1))
+    val asset1: Asset = altitude.service.library.add(makeAsset(folder1))
+    val asset2: Asset = altitude.service.library.add(makeAsset(folder1))
 
-    altitude.service.library.recycleAsset(asset1.id.get)
-    altitude.service.library.recycleAsset(asset1.id.get)
+    altitude.service.library.recycleAssets(Set(asset1.id.get, asset2.id.get))
+
+
+    altitude.service.library.restoreRecycledAsset(asset1.id.get)
+    // throw an exception during file move
+    val spy: FileStoreService = Mockito.spy(altitude.service.fileStore)
+
+    Mockito.when(spy.restoreAsset(any[Asset])(any[Context], any[TransactionId])).thenAnswer({throw StorageException("test")})
+
+    altitude.service.library.restoreRecycledAssets(Set(asset1.id.get, asset2.id.get))
   }
 }
