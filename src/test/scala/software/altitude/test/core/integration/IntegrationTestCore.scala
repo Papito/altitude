@@ -1,11 +1,14 @@
 package software.altitude.test.core.integration
 
 import java.io.File
+import scala.language.implicitConversions
 
 import com.google.inject.{AbstractModule, Guice}
 import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
 import org.apache.commons.io.FileUtils
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 import org.scalatest._
 import org.slf4j.{LoggerFactory, MDC}
 import software.altitude.core.models._
@@ -13,6 +16,7 @@ import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C, _}
 import software.altitude.test.core.integration.util.dao.{UtilitiesDao, jdbc}
 import software.altitude.test.core.suites.{PostgresSuite, SqliteSuite}
+
 
 object IntegrationTestCore {
   def createTestDir(altitude: AltitudeCoreApp): Unit = {
@@ -35,8 +39,21 @@ object IntegrationTestCore {
   }
 }
 
-abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with BeforeAndAfterEach with OptionValues {
-  val log =  LoggerFactory.getLogger(getClass)
+trait AnswerSugar {
+
+  implicit def toAnswer[T](f: () => T): Answer[T] = new Answer[T] {
+    override def answer(invocation: InvocationOnMock): T = f()
+  }
+
+  implicit def toAnswerWithArguments[T](f: (InvocationOnMock) => T): Answer[T] = new Answer[T] {
+    override def answer(invocation: InvocationOnMock): T = f(invocation)
+  }
+
+}
+
+abstract class IntegrationTestCore
+  extends FunSuite with BeforeAndAfter with BeforeAndAfterEach with OptionValues with AnswerSugar {
+  final val log =  LoggerFactory.getLogger(getClass)
 
   // Stores test app config overrides, since we run same tests with a different app setup.
   def config: Map[String, Any]
@@ -44,7 +61,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   // Force environment to always be TEST
   Environment.ENV = Environment.TEST
 
-  val datasource = config.get("datasource").get.asInstanceOf[C.DatasourceType.Value]
+  final val datasource = config("datasource").asInstanceOf[C.DatasourceType.Value]
 
   protected def altitude = datasource match {
     case C.DatasourceType.POSTGRES => PostgresSuite.app
@@ -55,8 +72,8 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   /**
    * Inject DB utilities, based on current data source
    */
-  val injector = Guice.createInjector(new InjectionModule)
-  protected val dbUtilities = injector.instance[UtilitiesDao]
+  final val injector = Guice.createInjector(new InjectionModule)
+  final protected val dbUtilities = injector.instance[UtilitiesDao]
 
   /**
    * Extremely important! This is the one and only transaction id for tests.
@@ -92,7 +109,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   private var user: User = null
   private var secondUser: User = null
 
-  var currentUser = user
+  var currentUser: User = user
 
   /**
    * Just as with users, we need at least two repositories to make sure repository
@@ -102,7 +119,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   private var repo: Repository = null
   private var secondRepo: Repository = null
 
-  var currentRepo = repo
+  var currentRepo: Repository = repo
 
   /**
    * Our implicit context for all tests.
@@ -114,18 +131,18 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   /**
    * Methods to toggle between different user and repositories.
    */
-  def SET_FIRST_USER() = {
+  def SET_FIRST_USER(): Unit = {
     currentUser = user
   }
-  def SET_SECOND_USER() = {
+  def SET_SECOND_USER(): Unit = {
     currentUser = secondUser
   }
 
-  def SET_FIRST_REPO() = {
+  def SET_FIRST_REPO(): Unit = {
     currentRepo = repo
   }
 
-  def SET_SECOND_REPO() = {
+  def SET_SECOND_REPO(): Unit = {
     currentRepo = secondRepo
   }
 
@@ -156,7 +173,7 @@ abstract class IntegrationTestCore extends FunSuite with BeforeAndAfter with Bef
   // test count - we use it as a request ID for our logging environment
   private var count = 0
 
-  override def beforeEach() = {
+  override def beforeEach(): Unit = {
     // this is for logging context
     MDC.put("USER", s"[USR:$currentUser]")
     count = count + 1

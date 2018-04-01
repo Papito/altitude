@@ -254,7 +254,6 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Sto
 
     altitude.service.library.restoreRecycledAsset(asset1.id.get)
 
-
     // throw an exception during file move
     val altitudeSpy = Mockito.spy(altitude)
     val serviceSpy = Mockito.spy(altitude.service)
@@ -266,13 +265,10 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Sto
     Mockito.doReturn(librarySpy, Array.empty:_*).when(serviceSpy).library
     Mockito.doReturn(altitudeSpy, Array.empty:_*).when(librarySpy).app
 
-    val fakeAnswer = new Answer[Unit] {
-      override def answer(invocation: InvocationOnMock): Unit = {
-        throw StorageException("test")
-      }
-    }
+    Mockito.doAnswer((_: InvocationOnMock) => {
+      throw StorageException("test")
+    }).when(fileStoreSpy).restoreAsset(any())(any(), any())
 
-    Mockito.doAnswer(fakeAnswer).when(fileStoreSpy).restoreAsset(any())(any(), any())
     altitudeSpy.service.library.restoreRecycledAssets(Set(asset1.id.get, asset2.id.get))
   }
 }
