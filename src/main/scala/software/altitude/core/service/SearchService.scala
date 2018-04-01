@@ -8,7 +8,7 @@ import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.QueryResult
 import software.altitude.core.{Altitude, Context}
 
-class SearchService(app: Altitude) {
+class SearchService(val app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
   protected val SEARCH_DAO: SearchDao = app.injector.instance[SearchDao]
 

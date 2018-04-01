@@ -9,7 +9,7 @@ import software.altitude.core.transactions.{AbstractTransactionManager, Transact
 import software.altitude.core.util.Query
 import software.altitude.core.{Altitude, Context}
 
-class StatsService(app: Altitude) {
+class StatsService(val app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
   protected val DAO: StatDao = app.injector.instance[StatDao]
   protected val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
