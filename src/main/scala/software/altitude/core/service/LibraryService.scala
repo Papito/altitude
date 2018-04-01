@@ -16,7 +16,7 @@ import software.altitude.core.transactions.{AbstractTransactionManager, Transact
 import software.altitude.core.util.{Query, QueryResult}
 import software.altitude.core.{Altitude, Const => C, Context, _}
 
-class LibraryService(app: Altitude) {
+class LibraryService(val app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
   protected val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
 

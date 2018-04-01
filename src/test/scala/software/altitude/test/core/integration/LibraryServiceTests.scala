@@ -2,16 +2,15 @@ package software.altitude.test.core.integration
 
 import org.mockito.Mockito
 import org.mockito.ArgumentMatchers.any
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
-import org.scalatest.mockito.MockitoSugar
 import software.altitude.core.models.{Asset, Folder}
-import software.altitude.core.service.filestore.FileStoreService
-import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.Query
-import software.altitude.core.{Context, IllegalOperationException, NotFoundException, StorageException, Const => C}
+import software.altitude.core.{IllegalOperationException, NotFoundException, StorageException, Const => C}
 
-@DoNotDiscover class LibraryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore with MockitoSugar {
+@DoNotDiscover class LibraryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
   test("folder counts") {
     /*
@@ -253,13 +252,27 @@ import software.altitude.core.{Context, IllegalOperationException, NotFoundExcep
 
     altitude.service.library.recycleAssets(Set(asset1.id.get, asset2.id.get))
 
-
     altitude.service.library.restoreRecycledAsset(asset1.id.get)
+
+
     // throw an exception during file move
-    val spy: FileStoreService = Mockito.spy(altitude.service.fileStore)
+    val altitudeSpy = Mockito.spy(altitude)
+    val serviceSpy = Mockito.spy(altitude.service)
+    val librarySpy = Mockito.spy(altitude.service.library)
+    val fileStoreSpy = Mockito.spy(altitude.service.fileStore)
 
-    Mockito.when(spy.restoreAsset(any[Asset])(any[Context], any[TransactionId])).thenAnswer({throw StorageException("test")})
+    Mockito.doReturn(serviceSpy, Array.empty:_*).when(altitudeSpy).service
+    Mockito.doReturn(fileStoreSpy, Array.empty:_*).when(serviceSpy).fileStore
+    Mockito.doReturn(librarySpy, Array.empty:_*).when(serviceSpy).library
+    Mockito.doReturn(altitudeSpy, Array.empty:_*).when(librarySpy).app
 
-    altitude.service.library.restoreRecycledAssets(Set(asset1.id.get, asset2.id.get))
+    val fakeAnswer = new Answer[Unit] {
+      override def answer(invocation: InvocationOnMock): Unit = {
+        throw StorageException("test")
+      }
+    }
+
+    Mockito.doAnswer(fakeAnswer).when(fileStoreSpy).restoreAsset(any())(any(), any())
+    altitudeSpy.service.library.restoreRecycledAssets(Set(asset1.id.get, asset2.id.get))
   }
 }

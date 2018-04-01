@@ -15,7 +15,6 @@ libraryDependencies ++= Seq(
   "org.scalatra"                %% "scalatra-atmosphere"   % ScalatraVersion,
   "org.scalatra"                %% "scalatra-scalatest"    % ScalatraVersion % Test,
   "org.mockito"                  % "mockito-core"          % "2.17.0" % Test,
-  "org.scalamock"               %% "scalamock"             % "4.1.0" % Test,
 
   "com.typesafe.play"           %% "play-json"             % "2.6.8",
 
