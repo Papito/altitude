@@ -6,7 +6,7 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
-import software.altitude.core.models.{Asset, Folder}
+import software.altitude.core.models.{Asset, Folder, Stats}
 import software.altitude.core.util.Query
 import software.altitude.core.{IllegalOperationException, NotFoundException, StorageException, Const => C}
 
@@ -269,6 +269,20 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Sto
       throw StorageException("test")
     }).when(fileStoreSpy).restoreAsset(any())(any(), any())
 
-    altitudeSpy.service.library.restoreRecycledAssets(Set(asset1.id.get, asset2.id.get))
+    // error
+    intercept[StorageException] {
+      altitudeSpy.service.library.restoreRecycledAssets(Set(asset1.id.get, asset2.id.get))
+    }
+
+    Mockito.doCallRealMethod().when(fileStoreSpy).restoreAsset(any())(any(), any())
+
+    // success
+    altitudeSpy.service.library.restoreRecycledAssets(Set(asset2.id.get))
+
+    val stats = altitude.service.stats.getStats
+    println(stats.getStatValue(Stats.SORTED_ASSETS))
+
+    stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 2
   }
+
 }
