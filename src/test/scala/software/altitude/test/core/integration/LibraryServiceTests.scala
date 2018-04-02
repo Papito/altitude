@@ -245,7 +245,7 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Sto
     }
   }
 
-  test("Recycle asset twice", focused) {
+  test("Restore recycled asset twice", focused) {
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
     val asset1: Asset = altitude.service.library.add(makeAsset(folder1))
     val asset2: Asset = altitude.service.library.add(makeAsset(folder1))
@@ -271,7 +271,7 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Sto
 
     // error
     intercept[StorageException] {
-      altitudeSpy.service.library.restoreRecycledAssets(Set(asset1.id.get, asset2.id.get))
+      altitudeSpy.service.library.restoreRecycledAssets(Set(asset2.id.get))
     }
 
     Mockito.doCallRealMethod().when(fileStoreSpy).restoreAsset(any())(any(), any())
