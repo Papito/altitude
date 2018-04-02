@@ -40,7 +40,7 @@ object IntegrationTestCore {
 }
 
 trait AnswerSugar {
-
+  // Sugar for Mockito `doAnswer` calls
   implicit def toAnswer[T](f: () => T): Answer[T] = new Answer[T] {
     override def answer(invocation: InvocationOnMock): T = f()
   }

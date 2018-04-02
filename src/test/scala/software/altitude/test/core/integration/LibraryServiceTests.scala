@@ -264,25 +264,29 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Sto
     Mockito.doReturn(librarySpy, Array.empty:_*).when(serviceSpy).library
     Mockito.doReturn(altitudeSpy, Array.empty:_*).when(librarySpy).app
 
+    // error
     Mockito.doAnswer((_: InvocationOnMock) => {
       throw StorageException("test")
     }).when(fileStoreSpy).restoreAsset(any())(any(), any())
 
-    // error
     intercept[StorageException] {
       altitudeSpy.service.library.restoreRecycledAssets(Set(asset2.id.get))
     }
 
-    Mockito.doCallRealMethod().when(fileStoreSpy).restoreAsset(any())(any(), any())
+    var stats = altitude.service.stats.getStats
+
+    stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 1
+    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 2
+    stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 1
 
     // success
+    Mockito.doCallRealMethod().when(fileStoreSpy).restoreAsset(any())(any(), any())
     altitudeSpy.service.library.restoreRecycledAssets(Set(asset2.id.get))
 
-    val stats = altitude.service.stats.getStats
+    stats = altitude.service.stats.getStats
 
     stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 2
     stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 2
     stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 0
   }
-
 }
