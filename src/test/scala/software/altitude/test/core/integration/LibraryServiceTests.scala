@@ -259,7 +259,6 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Sto
     val serviceSpy = Mockito.spy(altitude.service)
     val librarySpy = Mockito.spy(altitude.service.library)
     val fileStoreSpy = Mockito.spy(altitude.service.fileStore)
-
     Mockito.doReturn(serviceSpy, Array.empty:_*).when(altitudeSpy).service
     Mockito.doReturn(fileStoreSpy, Array.empty:_*).when(serviceSpy).fileStore
     Mockito.doReturn(librarySpy, Array.empty:_*).when(serviceSpy).library
@@ -280,9 +279,10 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Sto
     altitudeSpy.service.library.restoreRecycledAssets(Set(asset2.id.get))
 
     val stats = altitude.service.stats.getStats
-    println(stats.getStatValue(Stats.SORTED_ASSETS))
 
     stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 2
+    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 2
+    stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 0
   }
 
 }
