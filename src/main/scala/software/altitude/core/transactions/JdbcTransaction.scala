@@ -45,7 +45,7 @@ class JdbcTransaction(private val conn: Connection, val isReadOnly: Boolean) ext
 
   override def rollback() {
     if (!hasParents && !conn.isReadOnly) {
-      log.warn(s"ROLLBACK for transaction $id", C.LogTag.DB)
+      log.warn(s"!ROLLBACK!$id", C.LogTag.DB)
       try {
         conn.rollback()
       }

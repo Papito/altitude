@@ -78,7 +78,7 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
   }
 
   /**
-   * This is defined for any JDBC driver that is not thread-safe for writes
+   * This is defined for any JDBC driver that is not thread-safe for writes (Sqlite)
    */
   protected def lock(tx: Transaction): Unit = {}
   protected def unlock(tx: Transaction): Unit = {}
@@ -105,7 +105,7 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
       // commit exiting transactions
       if (tx.mustCommit) {
         log.debug(s"End: ${tx.id}", C.LogTag.DB)
-        log.info(s"COMMITTING ${tx.id}", C.LogTag.DB)
+        log.info(s"!COMMIT! ${tx.id}", C.LogTag.DB)
         tx.commit()
         transactions.COMMITTED += 1
       }

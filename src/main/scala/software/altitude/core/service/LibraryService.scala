@@ -381,8 +381,10 @@ class LibraryService(val app: Altitude) {
 
   def restoreRecycledAssets(assetIds: Set[String])
                            (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+    log.info(s"Restoring recycled assets [${assetIds.mkString(",")}]")
     txManager.withTransaction {
       assetIds.foreach { assetId =>
+        log.info(s"Restoring recycled asset [$assetId]")
         app.service.asset.setAssetAsRecycled(assetId, isRecycled = false)
         val restoredAsset: Asset = getById(assetId)
         app.service.stats.restoreAsset(restoredAsset)

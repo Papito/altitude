@@ -1,6 +1,7 @@
 package software.altitude.core.service
 
 import net.codingwell.scalaguice.InjectorExtensions._
+import org.slf4j.LoggerFactory
 import software.altitude.core.dao.AssetDao
 import software.altitude.core.models.Asset
 import software.altitude.core.transactions.TransactionId
@@ -15,9 +16,11 @@ import software.altitude.core.{Altitude, Context}
  * the jurisdiction of the Library service - it does all the counter decrementin' and wrist slappin'
  */
 class AssetService(val app: Altitude) extends BaseService[Asset] {
+  private final val log = LoggerFactory.getLogger(getClass)
   override protected val DAO: AssetDao = app.injector.instance[AssetDao]
 
   def setAssetAsRecycled(assetId: String, isRecycled: Boolean)(implicit ctx: Context, txId: TransactionId): Unit = {
+    log.info(s"Setting asset [$assetId] recycled flag to [$isRecycled]")
     DAO.setAssetAsRecycled(assetId, isRecycled = isRecycled)
   }
 

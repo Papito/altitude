@@ -32,12 +32,12 @@ class StatsService(val app: Altitude) {
   }
 
   private def incrementStat(statName: String, count: Long = 1)
-                   (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+                   (implicit ctx: Context, txId: TransactionId): Unit = {
     DAO.incrementStat(statName, count)
   }
 
   private def decrementStat(statName: String, count: Long = 1)
-                   (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+                   (implicit ctx: Context, txId: TransactionId): Unit = {
     DAO.decrementStat(statName, count)
   }
 
