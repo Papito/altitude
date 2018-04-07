@@ -14,9 +14,9 @@ object SqliteTransactionManager {
 
   val sqliteConfig: SQLiteConfig = new SQLiteConfig()
   sqliteConfig.setReadOnly(true)
-  private lazy val roConnection = DriverManager.getConnection(url, sqliteConfig.toProperties)
-  private lazy val wConnection = DriverManager.getConnection(url)
-  wConnection.setAutoCommit(false)
+  private lazy val RO_CONNECTION = DriverManager.getConnection(url, sqliteConfig.toProperties)
+  private lazy val WR_CONNECTION = DriverManager.getConnection(url)
+  WR_CONNECTION.setAutoCommit(false)
 }
 
 class SqliteTransactionManager(app: AltitudeCoreApp)
@@ -25,9 +25,9 @@ class SqliteTransactionManager(app: AltitudeCoreApp)
 
   override def connection(readOnly: Boolean = false): Connection = {
     val conn = if (readOnly)
-      SqliteTransactionManager.roConnection
+      SqliteTransactionManager.RO_CONNECTION
     else
-      SqliteTransactionManager.wConnection
+      SqliteTransactionManager.WR_CONNECTION
 
     log.debug(s"Getting connection $conn. Read-only: $readOnly")
     conn

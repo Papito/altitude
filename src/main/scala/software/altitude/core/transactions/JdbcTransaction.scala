@@ -34,6 +34,7 @@ class JdbcTransaction(private val conn: Connection, val isReadOnly: Boolean) ext
   override def commit() {
     if (!hasParents) {
       try {
+        log.info(s"!COMMIT! $id", C.LogTag.DB)
         conn.commit()
       }
       catch {
@@ -45,7 +46,7 @@ class JdbcTransaction(private val conn: Connection, val isReadOnly: Boolean) ext
 
   override def rollback() {
     if (!hasParents && !conn.isReadOnly) {
-      log.warn(s"!ROLLBACK!$id", C.LogTag.DB)
+      log.warn(s"!ROLLBACK! $id", C.LogTag.DB)
       try {
         conn.rollback()
       }

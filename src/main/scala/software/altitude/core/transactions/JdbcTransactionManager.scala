@@ -56,6 +56,7 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
   /**
    * JDBC-specific connection snooze-fest
    */
+  // FIXME: Should be in (new) Postgres manager
   def connection(readOnly: Boolean): Connection = {
     val props = new Properties
     val user = app.config.getString("db.postgres.user")
@@ -105,7 +106,6 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
       // commit exiting transactions
       if (tx.mustCommit) {
         log.debug(s"End: ${tx.id}", C.LogTag.DB)
-        log.info(s"!COMMIT! ${tx.id}", C.LogTag.DB)
         tx.commit()
         transactions.COMMITTED += 1
       }
@@ -116,6 +116,11 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
       case ex: Exception =>
         tx.down()
         log.error(s"Error (${ex.getClass.getName}): ${ex.getMessage}")
+
+        if (tx.mustCommit) {
+          tx.rollback()
+        }
+
         throw ex
     }
     finally {
@@ -126,6 +131,7 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
         closeTransaction(tx)
         transactions.CLOSED += 1
       }
+
       unlock(tx)
     }
   }
