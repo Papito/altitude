@@ -191,6 +191,10 @@ abstract class IntegrationTestCore
     SET_FIRST_REPO()
   }
 
+  def savepoint(): Unit = {
+    altitude.txManager.savepoint()
+  }
+
   override def afterEach() {
     dbUtilities.cleanupTest()
 

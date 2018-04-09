@@ -104,9 +104,8 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
       tx.down()
 
       // commit exiting transactions
+      tx.commit()
       if (tx.mustCommit) {
-        log.debug(s"End: ${tx.id}", C.LogTag.DB)
-        tx.commit()
         transactions.COMMITTED += 1
       }
 
@@ -116,11 +115,7 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
       case ex: Exception =>
         tx.down()
         log.error(s"Error (${ex.getClass.getName}): ${ex.getMessage}")
-
-        if (tx.mustCommit) {
-          tx.rollback()
-        }
-
+        tx.rollback()
         throw ex
     }
     finally {
@@ -161,5 +156,9 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
         transactions.CLOSED += 1
       }
     }
+  }
+
+  override def savepoint()(implicit txId: TransactionId): Unit = {
+    transaction().addSavepoint()
   }
 }

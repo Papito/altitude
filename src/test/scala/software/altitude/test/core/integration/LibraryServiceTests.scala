@@ -270,6 +270,7 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Sto
     }).when(fileStoreSpy).restoreAsset(any())(any(), any())
 
     intercept[StorageException] {
+      savepoint()
       altitudeSpy.service.library.restoreRecycledAssets(Set(asset2.id.get))
     }
 

@@ -9,7 +9,7 @@ class UtilitiesDao(app: AltitudeCoreApp) extends dao.UtilitiesDao {
 
   protected final def txManager = app.injector.instance[JdbcTransactionManager]
 
-  override def rollback() = {
+  override def rollback(): Unit = {
 
     txManager.txRegistry.foreach(tx => {
       tx._2.down()
@@ -17,14 +17,14 @@ class UtilitiesDao(app: AltitudeCoreApp) extends dao.UtilitiesDao {
     })
   }
 
-  override def close() = {
+  override def close(): Unit = {
     txManager.txRegistry.foreach(tx => {
       tx._2.down()
       txManager.closeTransaction(tx._2)
     })
   }
 
-  override def cleanupTest() = {
+  override def cleanupTest(): Unit = {
     rollback()
     close()
     txManager.txRegistry.clear()
