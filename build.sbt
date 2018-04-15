@@ -42,6 +42,8 @@ enablePlugins(ScalatraPlugin)
 
 test in assembly := {}
 
+parallelExecution in Test := false
+
 assemblyMergeStrategy in assembly := {
   case x if x.startsWith("META-INF") => MergeStrategy.discard
   case x =>
