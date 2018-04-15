@@ -38,7 +38,7 @@ class Configuration(configOverride: Map[String, Any] = new HashMap()) {
     "importMode" -> C.ImportMode.COPY,
     "filestore" -> C.FileStoreType.FS,
 
-    "db.postgres.url" -> "jdbc:postgresql://localhost/altitude-test",
+    "db.postgres.url" -> "jdbc:postgresql://localhost:5433/altitude-test",
     "db.postgres.user" -> "altitude-test",
 
     "db.sqlite.url" -> "jdbc:sqlite:./test-data/test.sqlite.db"
