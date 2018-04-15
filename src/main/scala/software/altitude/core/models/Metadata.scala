@@ -17,7 +17,7 @@ object Metadata {
 
   /**
    * Adapter to easily set metadata from a set of plain strings.
-   * Note: dummy implicit is added to prevent compiler from complaining about double defition
+   * Note: dummy implicit is added to prevent compiler from complaining about double definition
    * due to type erasure
    * @param data { fieldId -> Set of string }
    */

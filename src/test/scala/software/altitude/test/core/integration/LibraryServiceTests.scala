@@ -3,12 +3,11 @@ package software.altitude.test.core.integration
 import org.mockito.Mockito
 import org.mockito.ArgumentMatchers.any
 import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
-import software.altitude.core.models.{Asset, Folder, Stats}
+import software.altitude.core.models._
 import software.altitude.core.util.Query
-import software.altitude.core.{IllegalOperationException, NotFoundException, StorageException, Const => C}
+import software.altitude.core.{IllegalOperationException, NotFoundException, StorageException, Util, Const => C}
 
 @DoNotDiscover class LibraryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
@@ -247,12 +246,17 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Sto
 
   test("Restore recycled asset twice", focused) {
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
+
     val asset1: Asset = altitude.service.library.add(makeAsset(folder1))
     val asset2: Asset = altitude.service.library.add(makeAsset(folder1))
+    val asset3: Asset = altitude.service.library.add(makeAsset(folder1))
+    // assets 1, 2, 3 in folder 1
 
-    altitude.service.library.recycleAssets(Set(asset1.id.get, asset2.id.get))
+    altitude.service.library.recycleAssets(Set(asset1.id.get, asset2.id.get, asset3.id.get))
+    // assets 1, 2, 3 in trash bin
 
     altitude.service.library.restoreRecycledAsset(asset1.id.get)
+    // asset 1 in folder 1; assets 2, 3 in trash bin
 
     // throw an exception during file move
     val altitudeSpy = Mockito.spy(altitude)
@@ -264,30 +268,38 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Sto
     Mockito.doReturn(librarySpy, Array.empty:_*).when(serviceSpy).library
     Mockito.doReturn(altitudeSpy, Array.empty:_*).when(librarySpy).app
 
+    savepoint()
     // error
+    var numOfCalls = 0 // throw on *second* asset being restored in storage
     Mockito.doAnswer((_: InvocationOnMock) => {
-      throw StorageException("test")
+      numOfCalls += 1
+
+      val doThrow = numOfCalls == 2
+      if (doThrow) {
+        throw StorageException("test")
+      }
     }).when(fileStoreSpy).restoreAsset(any())(any(), any())
 
     intercept[StorageException] {
-      savepoint()
-      altitudeSpy.service.library.restoreRecycledAssets(Set(asset2.id.get))
+      altitudeSpy.service.library.restoreRecycledAssets(Set(asset2.id.get, asset3.id.get))
     }
+    // asset 1, 2 in folder 1; asset 3 in trash bin
 
     var stats = altitude.service.stats.getStats
 
+    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 3
     stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 1
-    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 2
-    stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 1
+    stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 2
 
     // success
     Mockito.doCallRealMethod().when(fileStoreSpy).restoreAsset(any())(any(), any())
-    altitudeSpy.service.library.restoreRecycledAssets(Set(asset2.id.get))
+    altitudeSpy.service.library.restoreRecycledAssets(Set(asset3.id.get))
+    // assets 1, 2, 3 in folder 1
 
     stats = altitude.service.stats.getStats
 
     stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 2
-    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 2
-    stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 0
+    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 3
+    stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 1
   }
 }
