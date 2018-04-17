@@ -1,5 +1,6 @@
 package software.altitude.core.models
 
+import java.util.UUID
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json._
@@ -8,10 +9,10 @@ import software.altitude.core.{Const => C, Util}
 import scala.language.implicitConversions
 
 object BaseModel {
-  final val ID_LEN = 24
+  final val ID_LEN = 36
 
   // make a new model ID
-  final def genId: String = scala.util.Random.alphanumeric.take(ID_LEN).mkString.toLowerCase
+  final def genId: String = UUID.randomUUID.toString
 
   // implicit converter to go from a model to JSON
   implicit def toJson(obj: BaseModel): JsObject = obj.toJson
@@ -71,8 +72,8 @@ abstract class BaseModel {
   }
 
   /**
-   * Returns core JSON attributes that most models should have
-   */
+    * Returns core JSON attributes that most models should have
+    */
   protected def coreJsonAttrs = JsObject(Map(
     C.Base.ID -> {id match {
       case None => JsNull
@@ -80,20 +81,20 @@ abstract class BaseModel {
     }},
 
     C.Base.CREATED_AT -> {createdAt match {
-        case None => JsNull
-        case _ => JsString(Util.isoDateTime(createdAt))
+      case None => JsNull
+      case _ => JsString(Util.isoDateTime(createdAt))
     }},
 
     C.Base.UPDATED_AT -> {updatedAt match {
-        case None => JsNull
-        case _ => JsString(Util.isoDateTime(updatedAt))
+      case None => JsNull
+      case _ => JsString(Util.isoDateTime(updatedAt))
     }}
   ).toSeq)
 
   /**
-   * Return this type of object, but with core attributes
-   * present, parsed from the passed in JSON object (if the values are present)
-   */
+    * Return this type of object, but with core attributes
+    * present, parsed from the passed in JSON object (if the values are present)
+    */
   protected def withCoreAttr(json: JsValue): this.type  = {
     val isoCreatedAt = (json \ C.Base.CREATED_AT).asOpt[String]
     if (isoCreatedAt.isDefined) {

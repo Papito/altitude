@@ -244,7 +244,7 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Sto
     }
   }
 
-  test("Restore recycled asset twice", focused) {
+  test("Restore recycled asset twice") {
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
     val asset1: Asset = altitude.service.library.add(makeAsset(folder1))
