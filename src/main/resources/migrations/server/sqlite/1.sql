@@ -1,15 +1,19 @@
 CREATE TABLE system (
   id INT NOT NULL,
   version INT NOT NULL
-);#END
-CREATE UNIQUE INDEX system_01 ON system(id);#END
-INSERT INTO system(id, version) VALUES(0, 0);#END
+);
+--//END
+CREATE UNIQUE INDEX system_01 ON system(id);
+--//END
+INSERT INTO system(id, version) VALUES(0, 0);
+--//END
 
 CREATE TABLE repository_user(
   id CHAR(36) PRIMARY KEY,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
-);#END
+);
+--//END
 
 CREATE TABLE repository(
   id CHAR(36) PRIMARY KEY,
@@ -21,15 +25,19 @@ CREATE TABLE repository(
   file_store_config TEXT NOT NULL,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
-);#END
+);
+--//END
 
 CREATE TABLE stats (
   repository_id CHAR(36) NOT NULL,
   dimension VARCHAR(60),
   dim_val INT NOT NULL DEFAULT 0
-);#END
-CREATE INDEX stats_01 ON stats(repository_id);#END
-CREATE UNIQUE INDEX stats_02 ON stats(repository_id, dimension);#END
+);
+--//END
+CREATE INDEX stats_01 ON stats(repository_id);
+--//END
+CREATE UNIQUE INDEX stats_02 ON stats(repository_id, dimension);
+--//END
 
 CREATE TABLE asset  (
   id CHAR(36) PRIMARY KEY,
@@ -48,9 +56,12 @@ CREATE TABLE asset  (
   is_recycled TINYINT NOT NULL DEFAULT 0,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
-);#END
-CREATE UNIQUE INDEX asset_01 ON asset(repository_id, md5, is_recycled);#END
-CREATE UNIQUE INDEX asset_02 ON asset(repository_id, folder_id, filename, is_recycled);#END
+);
+--//END
+CREATE UNIQUE INDEX asset_01 ON asset(repository_id, md5, is_recycled);
+--//END
+CREATE UNIQUE INDEX asset_02 ON asset(repository_id, folder_id, filename, is_recycled);
+--//END
 
 CREATE TABLE metadata_field (
   id CHAR(36) PRIMARY KEY,
@@ -60,9 +71,12 @@ CREATE TABLE metadata_field (
   field_type VARCHAR(255) NOT NULL,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
-);#END
-CREATE INDEX metadata_field_01 ON metadata_field(repository_id);#END
-CREATE UNIQUE INDEX metadata_field_02 ON metadata_field(repository_id, name_lc);#END
+);
+--//END
+CREATE INDEX metadata_field_01 ON metadata_field(repository_id);
+--//END
+CREATE UNIQUE INDEX metadata_field_02 ON metadata_field(repository_id, name_lc);
+--//END
 
 
 CREATE TABLE folder (
@@ -74,10 +88,14 @@ CREATE TABLE folder (
   num_of_assets INTEGER NOT NULL DEFAULT 0,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
-);#END
-CREATE INDEX folder_01 ON folder(repository_id, parent_id);#END
-CREATE UNIQUE INDEX folder_02 ON folder(repository_id, parent_id, name_lc);#END
-CREATE UNIQUE INDEX folder_03 ON folder(repository_id, parent_id, name_lc);#END
+);
+--//END
+CREATE INDEX folder_01 ON folder(repository_id, parent_id);
+--//END
+CREATE UNIQUE INDEX folder_02 ON folder(repository_id, parent_id, name_lc);
+--//END
+CREATE UNIQUE INDEX folder_03 ON folder(repository_id, parent_id, name_lc);
+--//END
 
 CREATE TABLE search_parameter (
   repository_id CHAR(36) NOT NULL,
@@ -87,10 +105,16 @@ CREATE TABLE search_parameter (
   field_value_num DECIMAL,
   field_value_bool BOOLEAN,
   field_value_dt DATE
-);#END
-CREATE INDEX search_parameter_01 ON search_parameter(repository_id, field_id, field_value_kw);#END
-CREATE INDEX search_parameter_02 ON search_parameter(repository_id, field_id, field_value_num);#END
-CREATE INDEX search_parameter_03 ON search_parameter(repository_id, field_id, field_value_bool);#END
-CREATE INDEX search_parameter_04 ON search_parameter(repository_id, field_id, field_value_dt);#END
+);
+--//END
+CREATE INDEX search_parameter_01 ON search_parameter(repository_id, field_id, field_value_kw);
+--//END
+CREATE INDEX search_parameter_02 ON search_parameter(repository_id, field_id, field_value_num);
+--//END
+CREATE INDEX search_parameter_03 ON search_parameter(repository_id, field_id, field_value_bool);
+--//END
+CREATE INDEX search_parameter_04 ON search_parameter(repository_id, field_id, field_value_dt);
+--//END
 
-CREATE VIRTUAL TABLE search_document USING fts4(repository_id, asset_id, body);#END
+CREATE VIRTUAL TABLE search_document USING fts4(repository_id, asset_id, body);
+--//END

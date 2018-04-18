@@ -74,7 +74,7 @@ abstract class CoreMigrationService {
     log.info(s"PATH: $path")
 
     val r = getClass.getResource(path)
-    Source.fromURL(r).mkString.split("#END").map(_.trim).toList.filter(_.nonEmpty)
+    Source.fromURL(r).mkString.split("--//END").map(_.trim).toList.filter(_.nonEmpty)
   }
 
 }
