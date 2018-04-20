@@ -31,7 +31,7 @@ CREATE TABLE repository(
 --//END
 
 CREATE TABLE stats (
-  repository_id CHAR(36) NOT NULL,
+  repository_id CHAR(36) REFERENCES repository(id),
   dimension VARCHAR(60),
   dim_val INT NOT NULL DEFAULT 0
 );
@@ -43,8 +43,8 @@ CREATE UNIQUE INDEX stats_02 ON stats(repository_id, dimension);
 
 CREATE TABLE asset (
   id CHAR(36) PRIMARY KEY,
-  repository_id CHAR(36) NOT NULL,
-  user_id CHAR(36) NOT NULL,
+  repository_id CHAR(36) REFERENCES repository(id),
+  user_id CHAR(36) REFERENCES repository_user(id),
   md5 VARCHAR(32) NOT NULL,
   media_type VARCHAR(64) NOT NULL,
   media_subtype VARCHAR(64) NOT NULL,
@@ -65,7 +65,7 @@ CREATE UNIQUE INDEX asset_02 ON asset(repository_id, folder_id, filename, is_rec
 
 CREATE TABLE metadata_field (
   id CHAR(36) PRIMARY KEY,
-  repository_id CHAR(36) NOT NULL,
+  repository_id CHAR(36) REFERENCES repository(id),
   name VARCHAR(255) NOT NULL,
   name_lc VARCHAR(255) NOT NULL,
   field_type VARCHAR(255) NOT NULL
@@ -78,7 +78,7 @@ CREATE UNIQUE INDEX metadata_field_02 ON metadata_field(repository_id, name_lc);
 
 CREATE TABLE folder (
   id CHAR(36) PRIMARY KEY,
-  repository_id CHAR(36) NOT NULL,
+  repository_id CHAR(36) REFERENCES repository(id),
   name VARCHAR(255) NOT NULL,
   name_lc VARCHAR(255) NOT NULL,
   parent_id CHAR(36) NOT NULL,
@@ -91,9 +91,9 @@ CREATE UNIQUE INDEX folder_02 ON folder(repository_id, parent_id, name_lc);
 --//END
 
 CREATE TABLE search_parameter (
-  repository_id CHAR(36) NOT NULL,
-  asset_id CHAR(36) NOT NULL,
-  field_id CHAR(36) NOT NULL,
+  repository_id CHAR(36) REFERENCES repository(id),
+  asset_id CHAR(36) REFERENCES asset(id),
+  field_id CHAR(36) REFERENCES metadata_field(id),
   field_value_kw TEXT NULL,
   field_value_num DECIMAL,
   field_value_bool BOOLEAN,
@@ -110,8 +110,8 @@ CREATE INDEX search_parameter_04 ON search_parameter(repository_id, field_id, fi
 --//END
 
 CREATE TABLE search_document (
-  repository_id CHAR(36) NOT NULL,
-  asset_id CHAR(36) NOT NULL,
+  repository_id CHAR(36) REFERENCES repository(id),
+  asset_id CHAR(36) REFERENCES asset(id),
   path TEXT NOT NULL,
   metadata_values TEXT NOT NULL,
   body TEXT NOT NULL,

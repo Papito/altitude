@@ -31,7 +31,8 @@ CREATE TABLE repository(
 CREATE TABLE stats (
   repository_id CHAR(36) NOT NULL,
   dimension VARCHAR(60),
-  dim_val INT NOT NULL DEFAULT 0
+  dim_val INT NOT NULL DEFAULT 0,
+  FOREIGN KEY(repository_id) REFERENCES repository(id)
 );
 --//END
 CREATE INDEX stats_01 ON stats(repository_id);
@@ -55,7 +56,9 @@ CREATE TABLE asset  (
   size_bytes INT NOT NULL,
   is_recycled TINYINT NOT NULL DEFAULT 0,
   created_at DATE DEFAULT (datetime('now', 'utc')),
-  updated_at DATE DEFAULT NULL
+  updated_at DATE DEFAULT NULL,
+  FOREIGN KEY(repository_id) REFERENCES repository(id),
+  FOREIGN KEY(user_id) REFERENCES repository_user(id)
 );
 --//END
 CREATE UNIQUE INDEX asset_01 ON asset(repository_id, md5, is_recycled);
@@ -70,7 +73,8 @@ CREATE TABLE metadata_field (
   name_lc VARCHAR(255) NOT NULL,
   field_type VARCHAR(255) NOT NULL,
   created_at DATE DEFAULT (datetime('now', 'utc')),
-  updated_at DATE DEFAULT NULL
+  updated_at DATE DEFAULT NULL,
+  FOREIGN KEY(repository_id) REFERENCES repository(id)
 );
 --//END
 CREATE INDEX metadata_field_01 ON metadata_field(repository_id);
@@ -87,7 +91,8 @@ CREATE TABLE folder (
   parent_id CHAR(36) NOT NULL,
   num_of_assets INTEGER NOT NULL DEFAULT 0,
   created_at DATE DEFAULT (datetime('now', 'utc')),
-  updated_at DATE DEFAULT NULL
+  updated_at DATE DEFAULT NULL,
+  FOREIGN KEY(repository_id) REFERENCES repository(id)
 );
 --//END
 CREATE INDEX folder_01 ON folder(repository_id, parent_id);
@@ -104,7 +109,10 @@ CREATE TABLE search_parameter (
   field_value_kw TEXT NULL,
   field_value_num DECIMAL,
   field_value_bool BOOLEAN,
-  field_value_dt DATE
+  field_value_dt DATE,
+  FOREIGN KEY(repository_id) REFERENCES repository(id),
+  FOREIGN KEY(asset_id) REFERENCES asset(id),
+  FOREIGN KEY(field_id) REFERENCES metadata_field(id)
 );
 --//END
 CREATE INDEX search_parameter_01 ON search_parameter(repository_id, field_id, field_value_kw);
