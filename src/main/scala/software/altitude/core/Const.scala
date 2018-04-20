@@ -55,7 +55,6 @@ object Const {
     val ASSET_TYPE = "asset_type"
     val PATH = "path"
     val FOLDER_ID = "folder_id"
-    val MD5 = "md5"
     val SIZE_BYTES = "size_bytes"
     val FILENAME = "filename"
     val METADATA = "metadata"

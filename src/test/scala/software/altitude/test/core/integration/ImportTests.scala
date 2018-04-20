@@ -32,12 +32,12 @@ import software.altitude.core.models.{Asset, Preview}
     val importedAsset = altitude.service.assetImport.importAsset(fileImportAsset).get
     importedAsset.assetType should equal(importedAsset.assetType)
     importedAsset.path should not be empty
-    importedAsset.md5 should not be empty
+    importedAsset.checksum should not be empty
 
     val asset = altitude.service.library.getById(importedAsset.id.get): Asset
     asset.assetType should equal(importedAsset.assetType)
     asset.path should not be empty
-    asset.md5 should not be empty
+    asset.checksum should not be empty
     asset.sizeBytes should not be 0
     asset
   }

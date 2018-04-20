@@ -29,7 +29,7 @@ class LibraryService(val app: Altitude) {
       throw IllegalOperationException("Cannot have assets in root folder")
     }
 
-    val qForExisting = Query(Map(C.Asset.MD5 -> assetIn.md5))
+    val qForExisting = Query(Map(C.Asset.CHECKSUM -> assetIn.checksum))
 
     txManager.withTransaction[JsObject] {
       val existing = app.service.asset.query(qForExisting)
@@ -54,7 +54,7 @@ class LibraryService(val app: Altitude) {
         userId = assetIn.userId,
         assetType = assetIn.assetType,
         fileName = fileName,
-        md5 = assetIn.md5,
+        checksum = assetIn.checksum,
         sizeBytes = assetIn.sizeBytes,
         folderId = assetIn.folderId,
         metadata = metadata,

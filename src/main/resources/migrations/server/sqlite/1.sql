@@ -44,7 +44,7 @@ CREATE TABLE asset  (
   id CHAR(36) PRIMARY KEY,
   repository_id CHAR(36) NOT NULL,
   user_id CHAR(36) NOT NULL,
-  md5 VARCHAR(32) NOT NULL,
+  checksum VARCHAR(64) NOT NULL,
   media_type VARCHAR(64) NOT NULL,
   media_subtype VARCHAR(64) NOT NULL,
   mime_type VARCHAR(64) NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE asset  (
   FOREIGN KEY(user_id) REFERENCES repository_user(id)
 );
 --//END
-CREATE UNIQUE INDEX asset_01 ON asset(repository_id, md5, is_recycled);
+CREATE UNIQUE INDEX asset_01 ON asset(repository_id, checksum, is_recycled);
 --//END
 CREATE UNIQUE INDEX asset_02 ON asset(repository_id, folder_id, filename, is_recycled);
 --//END

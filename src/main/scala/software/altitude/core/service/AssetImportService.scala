@@ -55,7 +55,7 @@ class AssetImportService(app: Altitude) {
       userId = ctx.user.id.get,
       data = importAsset.data,
       fileName = importAsset.fileName,
-      md5 = getChecksum(importAsset),
+      checksum = getChecksum(importAsset),
       assetType = assetType,
       sizeBytes = importAsset.data.length,
       folderId = ctx.repo.triageFolderId,
@@ -80,5 +80,5 @@ class AssetImportService(app: Altitude) {
   }
 
   protected def getChecksum(importAsset: ImportAsset): String =
-    DigestUtils.md5Hex(importAsset.data)
+    DigestUtils.sha1Hex(importAsset.data)
 }

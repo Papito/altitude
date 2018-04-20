@@ -156,7 +156,7 @@ abstract class IntegrationTestCore
       mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime"),
     fileName = Util.randomStr(50),
     path = Some(Util.randomStr(50)),
-    md5 = Util.randomStr(32),
+    checksum = Util.randomStr(32),
     metadata = metadata,
     sizeBytes = 1000L)
 

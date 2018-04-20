@@ -36,7 +36,7 @@ abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softw
         case 0 => false
         case 1 => true
       },
-      md5 = rec(C.Asset.MD5).asInstanceOf[String],
+      checksum = rec(C.Asset.CHECKSUM).asInstanceOf[String],
       assetType = assetType,
       sizeBytes = rec(C.Asset.SIZE_BYTES).asInstanceOf[Int],
       metadata = metadataJson: Metadata,
@@ -82,7 +82,7 @@ abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softw
 
     val sql = s"""
         INSERT INTO $TABLE_NAME (
-             $CORE_SQL_COLS_FOR_INSERT, ${C.Base.USER_ID}, ${C.Asset.MD5},
+             $CORE_SQL_COLS_FOR_INSERT, ${C.Base.USER_ID}, ${C.Asset.CHECKSUM},
              ${C.Asset.FILENAME}, ${C.Asset.SIZE_BYTES},
              ${C.AssetType.MEDIA_TYPE}, ${C.AssetType.MEDIA_SUBTYPE}, ${C.AssetType.MIME_TYPE},
              ${C.Asset.FOLDER_ID}, ${C.Asset.METADATA}, ${C.Asset.EXTRACTED_METADATA})
@@ -91,7 +91,7 @@ abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softw
 
     val sqlVals: List[Any] = List(
       asset.userId,
-      asset.md5,
+      asset.checksum,
       asset.fileName,
       asset.sizeBytes.asInstanceOf[Object],
       asset.assetType.mediaType,

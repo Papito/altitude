@@ -20,7 +20,7 @@ import software.altitude.core.{Const => C, Util}
       assetType = mediaType,
       fileName = "filename.ext",
       path = Some("path"),
-      md5 = "md5",
+      checksum = "checksum",
       folderId = ctx.repo.triageFolderId,
       sizeBytes = 1L)
     altitude.service.asset.add(asset)
@@ -36,7 +36,7 @@ import software.altitude.core.{Const => C, Util}
       assetType = mediaType,
       fileName = "filename.ext",
       path = Some("path"),
-      md5 = "md5",
+      checksum = "checksum",
       folderId = ctx.repo.triageFolderId,
       sizeBytes = 1L)
     altitude.service.asset.add(asset)
@@ -70,7 +70,7 @@ import software.altitude.core.{Const => C, Util}
       assetType = mediaType,
       fileName = "filename.ext",
       path = Some(Util.randomStr(30)),
-      md5 = Util.randomStr(32),
+      checksum = Util.randomStr(32),
       sizeBytes = 1L))
 
     altitude.service.asset.add(new Asset(
@@ -79,7 +79,7 @@ import software.altitude.core.{Const => C, Util}
       assetType = mediaType,
       fileName = "filename.ext",
       path = Some(Util.randomStr(30)),
-      md5 = Util.randomStr(32),
+      checksum = Util.randomStr(32),
       sizeBytes = 1L))
 
     altitude.service.asset.add(new Asset(
@@ -88,7 +88,7 @@ import software.altitude.core.{Const => C, Util}
       assetType = mediaType,
       fileName = "filename.ext",
       path = Some(Util.randomStr(30)),
-      md5 = Util.randomStr(32),
+      checksum = Util.randomStr(32),
       sizeBytes = 1L))
 
     altitude.service.library.query(
