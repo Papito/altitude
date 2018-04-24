@@ -18,13 +18,13 @@ object FolderService {
 
 class FolderService(val app: Altitude) extends BaseService[Folder] {
   private final val log = LoggerFactory.getLogger(getClass)
-  override protected val DAO: FolderDao = app.injector.instance[FolderDao]
+  override protected val dao: FolderDao = app.injector.instance[FolderDao]
 
-  override final val CLEANER = Some(
+  override final val cleaner = Some(
     Cleaners.Cleaner(
       trim = Some(List(C.Folder.NAME, C.Folder.PARENT_ID))))
 
-  override final val VALIDATOR = Some(new FolderService.FolderValidator)
+  override final val validator = Some(new FolderService.FolderValidator)
 
   /**
    * Add a new folder - THIS SHOULD NOT BE USED DIRECTLY. Use <code>addFolder</code>
@@ -72,7 +72,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
    */
   override def getAll(implicit ctx: Context, txId: TransactionId = new TransactionId): List[JsObject] = {
     txManager.asReadOnly[List[JsObject]] {
-     val wCounts = addAssetCount(DAO.getAll)
+     val wCounts = addAssetCount(dao.getAll)
      val wPaths = wCounts
      wPaths
     }
@@ -232,7 +232,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
 
   override def deleteById(id: String)
                          (implicit ctx: Context, txId: TransactionId): Int = {
-    DAO.deleteById(id)
+    dao.deleteById(id)
   }
 
   override def deleteByQuery(query: Query)
@@ -469,7 +469,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     log.debug(s"Incrementing folder $folderId count by $count")
 
     txManager.withTransaction {
-      DAO.increment(folderId, C.Folder.NUM_OF_ASSETS, count)
+      dao.increment(folderId, C.Folder.NUM_OF_ASSETS, count)
     }
   }
 
@@ -481,7 +481,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     log.debug(s"Decrementing folder $folderId count by $count")
 
     txManager.withTransaction {
-      DAO.decrement(folderId, C.Folder.NUM_OF_ASSETS, count)
+      dao.decrement(folderId, C.Folder.NUM_OF_ASSETS, count)
     }
   }
 
@@ -494,7 +494,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     txManager.asReadOnly[Map[String, Folder]] {
       val allSysFolders = if (allRepoFolders.isEmpty) {
         val sysFolderIds: Set[String] = systemFolders.map(_.id.get).toSet
-        DAO.getByIds(sysFolderIds)
+        dao.getByIds(sysFolderIds)
       }
       else {
         allRepoFolders.filter(json => {

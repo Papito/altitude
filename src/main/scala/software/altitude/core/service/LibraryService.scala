@@ -20,7 +20,8 @@ class LibraryService(val app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
   protected val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
 
-  val PREVIEW_BOX_SIZE: Int = app.config.getInt("preview.box.pixels")
+  // FIXME: does not belong here - image specific
+  val previewBoxSize: Int = app.config.getInt("preview.box.pixels")
 
   def add(assetIn: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
     log.info(s"Preparing to add asset [$assetIn]")
@@ -177,20 +178,20 @@ class LibraryService(val app: Altitude) {
       require(asset.data.length != 0)
       val dataStream: InputStream = new ByteArrayInputStream(asset.data)
       val srcImage: BufferedImage = ImageIO.read(dataStream)
-      val scaledImage: BufferedImage = Scalr.resize(srcImage, Scalr.Method.ULTRA_QUALITY, PREVIEW_BOX_SIZE)
+      val scaledImage: BufferedImage = Scalr.resize(srcImage, Scalr.Method.ULTRA_QUALITY, previewBoxSize)
       val height: Int = scaledImage.getHeight
       val width: Int = scaledImage.getWidth
 
-      val x: Int = if (height > width) (PREVIEW_BOX_SIZE - width) / 2 else 0
+      val x: Int = if (height > width) (previewBoxSize - width) / 2 else 0
 
-      val y: Int = if (height < width) (PREVIEW_BOX_SIZE - height) / 2 else 0
+      val y: Int = if (height < width) (previewBoxSize - height) / 2 else 0
 
       val COMPOSITE_IMAGE: BufferedImage =
-        new BufferedImage(PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE, BufferedImage.TYPE_INT_ARGB)
+        new BufferedImage(previewBoxSize, previewBoxSize, BufferedImage.TYPE_INT_ARGB)
       val G2D: Graphics2D = COMPOSITE_IMAGE.createGraphics
 
       G2D.setComposite(AlphaComposite.Clear)
-      G2D.fillRect(0, 0, PREVIEW_BOX_SIZE, PREVIEW_BOX_SIZE)
+      G2D.fillRect(0, 0, previewBoxSize, previewBoxSize)
       G2D.setComposite(AlphaComposite.Src)
       G2D.drawImage(scaledImage, x, y, null)
       val byteArray: ByteArrayOutputStream = new ByteArrayOutputStream

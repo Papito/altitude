@@ -14,7 +14,7 @@ import scala.language.implicitConversions
 abstract class BaseService[Model <: BaseModel] extends ModelValidation {
   protected val app: Altitude
   private final val log = LoggerFactory.getLogger(getClass)
-  protected val DAO: BaseDao
+  protected val dao: BaseDao
   protected val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
 
   /**
@@ -36,7 +36,7 @@ abstract class BaseService[Model <: BaseModel] extends ModelValidation {
     }
 
     txManager.withTransaction[JsObject] {
-      DAO.add(cleaned)
+      dao.add(cleaned)
     }
   }
 
@@ -66,7 +66,7 @@ abstract class BaseService[Model <: BaseModel] extends ModelValidation {
     }
 
     txManager.withTransaction[Int] {
-      DAO.updateById(id, cleaned, fields)
+      dao.updateById(id, cleaned, fields)
     }
   }
 
@@ -88,7 +88,7 @@ abstract class BaseService[Model <: BaseModel] extends ModelValidation {
     }
 
     txManager.withTransaction[Int] {
-      DAO.updateByQuery(query, data, fields)
+      dao.updateByQuery(query, data, fields)
     }
   }
 
@@ -101,7 +101,7 @@ abstract class BaseService[Model <: BaseModel] extends ModelValidation {
    */
   def getById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
     txManager.asReadOnly[JsObject] {
-      DAO.getById(id) match {
+      dao.getById(id) match {
         case Some(obj) => obj
         case None => throw NotFoundException(s"Cannot find ID [$id]")
       }
@@ -113,7 +113,7 @@ abstract class BaseService[Model <: BaseModel] extends ModelValidation {
    */
   def getAll(implicit ctx: Context, txId: TransactionId = new TransactionId): List[JsObject] = {
     txManager.asReadOnly[List[JsObject]] {
-      DAO.getAll
+      dao.getAll
     }
   }
 
@@ -122,7 +122,7 @@ abstract class BaseService[Model <: BaseModel] extends ModelValidation {
    */
   def query(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
     txManager.asReadOnly[QueryResult] {
-      DAO.query(query)
+      dao.query(query)
     }
   }
 
@@ -133,7 +133,7 @@ abstract class BaseService[Model <: BaseModel] extends ModelValidation {
    */
   def deleteById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Int = {
     txManager.withTransaction[Int] {
-      DAO.deleteById(id)
+      dao.deleteById(id)
     }
   }
 
@@ -149,7 +149,7 @@ abstract class BaseService[Model <: BaseModel] extends ModelValidation {
     }
 
     txManager.withTransaction[Int] {
-      DAO.deleteByQuery(query)
+      dao.deleteByQuery(query)
     }
   }
 }

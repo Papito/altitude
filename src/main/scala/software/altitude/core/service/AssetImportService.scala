@@ -11,10 +11,12 @@ import software.altitude.core.models._
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Altitude, Context, FormatException, MetadataExtractorException}
 
+object AssetImportService {
+  protected val SUPPORTED_MEDIA_TYPES = Set("audio", "image")
+}
+
 class AssetImportService(app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
-
-  protected val SUPPORTED_MEDIA_TYPES = Set("audio", "image")
 
   def detectAssetType(importAsset: ImportAsset): AssetType = {
     log.debug(s"Detecting media type for: '$importAsset'")
@@ -36,7 +38,7 @@ class AssetImportService(app: Altitude) {
     log.info(s"Importing file asset '$importAsset'")
     val assetType = detectAssetType(importAsset)
 
-    if (!SUPPORTED_MEDIA_TYPES.contains(assetType.mediaType)) {
+    if (!AssetImportService.SUPPORTED_MEDIA_TYPES.contains(assetType.mediaType)) {
       log.warn(s"Ignoring ${importAsset.path} of type ${assetType.mediaType}")
       return None
     }

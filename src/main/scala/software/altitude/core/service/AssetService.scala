@@ -17,19 +17,19 @@ import software.altitude.core.{Altitude, Context}
  */
 class AssetService(val app: Altitude) extends BaseService[Asset] {
   private final val log = LoggerFactory.getLogger(getClass)
-  override protected val DAO: AssetDao = app.injector.instance[AssetDao]
+  override protected val dao: AssetDao = app.injector.instance[AssetDao]
 
   def setAssetAsRecycled(assetId: String, isRecycled: Boolean)(implicit ctx: Context, txId: TransactionId): Unit = {
     log.info(s"Setting asset [$assetId] recycled flag to [$isRecycled]")
-    DAO.setAssetAsRecycled(assetId, isRecycled = isRecycled)
+    dao.setAssetAsRecycled(assetId, isRecycled = isRecycled)
   }
 
   override def query(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
-    DAO.queryNotRecycled(q)
+    dao.queryNotRecycled(q)
   }
 
   def queryRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
-    DAO.queryRecycled(q)
+    dao.queryRecycled(q)
   }
 
   // NO

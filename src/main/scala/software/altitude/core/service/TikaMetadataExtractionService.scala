@@ -17,10 +17,10 @@ import software.altitude.core.models.{MetadataValue, AssetType, ImportAsset, Met
 import software.altitude.core.{AllDone, Const => C}
 
 class TikaMetadataExtractionService extends MetadataExtractionService {
-  val log =  LoggerFactory.getLogger(getClass)
+  private final val log =  LoggerFactory.getLogger(getClass)
 
   private object PARSERS {
-    final val IMAGE = new ImageParser
+    final val IMAGE = List(new JpegParser, new TiffParser)
     final val MPEG_AUDIO = new Mp3Parser
     final val ANY_AUDIO = new AudioParser
   }
@@ -29,8 +29,7 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
 
   override def extract(importAsset: ImportAsset, mediaType: AssetType, asRaw: Boolean = false): Metadata = {
     val raw: Option[TikaMetadata]  = mediaType match {
-      case mt: AssetType if mt.mediaType == "image" =>
-        extractMetadata(importAsset, List(new JpegParser, new TiffParser))
+      case mt: AssetType if mt.mediaType == "image" => extractMetadata(importAsset, PARSERS.IMAGE)
       /*
           case mt: MediaType if mt.mediaType == "audio" && mt.mediaSubtype == "mpeg" =>
             extractMetadata(importAsset, List(PARSERS.MPEG_AUDIO))

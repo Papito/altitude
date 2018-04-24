@@ -11,12 +11,12 @@ import software.altitude.core.{Altitude, Context}
 
 class StatsService(val app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
-  protected val DAO: StatDao = app.injector.instance[StatDao]
+  protected val dao: StatDao = app.injector.instance[StatDao]
   protected val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
 
   def getStats(implicit ctx: Context, txId: TransactionId = new TransactionId): Stats = {
     txManager.asReadOnly[Stats] {
-      val stats: List[Stat] = DAO.query(Query()).records.map(Stat.fromJson)
+      val stats: List[Stat] = dao.query(Query()).records.map(Stat.fromJson)
 
       // Assemble the total stats on-the-fly
       val totalAssetsDims = Stats.SORTED_ASSETS :: Stats.RECYCLED_ASSETS :: Stats.TRIAGE_ASSETS :: Nil
@@ -33,19 +33,19 @@ class StatsService(val app: Altitude) {
 
   private def incrementStat(statName: String, count: Long = 1)
                    (implicit ctx: Context, txId: TransactionId): Unit = {
-    DAO.incrementStat(statName, count)
+    dao.incrementStat(statName, count)
   }
 
   private def decrementStat(statName: String, count: Long = 1)
                    (implicit ctx: Context, txId: TransactionId): Unit = {
-    DAO.decrementStat(statName, count)
+    dao.decrementStat(statName, count)
   }
 
   def createStat(dimension: String)
                 (implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
     txManager.withTransaction {
       val stat = Stat(dimension, 0)
-      DAO.add(stat)
+      dao.add(stat)
     }
   }
 

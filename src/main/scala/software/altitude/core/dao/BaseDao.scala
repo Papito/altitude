@@ -32,7 +32,6 @@ object BaseDao {
 
 trait BaseDao {
   val app: AltitudeCoreApp
-  protected val MAX_RECORDS: Int = app.config.getInt("db.max_records")
 
   /**
    * Add a single record

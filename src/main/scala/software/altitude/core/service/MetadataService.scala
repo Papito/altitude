@@ -30,8 +30,8 @@ class MetadataService(val app: Altitude) extends ModelValidation {
   private final val log = LoggerFactory.getLogger(getClass)
 
   protected val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
-  protected val METADATA_FIELD_DAO: MetadataFieldDao = app.injector.instance[MetadataFieldDao]
-  protected val ASSET_DAO: AssetDao = app.injector.instance[AssetDao]
+  protected val metadataFieldDao: MetadataFieldDao = app.injector.instance[MetadataFieldDao]
+  protected val assetDao: AssetDao = app.injector.instance[AssetDao]
 
   def addField(metadataField: MetadataField)
               (implicit ctx: Context, txId: TransactionId = new TransactionId): MetadataField = {
@@ -40,7 +40,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
       val cleaned: MetadataField = cleanAndValidate(
         metadataField, Some(MetadataService.METADATA_FIELD_CLEANER), Some(MetadataService.METADATA_FIELD_VALIDATOR))
 
-      val existing = METADATA_FIELD_DAO.query(Query(Map(
+      val existing = metadataFieldDao.query(Query(Map(
         C.MetadataField.NAME_LC -> cleaned.nameLowercase
       )))
 
@@ -49,7 +49,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
         throw DuplicateException(cleaned, existing.records.head)
       }
 
-      METADATA_FIELD_DAO.add(cleaned)
+      metadataFieldDao.add(cleaned)
     }
   }
 
@@ -58,7 +58,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
    */
   def getAllFields(implicit ctx: Context, txId: TransactionId = new TransactionId): Map[String, MetadataField] =
     txManager.asReadOnly[Map[String, MetadataField]] {
-      METADATA_FIELD_DAO.getAll.map{ res =>
+      metadataFieldDao.getAll.map{ res =>
         val metadataField: MetadataField = res
         metadataField.id.get -> metadataField
       }.toMap
@@ -66,7 +66,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
 
   def getFieldById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject =
     txManager.asReadOnly[JsObject] {
-      METADATA_FIELD_DAO.getById(id) match {
+      metadataFieldDao.getById(id) match {
         case Some(obj) => obj
         case None => throw NotFoundException(s"Cannot find field by ID [$id]")
       }
@@ -74,13 +74,13 @@ class MetadataService(val app: Altitude) extends ModelValidation {
 
   def deleteFieldById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Int =
     txManager.withTransaction[Int] {
-      METADATA_FIELD_DAO.deleteById(id)
+      metadataFieldDao.deleteById(id)
     }
 
   def getMetadata(assetId: String)
                  (implicit ctx: Context, txId: TransactionId = new TransactionId): Metadata =
     // return the metadata or a new empty one if blank
-    ASSET_DAO.getMetadata(assetId) match {
+    assetDao.getMetadata(assetId) match {
       case Some(metadata) => metadata
       case None => Metadata()
     }
@@ -92,7 +92,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     txManager.withTransaction {
       val cleanMetadata = cleanAndValidate(metadata)
 
-      ASSET_DAO.setMetadata(assetId = assetId, metadata = cleanMetadata)
+      assetDao.setMetadata(assetId = assetId, metadata = cleanMetadata)
     }
   }
 
@@ -109,7 +109,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
        */
       val deletedFields = metadata.data.keys.filterNot(cleanMetadata.data.keys.toSet.contains).toSet
 
-      ASSET_DAO.updateMetadata(assetId, cleanMetadata, deletedFields)
+      assetDao.updateMetadata(assetId, cleanMetadata, deletedFields)
     }
   }
 

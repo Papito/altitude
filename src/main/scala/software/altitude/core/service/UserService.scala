@@ -8,7 +8,7 @@ import software.altitude.core.models.User
 import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
 
 class UserService(val app: Altitude) extends BaseService[User] {
-  protected val DAO: UserDao = app.injector.instance[UserDao]
+  protected val dao: UserDao = app.injector.instance[UserDao]
   override protected val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
 
   override def getById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
@@ -19,7 +19,7 @@ class UserService(val app: Altitude) extends BaseService[User] {
     txManager.asReadOnly[JsObject] {
       implicit val context: Context = Context.EMPTY
 
-      DAO.getById(id) match {
+      dao.getById(id) match {
         case Some(obj) => obj
         case None => throw NotFoundException(s"Cannot find ID '$id'")
       }

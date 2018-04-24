@@ -12,7 +12,7 @@ import software.altitude.core.{Altitude, Const => C, Context, NotFoundException}
 
 class RepositoryService(val app: Altitude) extends BaseService[Repository] {
   private final val log = LoggerFactory.getLogger(getClass)
-  protected val DAO = app.injector.instance[RepositoryDao]
+  protected val dao = app.injector.instance[RepositoryDao]
   override protected val txManager = app.injector.instance[AbstractTransactionManager]
 
   override def getById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
@@ -23,7 +23,7 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
     txManager.asReadOnly[JsObject] {
       implicit val context = Context.EMPTY
 
-      DAO.getById(id) match {
+      dao.getById(id) match {
         case Some(obj) => obj
         case None => throw NotFoundException(s"Cannot find ID '$id'")
       }

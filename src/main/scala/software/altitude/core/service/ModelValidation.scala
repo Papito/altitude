@@ -6,9 +6,9 @@ import software.altitude.core.Validators.ModelDataValidator
 
 trait ModelValidation {
   // object cleaner
-  protected val CLEANER: Option[Cleaner] = None
+  protected val cleaner: Option[Cleaner] = None
   // object validator, invoked AFTER the cleaner
-  protected val VALIDATOR: Option[ModelDataValidator] = None
+  protected val validator: Option[ModelDataValidator] = None
 
   /**
    * Use the service-wide definitions of data cleaner and validator
@@ -18,14 +18,14 @@ trait ModelValidation {
    * @return copy of the original document, cleaned and validated, if any of those steps are defined
    */
   protected def cleanAndValidate(objIn: JsObject): JsObject = {
-    val cleaned = CLEANER match {
-      case Some(cleaner) => cleaner.clean(objIn)
+    val cleaned = cleaner match {
+      case Some(cl) => cl.clean(objIn)
       case None => objIn
     }
 
-    VALIDATOR match {
-      case Some(validator) =>
-        validator.validate(cleaned)
+    validator match {
+      case Some(v) =>
+        v.validate(cleaned)
         cleaned
       case None => cleaned
     }

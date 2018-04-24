@@ -53,7 +53,7 @@ trait AnswerSugar {
 
 abstract class IntegrationTestCore
   extends FunSuite with BeforeAndAfter with BeforeAndAfterEach with OptionValues with AnswerSugar {
-  final val log =  LoggerFactory.getLogger(getClass)
+  protected final val log =  LoggerFactory.getLogger(getClass)
 
   // Stores test app config overrides, since we run same tests with a different app setup.
   def config: Map[String, Any]

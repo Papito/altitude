@@ -10,17 +10,16 @@ import software.altitude.core.{Altitude, Context}
 
 class SearchService(val app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
-  protected val SEARCH_DAO: SearchDao = app.injector.instance[SearchDao]
-
+  protected val searchDao: SearchDao = app.injector.instance[SearchDao]
 
   def indexAsset(asset: Asset)(implicit ctx: Context, txId: TransactionId): Unit = {
     require(asset.path.isEmpty)
     log.info(s"Indexing asset $asset")
     val metadataFields: Map[String, MetadataField] = app.service.metadata.getAllFields
-    SEARCH_DAO.indexAsset(asset, metadataFields)
+    searchDao.indexAsset(asset, metadataFields)
   }
 
   def search(textQuery: String)(implicit ctx: Context, txId: TransactionId): QueryResult = {
-    SEARCH_DAO.search(textQuery)
+    searchDao.search(textQuery)
   }
 }
