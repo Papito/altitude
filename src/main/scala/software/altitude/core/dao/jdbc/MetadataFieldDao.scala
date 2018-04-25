@@ -8,7 +8,7 @@ import software.altitude.core.{AltitudeCoreApp, Const => C, Context}
 abstract class MetadataFieldDao(val app: AltitudeCoreApp)
   extends BaseJdbcDao with software.altitude.core.dao.MetadataFieldDao {
 
-  override final val TABLE_NAME = "metadata_field"
+  override final val tableName = "metadata_field"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val model = MetadataField(
@@ -24,12 +24,12 @@ abstract class MetadataFieldDao(val app: AltitudeCoreApp)
     val metadataField = jsonIn: MetadataField
 
     val sql = s"""
-        INSERT INTO $TABLE_NAME (
-             $CORE_SQL_COLS_FOR_INSERT,
+        INSERT INTO $tableName (
+             $coreSqlColsForInsert,
              ${C.MetadataField.NAME},
              ${C.MetadataField.NAME_LC},
              ${C.MetadataField.FIELD_TYPE})
-            VALUES ($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?)
+            VALUES ($coreSqlValsForInsert, ?, ?, ?)
         """
 
     val sqlVals: List[Any] = List(

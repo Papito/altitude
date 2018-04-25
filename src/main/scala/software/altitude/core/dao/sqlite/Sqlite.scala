@@ -8,15 +8,15 @@ import software.altitude.core.{Const => C}
 
 trait Sqlite { this: BaseJdbcDao =>
 
-  override protected def DEFAULT_SQL_COLS_FOR_SELECT = s"""
+  override protected def defaultSqlColsForSelect = s"""
       ${C.Base.ID}, *,
       CAST(STRFTIME('%s', created_at) AS INT) AS created_at,
       CAST(STRFTIME('%s', updated_at) AS INT) AS updated_at
     """
 
-  override protected def CURRENT_TIME_FUNC = "datetime('now', 'localtime')"
+  override protected def nowTimeFunc = "datetime('now', 'localtime')"
 
-  override protected def JSON_FUNC = "?"
+  override protected def jsonFunc = "?"
 
   override protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): model.type = {
     val createdAtSeconds = rec.getOrElse(C.Base.CREATED_AT, 0).asInstanceOf[Int]
@@ -32,14 +32,14 @@ trait Sqlite { this: BaseJdbcDao =>
     model
   }
 
-  override protected def GET_DATETIME_FROM_REC(field: String, rec: Map[String, AnyRef]): Option[DateTime] = {
+  override protected def getDateTimeFromRec(field: String, rec: Map[String, AnyRef]): Option[DateTime] = {
     val timestamp: String = rec(field).asInstanceOf[String]
     val formatter: DateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
     val dt: DateTime = formatter.withZone(DateTimeZone.forID("UTC")).parseDateTime(timestamp)
     Some(dt)
   }
 
-  override protected def DATETIME_TO_DB_FUNC(datetime: Option[DateTime]): String = {
+  override protected def dateTimeToDbFunc(datetime: Option[DateTime]): String = {
     datetime match {
       case None => null
       case _ => s"strftime('%Y-%m-%d %H:%M:%S Z', ${datetime.get.getMillis} / 1000, 'unixepoch')"

@@ -9,11 +9,11 @@ import software.altitude.core.{AltitudeCoreApp, Const => C, Context}
 abstract class UserDao(val app: AltitudeCoreApp) extends BaseJdbcDao with software.altitude.core.dao.UserDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override final val TABLE_NAME = "repository_user"
+  override final val tableName = "repository_user"
 
-  override protected val ONE_SQL = s"""
-      SELECT $DEFAULT_SQL_COLS_FOR_SELECT
-        FROM $TABLE_NAME
+  override protected val oneRecSelectSql = s"""
+      SELECT $defaultSqlColsForSelect
+        FROM $tableName
        WHERE ${C.Base.ID} = ?"""
 
 
@@ -27,7 +27,7 @@ abstract class UserDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softwa
 
   override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
     val sql = s"""
-        INSERT INTO $TABLE_NAME (${C.Base.ID})
+        INSERT INTO $tableName (${C.Base.ID})
              VALUES (?)
     """
 
@@ -35,8 +35,8 @@ abstract class UserDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softwa
   }
 
   override def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
-    log.debug(s"Getting by ID '$id' from '$TABLE_NAME'", C.LogTag.DB)
-    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(ONE_SQL, List(id))
+    log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
+    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneRecSelectSql, List(id))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
 

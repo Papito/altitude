@@ -10,7 +10,7 @@ import software.altitude.core.{AltitudeCoreApp, Const => C, Context}
 abstract class StatDao(val app: AltitudeCoreApp) extends BaseJdbcDao with software.altitude.core.dao.StatDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override final val TABLE_NAME = "stats"
+  override final val tableName = "stats"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = Stat(
     rec(C.Stat.DIMENSION).asInstanceOf[String],
@@ -18,7 +18,7 @@ abstract class StatDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softwa
 
   override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
     val sql: String =s"""
-      INSERT INTO $TABLE_NAME (${C.Base.REPO_ID}, ${C.Stat.DIMENSION})
+      INSERT INTO $tableName (${C.Base.REPO_ID}, ${C.Stat.DIMENSION})
            VALUES (? ,?)"""
 
     val stat: Stat = jsonIn
@@ -43,7 +43,7 @@ abstract class StatDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softwa
   def incrementStat(statName: String, count: Long = 1)
                    (implicit ctx: Context, txId: TransactionId): Unit = {
     val sql = s"""
-      UPDATE $TABLE_NAME
+      UPDATE $tableName
          SET ${C.Stat.DIM_VAL} = ${C.Stat.DIM_VAL} + $count
        WHERE ${C.Base.REPO_ID} = ? and ${C.Stat.DIMENSION} = ?
       """

@@ -9,7 +9,7 @@ import software.altitude.core.{AltitudeCoreApp, Const => C, Context}
 abstract class FolderDao(val app: AltitudeCoreApp) extends BaseJdbcDao with software.altitude.core.dao.FolderDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override final val TABLE_NAME = "folder"
+  override final val tableName = "folder"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val model = Folder(
@@ -25,10 +25,10 @@ abstract class FolderDao(val app: AltitudeCoreApp) extends BaseJdbcDao with soft
     val folder = jsonIn: Folder
 
     val sql = s"""
-        INSERT INTO $TABLE_NAME (
-             $CORE_SQL_COLS_FOR_INSERT,
+        INSERT INTO $tableName (
+             $coreSqlColsForInsert,
              ${C.Folder.NAME}, ${C.Folder.NAME_LC}, ${C.Folder.PARENT_ID})
-            VALUES ($CORE_SQL_VALS_FOR_INSERT, ?, ?, ?)
+            VALUES ($coreSqlValsForInsert, ?, ?, ?)
     """
 
     val sqlVals: List[Any] = List(

@@ -9,12 +9,12 @@ import software.altitude.core.{AltitudeCoreApp, Const => C, Context}
 abstract class RepositoryDao(val app: AltitudeCoreApp) extends BaseJdbcDao with software.altitude.core.dao.RepositoryDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override final val TABLE_NAME = "repository"
+  override final val tableName = "repository"
 
   // this is the same as the base one - minus the repository ID, which this model does not have
-  override protected val ONE_SQL = s"""
-      SELECT $DEFAULT_SQL_COLS_FOR_SELECT
-        FROM $TABLE_NAME
+  override protected val oneRecSelectSql = s"""
+      SELECT $defaultSqlColsForSelect
+        FROM $tableName
        WHERE ${C.Base.ID} = ?"""
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
@@ -35,8 +35,8 @@ abstract class RepositoryDao(val app: AltitudeCoreApp) extends BaseJdbcDao with 
   }
 
   override def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
-    log.debug(s"Getting by ID '$id' from '$TABLE_NAME'", C.LogTag.DB)
-    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(ONE_SQL, List(id))
+    log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
+    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneRecSelectSql, List(id))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
 
@@ -44,11 +44,11 @@ abstract class RepositoryDao(val app: AltitudeCoreApp) extends BaseJdbcDao with 
     val repo = jsonIn: Repository
 
     val sql = s"""
-        INSERT INTO $TABLE_NAME (
+        INSERT INTO $tableName (
              ${C.Base.ID}, ${C.Repository.NAME}, ${C.Repository.FILE_STORE_TYPE},
              ${C.Repository.ROOT_FOLDER_ID}, ${C.Repository.TRIAGE_FOLDER_ID},
              ${C.Repository.FILES_STORE_CONFIG})
-            VALUES (?, ?, ?, ?, ?, $JSON_FUNC)
+            VALUES (?, ?, ?, ?, ?, $jsonFunc)
     """
 
     val sqlVals: List[Any] = List(

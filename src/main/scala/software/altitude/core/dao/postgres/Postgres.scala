@@ -10,15 +10,15 @@ import software.altitude.core.{Const => C}
 
 trait Postgres { this: BaseJdbcDao =>
 
-  override protected def DEFAULT_SQL_COLS_FOR_SELECT = s"""
+  override protected def defaultSqlColsForSelect = s"""
       ${C.Base.ID}, *,
       EXTRACT(EPOCH FROM created_at) AS created_at,
       EXTRACT(EPOCH FROM updated_at) AS updated_at
     """
 
-  override protected def CURRENT_TIME_FUNC = "current_timestamp"
+  override protected def nowTimeFunc = "current_timestamp"
 
-  override protected def JSON_FUNC = "CAST(? as jsonb)"
+  override protected def jsonFunc = "CAST(? as jsonb)"
 
   override protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): model.type = {
     val createdAtMilis = rec.getOrElse(C.Base.CREATED_AT, 0d).asInstanceOf[Double].toLong
@@ -34,13 +34,13 @@ trait Postgres { this: BaseJdbcDao =>
     model
   }
 
-  override protected def GET_DATETIME_FROM_REC(field: String, rec: Map[String, AnyRef]): Option[DateTime] = {
+  override protected def getDateTimeFromRec(field: String, rec: Map[String, AnyRef]): Option[DateTime] = {
     val timestamp: Timestamp = rec(field).asInstanceOf[Timestamp]
     val dt = new DateTime(timestamp.getTime).withMillisOfSecond(0)
     Some(dt)
   }
 
-  override protected def DATETIME_TO_DB_FUNC(datetime: Option[DateTime]): String = {
+  override protected def dateTimeToDbFunc(datetime: Option[DateTime]): String = {
     datetime match {
       case None => null
       case _ => s"to_timestamp(${datetime.get.getMillis} / 1000)"

@@ -11,6 +11,6 @@ object AssetDao {
 }
 
 class AssetDao(app: AltitudeCoreApp) extends software.altitude.core.dao.jdbc.AssetDao(app) with Sqlite {
-  override protected def DEFAULT_SQL_COLS_FOR_SELECT: String = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT
+  override protected def defaultSqlColsForSelect: String = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT
 }
 

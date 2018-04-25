@@ -19,7 +19,7 @@ import scala.collection.JavaConversions._
 abstract class BaseJdbcDao extends BaseDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  val TABLE_NAME: String
+  val tableName: String
 
   protected final def txManager: JdbcTransactionManager = app.injector.instance[JdbcTransactionManager]
 
@@ -28,21 +28,21 @@ abstract class BaseJdbcDao extends BaseDao {
     txManager.transaction().getConnection
   }
 
-  protected def DEFAULT_SQL_COLS_FOR_SELECT: String
+  protected def defaultSqlColsForSelect: String
 
   // if supported, DB function to store native JSON data
-  protected def JSON_FUNC: String
+  protected def jsonFunc: String
   // DB current time function
-  protected def CURRENT_TIME_FUNC: String
+  protected def nowTimeFunc: String
 
   // conversion function to go from Java time to DB time
-  protected def DATETIME_TO_DB_FUNC(datetime: Option[DateTime]): String
+  protected def dateTimeToDbFunc(datetime: Option[DateTime]): String
   // opposite of the above
-  protected def GET_DATETIME_FROM_REC(field: String, rec: Map[String, AnyRef]): Option[DateTime]
+  protected def getDateTimeFromRec(field: String, rec: Map[String, AnyRef]): Option[DateTime]
 
   // common fields for new records, and their placeholders - mostly to avoid repetition
-  protected val CORE_SQL_COLS_FOR_INSERT = s"${C.Base.ID}, ${C.Base.REPO_ID}"
-  protected def CORE_SQL_VALS_FOR_INSERT: String = "?, ?"
+  protected val coreSqlColsForInsert = s"${C.Base.ID}, ${C.Base.REPO_ID}"
+  protected def coreSqlValsForInsert: String = "?, ?"
 
   // how we get current timestamp
   protected def utcNow: DateTime = Util.utcNow
@@ -51,25 +51,25 @@ abstract class BaseJdbcDao extends BaseDao {
   protected def dtAsJsString(dt: DateTime) = JsString(Util.isoDateTime(Some(dt)))
 
   // table-specific SQL query builder
-  protected lazy val SQL_QUERY_BUILDER = new SqlQueryBuilder(DEFAULT_SQL_COLS_FOR_SELECT, TABLE_NAME)
+  protected lazy val sqlQueryBuilder = new SqlQueryBuilder(defaultSqlColsForSelect, tableName)
 
   // SQL to select the whole record, in very simple cases
-  protected val ONE_SQL = s"""
-      SELECT $DEFAULT_SQL_COLS_FOR_SELECT
-        FROM $TABLE_NAME
+  protected val oneRecSelectSql = s"""
+      SELECT $defaultSqlColsForSelect
+        FROM $tableName
        WHERE ${C.Base.ID} = ? AND ${C.Base.REPO_ID} = ?"""
 
   override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
     val sql: String =s"""
-      INSERT INTO $TABLE_NAME ($CORE_SQL_COLS_FOR_INSERT)
-           VALUES ($CORE_SQL_VALS_FOR_INSERT)"""
+      INSERT INTO $tableName ($coreSqlColsForInsert)
+           VALUES ($coreSqlValsForInsert)"""
 
     addRecord(jsonIn, sql, List[Any]())
   }
 
   override def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
-    log.debug(s"Getting by ID '$id' from '$TABLE_NAME'", C.LogTag.DB)
-    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(ONE_SQL, List(id, ctx.repo.id.get))
+    log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
+    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneRecSelectSql, List(id, ctx.repo.id.get))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
 
@@ -79,7 +79,7 @@ abstract class BaseJdbcDao extends BaseDao {
 
     val sql = s"""
       DELETE
-        FROM $TABLE_NAME
+        FROM $tableName
        WHERE ${C.Base.REPO_ID} = ? AND ${fieldPlaceholders.mkString(",")}
       """
 
@@ -101,7 +101,7 @@ abstract class BaseJdbcDao extends BaseDao {
   }
 
   override def query(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
-    this.query(q, SQL_QUERY_BUILDER)
+    this.query(q, sqlQueryBuilder)
 
   /**
    * Internal version for querying with a customized query builder
@@ -227,8 +227,8 @@ abstract class BaseJdbcDao extends BaseDao {
                        (implicit ctx: Context, txId: TransactionId): List[JsObject] = {
     val placeholders = ids.toSeq.map(_ => "?")
     val sql = s"""
-      SELECT $DEFAULT_SQL_COLS_FOR_SELECT
-        FROM $TABLE_NAME
+      SELECT $defaultSqlColsForSelect
+        FROM $tableName
        WHERE ${C.Base.REPO_ID} = ? AND id IN (${placeholders.mkString(",")})
       """
 
@@ -253,8 +253,8 @@ abstract class BaseJdbcDao extends BaseDao {
     }.toList
 
     val sql = s"""
-      UPDATE $TABLE_NAME
-         SET ${C.Base.UPDATED_AT} = $CURRENT_TIME_FUNC, ${updateFieldPlaceholders.mkString(", ")}
+      UPDATE $tableName
+         SET ${C.Base.UPDATED_AT} = $nowTimeFunc, ${updateFieldPlaceholders.mkString(", ")}
        WHERE ${C.Base.REPO_ID} = ? AND ${queryFieldPlaceholders.mkString(",")}
       """
 
@@ -275,7 +275,7 @@ abstract class BaseJdbcDao extends BaseDao {
   override def increment(id: String, field: String, count: Int = 1)
                         (implicit ctx: Context, txId: TransactionId): Unit = {
     val sql = s"""
-      UPDATE $TABLE_NAME
+      UPDATE $tableName
          SET $field = $field + $count
        WHERE ${C.Base.REPO_ID} = ? AND id = ?
       """

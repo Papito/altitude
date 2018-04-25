@@ -11,7 +11,7 @@ abstract class MigrationDao(val app: AltitudeCoreApp)
 
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override val TABLE_NAME = "system"
+  override val tableName = "system"
 
   /**
    * Get current version of the schema
@@ -19,7 +19,7 @@ abstract class MigrationDao(val app: AltitudeCoreApp)
    * @return The integer version
    */
   override def currentVersion(implicit ctx: Context, txId: TransactionId = new TransactionId): Int = {
-    val sql = s"SELECT version FROM $TABLE_NAME"
+    val sql = s"SELECT version FROM $tableName"
     val version = try {
       val rec = oneBySqlQuery(sql)
       rec.get("version").asInstanceOf[Int]
@@ -46,7 +46,7 @@ abstract class MigrationDao(val app: AltitudeCoreApp)
   override def versionUp()(implicit ctx: Context, txId: TransactionId): Unit = {
     log.info("VERSION UP")
     val runner: QueryRunner = new QueryRunner()
-    val sql = s"UPDATE $TABLE_NAME SET version = 1 WHERE id = 0"
+    val sql = s"UPDATE $tableName SET version = 1 WHERE id = 0"
     log.info(sql)
     runner.update(conn, sql)
   }
