@@ -217,6 +217,7 @@ object Const {
       val WRONG_VALUE = "Not an allowed value. Allowed values are: %s"
       val EMPTY_REQUEST_BODY = "Empty request body"
       val DUPLICATE = "Duplicate"
+      val NOT_SUPPORTED = "Not supported"
       val DUPLICATE_FIELD_VALUE = "Duplicate values in [%s]"
       val INCORRECT_VALUE_TYPE = "Incorrect value type"
       val VALUES_TOO_LONG = "Values are too long: [%s]"
