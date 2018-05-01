@@ -4,10 +4,11 @@ import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.dao.BaseDao
-import software.altitude.core.models.BaseModel
+import software.altitude.core.models.{Asset, BaseModel}
 import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
 import software.altitude.core.util.{Query, QueryResult}
 import software.altitude.core.{Altitude, Context, DuplicateException, NotFoundException}
+import software.altitude.core.{Const => C}
 
 import scala.language.implicitConversions
 
@@ -31,8 +32,9 @@ abstract class BaseService[Model <: BaseModel] extends ModelValidation {
     val existing = if (queryForDup.isDefined) query(queryForDup.get) else QueryResult.EMPTY
 
     if (existing.nonEmpty) {
-      log.debug(s"Duplicate found for $objIn and query: ${queryForDup.get.params}")
-      throw DuplicateException(objIn, existing.records.head)
+      log.debug(s"Duplicate found for [$objIn] and query: ${queryForDup.get.params}")
+      val existingId = (existing.records.head \ C.Base.ID).get.toString
+      throw DuplicateException(existingId)
     }
 
     txManager.withTransaction[JsObject] {
@@ -61,8 +63,9 @@ abstract class BaseService[Model <: BaseModel] extends ModelValidation {
     val existing = if (queryForDup.isDefined) query(queryForDup.get) else QueryResult.EMPTY
 
     if (existing.nonEmpty) {
-      log.debug(s"Duplicate found for $data and query: ${queryForDup.get.params}")
-      throw DuplicateException(data, existing.records.head)
+      log.debug(s"Duplicate found for [$data] and query: ${queryForDup.get.params}")
+      val existingId = (existing.records.head \ C.Base.ID).get.toString
+      throw DuplicateException(existingId)
     }
 
     txManager.withTransaction[Int] {

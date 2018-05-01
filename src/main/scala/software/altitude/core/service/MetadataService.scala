@@ -45,8 +45,9 @@ class MetadataService(val app: Altitude) extends ModelValidation {
       )))
 
       if (existing.nonEmpty) {
+        val existingField: MetadataField = existing.records.head
         log.debug(s"Duplicate found for field [${cleaned.name}]")
-        throw DuplicateException(cleaned, existing.records.head)
+        throw DuplicateException(existingField.id.get)
       }
 
       metadataFieldDao.add(cleaned)

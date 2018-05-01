@@ -36,8 +36,9 @@ class LibraryService(val app: Altitude) {
       val existing = app.service.asset.query(qForExisting)
 
       if (existing.nonEmpty) {
-        log.warn(s"Asset already exists for $assetIn")
-        throw DuplicateException(assetIn.toJson, existing.records.head)
+        log.debug(s"Duplicate found for [$assetIn] and query: ${qForExisting.params}")
+        val existingAsset: Asset = existing.records.head
+        throw DuplicateException(existingAsset.id.get)
       }
 
       /**
