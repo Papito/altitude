@@ -10,6 +10,7 @@ import software.altitude.core.dao._
 import software.altitude.core.service._
 import software.altitude.core.service.filestore.{FileStoreService, FileSystemStoreService}
 import software.altitude.core.service.migration._
+import software.altitude.core.service.source.FileSystemSourceService
 import software.altitude.core.transactions._
 import software.altitude.core.{Const => C}
 
@@ -49,6 +50,10 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeCor
     val fileStore: FileStoreService = fileStoreType match {
       case C.FileStoreType.FS => new FileSystemStoreService(app)
       case _ => throw new NotImplementedError
+    }
+
+    object source {
+      val fileSystem = new FileSystemSourceService(app)
     }
 
     final val schemaVersion = 1
