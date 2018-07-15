@@ -7,7 +7,7 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 import software.altitude.core.models._
 import software.altitude.core.util.Query
-import software.altitude.core.{IllegalOperationException, NotFoundException, StorageException, Util, Const => C}
+import software.altitude.core.{DuplicateException, IllegalOperationException, NotFoundException, StorageException, Util, Const => C}
 
 @DoNotDiscover class LibraryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
@@ -269,6 +269,7 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Sto
     Mockito.doReturn(altitudeSpy, Array.empty:_*).when(librarySpy).app
 
     savepoint()
+
     // error
     var numOfCalls = 0 // throw on *second* asset being restored in storage
     Mockito.doAnswer((_: InvocationOnMock) => {
@@ -301,5 +302,23 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Sto
     stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 2
     stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 3
     stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 1
+  }
+
+  test("Restore an asset that was imported again") {
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+
+    val assetToImport: Asset = makeAsset(folder1)
+    val importedAsset: Asset = altitude.service.library.add(assetToImport)
+
+    // recycle the asset
+    altitude.service.library.recycleAsset(importedAsset.id.get)
+
+    // import a new copy of it (should be allowed)
+    altitude.service.library.add(assetToImport)
+
+    // now restore the previously deleted copy into itself
+    intercept[DuplicateException] {
+      altitude.service.library.restoreRecycledAsset(importedAsset.id.get)
+    }
   }
 }

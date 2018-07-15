@@ -30,14 +30,12 @@ class LibraryService(val app: Altitude) {
       throw IllegalOperationException("Cannot have assets in root folder")
     }
 
-    val qForExisting = Query(Map(C.Asset.CHECKSUM -> assetIn.checksum))
-
     txManager.withTransaction[JsObject] {
-      val existing = app.service.asset.query(qForExisting)
+      val existing: Option[Asset] = getByChecksum(assetIn.checksum)
 
       if (existing.nonEmpty) {
-        log.debug(s"Duplicate found for [$assetIn] and query: ${qForExisting.params}")
-        val existingAsset: Asset = existing.records.head
+        log.debug(s"Duplicate found for [$assetIn] and checksum: ${assetIn.checksum}")
+        val existingAsset: Asset = existing.get
         throw DuplicateException(existingAsset.id.get)
       }
 
@@ -96,6 +94,14 @@ class LibraryService(val app: Altitude) {
       val asset: Asset = app.service.asset.getById(id)
       val path = app.service.fileStore.getAssetPath(asset)
       asset.toJson ++ Json.obj(C.Asset.PATH -> path)
+    }
+  }
+
+  def getByChecksum(checksum: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Option[Asset] = {
+    txManager.asReadOnly[Option[Asset]] {
+      val query = Query(Map(C.Asset.CHECKSUM -> checksum))
+      val existing = app.service.asset.query(query)
+      if (existing.nonEmpty) Some(existing.records.head: Asset) else None
     }
   }
 
@@ -387,6 +393,14 @@ class LibraryService(val app: Altitude) {
 
     assetIds.foreach { assetId =>
       log.info(s"Restoring recycled asset [$assetId]")
+
+      val asset: Asset = getById(assetId)
+      val existing = getByChecksum(asset.checksum)
+
+      if (existing.isDefined) {
+        throw DuplicateException(existingAssetId = existing.get.id.get)
+      }
+
       txManager.withTransaction {
         app.service.asset.setAssetAsRecycled(assetId, isRecycled = false)
         val restoredAsset: Asset = getById(assetId)
