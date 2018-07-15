@@ -6,7 +6,7 @@ import play.api.libs.json.JsObject
 import software.altitude.core.models.BaseModel
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.{Query, QueryResult}
-import software.altitude.core.{AltitudeCoreApp, Const => C, Context}
+import software.altitude.core.{AltitudeCoreApp, Context, Const => C}
 
 object BaseDao {
   // this is the valid ID pattern

@@ -5,9 +5,8 @@ import java.io.File
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.{IOFileFilter, TrueFileFilter}
 import org.slf4j.LoggerFactory
-import software.altitude.core.Altitude
 import software.altitude.core.models._
-import software.altitude.core.{Const => C}
+import software.altitude.core.{Altitude, Const => C}
 
 object FileSystemSourceService {
   private val ANY_FILE_FILTER: IOFileFilter = TrueFileFilter.INSTANCE

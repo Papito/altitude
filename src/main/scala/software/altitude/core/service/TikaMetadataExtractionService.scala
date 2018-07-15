@@ -8,12 +8,12 @@ import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
 import org.apache.tika.parser.AbstractParser
 import org.apache.tika.parser.audio.AudioParser
-import org.apache.tika.parser.image.{ImageParser, TiffParser}
+import org.apache.tika.parser.image.TiffParser
 import org.apache.tika.parser.jpeg.JpegParser
 import org.apache.tika.parser.mp3.Mp3Parser
 import org.slf4j.LoggerFactory
 import org.xml.sax.helpers.DefaultHandler
-import software.altitude.core.models.{MetadataValue, AssetType, ImportAsset, Metadata}
+import software.altitude.core.models.{AssetType, ImportAsset, Metadata, MetadataValue}
 import software.altitude.core.{AllDone, Const => C}
 
 class TikaMetadataExtractionService extends MetadataExtractionService {

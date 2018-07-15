@@ -3,7 +3,7 @@ package software.altitude.test.core.integration
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 import software.altitude.core.models.Repository
-import software.altitude.core.{Const => C, Util}
+import software.altitude.core.{Util, Const => C}
 
 @DoNotDiscover class RepositoryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 

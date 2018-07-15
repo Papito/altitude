@@ -6,7 +6,7 @@ import org.apache.commons.io.{FileUtils, FilenameUtils}
 import org.slf4j.LoggerFactory
 import software.altitude.core.models.{Asset, Data, Folder, Preview}
 import software.altitude.core.transactions.TransactionId
-import software.altitude.core.{Altitude, Const => C, Context, NotFoundException, StorageException}
+import software.altitude.core.{Altitude, Context, NotFoundException, StorageException, Const => C}
 
 class FileSystemStoreService(app: Altitude) extends FileStoreService {
   private final val log = LoggerFactory.getLogger(getClass)

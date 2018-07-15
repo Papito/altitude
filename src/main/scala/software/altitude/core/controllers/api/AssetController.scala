@@ -7,7 +7,7 @@ import software.altitude.core.Const.Api
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.Util
 import software.altitude.core.models.{Asset, Data, Preview}
-import software.altitude.core.{Const => C, NotFoundException}
+import software.altitude.core.{NotFoundException, Const => C}
 
 class AssetController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)

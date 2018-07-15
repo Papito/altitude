@@ -12,7 +12,7 @@ import software.altitude.core.dao.BaseDao
 import software.altitude.core.models.BaseModel
 import software.altitude.core.transactions.{JdbcTransactionManager, TransactionId}
 import software.altitude.core.util.{Query, QueryResult}
-import software.altitude.core.{Const => C, ConstraintException, Context, Util}
+import software.altitude.core.{ConstraintException, Context, Util, Const => C}
 
 import scala.collection.JavaConversions._
 

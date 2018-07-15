@@ -1,7 +1,6 @@
 package software.altitude.core
 
 import javax.servlet.ServletContext
-
 import org.scalatra.servlet.ServletApiImplicits._
 import org.slf4j.LoggerFactory
 import software.altitude.core.controllers.api._

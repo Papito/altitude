@@ -8,7 +8,7 @@ import play.api.libs.json.JsObject
 import software.altitude.core.dao.RepositoryDao
 import software.altitude.core.models.{BaseModel, Repository, Stats, User}
 import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
-import software.altitude.core.{Altitude, Const => C, Context, NotFoundException}
+import software.altitude.core.{Altitude, Context, NotFoundException, Const => C}
 
 class RepositoryService(val app: Altitude) extends BaseService[Repository] {
   private final val log = LoggerFactory.getLogger(getClass)

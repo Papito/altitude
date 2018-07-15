@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.models.Folder
 import software.altitude.core.transactions.TransactionId
-import software.altitude.core.{AltitudeCoreApp, Const => C, Context}
+import software.altitude.core.{AltitudeCoreApp, Context, Const => C}
 
 abstract class FolderDao(val app: AltitudeCoreApp) extends BaseJdbcDao with software.altitude.core.dao.FolderDao {
   private final val log = LoggerFactory.getLogger(getClass)

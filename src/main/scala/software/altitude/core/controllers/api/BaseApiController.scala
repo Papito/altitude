@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsNull, JsObject, Json}
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.BaseController
-import software.altitude.core.{Const => C, NotFoundException, ValidationException}
+import software.altitude.core.{NotFoundException, ValidationException, Const => C}
 
 import scala.compat.Platform
 

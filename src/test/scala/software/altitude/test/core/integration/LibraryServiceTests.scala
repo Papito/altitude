@@ -1,14 +1,13 @@
 package software.altitude.test.core.integration
 
-import org.mockito.Mockito
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito
 import org.mockito.invocation.InvocationOnMock
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
-import play.api.libs.json.{JsObject, Json}
 import software.altitude.core.models._
 import software.altitude.core.util.Query
-import software.altitude.core.{DuplicateException, IllegalOperationException, NotFoundException, StorageException, Util, Const => C}
+import software.altitude.core.{DuplicateException, IllegalOperationException, NotFoundException, StorageException, Const => C}
 
 @DoNotDiscover class LibraryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 

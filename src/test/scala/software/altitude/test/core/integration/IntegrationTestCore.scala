@@ -1,7 +1,6 @@
 package software.altitude.test.core.integration
 
 import java.io.File
-import scala.language.implicitConversions
 
 import com.google.inject.{AbstractModule, Guice}
 import net.codingwell.scalaguice.InjectorExtensions._
@@ -16,6 +15,8 @@ import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C, _}
 import software.altitude.test.core.integration.util.dao.{UtilitiesDao, jdbc}
 import software.altitude.test.core.suites.{PostgresSuite, SqliteSuite}
+
+import scala.language.implicitConversions
 
 
 object IntegrationTestCore {

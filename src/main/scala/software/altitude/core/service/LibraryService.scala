@@ -3,8 +3,8 @@ package software.altitude.core.service
 import java.awt.image.BufferedImage
 import java.awt.{AlphaComposite, Graphics2D}
 import java.io._
-import javax.imageio.ImageIO
 
+import javax.imageio.ImageIO
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.imgscalr.Scalr
 import org.slf4j.LoggerFactory
@@ -14,7 +14,7 @@ import software.altitude.core.Const.Api.Folder
 import software.altitude.core.models._
 import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
 import software.altitude.core.util.{Query, QueryResult}
-import software.altitude.core.{Altitude, Const => C, Context, _}
+import software.altitude.core.{Altitude, Context, Const => C, _}
 
 class LibraryService(val app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
