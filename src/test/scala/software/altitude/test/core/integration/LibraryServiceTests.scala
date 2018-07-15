@@ -5,13 +5,14 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.invocation.InvocationOnMock
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
+import play.api.libs.json.{JsObject, Json}
 import software.altitude.core.models._
 import software.altitude.core.util.Query
 import software.altitude.core.{DuplicateException, IllegalOperationException, NotFoundException, StorageException, Util, Const => C}
 
 @DoNotDiscover class LibraryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
-  test("folder counts") {
+  test("Folder counts should check out") {
     /*
     folder1
     folder2
@@ -79,7 +80,7 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     hierarchy.last.numOfAssets shouldBe 10
   }
 
-  test("rename asset") {
+  test("Rename asset and attempt to rename a recycled asset") {
     var asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
     var updatedAsset: Asset = altitude.service.library.renameAsset(asset.id.get, "newName")
     updatedAsset.fileName shouldBe "newName"
@@ -98,7 +99,7 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     }
   }
 
-  test("move recycled asset to folder") {
+  test("Move recycled asset to folder") {
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
     altitude.service.asset.query(Query()).records.length shouldBe 1
     altitude.service.asset.queryRecycled(Query()).records.length shouldBe 0
@@ -120,7 +121,7 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     (altitude.service.folder.getByIdWithChildAssetCounts(folder1.id.get, all): Folder).numOfAssets shouldBe 1
   }
 
-  test("move asset to a different folder") {
+  test("Move asset to a different folder") {
     /*
     folder1
     folder2
@@ -154,7 +155,7 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     ).isEmpty shouldBe true
   }
 
-  test("move asset to same folder") {
+  test("Move asset to same folder") {
     /*
     folder1
     folder2
@@ -170,7 +171,7 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     altitude.service.library.moveAssetToFolder(asset.id.get, folder1.id.get)
   }
 
-  test("recycle asset") {
+  test("Recycle asset") {
     altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
 
     SET_SECOND_USER()
@@ -190,19 +191,19 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     altitude.service.asset.queryRecycled(Query()).records.length shouldBe 0
   }
 
-  test("get recycled asset") {
+  test("Get recycled asset") {
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
     altitude.service.library.recycleAsset(asset.id.get)
   }
 
-  test("restore recycled asset") {
+  test("Restore recycled asset") {
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
     val trashed: Asset = altitude.service.library.recycleAsset(asset.id.get)
     altitude.service.library.restoreRecycledAsset(trashed.id.get)
     altitude.service.asset.query(Query()).isEmpty shouldBe false
   }
 
-  test("restore recycled asset to non-existing folder") {
+  test("Restore recycled asset to non-existing folder") {
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
     altitude.service.library.recycleAsset(asset.id.get)
 
@@ -211,7 +212,7 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     }
   }
 
-  test("recycle folder assets") {
+  test("Recycle folder assets") {
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
     val folder2: Folder = altitude.service.folder.addFolder("folder2")
@@ -235,7 +236,7 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     asset3.isRecycled shouldBe true
   }
 
-  test("recycle non-existent folder") {
+  test("Recycle non-existent folder") {
     val folder1: Folder = altitude.service.folder.addFolder("folder1")
     altitude.service.library.deleteFolderById(folder1.id.get)
 

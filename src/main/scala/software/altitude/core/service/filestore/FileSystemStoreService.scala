@@ -219,9 +219,17 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
 
   override def getRecycledAssetPath(asset: Asset)(implicit ctx: Context): String = {
     val ext = FilenameUtils.getExtension(asset.fileName)
-    new File(
-      trashFolderPath,
-      s"${asset.id.get}${FilenameUtils.EXTENSION_SEPARATOR}$ext").toString
+
+    // no guarantee there IS an extension
+    if (ext.nonEmpty) {
+      new File(
+        trashFolderPath,
+        s"${asset.id.get}${FilenameUtils.EXTENSION_SEPARATOR}$ext").toString
+    }
+    else {
+      new File(trashFolderPath, s"${asset.id.get}").toString
+
+    }
   }
 
   override def addPreview(preview: Preview)(implicit ctx: Context): Unit = {

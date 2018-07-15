@@ -5,8 +5,9 @@ import java.io.File
 import org.apache.commons.io.{FileUtils, FilenameUtils}
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
+import play.api.libs.json.{JsObject, Json}
 import software.altitude.core.models.{Asset, Folder, Repository}
-import software.altitude.core.{Const => C, NotFoundException, StorageException, Util}
+import software.altitude.core.{NotFoundException, StorageException, Util, Const => C}
 
 @DoNotDiscover class FileStoreServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
@@ -247,6 +248,20 @@ import software.altitude.core.{Const => C, NotFoundException, StorageException, 
     checkRepositoryDirPath(C.Path.ROOT)
     checkRepositoryDirPath(C.Path.TRIAGE)
     checkRepositoryDirPath(C.Path.TRASH)
+  }
+
+  test("Recycled path of extension-less files should not contain trailing separator") {
+    val assetToImport: Asset = (makeAsset(altitude.service.folder.triageFolder): JsObject) ++
+      Json.obj(C.Asset.FILENAME -> "filename")
+
+    val importedAsset: Asset = altitude.service.library.add(assetToImport)
+    importedAsset.fileName shouldEqual "filename"
+
+    val recycledAsset: Asset = altitude.service.library.recycleAsset(importedAsset.id.get)
+    recycledAsset.fileName shouldEqual "filename"
+
+    val relAssetPath = new File(altitude.service.fileStore.trashFolderPath, recycledAsset.id.get)
+    checkRepositoryFilePath(relAssetPath.getPath)
   }
 
   private def checkRepositoryDirPath(path: String) = {
