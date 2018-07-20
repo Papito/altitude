@@ -90,6 +90,7 @@ CREATE TABLE folder (
   name_lc VARCHAR(255) NOT NULL,
   parent_id CHAR(36) NOT NULL,
   num_of_assets INTEGER NOT NULL DEFAULT 0,
+  is_recycled TINYINT NOT NULL DEFAULT 0,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL,
   FOREIGN KEY(repository_id) REFERENCES repository(id)

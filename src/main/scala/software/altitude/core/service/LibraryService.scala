@@ -288,6 +288,8 @@ class LibraryService(val app: Altitude) {
       childrenAndDepths.foreach {t =>
         val folderId = t._2
         // set all the assets as recycled
+        //FIXME: When this is fixed: https://trello.com/c/YzFywNPZ, filter only the recycled
+        // assets
         val folderAssetsQuery = Query(
           params = Map(Api.Folder.QUERY_ARG_NAME -> folderId))
 

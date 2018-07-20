@@ -321,4 +321,16 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
       altitude.service.library.restoreRecycledAsset(importedAsset.id.get)
     }
   }
+
+/*
+  test("Restoring an asset into a defunct path should recreate it") {
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+
+    val assetToImport: Asset = makeAsset(folder1)
+    val importedAsset: Asset = altitude.service.library.add(assetToImport)
+    altitude.service.library.recycleAsset(importedAsset.id.get)
+    altitude.service.library.deleteFolderById(folder1.id.get)
+    altitude.service.library.restoreRecycledAsset(importedAsset.id.get)
+  }
+*/
 }

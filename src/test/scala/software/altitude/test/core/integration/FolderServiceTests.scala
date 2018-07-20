@@ -2,7 +2,7 @@ package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
-import software.altitude.core.models.Folder
+import software.altitude.core.models.{Asset, Folder}
 import software.altitude.core.{IllegalOperationException, NotFoundException, ValidationException, Const => C}
 
 @DoNotDiscover class FolderServiceTests (val config: Map[String, Any]) extends IntegrationTestCore {
@@ -336,10 +336,6 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     renamedFolder.name shouldEqual "newName"
   }
 
-  test("Rename a folder to a different casing") {
-    //FIXME
-  }
-
   test("Illegal rename actions should throw") {
     val folder1: Folder = altitude.service.folder.addFolder("folder")
 
@@ -356,5 +352,31 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     intercept[IllegalOperationException] {
       altitude.service.library.renameFolder(ctx.repo.rootFolderId, folder1.name)
     }
+  }
+
+/*
+  test("Folder referenced by recycled assets is marked as recycled", focused) {
+    val folder1: Folder = altitude.service.folder.addFolder("folder")
+    val folder1_1: Folder = altitude.service.folder.addFolder("folder1", parentId = folder1.id)
+    val asset: Asset = altitude.service.library.add(makeAsset(folder1_1))
+
+    altitude.service.library.recycleAsset(asset.id.get)
+
+    altitude.service.library.deleteFolderById(folder1_1.id.get)
+
+    // the folder should still exist as recycled
+    val recycledFolder = altitude.service.folder.getById(folder1_1.id.get)
+  }
+*/
+
+  test("Folder NOT referenced by recycled assets is purged") {
+    val folder: Folder = altitude.service.folder.addFolder("folder")
+    val asset: Asset = altitude.service.library.add(makeAsset(folder))
+
+    altitude.service.library.recycleAsset(asset.id.get)
+  }
+
+  test("Rename a folder to a different casing") {
+    //FIXME
   }
 }

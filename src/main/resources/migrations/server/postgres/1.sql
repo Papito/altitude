@@ -82,7 +82,8 @@ CREATE TABLE folder (
   name VARCHAR(255) NOT NULL,
   name_lc VARCHAR(255) NOT NULL,
   parent_id CHAR(36) NOT NULL,
-  num_of_assets INTEGER NOT NULL DEFAULT 0
+  num_of_assets INTEGER NOT NULL DEFAULT 0,
+  is_recycled INT NOT NULL DEFAULT 0
 ) INHERITS (_core);
 --//END
 CREATE INDEX folder_01 ON folder(repository_id, parent_id);
