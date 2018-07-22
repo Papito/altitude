@@ -250,7 +250,7 @@ class LibraryService(val app: Altitude) {
       assetIds.foreach { assetId =>
         txManager.withTransaction {
           val asset = getById(assetId)
-          app.service.asset.setAssetAsRecycled(assetId, isRecycled = true)
+          app.service.asset.setRecycledProp(asset, isRecycled = true)
           val recycledAsset = getById(assetId)
           app.service.stats.recycleAsset(recycledAsset)
           app.service.fileStore.recycleAsset(asset)
@@ -402,7 +402,7 @@ class LibraryService(val app: Altitude) {
       }
 
       txManager.withTransaction {
-        app.service.asset.setAssetAsRecycled(assetId, isRecycled = false)
+        app.service.asset.setRecycledProp(asset, isRecycled = false)
         val restoredAsset: Asset = getById(assetId)
         app.service.stats.restoreAsset(restoredAsset)
         app.service.fileStore.restoreAsset(restoredAsset)

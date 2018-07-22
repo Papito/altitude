@@ -14,8 +14,6 @@ trait AssetDao extends BaseDao {
 
   def setMetadata(assetId: String, metadata: Metadata)(implicit ctx: Context, txId: TransactionId): Unit
 
-  def setAssetAsRecycled(assetId: String, isRecycled: Boolean)(implicit ctx: Context, txId: TransactionId)
-
   def queryNotRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult
 
   def queryRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult

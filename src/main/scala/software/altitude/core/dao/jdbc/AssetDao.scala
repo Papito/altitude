@@ -121,21 +121,4 @@ abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softw
 
     runner.update(conn, sql, updateValues:_*)
   }
-
-  override def setAssetAsRecycled(assetId: String, isRecycled: Boolean)
-                            (implicit ctx: Context, txId: TransactionId): Unit = {
-    val sql = s"""
-        UPDATE $tableName
-           SET ${C.Base.UPDATED_AT} = $nowTimeFunc,
-               ${C.Asset.IS_RECYCLED} = ?
-         WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
-      """
-
-    val _isRecycled = if (isRecycled) 1 else 0
-    val updateValues = List[Object](_isRecycled.asInstanceOf[Object], ctx.repo.id.get, assetId)
-    log.debug(s"Update SQL: [$sql] with values: $updateValues")
-
-    val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, sql, updateValues:_*)
-  }
 }

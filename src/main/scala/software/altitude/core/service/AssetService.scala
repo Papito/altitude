@@ -6,7 +6,7 @@ import software.altitude.core.dao.AssetDao
 import software.altitude.core.models.Asset
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.{Query, QueryResult}
-import software.altitude.core.{Altitude, Context}
+import software.altitude.core.{Altitude, Context, Const => C}
 
 /**
  * This is a "dumb" service - meaning it delegates everything to to the base service implementation
@@ -19,9 +19,15 @@ class AssetService(val app: Altitude) extends BaseService[Asset] {
   private final val log = LoggerFactory.getLogger(getClass)
   override protected val dao: AssetDao = app.injector.instance[AssetDao]
 
-  def setAssetAsRecycled(assetId: String, isRecycled: Boolean)(implicit ctx: Context, txId: TransactionId): Unit = {
-    log.info(s"Setting asset [$assetId] recycled flag to [$isRecycled]")
-    dao.setAssetAsRecycled(assetId, isRecycled = isRecycled)
+  def setRecycledProp(asset: Asset, isRecycled: Boolean)
+                     (implicit ctx: Context, txId: TransactionId): Unit = {
+    if (asset.isRecycled == isRecycled) {
+      return
+    }
+
+    log.info(s"Setting asset [${asset.id.get}] recycled flag to [$isRecycled]")
+    val updatedAsset = asset.modify(C.Asset.IS_RECYCLED -> isRecycled)
+    dao.updateById(asset.id.get, data = updatedAsset, fields = List(C.Asset.IS_RECYCLED))
   }
 
   override def query(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
