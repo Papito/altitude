@@ -57,7 +57,7 @@ abstract class BaseService[Model <: BaseModel] extends ModelValidation {
    */
   def updateById(id: String, data: Model, fields: List[String], queryForDup: Option[Query] = None)
                 (implicit ctx: Context, txId: TransactionId = new TransactionId): Int = {
-    val cleaned = cleanAndValidate(data)
+    val cleaned: JsObject = cleanAndValidate(data)
 
     val existing = if (queryForDup.isDefined) query(queryForDup.get) else QueryResult.EMPTY
 

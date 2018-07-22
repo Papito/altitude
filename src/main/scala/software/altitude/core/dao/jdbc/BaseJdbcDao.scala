@@ -258,11 +258,20 @@ abstract class BaseJdbcDao extends BaseDao {
        WHERE ${C.Base.REPO_ID} = ? AND ${queryFieldPlaceholders.mkString(",")}
       """
 
-    val dataUpdateValues = json.fields.filter {
+    val dataUpdateValues: List[Any] = json.fields.filter {
       // extract only the json elements we want to update
       v: (String, JsValue) => fields.contains(v._1)}.map {
       // convert the values to string
-      v: (String, JsValue) => v._2.as[String]}.toList
+      v: (String, JsValue) => {
+        val jsVal: JsValue = v._2
+
+        jsVal match {
+          case JsTrue => 1
+          case JsFalse => 0
+          case _ => jsVal.as[String]
+        }
+      }
+    }.toList
 
     val valuesForAllPlaceholders = dataUpdateValues ::: List(ctx.repo.id.get) ::: q.params.values.toList
     log.debug(s"Update SQL: $sql, with query values: $valuesForAllPlaceholders")
