@@ -316,19 +316,17 @@ class LibraryService(val app: Altitude) {
 
       app.service.stats.moveAsset(asset, destFolderId)
 
-      // if it's a recycled asset, we are adding it back to the general population
-      if (asset.isRecycled) {
-        app.service.asset.setAssetAsRecycled(assetId = asset.id.get, isRecycled = false)
-      }
-
-      // point asset to the new folder
-      val updatedAsset: Asset = asset ++ Json.obj(
+      /* Point the asset to the new folder.
+         It may or may not be recycled, so we update it as not recycled unconditionally
+         (saves us a separate update query)
+      */
+      val updatedAsset: Asset = asset.modify(
         C.Asset.FOLDER_ID -> destFolderId,
         C.Asset.IS_RECYCLED -> false)
 
       app.service.asset.updateById(
         asset.id.get, updatedAsset,
-        fields = List(C.Asset.FOLDER_ID))
+        fields = List(C.Asset.FOLDER_ID, C.Asset.IS_RECYCLED))
 
       app.service.fileStore.moveAsset(asset, updatedAsset)
     }
