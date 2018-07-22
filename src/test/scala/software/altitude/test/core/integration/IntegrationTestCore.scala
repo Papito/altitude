@@ -13,6 +13,7 @@ import org.slf4j.{LoggerFactory, MDC}
 import software.altitude.core.models._
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C, _}
+import software.altitude.test.core.TestFocus
 import software.altitude.test.core.integration.util.dao.{UtilitiesDao, jdbc}
 import software.altitude.test.core.suites.{PostgresSuite, SqliteSuite}
 
@@ -53,7 +54,12 @@ trait AnswerSugar {
 }
 
 abstract class IntegrationTestCore
-  extends FunSuite with BeforeAndAfter with BeforeAndAfterEach with OptionValues with AnswerSugar {
+  extends FunSuite
+    with BeforeAndAfter
+    with BeforeAndAfterEach
+    with OptionValues
+    with AnswerSugar
+    with TestFocus {
   protected final val log =  LoggerFactory.getLogger(getClass)
 
   // Stores test app config overrides, since we run same tests with a different app setup.
@@ -84,24 +90,6 @@ abstract class IntegrationTestCore
    * clean.
    */
   implicit val txId: TransactionId = new TransactionId
-
-  /**
-   * Scalatest tag to run a specific test[s]
-   *
-   * test("work in progress", focused) {
-   *
-   * }
-   *
-   * To run:
-   *
-   * sbt> test-only -- -n focused
-   *
-   * For specific DB suite:
-   *
-   * sbt> test-only software.altitude.test.core.suites.SqliteSuite -- -n focused
-   */
-  object focused extends Tag("focused")
-
 
   /**
    * Our test users. We may alternate between them to make sure there is proper
