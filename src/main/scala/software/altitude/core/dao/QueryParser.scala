@@ -21,6 +21,16 @@ trait QueryParser {
     }
   }
 
-  // parse out system parameters
-  protected def getParams(query: Query): Map[String, Any] = query.params.filterKeys(!RESERVED_PARAMS.contains(_))
+  /*
+   - Filters out system parameters
+   - Replaces booleans with integers, as this is what's used in databases
+    */
+  protected def getParams(query: Query): Map[String, Any] = {
+    query.params.filterKeys(!RESERVED_PARAMS.contains(_)).map { v: (String, Any) =>
+      v._2 match {
+        case x: String => (v._1, x)
+        case x: Boolean => if (x) (v._1, 1) else (v._1, 0)
+      }
+    }
+  }
 }

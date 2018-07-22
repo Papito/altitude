@@ -1,11 +1,11 @@
 package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
-import play.api.libs.json.Json
 import software.altitude.core.NotFoundException
 import software.altitude.core.models.Asset
 import software.altitude.core.{Const => C, _}
 import org.scalatest.Matchers._
+import software.altitude.core.util.Query
 
 
 @DoNotDiscover class AssetServiceTests (val config: Map[String, Any]) extends IntegrationTestCore {
@@ -33,5 +33,17 @@ import org.scalatest.Matchers._
       fields = List(C.Asset.IS_RECYCLED))
 
     (altitude.service.library.getById(asset.id.get): Asset).isRecycled shouldBe true
+  }
+
+  test("Should be able to query by the recycled property", focused) {
+    val triageFolder = altitude.service.folder.triageFolder
+    altitude.service.library.add(
+      makeAsset(triageFolder).modify(
+        C.Asset.IS_RECYCLED -> false))
+
+    val q = Query(params = Map(C.Asset.IS_RECYCLED -> false))
+    val result = altitude.service.asset.query(q)
+
+    result.total shouldBe 1
   }
 }
