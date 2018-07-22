@@ -8,6 +8,6 @@ object Util {
   def withFormattedMetadata(app: Altitude, asset: Asset, allFields: Option[Map[String, MetadataField]] = None)
                     (implicit ctx: Context): JsObject = {
     val metadata = app.service.metadata.toJson(asset.metadata, allFields)
-    asset.toJson ++ Json.obj(C.Asset.METADATA -> metadata)
+    asset.modify(C.Asset.METADATA -> metadata)
   }
 }

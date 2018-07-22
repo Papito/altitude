@@ -81,7 +81,7 @@ class LibraryService(val app: Altitude) {
 
       val path = app.service.fileStore.getAssetPath(assetToAdd)
 
-      storedAsset ++ Json.obj(C.Asset.PATH -> path)
+      storedAsset.modify(C.Asset.PATH -> path)
     }
   }
 
@@ -93,7 +93,7 @@ class LibraryService(val app: Altitude) {
     txManager.asReadOnly[JsObject] {
       val asset: Asset = app.service.asset.getById(id)
       val path = app.service.fileStore.getAssetPath(asset)
-      asset.toJson ++ Json.obj(C.Asset.PATH -> path)
+      asset.modify(C.Asset.PATH -> path)
     }
   }
 
@@ -358,10 +358,11 @@ class LibraryService(val app: Altitude) {
         throw IllegalOperationException(s"Cannot rename a recycled asset: [$asset]")
       }
 
-      val updatedAsset: Asset = asset ++ Json.obj(
+      val updatedAsset: Asset = asset.modify(
           C.Asset.FILENAME -> newFilename,
           C.Asset.PATH -> app.service.fileStore.getPathWithNewFilename(asset, newFilename))
 
+      // Note that we are not updating the PATH because it does not exist as a property
       app.service.asset.updateById(
         asset.id.get, updatedAsset,
         fields = List(C.Asset.FILENAME))

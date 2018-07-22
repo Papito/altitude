@@ -26,7 +26,7 @@ import org.scalatest.Matchers._
     val asset: Asset = altitude.service.library.add(makeAsset(triageFolder))
     asset.isRecycled shouldBe false
 
-    val updateAsset: Asset = asset ++ Json.obj(C.Asset.IS_RECYCLED -> true)
+    val updateAsset: Asset = asset.modify(C.Asset.IS_RECYCLED -> true)
 
     altitude.service.asset.updateById(
       asset.id.get, updateAsset,
