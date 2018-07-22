@@ -4,6 +4,7 @@ import java.util.UUID
 
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
+import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 import software.altitude.core.{Util, Const => C}
 
@@ -70,6 +71,24 @@ abstract class BaseModel {
     }
 
     isClean
+  }
+
+  def modify(fields: (String, JsValueWrapper)*): JsObject = {
+    // get a set of property names that we are updating
+    val updatedPropNames: Set[String] = fields.map(pair => pair._1).toSet
+
+    // Extract the list of property names that are not part of this object -
+    // we won't get any indication of user error
+    val wrongPropNames = updatedPropNames.foldLeft(Set[String]()) { (res, propName) =>
+      if (!this.toJson.keys.contains(propName)) res + propName else res
+    }
+
+    if (wrongPropNames.nonEmpty) {
+      throw new IllegalArgumentException(
+        s"Cannot update the model with these properties ${wrongPropNames}")
+    }
+
+    this.toJson ++ Json.obj(fields:_*)
   }
 
   /**
