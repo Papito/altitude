@@ -89,7 +89,7 @@ trait BaseDao {
    * @return number of documents deleted - 0 or 1
    */
   def deleteById(id: String)(implicit ctx: Context, txId: TransactionId): Int = {
-    val q: Query = Query(Map(C.Base.ID -> id))
+    val q: Query = Query().add(C.Base.ID -> id)
     deleteByQuery(q)
   }
 
@@ -104,7 +104,7 @@ trait BaseDao {
    */
   def updateById(id: String, data: JsObject, fields: List[String])
                 (implicit ctx: Context, txId: TransactionId): Int = {
-    val q: Query = Query(Map(C.Base.ID -> id))
+    val q: Query = Query().add(C.Base.ID -> id)
     updateByQuery(q, data, fields)
   }
 
