@@ -46,14 +46,13 @@ abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softw
     addCoreAttrs(model, rec)
   }
 
-  protected lazy val NOT_RECYCLED_QUERY_BUILDER = new NotRecycledQueryBuilder(defaultSqlColsForSelect, tableName)
+  protected lazy val QUERY_BUILDER = new SqlQueryBuilder(defaultSqlColsForSelect, tableName)
+
   override def queryNotRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
-    this.query(q, NOT_RECYCLED_QUERY_BUILDER)
+    this.query(q.add(C.Asset.IS_RECYCLED -> false), QUERY_BUILDER)
 
-
-  protected lazy val RECYCLED_QUERY_BUILDER = new RecycledQueryBuilder(defaultSqlColsForSelect, tableName)
   override def queryRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
-    this.query(q, RECYCLED_QUERY_BUILDER)
+    this.query(q.add(C.Asset.IS_RECYCLED -> true), QUERY_BUILDER)
 
   override def getMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Option[Metadata] = {
     val sql = s"""
