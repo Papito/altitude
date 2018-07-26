@@ -150,6 +150,10 @@ class LibraryService(val app: Altitude) {
     app.service.asset.queryRecycled(query)
   }
 
+  def queryAll(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
+    app.service.asset.queryAll(query)
+  }
+
   def genPreviewData(asset: Asset)
                     (implicit ctx: Context, txId: TransactionId = new TransactionId): Array[Byte] = {
     asset.assetType.mediaType match {
@@ -244,6 +248,16 @@ class LibraryService(val app: Altitude) {
     }
   }
 
+  def recycleFolder(folderId: String)
+                   (implicit ctx: Context, txId: TransactionId = new TransactionId): Folder = {
+
+    txManager.withTransaction {
+      val folder: Folder = app.service.folder.getById(folderId)
+      app.service.folder.setRecycledProp(folder, isRecycled = true)
+      folder.modify(C.Folder.IS_RECYCLED -> true)
+    }
+  }
+
   def recycleAssets(assetIds: Set[String])
                    (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
 
@@ -281,29 +295,48 @@ class LibraryService(val app: Altitude) {
 
       // get the list of tuples - (depth, id), with most-deep first
       val childrenAndDepths: List[(Int, String)] =
-        app.service.folder.flatChildrenIdsWithDepths(id, app.service.folder.repositoryFolders()).sortBy(_._1).reverse
-                                                        /* ^^^ sort by depth */
+        app.service.folder.flatChildrenIdsWithDepths(
+          id, app.service.folder.repositoryFolders()).sortBy(_._1).reverse
+      /* ^^^ sort by depth */
 
-      // now delete the children, most-deep first
-      childrenAndDepths.foreach {t =>
-        val folderId = t._2
+
+      log.trace(s"Folder children, deepest first: $childrenAndDepths")
+
+      childrenAndDepths.foldLeft(0) { (assetCount: Int, f: (Int, String)) =>
+        val folderId = f._2
+        log.trace(s"Deleting or recycling folder $f")
+
         // set all the assets as recycled
-        //FIXME: When this is fixed: https://trello.com/c/YzFywNPZ, filter only the recycled
-        // assets
-        val folderAssetsQuery = Query(
-          params = Map(Api.Folder.QUERY_ARG_NAME -> folderId))
+        val folderAssetsQuery = Query(params = Map(Api.Folder.QUERY_ARG_NAME -> folderId))
 
-        val results: QueryResult = app.service.library.query(folderAssetsQuery)
+        val results: QueryResult = app.service.library.queryAll(folderAssetsQuery)
+
+        log.trace(s"Folder ${folderId} has ${results.total} assets")
 
         results.records.foreach { record =>
           val assetId = (record \ C.Asset.ID).as[String]
           this.recycleAsset(assetId)
         }
-        app.service.folder.deleteById(folderId)}
 
-      app.service.fileStore.deleteFolder(folder)
+        val treeAssetCount = assetCount + results.total
+
+        log.trace(s"Total assets in the tree of folder ${folder.id.get}: $treeAssetCount")
+
+        // delete folder if it has no assets, otherwise - recycle it
+        if (treeAssetCount == 0) {
+          log.trace(s"DELETING (PURGING) folder $f")
+          app.service.folder.deleteById(folderId)
+        }
+        else {
+          val childFolder: Folder = app.service.folder.getById(folderId)
+          log.trace(s"RECYCLING folder $folderId")
+          app.service.folder.setRecycledProp(childFolder, isRecycled = true)
+        }
+
+        treeAssetCount // accumulates total asset cound for the next step in the fold
+      }
     }
- }
+  }
 
   def moveAssetsToFolder(assetIds: Set[String], destFolderId: String)
                         (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {

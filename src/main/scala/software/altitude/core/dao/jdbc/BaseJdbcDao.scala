@@ -274,7 +274,6 @@ abstract class BaseJdbcDao extends BaseDao {
     }.toList
 
     val valuesForAllPlaceholders = dataUpdateValues ::: List(ctx.repo.id.get) ::: q.params.values.toList
-    log.debug(s"Update SQL: $sql, with query values: $valuesForAllPlaceholders")
     val runner: QueryRunner = new QueryRunner()
 
     val numUpdated = runner.update(conn, sql,  valuesForAllPlaceholders.map(_.asInstanceOf[Object]):_*)

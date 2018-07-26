@@ -54,6 +54,9 @@ abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softw
   override def queryRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
     this.query(q.add(C.Asset.IS_RECYCLED -> true), QUERY_BUILDER)
 
+  override def queryAll(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
+    this.query(q, QUERY_BUILDER)
+
   override def getMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Option[Metadata] = {
     val sql = s"""
       SELECT ${C.Asset.METADATA}

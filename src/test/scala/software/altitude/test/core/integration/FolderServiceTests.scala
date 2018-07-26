@@ -354,21 +354,6 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     }
   }
 
-/*
-  test("Folder referenced by recycled assets is marked as recycled", focused) {
-    val folder1: Folder = altitude.service.folder.addFolder("folder")
-    val folder1_1: Folder = altitude.service.folder.addFolder("folder1", parentId = folder1.id)
-    val asset: Asset = altitude.service.library.add(makeAsset(folder1_1))
-
-    altitude.service.library.recycleAsset(asset.id.get)
-
-    altitude.service.library.deleteFolderById(folder1_1.id.get)
-
-    // the folder should still exist as recycled
-    val recycledFolder = altitude.service.folder.getById(folder1_1.id.get)
-  }
-*/
-
   test("Folder NOT referenced by recycled assets is purged") {
     val folder: Folder = altitude.service.folder.addFolder("folder")
     val asset: Asset = altitude.service.library.add(makeAsset(folder))
@@ -376,7 +361,27 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     altitude.service.library.recycleAsset(asset.id.get)
   }
 
-  test("Rename a folder to a different casing") {
-    //FIXME
+  test("Deleting a folder recycles all assets and marks folder as as recycled", focused) {
+    val folder1: Folder = altitude.service.folder.addFolder(
+      "folder")
+    val folder1_1: Folder = altitude.service.folder.addFolder(
+      "folder1_1", parentId = folder1.id)
+    val folder1_1_1: Folder = altitude.service.folder.addFolder(
+      "folder1_1_1", parentId = folder1_1.id)
+
+    val asset1: Asset = altitude.service.library.add(makeAsset(folder1))
+    val asset2: Asset = altitude.service.library.add(makeAsset(folder1_1))
+
+    //altitude.service.library.recycleAsset(asset.id.get)
+
+    // delete the parent folder
+    altitude.service.library.deleteFolderById(folder1.id.get)
+
+    // Folder 1_1 should stay as recycled, as it has an asset
+    (altitude.service.folder.getById(folder1.id.get): Folder).isRecycled shouldBe  true
+
+    // Folder 1 should stay as recycled, as it has an asset
+
+    // Folder 1_1_1 should be gone, as it had no assets in it, recycled or otherwise
   }
 }

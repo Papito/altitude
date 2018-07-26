@@ -18,6 +18,8 @@ trait AssetDao extends BaseDao {
 
   def queryRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult
 
+  def queryAll(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult
+
   override def query(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
     throw new NotImplementedError("Can only directly query recycled and not recycled data sets")
 

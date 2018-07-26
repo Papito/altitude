@@ -15,7 +15,8 @@ object Folder {
       path = (json \ C.Folder.PATH).asOpt[String],
       children = childrenJson.map(Folder.fromJson),
       parentId = (json \ C.Folder.PARENT_ID).as[String],
-      numOfAssets = (json \ C.Folder.NUM_OF_ASSETS).as[Int]
+      numOfAssets = (json \ C.Folder.NUM_OF_ASSETS).as[Int],
+      isRecycled = (json \ C.Folder.IS_RECYCLED).as[Boolean]
     ).withCoreAttr(json)
   }
 }
@@ -25,6 +26,7 @@ case class Folder(id: Option[String] = None,
                   name: String,
                   path: Option[String] = None,
                   children: List[Folder] = List(),
+                  isRecycled: Boolean = false,
                   numOfAssets: Int = 0) extends BaseModel {
 
   val nameLowercase: String = name.toLowerCase
@@ -37,17 +39,18 @@ case class Folder(id: Option[String] = None,
       C.Folder.NAME_LC -> nameLowercase,
       C.Folder.PARENT_ID -> parentId,
       C.Folder.CHILDREN ->  JsArray(childrenJson),
-      C.Folder.NUM_OF_ASSETS -> numOfAssets
+      C.Folder.NUM_OF_ASSETS -> numOfAssets,
+      C.Folder.IS_RECYCLED -> isRecycled
     ) ++ coreJsonAttrs
   }
 
   override def canEqual(other: Any): Boolean = other.isInstanceOf[Folder]
 
-  override def equals( that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match {
     case that: Folder if !that.canEqual( this) => false
     case that: Folder => {
-      val thisStringRepr = this.id.getOrElse("") + this.parentId + this.name
-      val thatStringRepr = that.id.getOrElse("") + that.parentId + that.name
+      val thisStringRepr = this.id.getOrElse("") + this.parentId + this.name.toLowerCase
+      val thatStringRepr = that.id.getOrElse("") + that.parentId + that.name.toLowerCase
       thisStringRepr == thatStringRepr
     }
     case _ => false

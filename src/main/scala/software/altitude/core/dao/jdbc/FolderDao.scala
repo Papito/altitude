@@ -16,6 +16,10 @@ abstract class FolderDao(val app: AltitudeCoreApp) extends BaseJdbcDao with soft
       id = Some(rec(C.Base.ID).asInstanceOf[String]),
       name = rec(C.Folder.NAME).asInstanceOf[String],
       parentId = rec(C.Folder.PARENT_ID).asInstanceOf[String],
+      isRecycled = rec(C.Folder.IS_RECYCLED).asInstanceOf[Int] match {
+        case 0 => false
+        case 1 => true
+      },
       numOfAssets = rec(C.Folder.NUM_OF_ASSETS).asInstanceOf[Int]
     )
     addCoreAttrs(model, rec)

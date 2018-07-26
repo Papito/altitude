@@ -76,6 +76,7 @@ object Const {
     val NUM_OF_ASSETS = "num_of_assets"
     val CHILDREN = "children"
     val IS_ROOT = "is_root"
+    val IS_RECYCLED = "is_recycled"
 
     object Name {
       val ROOT = "root"

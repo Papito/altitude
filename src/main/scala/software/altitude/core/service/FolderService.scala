@@ -138,13 +138,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     txManager.asReadOnly[Folder] {
       val _pathComponents = pathComponents(folder.id.get).map(_.name)
       val relPath = app.service.fileStore.assemblePath(_pathComponents)
-
-      Folder(
-        id = folder.id,
-        name = folder.name,
-        parentId = folder.parentId,
-        path = Some(relPath),
-        numOfAssets = folder.numOfAssets)
+      folder.modify(C.Folder.PATH -> relPath)
     }
   }
 
@@ -510,4 +504,18 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       ).toMap
     }
   }
+
+  def setRecycledProp(folder: Folder, isRecycled: Boolean)
+                     (implicit ctx: Context, txId: TransactionId): Unit = {
+    if (folder.isRecycled == isRecycled) {
+      return
+    }
+
+    txManager.withTransaction {
+      log.info(s"Setting folder [${folder.id.get}] recycled flag to [$isRecycled]")
+      val updatedFolder = folder.modify(C.Folder.IS_RECYCLED -> isRecycled)
+      dao.updateById(folder.id.get, data = updatedFolder, fields = List(C.Folder.IS_RECYCLED))
+    }
+  }
+
 }
