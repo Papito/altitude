@@ -445,10 +445,21 @@ class LibraryService(val app: Altitude) {
       }
 
       txManager.withTransaction {
-        app.service.asset.setRecycledProp(asset, isRecycled = false)
-        val restoredAsset: Asset = getById(assetId)
-        app.service.stats.restoreAsset(restoredAsset)
-        app.service.fileStore.restoreAsset(restoredAsset)
+        if (asset.isRecycled) {
+          app.service.asset.setRecycledProp(asset, isRecycled = false)
+          // OPTIMIZE: create a lookup cache for folders, to avoid querying for each asset
+          val folder: Folder = app.service.folder.getById(asset.folderId)
+
+          if (folder.isRecycled) {
+            app.service.folder.setRecycledProp(folder = folder, isRecycled = false)
+            // the folder is not in the store.
+            app.service.fileStore.addFolder(folder)
+          }
+
+          val restoredAsset: Asset = getById(assetId)
+          app.service.stats.restoreAsset(restoredAsset)
+          app.service.fileStore.restoreAsset(restoredAsset)
+        }
       }
     }
   }

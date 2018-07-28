@@ -377,16 +377,20 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     }
   }
 
+  test("Restoring an asset into a recycled folder should recreate the folder", focused) {
+    val folder1: Folder = altitude.service.folder.addFolder("folder1")
 
-  /*
-    test("Restoring an asset into a recycled folder should recreate the folder") {
-      val folder1: Folder = altitude.service.folder.addFolder("folder1")
+    val assetToImport: Asset = makeAsset(folder1)
+    val importedAsset: Asset = altitude.service.library.add(assetToImport)
+    altitude.service.library.recycleAsset(importedAsset.id.get)
+    altitude.service.library.deleteFolderById(folder1.id.get)
 
-      val assetToImport: Asset = makeAsset(folder1)
-      val importedAsset: Asset = altitude.service.library.add(assetToImport)
-      altitude.service.library.recycleAsset(importedAsset.id.get)
-      altitude.service.library.deleteFolderById(folder1.id.get)
-      altitude.service.library.restoreRecycledAsset(importedAsset.id.get)
-    }
-  */
+    val deletedFolder: Folder = altitude.service.folder.getById(folder1.id.get)
+    deletedFolder.isRecycled shouldBe true
+
+    altitude.service.library.restoreRecycledAsset(importedAsset.id.get)
+
+    val restoredFolder: Folder = altitude.service.folder.getById(folder1.id.get)
+    restoredFolder.isRecycled shouldBe false
+  }
 }
