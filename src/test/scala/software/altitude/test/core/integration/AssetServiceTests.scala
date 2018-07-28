@@ -35,11 +35,11 @@ import software.altitude.core.util.Query
     (altitude.service.library.getById(asset.id.get): Asset).isRecycled shouldBe true
   }
 
-  test("Should be able to query by the recycled property", focused) {
+  test("Should be able to query by the recycled property") {
     val triageFolder = altitude.service.folder.triageFolder
     altitude.service.library.add(
-      makeAsset(triageFolder).modify(
-        C.Asset.IS_RECYCLED -> false))
+      makeAsset(triageFolder).modify(C.Asset.IS_RECYCLED -> false)
+    )
 
     val q = Query(params = Map(C.Asset.IS_RECYCLED -> false))
     val result = altitude.service.asset.query(q)

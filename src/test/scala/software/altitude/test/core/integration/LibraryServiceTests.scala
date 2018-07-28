@@ -322,15 +322,71 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     }
   }
 
-/*
-  test("Restoring an asset into a defunct path should recreate it") {
-    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+  test("Deleting a folder recycles all assets and marks folder as recycled") {
+    val folder1: Folder = altitude.service.folder.addFolder(
+      "folder")
+    val folder1_1: Folder = altitude.service.folder.addFolder(
+      "folder1_1", parentId = folder1.id)
+    val folder1_1_1: Folder = altitude.service.folder.addFolder(
+      "folder1_1_1", parentId = folder1_1.id)
 
-    val assetToImport: Asset = makeAsset(folder1)
-    val importedAsset: Asset = altitude.service.library.add(assetToImport)
-    altitude.service.library.recycleAsset(importedAsset.id.get)
+    val asset1: Asset = altitude.service.library.add(makeAsset(folder1))
+    val asset2: Asset = altitude.service.library.add(makeAsset(folder1_1))
+
+    // delete the parent folder
     altitude.service.library.deleteFolderById(folder1.id.get)
-    altitude.service.library.restoreRecycledAsset(importedAsset.id.get)
+
+    // Folder 1 should stay as recycled, as it has an asset
+    (altitude.service.folder.getById(folder1.id.get): Folder).isRecycled shouldBe  true
+
+    // Folder 1_1 should stay as recycled, as it has an asset
+    (altitude.service.folder.getById(folder1_1.id.get): Folder).isRecycled shouldBe  true
+
+    // Folder 1_1_1 should be gone, as it had no assets in it, recycled or otherwise
+    intercept[NotFoundException] {
+      altitude.service.folder.getById(folder1_1_1.id.get)
+    }
   }
-*/
+
+  test("Deleting a folder referenced by recycled assets marks folder as recycled") {
+    val folder1: Folder = altitude.service.folder.addFolder(
+      "folder")
+    val folder1_1: Folder = altitude.service.folder.addFolder(
+      "folder1_1", parentId = folder1.id)
+    val folder1_1_1: Folder = altitude.service.folder.addFolder(
+      "folder1_1_1", parentId = folder1_1.id)
+
+    val asset1: Asset = altitude.service.library.add(makeAsset(folder1))
+    val asset2: Asset = altitude.service.library.add(makeAsset(folder1_1))
+
+    altitude.service.library.recycleAsset(asset1.id.get)
+    altitude.service.library.recycleAsset(asset2.id.get)
+
+    // delete the parent folder
+    altitude.service.library.deleteFolderById(folder1.id.get)
+
+    // Folder 1 should stay as recycled, as it has an asset
+    (altitude.service.folder.getById(folder1.id.get): Folder).isRecycled shouldBe  true
+
+    // Folder 1_1 should stay as recycled, as it has an asset
+    (altitude.service.folder.getById(folder1_1.id.get): Folder).isRecycled shouldBe  true
+
+    // Folder 1_1_1 should be gone, as it had no assets in it, recycled or otherwise
+    intercept[NotFoundException] {
+      altitude.service.folder.getById(folder1_1_1.id.get)
+    }
+  }
+
+
+  /*
+    test("Restoring an asset into a recycled folder should recreate the folder") {
+      val folder1: Folder = altitude.service.folder.addFolder("folder1")
+
+      val assetToImport: Asset = makeAsset(folder1)
+      val importedAsset: Asset = altitude.service.library.add(assetToImport)
+      altitude.service.library.recycleAsset(importedAsset.id.get)
+      altitude.service.library.deleteFolderById(folder1.id.get)
+      altitude.service.library.restoreRecycledAsset(importedAsset.id.get)
+    }
+  */
 }

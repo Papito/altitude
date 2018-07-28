@@ -172,7 +172,7 @@ import software.altitude.core.{NotFoundException, StorageException, Util, Const 
     }
   }
 
-  test("manage folders") {
+  test("Folder tree can be created and deleted") {
     /*
       folder1
       folder2

@@ -304,6 +304,8 @@ class LibraryService(val app: Altitude) {
 
       childrenAndDepths.foldLeft(0) { (assetCount: Int, f: (Int, String)) =>
         val folderId = f._2
+        val childFolder: Folder = app.service.folder.getById(folderId)
+
         log.trace(s"Deleting or recycling folder $f")
 
         // set all the assets as recycled
@@ -313,9 +315,16 @@ class LibraryService(val app: Altitude) {
 
         log.trace(s"Folder ${folderId} has ${results.total} assets")
 
+        // OPTIMIZE: bulk deletions.
         results.records.foreach { record =>
-          val assetId = (record \ C.Asset.ID).as[String]
-          this.recycleAsset(assetId)
+          val asset: Asset = record
+
+          /* We only want to recycle assets that are not recycled,
+             however the query is for all assets, as we need to know if the folder
+             has any asset references in the repository. This spares us a second
+             query.
+           */
+          if (!asset.isRecycled) this.recycleAsset(asset.id.get)
         }
 
         val treeAssetCount = assetCount + results.total
@@ -326,9 +335,9 @@ class LibraryService(val app: Altitude) {
         if (treeAssetCount == 0) {
           log.trace(s"DELETING (PURGING) folder $f")
           app.service.folder.deleteById(folderId)
+          app.service.fileStore.deleteFolder(childFolder)
         }
         else {
-          val childFolder: Folder = app.service.folder.getById(folderId)
           log.trace(s"RECYCLING folder $folderId")
           app.service.folder.setRecycledProp(childFolder, isRecycled = true)
         }
