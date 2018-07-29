@@ -377,7 +377,7 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     }
   }
 
-  test("Restoring an asset into a recycled folder should recreate the folder", focused) {
+  test("Restoring an asset into a recycled folder should recreate the folder") {
     val folder1: Folder = altitude.service.library.addFolder("folder1")
 
     val assetToImport: Asset = makeAsset(folder1)

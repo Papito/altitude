@@ -336,7 +336,7 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     renamedFolder.name shouldEqual "newName"
   }
 
-  test("Folder name casing can be changed", focused) {
+  test("Folder name casing can be changed") {
     val folder1: Folder = altitude.service.library.addFolder("folder")
 
     altitude.service.library.renameFolder(folder1.id.get, "Folder")
@@ -345,18 +345,11 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     renamedFolder.name shouldEqual "Folder"
   }
 
-
-
   test("Illegal rename actions should throw") {
     val folder1: Folder = altitude.service.library.addFolder("folder")
 
     intercept[ValidationException] {
       altitude.service.library.renameFolder(folder1.id.get, folder1.name)
-    }
-
-    // rename to same but with different casing
-    intercept[ValidationException] {
-      altitude.service.library.renameFolder(folder1.id.get, folder1.name.toUpperCase)
     }
 
     // rename a system folder

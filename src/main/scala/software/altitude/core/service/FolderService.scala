@@ -418,7 +418,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       // new folder name cannot match existing one
       val dupQuery = Query(Map(
         C.Folder.PARENT_ID -> folder.parentId,
-        C.Folder.NAME_LC -> newName.toLowerCase))
+        C.Folder.NAME -> newName))
 
       try {
         val folderForUpdate: Folder = folder.modify(

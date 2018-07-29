@@ -239,7 +239,7 @@ import software.altitude.core.{NotFoundException, StorageException, Util, Const 
     checkRepositoryDirPath(relativePath)
   }
 
-  test("Creating new repository sets up the folder tree", focused) {
+  test("Creating new repository sets up the folder tree") {
     val repository: Repository = altitude.service.repository.addRepository(
       name = Util.randomStr(),
       fileStoreType = C.FileStoreType.FS,
