@@ -52,14 +52,14 @@ import software.altitude.core.{Util, Const => C}
     folder1_1
     folder1_2
   */
-    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+    val folder1: Folder = altitude.service.library.addFolder("folder1")
 
-    val folder1_1: Folder = altitude.service.folder.addFolder(
+    val folder1_1: Folder = altitude.service.library.addFolder(
       name = "folder1_1", parentId = folder1.id)
 
     folder1_1.parentId should not be None
 
-    val folder1_2: Folder = altitude.service.folder.addFolder(
+    val folder1_2: Folder = altitude.service.library.addFolder(
       name = "folder1_2", parentId = folder1.id)
 
     val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
@@ -110,11 +110,11 @@ import software.altitude.core.{Util, Const => C}
     folder2
       folder2_1
     */
-    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+    val folder1: Folder = altitude.service.library.addFolder("folder1")
 
-    val folder2: Folder = altitude.service.folder.addFolder("folder2")
+    val folder2: Folder = altitude.service.library.addFolder("folder2")
 
-    val folder2_1: Folder = altitude.service.folder.addFolder(
+    val folder2_1: Folder = altitude.service.library.addFolder(
       name = "folder2_1", parentId = folder2.id)
 
     // fill up the hierarchy with assets x times over

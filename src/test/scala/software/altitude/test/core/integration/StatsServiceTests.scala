@@ -11,7 +11,7 @@ import software.altitude.core.util.Query
 
   test("Test totals (simple cases)") {
     // create an asset in a folder
-    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+    val folder1: Folder = altitude.service.library.addFolder("folder1")
 
     altitude.service.library.add(makeAsset(folder1))
 
@@ -67,7 +67,7 @@ import software.altitude.core.util.Query
 
   test("Test triage") {
     // create an asset in a folder
-    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+    val folder1: Folder = altitude.service.library.addFolder("folder1")
 
     val asset: Asset = altitude.service.library.add(makeAsset(folder1))
 
@@ -82,7 +82,7 @@ import software.altitude.core.util.Query
   }
 
   test("Test move recycled asset to new folder") {
-    var folder1: Folder = altitude.service.folder.addFolder("folder1")
+    var folder1: Folder = altitude.service.library.addFolder("folder1")
 
     val asset: Asset = altitude.service.library.add(makeAsset(folder1))
 
@@ -91,7 +91,7 @@ import software.altitude.core.util.Query
 
     altitude.service.library.recycleAsset(asset.id.get)
 
-    var folder2: Folder = altitude.service.folder.addFolder("folder2")
+    var folder2: Folder = altitude.service.library.addFolder("folder2")
 
     altitude.service.library.moveAssetToFolder(asset.id.get, folder2.id.get)
 
@@ -110,7 +110,7 @@ import software.altitude.core.util.Query
   }
 
   test("Test move recycled asset to original folder") {
-    var folder1: Folder = altitude.service.folder.addFolder("folder1")
+    var folder1: Folder = altitude.service.library.addFolder("folder1")
 
     val asset: Asset = altitude.service.library.add(makeAsset(folder1))
 
@@ -174,7 +174,7 @@ import software.altitude.core.util.Query
   }
 
   test("Restore recycled asset to original folder") {
-    var folder1: Folder = altitude.service.folder.addFolder("folder1")
+    var folder1: Folder = altitude.service.library.addFolder("folder1")
 
     val asset: Asset = altitude.service.library.add(makeAsset(folder1))
 
@@ -189,7 +189,7 @@ import software.altitude.core.util.Query
   }
 
   test("Recycle multiple assets") {
-    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+    val folder1: Folder = altitude.service.library.addFolder("folder1")
 
     1 to 2 foreach { n =>
       altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
@@ -214,8 +214,8 @@ import software.altitude.core.util.Query
   }
 
   test("Recycle a folder") {
-    val folder1: Folder = altitude.service.folder.addFolder("folder1")
-    val folder2: Folder = altitude.service.folder.addFolder("folder2")
+    val folder1: Folder = altitude.service.library.addFolder("folder1")
+    val folder2: Folder = altitude.service.library.addFolder("folder2")
 
     1 to 2 foreach { n =>
       altitude.service.library.add(makeAsset(folder1))

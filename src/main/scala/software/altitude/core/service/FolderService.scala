@@ -43,7 +43,6 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       try {
         val addedFolder = addPath(super.add(folder, Some(dupQuery)))
         require(addedFolder.path.nonEmpty)
-        app.service.fileStore.addFolder(addedFolder)
         addedFolder
       } catch {
         case _: DuplicateException => {
@@ -53,18 +52,6 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
         }
       }
     }
-  }
-
-  /**
-   * Add a new folder
-   */
-  def addFolder(name: String, parentId: Option[String] = None)
-               (implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
-    val _parentId = if (parentId.isDefined) parentId.get else ctx.repo.rootFolderId
-    val folder = Folder(
-      name = name,
-      parentId = _parentId)
-    add(folder)
   }
 
   /**
@@ -369,7 +356,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
    * Move a folder from one parent to another
    */
   def move(folderBeingMovedId: String, destFolderId: String)
-          (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+          (implicit ctx: Context, txId: TransactionId = new TransactionId): (Folder, Folder) = {
 
     if (isRootFolder(folderBeingMovedId)) {
       throw IllegalOperationException("Cannot move the root folder")
@@ -415,7 +402,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
           s"Cannot move to '${destFolder.get.name}' as a folder by this name already exists")
       }
 
-      app.service.fileStore.moveFolder(folderBeingMoved, destFolder.get)
+      Tuple2(folderBeingMoved, destFolder.get)
     }
   }
 
@@ -433,25 +420,20 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
         C.Folder.PARENT_ID -> folder.parentId,
         C.Folder.NAME_LC -> newName.toLowerCase))
 
-      var folderForUpdate: Option[Folder] = None
-
       try {
-        folderForUpdate = Some(Folder(
-          parentId = folder.parentId,
-          name = newName,
-          path = Some(app.service.fileStore.getFolderPath(newName, folder.parentId))))
+        val folderForUpdate: Folder = folder.modify(
+          C.Folder.NAME -> newName,
+          C.Folder.PATH -> app.service.fileStore.getFolderPath(newName, folder.parentId)
+        )
 
-        updateById(folderId, folderForUpdate.get, List(C.Folder.NAME, C.Folder.NAME_LC), Some(dupQuery))
+        updateById(folderId, folderForUpdate, List(C.Folder.NAME, C.Folder.NAME_LC), Some(dupQuery))
+        folderForUpdate
       } catch {
         case _: DuplicateException =>
           val ex = ValidationException()
           ex.errors += C.Folder.NAME -> C.Msg.Err.DUPLICATE
           throw ex
       }
-
-      app.service.fileStore.renameFolder(folder, newName)
-
-      folderForUpdate.get
     }
   }
 

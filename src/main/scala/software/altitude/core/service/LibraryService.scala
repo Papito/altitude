@@ -8,10 +8,9 @@ import javax.imageio.ImageIO
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.imgscalr.Scalr
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.JsObject
 import software.altitude.core.Const.Api
-import software.altitude.core.Const.Api.Folder
-import software.altitude.core.models._
+import software.altitude.core.models.{Folder, _}
 import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
 import software.altitude.core.util.{Query, QueryResult}
 import software.altitude.core.{Altitude, Context, Const => C, _}
@@ -117,7 +116,7 @@ class LibraryService(val app: Altitude) {
     log.debug(s"Asset query $query")
 
     // parse out folder ids as a set
-    val folderIds: Set[String] = query.params.getOrElse(Folder.QUERY_ARG_NAME, "")
+    val folderIds: Set[String] = query.params.getOrElse(C.Api.Folder.QUERY_ARG_NAME, "")
       .toString.split(s"\\${Api.MULTI_VALUE_DELIM}").map(_.trim).filter(_.nonEmpty).toSet
 
     log.debug(s"${folderIds.size} folder ids: $folderIds")
@@ -415,12 +414,39 @@ class LibraryService(val app: Altitude) {
     }
   }
 
+  /**
+    * Add a new folder
+    */
+  def addFolder(name: String, parentId: Option[String] = None)
+               (implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
+    txManager.withTransaction[JsObject] {
+      val _parentId = if (parentId.isDefined) parentId.get else ctx.repo.rootFolderId
+      val folder = Folder(name = name, parentId = _parentId)
+      val addedFolder = app.service.folder.add(folder)
+      app.service.fileStore.addFolder(addedFolder)
+      addedFolder
+    }
+  }
+
   def renameFolder(folderId: String, newName: String)
                   (implicit ctx: Context, txId: TransactionId = new TransactionId): Folder = {
     txManager.withTransaction[Folder] {
-      app.service.folder.rename(folderId, newName)
+      val folder: Folder = app.service.folder.getById(folderId)
+      val updatedFolder = app.service.folder.rename(folderId, newName)
+      app.service.fileStore.renameFolder(folder, newName)
+      updatedFolder
     }
   }
+
+  def moveFolder(folderBeingMovedId: String, destFolderId: String)
+                  (implicit ctx: Context, txId: TransactionId = new TransactionId): Folder = {
+    txManager.withTransaction[Folder] {
+      val (movedFolder, newParent) = app.service.folder.move(folderBeingMovedId, destFolderId)
+      app.service.fileStore.moveFolder(movedFolder, newParent)
+      movedFolder
+    }
+  }
+
 
   def restoreRecycledAsset(assetId: String)
                           (implicit ctx: Context, txId: TransactionId = new TransactionId): Asset = {

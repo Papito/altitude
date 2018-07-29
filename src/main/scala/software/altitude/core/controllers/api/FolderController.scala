@@ -53,7 +53,7 @@ class FolderController extends BaseApiController {
     val name = (requestJson.get \ C.Api.Folder.NAME).as[String]
     val parentId = realId((requestJson.get \ C.Api.Folder.PARENT_ID).as[String])
 
-    val newFolder: Folder = app.service.folder.addFolder(name = name, parentId = Some(parentId))
+    val newFolder: Folder = app.service.library.addFolder(name = name, parentId = Some(parentId))
     log.debug(s"New folder: $newFolder")
 
     Ok(Json.obj(C.Api.Folder.FOLDER -> newFolder.toJson))
@@ -78,7 +78,7 @@ class FolderController extends BaseApiController {
     }
 
     if (newParentId.isDefined) {
-      app.service.folder.move(id, newParentId.get)
+      app.service.library.moveFolder(id, newParentId.get)
     }
 
     OK

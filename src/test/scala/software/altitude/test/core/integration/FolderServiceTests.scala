@@ -14,16 +14,16 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
         folder1_2
       */
 
-    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+    val folder1: Folder = altitude.service.library.addFolder("folder1")
 
     folder1.parentId shouldEqual ctx.repo.rootFolderId
 
-    val folder1_1: Folder = altitude.service.folder.addFolder(
+    val folder1_1: Folder = altitude.service.library.addFolder(
       name = "folder1_1", parentId = folder1.id)
 
         folder1_1.parentId should not be None
 
-        val folder1_2: Folder = altitude.service.folder.addFolder(
+        val folder1_2: Folder = altitude.service.library.addFolder(
           name = "folder1_2", parentId = folder1.id)
 
         folder1.id should contain(folder1_2.parentId)
@@ -34,22 +34,22 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
               folder2_1_1
             folder2_2
           */
-        val folder2: Folder = altitude.service.folder.addFolder(
+        val folder2: Folder = altitude.service.library.addFolder(
           name = "folder2")
 
         folder2.parentId shouldEqual ctx.repo.rootFolderId
 
-        val folder2_1: Folder = altitude.service.folder.addFolder(
+        val folder2_1: Folder = altitude.service.library.addFolder(
           name = "folder2_1", parentId = folder2.id)
 
         folder2.id should contain(folder2_1.parentId)
 
-        val folder2_1_1: Folder = altitude.service.folder.addFolder(
+        val folder2_1_1: Folder = altitude.service.library.addFolder(
           name = "folder2_1_1", parentId = folder2_1.id)
 
         folder2_1.id should contain(folder2_1_1.parentId)
 
-        val folder2_2: Folder = altitude.service.folder.addFolder(
+        val folder2_2: Folder = altitude.service.library.addFolder(
           name = "folder2_2", parentId = folder2.id)
 
         folder2.id should contain(folder2_2.parentId)
@@ -95,10 +95,10 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
   }
 
   test("Adding a duplicate folder under the same parent should fail") {
-    val folder: Folder = altitude.service.folder.addFolder("folder1")
+    val folder: Folder = altitude.service.library.addFolder("folder1")
 
     intercept[ValidationException] {
-      altitude.service.folder.addFolder(folder.name)
+      altitude.service.library.addFolder(folder.name)
     }
 
     val folders = altitude.service.folder.hierarchy()
@@ -107,24 +107,24 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
 
   test("Invalid folder names should fail") {
     intercept[ValidationException] {
-      altitude.service.folder.addFolder("")
+      altitude.service.library.addFolder("")
     }
     intercept[ValidationException] {
-      altitude.service.folder.addFolder(" ")
+      altitude.service.library.addFolder(" ")
     }
     intercept[ValidationException] {
-      altitude.service.folder.addFolder(" ")
+      altitude.service.library.addFolder(" ")
     }
     intercept[ValidationException] {
-      altitude.service.folder.addFolder("\t \t   ")
+      altitude.service.library.addFolder("\t \t   ")
     }
   }
 
   test("New folders  should be free of user-entered space characters") {
-    val folder1: Folder = altitude.service.folder.addFolder(" folder  ")
+    val folder1: Folder = altitude.service.library.addFolder(" folder  ")
     folder1.name shouldEqual "folder"
 
-    val folder2:Folder = altitude.service.folder.addFolder(" Folder one \n")
+    val folder2:Folder = altitude.service.library.addFolder(" Folder one \n")
     folder2.name shouldEqual "Folder one"
   }
 
@@ -137,21 +137,21 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
         folder1_1_1_2
     folder1_2
   */
-    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+    val folder1: Folder = altitude.service.library.addFolder("folder1")
 
-    val folder1_1: Folder = altitude.service.folder.addFolder(
+    val folder1_1: Folder = altitude.service.library.addFolder(
       name = "folder1_1", parentId = folder1.id)
 
-    val folder1_1_1: Folder = altitude.service.folder.addFolder(
+    val folder1_1_1: Folder = altitude.service.library.addFolder(
       name = "folder1_1_1", parentId = folder1_1.id)
 
-    val folder1_1_1_1: Folder = altitude.service.folder.addFolder(
+    val folder1_1_1_1: Folder = altitude.service.library.addFolder(
       name = "folder1_1_1_1", parentId = folder1_1_1.id)
 
-    val folder1_1_1_2: Folder = altitude.service.folder.addFolder(
+    val folder1_1_1_2: Folder = altitude.service.library.addFolder(
       name = "folder1_1_1_2", parentId = folder1_1_1.id)
 
-    val folder1_2: Folder = altitude.service.folder.addFolder(
+    val folder1_2: Folder = altitude.service.library.addFolder(
       name = "folder1_2", parentId = folder1.id)
 
     altitude.service.library.deleteFolderById(folder1.id.get)
@@ -204,7 +204,7 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
   test("Adding a child folder to a system folder shoul fail") {
     altitude.service.folder.systemFolders.foreach { sysFolder =>
       intercept[IllegalOperationException] {
-        altitude.service.folder.addFolder(name = "folder1", parentId = sysFolder.id)
+        altitude.service.library.addFolder(name = "folder1", parentId = sysFolder.id)
        }
     }
   }
@@ -217,18 +217,18 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     folder1_2
   folder2
   */
-    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+    val folder1: Folder = altitude.service.library.addFolder("folder1")
 
-    val folder1_1: Folder = altitude.service.folder.addFolder(
+    val folder1_1: Folder = altitude.service.library.addFolder(
       name = "folder1_1", parentId = folder1.id)
 
-    val folder1_1_1: Folder = altitude.service.folder.addFolder(
+    val folder1_1_1: Folder = altitude.service.library.addFolder(
       name = "folder1_1_1", parentId = folder1_1.id)
 
-    val folder1_2: Folder = altitude.service.folder.addFolder(
+    val folder1_2: Folder = altitude.service.library.addFolder(
       name = "folder1_2", parentId = folder1.id)
 
-    val folder2: Folder = altitude.service.folder.addFolder("folder2")
+    val folder2: Folder = altitude.service.library.addFolder("folder2")
 
     // assert initial state
     // target
@@ -237,7 +237,7 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     altitude.app.service.folder.immediateChildren(rootId = folder1_1.id.get).length shouldBe 1
 
     // move folder1_1_1 to folder2
-    altitude.service.folder.move(folder1_1_1.id.get, folder2.id.get)
+    altitude.service.library.moveFolder(folder1_1_1.id.get, folder2.id.get)
     // target
     altitude.app.service.folder.immediateChildren(rootId = folder2.id.get).length shouldBe 1
     // source
@@ -251,23 +251,23 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
       folder1_1_1
   folder2
   */
-    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+    val folder1: Folder = altitude.service.library.addFolder("folder1")
 
-    val folder1_1: Folder = altitude.service.folder.addFolder(
+    val folder1_1: Folder = altitude.service.library.addFolder(
       name = "folder1_1", parentId = folder1.id)
 
-    val folder1_1_1: Folder = altitude.service.folder.addFolder(
+    val folder1_1_1: Folder = altitude.service.library.addFolder(
       name = "folder1_1_1", parentId = folder1_1.id)
 
-    val folder2: Folder = altitude.service.folder.addFolder("folder2")
+    val folder2: Folder = altitude.service.library.addFolder("folder2")
 
     // assert initial state
     altitude.app.service.folder.immediateChildren(rootId = ctx.repo.rootFolderId).length shouldBe 2
 
-    altitude.service.folder.move(folder1_1_1.id.get, ctx.repo.rootFolderId)
+    altitude.service.library.moveFolder(folder1_1_1.id.get, ctx.repo.rootFolderId)
     altitude.app.service.folder.immediateChildren(rootId = ctx.repo.rootFolderId).length shouldBe 3
 
-    altitude.service.folder.move(folder1_1.id.get, ctx.repo.rootFolderId)
+    altitude.service.library.moveFolder(folder1_1.id.get, ctx.repo.rootFolderId)
     altitude.app.service.folder.immediateChildren(rootId = ctx.repo.rootFolderId).length shouldBe 4
   }
 
@@ -281,54 +281,54 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     folder3
         FOLDER1_1_1
     */
-    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+    val folder1: Folder = altitude.service.library.addFolder("folder1")
 
-    val folder1_1: Folder = altitude.service.folder.addFolder(
+    val folder1_1: Folder = altitude.service.library.addFolder(
       name = "folder1_1", parentId = folder1.id)
 
-    val folder1_1_1: Folder = altitude.service.folder.addFolder(
+    val folder1_1_1: Folder = altitude.service.library.addFolder(
       name = "folder1_1_1", parentId = folder1_1.id)
 
-    val folder2: Folder = altitude.service.folder.addFolder("folder2")
+    val folder2: Folder = altitude.service.library.addFolder("folder2")
 
     // create folder1_1_1 as a duplicate under a different parent
-    altitude.service.folder.addFolder(
+    altitude.service.library.addFolder(
       name = "folder1_1_1", parentId = folder2.id)
 
-    val folder3: Folder = altitude.service.folder.addFolder("folder3")
+    val folder3: Folder = altitude.service.library.addFolder("folder3")
 
     // create folder1_1_1 as a duplicate under a different parent
-    altitude.service.folder.addFolder(
+    altitude.service.library.addFolder(
       name = "FOLDER1_1_1", parentId = folder3.id)
 
     // move into itself
     intercept[IllegalOperationException] {
-      altitude.service.folder.move(folder1.id.get, folder1.id.get)
+      altitude.service.library.moveFolder(folder1.id.get, folder1.id.get)
     }
 
     // move into a child
     intercept[IllegalOperationException] {
-      altitude.service.folder.move(folder1.id.get, folder1_1_1.id.get)
+      altitude.service.library.moveFolder(folder1.id.get, folder1_1_1.id.get)
     }
 
     // move into a parent with the same immediate child name
     intercept[ValidationException] {
-      altitude.service.folder.move(folder1_1_1.id.get, folder2.id.get)
+      altitude.service.library.moveFolder(folder1_1_1.id.get, folder2.id.get)
     }
 
     // move into a parent with the same immediate child name (different casing_
     intercept[ValidationException] {
-      altitude.service.folder.move(folder1_1_1.id.get, folder3.id.get)
+      altitude.service.library.moveFolder(folder1_1_1.id.get, folder3.id.get)
     }
 
     // move into a folder that does not exist
     intercept[ValidationException] {
-    altitude.service.folder.move(folder1.id.get, "bogus")
+    altitude.service.library.moveFolder(folder1.id.get, "bogus")
     }
   }
 
   test("Rename a folder") {
-    val folder1: Folder = altitude.service.folder.addFolder("folder")
+    val folder1: Folder = altitude.service.library.addFolder("folder")
 
     altitude.service.library.renameFolder(folder1.id.get, "newName")
 
@@ -336,8 +336,19 @@ import software.altitude.core.{IllegalOperationException, NotFoundException, Val
     renamedFolder.name shouldEqual "newName"
   }
 
+  test("Folder name casing can be changed", focused) {
+    val folder1: Folder = altitude.service.library.addFolder("folder")
+
+    altitude.service.library.renameFolder(folder1.id.get, "Folder")
+
+    val renamedFolder: Folder = altitude.service.folder.getById(folder1.id.get)
+    renamedFolder.name shouldEqual "Folder"
+  }
+
+
+
   test("Illegal rename actions should throw") {
-    val folder1: Folder = altitude.service.folder.addFolder("folder")
+    val folder1: Folder = altitude.service.library.addFolder("folder")
 
     intercept[ValidationException] {
       altitude.service.library.renameFolder(folder1.id.get, folder1.name)

@@ -16,7 +16,7 @@ import software.altitude.core.{NotFoundException, StorageException, Util, Const 
     var relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
     checkRepositoryFilePath(relAssetPath.getPath)
 
-    val folder: Folder = altitude.service.folder.addFolder("folder1")
+    val folder: Folder = altitude.service.library.addFolder("folder1")
     relAssetPath = new File(folder.path.get, "1.jpg")
     val movedAsset = altitude.service.library.moveAssetToFolder(asset.id.get, folder.id.get)
     checkRepositoryFilePath(relAssetPath.getPath)
@@ -24,12 +24,12 @@ import software.altitude.core.{NotFoundException, StorageException, Util, Const 
   }
 
   test("move folder") {
-    var folder1: Folder = altitude.service.folder.addFolder("folder1")
+    var folder1: Folder = altitude.service.library.addFolder("folder1")
     var asset1: Asset = altitude.service.library.add(makeAsset(folder1))
-    val folder2: Folder = altitude.service.folder.addFolder("folder2")
+    val folder2: Folder = altitude.service.library.addFolder("folder2")
     altitude.service.library.add(makeAsset(folder2))
 
-    altitude.service.folder.move(folder1.id.get, folder2.id.get)
+    altitude.service.library.moveFolder(folder1.id.get, folder2.id.get)
     checkNoRepositoryDirPath(folder1.path.get)
 
     folder1 = altitude.service.folder.getById(folder1.id.get)
@@ -44,12 +44,12 @@ import software.altitude.core.{NotFoundException, StorageException, Util, Const 
     var relAssetPath = new File(altitude.service.fileStore.triageFolderPath, "1.jpg")
     checkRepositoryFilePath(relAssetPath.getPath)
 
-    var folder: Folder = altitude.service.folder.addFolder("folder1")
+    var folder: Folder = altitude.service.library.addFolder("folder1")
     relAssetPath = new File(folder.path.get, "1.jpg")
     val movedAsset = altitude.service.library.moveAssetToFolder(asset.id.get, folder.id.get)
 
     // create a dummy file in place of destination
-    folder  = altitude.service.folder.addFolder("folder2")
+    folder  = altitude.service.library.addFolder("folder2")
     relAssetPath = new File(folder.path.get, "1.jpg")
     FileUtils.writeByteArrayToFile(getAbsoluteFile(relAssetPath.getPath), new Array[Byte](0))
 
@@ -60,7 +60,7 @@ import software.altitude.core.{NotFoundException, StorageException, Util, Const 
   }
 
   test("rename directory") {
-    var folder1: Folder = altitude.service.folder.addFolder("folder1")
+    var folder1: Folder = altitude.service.library.addFolder("folder1")
 
     var asset1: Asset = altitude.service.library.add(makeAsset(folder1))
     val asset2: Asset = altitude.service.library.add(makeAsset(folder1))
@@ -85,13 +85,13 @@ import software.altitude.core.{NotFoundException, StorageException, Util, Const 
   }
 
   test("delete folder") {
-    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+    val folder1: Folder = altitude.service.library.addFolder("folder1")
     altitude.service.library.deleteFolderById(folder1.id.get)
     checkRepositoryDirPath("")
   }
 
   test("delete folder and assets") {
-    val folder1: Folder = altitude.service.folder.addFolder("folder1")
+    val folder1: Folder = altitude.service.library.addFolder("folder1")
 
     val asset1: Asset = altitude.service.library.add(makeAsset(folder1))
     val asset2: Asset = altitude.service.library.add(makeAsset(folder1))
@@ -181,31 +181,31 @@ import software.altitude.core.{NotFoundException, StorageException, Util, Const 
         folder2_2
       */
 
-    val folder1: Folder = altitude.service.folder.addFolder(
+    val folder1: Folder = altitude.service.library.addFolder(
       name = "folder1")
 
     var relativePath = FilenameUtils.concat(C.Path.ROOT, folder1.name)
     checkRepositoryDirPath(relativePath)
 
-    val folder2: Folder = altitude.service.folder.addFolder(
+    val folder2: Folder = altitude.service.library.addFolder(
       name = "folder2")
 
     relativePath = FilenameUtils.concat(C.Path.ROOT, folder2.name)
     checkRepositoryDirPath(relativePath)
 
-    val folder2_1: Folder = altitude.service.folder.addFolder(
+    val folder2_1: Folder = altitude.service.library.addFolder(
       name = "folder2_1", parentId = folder2.id)
 
     relativePath = folder2_1.path.get
     checkRepositoryDirPath(relativePath)
 
-    val folder2_1_1: Folder = altitude.service.folder.addFolder(
+    val folder2_1_1: Folder = altitude.service.library.addFolder(
       name = "folder2_1_1", parentId = folder2_1.id)
 
     relativePath = folder2_1_1.path.get
     checkRepositoryDirPath(relativePath)
 
-    val folder2_2: Folder = altitude.service.folder.addFolder(
+    val folder2_2: Folder = altitude.service.library.addFolder(
       name = "folder2_2", parentId = folder2.id)
 
     relativePath = folder2_2.path.get
@@ -226,20 +226,20 @@ import software.altitude.core.{NotFoundException, StorageException, Util, Const 
         altitude.service.library.deleteFolderById(folder2.id.get)
     }
 
-    val folder3: Folder = altitude.service.folder.addFolder(
+    val folder3: Folder = altitude.service.library.addFolder(
       name = "folder3")
 
-    val folder3_3: Folder = altitude.service.folder.addFolder(
+    val folder3_3: Folder = altitude.service.library.addFolder(
       name = "folder3_3", parentId = folder3.id)
 
-    altitude.service.folder.rename(folder3.id.get, "folder3_new")
+    altitude.service.library.renameFolder(folder3.id.get, "folder3_new")
     relativePath = FilenameUtils.concat(C.Path.ROOT, folder3_3.name)
     checkNoRepositoryDirPath(relativePath)
     relativePath = FilenameUtils.concat(C.Path.ROOT, "folder3_new")
     checkRepositoryDirPath(relativePath)
   }
 
-  test("Creating new repository sets up the folder tree") {
+  test("Creating new repository sets up the folder tree", focused) {
     val repository: Repository = altitude.service.repository.addRepository(
       name = Util.randomStr(),
       fileStoreType = C.FileStoreType.FS,

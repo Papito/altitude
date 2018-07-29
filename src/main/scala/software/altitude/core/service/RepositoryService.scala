@@ -56,8 +56,12 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
       implicit val ctx: Context = new Context(repo = repo, user = user)
 
       log.info(s"Creating repository [${ctx.repo.name}] system folders")
-      app.service.folder.add(app.service.folder.rootFolder)
-      app.service.folder.add(app.service.folder.triageFolder)
+
+      val rootFolder = app.service.folder.add(app.service.folder.rootFolder)
+      app.service.fileStore.addFolder(rootFolder)
+
+      val triageFolder = app.service.folder.add(app.service.folder.triageFolder)
+      app.service.fileStore.addFolder(triageFolder)
 
       // trash does not have an explicit folder record - just the storage location
       app.service.fileStore.createPath(app.service.fileStore.trashFolderPath)
