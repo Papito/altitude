@@ -73,9 +73,9 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) extends Query
   protected def assembleQuery(select: String, from: String, where: String, rpp: Int = 0, page: Int = 0): String = {
     val sqlWithoutPaging = s"SELECT $select FROM $from $where"
 
-    rpp match  {
+    rpp match {
       case 0 => sqlWithoutPaging
-      case _ =>  sqlWithoutPaging + s"""
+      case _ => sqlWithoutPaging + s"""
         LIMIT $rpp
         OFFSET ${(page - 1) * rpp}"""
     }

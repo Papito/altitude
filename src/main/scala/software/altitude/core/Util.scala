@@ -15,7 +15,7 @@ object Util {
   def utcNow: DateTime = new DateTime().withZoneRetainFields(DateTimeZone.forID("UTC")).withMillisOfSecond(0)
   def utcNowNoTZ: DateTime = new DateTime().withMillisOfSecond(0)
 
-  def logStacktrace(e: Exception): String  = {
+  def logStacktrace(e: Exception): String = {
     e.printStackTrace()
     val sw: StringWriter = new StringWriter()
     val pw: PrintWriter = new PrintWriter(sw)

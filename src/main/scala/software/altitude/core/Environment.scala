@@ -6,7 +6,7 @@ object Environment extends Enumeration {
   val TEST, PROD, DEV = Value
   var ENV = DEV
 
-  def root: String = ENV match  {
+  def root: String = ENV match {
     case PROD =>
       val url = Environment.getClass.getProtectionDomain.getCodeSource.getLocation
       val path = new File(url.toURI).getParentFile.getPath

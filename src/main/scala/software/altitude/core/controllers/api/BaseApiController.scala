@@ -32,22 +32,25 @@ class BaseApiController extends BaseController with ContentEncodingSupport {
     Process all validators that may be set for this controller/method.
      */
     HTTP_POST_VALIDATOR match {
-      case Some(ApiRequestValidator(_)) if requestMethod == "post" => HTTP_POST_VALIDATOR.get.validate(requestJson.get)
+      case Some(ApiRequestValidator(_)) if requestMethod == "post" =>
+        HTTP_POST_VALIDATOR.get.validate(requestJson.get)
       case _ if requestMethod == "post" =>
         log.debug(s"No POST validator specified for ${this.getClass.getName}")
       case _ =>
     }
 
     HTTP_DELETE_VALIDATOR match {
-      case Some(ApiRequestValidator(_)) if requestMethod == "delete" => HTTP_DELETE_VALIDATOR.get.validate(requestJson.get)
+      case Some(ApiRequestValidator(_)) if requestMethod == "delete" =>
+        HTTP_DELETE_VALIDATOR.get.validate(requestJson.get)
       case _ if requestMethod == "delete" =>
         log.debug(s"No DELETE validator specified for ${this.getClass.getName}")
       case _ =>
     }
 
     HTTP_UPDATE_VALIDATOR match {
-      case Some(ApiRequestValidator(_)) if requestMethod == "put" => HTTP_UPDATE_VALIDATOR.get.validate(requestJson.get)
-      case _ if requestMethod == "update"  =>
+      case Some(ApiRequestValidator(_)) if requestMethod == "put" =>
+        HTTP_UPDATE_VALIDATOR.get.validate(requestJson.get)
+      case _ if requestMethod == "update" =>
         log.debug(s"No PUT validator specified for ${this.getClass.getName}")
       case _ =>
     }
@@ -58,7 +61,8 @@ class BaseApiController extends BaseController with ContentEncodingSupport {
 
   override def logRequestStart(): Unit = {
     log.info(
-      s"API ${request.getRequestURI} ${requestMethod.toUpperCase} with {${request.body}} and ${request.getParameterMap}")
+      s"API ${request.getRequestURI} ${requestMethod.toUpperCase} " +
+        s"with {${request.body}} and ${request.getParameterMap}")
   }
 
   override def logRequestEnd(): Unit = {
@@ -75,7 +79,7 @@ class BaseApiController extends BaseController with ContentEncodingSupport {
 
   error {
     case ex: ValidationException => {
-      val jsonErrors = ex.errors.keys.foldLeft(Json.obj()){(res, field) => {
+      val jsonErrors = ex.errors.keys.foldLeft(Json.obj()) {(res, field) => {
         val key = field.toString
         res ++ Json.obj(key -> ex.errors(key))}
       }

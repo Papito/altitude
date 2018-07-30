@@ -49,6 +49,6 @@ class FileSystemSourceService(app: Altitude) extends AssetSourceService {
     fileName = file.getName,
     path = file.getAbsolutePath,
     sourceType = C.FileStoreType.FS,
-    data =  FileUtils.readFileToByteArray(file),
+    data = FileUtils.readFileToByteArray(file),
     metadata = Metadata())
 }

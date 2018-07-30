@@ -10,7 +10,7 @@ import software.altitude.test.core.integration.IntegrationTestCore
 
 trait PostgresSuiteSetup extends Suite with BeforeAndAfterAll {
   Environment.ENV = Environment.TEST
-  protected final val log: Logger =  LoggerFactory.getLogger(getClass)
+  protected final val log: Logger = LoggerFactory.getLogger(getClass)
 
   override def beforeAll(): Unit = {
     IntegrationTestCore.createTestDir(PostgresSuite.app)

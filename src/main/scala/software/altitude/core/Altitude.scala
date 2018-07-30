@@ -35,6 +35,7 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeCor
    */
   override val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
 
+  // scalastyle:off
   object service {
     val user = new UserService(app)
     val repository = new RepositoryService(app)
@@ -55,6 +56,7 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeCor
     object source {
       val fileSystem = new FileSystemSourceService(app)
     }
+    // scalastyle:on
 
     final val schemaVersion = 1
 

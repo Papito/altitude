@@ -6,7 +6,9 @@ import software.altitude.core.models.Repository
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{AltitudeCoreApp, Context, Const => C}
 
-abstract class RepositoryDao(val app: AltitudeCoreApp) extends BaseJdbcDao with software.altitude.core.dao.RepositoryDao {
+abstract class RepositoryDao(val app: AltitudeCoreApp)
+  extends BaseJdbcDao
+    with software.altitude.core.dao.RepositoryDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override final val tableName = "repository"
@@ -19,7 +21,12 @@ abstract class RepositoryDao(val app: AltitudeCoreApp) extends BaseJdbcDao with 
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val fileStoreConfigCol = rec(C.Repository.FILES_STORE_CONFIG)
-    val fileStoreConfigJsonStr: String = if (fileStoreConfigCol == null) "{}" else fileStoreConfigCol.asInstanceOf[String]
+    val fileStoreConfigJsonStr: String = if (fileStoreConfigCol == null) {
+      "{}"
+    } else {
+      fileStoreConfigCol.asInstanceOf[String]
+    }
+
     val fileStoreConfigJson = Json.parse(fileStoreConfigJsonStr).as[JsObject]
 
     val model = Repository(

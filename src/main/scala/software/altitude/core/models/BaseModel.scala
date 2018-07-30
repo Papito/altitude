@@ -88,7 +88,7 @@ abstract class BaseModel {
         s"Cannot update the model with these properties ${wrongPropNames}")
     }
 
-    this.toJson ++ Json.obj(fields:_*)
+    this.toJson ++ Json.obj(fields: _*)
   }
 
   /**

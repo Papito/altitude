@@ -17,7 +17,7 @@ abstract class StatDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softwa
     rec(C.Stat.DIM_VAL).asInstanceOf[Int])
 
   override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
-    val sql: String =s"""
+    val sql: String = s"""
       INSERT INTO $tableName (${C.Base.REPO_ID}, ${C.Stat.DIMENSION})
            VALUES (? ,?)"""
 
@@ -31,7 +31,7 @@ abstract class StatDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softwa
                          (implicit ctx: Context, txId: TransactionId): JsObject = {
     log.info(s"JDBC INSERT: $jsonIn")
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, q, values.map(_.asInstanceOf[Object]):_*)
+    runner.update(conn, q, values.map(_.asInstanceOf[Object]): _*)
     jsonIn
   }
 

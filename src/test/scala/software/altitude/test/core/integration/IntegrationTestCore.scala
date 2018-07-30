@@ -60,7 +60,7 @@ abstract class IntegrationTestCore
     with OptionValues
     with AnswerSugar
     with TestFocus {
-  protected final val log =  LoggerFactory.getLogger(getClass)
+  protected final val log = LoggerFactory.getLogger(getClass)
 
   // Stores test app config overrides, since we run same tests with a different app setup.
   def config: Map[String, Any]
@@ -156,7 +156,7 @@ abstract class IntegrationTestCore
     fileName = file.getName,
     path = file.getAbsolutePath,
     sourceType = C.FileStoreType.FS,
-    data =  FileUtils.readFileToByteArray(file),
+    data = FileUtils.readFileToByteArray(file),
     metadata = Metadata())
 
   // test count - we use it as a request ID for our logging environment

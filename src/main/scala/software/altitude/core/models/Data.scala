@@ -13,7 +13,7 @@ object Data {
     Preview(
       assetId = (json \ C.Data.ASSET_ID).as[String],
       mimeType = (json \ C.Data.MIME_TYPE).as[String],
-      data =  Base64.decodeBase64(data)
+      data = Base64.decodeBase64(data)
     )
   }
 }

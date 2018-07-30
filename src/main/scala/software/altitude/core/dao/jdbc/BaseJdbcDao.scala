@@ -60,7 +60,7 @@ abstract class BaseJdbcDao extends BaseDao {
        WHERE ${C.Base.ID} = ? AND ${C.Base.REPO_ID} = ?"""
 
   override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
-    val sql: String =s"""
+    val sql: String = s"""
       INSERT INTO $tableName ($coreSqlColsForInsert)
            VALUES ($coreSqlValsForInsert)"""
 
@@ -86,7 +86,7 @@ abstract class BaseJdbcDao extends BaseDao {
     log.debug(s"Delete SQL: $sql, with values: ${q.params.values.toList}")
     val runner: QueryRunner = new QueryRunner()
     val numDeleted = runner.update(
-      conn, sql,  ctx.repo.id.get :: q.params.values.toList.map(_.asInstanceOf[Object]):_*)
+      conn, sql, ctx.repo.id.get :: q.params.values.toList.map(_.asInstanceOf[Object]): _*)
     log.debug(s"Deleted records: $numDeleted")
     numDeleted
   }
@@ -95,7 +95,7 @@ abstract class BaseJdbcDao extends BaseDao {
     log.debug(s"Deleting records by SQL")
     log.debug(s"Delete SQL: $sql, with values: $bindValues")
     val runner: QueryRunner = new QueryRunner()
-    val numDeleted = runner.update(conn, sql, bindValues:_*)
+    val numDeleted = runner.update(conn, sql, bindValues: _*)
     log.debug(s"Deleted records: $numDeleted")
     numDeleted
   }
@@ -131,7 +131,7 @@ abstract class BaseJdbcDao extends BaseDao {
     val runner: QueryRunner = new QueryRunner()
 
     // We are defensive with different JDBC drivers operating with either java.lang.Int or java.lang.Long
-    runner.query(conn, sql, new ScalarHandler[AnyRef]("count"),  values.map(_.asInstanceOf[Object]):_*) match {
+    runner.query(conn, sql, new ScalarHandler[AnyRef]("count"), values.map(_.asInstanceOf[Object]): _*) match {
       case v: java.lang.Integer => v.intValue
       case v: java.lang.Long => v.asInstanceOf[Long].toInt
     }
@@ -157,7 +157,7 @@ abstract class BaseJdbcDao extends BaseDao {
     log.debug(s"INSERT SQL: $sql. ARGS: ${_values.toString()}")
 
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, sql, _values.map(_.asInstanceOf[Object]):_*)
+    runner.update(conn, sql, _values.map(_.asInstanceOf[Object]): _*)
 
     val recordJson = jsonIn ++ Json.obj(C.Base.ID -> id)
 
@@ -185,14 +185,14 @@ abstract class BaseJdbcDao extends BaseDao {
   protected def addRecords(q: String, values: List[Any])
                           (implicit ctx: Context, txId: TransactionId): Int = {
     log.debug(s"INSERT MULTIPLE SQL: $q. ARGS: ${values.toString()}")
-    new QueryRunner().update(conn, q, values.map(_.asInstanceOf[Object]):_*)
+    new QueryRunner().update(conn, q, values.map(_.asInstanceOf[Object]): _*)
   }
 
   protected def manyBySqlQuery(sql: String, values: List[Any] = List())
                               (implicit ctx: Context, txId: TransactionId): List[Map[String, AnyRef]] = {
     log.debug(s"Running SQL query [$sql] with $values")
     val runner: QueryRunner = new QueryRunner()
-    val res = runner.query(conn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]):_*)
+    val res = runner.query(conn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]): _*)
     log.debug(s"Found ${res.size()} records", C.LogTag.DB)
     res.map{_.toMap[String, AnyRef]}.toList
   }
@@ -207,15 +207,17 @@ abstract class BaseJdbcDao extends BaseDao {
     log.debug(s"Running SQL query [$sql] with $values")
 
     val runner: QueryRunner = new QueryRunner()
-    val res = runner.query(conn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]):_*)
+    val res = runner.query(conn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]): _*)
 
     log.debug(s"Found ${res.size()} records", C.LogTag.DB)
 
-    if (res.size() == 0)
+    if (res.size() == 0) {
       return None
+    }
 
-    if (res.size() > 1)
+    if (res.size() > 1) {
       throw ConstraintException("getById should return only a single result")
+    }
 
     val rec = res.head
 
@@ -276,7 +278,7 @@ abstract class BaseJdbcDao extends BaseDao {
     val valuesForAllPlaceholders = dataUpdateValues ::: List(ctx.repo.id.get) ::: q.params.values.toList
     val runner: QueryRunner = new QueryRunner()
 
-    val numUpdated = runner.update(conn, sql,  valuesForAllPlaceholders.map(_.asInstanceOf[Object]):_*)
+    val numUpdated = runner.update(conn, sql, valuesForAllPlaceholders.map(_.asInstanceOf[Object]): _*)
     numUpdated
   }
 
@@ -293,7 +295,7 @@ abstract class BaseJdbcDao extends BaseDao {
     runner.update(conn, sql, ctx.repo.id.get, id)
   }
 
-  override def decrement(id: String,  field: String, count: Int = 1)
+  override def decrement(id: String, field: String, count: Int = 1)
                         (implicit ctx: Context, txId: TransactionId): Unit = {
     increment(id, field, -count)
   }

@@ -25,6 +25,7 @@ object Query {
       this(value, ParamType.EQ, negate = false)
   }
 
+  // scalastyle:off
   def EQUALS(value: Any) = new QueryParam(value)
   def NOT_EQUALS(value: Any) = new QueryParam(value, ParamType.EQ, negate = true)
 
@@ -61,6 +62,7 @@ object Query {
 
   def MATCHES(value: Any) = new QueryParam(value, ParamType.MATCHES)
   def NOT_MATCHES(value: Any) = new QueryParam(value, ParamType.MATCHES, negate = true)
+  // scalastyle:on
 }
 
 case class Query(params: Map[String, Any] = Map(), rpp: Int = 0, page: Int = 1) {

@@ -37,6 +37,6 @@ case class Repository(id: Option[String] = None,
     ) ++ coreJsonAttrs
   }
 
-  override def toString = s"<repo> ${id.getOrElse("NO ID")}: $name"
+  override def toString: String = s"<repo> ${id.getOrElse("NO ID")}: $name"
 }
 

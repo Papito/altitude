@@ -31,7 +31,7 @@ abstract class SearchDao(override val app: Altitude) extends AssetDao(app) with 
   override protected def addRecord(jsonIn: JsObject, q: String, values: List[Any])
                                   (implicit ctx: Context, txId: TransactionId): JsObject = {
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, q, values.map(_.asInstanceOf[Object]):_*)
+    runner.update(conn, q, values.map(_.asInstanceOf[Object]): _*)
     jsonIn
   }
 
@@ -51,7 +51,7 @@ abstract class SearchDao(override val app: Altitude) extends AssetDao(app) with 
       val values = m._2
       log.debug(s"Processing field [${field.nameLowercase}] with values [$values]")
 
-      val sql =  s"""
+      val sql = s"""
             INSERT INTO search_parameter (
                         ${C.SearchToken.REPO_ID}, ${C.SearchToken.ASSET_ID},
                         ${C.SearchToken.FIELD_ID},

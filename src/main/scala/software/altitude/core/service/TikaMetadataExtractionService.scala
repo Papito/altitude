@@ -17,7 +17,7 @@ import software.altitude.core.models.{AssetType, ImportAsset, Metadata, Metadata
 import software.altitude.core.{AllDone, Const => C}
 
 class TikaMetadataExtractionService extends MetadataExtractionService {
-  private final val log =  LoggerFactory.getLogger(getClass)
+  private final val log = LoggerFactory.getLogger(getClass)
 
   private object PARSERS {
     final val IMAGE = List(new JpegParser, new TiffParser)

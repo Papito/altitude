@@ -263,10 +263,10 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     val serviceSpy = Mockito.spy(altitude.service)
     val librarySpy = Mockito.spy(altitude.service.library)
     val fileStoreSpy = Mockito.spy(altitude.service.fileStore)
-    Mockito.doReturn(serviceSpy, Array.empty:_*).when(altitudeSpy).service
-    Mockito.doReturn(fileStoreSpy, Array.empty:_*).when(serviceSpy).fileStore
-    Mockito.doReturn(librarySpy, Array.empty:_*).when(serviceSpy).library
-    Mockito.doReturn(altitudeSpy, Array.empty:_*).when(librarySpy).app
+    Mockito.doReturn(serviceSpy, Array.empty: _*).when(altitudeSpy).service
+    Mockito.doReturn(fileStoreSpy, Array.empty: _*).when(serviceSpy).fileStore
+    Mockito.doReturn(librarySpy, Array.empty: _*).when(serviceSpy).library
+    Mockito.doReturn(altitudeSpy, Array.empty: _*).when(librarySpy).app
 
     savepoint()
 

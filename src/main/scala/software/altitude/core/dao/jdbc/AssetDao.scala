@@ -121,6 +121,6 @@ abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softw
     log.debug(s"Update SQL: [$sql] with values: $updateValues")
     val runner: QueryRunner = new QueryRunner()
 
-    runner.update(conn, sql, updateValues:_*)
+    runner.update(conn, sql, updateValues: _*)
   }
 }

@@ -9,7 +9,7 @@ import software.altitude.test.core.integration.IntegrationTestCore
 
 trait SqliteSuiteSetup extends Suite with BeforeAndAfterAll {
   Environment.ENV = Environment.TEST
-  protected final val log =  LoggerFactory.getLogger(getClass)
+  protected final val log = LoggerFactory.getLogger(getClass)
 
   override def beforeAll(): Unit = {
     IntegrationTestCore.createTestDir(SqliteSuite.app)
