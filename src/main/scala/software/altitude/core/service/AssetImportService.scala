@@ -34,7 +34,7 @@ class AssetImportService(app: Altitude) {
   }
 
   def importAsset(importAsset: ImportAsset)
-                 (implicit ctx: Context, txId: TransactionId = new TransactionId) : Option[Asset]  = {
+                 (implicit ctx: Context, txId: TransactionId = new TransactionId) : Option[Asset] = {
     log.info(s"Importing file asset '$importAsset'")
     val assetType = detectAssetType(importAsset)
 

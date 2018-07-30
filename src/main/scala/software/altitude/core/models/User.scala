@@ -17,5 +17,5 @@ case class User(id: Option[String] = None) extends BaseModel {
     C.Base.ID -> id
   ) ++ coreJsonAttrs
 
-  override def toString = s"<user> ${id.getOrElse("NO ID")}"
+  override def toString: String = s"<user> ${id.getOrElse("NO ID")}"
 }

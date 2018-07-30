@@ -9,8 +9,9 @@ object Query {
     require(values.nonEmpty)
 
     // types that requires two values
-    if (paramType == ParamType.RANGE || paramType == ParamType.OR)
+    if (paramType == ParamType.RANGE || paramType == ParamType.OR) {
       require(values.size == 2)
+    }
 
     // overloaded to accept one value
     def this (value: Any, paramType: ParamType.Value, negate: Boolean) =
@@ -70,6 +71,9 @@ case class Query(params: Map[String, Any] = Map(), rpp: Int = 0, page: Int = 1) 
   if (page < 1) throw new IllegalArgumentException(s"Invalid page value: $page")
 
   // append new params to the query and return a new copy
-  def add(_params: (String, Any)*): Query = Query(params=params ++ _params, rpp=rpp, page=page)
+  def add(_params: (String, Any)*): Query = Query(
+    params = params ++ _params,
+    rpp = rpp,
+    page = page)
 
 }

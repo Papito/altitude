@@ -38,6 +38,7 @@ abstract class AbstractTransactionManager {
   /** Transaction counters.
     * We use these for sanity checks during tests or for runtime stats.
     */
+  // scalastyle:off
   object transactions {
     var CREATED = 0
     var COMMITTED = 0
@@ -49,6 +50,7 @@ abstract class AbstractTransactionManager {
       CLOSED = 0
     }
   }
+  // scalastyle:on
 
   def withTransaction[A](f: => A)(implicit txId: TransactionId): A
   def savepoint()(implicit txId: TransactionId): Unit = throw new NotImplementedError

@@ -243,10 +243,10 @@ object Const {
   final val DEFAULT_RPP = "15"
 
   object LogTag {
-    val APP     = "APP"
-    val API     = "API"
-    val DAO     = "DAO"
-    val WEB     = "WEB"
+    val APP = "APP"
+    val API = "API"
+    val DAO = "DAO"
+    val WEB = "WEB"
     val SERVICE = "SERVICE"
     val DB = "DB"
   }

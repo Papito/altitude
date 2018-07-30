@@ -3,7 +3,7 @@ package software.altitude.core.transactions
 trait Transaction {
   val id: Int = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
   val isReadOnly: Boolean
-  protected var _level: Int  = 0
+  protected var _level: Int = 0
   def level: Int = _level
   def hasParents: Boolean = level > 0
   def mustCommit: Boolean = !hasParents

@@ -171,9 +171,9 @@ class LibraryService(val app: Altitude) {
       case size if size > 0 =>
 
         val preview: Preview = Preview(
-          assetId=asset.id.get,
-          mimeType=asset.assetType.mime,
-          data=previewData)
+          assetId = asset.id.get,
+          mimeType = asset.assetType.mime,
+          data = previewData)
 
         app.service.fileStore.addPreview(preview)
 

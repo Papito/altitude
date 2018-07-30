@@ -287,7 +287,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
    * Get the absolute path to the asset on file system,
    * given path relative to repository root
    */
-  private def absoluteFile(relativePath: String)(implicit ctx: Context): File =  {
+  private def absoluteFile(relativePath: String)(implicit ctx: Context): File = {
     val repositoryRoot = ctx.repo.fileStoreConfig(C.Repository.Config.PATH)
     new File(repositoryRoot, relativePath)
   }

@@ -31,8 +31,9 @@ abstract class BaseModel {
   def createdAt: Option[DateTime] = _createdAt
 
   def createdAt_= (arg: DateTime): Unit = {
-    if (_createdAt.isDefined)
+    if (_createdAt.isDefined) {
       throw new RuntimeException("Cannot set 'created at' twice")
+    }
     _createdAt = Some(arg)
   }
 
@@ -42,8 +43,9 @@ abstract class BaseModel {
   def updatedAt: Option[DateTime] = _updatedAt
 
   def updatedAt_= (arg: DateTime): Unit = {
-    if (_updatedAt.isDefined)
+    if (_updatedAt.isDefined) {
       throw new RuntimeException("Cannot set 'updated at' twice")
+    }
     _updatedAt = Some(arg)
   }
 
@@ -115,7 +117,7 @@ abstract class BaseModel {
     * Return this type of object, but with core attributes
     * present, parsed from the passed in JSON object (if the values are present)
     */
-  protected def withCoreAttr(json: JsValue): this.type  = {
+  protected def withCoreAttr(json: JsValue): this.type = {
     val isoCreatedAt = (json \ C.Base.CREATED_AT).asOpt[String]
     if (isoCreatedAt.isDefined) {
       createdAt = ISODateTimeFormat.dateTime().parseDateTime(isoCreatedAt.get)

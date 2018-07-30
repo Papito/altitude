@@ -193,7 +193,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
 
       val newMvalue = MetadataValue(id = Some(valueId), value = newValue)
       // find the field that has the value by ID
-      val search = currentMetadata.data.filter(_._2/*values*/.exists(_.id.contains(valueId)))
+      val search = currentMetadata.data.filter(_._2/* values */.exists(_.id.contains(valueId)))
 
       // FIXME: NotFound
       require(search.size == 1)
@@ -261,10 +261,11 @@ class MetadataService(val app: Altitude) extends ModelValidation {
 
     val missing = suppliedFieldIds.diff(existingFieldIds)
 
-    if (missing.nonEmpty)
+    if (missing.nonEmpty) {
       throw NotFoundException(
         s"Fields [${missing.mkString(", ")}] are not supported by this repository"
       )
+    }
 
     /**
      * Clean the metadata to be ready for validation

@@ -68,7 +68,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   /**
    * Get root folder object for this repository.
    */
-  def rootFolder(implicit ctx: Context, txId: TransactionId = new TransactionId) = Folder(
+  def rootFolder(implicit ctx: Context, txId: TransactionId = new TransactionId): Folder = Folder(
     id = Some(ctx.repo.rootFolderId),
     parentId = ctx.repo.rootFolderId,
     name = C.Folder.Name.ROOT,
@@ -78,7 +78,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   /**
    * Get the Triage folder for this repository
    */
-  def triageFolder(implicit ctx: Context, txId: TransactionId = new TransactionId) = Folder(
+  def triageFolder(implicit ctx: Context, txId: TransactionId = new TransactionId): Folder = Folder(
     id = Some(ctx.repo.triageFolderId),
     parentId = ctx.repo.rootFolderId,
     name = C.Folder.Name.TRIAGE,
@@ -253,7 +253,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
    * The list goes from closest parent to farthest.
    */
   private def findParents(folderId: String, allRepoFolders: List[JsObject])
-                         (implicit ctx: Context, txId: TransactionId):  List[Folder] = {
+                         (implicit ctx: Context, txId: TransactionId): List[Folder] = {
     val repoFolders = repositoryFolders(allRepoFolders)
     val folderEl = repoFolders.find(json => (json \ C.Base.ID).as[String] == folderId)
 
@@ -323,7 +323,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
    * It's a "raw" list of folder ids.
    */
   def flatChildrenIds(parentIds: Set[String], allRepoFolders: List[JsObject] = List())
-                     (implicit ctx: Context, txId: TransactionId = new TransactionId): Set[String]  =
+                     (implicit ctx: Context, txId: TransactionId = new TransactionId): Set[String] =
     parentIds.foldLeft(Set[String]()) {(s, id) => {
       s ++ app.service.folder.flatChildrenIdsWithDepths(parentId = id, allRepoFolders = allRepoFolders).map(_._2).toSet
     }}
@@ -332,7 +332,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
    * Returns flat children as a set of Folder objects
    */
   def flatChildren(parentId: String, all: List[JsObject], depth: Int = 0)
-                  (implicit ctx: Context): Set[Folder]  = {
+                  (implicit ctx: Context): Set[Folder] = {
     if (isSystemFolder(Some(parentId)) || isRootFolder(parentId)) {
       return Set()
     }
@@ -372,7 +372,8 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     txManager.withTransaction {
       // cannot move into own child
       if (flatChildrenIdsWithDepths(folderBeingMovedId, repositoryFolders()).map(_._2).contains(destFolderId)) {
-        throw IllegalOperationException(s"Cannot move a folder into own child. $destFolderId ID in $folderBeingMovedId path")
+        throw IllegalOperationException(
+          s"Cannot move a folder into own child. $destFolderId ID in $folderBeingMovedId path")
       }
 
       var destFolder: Option[Folder] = None

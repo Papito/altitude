@@ -53,7 +53,7 @@ case class Metadata(data: Map[String, Set[MetadataValue]])
   extends BaseModel with NoId {
 
   def get(key: String): Option[Set[MetadataValue]] = data.get(key)
-  def apply(key: String) = data(key)
+  def apply(key: String): Set[MetadataValue] = data(key)
   def contains(key: String): Boolean = data.keys.toSeq.contains(key)
   def isEmpty: Boolean = data.isEmpty
 

@@ -48,6 +48,6 @@ case class Asset(id: Option[String] = None,
     C.Asset.IS_RECYCLED -> isRecycled
   ) ++ coreJsonAttrs
 
-  override def toString =
+  override def toString: String =
     s"path: [$path] recycled: [$isRecycled] class: [${assetType.mediaType}:${assetType.mediaSubtype}]"
 }

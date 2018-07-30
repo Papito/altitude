@@ -55,4 +55,6 @@ case class Folder(id: Option[String] = None,
     }
     case _ => false
   }
+
+  override def hashCode: Int = super.hashCode
 }

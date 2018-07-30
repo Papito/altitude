@@ -129,7 +129,8 @@ class StatsService(val app: Altitude) {
     }
   }
 
-  private def moveRecycledAsset(asset: Asset, destFolderId: String)(implicit ctx: Context, txId: TransactionId): Unit = {
+  private def moveRecycledAsset(asset: Asset, destFolderId: String)
+                               (implicit ctx: Context, txId: TransactionId): Unit = {
     log.debug(s"Moving recycled asset [${asset.id}]. Decrementing RECYCLED")
 
     app.service.stats.decrementStat(Stats.RECYCLED_ASSETS)
@@ -140,7 +141,7 @@ class StatsService(val app: Altitude) {
       app.service.stats.incrementStat(Stats.TRIAGE_ASSETS)
       app.service.stats.incrementStat(Stats.TRIAGE_BYTES, asset.sizeBytes)
     }
-    else if(!app.service.folder.isSystemFolder(Some(destFolderId))) {
+    else if (!app.service.folder.isSystemFolder(Some(destFolderId))) {
       log.debug(s"Recycled asset [${asset.id}] moving TO sorted. Incrementing SORTED")
       app.service.stats.incrementStat(Stats.SORTED_ASSETS)
       app.service.stats.incrementStat(Stats.SORTED_BYTES, asset.sizeBytes)

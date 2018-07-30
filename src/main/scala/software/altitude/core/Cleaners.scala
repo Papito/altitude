@@ -20,8 +20,8 @@ object Cleaners {
    * @param defaults fields to set defaults for, if they are not given
    */
   case class Cleaner(trim: Option[List[String]] = None,
-                     lower:  Option[List[String]] = None,
-                     defaults:  Option[Map[String, String]] = None) {
+                     lower: Option[List[String]] = None,
+                     defaults: Option[Map[String, String]] = None) {
 
     def clean(json: JsObject): JsObject = {
       val trimmed = doTrim(json)

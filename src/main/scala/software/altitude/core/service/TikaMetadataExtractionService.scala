@@ -28,7 +28,7 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
   final private val TIKA_HANDLER = new DefaultHandler
 
   override def extract(importAsset: ImportAsset, mediaType: AssetType, asRaw: Boolean = false): Metadata = {
-    val raw: Option[TikaMetadata]  = mediaType match {
+    val raw: Option[TikaMetadata] = mediaType match {
       case mt: AssetType if mt.mediaType == "image" => extractMetadata(importAsset, PARSERS.IMAGE)
       /*
           case mt: MediaType if mt.mediaType == "audio" && mt.mediaSubtype == "mpeg" =>
@@ -61,7 +61,7 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
     Metadata(data.toMap)
   }
 
-  private def extractMetadata(importAsset: ImportAsset, parsers: List[AbstractParser]): Option[TikaMetadata]  = {
+  private def extractMetadata(importAsset: ImportAsset, parsers: List[AbstractParser]): Option[TikaMetadata] = {
     var inputStream: Option[InputStream] = None
     var metadata: Option[TikaMetadata] = None
 
@@ -84,8 +84,7 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
               s"Error extracting metadata for '$importAsset' with ${parser.getClass.getSimpleName}: ${ex.toString}")
         }
         finally {
-          if (inputStream.isDefined)
-            inputStream.get.close()
+          if (inputStream.isDefined) inputStream.get.close()
         }
       }
     }
