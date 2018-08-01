@@ -65,7 +65,7 @@ abstract class SearchDao(override val app: Altitude) extends AssetDao(app) with 
 
       val preparedStatement: PreparedStatement = conn.prepareStatement(sql)
 
-      values.foreach { mValue =>
+      values.foreach { mdVal =>
         preparedStatement.clearParameters()
         preparedStatement.setString(1, ctx.repo.id.get)
         preparedStatement.setString(2, asset.id.get)
@@ -73,19 +73,19 @@ abstract class SearchDao(override val app: Altitude) extends AssetDao(app) with 
 
         // keyword
         if (field.fieldType == FieldType.KEYWORD) {
-          preparedStatement.setString(4, mValue.value.toLowerCase)
+          preparedStatement.setString(4, mdVal.value.toLowerCase)
         } else {
           preparedStatement.setNull(4, Types.VARCHAR)
         }
         // number
         if (field.fieldType == FieldType.NUMBER) {
-          preparedStatement.setDouble(5, mValue.value.toDouble)
+          preparedStatement.setDouble(5, mdVal.value.toDouble)
         } else {
           preparedStatement.setNull(5, Types.DOUBLE)
         }
         // boolean
         if (field.fieldType == FieldType.BOOL) {
-          preparedStatement.setBoolean(6, mValue.value.toBoolean)
+          preparedStatement.setBoolean(6, mdVal.value.toBoolean)
         } else {
           preparedStatement.setNull(6, Types.BOOLEAN)
         }

@@ -191,14 +191,14 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     txManager.withTransaction {
       val currentMetadata = getMetadata(assetId)
 
-      val newMvalue = MetadataValue(id = Some(valueId), value = newValue)
+      val newMdVal = MetadataValue(id = Some(valueId), value = newValue)
       // find the field that has the value by ID
       val search = currentMetadata.data.filter(_._2/* values */.exists(_.id.contains(valueId)))
 
       // FIXME: NotFound
       require(search.size == 1)
 
-      val (fieldId, currentMvalues) = search.head
+      val (fieldId, currentMdVals) = search.head
 
       val metadata = Metadata(Map(fieldId -> Set(MetadataValue(newValue))))
       val cleanMetadata = cleanAndValidate(metadata)
@@ -210,20 +210,20 @@ class MetadataService(val app: Altitude) extends ModelValidation {
         ex.trigger()
       }
 
-      val cleanMvalue = cleanMetadata.get(fieldId).get.head
+      val cleamMdVal = cleanMetadata.get(fieldId).get.head
 
-      val existingMvalue = currentMvalues.find(_.id.contains(valueId))
+      val existingMdVal = currentMdVals.find(_.id.contains(valueId))
 
       // FIXME: NotFound
-      require(existingMvalue.nonEmpty)
+      require(existingMdVal.nonEmpty)
 
       // bail if the new values is identical to the old one
-      if (existingMvalue.get.value == newMvalue.value) {
+      if (existingMdVal.get.value == newMdVal.value) {
         return
       }
 
       // when checking for existing values, ignore the current ID
-      if (currentMvalues.filterNot(_.id.contains(valueId)).contains(cleanMvalue)) {
+      if (currentMdVals.filterNot(_.id.contains(valueId)).contains(cleamMdVal)) {
         val ex = ValidationException()
         ex.errors += (fieldId -> C.Msg.Err.DUPLICATE)
         ex.trigger()
@@ -231,19 +231,19 @@ class MetadataService(val app: Altitude) extends ModelValidation {
 
       val newData = currentMetadata.data.map { item =>
         val fId = item._1
-        val mValues = item._2
+        val mdVals = item._2
 
         // return all values as is, only replacing the one value we are working on
-        val newMvalues = if (fId == fieldId) {
-          mValues.map { v =>
-            if (v.id.get == valueId) newMvalue else v
+        val newMdVals = if (fId == fieldId) {
+          mdVals.map { v =>
+            if (v.id.get == valueId) newMdVal else v
           }
         }
         else {
-          mValues
+          mdVals
         }
 
-        fId -> newMvalues
+        fId -> newMdVals
       }
 
       updateMetadata(assetId, Metadata(newData))
@@ -273,33 +273,33 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     val cleanData = metadata.data.foldLeft(Map[String, Set[MetadataValue]]()) { (res, m) =>
       val fieldId = m._1
       val field: MetadataField = fields(fieldId)
-      val mValues: Set[MetadataValue] = m._2
+      val mdVals: Set[MetadataValue] = m._2
 
       val trimmed: Set[MetadataValue] = field.fieldType match {
         case FieldType.KEYWORD => {
-          mValues
+          mdVals
           // trim leading/trailing
-          .map{ mValue => MetadataValue(mValue.id, mValue.value.trim) }
+          .map{ mdVal => MetadataValue(mdVal.id, mdVal.value.trim) }
           // compact multiple space characters into one
-          .map{ mValue => MetadataValue(mValue.id, mValue.value.replaceAll("[\\s]{2,}", " "))}
+          .map{ mdVal => MetadataValue(mdVal.id, mdVal.value.replaceAll("[\\s]{2,}", " "))}
           // force a space character to be vanilla whitespace
-          .map{ mValue => MetadataValue(mValue.id, mValue.value.replaceAll("\\s", " ")) }
+          .map{ mdVal => MetadataValue(mdVal.id, mdVal.value.replaceAll("\\s", " ")) }
           // and lose the blanks
           .filter(_.nonEmpty)
         }
 
         case FieldType.TEXT => {
-          mValues
+          mdVals
           // trim leading/trailing
-          .map{ mValue => MetadataValue(mValue.id, mValue.value.trim) }
+          .map{ mdVal => MetadataValue(mdVal.id, mdVal.value.trim) }
           // and lose the blanks
           .filter(_.nonEmpty)
         }
 
         case FieldType.NUMBER | FieldType.BOOL => {
-          mValues
+          mdVals
           // trim leading/trailing
-          .map{ mValue => MetadataValue(mValue.id, mValue.value.trim) }
+          .map{ mdVal => MetadataValue(mdVal.id, mdVal.value.trim) }
           // and lose the blanks
           .filter(_.nonEmpty)
         }
@@ -328,16 +328,16 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     metadata.data.foreach { m =>
       val fieldId = m._1
       val field: MetadataField = fields(fieldId)
-      val values: Set[MetadataValue] = m._2
+      val mdVals: Set[MetadataValue] = m._2
 
       breakable {
         // booleans cannot have multiple values
-        if (field.fieldType == FieldType.BOOL && values.size > 1) {
+        if (field.fieldType == FieldType.BOOL && mdVals.size > 1) {
           ex.errors += (field.id.get -> C.Msg.Err.INCORRECT_VALUE_TYPE.format(field.name))
           break()
         }
 
-        val illegalValues = collectInvalidTypeValues(field.fieldType, values)
+        val illegalValues = collectInvalidTypeValues(field.fieldType, mdVals)
 
         // add to the validation exception if any
         if (illegalValues.nonEmpty) {
@@ -364,43 +364,46 @@ class MetadataService(val app: Altitude) extends ModelValidation {
   }
 
   /*
-    Presentation-level JSON transformer for metadata. This augments the limiting metadata JSON object to supply
-    the names of fields, pulled from field configuration that the Metadata domain object is not aware of.
-
-    On the way in we get:
-    {
-      field id -> values
-      field id -> values
-    }
-
-    We get out:
-    [
-      VALUES -> values[]
-      FIELD_TYPE ->
-        ID -> field id
-        NAME -> field name
-        FIELD_TYPE -> field type
-
-      VALUES -> values[]
-      FIELD_TYPE ->
-        ID -> field id
-        NAME -> field name
-        FIELD_TYPE -> field type
-    ]
    */
+
+  /**
+    * Presentation-level JSON transformer for metadata. This augments the limiting metadata JSON object to supply
+    * the names of fields, pulled from field configuration that the Metadata domain object is not aware of.
+    *
+    * On the way in we get:
+    * {
+    *   field id -> values
+    *   field id -> values
+    * }
+    *
+    * We get out:
+    * [
+    *   VALUES -> values[]
+    *   FIELD_TYPE ->
+    *     ID -> field id
+    *     NAME -> field name
+    *     FIELD_TYPE -> field type
+    *
+    *   VALUES -> values[]
+    *   FIELD_TYPE ->
+    *     ID -> field id
+    *     NAME -> field name
+    *     FIELD_TYPE -> field type
+    * ]
+    */
   def toJson(metadata: Metadata, allMetadataFields: Option[Map[String, MetadataField]] = None)
             (implicit ctx: Context, txId: TransactionId = new TransactionId): JsArray = {
 
     txManager.asReadOnly[JsArray] {
       val allFields = if (allMetadataFields.isDefined) allMetadataFields.get else getAllFields
 
-      def toJson(field: MetadataField, mValues: Set[MetadataValue]): JsObject = {
+      def toJson(field: MetadataField, mdVals: Set[MetadataValue]): JsObject = {
         Json.obj(
           C.MetadataField.FIELD -> (field.toJson -
             C.Base.UPDATED_AT -
             C.Base.CREATED_AT -
             C.MetadataField.NAME_LC),
-          C.MetadataField.VALUES -> JsArray(mValues.toSeq.map(_.toJson))
+          C.MetadataField.VALUES -> JsArray(mdVals.toSeq.map(_.toJson))
         )
       }
 
@@ -437,22 +440,22 @@ class MetadataService(val app: Altitude) extends ModelValidation {
    * @return All values that FAIL type validation
    */
   def collectInvalidTypeValues(fieldType: FieldType.Value, values: Set[MetadataValue]): Set[String] = {
-    values.map { mValue =>
+    values.map { mdVal =>
       fieldType match {
         case FieldType.NUMBER => try {
-          mValue.value.toDouble
+          mdVal.value.toDouble
           None
         } catch {
-          case _: Throwable => Some(mValue.value)
+          case _: Throwable => Some(mdVal.value)
         }
         case FieldType.KEYWORD => None // everything is allowed
         case FieldType.TEXT => None // everything is allowed
         case FieldType.BOOL => // only values that we recognize as booleans
-          if (MetadataService.VALID_BOOLEAN_VALUES.contains(mValue.value.toLowerCase)) {
+          if (MetadataService.VALID_BOOLEAN_VALUES.contains(mdVal.value.toLowerCase)) {
             None
           }
           else {
-            Some(mValue.value)
+            Some(mdVal.value)
           }
       }
       // get rid of None's - those are valid values

@@ -35,14 +35,14 @@ object Metadata {
   }
 
   def withIds(metadata: Metadata): Metadata = {
-    val dataWithIds = metadata.data.map{ case (fieldId, mValues) =>
-      val mValuesWithIds = mValues.map{ mValue =>
-        mValue.id match {
-          case None => MetadataValue(id = Some(BaseModel.genId), value = mValue.value)
-          case Some(_) => mValue
+    val dataWithIds = metadata.data.map{ case (fieldId, mdVal) =>
+      val mdValsWithIds = mdVal.map{ mdVal =>
+        mdVal.id match {
+          case None => MetadataValue(id = Some(BaseModel.genId), value = mdVal.value)
+          case Some(_) => mdVal
         }
       }
-      (fieldId, mValuesWithIds)
+      (fieldId, mdValsWithIds)
     }
 
     Metadata(dataWithIds)
