@@ -164,7 +164,7 @@ object Const {
 
     object Search {
       val ASSETS = "assets"
-      val QUERY_TEXT = "query_txt"
+      val QUERY_TEXT = "q"
       val RESULTS_PER_PAGE = "rpp"
       val PAGE = "p"
       val FOLDERS = "folders"
