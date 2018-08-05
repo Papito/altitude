@@ -1,6 +1,7 @@
 package software.altitude.core.controllers.api
 
 import org.scalatra.{ActionResult, Ok}
+import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 import software.altitude.core.controllers.Util
 import software.altitude.core.models.Asset
@@ -8,6 +9,7 @@ import software.altitude.core.util.Query
 import software.altitude.core.{Const => C}
 
 class QueryController extends BaseApiController {
+  private final val log = LoggerFactory.getLogger(getClass)
 
   get("/") {
     val foldersQuery = params.getOrElse(C.Api.Search.FOLDERS, "")
@@ -15,10 +17,6 @@ class QueryController extends BaseApiController {
     val folderId = if (foldersQuery.isEmpty) repository.rootFolderId else foldersQuery
 
     defaultQuery(folderId)
-  }
-
-  get("/triage") {
-    defaultQuery(repository.triageFolderId)
   }
 
   get(s"/p/:${C.Api.Search.PAGE}/rpp/:${C.Api.Search.RESULTS_PER_PAGE}") {
@@ -29,14 +27,37 @@ class QueryController extends BaseApiController {
 
     val folderId = if (foldersQuery.isEmpty) repository.rootFolderId else foldersQuery
 
-    query(folderId, page, rpp)
+    val q = Query(
+      params = Map(C.Api.Folder.QUERY_ARG_NAME -> folderId),
+      rpp = rpp, page = page
+    )
+
+    query(q)
+  }
+
+  get("/triage") {
+    defaultQuery(repository.triageFolderId)
   }
 
   get(s"/triage/p/:${C.Api.Search.PAGE}/rpp/:${C.Api.Search.RESULTS_PER_PAGE}") {
     val rpp = params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, C.DEFAULT_RPP).toInt
     val page = params.getOrElse(C.Api.Search.PAGE, "1").toInt
 
-    query(repository.triageFolderId, page, rpp)
+    val q = Query(
+      params = Map(C.Api.Folder.QUERY_ARG_NAME -> repository.triageFolderId),
+      rpp = rpp, page = page
+    )
+
+    query(q)
+  }
+
+  get(s"/search/p/:${C.Api.Search.PAGE}/rpp/:${C.Api.Search.RESULTS_PER_PAGE}") {
+    // FIXME: any Scalatra way to enforce these are ints?
+    val rpp = params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, C.DEFAULT_RPP).toInt
+    val page = params.getOrElse(C.Api.Search.PAGE, "1").toInt
+
+    val queryString = params.get(C.Api.Search.QUERY_TEXT)
+    log.debug(s"Query string: $queryString")
   }
 
   private def defaultQuery(folderId: String): ActionResult = {
@@ -58,11 +79,7 @@ class QueryController extends BaseApiController {
     ))
   }
 
-  private def query(folderId: String, page: Int, rpp: Int): ActionResult = {
-    val q = Query(
-      params = Map(C.Api.Folder.QUERY_ARG_NAME -> folderId),
-      rpp = rpp, page = page)
-
+  private def query(q: Query): ActionResult = {
     val results = app.service.library.query(q)
 
     Ok(Json.obj(
