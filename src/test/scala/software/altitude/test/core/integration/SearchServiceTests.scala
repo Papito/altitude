@@ -3,7 +3,7 @@ package software.altitude.test.core.integration
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 import software.altitude.core.models._
-import software.altitude.core.util.QueryResult
+import software.altitude.core.util.{Query, QueryResult}
 
 @DoNotDiscover class SearchServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
@@ -63,14 +63,14 @@ import software.altitude.core.util.QueryResult
     val assetData2 = makeAsset(altitude.service.folder.triageFolder, Metadata(data))
     altitude.service.library.add(assetData2)
 
-    var results: QueryResult = altitude.service.search.search("keanu")
+    var results: QueryResult = altitude.service.search.search(Query(text="keanu"))
     results.nonEmpty shouldBe true
     results.total shouldBe 1
     // check that the document is indeed - an asset
     val resultJson = results.records.head
     Asset.fromJson(resultJson)
 
-    results = altitude.service.search.search("TERI")
+    results = altitude.service.search.search(Query(text="TERI"))
     results.nonEmpty shouldBe true
     results.total shouldBe 2
   }

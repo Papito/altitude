@@ -40,7 +40,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
       val cleaned: MetadataField = cleanAndValidate(
         metadataField, Some(MetadataService.METADATA_FIELD_CLEANER), Some(MetadataService.METADATA_FIELD_VALIDATOR))
 
-      val existing = metadataFieldDao.query(Query(Map(
+      val existing = metadataFieldDao.query(Query(params=Map(
         C.MetadataField.NAME_LC -> cleaned.nameLowercase
       )))
 

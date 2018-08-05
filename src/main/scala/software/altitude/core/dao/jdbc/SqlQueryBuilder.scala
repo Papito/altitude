@@ -7,13 +7,7 @@ import software.altitude.core.util.Query
 import software.altitude.core.{Context, Const => C}
 
 /**
- * This is no substitute for a real ORM query generator, but more of a helper stitching
- * together SQL queries.
- *
- * Fortunately there are a lot of solid assumptions that make this much easier - like the fact
- * that the "where" clause is never, ever empty.
- *
- * This is only for SELECT queries, and it covers a big chunk of use cases.
+ * An advanced ORM replacement :)
  *
  * @param sqlColsForSelect columns to select
  * @param tableName table name to query

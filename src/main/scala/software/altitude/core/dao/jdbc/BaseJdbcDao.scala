@@ -194,6 +194,7 @@ abstract class BaseJdbcDao extends BaseDao {
     val runner: QueryRunner = new QueryRunner()
     val res = runner.query(conn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]): _*)
     log.debug(s"Found ${res.size()} records", C.LogTag.DB)
+    // FIXME: is spacing here a scala Style violation?
     res.map{_.toMap[String, AnyRef]}.toList
   }
 
