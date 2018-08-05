@@ -7,7 +7,7 @@ import software.altitude.core.util.QueryResult
 
 @DoNotDiscover class SearchServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
-  test("Index and search by term") {
+  test("Index and search by term", focused) {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "keywords",
@@ -20,7 +20,7 @@ import software.altitude.core.util.QueryResult
 
     val field3 = altitude.service.metadata.addField(
       MetadataField(
-        name = "actors",
+        name = "cast",
         fieldType = FieldType.KEYWORD))
 
     var data = Map[String, Set[String]](
@@ -37,7 +37,7 @@ import software.altitude.core.util.QueryResult
           It's called "We Hate You, Please Die."
           """,
           """
-          I partake not in the meat, nor the breastmilk, nor the ovum, of any creature, with a face.
+          I partake not in the meat, nor the breas tmilk, nor the ovum, of any creature, with a face.
           """
         ),
         field3.id.get -> Set("Lindsay Lohan", "Conan O'Brien", "Teri Hatcher", "Sam Rockwell"))
@@ -68,15 +68,15 @@ import software.altitude.core.util.QueryResult
     results.total shouldBe 1
     // check that the document is indeed - an asset
     val resultJson = results.records.head
-    val resultAsset: Asset = resultJson
+    Asset.fromJson(resultJson)
 
     results = altitude.service.search.search("TERI")
     results.nonEmpty shouldBe true
     results.total shouldBe 2
   }
 
-  /*
-  test("index and search by metadata") {
+/*
+  test("index and search by metadata", focused) {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "field 1",
