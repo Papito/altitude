@@ -5,9 +5,10 @@ import java.sql.{PreparedStatement, Types}
 import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
+import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models._
 import software.altitude.core.transactions.TransactionId
-import software.altitude.core.util.{Query, QueryResult}
+import software.altitude.core.util.{QueryResult, SearchQuery}
 import software.altitude.core.{Altitude, Context, Const => C}
 
 abstract class SearchDao(override val app: Altitude) extends AssetDao(app) with software.altitude.core.dao.SearchDao {
@@ -15,7 +16,7 @@ abstract class SearchDao(override val app: Altitude) extends AssetDao(app) with 
 
   override protected lazy val sqlQueryBuilder = new SqlQueryBuilder(defaultSqlColsForSelect, tableName)
 
-  override def search(query: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
+  override def search(query: SearchQuery)(implicit ctx: Context, txId: TransactionId): QueryResult =
     throw new NotImplementedError
 
   protected def addSearchDocument(asset: Asset)(implicit ctx: Context, txId: TransactionId): Unit =

@@ -66,13 +66,16 @@ object Query {
   // scalastyle:on
 }
 
-case class Query(text: String = "", params: Map[String, Any] = Map(), rpp: Int = 0, page: Int = 1) {
+class Query(val params: Map[String, Any] = Map(),
+            val folderIds: Set[String] = Set(),
+            val rpp: Int = 0,
+            val page: Int = 1) {
   if (rpp < 0) throw new IllegalArgumentException(s"Invalid results per page value: $rpp")
   if (page < 1) throw new IllegalArgumentException(s"Invalid page value: $page")
 
   // append new params to the query and return a new copy
-  def add(_params: (String, Any)*): Query = Query(
-    text = text,
+  def add(_params: (String, Any)*): Query = new Query(
+    folderIds = folderIds,
     params = params ++ _params,
     rpp = rpp,
     page = page)

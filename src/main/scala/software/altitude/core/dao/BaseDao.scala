@@ -76,7 +76,7 @@ trait BaseDao {
    * Get all documents, which will literally crash your machine if you do it by accident on
    * a massive document set
    */
-  def getAll(implicit ctx: Context, txId: TransactionId): List[JsObject] = query(Query()).records
+  def getAll(implicit ctx: Context, txId: TransactionId): List[JsObject] = query(new Query()).records
 
   /**
    * Get multiple documents using a Query
@@ -89,7 +89,7 @@ trait BaseDao {
    * @return number of documents deleted - 0 or 1
    */
   def deleteById(id: String)(implicit ctx: Context, txId: TransactionId): Int = {
-    val q: Query = Query().add(C.Base.ID -> id)
+    val q: Query = new Query().add(C.Base.ID -> id)
     deleteByQuery(q)
   }
 
@@ -104,7 +104,7 @@ trait BaseDao {
    */
   def updateById(id: String, data: JsObject, fields: List[String])
                 (implicit ctx: Context, txId: TransactionId): Int = {
-    val q: Query = Query().add(C.Base.ID -> id)
+    val q: Query = new Query().add(C.Base.ID -> id)
     updateByQuery(q, data, fields)
   }
 

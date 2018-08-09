@@ -98,7 +98,7 @@ class LibraryService(val app: Altitude) {
 
   def getByChecksum(checksum: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Option[Asset] = {
     txManager.asReadOnly[Option[Asset]] {
-      val query = Query(params=Map(C.Asset.CHECKSUM -> checksum))
+      val query = new Query(params=Map(C.Asset.CHECKSUM -> checksum))
       val existing = app.service.asset.query(query)
       if (existing.nonEmpty) Some(existing.records.head: Asset) else None
     }
@@ -132,7 +132,7 @@ class LibraryService(val app: Altitude) {
         log.debug(s"Expanded folder ids: $allFolderIds")
 
         // repackage the query to include all folders (they will have to be re-parsed again)
-        Query(
+        new Query(
           params = query.params
             ++ Map(Api.Folder.QUERY_ARG_NAME -> allFolderIds.mkString(C.Api.MULTI_VALUE_DELIM)),
           page = query.page, rpp = query.rpp)
@@ -308,7 +308,7 @@ class LibraryService(val app: Altitude) {
         log.trace(s"Deleting or recycling folder $f")
 
         // set all the assets as recycled
-        val folderAssetsQuery = Query(params = Map(Api.Folder.QUERY_ARG_NAME -> folderId))
+        val folderAssetsQuery = new Query(params = Map(Api.Folder.QUERY_ARG_NAME -> folderId))
 
         val results: QueryResult = app.service.library.queryAll(folderAssetsQuery)
 

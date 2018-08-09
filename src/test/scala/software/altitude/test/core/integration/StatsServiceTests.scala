@@ -201,7 +201,7 @@ import software.altitude.core.util.Query
     stats.getStatValue(Stats.SORTED_BYTES) shouldBe
       stats.getStatValue(Stats.SORTED_ASSETS) * ASSET_SIZE
 
-    val all: List[Asset] = altitude.service.asset.query(Query()).records.map(Asset.fromJson)
+    val all: List[Asset] = altitude.service.asset.query(new Query()).records.map(Asset.fromJson)
 
     altitude.service.library.recycleAssets(all.map(_.id.get).toSet)
 

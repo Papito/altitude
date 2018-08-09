@@ -3,6 +3,7 @@ package software.altitude.core.dao.jdbc
 import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
+import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models.{Asset, AssetType, Metadata}
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.{Query, QueryResult}

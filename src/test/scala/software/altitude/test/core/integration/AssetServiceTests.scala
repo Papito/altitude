@@ -41,7 +41,7 @@ import software.altitude.core.util.Query
       makeAsset(triageFolder).modify(C.Asset.IS_RECYCLED -> false)
     )
 
-    val q = Query(params = Map(C.Asset.IS_RECYCLED -> false))
+    val q = new Query(params = Map(C.Asset.IS_RECYCLED -> false))
     val result = altitude.service.asset.query(q)
 
     result.total shouldBe 1

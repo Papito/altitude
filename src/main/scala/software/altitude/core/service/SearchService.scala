@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import software.altitude.core.dao.SearchDao
 import software.altitude.core.models.{Asset, MetadataField}
 import software.altitude.core.transactions.TransactionId
-import software.altitude.core.util.{Query, QueryResult}
+import software.altitude.core.util.{QueryResult, SearchQuery}
 import software.altitude.core.{Altitude, Context}
 
 class SearchService(val app: Altitude) {
@@ -19,7 +19,7 @@ class SearchService(val app: Altitude) {
     searchDao.indexAsset(asset, metadataFields)
   }
 
-  def search(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
+  def search(query: SearchQuery)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
     searchDao.search(query)
   }
 }

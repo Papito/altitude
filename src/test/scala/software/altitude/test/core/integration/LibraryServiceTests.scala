@@ -100,19 +100,19 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
 
   test("Move recycled asset to folder") {
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
-    altitude.service.asset.query(Query()).records.length shouldBe 1
-    altitude.service.asset.queryRecycled(Query()).records.length shouldBe 0
+    altitude.service.asset.query(new Query()).records.length shouldBe 1
+    altitude.service.asset.queryRecycled(new Query()).records.length shouldBe 0
     altitude.service.library.recycleAsset(asset.id.get)
-    altitude.service.asset.queryRecycled(Query()).records.length shouldBe 1
+    altitude.service.asset.queryRecycled(new Query()).records.length shouldBe 1
 
     val folder1: Folder = altitude.service.library.addFolder("folder1")
 
     altitude.service.library.moveAssetToFolder(asset.id.get, folder1.id.get)
-    altitude.service.asset.queryRecycled(Query()).records.length shouldBe 0
-    altitude.service.asset.query(Query()).records.length shouldBe 1
+    altitude.service.asset.queryRecycled(new Query()).records.length shouldBe 0
+    altitude.service.asset.query(new Query()).records.length shouldBe 1
 
     altitude.service.library.query(
-      Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
+      new Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
     ).records.length shouldBe 1
 
     val all = altitude.service.folder.repositoryFolders()
@@ -132,25 +132,25 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     val asset: Asset = altitude.service.library.add(makeAsset(folder1))
 
     altitude.service.library.query(
-      Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
+      new Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
     ).records.length shouldBe 1
 
     altitude.service.library.moveAssetToFolder(asset.id.get, folder2.id.get)
 
     altitude.service.library.query(
-      Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
+      new Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
     ).records.length shouldBe 0
 
     altitude.service.library.query(
-      Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2.id.get))
+      new Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2.id.get))
     ).records.length shouldBe 1
 
     SET_SECOND_REPO()
 
-    altitude.service.library.query(Query()).isEmpty shouldBe true
+    altitude.service.library.query(new Query()).isEmpty shouldBe true
 
     altitude.service.library.query(
-      Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
+      new Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
     ).isEmpty shouldBe true
   }
 
@@ -177,17 +177,17 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
 
     SET_FIRST_USER()
-    altitude.service.asset.query(Query()).records.length shouldBe 2
+    altitude.service.asset.query(new Query()).records.length shouldBe 2
 
-    val asset: Asset = altitude.service.asset.query(Query()).records.head
+    val asset: Asset = altitude.service.asset.query(new Query()).records.head
     altitude.service.library.recycleAsset(asset.id.get)
 
-    altitude.service.asset.query(Query()).records.length shouldBe 1
-    altitude.service.asset.queryRecycled(Query()).records.length shouldBe 1
+    altitude.service.asset.query(new Query()).records.length shouldBe 1
+    altitude.service.asset.queryRecycled(new Query()).records.length shouldBe 1
 
     SET_SECOND_REPO()
 
-    altitude.service.asset.queryRecycled(Query()).records.length shouldBe 0
+    altitude.service.asset.queryRecycled(new Query()).records.length shouldBe 0
   }
 
   test("Get recycled asset") {
@@ -199,7 +199,7 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
     val trashed: Asset = altitude.service.library.recycleAsset(asset.id.get)
     altitude.service.library.restoreRecycledAsset(trashed.id.get)
-    altitude.service.asset.query(Query()).isEmpty shouldBe false
+    altitude.service.asset.query(new Query()).isEmpty shouldBe false
   }
 
   test("Restore recycled asset to non-existing folder") {

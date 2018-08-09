@@ -88,7 +88,7 @@ class TrashController extends BaseApiController {
     val rpp = params.getOrElse(Api.Search.RESULTS_PER_PAGE, C.DEFAULT_RPP).toInt
     val page = params.getOrElse(C.Api.Search.PAGE, "1").toInt
 
-    val q = Query(rpp = rpp, page = page)
+    val q = new Query(rpp = rpp, page = page)
 
     val results = app.service.library.queryRecycled(q)
 

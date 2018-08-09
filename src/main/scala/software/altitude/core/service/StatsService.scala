@@ -16,7 +16,7 @@ class StatsService(val app: Altitude) {
 
   def getStats(implicit ctx: Context, txId: TransactionId = new TransactionId): Stats = {
     txManager.asReadOnly[Stats] {
-      val stats: List[Stat] = dao.query(Query()).records.map(Stat.fromJson)
+      val stats: List[Stat] = dao.query(new Query()).records.map(Stat.fromJson)
 
       // Assemble the total stats on-the-fly
       val totalAssetsDims = Stats.SORTED_ASSETS :: Stats.RECYCLED_ASSETS :: Stats.TRIAGE_ASSETS :: Nil

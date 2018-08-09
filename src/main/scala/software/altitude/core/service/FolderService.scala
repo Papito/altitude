@@ -36,7 +36,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     }
 
     txManager.withTransaction[JsObject] {
-      val dupQuery = Query(params=Map(
+      val dupQuery = new Query(params=Map(
         C.Folder.PARENT_ID -> folder.parentId,
         C.Folder.NAME_LC -> folder.nameLowercase))
 
@@ -387,7 +387,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       val folderBeingMoved: Folder = getById(folderBeingMovedId)
 
       // destination parent cannot have folder by the same name
-      val dupQuery = Query(params=Map(
+      val dupQuery = new Query(params=Map(
         C.Folder.PARENT_ID -> destFolderId,
         C.Folder.NAME_LC -> folderBeingMoved.nameLowercase))
 
@@ -417,7 +417,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       val folder: Folder = getById(folderId)
 
       // new folder name cannot match existing one
-      val dupQuery = Query(params=Map(
+      val dupQuery = new Query(params=Map(
         C.Folder.PARENT_ID -> folder.parentId,
         C.Folder.NAME -> newName))
 

@@ -2,7 +2,7 @@ package software.altitude.test.core.unit
 
 import org.scalatest.FunSuite
 import software.altitude.core.models.{BaseModel, User}
-import software.altitude.core.util.Query
+import software.altitude.core.util.SearchQuery
 
 class SearchQueryModelTests extends FunSuite {
 
@@ -10,16 +10,16 @@ class SearchQueryModelTests extends FunSuite {
 
   test("Invalid RPP") {
     intercept[IllegalArgumentException] {
-      Query(rpp = -1)
+      new SearchQuery(rpp = -1)
     }
   }
 
   test("Invalid page") {
     intercept[IllegalArgumentException] {
-      Query(page = 0)
+      new SearchQuery(page = 0)
     }
     intercept[IllegalArgumentException] {
-      Query(page = -1)
+      new SearchQuery(page = -1)
     }
   }
 }

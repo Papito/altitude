@@ -9,6 +9,7 @@ import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
 import software.altitude.core.dao.BaseDao
+import software.altitude.core.dao.jdbc.querybuilder.{SqlQuery, SqlQueryBuilder}
 import software.altitude.core.models.BaseModel
 import software.altitude.core.transactions.{JdbcTransactionManager, TransactionId}
 import software.altitude.core.util.{Query, QueryResult}

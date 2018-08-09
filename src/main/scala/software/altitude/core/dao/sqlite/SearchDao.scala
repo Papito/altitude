@@ -3,7 +3,7 @@ package software.altitude.core.dao.sqlite
 import org.slf4j.LoggerFactory
 import software.altitude.core.models.Asset
 import software.altitude.core.transactions.TransactionId
-import software.altitude.core.util.{Query, QueryResult}
+import software.altitude.core.util.{QueryResult, SearchQuery}
 import software.altitude.core.{Altitude, Context, Const => C}
 
 class SearchDao(override val app: Altitude) extends software.altitude.core.dao.jdbc.SearchDao(app) with Sqlite {
@@ -34,7 +34,7 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
     addRecord(asset, docSql, sqlVals)
   }
 
-  override def search(query: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+  override def search(query: SearchQuery)(implicit ctx: Context, txId: TransactionId): QueryResult = {
     val sql =
       s"""
         SELECT %s

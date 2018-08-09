@@ -1,4 +1,4 @@
-package software.altitude.core.dao.jdbc
+package software.altitude.core.dao.jdbc.querybuilder
 
 /**
  * This is the result of SqlQueryBuilder

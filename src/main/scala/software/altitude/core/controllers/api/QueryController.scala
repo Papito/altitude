@@ -27,7 +27,7 @@ class QueryController extends BaseApiController {
 
     val folderId = if (foldersQuery.isEmpty) repository.rootFolderId else foldersQuery
 
-    val q = Query(
+    val q = new Query(
       params = Map(C.Api.Folder.QUERY_ARG_NAME -> folderId),
       rpp = rpp, page = page
     )
@@ -43,7 +43,7 @@ class QueryController extends BaseApiController {
     val rpp = params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, C.DEFAULT_RPP).toInt
     val page = params.getOrElse(C.Api.Search.PAGE, "1").toInt
 
-    val q = Query(
+    val q = new Query(
       params = Map(C.Api.Folder.QUERY_ARG_NAME -> repository.triageFolderId),
       rpp = rpp, page = page
     )
@@ -61,7 +61,7 @@ class QueryController extends BaseApiController {
   }
 
   private def defaultQuery(folderId: String): ActionResult = {
-    val q = Query(
+    val q = new Query(
       params = Map(C.Api.Folder.QUERY_ARG_NAME -> folderId),
       rpp = C.DEFAULT_RPP.toInt)
 
