@@ -112,7 +112,7 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     altitude.service.asset.query(new Query()).records.length shouldBe 1
 
     altitude.service.library.query(
-      new Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
+      new Query(Map(C.Asset.FOLDER_ID -> folder1.id.get))
     ).records.length shouldBe 1
 
     val all = altitude.service.folder.repositoryFolders()
@@ -132,17 +132,17 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     val asset: Asset = altitude.service.library.add(makeAsset(folder1))
 
     altitude.service.library.query(
-      new Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
+      new Query(Map(C.Asset.FOLDER_ID -> folder1.id.get))
     ).records.length shouldBe 1
 
     altitude.service.library.moveAssetToFolder(asset.id.get, folder2.id.get)
 
     altitude.service.library.query(
-      new Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
+      new Query(Map(C.Asset.FOLDER_ID -> folder1.id.get))
     ).records.length shouldBe 0
 
     altitude.service.library.query(
-      new Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2.id.get))
+      new Query(Map(C.Asset.FOLDER_ID -> folder2.id.get))
     ).records.length shouldBe 1
 
     SET_SECOND_REPO()
@@ -150,7 +150,7 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     altitude.service.library.query(new Query()).isEmpty shouldBe true
 
     altitude.service.library.query(
-      new Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
+      new Query(Map(C.Asset.FOLDER_ID -> folder1.id.get))
     ).isEmpty shouldBe true
   }
 

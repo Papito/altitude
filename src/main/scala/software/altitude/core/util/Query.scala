@@ -67,7 +67,6 @@ object Query {
 }
 
 class Query(val params: Map[String, Any] = Map(),
-            val folderIds: Set[String] = Set(),
             val rpp: Int = 0,
             val page: Int = 1) {
   if (rpp < 0) throw new IllegalArgumentException(s"Invalid results per page value: $rpp")
@@ -75,7 +74,6 @@ class Query(val params: Map[String, Any] = Map(),
 
   // append new params to the query and return a new copy
   def add(_params: (String, Any)*): Query = new Query(
-    folderIds = folderIds,
     params = params ++ _params,
     rpp = rpp,
     page = page)

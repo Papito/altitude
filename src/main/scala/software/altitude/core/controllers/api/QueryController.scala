@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 import software.altitude.core.controllers.Util
 import software.altitude.core.models.Asset
-import software.altitude.core.util.Query
+import software.altitude.core.util.{Query, SearchQuery}
 import software.altitude.core.{Const => C}
 
 class QueryController extends BaseApiController {
@@ -25,11 +25,11 @@ class QueryController extends BaseApiController {
 
     val foldersQuery = params.getOrElse(C.Api.Search.FOLDERS, "")
 
-    val folderId = if (foldersQuery.isEmpty) repository.rootFolderId else foldersQuery
+    val folderIdsArg = if (foldersQuery.isEmpty) repository.rootFolderId else foldersQuery
 
-    val q = new Query(
-      params = Map(C.Api.Folder.QUERY_ARG_NAME -> folderId),
-      rpp = rpp, page = page
+    val q = new SearchQuery(
+      rpp = rpp, page = page,
+      folderIds = Util.parseFolderIds(folderIds = folderIdsArg)
     )
 
     query(q)
@@ -43,9 +43,9 @@ class QueryController extends BaseApiController {
     val rpp = params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, C.DEFAULT_RPP).toInt
     val page = params.getOrElse(C.Api.Search.PAGE, "1").toInt
 
-    val q = new Query(
-      params = Map(C.Api.Folder.QUERY_ARG_NAME -> repository.triageFolderId),
-      rpp = rpp, page = page
+    val q = new SearchQuery(
+      rpp = rpp, page = page,
+      folderIds = Set(repository.triageFolderId)
     )
 
     query(q)
@@ -61,9 +61,10 @@ class QueryController extends BaseApiController {
   }
 
   private def defaultQuery(folderId: String): ActionResult = {
-    val q = new Query(
-      params = Map(C.Api.Folder.QUERY_ARG_NAME -> folderId),
-      rpp = C.DEFAULT_RPP.toInt)
+    val q = new SearchQuery(
+      rpp = C.DEFAULT_RPP.toInt,
+      folderIds = Set(folderId)
+    )
 
     val results = app.service.library.query(q)
 

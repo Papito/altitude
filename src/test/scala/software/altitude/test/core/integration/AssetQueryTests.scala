@@ -41,100 +41,9 @@ import software.altitude.core.{Util, Const => C}
       sizeBytes = 1L)
     altitude.service.asset.add(asset)
 
-    val query = new Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> ctx.repo.triageFolderId))
+    val query = new Query(Map(C.Asset.FOLDER_ID -> ctx.repo.triageFolderId))
     val assets = altitude.service.library.query(query).records
     assets.length shouldBe 1
-  }
-
-  test("Search a folder") {
-    /*
-  folder1
-    folder1_1
-    folder1_2
-  */
-    val folder1: Folder = altitude.service.library.addFolder("folder1")
-
-    val folder1_1: Folder = altitude.service.library.addFolder(
-      name = "folder1_1", parentId = folder1.id)
-
-    folder1_1.parentId should not be None
-
-    val folder1_2: Folder = altitude.service.library.addFolder(
-      name = "folder1_2", parentId = folder1.id)
-
-    val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
-
-    altitude.service.asset.add(new Asset(
-      folderId = folder1_1.id.get.toString,
-      userId = currentUser.id.get,
-      assetType = mediaType,
-      fileName = "filename.ext",
-      path = Some(Util.randomStr(30)),
-      checksum = Util.randomStr(32),
-      sizeBytes = 1L))
-
-    altitude.service.asset.add(new Asset(
-      folderId = folder1_2.id.get.toString,
-      userId = currentUser.id.get,
-      assetType = mediaType,
-      fileName = "filename.ext",
-      path = Some(Util.randomStr(30)),
-      checksum = Util.randomStr(32),
-      sizeBytes = 1L))
-
-    altitude.service.asset.add(new Asset(
-      folderId = folder1.id.get.toString,
-      userId = currentUser.id.get,
-      assetType = mediaType,
-      fileName = "filename.ext",
-      path = Some(Util.randomStr(30)),
-      checksum = Util.randomStr(32),
-      sizeBytes = 1L))
-
-    altitude.service.library.query(
-      new Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1_2.id.get))
-    ).records.length shouldBe 1
-
-    altitude.service.library.query(
-      new Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1_1.id.get))
-    ).records.length shouldBe 1
-
-    altitude.service.library.query(
-      new Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
-    ).records.length shouldBe 3
-  }
-
-  test("Folder filtering") {
-    /*
-    folder1
-    folder2
-      folder2_1
-    */
-    val folder1: Folder = altitude.service.library.addFolder("folder1")
-
-    val folder2: Folder = altitude.service.library.addFolder("folder2")
-
-    val folder2_1: Folder = altitude.service.library.addFolder(
-      name = "folder2_1", parentId = folder2.id)
-
-    // fill up the hierarchy with assets x times over
-    1 to 2 foreach {n =>
-      altitude.service.library.add(makeAsset(folder1))
-      altitude.service.library.add(makeAsset(folder2))
-      altitude.service.library.add(makeAsset(folder2_1))
-    }
-
-    altitude.service.library.query(
-      new Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder1.id.get))
-    ).records.length shouldBe 2
-
-    altitude.service.library.query(
-      new Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2_1.id.get))
-    ).records.length shouldBe 2
-
-    altitude.service.library.query(
-      new Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> folder2.id.get))
-    ).records.length shouldBe 4
   }
 
   test("Pagination") {
@@ -189,7 +98,7 @@ import software.altitude.core.{Util, Const => C}
     /* We now have two assets. One in triage, one trash. Each of the totals should be "1" not "2"
      */
 
-    val query = new Query(params = Map(C.Api.Folder.QUERY_ARG_NAME -> ctx.repo.triageFolderId))
+    val query = new Query(Map(C.Asset.FOLDER_ID -> ctx.repo.triageFolderId))
     var results = altitude.service.library.query(query)
     results.records.length shouldBe 1
     results.total shouldBe 1

@@ -5,7 +5,7 @@ class SearchQuery(val text: String = "",
                   folderIds: Set[String] = Set(),
                   rpp: Int = 0,
                   page: Int = 1)
-  extends Query(params = params, folderIds = folderIds, rpp = rpp, page = page) {
+  extends Query(params = params, rpp = rpp, page = page) {
 
   override def add(_params: (String, Any)*): SearchQuery = new SearchQuery(
     text = text,

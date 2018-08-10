@@ -115,33 +115,9 @@ class LibraryService(val app: Altitude) {
   def query(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
     log.debug(s"Asset query $query")
 
-    // parse out folder ids as a set
-    val folderIds: Set[String] = query.params.getOrElse(C.Api.Folder.QUERY_ARG_NAME, "")
-      .toString.split(s"\\${Api.MULTI_VALUE_DELIM}").map(_.trim).filter(_.nonEmpty).toSet
-
-    log.debug(s"${folderIds.size} folder ids: $folderIds")
-
     txManager.asReadOnly[QueryResult] {
-      val _query: Query = if (folderIds.isEmpty) {
-        // no folder filtering, query as is
-        query
-      }
-      else {
-        // create a new query that includes folder children, since we are searching the hierarchy
-        val allFolderIds = app.service.folder.flatChildrenIds(parentIds = folderIds)
-        log.debug(s"Expanded folder ids: $allFolderIds")
-
-        // repackage the query to include all folders (they will have to be re-parsed again)
-        new Query(
-          params = query.params
-            ++ Map(Api.Folder.QUERY_ARG_NAME -> allFolderIds.mkString(C.Api.MULTI_VALUE_DELIM)),
-          page = query.page, rpp = query.rpp)
-
-      }
-
-      log.info("SEARCH QUERY: " + _query)
-
-      app.service.asset.query(_query)
+      log.info(s"SEARCH QUERY: $query")
+      app.service.asset.query(query)
     }
   }
 
@@ -308,7 +284,7 @@ class LibraryService(val app: Altitude) {
         log.trace(s"Deleting or recycling folder $f")
 
         // set all the assets as recycled
-        val folderAssetsQuery = new Query(params = Map(Api.Folder.QUERY_ARG_NAME -> folderId))
+        val folderAssetsQuery = new Query(Map(C.Asset.FOLDER_ID -> folderId))
 
         val results: QueryResult = app.service.library.queryAll(folderAssetsQuery)
 
