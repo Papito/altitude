@@ -2,8 +2,10 @@ package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
+import software.altitude.core.Util
 import software.altitude.core.models._
 import software.altitude.core.util.{Query, QueryResult, SearchQuery}
+import software.altitude.core.{Const => C}
 
 @DoNotDiscover class SearchServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
@@ -45,6 +47,7 @@ import software.altitude.core.util.{Query, QueryResult, SearchQuery}
     val assetData1 = makeAsset(altitude.service.folder.triageFolder, Metadata(data))
     altitude.service.library.add(assetData1)
 
+    // scalastyle:off
     data = Map[String, Set[String]](
         field1.id.get -> Set("tree", "shoe", "desert", "California"),
         field2.id.get -> Set(
@@ -59,26 +62,24 @@ import software.altitude.core.util.{Query, QueryResult, SearchQuery}
           """
         ),
         field3.id.get -> Set("Keanu Reeves", "Sandra Bullock", "Dennis Hopper", "Teri Hatcher"))
+    // scalastyle:on
 
     val assetData2 = makeAsset(altitude.service.folder.triageFolder, Metadata(data))
     altitude.service.library.add(assetData2)
 
-    var results: QueryResult = altitude.service.search.search(new SearchQuery(text="keanu"))
+    var results: QueryResult = altitude.service.search.search(new SearchQuery(text = "keanu"))
     results.nonEmpty shouldBe true
     results.total shouldBe 1
     // check that the document is indeed - an asset
     val resultJson = results.records.head
     Asset.fromJson(resultJson)
 
-    results = altitude.service.search.search(new SearchQuery(text="TERI"))
+    results = altitude.service.search.search(new SearchQuery(text = "TERI"))
     results.nonEmpty shouldBe true
     results.total shouldBe 2
   }
 
-/*
-  This does not pass because the last test fails, as subfolder querying does not work without actual search
-
-  test("Search a folder") {
+  test("Search by folder hierarchy should return assets in subfolders", Focused) {
     /*
   folder1
     folder1_1
@@ -136,8 +137,7 @@ import software.altitude.core.util.{Query, QueryResult, SearchQuery}
     ).records.length shouldBe 3
   }
 
-*/
-/*
+  /*
 
   Same idea - parent folder will not get records from subfolders without search
 

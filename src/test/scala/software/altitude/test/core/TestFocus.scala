@@ -18,5 +18,5 @@ trait TestFocus {
     *
     * sbt> test-only software.altitude.test.core.suites.SqliteSuite -- -n focused
     */
-  object focused extends Tag("focused")
+  object Focused extends Tag("focused")
 }
