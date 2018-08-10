@@ -7,20 +7,19 @@ import software.altitude.core.util.Query.QueryParam
 import software.altitude.core.{Context, Const => C}
 
 /**
- * An advanced ORM replacement :)
- *
- * @param sqlColsForSelect columns to select
- * @param tableName table name to query
- */
+  * An advanced ORM replacement :)
+  *
+  * @param sqlColsForSelect columns to select
+  * @param tableName table name to query
+  */
 class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) {
   private final val log = LoggerFactory.getLogger(getClass)
+
 
   def toSelectQuery(query: Query, countOnly: Boolean = false)
                    (implicit ctx: Context, txId: TransactionId): SqlQuery = {
 
-    val (sqlColumns, sqlValues) = getParams(query).unzip
-
-    val whereClause = getWhereClause(sqlColumns.toSeq)
+    val (whereClause, sqlValues) = getWhereClause(query)
 
     val sql = if (countOnly) {
       assembleQuery(
@@ -53,17 +52,7 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) {
       v._2 match {
         case scalar: String => (v._1, scalar)
         case scalar: Boolean => if (scalar) (v._1, 1) else (v._1, 0)
-        case qPara6m: QueryParam => qParam.paramType match {
-          case Query.ParamType.EQ => {
-            (v._1, qParam.values.head)
-          }
-          case Query.ParamType.IN => {
-            println("!!!!!!!!!!")
-            (v._1, qParam.values.head)
-          }
-          case _ => throw new IllegalArgumentException(
-            s"This type of query parameter is not supported: ${qParam.paramType}")
-        }
+        case qParam: QueryParam => (v._1, qParam)
         case _ => throw new IllegalArgumentException("This type of parameter is not supported")
       }
     } + (C.Base.REPO_ID -> ctx.repo.id.get)
@@ -89,4 +78,6 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) {
         OFFSET ${(page - 1) * rpp}"""
     }
   }
+
+  protected def compileQuery
 }
