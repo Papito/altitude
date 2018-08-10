@@ -3,6 +3,7 @@ package software.altitude.core.dao.jdbc.querybuilder
 import org.slf4j.LoggerFactory
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.Query
+import software.altitude.core.util.Query.QueryParam
 import software.altitude.core.{Context, Const => C}
 
 /**
@@ -37,6 +38,7 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) {
     }
 
     log.debug(s"SQL QUERY: $sql with $sqlValues")
+    println(sql, sqlValues)
     SqlQuery(sql, sqlValues.toList)
   }
 
@@ -49,8 +51,20 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) {
   protected def getParams(query: Query)(implicit ctx: Context): Map[String, Any] = {
     query.params.map { v: (String, Any) =>
       v._2 match {
-        case x: String => (v._1, x)
-        case x: Boolean => if (x) (v._1, 1) else (v._1, 0)
+        case scalar: String => (v._1, scalar)
+        case scalar: Boolean => if (scalar) (v._1, 1) else (v._1, 0)
+        case qPara6m: QueryParam => qParam.paramType match {
+          case Query.ParamType.EQ => {
+            (v._1, qParam.values.head)
+          }
+          case Query.ParamType.IN => {
+            println("!!!!!!!!!!")
+            (v._1, qParam.values.head)
+          }
+          case _ => throw new IllegalArgumentException(
+            s"This type of query parameter is not supported: ${qParam.paramType}")
+        }
+        case _ => throw new IllegalArgumentException("This type of parameter is not supported")
       }
     } + (C.Base.REPO_ID -> ctx.repo.id.get)
   }

@@ -14,54 +14,46 @@ object Query {
     }
 
     // overloaded to accept one value
-    def this (value: Any, paramType: ParamType.Value, negate: Boolean) =
+    def this(value: Any, paramType: ParamType.Value, negate: Boolean) =
       this(Set(value), paramType, negate)
-
-    // overloaded to accept two values
-    def this(value1: Any, value2: Any, paramType: ParamType.Value, negate: Boolean) =
-      this(value1 :: value2 :: Nil, paramType, negate)
-
-    // overloaded as simple equals
-    def this(value: Any) =
-      this(value, ParamType.EQ, negate = false)
   }
 
   // scalastyle:off
-  def EQUALS(value: Any) = new QueryParam(value)
+  def EQUALS(value: Any) = new QueryParam(value, ParamType.EQ, negate = false)
   def NOT_EQUALS(value: Any) = new QueryParam(value, ParamType.EQ, negate = true)
 
-  def LT(value: Any) = new QueryParam(value, ParamType.LT)
+  def LT(value: Any) = new QueryParam(value, ParamType.LT, negate = false)
   def NOT_LT(value: Any) = new QueryParam(value, ParamType.LT, negate = true)
 
-  def LTE(value: Any) = new QueryParam(value, ParamType.LTE)
+  def LTE(value: Any) = new QueryParam(value, ParamType.LTE, negate = false)
   def NOT_LTE(value: Any) = new QueryParam(value, ParamType.LTE, negate = true)
 
-  def GT(value: Any) = new QueryParam(value, ParamType.GT)
+  def GT(value: Any) = new QueryParam(value, ParamType.GT, negate = false)
   def NOT_GT(value: Any) = new QueryParam(value, ParamType.GT, negate = true)
 
-  def GTE(value: Any) = new QueryParam(value, ParamType.GTE)
+  def GTE(value: Any) = new QueryParam(value, ParamType.GTE, negate = false)
   def NOT_GTE(value: Any) = new QueryParam(value, ParamType.GTE, negate = true)
 
-  def RANGE(values: List[Any]) = new QueryParam(values, ParamType.RANGE)
+  def RANGE(values: List[Any]) = new QueryParam(values, ParamType.RANGE, negate = false)
   def NOT_IN_RANGE(values: List[Any]) = new QueryParam(values, ParamType.RANGE, negate = true)
 
-  def OR(values: List[Any]) = new QueryParam(values, ParamType.OR)
+  def OR(values: List[Any]) = new QueryParam(values, ParamType.OR, negate = false)
   def NOT_OR(values: List[Any]) = new QueryParam(values, ParamType.OR, negate = true)
 
-  def IN(values: List[Any], negate: Boolean = false): QueryParam = {
+  def IN(values: Set[Any], negate: Boolean = false): QueryParam = {
     // if only one value given - simplify this to be just an equals
-    if (values.lengthCompare(1) == 0) {
-      new QueryParam(values.head, negate)
+    if (values.size == 1) {
+      new QueryParam(values.head, ParamType.EQ, negate)
     } else {
       new QueryParam(values, ParamType.IN, negate)
     }
   }
-  def NOT_IN(values: List[Any]): QueryParam  = IN(values, negate = true)
+  def NOT_IN(values: Set[Any]): QueryParam  = IN(values, negate = true)
 
-  def CONTAINS (value: Any) = new QueryParam(value, ParamType.CONTAINS)
+  def CONTAINS (value: Any) = new QueryParam(value, ParamType.CONTAINS, negate = false)
   def NOT_CONTAINS(value: Any) = new QueryParam(value, ParamType.CONTAINS, negate = true)
 
-  def MATCHES(value: Any) = new QueryParam(value, ParamType.MATCHES)
+  def MATCHES(value: Any) = new QueryParam(value, ParamType.MATCHES, negate = false)
   def NOT_MATCHES(value: Any) = new QueryParam(value, ParamType.MATCHES, negate = true)
   // scalastyle:on
 }

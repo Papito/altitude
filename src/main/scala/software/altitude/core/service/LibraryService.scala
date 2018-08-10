@@ -113,11 +113,22 @@ class LibraryService(val app: Altitude) {
   }
 
   def query(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
-    log.debug(s"Asset query $query")
+    log.info(s"Query: $query")
 
     txManager.asReadOnly[QueryResult] {
-      log.info(s"SEARCH QUERY: $query")
-      app.service.asset.query(query)
+      // if folder id is specified, we want to expand it to include all subfolders
+      val folderId = query.params.get(C.Asset.FOLDER_ID).asInstanceOf[Option[String]]
+
+      val _query: Query = if (folderId.isDefined) {
+        val allFolderIds = app.service.folder.flatChildrenIds(parentIds = Set(folderId.get))
+        val foldersQueryParam = Query.IN(allFolderIds.asInstanceOf[Set[Any]])
+        query.add(C.Asset.FOLDER_ID -> foldersQueryParam)
+      }
+      else {
+        query
+      }
+
+      app.service.asset.query(_query)
     }
   }
 
