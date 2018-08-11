@@ -5,7 +5,7 @@ object Query {
     val EQ, GT, LT, GTE, LTE, IN, RANGE, OR, CONTAINS, MATCHES = Value
   }
 
-  case class QueryParam private (values: Set[Any], paramType: ParamType.Value, negate: Boolean = false) {
+  case class QueryParam (values: Set[Any], paramType: ParamType.Value, negate: Boolean = false) {
     require(values.nonEmpty)
 
     // types that requires two values
@@ -45,7 +45,7 @@ object Query {
     if (values.size == 1) {
       new QueryParam(values.head, ParamType.EQ, negate)
     } else {
-      new QueryParam(values, ParamType.IN, negate)
+      QueryParam(values, ParamType.IN, negate)
     }
   }
   def NOT_IN(values: Set[Any]): QueryParam  = IN(values, negate = true)

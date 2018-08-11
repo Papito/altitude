@@ -7,7 +7,8 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 import software.altitude.core.models._
 import software.altitude.core.util.Query
-import software.altitude.core.{DuplicateException, IllegalOperationException, NotFoundException, StorageException, Const => C}
+import software.altitude.core.{DuplicateException,
+  IllegalOperationException, NotFoundException, StorageException, Util, Const => C}
 
 @DoNotDiscover class LibraryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
@@ -118,6 +119,97 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     val all = altitude.service.folder.repositoryFolders()
 
     (altitude.service.folder.getByIdWithChildAssetCounts(folder1.id.get, all): Folder).numOfAssets shouldBe 1
+  }
+
+  test("Search by folder hierarchy should return assets in subfolders") {
+    /*
+  folder1
+    folder1_1
+    folder1_2
+  */
+    val folder1: Folder = altitude.service.library.addFolder("folder1")
+
+    val folder1_1: Folder = altitude.service.library.addFolder(
+      name = "folder1_1", parentId = folder1.id)
+
+    folder1_1.parentId should not be None
+
+    val folder1_2: Folder = altitude.service.library.addFolder(
+      name = "folder1_2", parentId = folder1.id)
+
+    val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
+
+    altitude.service.asset.add(new Asset(
+      folderId = folder1_1.id.get.toString,
+      userId = currentUser.id.get,
+      assetType = mediaType,
+      fileName = "filename.ext",
+      path = Some(Util.randomStr(30)),
+      checksum = Util.randomStr(32),
+      sizeBytes = 1L))
+
+    altitude.service.asset.add(new Asset(
+      folderId = folder1_2.id.get.toString,
+      userId = currentUser.id.get,
+      assetType = mediaType,
+      fileName = "filename.ext",
+      path = Some(Util.randomStr(30)),
+      checksum = Util.randomStr(32),
+      sizeBytes = 1L))
+
+    altitude.service.asset.add(new Asset(
+      folderId = folder1.id.get.toString,
+      userId = currentUser.id.get,
+      assetType = mediaType,
+      fileName = "filename.ext",
+      path = Some(Util.randomStr(30)),
+      checksum = Util.randomStr(32),
+      sizeBytes = 1L))
+
+    altitude.service.library.query(
+      new Query(Map(C.Asset.FOLDER_ID -> folder1_2.id.get))
+    ).records.length shouldBe 1
+
+    altitude.service.library.query(
+      new Query(Map(C.Asset.FOLDER_ID -> folder1_1.id.get))
+    ).records.length shouldBe 1
+
+    altitude.service.library.query(
+      new Query(Map(C.Asset.FOLDER_ID -> folder1.id.get))
+    ).records.length shouldBe 3
+  }
+
+  test("Folder filtering") {
+    /*
+    folder1
+    folder2
+      folder2_1
+    */
+    val folder1: Folder = altitude.service.library.addFolder("folder1")
+
+    val folder2: Folder = altitude.service.library.addFolder("folder2")
+
+    val folder2_1: Folder = altitude.service.library.addFolder(
+      name = "folder2_1", parentId = folder2.id)
+
+    // fill up the hierarchy with assets x times over
+    1 to 2 foreach {n =>
+      altitude.service.library.add(makeAsset(folder1))
+      altitude.service.library.add(makeAsset(folder2))
+      altitude.service.library.add(makeAsset(folder2_1))
+    }
+
+    altitude.service.library.query(
+      new Query(Map(C.Asset.FOLDER_ID -> folder1.id.get))
+    ).records.length shouldBe 2
+
+    altitude.service.library.query(
+      new Query(Map(C.Asset.FOLDER_ID -> folder2_1.id.get))
+    ).records.length shouldBe 2
+
+    altitude.service.library.query(
+      new Query(Map(C.Asset.FOLDER_ID -> folder2.id.get))
+    ).records.length shouldBe 4
   }
 
   test("Move asset to a different folder") {

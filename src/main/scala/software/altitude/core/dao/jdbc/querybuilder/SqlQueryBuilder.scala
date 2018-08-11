@@ -19,7 +19,7 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) {
   def toSelectQuery(query: Query, countOnly: Boolean = false)
                    (implicit ctx: Context, txId: TransactionId): SqlQuery = {
 
-    val (whereClause, sqlValues) = getWhereClause(query)
+    val (whereClause, sqlBindVals) = compileQuery(query)
 
     val sql = if (countOnly) {
       assembleQuery(
@@ -36,37 +36,10 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) {
         page = query.page)
     }
 
-    log.debug(s"SQL QUERY: $sql with $sqlValues")
-    println(sql, sqlValues)
-    SqlQuery(sql, sqlValues.toList)
+    log.debug(s"SQL QUERY: $sql with $sqlBindVals")
+    SqlQuery(sql, sqlBindVals)
   }
 
-  /**
-    * Massage the parameters and make them SQL-read (no booleans, for example).
-    * THEN, append the repo ID
-    * @param query
-    * @return Map of String->Any values, that are ready to be bound to a SQL select statement
-    */
-  protected def getParams(query: Query)(implicit ctx: Context): Map[String, Any] = {
-    query.params.map { v: (String, Any) =>
-      v._2 match {
-        case scalar: String => (v._1, scalar)
-        case scalar: Boolean => if (scalar) (v._1, 1) else (v._1, 0)
-        case qParam: QueryParam => (v._1, qParam)
-        case _ => throw new IllegalArgumentException("This type of parameter is not supported")
-      }
-    } + (C.Base.REPO_ID -> ctx.repo.id.get)
-  }
-
-  protected def getWhereClause(sqlColumns: Seq[String])(implicit ctx: Context): String = {
-    // create pairs of column names and value placeholders, to be joined in the final clause
-    val whereClauses: List[String] = sqlColumns.toList.map(_ + " = ?")
-
-    whereClauses.length match {
-      case 0 => ""
-      case _ => s"""WHERE ${whereClauses.mkString(" AND ")}"""
-    }
-  }
 
   protected def assembleQuery(select: String, from: String, where: String, rpp: Int = 0, page: Int = 0): String = {
     val sqlWithoutPaging = s"SELECT $select FROM $from $where"
@@ -79,5 +52,43 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) {
     }
   }
 
-  protected def compileQuery
+  protected def compileQuery(query: Query)(implicit ctx: Context): (String, List[Any]) = {
+
+    val sqlBindVals: List[Any] = query.params.foldLeft(List[Any]()) { (res, el: (String, Any)) =>
+      val value = el._2
+      value match {
+        // string or integer values as is
+        case _: String => res :+ value
+        case _: Number => res :+ value
+        // boolean becomes 0 or 1
+        case _: Boolean => res :+ (if (value == true) 1 else 0)
+        // extract all values from qParam
+        case qParam: QueryParam => res ::: qParam.values.toList
+        case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: $value")
+      }
+    } :+ ctx.repo.id.get
+
+    val whereClauses: List[String] = query.params.map { el: (String, Any) =>
+      val (columnName, value) = el
+      value match {
+        case _: String => s"$columnName = ?"
+        case _: Boolean => s"$columnName = ?"
+        case _: Number => s"$columnName = ?"
+        case qParam: QueryParam => qParam.paramType match {
+          case Query.ParamType.IN => {
+            val placeholders: String = qParam.values.toList.map {_ => "?"}.mkString(", ")
+            s"$columnName IN ($placeholders)"
+          }
+          case Query.ParamType.EQ => s"$columnName = ?"
+
+          case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: ${qParam.paramType}")
+        }
+        case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: $value")
+      }
+    }.toList :+ s"${C.Base.REPO_ID} = ?"
+
+    val whereClause = s"""WHERE ${whereClauses.mkString(" AND ")}"""
+
+    (whereClause, sqlBindVals)
+  }
 }
