@@ -18,7 +18,6 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) {
 
   def toSelectQuery(query: Query, countOnly: Boolean = false)
                    (implicit ctx: Context, txId: TransactionId): SqlQuery = {
-
     val (whereClause, sqlBindVals) = compileQuery(query)
 
     val sql = if (countOnly) {
@@ -53,8 +52,14 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) {
   }
 
   protected def compileQuery(query: Query)(implicit ctx: Context): (String, List[Any]) = {
+    val sqlBindVals = getSqlBindVals(query)
+    val whereClauses = getWhereClauses(query)
+    val whereClause = s"""WHERE ${whereClauses.mkString(" AND ")}"""
+    (whereClause, sqlBindVals)
+  }
 
-    val sqlBindVals: List[Any] = query.params.foldLeft(List[Any]()) { (res, el: (String, Any)) =>
+  protected def getSqlBindVals(query: Query)(implicit ctx: Context): List[Any] = {
+    query.params.foldLeft(List[Any]()) { (res, el: (String, Any)) =>
       val value = el._2
       value match {
         // string or integer values as is
@@ -67,8 +72,10 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) {
         case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: $value")
       }
     } :+ ctx.repo.id.get
+  }
 
-    val whereClauses: List[String] = query.params.map { el: (String, Any) =>
+  protected def getWhereClauses(query: Query)(implicit ctx: Context): List[String] = {
+    query.params.map { el: (String, Any) =>
       val (columnName, value) = el
       value match {
         case _: String => s"$columnName = ?"
@@ -86,9 +93,5 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) {
         case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: $value")
       }
     }.toList :+ s"${C.Base.REPO_ID} = ?"
-
-    val whereClause = s"""WHERE ${whereClauses.mkString(" AND ")}"""
-
-    (whereClause, sqlBindVals)
   }
 }

@@ -51,7 +51,7 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
 
     val countSql = sql.format("COUNT(*) as count")
 
-    val bindVals: List[Any] = List(ctx.repo.id.get, ctx.repo.id.get, query.text)
+    val bindVals: List[Any] = List(ctx.repo.id.get, ctx.repo.id.get, query.text.get)
 
     val recs = manyBySqlQuery(selectSql, bindVals)
     val count: Int = getQueryResultCountBySql(countSql, bindVals)

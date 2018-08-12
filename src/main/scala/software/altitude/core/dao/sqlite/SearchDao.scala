@@ -1,6 +1,7 @@
 package software.altitude.core.dao.sqlite
 
 import org.slf4j.LoggerFactory
+import software.altitude.core.dao.sqlite.querybuilder.AssetSearchQueryBuilder
 import software.altitude.core.models.Asset
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.{QueryResult, SearchQuery}
@@ -8,6 +9,9 @@ import software.altitude.core.{Altitude, Context, Const => C}
 
 class SearchDao(override val app: Altitude) extends software.altitude.core.dao.jdbc.SearchDao(app) with Sqlite {
   private final val log = LoggerFactory.getLogger(getClass)
+
+  private val SQL_QUERY_BUILDER = new AssetSearchQueryBuilder(
+    sqlColsForSelect = "%s", tableName = "search_document, asset")
 
   override protected def addSearchDocument(asset: Asset)(implicit ctx: Context, txId: TransactionId): Unit = {
     require(asset.path.isEmpty)
@@ -35,6 +39,9 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
   }
 
   override def search(query: SearchQuery)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+
+    //SQL_QUERY_BUILDER.toSelectQuery()
+
     val sql =
       s"""
         SELECT %s
@@ -43,13 +50,14 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
            AND search_document.${C.Base.REPO_ID} = ?
            AND search_document.${C.SearchToken.ASSET_ID} = asset.id
            AND body MATCH ?
+           AND is_recycled = 0
       """
 
     val selectSql = sql.format(AssetDao.DEFAULT_SQL_COLS_FOR_SELECT)
 
     val countSql = sql.format("COUNT(*) as count")
 
-    val bindVals: List[Any] = List(ctx.repo.id.get, ctx.repo.id.get, query.text)
+    val bindVals: List[Any] = List(ctx.repo.id.get, ctx.repo.id.get, query.text.get)
     val recs = manyBySqlQuery(selectSql, bindVals)
     val count: Int = getQueryResultCountBySql(countSql, bindVals)
 

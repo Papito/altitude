@@ -9,7 +9,7 @@ import software.altitude.core.{Const => C}
 
 @DoNotDiscover class SearchServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
-  test("Index and search by term") {
+  test("Index and search by term", Focused) {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "keywords",
@@ -67,17 +67,37 @@ import software.altitude.core.{Const => C}
     val assetData2 = makeAsset(altitude.service.folder.triageFolder, Metadata(data))
     altitude.service.library.add(assetData2)
 
-    var results: QueryResult = altitude.service.search.search(new SearchQuery(text = "keanu"))
+    var results: QueryResult = altitude.service.search.search(new SearchQuery(text = Some("keanu")))
     results.nonEmpty shouldBe true
     results.total shouldBe 1
     // check that the document is indeed - an asset
     val resultJson = results.records.head
     Asset.fromJson(resultJson)
 
-    results = altitude.service.search.search(new SearchQuery(text = "TERI"))
+    results = altitude.service.search.search(new SearchQuery(text = Some("TERI")))
     results.nonEmpty shouldBe true
     results.total shouldBe 2
   }
+
+/*
+  test("Narrow down search to a folder", Focused) {
+    val folder1: Folder = altitude.service.library.addFolder("folder1")
+
+    val folder1_1: Folder = altitude.service.library.addFolder(
+      name = "folder2_1", parentId = folder1.id)
+
+    val assetToRecycle: Asset = altitude.service.library.add(makeAsset(folder1_1))
+    altitude.service.library.recycleAsset(assetToRecycle.id.get)
+
+    1 to 3 foreach {_ =>
+      altitude.service.library.add(makeAsset(folder1_1))
+    }
+
+    val results: QueryResult = altitude.service.search.search(new SearchQuery())
+    results.nonEmpty shouldBe true
+    results.total shouldBe 3
+  }
+*/
 
   /*
     test("index and search by metadata", focused) {

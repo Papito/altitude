@@ -1,6 +1,6 @@
 package software.altitude.core.util
 
-class SearchQuery(val text: String = "",
+class SearchQuery(val text: Option[String] = None,
                   params: Map[String, Any] = Map(),
                   folderIds: Set[String] = Set(),
                   rpp: Int = 0,

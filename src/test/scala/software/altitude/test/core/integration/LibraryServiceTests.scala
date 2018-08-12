@@ -38,7 +38,7 @@ import software.altitude.core.{DuplicateException,
       name = "folder2_2_2", parentId = folder2_2.id)
 
     // fill up the hierarchy with assets x times over
-    1 to 2 foreach {n =>
+    1 to 2 foreach {_ =>
       altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
       altitude.service.library.add(makeAsset(folder1))
       altitude.service.library.add(makeAsset(folder2))
