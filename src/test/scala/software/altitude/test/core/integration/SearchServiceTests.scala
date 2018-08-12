@@ -79,7 +79,7 @@ import software.altitude.core.{Const => C}
     results.total shouldBe 2
   }
 
-  test("Narrow down search to a folder", Focused) {
+  test("Narrow down search to a folder") {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "keywords",
@@ -113,6 +113,11 @@ import software.altitude.core.{Const => C}
     val qFolder1 = new SearchQuery(text = Some("space"), folderIds = Set(folder1.id.get))
     results = altitude.service.library.search(qFolder1)
     results.total shouldBe 6
+
+    val qAllFolders = new SearchQuery()
+    results = altitude.service.library.search(qAllFolders)
+    results.total shouldBe 6
+
   }
 
   /*
