@@ -9,7 +9,7 @@ import software.altitude.core.{Const => C}
 
 @DoNotDiscover class SearchServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
-  test("Index and search by term", Focused) {
+  test("Index and search by term") {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "keywords",
@@ -39,7 +39,7 @@ import software.altitude.core.{Const => C}
           It's called "We Hate You, Please Die."
           """,
           """
-          I partake not in the meat, nor the breas tmilk, nor the ovum, of any creature, with a face.
+          I partake not in the meat, nor the breast milk, nor the ovum, of any creature, with a face.
           """
         ),
         field3.id.get -> Set("Lindsay Lohan", "Conan O'Brien", "Teri Hatcher", "Sam Rockwell"))
@@ -67,37 +67,53 @@ import software.altitude.core.{Const => C}
     val assetData2 = makeAsset(altitude.service.folder.triageFolder, Metadata(data))
     altitude.service.library.add(assetData2)
 
-    var results: QueryResult = altitude.service.search.search(new SearchQuery(text = Some("keanu")))
+    var results: QueryResult = altitude.service.library.search(new SearchQuery(text = Some("keanu")))
     results.nonEmpty shouldBe true
     results.total shouldBe 1
     // check that the document is indeed - an asset
     val resultJson = results.records.head
     Asset.fromJson(resultJson)
 
-    results = altitude.service.search.search(new SearchQuery(text = Some("TERI")))
+    results = altitude.service.library.search(new SearchQuery(text = Some("TERI")))
     results.nonEmpty shouldBe true
     results.total shouldBe 2
   }
 
-/*
   test("Narrow down search to a folder", Focused) {
+    val field1 = altitude.service.metadata.addField(
+      MetadataField(
+        name = "keywords",
+        fieldType = FieldType.KEYWORD))
+
+    val data = Map[String, Set[String]](
+      field1.id.get -> Set("space", "force", "tactical", "pants")
+    )
+
+    val metadata = Metadata(data)
+
     val folder1: Folder = altitude.service.library.addFolder("folder1")
 
     val folder1_1: Folder = altitude.service.library.addFolder(
-      name = "folder2_1", parentId = folder1.id)
+      name = "folder1_1", parentId = folder1.id)
 
-    val assetToRecycle: Asset = altitude.service.library.add(makeAsset(folder1_1))
+    val assetToRecycle: Asset = altitude.service.library.add(makeAsset(folder1_1, metadata))
     altitude.service.library.recycleAsset(assetToRecycle.id.get)
 
     1 to 3 foreach {_ =>
-      altitude.service.library.add(makeAsset(folder1_1))
+      altitude.service.library.add(makeAsset(folder1_1, metadata))
+    }
+    1 to 3 foreach {_ =>
+      altitude.service.library.add(makeAsset(folder1, metadata))
     }
 
-    val results: QueryResult = altitude.service.search.search(new SearchQuery())
-    results.nonEmpty shouldBe true
+    val qFolder1_1 = new SearchQuery(text = Some("space"), folderIds = Set(folder1_1.id.get))
+    var results: QueryResult = altitude.service.library.search(qFolder1_1)
     results.total shouldBe 3
+
+    val qFolder1 = new SearchQuery(text = Some("space"), folderIds = Set(folder1.id.get))
+    results = altitude.service.library.search(qFolder1)
+    results.total shouldBe 6
   }
-*/
 
   /*
     test("index and search by metadata", focused) {

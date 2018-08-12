@@ -12,7 +12,8 @@ import play.api.libs.json.JsObject
 import software.altitude.core.Const.Api
 import software.altitude.core.models.{Folder, _}
 import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
-import software.altitude.core.util.{Query, QueryResult}
+import software.altitude.core.util.Query.QueryParam
+import software.altitude.core.util.{Query, QueryResult, SearchQuery}
 import software.altitude.core.{Altitude, Context, Const => C, _}
 
 class LibraryService(val app: Altitude) {
@@ -116,12 +117,10 @@ class LibraryService(val app: Altitude) {
     log.info(s"Query: $query")
 
     txManager.asReadOnly[QueryResult] {
-      // if folder id is specified, we want to expand it to include all subfolders
       val folderId = query.params.get(C.Asset.FOLDER_ID).asInstanceOf[Option[String]]
 
       val _query: Query = if (folderId.isDefined) {
-        val allFolderIds = app.service.folder.flatChildrenIds(parentIds = Set(folderId.get))
-        val foldersQueryParam = Query.IN(allFolderIds.asInstanceOf[Set[Any]])
+        val foldersQueryParam = getFoldersQueryParam(folderId.get)
         query.add(C.Asset.FOLDER_ID -> foldersQueryParam)
       }
       else {
@@ -138,6 +137,31 @@ class LibraryService(val app: Altitude) {
 
   def queryAll(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
     app.service.asset.queryAll(query)
+  }
+
+  def search(query: SearchQuery)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
+    txManager.asReadOnly[QueryResult] {
+      val _query: SearchQuery = if (query.folderIds.nonEmpty) {
+        val foldersQueryParam = getFoldersQueryParam(query.folderIds.head)
+        query.add(C.Asset.FOLDER_ID -> foldersQueryParam)
+      }
+      else {
+        query
+      }
+
+      app.service.search.search(_query.add(C.Asset.IS_RECYCLED -> false))
+    }
+  }
+
+  /** Given a query with a folder ID, return an IN query parameter that includes all subfolders.
+    * This way if an asset exists in *a* subfolder of a searched in folder, it will be discovered.
+    *
+    * @param query
+    * @return Folder IDs query parameter as an Option
+    */
+  private def getFoldersQueryParam(folderId: String)(implicit ctx: Context, txId: TransactionId): QueryParam = {
+    val allFolderIds = app.service.folder.flatChildrenIds(parentIds = Set(folderId))
+    Query.IN(allFolderIds.asInstanceOf[Set[Any]])
   }
 
   def genPreviewData(asset: Asset)

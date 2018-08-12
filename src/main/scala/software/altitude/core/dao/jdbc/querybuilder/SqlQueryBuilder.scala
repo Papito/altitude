@@ -12,24 +12,31 @@ import software.altitude.core.{Context, Const => C}
   * @param sqlColsForSelect columns to select
   * @param tableName table name to query
   */
-class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) {
+class SqlQueryBuilder(sqlColsForSelect: String, tableNames: Set[String]) {
   private final val log = LoggerFactory.getLogger(getClass)
 
 
-  def toSelectQuery(query: Query, countOnly: Boolean = false)
-                   (implicit ctx: Context, txId: TransactionId): SqlQuery = {
+  // convenience constructor for the common case of just one table
+  def this(sqlColsForSelect: String, tableName: String) = {
+    this(sqlColsForSelect, Set(tableName))
+  }
+
+  protected val tableNamesForSelect: String = tableNames.mkString(", ")
+
+  def build(query: Query, countOnly: Boolean = false)
+           (implicit ctx: Context, txId: TransactionId): SqlQuery = {
     val (whereClause, sqlBindVals) = compileQuery(query)
 
     val sql = if (countOnly) {
       assembleQuery(
         select = "count(*) AS count",
-        from = tableName,
+        from = tableNamesForSelect,
         where = whereClause)
     }
     else {
       assembleQuery(
         select = sqlColsForSelect,
-        from = tableName,
+        from = tableNamesForSelect,
         where = whereClause,
         rpp = query.rpp,
         page = query.page)
@@ -38,7 +45,6 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) {
     log.debug(s"SQL QUERY: $sql with $sqlBindVals")
     SqlQuery(sql, sqlBindVals)
   }
-
 
   protected def assembleQuery(select: String, from: String, where: String, rpp: Int = 0, page: Int = 0): String = {
     val sqlWithoutPaging = s"SELECT $select FROM $from $where"
@@ -71,7 +77,7 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) {
         case qParam: QueryParam => res ::: qParam.values.toList
         case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: $value")
       }
-    } :+ ctx.repo.id.get
+    } ::: tableNames.toSeq.map(_ => ctx.repo.id.get).toList // repo id for each table
   }
 
   protected def getWhereClauses(query: Query)(implicit ctx: Context): List[String] = {
@@ -92,6 +98,6 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableName: String) {
         }
         case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: $value")
       }
-    }.toList :+ s"${C.Base.REPO_ID} = ?"
+    }.toList ::: tableNames.map(tableName => s"$tableName.${C.Base.REPO_ID} = ?").toList
   }
 }

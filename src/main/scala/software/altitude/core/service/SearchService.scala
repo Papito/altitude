@@ -19,7 +19,7 @@ class SearchService(val app: Altitude) {
     searchDao.indexAsset(asset, metadataFields)
   }
 
-  def search(query: SearchQuery)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
+  def search(query: SearchQuery)(implicit ctx: Context, txId: TransactionId): QueryResult = {
     searchDao.search(query)
   }
 }
