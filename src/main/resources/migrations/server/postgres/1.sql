@@ -113,7 +113,6 @@ CREATE INDEX search_parameter_04 ON search_parameter(repository_id, field_id, fi
 CREATE TABLE search_document (
   repository_id CHAR(36) REFERENCES repository(id),
   asset_id CHAR(36) REFERENCES asset(id),
-  path TEXT NOT NULL,
   metadata_values TEXT NOT NULL,
   body TEXT NOT NULL,
   tsv TSVECTOR NOT NULL
@@ -127,9 +126,8 @@ CREATE INDEX search_document_02 ON search_document USING gin(tsv);
 CREATE FUNCTION update_search_document_rank() RETURNS trigger AS $$
 begin
 new.tsv :=
-setweight(to_tsvector('pg_catalog.english', new.path), 'A') ||
-setweight(to_tsvector('pg_catalog.english', new.metadata_values), 'B') ||
-setweight(to_tsvector('pg_catalog.english', new.body), 'C');
+setweight(to_tsvector('pg_catalog.english', new.metadata_values), 'A') ||
+setweight(to_tsvector('pg_catalog.english', new.body), 'B');
 return new;
 end
 $$ LANGUAGE plpgsql;

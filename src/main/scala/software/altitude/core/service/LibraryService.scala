@@ -113,9 +113,8 @@ class LibraryService(val app: Altitude) {
     app.service.fileStore.getById(assetId)
   }
 
-  def query(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
-    log.info(s"Query: $query")
-
+  def query(query: Query)
+           (implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
     txManager.asReadOnly[QueryResult] {
       val folderId = query.params.get(C.Asset.FOLDER_ID).asInstanceOf[Option[String]]
 
@@ -131,15 +130,8 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def queryRecycled(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
-    app.service.asset.queryRecycled(query)
-  }
-
-  def queryAll(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
-    app.service.asset.queryAll(query)
-  }
-
-  def search(query: SearchQuery)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
+  def search(query: SearchQuery)
+            (implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
     txManager.asReadOnly[QueryResult] {
       val _query: SearchQuery = if (query.folderIds.nonEmpty) {
         val foldersQueryParam = getFoldersQueryParam(query.folderIds.head)
@@ -151,6 +143,14 @@ class LibraryService(val app: Altitude) {
 
       app.service.search.search(_query.add(C.Asset.IS_RECYCLED -> false))
     }
+  }
+
+  def queryRecycled(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
+    app.service.asset.queryRecycled(query)
+  }
+
+  def queryAll(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
+    app.service.asset.queryAll(query)
   }
 
   /** Given a query with a folder ID, return an IN query parameter that includes all subfolders.

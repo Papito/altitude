@@ -17,8 +17,6 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
   override protected def addSearchDocument(asset: Asset)(implicit ctx: Context, txId: TransactionId): Unit = {
     require(asset.path.isEmpty)
 
-    val path = app.service.fileStore.getAssetPath(asset)
-
     val docSql =
       s"""
          INSERT INTO search_document (${C.Base.REPO_ID}, ${C.SearchToken.ASSET_ID}, body)
@@ -29,9 +27,7 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
       res ++ m._2.map(_.value)
     }
 
-    val body = path + ' ' +
-      metadataValues.mkString(" ") + ' ' +
-      "" // body
+    val body = metadataValues.mkString(" ")
 
     val sqlVals: List[Any] = List(
       ctx.repo.id.get, asset.id.get, body)

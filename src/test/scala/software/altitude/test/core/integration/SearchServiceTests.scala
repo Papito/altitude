@@ -9,7 +9,7 @@ import software.altitude.core.{Const => C}
 
 @DoNotDiscover class SearchServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
-  test("Index and search by term") {
+  test("Index and search by term", Focused) {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "keywords",
@@ -79,7 +79,7 @@ import software.altitude.core.{Const => C}
     results.total shouldBe 2
   }
 
-  test("Narrow down search to a folder") {
+  test("Narrow down search to a folder", Focused) {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "keywords",

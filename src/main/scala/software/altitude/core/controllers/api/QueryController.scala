@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 import software.altitude.core.controllers.Util
 import software.altitude.core.models.Asset
-import software.altitude.core.util.{Query, SearchQuery}
+import software.altitude.core.util.SearchQuery
 import software.altitude.core.{Const => C}
 
 class QueryController extends BaseApiController {
@@ -19,15 +19,18 @@ class QueryController extends BaseApiController {
     defaultQuery(folderId)
   }
 
-  get(s"/p/:${C.Api.Search.PAGE}/rpp/:${C.Api.Search.RESULTS_PER_PAGE}") {
+  get(s"/p/:${C.Api.Search.PAGE}/rpp/:${C.Api.Search.RESULTS_PER_PAGE}/?") {
     val rpp = params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, C.DEFAULT_RPP).toInt
     val page = params.getOrElse(C.Api.Search.PAGE, "1").toInt
+    val queryText = params.get(C.Api.Search.QUERY_TEXT)
+    log.info(s"Query string: $queryText")
 
+    // TODO: if there is query text, do not specify folder ids. Search everything
     val foldersQuery = params.getOrElse(C.Api.Search.FOLDERS, "")
-
     val folderIdsArg = if (foldersQuery.isEmpty) repository.rootFolderId else foldersQuery
 
     val q = new SearchQuery(
+      text = queryText,
       rpp = rpp, page = page,
       folderIds = Util.parseFolderIds(folderIds = folderIdsArg)
     )
@@ -51,22 +54,13 @@ class QueryController extends BaseApiController {
     query(q)
   }
 
-  get(s"/search/p/:${C.Api.Search.PAGE}/rpp/:${C.Api.Search.RESULTS_PER_PAGE}") {
-    // FIXME: any Scalatra way to enforce these are ints?
-    val rpp = params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, C.DEFAULT_RPP).toInt
-    val page = params.getOrElse(C.Api.Search.PAGE, "1").toInt
-
-    val queryString = params.get(C.Api.Search.QUERY_TEXT)
-    log.debug(s"Query string: $queryString")
-  }
-
   private def defaultQuery(folderId: String): ActionResult = {
     val q = new SearchQuery(
       rpp = C.DEFAULT_RPP.toInt,
       folderIds = Set(folderId)
     )
 
-    val results = app.service.library.query(q)
+    val results = app.service.library.search(q)
 
     Ok(Json.obj(
       C.Api.Search.ASSETS -> results.records.map { x =>
@@ -80,8 +74,8 @@ class QueryController extends BaseApiController {
     ))
   }
 
-  private def query(q: Query): ActionResult = {
-    val results = app.service.library.query(q)
+  private def query(q: SearchQuery): ActionResult = {
+    val results = app.service.library.search(q)
 
     Ok(Json.obj(
       C.Api.Search.ASSETS -> results.records.map { x =>

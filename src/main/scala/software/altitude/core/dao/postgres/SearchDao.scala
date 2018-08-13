@@ -22,28 +22,28 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
     val docSql =
       s"""
          INSERT INTO search_document (
-                     ${C.SearchToken.REPO_ID}, ${C.SearchToken.ASSET_ID}, ${C.Asset.PATH},
+                     ${C.SearchToken.REPO_ID}, ${C.SearchToken.ASSET_ID},
                      metadata_values, body)
-              VALUES (?, ?, ?, ?, ?)
+              VALUES (?, ?, ?, ?)
        """
 
     val metadataValues = asset.metadata.data.foldLeft(Set[String]()) { (res, m) =>
       res ++ m._2.map(_.value)
     }
 
+    val body = ""
+
     val sqlVals: List[Any] = List(
       ctx.repo.id.get,
       asset.id.get,
-      path,
       metadataValues.mkString(" "),
-      "")
+      body)
 
     addRecord(asset, docSql, sqlVals)
   }
 
   override def search(query: SearchQuery)(implicit ctx: Context, txId: TransactionId): QueryResult = {
     val sqlQuery = SQL_QUERY_BUILDER.build(query, countOnly = false)
-    println(sqlQuery)
     val sqlCountQuery = SQL_QUERY_BUILDER.build(query, countOnly = true)
 
     // OPTIMIZE: in parallel?
