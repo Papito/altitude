@@ -53,6 +53,6 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
       log.debug(recs.map(_.toString()).mkString("\n"))
     }
 
-    QueryResult(records = recs.map{makeModel}, total = count, query = None)
+    QueryResult(records = recs.map{makeModel}, total = count, rpp = query.rpp)
   }
 }

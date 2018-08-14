@@ -118,7 +118,7 @@ abstract class BaseJdbcDao extends BaseDao {
     if (recs.nonEmpty) {
       log.debug(recs.map(_.toString()).mkString("\n"))
     }
-    QueryResult(records = recs.map{makeModel}, total = count, query = Some(query))
+    QueryResult(records = recs.map{makeModel}, total = count, rpp = query.rpp)
   }
 
   protected def getQueryResultCount(query: Query, sqlQueryBuilder: SqlQueryBuilder, values: List[Any] = List())

@@ -70,11 +70,12 @@ import software.altitude.core.{Util, Const => C}
     results3.records.length shouldBe 2
     results3.totalPages shouldBe 3
 
+    // page too far
     val q4 = new Query(rpp = 2, page = 4)
     val results4 = altitude.service.library.query(q4)
     results4.total shouldBe 6
     results4.records.length shouldBe 0
-    results4.totalPages shouldBe 0
+    results4.totalPages shouldBe 3
 
     val q5 = new Query(rpp = 6, page = 1)
     val results5 = altitude.service.library.query(q5)
