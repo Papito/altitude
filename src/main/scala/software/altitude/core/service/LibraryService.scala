@@ -119,7 +119,9 @@ class LibraryService(val app: Altitude) {
       val folderId = query.params.get(C.Asset.FOLDER_ID).asInstanceOf[Option[String]]
 
       val _query: Query = if (folderId.isDefined) {
-        val foldersQueryParam = getFoldersQueryParam(folderId.get)
+        val allFolderIds = app.service.folder.flatChildrenIds(parentIds = Set(folderId.get))
+        val foldersQueryParam = Query.IN(allFolderIds.asInstanceOf[Set[Any]])
+
         query.add(C.Asset.FOLDER_ID -> foldersQueryParam)
       }
       else {
@@ -134,8 +136,14 @@ class LibraryService(val app: Altitude) {
             (implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
     txManager.asReadOnly[QueryResult] {
       val _query: SearchQuery = if (query.folderIds.nonEmpty) {
-        val foldersQueryParam = getFoldersQueryParam(query.folderIds.head)
-        query.add(C.Asset.FOLDER_ID -> foldersQueryParam)
+        // create a new query, with the new folder set
+        val allFolderIds = app.service.folder.flatChildrenIds(parentIds = query.folderIds)
+
+        new SearchQuery( text = query.text,
+          folderIds = allFolderIds,
+          params = query.params,
+          rpp = query.rpp,
+          page = query.page)
       }
       else {
         query
@@ -151,17 +159,6 @@ class LibraryService(val app: Altitude) {
 
   def queryAll(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
     app.service.asset.queryAll(query)
-  }
-
-  /** Given a folder ID, return an IN query parameter that includes all subfolders.
-    * This way if an asset exists in *a* subfolder of a searched in folder, it will be discovered.
-    *
-    * @param folderId
-    * @return Folder IDs query parameter as an Option
-    */
-  private def getFoldersQueryParam(folderId: String)(implicit ctx: Context, txId: TransactionId): QueryParam = {
-    val allFolderIds = app.service.folder.flatChildrenIds(parentIds = Set(folderId))
-    Query.IN(allFolderIds.asInstanceOf[Set[Any]])
   }
 
   def genPreviewData(asset: Asset)
