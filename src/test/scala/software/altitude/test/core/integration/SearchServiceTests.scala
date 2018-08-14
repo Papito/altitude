@@ -96,9 +96,6 @@ import software.altitude.core.{Const => C}
     val folder1_1: Folder = altitude.service.library.addFolder(
       name = "folder1_1", parentId = folder1.id)
 
-    val assetToRecycle: Asset = altitude.service.library.add(makeAsset(folder1_1, metadata))
-    altitude.service.library.recycleAsset(assetToRecycle.id.get)
-
     1 to 3 foreach {_ =>
       altitude.service.library.add(makeAsset(folder1_1, metadata))
     }
@@ -120,8 +117,7 @@ import software.altitude.core.{Const => C}
 
   }
 
-  /*
-    test("index and search by metadata", focused) {
+    test("Index and search by metadata", Focused) {
       val field1 = altitude.service.metadata.addField(
         MetadataField(
           name = "field 1",
@@ -141,18 +137,21 @@ import software.altitude.core.{Const => C}
           field1.id.get -> Set("one", "two", "three"),
           field2.id.get -> Set("1", "2", "3.002", "14.1", "1.25", "123456789"),
           field3.id.get -> Set("true"))
-      val assetData1 = makeAsset(altitude.service.folder.getTriageFolder, new Metadata(data))
-      val asset1: Asset = altitude.service.library.add(assetData1)
+      val assetData1 = makeAsset(altitude.service.folder.triageFolder, Metadata(data))
+      altitude.service.library.add(assetData1)
 
       data = Map[String, Set[String]](
           field1.id.get -> Set("six", "seven"),
           field2.id.get -> Set("5", "1001", "1"),
           field3.id.get -> Set("true"))
-      val assetData2 = makeAsset(altitude.service.folder.getTriageFolder, new Metadata(data))
-      val asset2: Asset = altitude.service.library.add(assetData2)
+      val assetData2 = makeAsset(altitude.service.folder.triageFolder, Metadata(data))
+      altitude.service.library.add(assetData2)
+
+      // simple value search
+      var results = altitude.service.library.search(new SearchQuery(text = Some("one")))
+      results.total shouldBe 1
     }
 
-    test("index and search by term and metadata") {
+    test("Recycled assets should not be in the search index") {
     }
-  */
 }

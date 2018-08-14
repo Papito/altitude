@@ -141,7 +141,7 @@ class LibraryService(val app: Altitude) {
         query
       }
 
-      app.service.search.search(_query.add(C.Asset.IS_RECYCLED -> false))
+      app.service.search.search(_query)
     }
   }
 
@@ -153,10 +153,10 @@ class LibraryService(val app: Altitude) {
     app.service.asset.queryAll(query)
   }
 
-  /** Given a query with a folder ID, return an IN query parameter that includes all subfolders.
+  /** Given a folder ID, return an IN query parameter that includes all subfolders.
     * This way if an asset exists in *a* subfolder of a searched in folder, it will be discovered.
     *
-    * @param query
+    * @param folderId
     * @return Folder IDs query parameter as an Option
     */
   private def getFoldersQueryParam(folderId: String)(implicit ctx: Context, txId: TransactionId): QueryParam = {

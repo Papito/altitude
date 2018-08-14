@@ -10,7 +10,7 @@ import software.altitude.core.{Context, Const => C}
   * An advanced ORM replacement :)
   *
   * @param sqlColsForSelect columns to select
-  * @param tableName table name to query
+  * @param tableNames table names for select
   */
 class SqlQueryBuilder(sqlColsForSelect: String, tableNames: Set[String]) {
   private final val log = LoggerFactory.getLogger(getClass)
