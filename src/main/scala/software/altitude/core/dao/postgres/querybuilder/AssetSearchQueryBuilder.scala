@@ -34,12 +34,14 @@ class AssetSearchQueryBuilder(sqlColsForSelect: String, tableNames: Set[String])
   }
 
   protected def compileQuery(searchQuery: SearchQuery)(implicit ctx: Context): (String, List[Any]) = {
-    val sqlBindVals = getSqlBindVals(searchQuery) :::
-      (if (searchQuery.text.isDefined) List(searchQuery.text.get) else List())
+    val sQueryWithNoRecycled = searchQuery.add(C.Asset.IS_RECYCLED -> false)
 
-    val whereClauses = getWhereClauses(searchQuery) :::
+    val sqlBindVals = getSqlBindVals(sQueryWithNoRecycled) :::
+      (if (sQueryWithNoRecycled.text.isDefined) List(sQueryWithNoRecycled.text.get) else List())
+
+    val whereClauses = getWhereClauses(sQueryWithNoRecycled) :::
       List(s"search_document.${C.SearchToken.ASSET_ID} = asset.id") :::
-      (if (searchQuery.text.isDefined) List("search_document.tsv @@ to_tsquery(?)") else List())
+      (if (sQueryWithNoRecycled.text.isDefined) List("search_document.tsv @@ to_tsquery(?)") else List())
 
     compileSearchQuery(searchQuery, whereClauses, sqlBindVals)
   }

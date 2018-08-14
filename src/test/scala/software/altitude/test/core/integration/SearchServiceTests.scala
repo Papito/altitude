@@ -152,6 +152,13 @@ import software.altitude.core.{Const => C}
       results.total shouldBe 1
     }
 
-    test("Recycled assets should not be in the search index") {
+    test("Recycled assets should not be in the search index", Focused) {
+      val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+      altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+
+      altitude.service.library.recycleAsset(asset.id.get)
+
+      val results = altitude.service.library.search(new SearchQuery)
+      results.total shouldBe 1
     }
 }
