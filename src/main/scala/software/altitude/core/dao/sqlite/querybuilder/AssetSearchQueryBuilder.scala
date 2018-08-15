@@ -35,13 +35,13 @@ class AssetSearchQueryBuilder(sqlColsForSelect: String, tableNames: Set[String])
 
   protected def compileQuery(searchQuery: SearchQuery)(implicit ctx: Context): (String, List[Any]) = {
     val sQueryWithNoRecycled = searchQuery.add(C.Asset.IS_RECYCLED -> false)
+    val queryTextBindVal = if (sQueryWithNoRecycled.text.isDefined) List(sQueryWithNoRecycled.text.get) else List()
+    val sqlBindVals = getSqlBindVals(sQueryWithNoRecycled) ::: queryTextBindVal
+    val queryTextWhereClause = if (sQueryWithNoRecycled.text.isDefined) List("body MATCH ?") else List()
 
-    val sqlBindVals = getSqlBindVals(sQueryWithNoRecycled) :::
-      (if (sQueryWithNoRecycled.text.isDefined) List(sQueryWithNoRecycled.text.get) else List())
-
-    val whereClauses = getWhereClauses(sQueryWithNoRecycled) ::: List(
-      s"search_document.${C.SearchToken.ASSET_ID} = asset.id") :::
-      (if (sQueryWithNoRecycled.text.isDefined) List("body MATCH ?") else List())
+    val whereClauses = getWhereClauses(sQueryWithNoRecycled) :::
+      List(s"search_document.${C.SearchToken.ASSET_ID} = asset.id") :::
+      queryTextWhereClause
 
     compileSearchQuery(searchQuery, whereClauses, sqlBindVals)
   }

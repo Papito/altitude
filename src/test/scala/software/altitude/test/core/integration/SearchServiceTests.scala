@@ -4,6 +4,7 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 import software.altitude.core.Util
 import software.altitude.core.models._
+import software.altitude.core.util.Query.QueryParam
 import software.altitude.core.util.{Query, QueryResult, SearchQuery}
 import software.altitude.core.{Const => C}
 
@@ -149,6 +150,12 @@ import software.altitude.core.{Const => C}
 
       // simple value search
       var results = altitude.service.library.search(new SearchQuery(text = Some("one")))
+      results.total shouldBe 1
+
+      val keywordSearchParam = Query.EQUALS(1)
+      results = altitude.service.library.search(
+        new SearchQuery(params = Map(field1.id.get -> keywordSearchParam))
+      )
       results.total shouldBe 1
     }
 
