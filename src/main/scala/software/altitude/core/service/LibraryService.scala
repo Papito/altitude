@@ -16,12 +16,26 @@ import software.altitude.core.util.Query.QueryParam
 import software.altitude.core.util.{Query, QueryResult, SearchQuery}
 import software.altitude.core.{Altitude, Context, Const => C, _}
 
+/**
+  * The class that stitches it all together
+  * TOC:
+  * - ASSETS
+  * - DATA/PREVIEW
+  * - DISCOVERY
+  * - FOLDERS
+  * - RECYCLING
+  * - METADATA
+  */
 class LibraryService(val app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
   protected val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
 
   // FIXME: does not belong here - image specific
   val previewBoxSize: Int = app.config.getInt("preview.box.pixels")
+
+  /** **************************************************************************
+    * ASSETS
+    * *************************************************************************/
 
   def add(assetIn: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
     log.info(s"Preparing to add asset [$assetIn]")
@@ -40,8 +54,8 @@ class LibraryService(val app: Altitude) {
       }
 
       /**
-      * Process metadata and append it to the asset
-      */
+        * Process metadata and append it to the asset
+        */
       val metadata = app.service.metadata.cleanAndValidate(assetIn.metadata)
 
       val assetId = BaseModel.genId
@@ -65,13 +79,13 @@ class LibraryService(val app: Altitude) {
       val storedAsset: Asset = app.service.asset.add(assetToAdd)
 
       /**
-      * Add to search index
-      */
+        * Add to search index
+        */
       app.service.search.indexAsset(storedAsset)
 
       /**
-      * Update repository counters
-      */
+        * Update repository counters
+        */
       app.service.stats.addAsset(assetToAdd)
 
       // add preview data
@@ -105,61 +119,99 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def getPreview(assetId: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Preview = {
-    app.service.fileStore.getPreviewById(assetId)
-  }
-
-  def getData(assetId: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Data = {
-    app.service.fileStore.getById(assetId)
-  }
-
-  def query(query: Query)
-           (implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
-    txManager.asReadOnly[QueryResult] {
-      val folderId = query.params.get(C.Asset.FOLDER_ID).asInstanceOf[Option[String]]
-
-      val _query: Query = if (folderId.isDefined) {
-        val allFolderIds = app.service.folder.flatChildrenIds(parentIds = Set(folderId.get))
-        val foldersQueryParam = Query.IN(allFolderIds.asInstanceOf[Set[Any]])
-
-        query.add(C.Asset.FOLDER_ID -> foldersQueryParam)
-      }
-      else {
-        query
-      }
-
-      app.service.asset.query(_query)
+  def moveAssetToFolder(assetId: String, folderId: String)
+                       (implicit ctx: Context, txId: TransactionId = new TransactionId): Asset = {
+    txManager.withTransaction[Asset] {
+      moveAssetsToFolder(Set(assetId), folderId)
+      getById(assetId)
     }
   }
 
-  def search(query: SearchQuery)
-            (implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
-    txManager.asReadOnly[QueryResult] {
-      val _query: SearchQuery = if (query.folderIds.nonEmpty) {
-        // create a new query, with the new folder set
-        val allFolderIds = app.service.folder.flatChildrenIds(parentIds = query.folderIds)
-
-        new SearchQuery( text = query.text,
-          folderIds = allFolderIds,
-          params = query.params,
-          rpp = query.rpp,
-          page = query.page)
-      }
-      else {
-        query
-      }
-
-      app.service.search.search(_query)
+  def moveAssetToTriage(assetId: String)
+                       (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+    txManager.withTransaction {
+      moveAssetsToTriage(Set(assetId))
     }
   }
 
-  def queryRecycled(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
-    app.service.asset.queryRecycled(query)
+  def moveAssetsToTriage(assetIds: Set[String])
+                        (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+    txManager.withTransaction {
+      moveAssetsToFolder(assetIds, ctx.repo.triageFolderId)
+    }
   }
 
-  def queryAll(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
-    app.service.asset.queryAll(query)
+  def moveAssetsToFolder(assetIds: Set[String], destFolderId: String)
+                        (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+
+    def move(asset: Asset): Unit = {
+      // cannot move to the same folder
+      if (!asset.isRecycled && asset.folderId == destFolderId) {
+        return
+      }
+
+      app.service.stats.moveAsset(asset, destFolderId)
+
+      /* Point the asset to the new folder.
+         It may or may not be recycled, so we update it as not recycled unconditionally
+         (saves us a separate update query)
+      */
+      val updatedAsset: Asset = asset.modify(
+        C.Asset.FOLDER_ID -> destFolderId,
+        C.Asset.IS_RECYCLED -> false)
+
+      app.service.asset.updateById(
+        asset.id.get, updatedAsset,
+        fields = List(C.Asset.FOLDER_ID, C.Asset.IS_RECYCLED))
+
+      app.service.fileStore.moveAsset(asset, updatedAsset)
+    }
+
+    txManager.withTransaction {
+      // ensure the folder exists
+      app.service.folder.getById(destFolderId)
+
+      assetIds.foreach { assetId =>
+        // cannot have assets in root folder - just other folders
+        if (app.service.folder.isRootFolder(destFolderId)) {
+          throw IllegalOperationException("Cannot move assets to root folder")
+        }
+
+        val asset: Asset = getById(assetId)
+
+        move(asset)
+      }
+    }
   }
+
+  def renameAsset(assetId: String, newFilename: String)
+                 (implicit ctx: Context, txId: TransactionId = new TransactionId): Asset = {
+
+    txManager.withTransaction[Asset] {
+      val asset: Asset = getById(assetId)
+
+      if (asset.isRecycled) {
+        throw IllegalOperationException(s"Cannot rename a recycled asset: [$asset]")
+      }
+
+      val updatedAsset: Asset = asset.modify(
+        C.Asset.FILENAME -> newFilename,
+        C.Asset.PATH -> app.service.fileStore.getPathWithNewFilename(asset, newFilename))
+
+      // Note that we are not updating the PATH because it does not exist as a property
+      app.service.asset.updateById(
+        asset.id.get, updatedAsset,
+        fields = List(C.Asset.FILENAME))
+
+      app.service.fileStore.moveAsset(asset, updatedAsset)
+
+      updatedAsset
+    }
+  }
+
+  /** **************************************************************************
+    * DATA/PREVIEW
+    * *************************************************************************/
 
   def genPreviewData(asset: Asset)
                     (implicit ctx: Context, txId: TransactionId = new TransactionId): Array[Byte] = {
@@ -190,6 +242,7 @@ class LibraryService(val app: Altitude) {
     }
   }
 
+  // FIXME: this is temporary as only image-specific
   private def makeImageThumbnail(asset: Asset)
                                 (implicit ctx: Context, txId: TransactionId): Array[Byte] = {
     try {
@@ -224,69 +277,91 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def moveAssetToFolder(assetId: String, folderId: String)
-                       (implicit ctx: Context, txId: TransactionId = new TransactionId): Asset = {
-    txManager.withTransaction[Asset] {
-      moveAssetsToFolder(Set(assetId), folderId)
-      getById(assetId)
-    }
+  def getPreview(assetId: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Preview = {
+    app.service.fileStore.getPreviewById(assetId)
   }
 
-  def moveAssetToTriage(assetId: String)
-                              (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
-    txManager.withTransaction {
-      moveAssetsToTriage(Set(assetId))
-    }
-  }
-
-  def moveAssetsToTriage(assetIds: Set[String])
-                               (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
-    txManager.withTransaction {
-      moveAssetsToFolder(assetIds, ctx.repo.triageFolderId)
-    }
+  def getData(assetId: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Data = {
+    app.service.fileStore.getById(assetId)
   }
 
 
-  def recycleAsset(assetId: String)
-                  (implicit ctx: Context, txId: TransactionId = new TransactionId): Asset = {
-    txManager.withTransaction {
-      recycleAssets(Set(assetId))
-      getById(assetId)
-    }
-  }
+  /** **************************************************************************
+    * DISCOVERY
+    * *************************************************************************/
 
-  def recycleFolder(folderId: String)
-                   (implicit ctx: Context, txId: TransactionId = new TransactionId): Folder = {
+  def query(query: Query)
+           (implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
+    txManager.asReadOnly[QueryResult] {
+      val folderId = query.params.get(C.Asset.FOLDER_ID).asInstanceOf[Option[String]]
 
-    txManager.withTransaction {
-      val folder: Folder = app.service.folder.getById(folderId)
-      app.service.folder.setRecycledProp(folder, isRecycled = true)
-      folder.modify(C.Folder.IS_RECYCLED -> true)
-    }
-  }
+      val _query: Query = if (folderId.isDefined) {
+        val allFolderIds = app.service.folder.flatChildrenIds(parentIds = Set(folderId.get))
+        val foldersQueryParam = Query.IN(allFolderIds.asInstanceOf[Set[Any]])
 
-  def recycleAssets(assetIds: Set[String])
-                   (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
-
-      assetIds.foreach { assetId =>
-        txManager.withTransaction {
-          val asset = getById(assetId)
-          app.service.asset.setRecycledProp(asset, isRecycled = true)
-          val recycledAsset = getById(assetId)
-          app.service.stats.recycleAsset(recycledAsset)
-          app.service.fileStore.recycleAsset(asset)
-        }
+        query.add(C.Asset.FOLDER_ID -> foldersQueryParam)
       }
+      else {
+        query
+      }
+
+      app.service.asset.query(_query)
+    }
+  }
+
+  def search(query: SearchQuery)
+            (implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
+    txManager.asReadOnly[QueryResult] {
+      val _query: SearchQuery = if (query.folderIds.nonEmpty) {
+        // create a new query, with the new folder set
+        val allFolderIds = app.service.folder.flatChildrenIds(parentIds = query.folderIds)
+
+        new SearchQuery(text = query.text,
+          folderIds = allFolderIds,
+          params = query.params,
+          rpp = query.rpp,
+          page = query.page)
+      }
+      else {
+        query
+      }
+
+      app.service.search.search(_query)
+    }
+  }
+
+  def queryRecycled(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
+    app.service.asset.queryRecycled(query)
+  }
+
+  def queryAll(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
+    app.service.asset.queryAll(query)
+  }
+
+
+  /** **************************************************************************
+    * FOLDERS
+    * *************************************************************************/
+
+  def addFolder(name: String, parentId: Option[String] = None)
+               (implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
+    txManager.withTransaction[JsObject] {
+      val _parentId = if (parentId.isDefined) parentId.get else ctx.repo.rootFolderId
+      val folder = Folder(name = name, parentId = _parentId)
+      val addedFolder = app.service.folder.add(folder)
+      app.service.fileStore.addFolder(addedFolder)
+      addedFolder
+    }
   }
 
   /**
-   * Delete a folder by ID, including its children. Does not allow deleting the root folder,
-   * or any system folders.
-   *
-   * Recycle all the assets in the tree.
-   */
+    * Delete a folder by ID, including its children. Does not allow deleting the root folder,
+    * or any system folders.
+    *
+    * Recycle all the assets in the tree.
+    */
   def deleteFolderById(id: String)
-                  (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+                      (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
     if (app.service.folder.isRootFolder(id)) {
       throw IllegalOperationException("Cannot delete the root folder")
     }
@@ -354,88 +429,6 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def moveAssetsToFolder(assetIds: Set[String], destFolderId: String)
-                        (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
-
-    def move(asset: Asset): Unit = {
-      // cannot move to the same folder
-      if (!asset.isRecycled && asset.folderId == destFolderId) {
-        return
-      }
-
-      app.service.stats.moveAsset(asset, destFolderId)
-
-      /* Point the asset to the new folder.
-         It may or may not be recycled, so we update it as not recycled unconditionally
-         (saves us a separate update query)
-      */
-      val updatedAsset: Asset = asset.modify(
-        C.Asset.FOLDER_ID -> destFolderId,
-        C.Asset.IS_RECYCLED -> false)
-
-      app.service.asset.updateById(
-        asset.id.get, updatedAsset,
-        fields = List(C.Asset.FOLDER_ID, C.Asset.IS_RECYCLED))
-
-      app.service.fileStore.moveAsset(asset, updatedAsset)
-    }
-
-    txManager.withTransaction {
-      // ensure the folder exists
-      app.service.folder.getById(destFolderId)
-
-      assetIds.foreach {assetId =>
-        // cannot have assets in root folder - just other folders
-        if (app.service.folder.isRootFolder(destFolderId)) {
-          throw IllegalOperationException("Cannot move assets to root folder")
-        }
-
-        val asset: Asset = getById(assetId)
-
-        move(asset)
-      }
-    }
-  }
-
-  def renameAsset(assetId: String, newFilename: String)
-                 (implicit ctx: Context, txId: TransactionId = new TransactionId): Asset = {
-
-    txManager.withTransaction[Asset] {
-      val asset: Asset = getById(assetId)
-
-      if (asset.isRecycled) {
-        throw IllegalOperationException(s"Cannot rename a recycled asset: [$asset]")
-      }
-
-      val updatedAsset: Asset = asset.modify(
-          C.Asset.FILENAME -> newFilename,
-          C.Asset.PATH -> app.service.fileStore.getPathWithNewFilename(asset, newFilename))
-
-      // Note that we are not updating the PATH because it does not exist as a property
-      app.service.asset.updateById(
-        asset.id.get, updatedAsset,
-        fields = List(C.Asset.FILENAME))
-
-      app.service.fileStore.moveAsset(asset, updatedAsset)
-
-      updatedAsset
-    }
-  }
-
-  /**
-    * Add a new folder
-    */
-  def addFolder(name: String, parentId: Option[String] = None)
-               (implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
-    txManager.withTransaction[JsObject] {
-      val _parentId = if (parentId.isDefined) parentId.get else ctx.repo.rootFolderId
-      val folder = Folder(name = name, parentId = _parentId)
-      val addedFolder = app.service.folder.add(folder)
-      app.service.fileStore.addFolder(addedFolder)
-      addedFolder
-    }
-  }
-
   def renameFolder(folderId: String, newName: String)
                   (implicit ctx: Context, txId: TransactionId = new TransactionId): Folder = {
     txManager.withTransaction[Folder] {
@@ -447,7 +440,7 @@ class LibraryService(val app: Altitude) {
   }
 
   def moveFolder(folderBeingMovedId: String, destFolderId: String)
-                  (implicit ctx: Context, txId: TransactionId = new TransactionId): Folder = {
+                (implicit ctx: Context, txId: TransactionId = new TransactionId): Folder = {
     txManager.withTransaction[Folder] {
       val (movedFolder, newParent) = app.service.folder.move(folderBeingMovedId, destFolderId)
       app.service.fileStore.moveFolder(movedFolder, newParent)
@@ -455,6 +448,10 @@ class LibraryService(val app: Altitude) {
     }
   }
 
+
+  /** **************************************************************************
+    * RECYCLING
+    * *************************************************************************/
 
   def restoreRecycledAsset(assetId: String)
                           (implicit ctx: Context, txId: TransactionId = new TransactionId): Asset = {
@@ -497,4 +494,64 @@ class LibraryService(val app: Altitude) {
       }
     }
   }
+
+  def recycleAsset(assetId: String)
+                  (implicit ctx: Context, txId: TransactionId = new TransactionId): Asset = {
+    txManager.withTransaction {
+      recycleAssets(Set(assetId))
+      getById(assetId)
+    }
+  }
+
+  def recycleFolder(folderId: String)
+                   (implicit ctx: Context, txId: TransactionId = new TransactionId): Folder = {
+
+    txManager.withTransaction {
+      val folder: Folder = app.service.folder.getById(folderId)
+      app.service.folder.setRecycledProp(folder, isRecycled = true)
+      folder.modify(C.Folder.IS_RECYCLED -> true)
+    }
+  }
+
+  def recycleAssets(assetIds: Set[String])
+                   (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+
+    assetIds.foreach { assetId =>
+      txManager.withTransaction {
+        val asset = getById(assetId)
+        app.service.asset.setRecycledProp(asset, isRecycled = true)
+        val recycledAsset = getById(assetId)
+        app.service.stats.recycleAsset(recycledAsset)
+        app.service.fileStore.recycleAsset(asset)
+      }
+    }
+  }
+
+
+  /** **************************************************************************
+    * METADATA
+    * *************************************************************************/
+
+  def addFieldValue(assetId: String, fieldId: String, newValue: String)
+                   (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+    txManager.withTransaction {
+      app.service.metadata.addFieldValue(assetId, fieldId, newValue)
+    }
+  }
+
+  def deleteFieldValue(assetId: String, valueId: String)
+                      (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+    txManager.withTransaction {
+      app.service.metadata.deleteFieldValue(assetId, valueId)
+    }
+  }
+
+  def updateFieldValue(assetId: String, valueId: String, newValue: String)
+                      (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+
+    txManager.withTransaction {
+      app.service.metadata.addFieldValue(assetId, valueId, newValue)
+    }
+  }
+
 }

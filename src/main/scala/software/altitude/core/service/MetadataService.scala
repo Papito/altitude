@@ -115,7 +115,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
   }
 
   def addFieldValue(assetId: String, fieldId: String, newValue: String)
-                    (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+                    (implicit ctx: Context, txId: TransactionId): Unit = {
     log.info(s"Adding value [$newValue] for field [$fieldId] on asset [$assetId] ")
 
     txManager.withTransaction {
@@ -164,7 +164,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
   }
 
   def deleteFieldValue(assetId: String, valueId: String)
-                      (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+                      (implicit ctx: Context, txId: TransactionId ): Unit = {
     log.info(s"Deleting value [$valueId] for on asset [$assetId] ")
 
     txManager.withTransaction {
@@ -184,7 +184,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
   }
 
   def updateFieldValue(assetId: String, valueId: String, newValue: String)
-                      (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+                      (implicit ctx: Context, txId: TransactionId): Unit = {
 
     log.info(s"Updating value [$valueId] for on asset [$assetId] with [$newValue] ")
 
@@ -440,6 +440,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
    * @return All values that FAIL type validation
    */
   def collectInvalidTypeValues(fieldType: FieldType.Value, values: Set[MetadataValue]): Set[String] = {
+    // FIXME: foldLeft is better-suited here
     values.map { mdVal =>
       fieldType match {
         case FieldType.NUMBER => try {

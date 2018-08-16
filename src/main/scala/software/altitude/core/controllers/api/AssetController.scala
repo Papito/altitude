@@ -42,7 +42,7 @@ class AssetController extends BaseApiController {
 
     log.info(s"Adding metadata value [$newValue] for field [$fieldId] on asset [$assetId]")
 
-    app.service.metadata.addFieldValue(assetId, fieldId, newValue)
+    app.service.library.addFieldValue(assetId, fieldId, newValue)
 
     val newMetadata = app.service.metadata.getMetadata(assetId)
 
@@ -58,7 +58,7 @@ class AssetController extends BaseApiController {
 
     log.info(s"Updating metadata value [$newValue] for value ID [$valueId] on asset [$assetId]")
 
-    app.service.metadata.updateFieldValue(assetId, valueId, newValue)
+    app.service.library.updateFieldValue(assetId, valueId, newValue)
 
     val newMetadata = app.service.metadata.getMetadata(assetId)
 
@@ -73,7 +73,7 @@ class AssetController extends BaseApiController {
 
     log.info(s"Removing metadata value [$valueId] on asset [$assetId]")
 
-    app.service.metadata.deleteFieldValue(assetId, valueId)
+    app.service.library.deleteFieldValue(assetId, valueId)
 
     val newMetadata = app.service.metadata.getMetadata(assetId)
 

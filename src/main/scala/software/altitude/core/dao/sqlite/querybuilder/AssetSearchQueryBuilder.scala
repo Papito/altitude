@@ -39,7 +39,7 @@ class AssetSearchQueryBuilder(sqlColsForSelect: String, tableNames: Set[String])
     }
 
     log.debug(s"SQL QUERY: $sql with $sqlBindVals")
-    println(sql, sqlBindVals)
+    //println(sql, sqlBindVals)
     SqlQuery(sql, sqlBindVals)
   }
 
