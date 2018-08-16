@@ -532,25 +532,31 @@ class LibraryService(val app: Altitude) {
     * METADATA
     * *************************************************************************/
 
-  def addFieldValue(assetId: String, fieldId: String, newValue: String)
-                   (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+  def addMetadataValue(assetId: String, fieldId: String, newValue: String)
+                      (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
     txManager.withTransaction {
       app.service.metadata.addFieldValue(assetId, fieldId, newValue)
+      val field: MetadataField = app.service.metadata.getFieldById(fieldId)
+      val asset: Asset = getById(assetId)
+      app.service.search.addMetadataValue(asset, field, newValue)
     }
   }
 
-  def deleteFieldValue(assetId: String, valueId: String)
-                      (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+  def deleteMetadataValue(assetId: String, valueId: String)
+                         (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
     txManager.withTransaction {
       app.service.metadata.deleteFieldValue(assetId, valueId)
+      val asset: Asset = getById(assetId)
+      app.service.search.deleteMetadataValue(asset, valueId)
     }
   }
 
-  def updateFieldValue(assetId: String, valueId: String, newValue: String)
-                      (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+  def updateMetadataValue(assetId: String, valueId: String, newValue: String)
+                         (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
 
     txManager.withTransaction {
-      app.service.metadata.addFieldValue(assetId, valueId, newValue)
+      app.service.metadata.updateFieldValue(assetId, valueId, newValue)
+      throw new NotImplementedError
     }
   }
 

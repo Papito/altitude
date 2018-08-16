@@ -1,5 +1,6 @@
 package software.altitude.core.dao.sqlite
 
+import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import software.altitude.core.dao.sqlite.querybuilder.AssetSearchQueryBuilder
 import software.altitude.core.models.Asset
@@ -15,8 +16,6 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
     tableNames = Set("search_document", "asset"))
 
   override protected def addSearchDocument(asset: Asset)(implicit ctx: Context, txId: TransactionId): Unit = {
-    require(asset.path.isEmpty)
-
     val docSql =
       s"""
          INSERT INTO search_document (${C.Base.REPO_ID}, ${C.SearchToken.ASSET_ID}, body)
@@ -33,6 +32,30 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
       ctx.repo.id.get, asset.id.get, body)
 
     addRecord(asset, docSql, sqlVals)
+  }
+
+  override protected def replaceSearchDocument(asset: Asset)(implicit ctx: Context, txId: TransactionId): Unit = {
+    val docSql =
+      s"""
+         UPDATE search_document
+            SET body = ?
+          WHERE ${C.Base.REPO_ID} = ?
+            AND ${C.SearchToken.ASSET_ID} = ?
+       """
+
+    val metadataValues = asset.metadata.data.foldLeft(Set[String]()) { (res, m) =>
+      res ++ m._2.map(_.value)
+    }
+
+    val body = metadataValues.mkString(" ")
+
+    val sqlVals: List[Any] = List(
+      body, ctx.repo.id.get, asset.id.get)
+
+    addRecord(asset, docSql, sqlVals)
+
+    val runner: QueryRunner = new QueryRunner()
+    runner.update(conn, docSql, sqlVals.map(_.asInstanceOf[Object]):_*)
   }
 
   override def search(query: SearchQuery)(implicit ctx: Context, txId: TransactionId): QueryResult = {

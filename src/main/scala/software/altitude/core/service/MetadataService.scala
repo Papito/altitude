@@ -152,13 +152,14 @@ class MetadataService(val app: Altitude) extends ModelValidation {
         currentMetadata.get(fieldId).get
       }
 
-      // boolean values replaces each other
       val newValues = field.fieldType match {
+        // boolean values replaces each other
         case FieldType.BOOL => Set(cleanValue)
+        // non-boolean values are appended
         case _ => currentValues + cleanValue
       }
-      val data = Map[String, Set[MetadataValue]](fieldId -> newValues)
 
+      val data = Map[String, Set[MetadataValue]](fieldId -> newValues)
       updateMetadata(assetId, Metadata(data))
     }
   }

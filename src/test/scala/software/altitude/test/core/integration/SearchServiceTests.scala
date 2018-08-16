@@ -175,7 +175,7 @@ import software.altitude.core.util.{Query, QueryResult, SearchQuery}
     val asset1: Asset = altitude.service.library.add(
       makeAsset(altitude.service.folder.triageFolder))
 
-    altitude.service.library.addFieldValue(asset1.id.get, fieldId = field1.id.get, newValue = "one")
+    altitude.service.library.addMetadataValue(asset1.id.get, fieldId = field1.id.get, newValue = "one")
 
     var results = altitude.service.library.search(new SearchQuery(text = Some("one")))
     results.total shouldBe 1

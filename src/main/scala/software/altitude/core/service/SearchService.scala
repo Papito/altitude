@@ -22,4 +22,20 @@ class SearchService(val app: Altitude) {
   def search(query: SearchQuery)(implicit ctx: Context, txId: TransactionId): QueryResult = {
     searchDao.search(query)
   }
+
+  def addMetadataValue(asset: Asset, field: MetadataField, value: String)
+                      (implicit ctx: Context, txId: TransactionId): Unit = {
+    searchDao.addMetadataValue(asset, field, value)
+  }
+
+  def addMetadataValues(asset: Asset, field: MetadataField, values: Set[String])
+                       (implicit ctx: Context, txId: TransactionId): Unit = {
+
+    searchDao.addMetadataValues(asset, field, values)
+  }
+
+  def deleteMetadataValue(asset: Asset, valueId: String)
+                         (implicit ctx: Context, txId: TransactionId): Unit = {
+    searchDao.deleteMetadataValue(asset, valueId)
+  }
 }

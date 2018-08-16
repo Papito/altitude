@@ -320,8 +320,8 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
     storedMetadata.get(field.id.get).value.size shouldBe 3
     val values: List[MetadataValue] = storedMetadata.get(field.id.get).value.toList
 
-    altitude.service.library.deleteFieldValue(asset.id.get, values.head.id.get)
-    altitude.service.library.deleteFieldValue(asset.id.get, values.last.id.get)
+    altitude.service.library.deleteMetadataValue(asset.id.get, values.head.id.get)
+    altitude.service.library.deleteMetadataValue(asset.id.get, values.last.id.get)
 
     storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
 
@@ -352,7 +352,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
     val field_1_valueId = storedMetadata.get(field1.id.get).get.head.id
     field_1_valueId should not be None
 
-    altitude.service.library.addFieldValue(asset.id.get, field2.id.get, "2")
+    altitude.service.library.addMetadataValue(asset.id.get, field2.id.get, "2")
 
     storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
 
@@ -378,15 +378,15 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
 
     intercept[ValidationException] {
-      altitude.service.library.addFieldValue(asset.id.get, metadataField.id.get, "")
+      altitude.service.library.addMetadataValue(asset.id.get, metadataField.id.get, "")
     }
 
     intercept[ValidationException] {
-      altitude.service.library.addFieldValue(asset.id.get, metadataField.id.get, "   ")
+      altitude.service.library.addMetadataValue(asset.id.get, metadataField.id.get, "   ")
     }
 
     intercept[ValidationException] {
-      altitude.service.library.addFieldValue(asset.id.get, metadataField.id.get, "  \t \n ")
+      altitude.service.library.addMetadataValue(asset.id.get, metadataField.id.get, "  \t \n ")
     }
   }
 
@@ -399,9 +399,9 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
     val metadataField = altitude.service.metadata.addField(_metadataField)
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
 
-    altitude.service.library.addFieldValue(asset.id.get, metadataField.id.get, "true")
-    altitude.service.library.addFieldValue(asset.id.get, metadataField.id.get, "true")
-    altitude.service.library.addFieldValue(asset.id.get, metadataField.id.get, "false")
+    altitude.service.library.addMetadataValue(asset.id.get, metadataField.id.get, "true")
+    altitude.service.library.addMetadataValue(asset.id.get, metadataField.id.get, "true")
+    altitude.service.library.addMetadataValue(asset.id.get, metadataField.id.get, "false")
 
     val metadata = altitude.service.metadata.getMetadata(asset.id.get)
     metadata.get(metadataField.id.get).get.size shouldBe 1
@@ -420,7 +420,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
     val metadata = Metadata(data)
 
     intercept[ValidationException] {
-      altitude.service.library.addFieldValue(asset.id.value, field.id.value, "   ")
+      altitude.service.library.addMetadataValue(asset.id.value, field.id.value, "   ")
     }
   }
 
@@ -443,7 +443,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
 
     val newValue = "Some updated text"
 
-    altitude.service.library.updateFieldValue(asset.id.get, storedValue.id.get, newValue)
+    altitude.service.library.updateMetadataValue(asset.id.get, storedValue.id.get, newValue)
 
     storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
     storedValue = storedMetadata.get(field.id.get).get.head
@@ -472,7 +472,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
 
     val newValue = oldValue.toUpperCase
 
-    altitude.service.library.updateFieldValue(asset.id.get, storedValue.id.get, newValue)
+    altitude.service.library.updateMetadataValue(asset.id.get, storedValue.id.get, newValue)
 
     storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
     storedValue = storedMetadata.get(field.id.get).get.head
@@ -499,7 +499,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
     var storedValue = storedMetadata.get(field.id.get).get.head
     val oldValueId = storedValue.id
 
-    altitude.service.library.updateFieldValue(asset.id.get, storedValue.id.get, oldValue)
+    altitude.service.library.updateMetadataValue(asset.id.get, storedValue.id.get, oldValue)
 
     storedMetadata = altitude.service.metadata.getMetadata(asset.id.get)
     storedValue = storedMetadata.get(field.id.get).get.head
@@ -527,7 +527,7 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
     val oldValueId = storedValue.id
 
     intercept[ValidationException] {
-      altitude.service.library.updateFieldValue(asset.id.get, storedValue.id.get, "  \t  ")
+      altitude.service.library.updateMetadataValue(asset.id.get, storedValue.id.get, "  \t  ")
     }
   }
 }
