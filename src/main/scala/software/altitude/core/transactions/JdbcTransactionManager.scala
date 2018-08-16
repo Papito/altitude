@@ -65,7 +65,7 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
     props.setProperty("password", password)
     val url = app.config.getString("db.postgres.url")
     val conn = DriverManager.getConnection(url, props)
-    log.info(s"Opening connection $conn. Read-only: $readOnly")
+    log.debug(s"Opening connection $conn. Read-only: $readOnly")
 
     if (readOnly) {
       conn.setReadOnly(true)

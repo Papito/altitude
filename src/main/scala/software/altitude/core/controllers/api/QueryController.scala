@@ -27,12 +27,11 @@ class QueryController extends BaseApiController {
 
     // TODO: if there is query text, do not specify folder ids. Search everything
     val foldersQuery = params.getOrElse(C.Api.Search.FOLDERS, "")
-    val folderIdsArg = if (foldersQuery.isEmpty) repository.rootFolderId else foldersQuery
 
     val q = new SearchQuery(
       text = queryText,
       rpp = rpp, page = page,
-      folderIds = Util.parseFolderIds(folderIds = folderIdsArg)
+      folderIds = Util.parseFolderIds(folderIds = foldersQuery)
     )
 
     query(q)

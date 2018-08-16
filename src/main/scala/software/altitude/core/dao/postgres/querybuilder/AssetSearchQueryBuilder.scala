@@ -9,27 +9,36 @@ import software.altitude.core.{Context, Const => C}
 class AssetSearchQueryBuilder(sqlColsForSelect: String, tableNames: Set[String])
   extends SqlQueryBuilder(sqlColsForSelect = sqlColsForSelect, tableNames = tableNames) with SearchQueryBuilder {
   private final val log = LoggerFactory.getLogger(getClass)
+  private val searchParamTable = "search_parameter"
 
-  def build(query: SearchQuery, countOnly: Boolean)
+  def build(searchQuery: SearchQuery, countOnly: Boolean)
            (implicit ctx: Context, txId: TransactionId): SqlQuery = {
-    val (whereClause, sqlBindVals) = compileQuery(query)
+    val (whereClause, sqlBindVals) = compileQuery(searchQuery)
+
+    // add search_parameter to table names, if this is a parametarized search
+    val _tableNamesForSelect = if (searchQuery.isParametarized) {
+      s"$tableNamesForSelect, $searchParamTable"
+    } else {
+      tableNamesForSelect
+    }
 
     val sql = if (countOnly) {
       assembleQuery(
         select = "count(*) AS count",
-        from = tableNamesForSelect,
+        from = _tableNamesForSelect,
         where = whereClause)
     }
     else {
       assembleQuery(
         select = sqlColsForSelect,
-        from = tableNamesForSelect,
+        from = _tableNamesForSelect,
         where = whereClause,
-        rpp = query.rpp,
-        page = query.page)
+        rpp = searchQuery.rpp,
+        page = searchQuery.page)
     }
 
     log.debug(s"SQL QUERY: $sql with $sqlBindVals")
+    println(sql, sqlBindVals)
     SqlQuery(sql, sqlBindVals)
   }
 

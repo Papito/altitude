@@ -7,6 +7,8 @@ class SearchQuery(val text: Option[String] = None,
                   page: Int = 1)
   extends Query(params = params, rpp = rpp, page = page) {
 
+  val isParametarized: Boolean = params.nonEmpty
+
   override def add(_params: (String, Any)*): SearchQuery = new SearchQuery(
     text = text,
     folderIds = folderIds,

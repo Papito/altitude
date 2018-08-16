@@ -2,15 +2,12 @@ package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
-import software.altitude.core.Util
 import software.altitude.core.models._
-import software.altitude.core.util.Query.QueryParam
 import software.altitude.core.util.{Query, QueryResult, SearchQuery}
-import software.altitude.core.{Const => C}
 
 @DoNotDiscover class SearchServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
-  test("Index and search by term", Focused) {
+  test("Index and search by term") {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "keywords",
@@ -80,7 +77,7 @@ import software.altitude.core.{Const => C}
     results.total shouldBe 2
   }
 
-  test("Narrow down search to a folder", Focused) {
+  test("Narrow down search to a folder") {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "keywords",
@@ -159,7 +156,7 @@ import software.altitude.core.{Const => C}
       results.total shouldBe 1
     }
 
-    test("Recycled assets should not be in the search index", Focused) {
+    test("Recycled assets should not be in the search index") {
       val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
       altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
 
