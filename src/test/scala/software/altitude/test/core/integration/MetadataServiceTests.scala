@@ -399,9 +399,9 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
     val metadataField = altitude.service.metadata.addField(_metadataField)
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
 
-    altitude.service.library.addMetadataValue(asset.id.get, metadataField.id.get, "true")
-    altitude.service.library.addMetadataValue(asset.id.get, metadataField.id.get, "true")
-    altitude.service.library.addMetadataValue(asset.id.get, metadataField.id.get, "false")
+    altitude.service.library.addMetadataValue(asset.id.get, metadataField.id.get, true)
+    altitude.service.library.addMetadataValue(asset.id.get, metadataField.id.get, true)
+    altitude.service.library.addMetadataValue(asset.id.get, metadataField.id.get, false)
 
     val metadata = altitude.service.metadata.getMetadata(asset.id.get)
     metadata.get(metadataField.id.get).get.size shouldBe 1
@@ -417,7 +417,6 @@ import software.altitude.core.{DuplicateException, NotFoundException, Util, Vali
     val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
 
     val data = Map[String, Set[String]](field.id.get -> Set("\n\n\r"))
-    val metadata = Metadata(data)
 
     intercept[ValidationException] {
       altitude.service.library.addMetadataValue(asset.id.value, field.id.value, "   ")

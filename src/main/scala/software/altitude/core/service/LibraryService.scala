@@ -532,13 +532,13 @@ class LibraryService(val app: Altitude) {
     * METADATA
     * *************************************************************************/
 
-  def addMetadataValue(assetId: String, fieldId: String, newValue: String)
+  def addMetadataValue(assetId: String, fieldId: String, newValue: Any)
                       (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
     txManager.withTransaction {
-      app.service.metadata.addFieldValue(assetId, fieldId, newValue)
+      app.service.metadata.addFieldValue(assetId, fieldId, newValue.toString)
       val field: MetadataField = app.service.metadata.getFieldById(fieldId)
       val asset: Asset = getById(assetId)
-      app.service.search.addMetadataValue(asset, field, newValue)
+      app.service.search.addMetadataValue(asset, field, newValue.toString)
     }
   }
 
@@ -552,11 +552,11 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def updateMetadataValue(assetId: String, valueId: String, newValue: String)
+  def updateMetadataValue(assetId: String, valueId: String, newValue: Any)
                          (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
 
     txManager.withTransaction {
-      app.service.metadata.updateFieldValue(assetId, valueId, newValue)
+      app.service.metadata.updateFieldValue(assetId, valueId, newValue.toString)
       val asset: Asset = getById(assetId)
       // OPTIMIZE: store value ID with search to update in a targeted way
       app.service.search.reindexAsset(asset)
