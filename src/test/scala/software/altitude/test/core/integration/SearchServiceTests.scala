@@ -176,8 +176,13 @@ import software.altitude.core.util.{Query, QueryResult, SearchQuery}
       makeAsset(altitude.service.folder.triageFolder))
 
     altitude.service.library.addMetadataValue(asset1.id.get, fieldId = field1.id.get, newValue = "one")
+    altitude.service.library.addMetadataValue(asset1.id.get, fieldId = field2.id.get, newValue = "1")
+    altitude.service.library.addMetadataValue(asset1.id.get, fieldId = field3.id.get, newValue = "true")
 
     var results = altitude.service.library.search(new SearchQuery(text = Some("one")))
+    results.total shouldBe 1
+
+    results = altitude.service.library.search(new SearchQuery(text = Some("1")))
     results.total shouldBe 1
   }
 

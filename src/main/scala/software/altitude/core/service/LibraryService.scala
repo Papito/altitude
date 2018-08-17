@@ -557,8 +557,8 @@ class LibraryService(val app: Altitude) {
 
     txManager.withTransaction {
       app.service.metadata.updateFieldValue(assetId, valueId, newValue)
-      // OPTIMIZE: store value ID with search to update in a targeted way
       val asset: Asset = getById(assetId)
+      // OPTIMIZE: store value ID with search to update in a targeted way
       app.service.search.reindexAsset(asset)
     }
   }
