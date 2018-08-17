@@ -547,7 +547,8 @@ class LibraryService(val app: Altitude) {
     txManager.withTransaction {
       app.service.metadata.deleteFieldValue(assetId, valueId)
       val asset: Asset = getById(assetId)
-      app.service.search.deleteMetadataValue(asset, valueId)
+      // OPTIMIZE: store value ID with search to delete in a targeted way
+      app.service.search.reindexAsset(asset)
     }
   }
 
@@ -556,7 +557,9 @@ class LibraryService(val app: Altitude) {
 
     txManager.withTransaction {
       app.service.metadata.updateFieldValue(assetId, valueId, newValue)
-      throw new NotImplementedError
+      // OPTIMIZE: store value ID with search to update in a targeted way
+      val asset: Asset = getById(assetId)
+      app.service.search.reindexAsset(asset)
     }
   }
 

@@ -12,13 +12,13 @@ trait SearchDao {
   def indexAsset(asset: Asset, metadataFields: Map[String, MetadataField])
                 (implicit ctx: Context, txId: TransactionId): Unit
 
+  def reindexAsset(asset: Asset, metadataFields: Map[String, MetadataField])
+                  (implicit ctx: Context, txId: TransactionId): Unit
+
   def addMetadataValue(asset: Asset, field: MetadataField, value: String)
                       (implicit ctx: Context, txId: TransactionId): Unit
 
   def addMetadataValues(asset: Asset, field: MetadataField, values: Set[String])
                        (implicit ctx: Context, txId: TransactionId): Unit
-
-  def deleteMetadataValue(asset: Asset, valueId: String)
-                         (implicit ctx: Context, txId: TransactionId): Unit
 
 }

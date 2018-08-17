@@ -12,30 +12,34 @@ class SearchService(val app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
   protected val searchDao: SearchDao = app.injector.instance[SearchDao]
 
-  def indexAsset(asset: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+  def indexAsset(asset: Asset)
+                (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
     require(asset.path.isEmpty)
     log.info(s"Indexing asset $asset")
     val metadataFields: Map[String, MetadataField] = app.service.metadata.getAllFields
     searchDao.indexAsset(asset, metadataFields)
   }
 
-  def search(query: SearchQuery)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+  def reindexAsset(asset: Asset)
+                (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+    log.info(s"Reindexing asset $asset")
+    val metadataFields: Map[String, MetadataField] = app.service.metadata.getAllFields
+    searchDao.reindexAsset(asset, metadataFields)
+  }
+
+  def search(query: SearchQuery)
+            (implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
     searchDao.search(query)
   }
 
   def addMetadataValue(asset: Asset, field: MetadataField, value: String)
-                      (implicit ctx: Context, txId: TransactionId): Unit = {
+                      (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
     searchDao.addMetadataValue(asset, field, value)
   }
 
   def addMetadataValues(asset: Asset, field: MetadataField, values: Set[String])
-                       (implicit ctx: Context, txId: TransactionId): Unit = {
+                       (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
 
     searchDao.addMetadataValues(asset, field, values)
-  }
-
-  def deleteMetadataValue(asset: Asset, valueId: String)
-                         (implicit ctx: Context, txId: TransactionId): Unit = {
-    searchDao.deleteMetadataValue(asset, valueId)
   }
 }

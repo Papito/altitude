@@ -43,10 +43,35 @@ abstract class SearchDao(override val app: Altitude)
   override def indexAsset(asset: Asset, metadataFields: Map[String, MetadataField])
                          (implicit ctx: Context, txId: TransactionId): Unit = {
     log.debug(s"Indexing asset $asset with metadata [${asset.metadata}]")
-
     indexMetadata(asset, metadataFields)
-
     addSearchDocument(asset)
+  }
+
+  def reindexAsset(asset: Asset, metadataFields: Map[String, MetadataField])
+                  (implicit ctx: Context, txId: TransactionId): Unit = {
+    log.debug(s"Reindexing asset $asset with metadata [${asset.metadata}]")
+
+    clearMetadata(asset.id.get)
+    indexMetadata(asset, metadataFields)
+    replaceSearchDocument(asset)
+  }
+
+  def clearMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId) = {
+    log.debug(s"Clearing asset $assetId metadata")
+
+    val sql =
+      s"""
+         DELETE FROM search_parameter
+               WHERE ${C.SearchToken.REPO_ID} = ?
+                 AND ${C.SearchToken.ASSET_ID} = ?
+      """
+
+    val bindValues = List[Object](ctx.repo.id.get, assetId)
+
+    log.debug(s"Delete SQL: $sql, with values: $bindValues")
+    val runner: QueryRunner = new QueryRunner()
+    val numDeleted = runner.update(conn, sql, bindValues: _*)
+    log.debug(s"Deleted records: $numDeleted")
   }
 
   def indexMetadata(asset: Asset, metadataFields: Map[String, MetadataField])
@@ -109,10 +134,6 @@ abstract class SearchDao(override val app: Altitude)
       }
 
     replaceSearchDocument(asset)
-  }
-
-  override def deleteMetadataValue(asset: Asset, valueId: String)(implicit ctx: Context, txId: TransactionId): Unit = {
-    throw new NotImplementedError
   }
 
   override protected def addRecord(jsonIn: JsObject, q: String, values: List[Any])
