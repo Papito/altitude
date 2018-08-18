@@ -3,10 +3,14 @@ package software.altitude.core.service
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import software.altitude.core.dao.SearchDao
-import software.altitude.core.models.{Asset, MetadataField}
+import software.altitude.core.models.{Asset, FieldType, MetadataField}
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.{QueryResult, SearchQuery}
 import software.altitude.core.{Altitude, Context}
+
+object SearchService {
+  val NON_INDEXABLE_FIELD_TYPES = Set(FieldType.TEXT)
+}
 
 class SearchService(val app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -34,11 +38,16 @@ class SearchService(val app: Altitude) {
 
   def addMetadataValue(asset: Asset, field: MetadataField, value: String)
                       (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+    // some fields are not eligible for parametarized search
+    if (SearchService.NON_INDEXABLE_FIELD_TYPES.contains(field.fieldType)) return
+
     searchDao.addMetadataValue(asset, field, value)
   }
 
   def addMetadataValues(asset: Asset, field: MetadataField, values: Set[String])
                        (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+    // some fields are not eligible for parametarized search
+    if (SearchService.NON_INDEXABLE_FIELD_TYPES.contains(field.fieldType)) return
 
     searchDao.addMetadataValues(asset, field, values)
   }
