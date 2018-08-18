@@ -32,6 +32,7 @@ trait AssetDao extends BaseDao {
      * Pedestrian version of this just overwrites fields for old metadata and re-sets it on the asset.
      * A better implementation - for advanced engines - updates only the metadata fields of interest.
      */
+    // OPTIMIZE
     val existingMetadata = getMetadata(assetId) match {
       case Some(m) => m
       case None => Metadata()

@@ -156,6 +156,16 @@ import software.altitude.core.util.{Query, QueryResult, SearchQuery}
     results.total shouldBe 1
   }
 
+  test("Recycled assets should not be in the search index") {
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+    altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+
+    altitude.service.library.recycleAsset(asset.id.get)
+
+    val results = altitude.service.library.search(new SearchQuery)
+    results.total shouldBe 1
+  }
+
   test("Tag assets and search by metadata", Focused) {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
@@ -176,23 +186,27 @@ import software.altitude.core.util.{Query, QueryResult, SearchQuery}
       makeAsset(altitude.service.folder.triageFolder))
 
     altitude.service.library.addMetadataValue(asset1.id.get, fieldId = field1.id.get, newValue = "one")
-    altitude.service.library.addMetadataValue(asset1.id.get, fieldId = field2.id.get, newValue = 1)
-    altitude.service.library.addMetadataValue(asset1.id.get, fieldId = field3.id.get, newValue = true)
+    // it's the only value for this field so get it
+    val metadata: Metadata = altitude.service.metadata.getMetadata(asset1.id.get)
+    val mdVal = metadata(field1.id.get).head
+
+    // tag a second field for posterity
+    altitude.service.library.addMetadataValue(asset1.id.get, fieldId = field2.id.get, newValue = 3)
 
     var results = altitude.service.library.search(new SearchQuery(text = Some("one")))
     results.total shouldBe 1
 
-    results = altitude.service.library.search(new SearchQuery(text = Some("1")))
+    // update the value and search again
+    altitude.service.library.updateMetadataValue(asset1.id.get, mdVal.id.get, "newone")
+    results = altitude.service.library.search(new SearchQuery(text = Some("newone")))
     results.total shouldBe 1
-  }
 
-  test("Recycled assets should not be in the search index") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
-    altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+    // remove the value and search again
+    altitude.service.library.deleteMetadataValue(assetId = asset1.id.get, valueId = mdVal.id.get)
 
-    altitude.service.library.recycleAsset(asset.id.get)
+    results = altitude.service.library.search(new SearchQuery(text = Some("one")))
+    results.isEmpty shouldBe true
 
-    val results = altitude.service.library.search(new SearchQuery)
-    results.total shouldBe 1
+    // FIXME: add tests for parametarized search
   }
 }
