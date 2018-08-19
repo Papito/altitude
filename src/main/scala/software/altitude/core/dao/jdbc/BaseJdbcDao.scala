@@ -135,6 +135,7 @@ abstract class BaseJdbcDao extends BaseDao {
     runner.query(conn, sql, new ScalarHandler[AnyRef]("count"), values.map(_.asInstanceOf[Object]): _*) match {
       case v: java.lang.Integer => v.intValue
       case v: java.lang.Long => v.asInstanceOf[Long].toInt
+      case null => 0
     }
   }
 

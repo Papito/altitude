@@ -125,7 +125,7 @@ import software.altitude.core.util.{Query, QueryResult, SearchQuery}
     results.total shouldBe 1
   }
 
-  test("Create assets and search by metadata", Focused) {
+  test("Create assets and search by metadata" ) {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "field 1",
@@ -161,15 +161,16 @@ import software.altitude.core.util.{Query, QueryResult, SearchQuery}
 
     results = altitude.service.library.search(
       new SearchQuery(params = Map(
+        field3.id.get -> Query.EQUALS(true),
         field2.id.get -> Query.EQUALS(1)))
     )
-    results.total shouldBe 1
+    results.total shouldBe 2
   }
 
   /**
     * What happens if we have a number field and search by integer?
     */
-  test("Search by wrong field type", Focused) {
+  test("Search by wrong field type") {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "field 1",
