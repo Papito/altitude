@@ -21,22 +21,20 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableNames: Set[String]) {
     this(sqlColsForSelect, Set(tableName))
   }
 
-  protected val tableNamesForSelect: String = tableNames.mkString(", ")
-
   def build(query: Query, countOnly: Boolean = false)
            (implicit ctx: Context, txId: TransactionId): SqlQuery = {
-    val (whereClause, sqlBindVals) = compileQuery(query)
+    val (whereClause, sqlBindVals) = compileQuery(query, tableNames)
 
     val sql = if (countOnly) {
       assembleQuery(
         select = "count(*) AS count",
-        from = tableNamesForSelect,
+        from = tableNames.mkString(", "),
         where = whereClause)
     }
     else {
       assembleQuery(
         select = sqlColsForSelect,
-        from = tableNamesForSelect,
+        from = tableNames.mkString(", "),
         where = whereClause,
         rpp = query.rpp,
         page = query.page)
@@ -57,14 +55,14 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableNames: Set[String]) {
     }
   }
 
-  protected def compileQuery(query: Query)(implicit ctx: Context): (String, List[Any]) = {
-    val sqlBindVals = getSqlBindVals(query)
-    val whereClauses = getWhereClauses(query)
+  protected def compileQuery(query: Query, _tableNames: Set[String])(implicit ctx: Context): (String, List[Any]) = {
+    val sqlBindVals = getSqlBindVals(query, _tableNames)
+    val whereClauses = getWhereClauses(query, _tableNames)
     val whereClause = s"""WHERE ${whereClauses.mkString(" AND ")}"""
     (whereClause, sqlBindVals)
   }
 
-  protected def getSqlBindVals(query: Query)(implicit ctx: Context): List[Any] = {
+  protected def getSqlBindVals(query: Query, _tableNames: Set[String])(implicit ctx: Context): List[Any] = {
     query.params.foldLeft(List[Any]()) { (res, el: (String, Any)) =>
       val value = el._2
       value match {
@@ -77,10 +75,10 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableNames: Set[String]) {
         case qParam: QueryParam => res ::: qParam.values.toList
         case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: $value")
       }
-    } ::: tableNames.toSeq.map(_ => ctx.repo.id.get).toList // repo id for each table
+    } ::: _tableNames.toSeq.map(_ => ctx.repo.id.get).toList // repo id for each table
   }
 
-  protected def getWhereClauses(query: Query)(implicit ctx: Context): List[String] = {
+  protected def getWhereClauses(query: Query, _tableNames: Set[String])(implicit ctx: Context): List[String] = {
     query.params.map { el: (String, Any) =>
       val (columnName, value) = el
       value match {
@@ -98,6 +96,6 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableNames: Set[String]) {
         }
         case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: $value")
       }
-    }.toList ::: tableNames.map(tableName => s"$tableName.${C.Base.REPO_ID} = ?").toList
+    }.toList ::: _tableNames.map(tableName => s"$tableName.${C.Base.REPO_ID} = ?").toList
   }
 }

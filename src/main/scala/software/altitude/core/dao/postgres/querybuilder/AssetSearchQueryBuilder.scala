@@ -3,35 +3,34 @@ package software.altitude.core.dao.postgres.querybuilder
 import org.slf4j.LoggerFactory
 import software.altitude.core.dao.jdbc.querybuilder.{SearchQueryBuilder, SqlQuery, SqlQueryBuilder}
 import software.altitude.core.transactions.TransactionId
-import software.altitude.core.util.SearchQuery
+import software.altitude.core.util.{Query, SearchQuery}
 import software.altitude.core.{Context, Const => C}
 
 class AssetSearchQueryBuilder(sqlColsForSelect: String, tableNames: Set[String])
   extends SqlQueryBuilder(sqlColsForSelect = sqlColsForSelect, tableNames = tableNames) with SearchQueryBuilder {
   private final val log = LoggerFactory.getLogger(getClass)
   private val searchParamTable = "search_parameter"
+  private val searchDocumentTable = "search_document"
 
   def build(searchQuery: SearchQuery, countOnly: Boolean)
            (implicit ctx: Context, txId: TransactionId): SqlQuery = {
-    val (whereClause, sqlBindVals) = compileQuery(searchQuery)
+    // append tables that we are interested in based on features of this query
+    val _tableNames: Set[String] = tableNames ++
+      (if (searchQuery.isParametarized) Set(searchParamTable) else Set()) ++
+      (if (searchQuery.isText) Set(searchDocumentTable) else Set())
 
-    // add search_parameter to table names, if this is a parametarized search
-    val _tableNamesForSelect = if (searchQuery.isParametarized) {
-      s"$tableNamesForSelect, $searchParamTable"
-    } else {
-      tableNamesForSelect
-    }
+    val (whereClause, sqlBindVals) = compileQuery(searchQuery, _tableNames)
 
     val sql = if (countOnly) {
       assembleQuery(
         select = "count(*) AS count",
-        from = _tableNamesForSelect,
+        from = _tableNames.mkString(", "),
         where = whereClause)
     }
     else {
       assembleQuery(
         select = sqlColsForSelect,
-        from = _tableNamesForSelect,
+        from = _tableNames.mkString(", "),
         where = whereClause,
         rpp = searchQuery.rpp,
         page = searchQuery.page)
@@ -41,20 +40,51 @@ class AssetSearchQueryBuilder(sqlColsForSelect: String, tableNames: Set[String])
     SqlQuery(sql, sqlBindVals)
   }
 
-  protected def compileQuery(searchQuery: SearchQuery)(implicit ctx: Context): (String, List[Any]) = {
-    val sQueryWithNoRecycled = searchQuery.add(C.Asset.IS_RECYCLED -> false)
-    val queryTextBindVal = if (sQueryWithNoRecycled.text.isDefined) List(sQueryWithNoRecycled.text.get) else List()
-    val sqlBindVals = getSqlBindVals(sQueryWithNoRecycled) ::: queryTextBindVal
-    val queryTextWhereClause = if (sQueryWithNoRecycled.text.isDefined) {
-      List("search_document.tsv @@ to_tsquery(?)")
+  protected def compileQuery(searchQuery: SearchQuery, _tableNames: Set[String])
+                            (implicit ctx: Context): (String, List[Any]) = {
+    /**
+      * Create DB query to create base search parameters, such as repo id and recycle flag.
+      * We want to treat SearchParam's differently for parametarized search, as
+      * these are no longer DB property lookups but search tokens.
+      *
+      * Note that we STRIP parameters for the base query - it will not create the SQL we need for
+      * highly specialized search SQL
+      */
+    val baseSqlQuery = new Query(
+      params = Map(C.Asset.IS_RECYCLED -> false),
+      rpp = searchQuery.rpp,
+      page = searchQuery.page)
+
+    // bind value for possible text search
+    val queryTextBindVal = if (searchQuery.isText) List(searchQuery.text.get) else List()
+    // where clause for text search if any
+    val queryTextWhereClause = if (searchQuery.isText) {
+      List(s"$searchDocumentTable.tsv @@ to_tsquery(?)")
+    } else {
+      List()
+    }
+    val queryTextJoinClause = if (searchQuery.isText) {
+      List(s"$searchDocumentTable.${C.SearchToken.ASSET_ID} = asset.id")
     } else {
       List()
     }
 
-    val whereClauses = (getWhereClauses(sQueryWithNoRecycled) :::
-      List(s"search_document.${C.SearchToken.ASSET_ID} = asset.id")) :::
+    val parametarizedSearchJoinClause = if (searchQuery.isParametarized) {
+      List(s"$searchParamTable.${C.SearchToken.ASSET_ID} = asset.id")
+    } else {
+      List()
+    }
+    // base bind values
+    val sqlBindVals = super[SqlQueryBuilder].getSqlBindVals(baseSqlQuery, _tableNames) :::
+      queryTextBindVal
+
+    // base where clauses
+    val whereClauses = super[SqlQueryBuilder].getWhereClauses(baseSqlQuery, _tableNames) :::
+      queryTextJoinClause :::
+      parametarizedSearchJoinClause :::
       queryTextWhereClause
 
     compileSearchQuery(searchQuery, whereClauses, sqlBindVals)
   }
+
 }

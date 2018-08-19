@@ -115,7 +115,17 @@ import software.altitude.core.util.{Query, QueryResult, SearchQuery}
 
   }
 
-  test("Create assets and search by metadata") {
+  test("Recycled assets should not be in the search index") {
+    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+    altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+
+    altitude.service.library.recycleAsset(asset.id.get)
+
+    val results = altitude.service.library.search(new SearchQuery)
+    results.total shouldBe 1
+  }
+
+  test("Create assets and search by metadata", Focused) {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "field 1",
@@ -146,27 +156,17 @@ import software.altitude.core.util.{Query, QueryResult, SearchQuery}
     altitude.service.library.add(assetData2)
 
     // simple value search
-    var results = altitude.service.library.search(new SearchQuery(text = Some("one")))
-    results.total shouldBe 1
+//    var results = altitude.service.library.search(new SearchQuery(text = Some("one")))
+//    results.total shouldBe 1
 
-    val keywordSearchParam = Query.EQUALS(1)
-    results = altitude.service.library.search(
-      new SearchQuery(params = Map(field1.id.get -> keywordSearchParam))
+    val results = altitude.service.library.search(
+      new SearchQuery(params = Map(
+        field1.id.get -> Query.EQUALS(1)))
     )
     results.total shouldBe 1
   }
 
-  test("Recycled assets should not be in the search index") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
-    altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
-
-    altitude.service.library.recycleAsset(asset.id.get)
-
-    val results = altitude.service.library.search(new SearchQuery)
-    results.total shouldBe 1
-  }
-
-  test("Tag assets and search by metadata", Focused) {
+  test("Parametarized search") {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "field 1",
@@ -177,10 +177,44 @@ import software.altitude.core.util.{Query, QueryResult, SearchQuery}
         name = "field 2",
         fieldType = FieldType.NUMBER))
 
-    val field3 = altitude.service.metadata.addField(
+    val asset1: Asset = altitude.service.library.add(
+      makeAsset(altitude.service.folder.triageFolder))
+
+    val asset2: Asset = altitude.service.library.add(
+      makeAsset(altitude.service.folder.triageFolder))
+
+    val asset3: Asset = altitude.service.library.add(
+      makeAsset(altitude.service.folder.triageFolder))
+
+    altitude.service.library.addMetadataValue(asset1.id.get, fieldId = field1.id.get, newValue = "one")
+    altitude.service.library.addMetadataValue(asset2.id.get, fieldId = field1.id.get, newValue = "one")
+    altitude.service.library.addMetadataValue(asset3.id.get, fieldId = field1.id.get, newValue = "two")
+
+    altitude.service.library.addMetadataValue(asset1.id.get, fieldId = field2.id.get, newValue = 1)
+    altitude.service.library.addMetadataValue(asset2.id.get, fieldId = field2.id.get, newValue = 1)
+    altitude.service.library.addMetadataValue(asset3.id.get, fieldId = field2.id.get, newValue = 2)
+
+    val results = altitude.service.library.search(
+      new SearchQuery(
+        params = Map(
+          field1.id.get -> Query.EQUALS("one"),
+          field2.id.get -> Query.EQUALS(1)
+        )
+      )
+    )
+    results.total shouldBe 2
+  }
+
+  test("Updating and removing metadata values updates search index") {
+    val field1 = altitude.service.metadata.addField(
       MetadataField(
-        name = "field 3",
-        fieldType = FieldType.BOOL))
+        name = "field 1",
+        fieldType = FieldType.KEYWORD))
+
+    val field2 = altitude.service.metadata.addField(
+      MetadataField(
+        name = "field 2",
+        fieldType = FieldType.NUMBER))
 
     val asset1: Asset = altitude.service.library.add(
       makeAsset(altitude.service.folder.triageFolder))
