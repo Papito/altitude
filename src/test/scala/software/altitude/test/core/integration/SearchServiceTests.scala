@@ -156,14 +156,42 @@ import software.altitude.core.util.{Query, QueryResult, SearchQuery}
     altitude.service.library.add(assetData2)
 
     // simple value search
-//    var results = altitude.service.library.search(new SearchQuery(text = Some("one")))
-//    results.total shouldBe 1
+    var results = altitude.service.library.search(new SearchQuery(text = Some("one")))
+    results.total shouldBe 1
 
-    val results = altitude.service.library.search(
+    results = altitude.service.library.search(
+      new SearchQuery(params = Map(
+        field2.id.get -> Query.EQUALS(1)))
+    )
+    results.total shouldBe 1
+  }
+
+  /**
+    * What happens if we have a number field and search by integer?
+    */
+  test("Search by wrong field type", Focused) {
+    val field1 = altitude.service.metadata.addField(
+      MetadataField(
+        name = "field 1",
+        fieldType = FieldType.KEYWORD))
+
+    val field2 = altitude.service.metadata.addField(
+      MetadataField(
+        name = "field 2",
+        fieldType = FieldType.NUMBER))
+
+    val data = Map[String, Set[String]](
+      field1.id.get -> Set("one"),
+      field2.id.get -> Set("1")
+    )
+    val assetData1 = makeAsset(altitude.service.folder.triageFolder, Metadata(data))
+    altitude.service.library.add(assetData1)
+
+   val results = altitude.service.library.search(
       new SearchQuery(params = Map(
         field1.id.get -> Query.EQUALS(1)))
     )
-    results.total shouldBe 1
+    results.total shouldBe 0
   }
 
   test("Parametarized search") {
