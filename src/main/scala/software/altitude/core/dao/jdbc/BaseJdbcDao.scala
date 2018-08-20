@@ -42,7 +42,7 @@ abstract class BaseJdbcDao extends BaseDao {
   protected def getDateTimeFromRec(field: String, rec: Map[String, AnyRef]): Option[DateTime]
 
   // common fields for new records, and their placeholders - mostly to avoid repetition
-  protected val coreSqlColsForInsert = s"${C.Base.ID}, ${C.Base.REPO_ID}"
+  protected val coreSqlColsForInsert: List[String] = List(C.Base.ID, C.Base.REPO_ID)
   protected def coreSqlValsForInsert: String = "?, ?"
 
   // how we get current timestamp
@@ -59,7 +59,7 @@ abstract class BaseJdbcDao extends BaseDao {
 
   override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
     val sql: String = s"""
-      INSERT INTO $tableName ($coreSqlColsForInsert)
+      INSERT INTO $tableName (${coreSqlColsForInsert.mkString(", ")})
            VALUES ($coreSqlValsForInsert)"""
 
     addRecord(jsonIn, sql, List[Any]())

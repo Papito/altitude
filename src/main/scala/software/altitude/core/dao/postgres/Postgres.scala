@@ -11,7 +11,7 @@ import software.altitude.core.{Const => C}
 trait Postgres { this: BaseJdbcDao =>
 
   override protected def defaultSqlColsForSelect = List(
-    s"${C.Base.ID}",
+    C.Base.ID,
     "*",
     "EXTRACT(EPOCH FROM created_at) AS created_at",
     "EXTRACT(EPOCH FROM updated_at) AS updated_at"

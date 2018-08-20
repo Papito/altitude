@@ -30,7 +30,7 @@ abstract class FolderDao(val app: AltitudeCoreApp) extends BaseJdbcDao with soft
 
     val sql = s"""
         INSERT INTO $tableName (
-             $coreSqlColsForInsert,
+             ${coreSqlColsForInsert.mkString(", ")},
              ${C.Folder.NAME}, ${C.Folder.NAME_LC}, ${C.Folder.PARENT_ID})
             VALUES ($coreSqlValsForInsert, ?, ?, ?)
     """

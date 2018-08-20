@@ -25,7 +25,7 @@ abstract class MetadataFieldDao(val app: AltitudeCoreApp)
 
     val sql = s"""
         INSERT INTO $tableName (
-             $coreSqlColsForInsert,
+             ${coreSqlColsForInsert.mkString(", ")},
              ${C.MetadataField.NAME},
              ${C.MetadataField.NAME_LC},
              ${C.MetadataField.FIELD_TYPE})

@@ -89,7 +89,7 @@ abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softw
 
     val sql = s"""
         INSERT INTO $tableName (
-             $coreSqlColsForInsert, ${C.Base.USER_ID}, ${C.Asset.CHECKSUM},
+             ${coreSqlColsForInsert.mkString(", ")}, ${C.Base.USER_ID}, ${C.Asset.CHECKSUM},
              ${C.Asset.FILENAME}, ${C.Asset.SIZE_BYTES},
              ${C.AssetType.MEDIA_TYPE}, ${C.AssetType.MEDIA_SUBTYPE}, ${C.AssetType.MIME_TYPE},
              ${C.Asset.FOLDER_ID}, ${C.Asset.METADATA}, ${C.Asset.EXTRACTED_METADATA})
