@@ -12,7 +12,7 @@ abstract class UserDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softwa
   override final val tableName = "repository_user"
 
   override protected val oneRecSelectSql = s"""
-      SELECT $defaultSqlColsForSelect
+      SELECT ${defaultSqlColsForSelect.mkString(", ")}
         FROM $tableName
        WHERE ${C.Base.ID} = ?"""
 

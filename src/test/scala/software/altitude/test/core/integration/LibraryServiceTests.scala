@@ -414,7 +414,7 @@ import software.altitude.core.{DuplicateException,
     }
   }
 
-  test("Deleting a folder recycles all assets and marks folder as recycled") {
+  test("Deleting a folder recycles all assets and marks folder as recycled", Focused) {
     val folder1: Folder = altitude.service.library.addFolder(
       "folder")
     val folder1_1: Folder = altitude.service.library.addFolder(

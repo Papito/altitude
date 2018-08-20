@@ -6,17 +6,17 @@ import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{AltitudeCoreApp, Context, Const => C}
 
 object AssetDao {
-    val DEFAULT_SQL_COLS_FOR_SELECT = s"""
-      asset.*,
-      (asset.${C.Asset.METADATA}#>>'{}')::text as ${C.Asset.METADATA},
-      (asset.${C.Asset.EXTRACTED_METADATA}#>>'{}')::text as ${C.Asset.EXTRACTED_METADATA},
-      EXTRACT(EPOCH FROM asset.created_at) AS created_at,
-      EXTRACT(EPOCH FROM asset.updated_at) AS updated_at
-    """
+    val DEFAULT_SQL_COLS_FOR_SELECT: List[String] = List(
+      "asset.*",
+      s"(asset.${C.Asset.METADATA}#>>'{}')::text as ${C.Asset.METADATA}",
+      s"(asset.${C.Asset.EXTRACTED_METADATA}#>>'{}')::text as ${C.Asset.EXTRACTED_METADATA}",
+      "EXTRACT(EPOCH FROM asset.created_at) AS created_at",
+      "EXTRACT(EPOCH FROM asset.updated_at) AS updated_at"
+    )
 }
 
 class AssetDao(app: AltitudeCoreApp) extends software.altitude.core.dao.jdbc.AssetDao(app) with Postgres {
-  override protected def defaultSqlColsForSelect: String = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT
+  override protected def defaultSqlColsForSelect:List[String] = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT
 
   override def getMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Option[Metadata] = {
     val sql = s"""

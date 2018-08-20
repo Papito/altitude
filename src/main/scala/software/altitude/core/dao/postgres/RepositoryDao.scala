@@ -4,10 +4,10 @@ import software.altitude.core.dao.jdbc
 import software.altitude.core.{AltitudeCoreApp, Const => C}
 
 class RepositoryDao(app: AltitudeCoreApp) extends jdbc.RepositoryDao(app) with Postgres {
-  override protected def defaultSqlColsForSelect = s"""
-      *,
-      (repository.${C.Repository.FILES_STORE_CONFIG}#>>'{}')::text as ${C.Repository.FILES_STORE_CONFIG},
-      EXTRACT(EPOCH FROM created_at) AS created_at,
-      EXTRACT(EPOCH FROM updated_at) AS updated_at
-    """
+  override protected def defaultSqlColsForSelect = List(
+    "*",
+    s"(repository.${C.Repository.FILES_STORE_CONFIG}#>>'{}')::text as ${C.Repository.FILES_STORE_CONFIG}",
+    "EXTRACT(EPOCH FROM created_at) AS created_at",
+    "EXTRACT(EPOCH FROM updated_at) AS updated_at"
+  )
 }

@@ -12,16 +12,16 @@ import software.altitude.core.{Context, Const => C}
   * @param sqlColsForSelect columns to select
   * @param tableNames table names for select
   */
-class SqlQueryBuilder(sqlColsForSelect: String, tableNames: Set[String]) {
+class SqlQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String]) {
   private final val log = LoggerFactory.getLogger(getClass)
 
   // convenience constructor for the common case of just one table
-  def this(sqlColsForSelect: String, tableName: String) = {
+  def this(sqlColsForSelect: List[String], tableName: String) = {
     this(sqlColsForSelect, Set(tableName))
   }
 
   def build(query: Query,
-            sqlColsForSelect: String = sqlColsForSelect,
+            sqlColsForSelect: List[String] = sqlColsForSelect,
             tableNames: Set[String] = tableNames,
             countOnly: Boolean = false)
            (implicit ctx: Context, txId: TransactionId): SqlQuery = {
@@ -35,7 +35,7 @@ class SqlQueryBuilder(sqlColsForSelect: String, tableNames: Set[String]) {
     }
     else {
       assembleQuery(
-        select = sqlColsForSelect,
+        select = sqlColsForSelect.mkString(", "),
         from = tableNames.mkString(", "),
         where = whereClause,
         rpp = query.rpp,

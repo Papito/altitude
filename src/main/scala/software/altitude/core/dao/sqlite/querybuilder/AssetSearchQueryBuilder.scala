@@ -7,7 +7,7 @@ import software.altitude.core.util.Query.QueryParam
 import software.altitude.core.util.{Query, SearchQuery}
 import software.altitude.core.{Context, Const => C}
 
-class AssetSearchQueryBuilder(sqlColsForSelect: String, tableNames: Set[String])
+class AssetSearchQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String])
   extends SqlQueryBuilder(sqlColsForSelect = sqlColsForSelect, tableNames = tableNames)
     with SearchQueryBuilder {
 
@@ -32,7 +32,7 @@ class AssetSearchQueryBuilder(sqlColsForSelect: String, tableNames: Set[String])
     }
     else {
       assembleQuery(
-        select = sqlColsForSelect,
+        select = sqlColsForSelect.mkString(", "),
         from = _tableNames.mkString(", "),
         where = whereClause,
         rpp = searchQuery.rpp,

@@ -8,11 +8,12 @@ import software.altitude.core.{Const => C}
 
 trait Sqlite { this: BaseJdbcDao =>
 
-  override protected def defaultSqlColsForSelect = s"""
-      ${C.Base.ID}, *,
-      CAST(STRFTIME('%s', created_at) AS INT) AS created_at,
-      CAST(STRFTIME('%s', updated_at) AS INT) AS updated_at
-    """
+  override protected def defaultSqlColsForSelect = List(
+    s"${C.Base.ID}",
+    "*",
+    "CAST(STRFTIME('%s', created_at) AS INT) AS created_at",
+    "CAST(STRFTIME('%s', updated_at) AS INT) AS updated_at"
+  )
 
   override protected def nowTimeFunc = "datetime('now', 'localtime')"
 

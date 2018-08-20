@@ -29,7 +29,7 @@ abstract class BaseJdbcDao extends BaseDao {
     txManager.transaction().getConnection
   }
 
-  protected def defaultSqlColsForSelect: String
+  protected def defaultSqlColsForSelect: List[String]
 
   // if supported, DB function to store native JSON data
   protected def jsonFunc: String
@@ -53,7 +53,7 @@ abstract class BaseJdbcDao extends BaseDao {
 
   // SQL to select the whole record, in very simple cases
   protected val oneRecSelectSql = s"""
-      SELECT $defaultSqlColsForSelect
+      SELECT ${defaultSqlColsForSelect.mkString(", ")}
         FROM $tableName
        WHERE ${C.Base.ID} = ? AND ${C.Base.REPO_ID} = ?"""
 
@@ -110,8 +110,8 @@ abstract class BaseJdbcDao extends BaseDao {
            (implicit ctx: Context, txId: TransactionId): QueryResult = {
     val sqlQuery: SqlQuery = sqlQueryBuilder.build(query)
 
-    val recs = manyBySqlQuery(sqlQuery.sqlAsString, sqlQuery.selectBindValues)
-    val count: Int = getQueryResultCount(query, sqlQueryBuilder, sqlQuery.selectBindValues)
+    val recs = manyBySqlQuery(sqlQuery.sqlAsString, sqlQuery.bindValues)
+    val count: Int = getQueryResultCount(query, sqlQueryBuilder, sqlQuery.bindValues)
 
     log.debug(s"Found [$count] records. Retrieved [${recs.length}] records")
     if (recs.nonEmpty) {
@@ -207,7 +207,6 @@ abstract class BaseJdbcDao extends BaseDao {
   protected def oneBySqlQuery(sql: String, values: List[Any] = List())
                              (implicit ctx: Context, txId: TransactionId): Option[Map[String, AnyRef]] = {
     log.debug(s"Running SQL query [$sql] with $values")
-
     val runner: QueryRunner = new QueryRunner()
     val res = runner.query(conn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]): _*)
 
@@ -231,7 +230,7 @@ abstract class BaseJdbcDao extends BaseDao {
                        (implicit ctx: Context, txId: TransactionId): List[JsObject] = {
     val placeholders = ids.toSeq.map(_ => "?")
     val sql = s"""
-      SELECT $defaultSqlColsForSelect
+      SELECT ${defaultSqlColsForSelect.mkString(", ")}
         FROM $tableName
        WHERE ${C.Base.REPO_ID} = ? AND id IN (${placeholders.mkString(",")})
       """
