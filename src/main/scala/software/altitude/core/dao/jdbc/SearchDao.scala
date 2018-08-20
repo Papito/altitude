@@ -29,8 +29,6 @@ abstract class SearchDao(override val app: Altitude)
 
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override protected lazy val sqlQueryBuilder = new SqlQueryBuilder(defaultSqlColsForSelect, tableName)
-
   override def search(query: SearchQuery)(implicit ctx: Context, txId: TransactionId): QueryResult =
     throw new NotImplementedError
 

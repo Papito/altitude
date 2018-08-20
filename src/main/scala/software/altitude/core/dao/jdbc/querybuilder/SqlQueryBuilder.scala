@@ -15,13 +15,15 @@ import software.altitude.core.{Context, Const => C}
 class SqlQueryBuilder(sqlColsForSelect: String, tableNames: Set[String]) {
   private final val log = LoggerFactory.getLogger(getClass)
 
-
   // convenience constructor for the common case of just one table
   def this(sqlColsForSelect: String, tableName: String) = {
     this(sqlColsForSelect, Set(tableName))
   }
 
-  def build(query: Query, countOnly: Boolean = false)
+  def build(query: Query,
+            sqlColsForSelect: String = sqlColsForSelect,
+            tableNames: Set[String] = tableNames,
+            countOnly: Boolean = false)
            (implicit ctx: Context, txId: TransactionId): SqlQuery = {
     val (whereClause, sqlBindVals) = compileQuery(query, tableNames)
 

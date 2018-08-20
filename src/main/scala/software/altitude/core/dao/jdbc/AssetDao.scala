@@ -47,16 +47,20 @@ abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softw
     addCoreAttrs(model, rec)
   }
 
-  protected lazy val QUERY_BUILDER = new SqlQueryBuilder(defaultSqlColsForSelect, tableName)
+  override def queryNotRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+    val sqlQueryBuilder = new SqlQueryBuilder(defaultSqlColsForSelect, tableName)
+    this.query(q.add(C.Asset.IS_RECYCLED -> false), sqlQueryBuilder)
+  }
 
-  override def queryNotRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
-    this.query(q.add(C.Asset.IS_RECYCLED -> false), QUERY_BUILDER)
+  override def queryRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+    val sqlQueryBuilder = new SqlQueryBuilder(defaultSqlColsForSelect, tableName)
+    this.query(q.add(C.Asset.IS_RECYCLED -> true), sqlQueryBuilder)
+  }
 
-  override def queryRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
-    this.query(q.add(C.Asset.IS_RECYCLED -> true), QUERY_BUILDER)
-
-  override def queryAll(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
-    this.query(q, QUERY_BUILDER)
+  override def queryAll(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+    val sqlQueryBuilder = new SqlQueryBuilder(defaultSqlColsForSelect, tableName)
+    this.query(q, sqlQueryBuilder)
+  }
 
   override def getMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Option[Metadata] = {
     val sql = s"""

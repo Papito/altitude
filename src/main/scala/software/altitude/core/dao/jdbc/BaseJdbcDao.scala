@@ -51,9 +51,6 @@ abstract class BaseJdbcDao extends BaseDao {
   // datetime as a JSON value
   protected def dtAsJsString(dt: DateTime) = JsString(Util.isoDateTime(Some(dt)))
 
-  // table-specific SQL query builder
-  protected lazy val sqlQueryBuilder = new SqlQueryBuilder(defaultSqlColsForSelect, tableName)
-
   // SQL to select the whole record, in very simple cases
   protected val oneRecSelectSql = s"""
       SELECT $defaultSqlColsForSelect
@@ -101,8 +98,10 @@ abstract class BaseJdbcDao extends BaseDao {
     numDeleted
   }
 
-  override def query(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult =
+  override def query(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+    val sqlQueryBuilder = new SqlQueryBuilder(defaultSqlColsForSelect, tableName)
     this.query(q, sqlQueryBuilder)
+  }
 
   /**
    * Internal version for querying with a customized query builder

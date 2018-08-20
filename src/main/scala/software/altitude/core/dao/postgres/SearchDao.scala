@@ -11,13 +11,7 @@ import software.altitude.core.{Altitude, Context, Const => C}
 class SearchDao(override val app: Altitude) extends software.altitude.core.dao.jdbc.SearchDao(app) with Postgres {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  private val SQL_QUERY_BUILDER = new AssetSearchQueryBuilder(
-    sqlColsForSelect = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT,
-    tableNames = Set("asset"))
-
   override protected def addSearchDocument(asset: Asset)(implicit ctx: Context, txId: TransactionId): Unit = {
-    val path = app.service.fileStore.getAssetPath(asset)
-
     val docSql =
       s"""
          INSERT INTO search_document (
@@ -59,9 +53,13 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
     runner.update(conn, docSql, sqlVals.map(_.asInstanceOf[Object]):_*)
   }
 
-  override def search(query: SearchQuery)(implicit ctx: Context, txId: TransactionId): QueryResult = {
-    val sqlQuery = SQL_QUERY_BUILDER.build(query, countOnly = false)
-    val sqlCountQuery = SQL_QUERY_BUILDER.build(query, countOnly = true)
+  override def search(searchQuery: SearchQuery)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+    val sqlQueryBuilder = new AssetSearchQueryBuilder(
+      sqlColsForSelect = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT,
+      tableNames = Set("asset"))
+
+    val sqlQuery = sqlQueryBuilder.build(searchQuery = searchQuery, countOnly = false)
+    val sqlCountQuery = sqlQueryBuilder.build(searchQuery = searchQuery, countOnly = true)
 
     // OPTIMIZE: in parallel?
     val recs = manyBySqlQuery(sqlQuery.sqlAsString, sqlQuery.selectBindValues)
@@ -76,6 +74,6 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
     if (recs.nonEmpty) {
       log.debug(recs.map(_.toString()).mkString("\n"))
     }
-    QueryResult(records = recs.map{makeModel}, total = count, rpp = query.rpp)
+    QueryResult(records = recs.map{makeModel}, total = count, rpp = searchQuery.rpp)
   }
 }

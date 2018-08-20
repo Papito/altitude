@@ -7,7 +7,9 @@ import software.altitude.core.util.{Query, SearchQuery}
 import software.altitude.core.{Context, Const => C}
 
 class AssetSearchQueryBuilder(sqlColsForSelect: String, tableNames: Set[String])
-  extends SqlQueryBuilder(sqlColsForSelect = sqlColsForSelect, tableNames = tableNames) with SearchQueryBuilder {
+  extends SqlQueryBuilder(sqlColsForSelect = sqlColsForSelect, tableNames = tableNames)
+    with SearchQueryBuilder {
+
   private final val log = LoggerFactory.getLogger(getClass)
   private val searchParamTable = "search_parameter"
   private val searchDocumentTable = "search_document"
