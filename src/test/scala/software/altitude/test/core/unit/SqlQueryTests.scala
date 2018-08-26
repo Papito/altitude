@@ -21,11 +21,20 @@ class SqlQueryTests extends FunSuite with TestFocus {
     repo = repo,
     user = null
   )
+
   test("Simple WHERE query is built correctly", Focused) {
     val builder = new SqlQueryBuilder(List("col1", "col2"), Set("table1", "table2"))
     val q = new Query(params = Map("searchValue" -> 3))
     val sqlQuery = builder.build2(q)
     sqlQuery.sqlAsString shouldBe "SELECT col1, col2 FROM table1, table2 WHERE searchValue = ? AND table1.repository_id = ? AND table2.repository_id = ?"
     sqlQuery.bindValues.size shouldBe 3
+  }
+
+  test("SQL query pagination", Focused) {
+    val builder = new SqlQueryBuilder(List("*"), Set("table1"))
+    val q = new Query(params = Map("searchValue" -> 3), rpp = 10, page = 2)
+    val sqlQuery = builder.build2(q)
+    sqlQuery.sqlAsString shouldBe "SELECT * FROM table1 WHERE searchValue = ? AND table1.repository_id = ? LIMIT 10 OFFSET 10"
+    sqlQuery.bindValues.size shouldBe 2
   }
 }

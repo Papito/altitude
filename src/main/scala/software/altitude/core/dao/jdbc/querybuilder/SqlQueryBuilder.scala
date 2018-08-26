@@ -71,7 +71,9 @@ class SqlQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String]) {
 
     val sql: String  = selectStr(allClauseComponents) +
       fromStr(allClauseComponents) +
-      whereStr(allClauseComponents)
+      whereStr(allClauseComponents) +
+      limitStr(query) +
+      offsetStr(query)
 
     val bindVals = allClauseComponents.foldLeft(List[Any]()) { (res, comp) =>
       res ++ comp._2.bindVals
@@ -133,6 +135,10 @@ class SqlQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String]) {
     val whereClauses = data(SqlQueryBuilder.WHERE).elements
     s" WHERE ${whereClauses.mkString(" AND ")}"
   }
+
+  protected def limitStr(query: Query): String = if (query.rpp > 0) s" LIMIT ${query.rpp}" else ""
+  protected def offsetStr(query: Query): String = if (query.rpp > 0) s" OFFSET ${(query.page - 1) * query.rpp}" else ""
+
 
   // ------------------------------------------------------------------------------------------------------------------
 
