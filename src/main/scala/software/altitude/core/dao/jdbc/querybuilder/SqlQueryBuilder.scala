@@ -6,14 +6,20 @@ import software.altitude.core.util.Query
 import software.altitude.core.util.Query.QueryParam
 import software.altitude.core.{Context, Const => C}
 
-/**
-  * An advanced ORM replacement :)
-  *
-  * @param sqlColsForSelect columns to select
-  * @param tableNames table names for select
-  */
+protected object SqlQueryBuilder {
+  val SELECT = "select"
+  val FROM = "from"
+  val JOIN = "join"
+  val WHERE = "where"
+  val GROUP_BY = "group_by"
+  val ORDER_BY = "order_by"
+}
+
 class SqlQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String]) {
   private final val log = LoggerFactory.getLogger(getClass)
+
+  type StmtComponents = List[String]
+  type ChainMethodType = (Query, Context) => List[String]
 
   // convenience constructor for the common case of just one table
   def this(sqlColsForSelect: List[String], tableName: String) = {
@@ -25,6 +31,7 @@ class SqlQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String]) {
             tableNames: Set[String] = tableNames,
             countOnly: Boolean = false)
            (implicit ctx: Context, txId: TransactionId): SqlQuery = {
+
     val (whereClause, sqlBindVals) = compileQuery(query, tableNames)
 
     val sql = if (countOnly) {
@@ -45,6 +52,81 @@ class SqlQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String]) {
     log.debug(s"SQL QUERY: $sql with $sqlBindVals")
     SqlQuery(sql, sqlBindVals)
   }
+
+  def build2(query: Query)(implicit ctx: Context): SqlQuery = {
+    // a list of methods we will apply to build final query components
+    val chainMethods: List[(String, ChainMethodType)] = List(
+      (SqlQueryBuilder.SELECT, this.select),
+      (SqlQueryBuilder.FROM, this.from),
+      (SqlQueryBuilder.WHERE, this.where)
+    )
+
+    // collect component statements so we can refer to them when we build the SQL string
+    val data = chainMethods.foldLeft(Map[String, List[String]]()) { (res, m) =>
+      val statement = m._1
+      val chainMethod = m._2
+      res + (statement -> chainMethod(query, ctx))
+    }
+
+    val sql: String  = selectStr(data) + fromStr(data) + whereStr(data)
+    SqlQuery(sql, getSqlBindVals2(query))
+  }
+
+  protected def select(query: Query, ctx: Context): StmtComponents = sqlColsForSelect
+  protected def selectStr(data: Map[String, List[String]]): String = {
+    val columnNames = data(SqlQueryBuilder.SELECT)
+    s"SELECT ${columnNames.mkString(", ")}"
+  }
+
+  protected def from(query: Query, ctx: Context): StmtComponents = tableNames.toList
+  protected def fromStr(data: Map[String, List[String]]): String = {
+    val tableNames = data(SqlQueryBuilder.FROM)
+    s" FROM ${tableNames.mkString(", ")}"
+  }
+
+  protected def where(query: Query, ctx: Context): StmtComponents = {
+    query.params.map { el: (String, Any) =>
+      val (columnName, value) = el
+      value match {
+        case _: String => s"$columnName = ?"
+        case _: Boolean => s"$columnName = ?"
+        case _: Number => s"$columnName = ?"
+        case qParam: QueryParam => qParam.paramType match {
+          case Query.ParamType.IN => {
+            val placeholders: String = qParam.values.toList.map {_ => "?"}.mkString(", ")
+            s"$columnName IN ($placeholders)"
+          }
+          case Query.ParamType.EQ => s"$columnName = ?"
+
+          case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: ${qParam.paramType}")
+        }
+        case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: $value")
+      }
+    }.toList ::: tableNames.map(tableName => s"$tableName.${C.Base.REPO_ID} = ?").toList
+  }
+
+  protected def whereStr(data: Map[String, List[String]]): String = {
+    val whereClauses = data(SqlQueryBuilder.WHERE)
+    s" WHERE ${whereClauses.mkString(" AND ")}"
+  }
+
+  protected def getSqlBindVals2(query: Query)(implicit ctx: Context): List[Any] = {
+    query.params.foldLeft(List[Any]()) { (res, el: (String, Any)) =>
+      val value = el._2
+      value match {
+        // string or integer values as is
+        case _: String => res :+ value
+        case _: Number => res :+ value
+        // boolean becomes 0 or 1
+        case _: Boolean => res :+ (if (value == true) 1 else 0)
+        // extract all values from qParam
+        case qParam: QueryParam => res ::: qParam.values.toList
+        case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: $value")
+      }
+    } ::: tableNames.toSeq.map(_ => ctx.repo.id.get).toList // repo id for each table
+  }
+
+  // ------------------------------------------------------------------------------------------------------------------
 
   protected def assembleQuery(select: String, from: String, where: String, rpp: Int = 0, page: Int = 0): String = {
     val sqlWithoutPaging = s"SELECT $select FROM $from $where"
