@@ -18,8 +18,8 @@ protected object SqlQueryBuilder {
 class SqlQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String]) {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  type StmtComponents = List[String]
-  type ChainMethodType = (Query, Context) => List[String]
+  protected case class ClauseComponents(elements: List[String], bindVals: List[Any] = List())
+  type ClauseGeneratorType = (Query, Context) => ClauseComponents
 
   // convenience constructor for the common case of just one table
   def this(sqlColsForSelect: List[String], tableName: String) = {
@@ -55,37 +55,45 @@ class SqlQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String]) {
 
   def build2(query: Query)(implicit ctx: Context): SqlQuery = {
     // a list of methods we will apply to build final query components
-    val chainMethods: List[(String, ChainMethodType)] = List(
+    val chainMethods: List[(String, ClauseGeneratorType)] = List(
       (SqlQueryBuilder.SELECT, this.select),
       (SqlQueryBuilder.FROM, this.from),
       (SqlQueryBuilder.WHERE, this.where)
     )
 
     // collect component statements so we can refer to them when we build the SQL string
-    val data = chainMethods.foldLeft(Map[String, List[String]]()) { (res, m) =>
-      val statement = m._1
-      val chainMethod = m._2
-      res + (statement -> chainMethod(query, ctx))
+    val allClauseComponents = chainMethods.foldLeft(Map[String, ClauseComponents]()) { (res, m) =>
+      val clauseName = m._1
+      val clauseGeneratorMethod = m._2
+      val clauseComponents = clauseGeneratorMethod(query, ctx)
+      res + (clauseName -> clauseComponents)
     }
 
-    val sql: String  = selectStr(data) + fromStr(data) + whereStr(data)
-    SqlQuery(sql, getSqlBindVals2(query))
+    val sql: String  = selectStr(allClauseComponents) +
+      fromStr(allClauseComponents) +
+      whereStr(allClauseComponents)
+
+    val bindVals = allClauseComponents.foldLeft(List[Any]()) { (res, comp) =>
+      res ++ comp._2.bindVals
+    }
+
+    SqlQuery(sql, bindVals)
   }
 
-  protected def select(query: Query, ctx: Context): StmtComponents = sqlColsForSelect
-  protected def selectStr(data: Map[String, List[String]]): String = {
-    val columnNames = data(SqlQueryBuilder.SELECT)
+  protected def select(query: Query, ctx: Context) = ClauseComponents(elements = sqlColsForSelect)
+  protected def selectStr(data: Map[String, ClauseComponents]): String = {
+    val columnNames = data(SqlQueryBuilder.SELECT).elements
     s"SELECT ${columnNames.mkString(", ")}"
   }
 
-  protected def from(query: Query, ctx: Context): StmtComponents = tableNames.toList
-  protected def fromStr(data: Map[String, List[String]]): String = {
-    val tableNames = data(SqlQueryBuilder.FROM)
+  protected def from(query: Query, ctx: Context) = ClauseComponents(elements = tableNames.toList)
+  protected def fromStr(data: Map[String, ClauseComponents]): String = {
+    val tableNames = data(SqlQueryBuilder.FROM).elements
     s" FROM ${tableNames.mkString(", ")}"
   }
 
-  protected def where(query: Query, ctx: Context): StmtComponents = {
-    query.params.map { el: (String, Any) =>
+  protected def where(query: Query, ctx: Context): ClauseComponents = {
+    val elements = query.params.map { el: (String, Any) =>
       val (columnName, value) = el
       value match {
         case _: String => s"$columnName = ?"
@@ -103,15 +111,8 @@ class SqlQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String]) {
         case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: $value")
       }
     }.toList ::: tableNames.map(tableName => s"$tableName.${C.Base.REPO_ID} = ?").toList
-  }
 
-  protected def whereStr(data: Map[String, List[String]]): String = {
-    val whereClauses = data(SqlQueryBuilder.WHERE)
-    s" WHERE ${whereClauses.mkString(" AND ")}"
-  }
-
-  protected def getSqlBindVals2(query: Query)(implicit ctx: Context): List[Any] = {
-    query.params.foldLeft(List[Any]()) { (res, el: (String, Any)) =>
+    val bindVals = query.params.foldLeft(List[Any]()) { (res, el: (String, Any)) =>
       val value = el._2
       value match {
         // string or integer values as is
@@ -124,6 +125,13 @@ class SqlQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String]) {
         case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: $value")
       }
     } ::: tableNames.toSeq.map(_ => ctx.repo.id.get).toList // repo id for each table
+
+    ClauseComponents(elements, bindVals)
+  }
+
+  protected def whereStr(data: Map[String, ClauseComponents]): String = {
+    val whereClauses = data(SqlQueryBuilder.WHERE).elements
+    s" WHERE ${whereClauses.mkString(" AND ")}"
   }
 
   // ------------------------------------------------------------------------------------------------------------------
