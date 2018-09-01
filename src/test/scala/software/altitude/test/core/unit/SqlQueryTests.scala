@@ -28,7 +28,6 @@ class SqlQueryTests extends FunSuite with TestFocus {
     val sqlQuery = builder.buildSelectSql(q)
     sqlQuery.sqlAsString shouldBe "SELECT col1, col2 FROM table1, table2 WHERE searchValue = ? AND table1.repository_id = ? AND table2.repository_id = ?"
     sqlQuery.bindValues.size shouldBe 3
-    // FIXME: check COUNT query
   }
 
   test("WHERE SQL query with pagination is built correctly") {
@@ -37,6 +36,5 @@ class SqlQueryTests extends FunSuite with TestFocus {
     val sqlQuery = builder.buildSelectSql(q)
     sqlQuery.sqlAsString shouldBe "SELECT * FROM table1 WHERE searchValue = ? AND table1.repository_id = ? LIMIT 10 OFFSET 10"
     sqlQuery.bindValues.size shouldBe 2
-    // FIXME: check COUNT query
   }
 }

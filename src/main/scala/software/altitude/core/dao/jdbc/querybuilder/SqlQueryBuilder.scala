@@ -12,13 +12,16 @@ protected object SqlQueryBuilder {
   val WHERE = "where"
   val GROUP_BY = "group_by"
   val ORDER_BY = "order_by"
+  val HAVING = "having"
 }
 
 class SqlQueryBuilder[QueryT <: Query](sqlColsForSelect: List[String], tableNames: Set[String]) {
   private final val log = LoggerFactory.getLogger(getClass)
 
   protected case class ClauseComponents(elements: List[String] = List(), bindVals: List[Any] = List()) {
-    // use the + operator to smuch two clause components together
+    val isEmpty: Boolean = elements.isEmpty
+
+    // use the + operator to smush two clause components together
     def +(that: ClauseComponents): ClauseComponents =
       ClauseComponents(this.elements ::: that.elements, this.bindVals ::: that.bindVals)
   }
@@ -28,7 +31,9 @@ class SqlQueryBuilder[QueryT <: Query](sqlColsForSelect: List[String], tableName
   protected val chainMethods: List[(String, ClauseGeneratorType)] = List(
     (SqlQueryBuilder.SELECT, this.select),
     (SqlQueryBuilder.FROM, this.from),
-    (SqlQueryBuilder.WHERE, this.where)
+    (SqlQueryBuilder.WHERE, this.where),
+    (SqlQueryBuilder.GROUP_BY, this.groupBy),
+    (SqlQueryBuilder.HAVING, this.having)
   )
 
   // convenience constructor for the common case of just one table
@@ -39,9 +44,11 @@ class SqlQueryBuilder[QueryT <: Query](sqlColsForSelect: List[String], tableName
   def buildSelectSql(query: QueryT)(implicit ctx: Context): SqlQuery = {
     val allClauses = compileClauses(query, ctx)
 
-    val sql: String  = selectStr(allClauses) +
-      fromStr(allClauses) +
-      whereStr(allClauses) +
+    val sql: String  = selectStr(allClauses(SqlQueryBuilder.SELECT)) +
+      fromStr(allClauses(SqlQueryBuilder.FROM)) +
+      whereStr(allClauses(SqlQueryBuilder.WHERE)) +
+      groupByStr(allClauses(SqlQueryBuilder.GROUP_BY)) +
+      havingStr(allClauses(SqlQueryBuilder.HAVING)) +
       limitStr(query) +
       offsetStr(query)
 
@@ -50,7 +57,7 @@ class SqlQueryBuilder[QueryT <: Query](sqlColsForSelect: List[String], tableName
     }
 
     log.debug(s"Select SQL: $sql with $bindVals")
-    println(sql, bindVals)
+    //println(sql, bindVals)
     SqlQuery(sql, bindVals)
   }
 
@@ -60,7 +67,11 @@ class SqlQueryBuilder[QueryT <: Query](sqlColsForSelect: List[String], tableName
     val allClauses = compileClauses(query, ctx) + (
       SqlQueryBuilder.SELECT -> selectClauseForCount)
 
-    val sql: String  = selectStr(allClauses) + fromStr(allClauses) + whereStr(allClauses)
+    val sql: String  = selectStr(allClauses(SqlQueryBuilder.SELECT)) +
+      fromStr(allClauses(SqlQueryBuilder.FROM)) +
+      whereStr(allClauses(SqlQueryBuilder.WHERE)) +
+      groupByStr(allClauses(SqlQueryBuilder.GROUP_BY)) +
+      havingStr(allClauses(SqlQueryBuilder.HAVING))
 
     val bindVals = allClauses.foldLeft(List[Any]()) { (res, comp) =>
       res ++ comp._2.bindVals
@@ -81,19 +92,19 @@ class SqlQueryBuilder[QueryT <: Query](sqlColsForSelect: List[String], tableName
   }
 
   protected def select(query: QueryT, ctx: Context) = ClauseComponents(elements = sqlColsForSelect)
-  protected def selectStr(data: Map[String, ClauseComponents]): String = {
-    val columnNames = data(SqlQueryBuilder.SELECT).elements
+  protected def selectStr(clauseComponents: ClauseComponents): String = {
+    val columnNames = clauseComponents.elements
     s"SELECT ${columnNames.mkString(", ")}"
   }
 
   protected def from(query: QueryT, ctx: Context) = ClauseComponents(elements = tableNames.toList)
-  protected def fromStr(data: Map[String, ClauseComponents]): String = {
-    val tableNames = data(SqlQueryBuilder.FROM).elements
+  protected def fromStr(clauseComponents: ClauseComponents): String = {
+    val tableNames = clauseComponents.elements
     s" FROM ${tableNames.mkString(", ")}"
   }
 
   protected def where(query: QueryT, ctx: Context): ClauseComponents = {
-    // FIXME: find a better way to get elements and bindvals in one swoop
+    // FIXME: find a better way to get elements and bind vals in one swoop
     val elements = query.params.map { el: (String, Any) =>
       val (columnName, value) = el
       value match {
@@ -130,9 +141,21 @@ class SqlQueryBuilder[QueryT <: Query](sqlColsForSelect: List[String], tableName
     ClauseComponents(elements, bindVals)
   }
 
-  protected def whereStr(data: Map[String, ClauseComponents]): String = {
-    val whereClauses = data(SqlQueryBuilder.WHERE).elements
+  protected def whereStr(clauseComponents: ClauseComponents): String = {
+    val whereClauses = clauseComponents.elements
     s" WHERE ${whereClauses.mkString(" AND ")}"
+  }
+
+  protected def groupBy(query: QueryT, ctx: Context): ClauseComponents = ClauseComponents()
+  protected def groupByStr(clauseComponents: ClauseComponents): String = {
+    if (clauseComponents.isEmpty) return ""
+    s" GROUP BY ${clauseComponents.elements.mkString(", ")}"
+  }
+
+  protected def having(query: QueryT, ctx: Context): ClauseComponents = ClauseComponents()
+  protected def havingStr(clauseComponents: ClauseComponents): String = {
+    if (clauseComponents.isEmpty) return ""
+    s" HAVING ${clauseComponents.elements.mkString(", ")}"
   }
 
   protected def limitStr(query: QueryT): String = if (query.rpp > 0) s" LIMIT ${query.rpp}" else ""

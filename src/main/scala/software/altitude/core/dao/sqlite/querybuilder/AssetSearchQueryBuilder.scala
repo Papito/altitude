@@ -10,8 +10,14 @@ import software.altitude.core.{Context, Const => C}
 class AssetSearchQueryBuilder(sqlColsForSelect: List[String])
     extends SearchQueryBuilder(sqlColsForSelect = sqlColsForSelect, tableNames = Set("asset")) {
 
-  private final val log = LoggerFactory.getLogger(getClass)
-  private val searchParamTable = "search_parameter"
-  private val searchDocumentTable = "search_document"
-
+  protected def textSearch(searchQuery: SearchQuery): ClauseComponents = {
+    if (searchQuery.isText) {
+      ClauseComponents(
+        elements = List("body MATCH ?"),
+        bindVals = List(searchQuery.text.get))
+    }
+    else {
+      ClauseComponents()
+    }
+  }
 }
