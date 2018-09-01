@@ -20,7 +20,7 @@ class SqlQueryBuilder[QueryT <: Query](sqlColsForSelect: List[String], tableName
   protected case class ClauseComponents(elements: List[String] = List(), bindVals: List[Any] = List()) {
     // use the + operator to smuch two clause components together
     def +(that: ClauseComponents): ClauseComponents =
-      ClauseComponents(this.elements ::: that.elements, bindVals ::: bindVals)
+      ClauseComponents(this.elements ::: that.elements, this.bindVals ::: that.bindVals)
   }
 
   type ClauseGeneratorType = (QueryT , Context) => ClauseComponents
@@ -50,14 +50,15 @@ class SqlQueryBuilder[QueryT <: Query](sqlColsForSelect: List[String], tableName
     }
 
     log.debug(s"Select SQL: $sql with $bindVals")
+    //println(sql, bindVals)
     SqlQuery(sql, bindVals)
   }
 
   def buildCountSql(query: QueryT)(implicit ctx: Context): SqlQuery = {
     // the SQL is the same but the WHERE clause is just the COUNT
-    val whereClauseForCount = ClauseComponents(List("COUNT(*) AS count"))
+    val selectClauseForCount = ClauseComponents(List("COUNT(*) AS count"))
     val allClauses = compileClauses(query, ctx) + (
-      SqlQueryBuilder.WHERE -> whereClauseForCount)
+      SqlQueryBuilder.SELECT -> selectClauseForCount)
 
     val sql: String  = selectStr(allClauses) + fromStr(allClauses) + whereStr(allClauses)
 

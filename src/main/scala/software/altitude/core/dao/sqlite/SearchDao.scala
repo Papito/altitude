@@ -59,8 +59,8 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
       sqlColsForSelect = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT,
       tableNames = Set("asset"))
 
-    val sqlQuery = sqlQueryBuilder.buildSelectSql(searchQuery = searchQuery)
-    val sqlCountQuery = sqlQueryBuilder.buildCountSql(searchQuery = searchQuery)
+    val sqlQuery = sqlQueryBuilder.buildSelectSql(query = searchQuery)
+    val sqlCountQuery = sqlQueryBuilder.buildCountSql(query = searchQuery)
 
     // OPTIMIZE: in parallel?
     val recs = manyBySqlQuery(sqlQuery.sqlAsString, sqlQuery.bindValues)

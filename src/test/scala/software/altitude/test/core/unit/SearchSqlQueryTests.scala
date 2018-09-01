@@ -22,13 +22,12 @@ class SearchSqlQueryTests extends FunSuite with TestFocus {
     user = null
   )
 
-  test("Basic WHERE SQL asset query is built correctly") {
+  test("Basic WHERE SQL asset query is built correctly", Focused) {
     val builder = new AssetSearchQueryBuilder(List("col1"), Set("table1"))
-    val q = new SearchQuery(params = Map("searchValue" -> 3), folderIds = Set("1", "2", "3"))
+    val q = new SearchQuery(params = Map("searchValue" -> 3))
     val sqlQuery = builder.buildSelectSql(q)
     sqlQuery.sqlAsString shouldBe "SELECT col1 FROM table1 WHERE searchValue = ? AND table1.repository_id = ?"
     sqlQuery.bindValues.size shouldBe 2
-
     // TODO: check recycle flag in the query
   }
 
@@ -36,7 +35,8 @@ class SearchSqlQueryTests extends FunSuite with TestFocus {
     val builder = new AssetSearchQueryBuilder(List("col1"), Set("table1"))
     val q = new SearchQuery(params = Map("searchValue" -> 3), folderIds = Set("1", "2", "3"))
     val sqlQuery = builder.buildSelectSql(q)
-    sqlQuery.sqlAsString shouldBe "SELECT col1 FROM table1 WHERE searchValue = ? AND table1.repository_id = ?"
-    sqlQuery.bindValues.size shouldBe 2
+    sqlQuery.sqlAsString shouldBe "SELECT col1 FROM table1 WHERE searchValue = ? AND table1.repository_id = ? AND folder_id IN (?, ?, ?)"
+    sqlQuery.bindValues.size shouldBe 5
+    // TODO: check recycle flag in the query
   }
 }
