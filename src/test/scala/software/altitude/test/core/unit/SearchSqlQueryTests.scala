@@ -22,7 +22,7 @@ class SearchSqlQueryTests extends FunSuite with TestFocus {
     user = null
   )
 
-  test("Basic WHERE SQL asset query is built correctly", Focused) {
+  test("Basic WHERE SQL asset query is built correctly") {
     val builder = new AssetSearchQueryBuilder(List("col1"), Set("table1"))
     val q = new SearchQuery(params = Map("searchValue" -> 3), folderIds = Set("1", "2", "3"))
     val sqlQuery = builder.buildSelectSql(q)

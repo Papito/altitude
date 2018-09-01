@@ -9,11 +9,11 @@ import software.altitude.core.{Context, Const => C}
   * Common code for JDBC search query builders
   */
 abstract class SearchQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String])
-  extends SqlQueryBuilder(sqlColsForSelect, tableNames) {
+  extends SqlQueryBuilder[SearchQuery](sqlColsForSelect, tableNames) {
 
   private final val log = LoggerFactory.getLogger(getClass)
 
-  def buildSelectSql(searchQuery: SearchQuery)(implicit ctx: Context): SqlQuery = {
+  override def buildSelectSql(searchQuery: SearchQuery)(implicit ctx: Context): SqlQuery = {
     val allClauses = compileClauses(searchQuery, ctx)
 
     val sql: String  = selectStr(allClauses) +
@@ -30,7 +30,7 @@ abstract class SearchQueryBuilder(sqlColsForSelect: List[String], tableNames: Se
     SqlQuery(sql, bindVals)
   }
 
-  def buildCountSql(searchQuery: SearchQuery)(implicit ctx: Context): SqlQuery = {
+  override def buildCountSql(searchQuery: SearchQuery)(implicit ctx: Context): SqlQuery = {
     // the SQL is the same but the WHERE clause is just the COUNT
     val whereClauseForCount = ClauseComponents(List("COUNT(*) AS count"))
     val allClauses = compileClauses(searchQuery, ctx) + (
@@ -44,6 +44,22 @@ abstract class SearchQueryBuilder(sqlColsForSelect: List[String], tableNames: Se
 
     log.debug(s"Count SQL: $sql with $bindVals")
     SqlQuery(sql, bindVals)
+  }
+
+  override protected def where(searchQuery: SearchQuery, ctx: Context): ClauseComponents = {
+    super.where(searchQuery, ctx) + whereFolderFilter(searchQuery)
+  }
+
+  protected def whereFolderFilter(searchQuery: SearchQuery): ClauseComponents = {
+    if (searchQuery.folderIds.isEmpty) return ClauseComponents()
+
+    // get ? placeholders equal to the number of folder ids
+    val folderIdPlaceholders: String = List.fill(searchQuery.folderIds.size)("?").mkString(", ")
+
+    ClauseComponents(
+      elements = List(s"${C.Asset.FOLDER_ID} IN ($folderIdPlaceholders)"),
+      bindVals = searchQuery.folderIds.toList
+    )
   }
 
 }

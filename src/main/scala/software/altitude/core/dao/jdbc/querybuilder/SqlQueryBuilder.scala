@@ -14,11 +14,16 @@ protected object SqlQueryBuilder {
   val ORDER_BY = "order_by"
 }
 
-class SqlQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String]) {
+class SqlQueryBuilder[QueryT <: Query](sqlColsForSelect: List[String], tableNames: Set[String]) {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  protected case class ClauseComponents(elements: List[String], bindVals: List[Any] = List())
-  type ClauseGeneratorType = (Query, Context) => ClauseComponents
+  protected case class ClauseComponents(elements: List[String] = List(), bindVals: List[Any] = List()) {
+    // use the + operator to smuch two clause components together
+    def +(that: ClauseComponents): ClauseComponents =
+      ClauseComponents(this.elements ::: that.elements, bindVals ::: bindVals)
+  }
+
+  type ClauseGeneratorType = (QueryT , Context) => ClauseComponents
 
   protected val chainMethods: List[(String, ClauseGeneratorType)] = List(
     (SqlQueryBuilder.SELECT, this.select),
@@ -31,7 +36,7 @@ class SqlQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String]) {
     this(sqlColsForSelect, Set(tableName))
   }
 
-  def buildSelectSql(query: Query)(implicit ctx: Context): SqlQuery = {
+  def buildSelectSql(query: QueryT)(implicit ctx: Context): SqlQuery = {
     val allClauses = compileClauses(query, ctx)
 
     val sql: String  = selectStr(allClauses) +
@@ -48,7 +53,7 @@ class SqlQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String]) {
     SqlQuery(sql, bindVals)
   }
 
-  def buildCountSql(query: Query)(implicit ctx: Context): SqlQuery = {
+  def buildCountSql(query: QueryT)(implicit ctx: Context): SqlQuery = {
     // the SQL is the same but the WHERE clause is just the COUNT
     val whereClauseForCount = ClauseComponents(List("COUNT(*) AS count"))
     val allClauses = compileClauses(query, ctx) + (
@@ -64,7 +69,7 @@ class SqlQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String]) {
     SqlQuery(sql, bindVals)
   }
 
-  protected def compileClauses(query: Query, ctx: Context): Map[String, ClauseComponents] = {
+  protected def compileClauses(query: QueryT, ctx: Context): Map[String, ClauseComponents] = {
     // collect clauses so we can refer to them when we build the SQL string
     chainMethods.foldLeft(Map[String, ClauseComponents]()) { (res, m) =>
       val clauseName = m._1
@@ -74,19 +79,20 @@ class SqlQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String]) {
     }
   }
 
-  protected def select(query: Query, ctx: Context) = ClauseComponents(elements = sqlColsForSelect)
+  protected def select(query: QueryT, ctx: Context) = ClauseComponents(elements = sqlColsForSelect)
   protected def selectStr(data: Map[String, ClauseComponents]): String = {
     val columnNames = data(SqlQueryBuilder.SELECT).elements
     s"SELECT ${columnNames.mkString(", ")}"
   }
 
-  protected def from(query: Query, ctx: Context) = ClauseComponents(elements = tableNames.toList)
+  protected def from(query: QueryT, ctx: Context) = ClauseComponents(elements = tableNames.toList)
   protected def fromStr(data: Map[String, ClauseComponents]): String = {
     val tableNames = data(SqlQueryBuilder.FROM).elements
     s" FROM ${tableNames.mkString(", ")}"
   }
 
-  protected def where(query: Query, ctx: Context): ClauseComponents = {
+  protected def where(query: QueryT, ctx: Context): ClauseComponents = {
+    // FIXME: find a better way to get elements and bindvals in one swoop
     val elements = query.params.map { el: (String, Any) =>
       val (columnName, value) = el
       value match {
@@ -128,6 +134,6 @@ class SqlQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String]) {
     s" WHERE ${whereClauses.mkString(" AND ")}"
   }
 
-  protected def limitStr(query: Query): String = if (query.rpp > 0) s" LIMIT ${query.rpp}" else ""
-  protected def offsetStr(query: Query): String = if (query.rpp > 0) s" OFFSET ${(query.page - 1) * query.rpp}" else ""
+  protected def limitStr(query: QueryT): String = if (query.rpp > 0) s" LIMIT ${query.rpp}" else ""
+  protected def offsetStr(query: QueryT): String = if (query.rpp > 0) s" OFFSET ${(query.page - 1) * query.rpp}" else ""
 }

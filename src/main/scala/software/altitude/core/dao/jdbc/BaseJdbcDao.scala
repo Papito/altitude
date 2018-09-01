@@ -99,14 +99,14 @@ abstract class BaseJdbcDao extends BaseDao {
   }
 
   override def query(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
-    val sqlQueryBuilder = new SqlQueryBuilder(defaultSqlColsForSelect, tableName)
+    val sqlQueryBuilder = new SqlQueryBuilder[Query](defaultSqlColsForSelect, tableName)
     this.query(q, sqlQueryBuilder)
   }
 
   /**
    * Internal version for querying with a customized query builder
    */
-  protected def query(query: Query, sqlQueryBuilder: SqlQueryBuilder)
+  protected def query(query: Query, sqlQueryBuilder: SqlQueryBuilder[Query])
            (implicit ctx: Context, txId: TransactionId): QueryResult = {
     val sqlQuery: SqlQuery = sqlQueryBuilder.buildSelectSql(query)
 
@@ -120,7 +120,7 @@ abstract class BaseJdbcDao extends BaseDao {
     QueryResult(records = recs.map{makeModel}, total = count, rpp = query.rpp)
   }
 
-  protected def getQueryResultCount(query: Query, sqlQueryBuilder: SqlQueryBuilder, values: List[Any] = List())
+  protected def getQueryResultCount(query: Query, sqlQueryBuilder: SqlQueryBuilder[Query], values: List[Any] = List())
                                    (implicit  ctx: Context, txId: TransactionId): Int = {
     val sqlCountQuery: SqlQuery = sqlQueryBuilder.buildCountSql(query)
     getQueryResultCountBySql(sqlCountQuery.sqlAsString, values)
