@@ -108,7 +108,7 @@ abstract class BaseJdbcDao extends BaseDao {
    */
   protected def query(query: Query, sqlQueryBuilder: SqlQueryBuilder)
            (implicit ctx: Context, txId: TransactionId): QueryResult = {
-    val sqlQuery: SqlQuery = sqlQueryBuilder.build(query)
+    val sqlQuery: SqlQuery = sqlQueryBuilder.buildSelectSql(query)
 
     val recs = manyBySqlQuery(sqlQuery.sqlAsString, sqlQuery.bindValues)
     val count: Int = getQueryResultCount(query, sqlQueryBuilder, sqlQuery.bindValues)
@@ -122,7 +122,7 @@ abstract class BaseJdbcDao extends BaseDao {
 
   protected def getQueryResultCount(query: Query, sqlQueryBuilder: SqlQueryBuilder, values: List[Any] = List())
                                    (implicit  ctx: Context, txId: TransactionId): Int = {
-    val sqlCountQuery: SqlQuery = sqlQueryBuilder.build(query, countOnly = true)
+    val sqlCountQuery: SqlQuery = sqlQueryBuilder.buildCountSql(query)
     getQueryResultCountBySql(sqlCountQuery.sqlAsString, values)
   }
 

@@ -3,7 +3,7 @@ package software.altitude.test.core.suites
 import org.scalatest.Suites
 import software.altitude.test.core.api.AssetApiControllerTests
 import software.altitude.test.core.integration._
-import software.altitude.test.core.unit.{FolderModelTests, ModelTests, SearchQueryModelTests, SqlQueryTests}
+import software.altitude.test.core.unit._
 
 abstract class AllTests(val config: Map[String, Any]) extends Suites(
   new ModelTests,
@@ -16,6 +16,7 @@ abstract class AllTests(val config: Map[String, Any]) extends Suites(
   new ImportTests(config),
   new FolderModelTests,
   new SqlQueryTests,
+  new SearchSqlQueryTests,
   new FolderServiceTests(config),
   new FileStoreServiceTests(config),
   new LibraryServiceTests(config),

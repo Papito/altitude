@@ -1,5 +1,6 @@
 package software.altitude.core.dao.jdbc.querybuilder
 
+import org.slf4j.LoggerFactory
 import software.altitude.core.util.Query.QueryParam
 import software.altitude.core.util.{Query, SearchQuery}
 import software.altitude.core.{Context, Const => C}
@@ -7,60 +8,42 @@ import software.altitude.core.{Context, Const => C}
 /**
   * Common code for JDBC search query builders
   */
-trait SearchQueryBuilder {
-  def compileSearchQuery(searchQuery: SearchQuery,
-                         whereClauses: List[String],
-                         sqlBindVals: List[Any]): (String, List[Any]) = {
+abstract class SearchQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String])
+  extends SqlQueryBuilder(sqlColsForSelect, tableNames) {
 
-    // Narrow down the search based on folder IDs in the search query
-    val folderIdPlaceholders: String = searchQuery.folderIds.toList.map {_ => "?"}.mkString(", ")
-    val folderIdsWhereClause = if (searchQuery.folderIds.nonEmpty) {
-      List(s"${C.Asset.FOLDER_ID} IN ($folderIdPlaceholders)")
+  private final val log = LoggerFactory.getLogger(getClass)
+
+  def buildSelectSql(searchQuery: SearchQuery)(implicit ctx: Context): SqlQuery = {
+    val allClauses = compileClauses(searchQuery, ctx)
+
+    val sql: String  = selectStr(allClauses) +
+      fromStr(allClauses) +
+      whereStr(allClauses) +
+      limitStr(searchQuery) +
+      offsetStr(searchQuery)
+
+    val bindVals = allClauses.foldLeft(List[Any]()) { (res, comp) =>
+      res ++ comp._2.bindVals
     }
-    else {
-      List()
-    }
 
-    val _whereClauses = whereClauses ::: folderIdsWhereClause ::: getSearchParamWhereClauses(searchQuery)
-    val _sqlBindVals = sqlBindVals ::: searchQuery.folderIds.toList ::: getSearchParamBindVals(searchQuery)
-    val whereClause = s"""WHERE ${_whereClauses.mkString(" AND ")}""" +
-      (if (searchQuery.isParametarized) s" GROUP BY asset.id HAVING count(asset.id) >= ${searchQuery.params.size}" else "")
-
-    (whereClause, _sqlBindVals)
+    log.debug(s"Select SQL: $sql with $bindVals")
+    SqlQuery(sql, bindVals)
   }
 
-  protected def getSearchParamWhereClauses(searchQuery: SearchQuery): List[String] = {
+  def buildCountSql(searchQuery: SearchQuery)(implicit ctx: Context): SqlQuery = {
+    // the SQL is the same but the WHERE clause is just the COUNT
+    val whereClauseForCount = ClauseComponents(List("COUNT(*) AS count"))
+    val allClauses = compileClauses(searchQuery, ctx) + (
+      SqlQueryBuilder.WHERE -> whereClauseForCount)
 
-    val whereClauses = searchQuery.params.map { el: (String, Any) =>
-      val (_, value) = el
-      value match {
-        case _: String => "(field_id = ? AND field_value_kw = ?)"
-        case _: Boolean => "(field_id = ? AND field_value_bool = ?)"
-        case _: Number => "(field_id = ? AND field_value_num = ?)"
-        case qParam: QueryParam => qParam.paramType match {
-          case Query.ParamType.EQ => qParam.values.head match {
-            case _: String => "(field_id = ? AND field_value_kw = ?)"
-            case _: Boolean => "(field_id = ? AND field_value_bool = ?)"
-            case _: Number => "(field_id = ? AND field_value_num = ?)"
-          }
-          case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: ${qParam.paramType}")
-        }
-        case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: $value")
-      }
-    }.toList
+    val sql: String  = selectStr(allClauses) + fromStr(allClauses) + whereStr(allClauses)
 
-    if (whereClauses.nonEmpty) List("(" + whereClauses.mkString(" OR ") + ")") else List()
-  }
-
-  protected def getSearchParamBindVals(searchQuery: SearchQuery): List[Any] = {
-    searchQuery.params.foldLeft(List[Any]()) { (res, el) =>
-      val (metadataFieldId, value) = el
-
-      // field id, value binds
-      res :+ metadataFieldId :+ (value match {
-        case qParam: QueryParam => qParam.values.head
-        case _ => value
-      })
+    val bindVals = allClauses.foldLeft(List[Any]()) { (res, comp) =>
+      res ++ comp._2.bindVals
     }
+
+    log.debug(s"Count SQL: $sql with $bindVals")
+    SqlQuery(sql, bindVals)
   }
+
 }
