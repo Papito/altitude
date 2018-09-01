@@ -50,7 +50,7 @@ class SqlQueryBuilder[QueryT <: Query](sqlColsForSelect: List[String], tableName
     }
 
     log.debug(s"Select SQL: $sql with $bindVals")
-    //println(sql, bindVals)
+    println(sql, bindVals)
     SqlQuery(sql, bindVals)
   }
 

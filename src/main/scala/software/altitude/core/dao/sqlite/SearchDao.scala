@@ -55,9 +55,7 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
   }
 
   override def search(searchQuery: SearchQuery)(implicit ctx: Context, txId: TransactionId): QueryResult = {
-    val sqlQueryBuilder = new AssetSearchQueryBuilder(
-      sqlColsForSelect = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT,
-      tableNames = Set("asset"))
+    val sqlQueryBuilder = new AssetSearchQueryBuilder(sqlColsForSelect = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT)
 
     val sqlQuery = sqlQueryBuilder.buildSelectSql(query = searchQuery)
     val sqlCountQuery = sqlQueryBuilder.buildCountSql(query = searchQuery)

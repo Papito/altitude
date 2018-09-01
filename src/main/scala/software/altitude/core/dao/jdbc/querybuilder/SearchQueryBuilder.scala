@@ -14,7 +14,9 @@ abstract class SearchQueryBuilder(sqlColsForSelect: List[String], tableNames: Se
   private final val log = LoggerFactory.getLogger(getClass)
 
   override protected def where(searchQuery: SearchQuery, ctx: Context): ClauseComponents = {
-    super.where(searchQuery, ctx) + whereFolderFilter(searchQuery)
+    super.where(searchQuery, ctx) +
+      ClauseComponents(elements = List(s"${C.Asset.IS_RECYCLED} = ?"), bindVals = List(false)) +
+      whereFolderFilter(searchQuery)
   }
 
   protected def whereFolderFilter(searchQuery: SearchQuery): ClauseComponents = {
