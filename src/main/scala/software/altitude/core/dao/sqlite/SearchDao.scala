@@ -58,10 +58,9 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
     val sqlQueryBuilder = new AssetSearchQueryBuilder(sqlColsForSelect = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT)
 
     val sqlQuery = sqlQueryBuilder.buildSelectSql(query = searchQuery)
-    val sqlCountQuery = sqlQueryBuilder.buildCountSql(query = searchQuery)
-
-    // OPTIMIZE: in parallel?
     val recs = manyBySqlQuery(sqlQuery.sqlAsString, sqlQuery.bindValues)
+
+    val sqlCountQuery = sqlQueryBuilder.buildCountSql(query = searchQuery)
     val count: Int = getQueryResultCountBySql(sqlCountQuery.sqlAsString, sqlCountQuery.bindValues)
 
     log.debug(s"Found [$count] records. Retrieved [${recs.length}] records")

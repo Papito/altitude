@@ -14,6 +14,8 @@ abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softw
 
   override final val tableName = "asset"
 
+  override protected val sqlQueryBuilder = new SqlQueryBuilder[Query](defaultSqlColsForSelect, tableName)
+
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val assetType = new AssetType(
       mediaType = rec(C.AssetType.MEDIA_TYPE).asInstanceOf[String],
@@ -48,17 +50,14 @@ abstract class AssetDao(val app: AltitudeCoreApp) extends BaseJdbcDao with softw
   }
 
   override def queryNotRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
-    val sqlQueryBuilder = new SqlQueryBuilder[Query](defaultSqlColsForSelect, tableName)
     this.query(q.add(C.Asset.IS_RECYCLED -> false), sqlQueryBuilder)
   }
 
   override def queryRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
-    val sqlQueryBuilder = new SqlQueryBuilder[Query](defaultSqlColsForSelect, tableName)
     this.query(q.add(C.Asset.IS_RECYCLED -> true), sqlQueryBuilder)
   }
 
   override def queryAll(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
-    val sqlQueryBuilder = new SqlQueryBuilder[Query](defaultSqlColsForSelect, tableName)
     this.query(q, sqlQueryBuilder)
   }
 

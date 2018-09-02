@@ -31,6 +31,8 @@ abstract class BaseJdbcDao extends BaseDao {
 
   protected def defaultSqlColsForSelect: List[String]
 
+  protected val sqlQueryBuilder: SqlQueryBuilder[Query] = new SqlQueryBuilder[Query](defaultSqlColsForSelect, tableName)
+
   // if supported, DB function to store native JSON data
   protected def jsonFunc: String
   // DB current time function
@@ -99,7 +101,6 @@ abstract class BaseJdbcDao extends BaseDao {
   }
 
   override def query(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
-    val sqlQueryBuilder = new SqlQueryBuilder[Query](defaultSqlColsForSelect, tableName)
     this.query(q, sqlQueryBuilder)
   }
 
