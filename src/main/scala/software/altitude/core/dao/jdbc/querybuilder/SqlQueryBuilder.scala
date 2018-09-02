@@ -15,20 +15,12 @@ protected object SqlQueryBuilder {
   val HAVING = "having"
 }
 
-class SqlQueryBuilder[QueryT <: Query](sqlColsForSelect: List[String], tableNames: Set[String]) {
+class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames: Set[String]) {
   private final val log = LoggerFactory.getLogger(getClass)
 
   // convenience constructor for the common case of just one table
   def this(sqlColsForSelect: List[String], tableName: String) = {
     this(sqlColsForSelect, Set(tableName))
-  }
-
-  protected case class ClauseComponents(elements: List[String] = List(), bindVals: List[Any] = List()) {
-    val isEmpty: Boolean = elements.isEmpty
-
-    // use the + operator to smush two clause components together
-    def +(that: ClauseComponents): ClauseComponents =
-      ClauseComponents(this.elements ::: that.elements, this.bindVals ::: that.bindVals)
   }
 
   type ClauseGeneratorType = (QueryT , Context) => ClauseComponents
@@ -91,7 +83,7 @@ class SqlQueryBuilder[QueryT <: Query](sqlColsForSelect: List[String], tableName
     }
   }
 
-  protected def select(query: QueryT, ctx: Context) = ClauseComponents(elements = sqlColsForSelect)
+  protected def select(query: QueryT, ctx: Context) = ClauseComponents(elements = selColumnNames)
   protected def selectStr(clauseComponents: ClauseComponents): String = {
     val columnNames = clauseComponents.elements
     s"SELECT ${columnNames.mkString(", ")}"

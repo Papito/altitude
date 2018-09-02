@@ -1,7 +1,7 @@
 package software.altitude.core.dao.sqlite.querybuilder
 
 import org.slf4j.LoggerFactory
-import software.altitude.core.dao.jdbc.querybuilder.{SearchQueryBuilder, SqlQuery, SqlQueryBuilder}
+import software.altitude.core.dao.jdbc.querybuilder.{ClauseComponents, SearchQueryBuilder, SqlQuery, SqlQueryBuilder}
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.Query.QueryParam
 import software.altitude.core.util.{Query, SearchQuery}
