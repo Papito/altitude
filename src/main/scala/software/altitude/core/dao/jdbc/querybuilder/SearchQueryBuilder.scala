@@ -39,7 +39,7 @@ abstract class SearchQueryBuilder(sqlColsForSelect: List[String], tableNames: Se
     ClauseComponents(repoIdElements, repoIdBindVals) +
       textSearch(searchQuery) +
       notRecycledFilter +
-      whereFolderFilter(searchQuery) +
+      folderFilter(searchQuery) +
       fieldFilter(searchQuery) +
       searchDocumentJoin(searchQuery) +
       searchParameterJoin(searchQuery)
@@ -48,7 +48,7 @@ abstract class SearchQueryBuilder(sqlColsForSelect: List[String], tableNames: Se
   /**
     * Generates a SQL "IN" clause for folder IDs
     */
-  protected def whereFolderFilter(searchQuery: SearchQuery): ClauseComponents = {
+  protected def folderFilter(searchQuery: SearchQuery): ClauseComponents = {
     if (searchQuery.folderIds.isEmpty) return ClauseComponents()
 
     // get ? placeholders equal to the number of folder ids

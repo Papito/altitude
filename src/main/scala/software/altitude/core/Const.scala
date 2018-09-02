@@ -239,7 +239,7 @@ object Const {
   }
 
   // default results per page
-  final val DEFAULT_RPP = "15"
+  final val DEFAULT_RPP = "20"
 
   object LogTag {
     val APP = "APP"

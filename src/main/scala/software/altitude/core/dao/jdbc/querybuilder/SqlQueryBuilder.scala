@@ -18,6 +18,11 @@ protected object SqlQueryBuilder {
 class SqlQueryBuilder[QueryT <: Query](sqlColsForSelect: List[String], tableNames: Set[String]) {
   private final val log = LoggerFactory.getLogger(getClass)
 
+  // convenience constructor for the common case of just one table
+  def this(sqlColsForSelect: List[String], tableName: String) = {
+    this(sqlColsForSelect, Set(tableName))
+  }
+
   protected case class ClauseComponents(elements: List[String] = List(), bindVals: List[Any] = List()) {
     val isEmpty: Boolean = elements.isEmpty
 
@@ -35,11 +40,6 @@ class SqlQueryBuilder[QueryT <: Query](sqlColsForSelect: List[String], tableName
     (SqlQueryBuilder.GROUP_BY, this.groupBy),
     (SqlQueryBuilder.HAVING, this.having)
   )
-
-  // convenience constructor for the common case of just one table
-  def this(sqlColsForSelect: List[String], tableName: String) = {
-    this(sqlColsForSelect, Set(tableName))
-  }
 
   def buildSelectSql(query: QueryT)(implicit ctx: Context): SqlQuery = {
     val allClauses = compileClauses(query, ctx)
