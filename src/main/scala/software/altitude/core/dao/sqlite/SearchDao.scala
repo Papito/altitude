@@ -51,7 +51,7 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
     addRecord(asset, docSql, sqlVals)
 
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, docSql, sqlVals.map(_.asInstanceOf[Object]):_*)
+    runner.update(conn, docSql, sqlVals.map(_.asInstanceOf[Object]): _*)
   }
 
   override def search(searchQuery: SearchQuery)(implicit ctx: Context, txId: TransactionId): QueryResult = {

@@ -2,10 +2,10 @@ package software.altitude.test.core.unit
 
 import org.scalatest.FunSuite
 import org.scalatest.Matchers._
-import software.altitude.core.{Const, Context}
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models.Repository
 import software.altitude.core.util.Query
+import software.altitude.core.{Const, Context}
 import software.altitude.test.core.TestFocus
 
 class SqlQueryTests extends FunSuite with TestFocus {

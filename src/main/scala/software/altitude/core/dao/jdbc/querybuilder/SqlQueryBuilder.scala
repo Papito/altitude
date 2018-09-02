@@ -23,7 +23,7 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
     this(sqlColsForSelect, Set(tableName))
   }
 
-  type ClauseGeneratorType = (QueryT , Context) => ClauseComponents
+  type ClauseGeneratorType = (QueryT, Context) => ClauseComponents
 
   protected val chainMethods: List[(String, ClauseGeneratorType)] = List(
     (SqlQueryBuilder.SELECT, this.select),
@@ -36,7 +36,7 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
   def buildSelectSql(query: QueryT)(implicit ctx: Context): SqlQuery = {
     val allClauses = compileClauses(query, ctx)
 
-    val sql: String  = selectStr(allClauses(SqlQueryBuilder.SELECT)) +
+    val sql: String = selectStr(allClauses(SqlQueryBuilder.SELECT)) +
       fromStr(allClauses(SqlQueryBuilder.FROM)) +
       whereStr(allClauses(SqlQueryBuilder.WHERE)) +
       groupByStr(allClauses(SqlQueryBuilder.GROUP_BY)) +
@@ -49,7 +49,7 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
     }
 
     log.debug(s"Select SQL: $sql with $bindVals")
-    //println(sql, bindVals)
+    // println(sql, bindVals)
     SqlQuery(sql, bindVals)
   }
 
@@ -59,7 +59,7 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
     val allClauses = compileClauses(query, ctx) + (
       SqlQueryBuilder.SELECT -> selectClauseForCount)
 
-    val sql: String  = selectStr(allClauses(SqlQueryBuilder.SELECT)) +
+    val sql: String = selectStr(allClauses(SqlQueryBuilder.SELECT)) +
       fromStr(allClauses(SqlQueryBuilder.FROM)) +
       whereStr(allClauses(SqlQueryBuilder.WHERE)) +
       groupByStr(allClauses(SqlQueryBuilder.GROUP_BY)) +

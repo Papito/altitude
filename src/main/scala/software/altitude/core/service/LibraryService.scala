@@ -9,10 +9,8 @@ import net.codingwell.scalaguice.InjectorExtensions._
 import org.imgscalr.Scalr
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
-import software.altitude.core.Const.Api
 import software.altitude.core.models.{Folder, _}
 import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
-import software.altitude.core.util.Query.QueryParam
 import software.altitude.core.util.{Query, QueryResult, SearchQuery}
 import software.altitude.core.{Altitude, Context, Const => C, _}
 
@@ -35,7 +33,7 @@ class LibraryService(val app: Altitude) {
 
   /** **************************************************************************
     * ASSETS
-    * *************************************************************************/
+    * *********************************************************************** */
 
   def add(assetIn: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
     log.info(s"Preparing to add asset [$assetIn]")
@@ -211,7 +209,7 @@ class LibraryService(val app: Altitude) {
 
   /** **************************************************************************
     * DATA/PREVIEW
-    * *************************************************************************/
+    * *********************************************************************** */
 
   def genPreviewData(asset: Asset)
                     (implicit ctx: Context, txId: TransactionId = new TransactionId): Array[Byte] = {
@@ -288,7 +286,7 @@ class LibraryService(val app: Altitude) {
 
   /** **************************************************************************
     * DISCOVERY
-    * *************************************************************************/
+    * *********************************************************************** */
 
   def query(query: Query)
            (implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
@@ -341,7 +339,7 @@ class LibraryService(val app: Altitude) {
 
   /** **************************************************************************
     * FOLDERS
-    * *************************************************************************/
+    * *********************************************************************** */
 
   def addFolder(name: String, parentId: Option[String] = None)
                (implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
@@ -451,7 +449,7 @@ class LibraryService(val app: Altitude) {
 
   /** **************************************************************************
     * RECYCLING
-    * *************************************************************************/
+    * *********************************************************************** */
 
   def restoreRecycledAsset(assetId: String)
                           (implicit ctx: Context, txId: TransactionId = new TransactionId): Asset = {
@@ -530,7 +528,7 @@ class LibraryService(val app: Altitude) {
 
   /** **************************************************************************
     * METADATA
-    * *************************************************************************/
+    * *********************************************************************** */
 
   def addMetadataValue(assetId: String, fieldId: String, newValue: Any)
                       (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {

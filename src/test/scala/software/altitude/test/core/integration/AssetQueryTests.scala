@@ -2,9 +2,9 @@ package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
-import software.altitude.core.models.{Asset, AssetType, Folder}
+import software.altitude.core.models.{Asset, AssetType}
 import software.altitude.core.util.Query
-import software.altitude.core.{Util, Const => C}
+import software.altitude.core.{Const => C}
 
 @DoNotDiscover class AssetQueryTests(val config: Map[String, Any]) extends IntegrationTestCore {
   test("Empty search") {

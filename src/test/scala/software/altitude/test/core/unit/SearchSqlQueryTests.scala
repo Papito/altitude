@@ -2,11 +2,11 @@ package software.altitude.test.core.unit
 
 import org.scalatest.FunSuite
 import org.scalatest.Matchers._
-import software.altitude.core.dao.sqlite.querybuilder.{AssetSearchQueryBuilder => SqliteAssetSearchQueryBuilder}
 import software.altitude.core.dao.postgres.querybuilder.{AssetSearchQueryBuilder => PostgresAssetSearchQueryBuilder}
-import software.altitude.core.{Context, Const => C}
+import software.altitude.core.dao.sqlite.querybuilder.{AssetSearchQueryBuilder => SqliteAssetSearchQueryBuilder}
 import software.altitude.core.models.Repository
 import software.altitude.core.util.{Query, SearchQuery}
+import software.altitude.core.{Context, Const => C}
 import software.altitude.test.core.TestFocus
 
 class SearchSqlQueryTests extends FunSuite with TestFocus {

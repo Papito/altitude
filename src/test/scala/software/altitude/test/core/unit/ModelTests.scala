@@ -1,10 +1,10 @@
 package software.altitude.test.core.unit
 
+import org.scalatest.Matchers._
 import org.scalatest._
 import play.api.libs.json._
 import software.altitude.core.models.BaseModel
 import software.altitude.test.core.TestFocus
-import org.scalatest.Matchers._
 
 import scala.language.implicitConversions
 

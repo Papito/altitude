@@ -16,6 +16,9 @@ package software.altitude.core.dao.jdbc.querybuilder
 case class ClauseComponents(elements: List[String] = List(), bindVals: List[Any] = List()) {
   val isEmpty: Boolean = elements.isEmpty
 
+  // scalastyle:off
   def +(that: ClauseComponents): ClauseComponents =
     ClauseComponents(this.elements ::: that.elements, this.bindVals ::: that.bindVals)
+  // scalastyle:on
+
 }

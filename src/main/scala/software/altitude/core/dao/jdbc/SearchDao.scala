@@ -5,7 +5,6 @@ import java.sql.{PreparedStatement, Types}
 import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
-import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models._
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.{QueryResult, SearchQuery}
@@ -54,7 +53,7 @@ abstract class SearchDao(override val app: Altitude)
     replaceSearchDocument(asset)
   }
 
-  def clearMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId) = {
+  def clearMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Unit = {
     log.debug(s"Clearing asset $assetId metadata")
 
     val sql =
