@@ -1,6 +1,6 @@
 version: '3'
 services:
-  db:
+  altitude_core_postgres_test_db:
     build: .
     ports:
       - "5433:5432"
@@ -8,3 +8,4 @@ services:
       - POSTGRRES_NAME=altitude-test
       - POSTGRES_USER=altitude-test
       - POSTGRES_PASSWORD=dba
+    container_name: altitude-core-postgres-test
