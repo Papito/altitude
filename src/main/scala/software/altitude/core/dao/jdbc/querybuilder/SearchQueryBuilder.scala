@@ -5,11 +5,15 @@ import software.altitude.core.util.{Query, SearchQuery}
 import software.altitude.core.{Context, Const => C}
 
 
+object SearchQueryBuilder {
+  val ASSET_TABLE_NAME = "asset"
+}
+
 /**
   * Common code for JDBC search query builders
   */
-abstract class SearchQueryBuilder(sqlColsForSelect: List[String], tableNames: Set[String])
-  extends SqlQueryBuilder[SearchQuery](sqlColsForSelect, tableNames) {
+abstract class SearchQueryBuilder(sqlColsForSelect: List[String])
+  extends SqlQueryBuilder[SearchQuery](sqlColsForSelect, Set(SearchQueryBuilder.ASSET_TABLE_NAME)) {
 
   protected val searchParamTable = "search_parameter"
   protected val searchDocumentTable = "search_document"
@@ -21,11 +25,14 @@ abstract class SearchQueryBuilder(sqlColsForSelect: List[String], tableNames: Se
   protected def textSearch(searchQuery: SearchQuery): ClauseComponents
 
   override protected def from(searchQuery: SearchQuery, ctx: Context): ClauseComponents = {
-    ClauseComponents(elements = tableNames(searchQuery))
+    ClauseComponents(elements = allTableNames(searchQuery))
   }
 
-  private def tableNames(searchQuery: SearchQuery): List[String] = {
-    val _tablesNames = tableNames ++
+  /**
+    * If we are joining a table - this will also include its name
+    */
+  private def allTableNames(searchQuery: SearchQuery): List[String] = {
+    val _tablesNames = List(SearchQueryBuilder.ASSET_TABLE_NAME) ++
       (if (searchQuery.isParametarized) Set(searchParamTable) else Set()) ++
       (if (searchQuery.isText) Set(searchDocumentTable) else Set())
 
@@ -47,10 +54,12 @@ abstract class SearchQueryBuilder(sqlColsForSelect: List[String], tableNames: Se
   }
 
   override protected def where(searchQuery: SearchQuery, ctx: Context): ClauseComponents = {
-    val repoIdElements = tableNames(searchQuery).map(tableName => s"$tableName.${C.Base.REPO_ID} = ?")
-    val repoIdBindVals = tableNames(searchQuery).map(_ => ctx.repo.id.get)
+    // this narrows down all assets to the current repository
+    val repoIdClauseComp = ClauseComponents(
+      elements = List(s"${SearchQueryBuilder.ASSET_TABLE_NAME}.${C.Base.REPO_ID} = ?"),
+      bindVals = List(ctx.repo.id.get))
 
-    ClauseComponents(repoIdElements, repoIdBindVals) +
+    repoIdClauseComp +
       textSearch(searchQuery) +
       notRecycledFilter +
       folderFilter(searchQuery) +
