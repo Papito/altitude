@@ -125,7 +125,7 @@ import software.altitude.core.util.{Query, QueryResult, SearchQuery}
     results.total shouldBe 1
   }
 
-  test("Create assets and search by metadata" ) {
+  test("Create assets and search by metadata") {
     val field1 = altitude.service.metadata.addField(
       MetadataField(
         name = "field 1",
@@ -259,9 +259,31 @@ import software.altitude.core.util.{Query, QueryResult, SearchQuery}
     var results = altitude.service.library.search(new SearchQuery(text = Some("one")))
     results.total shouldBe 1
 
+    // parametarized search
+    results = altitude.service.library.search(
+      new SearchQuery(
+        params = Map(
+          field1.id.get -> "one",
+          field2.id.get -> 3
+        )
+      )
+    )
+    results.total shouldBe 1
+
     // update the value and search again
     altitude.service.library.updateMetadataValue(asset1.id.get, mdVal.id.get, "newone")
     results = altitude.service.library.search(new SearchQuery(text = Some("newone")))
+    results.total shouldBe 1
+
+    // parametarized search
+    results = altitude.service.library.search(
+      new SearchQuery(
+        params = Map(
+          field1.id.get -> "newone",
+          field2.id.get -> 3
+        )
+      )
+    )
     results.total shouldBe 1
 
     // remove the value and search again
@@ -269,7 +291,5 @@ import software.altitude.core.util.{Query, QueryResult, SearchQuery}
 
     results = altitude.service.library.search(new SearchQuery(text = Some("one")))
     results.isEmpty shouldBe true
-
-    // FIXME: add tests for parametarized search
   }
 }

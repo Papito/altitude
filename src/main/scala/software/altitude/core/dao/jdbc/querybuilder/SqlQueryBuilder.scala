@@ -49,12 +49,12 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
     }
 
     log.debug(s"Select SQL: $sql with $bindVals")
-    // println(sql, bindVals)
+    // println("SELECT", sql, bindVals)
     SqlQuery(sql, bindVals)
   }
 
   def buildCountSql(query: QueryT)(implicit ctx: Context): SqlQuery = {
-    // the SQL is the same but the WHERE clause is just the COUNT
+    // the SQL is the same but the SELECT clause is just the COUNT
     val selectClauseForCount = ClauseComponents(List("COUNT(*) AS count"))
     val allClauses = compileClauses(query, ctx) + (
       SqlQueryBuilder.SELECT -> selectClauseForCount)
@@ -70,6 +70,7 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
     }
 
     log.debug(s"Count SQL: $sql with $bindVals")
+    // println("COUNT", sql, bindVals)
     SqlQuery(sql, bindVals)
   }
 

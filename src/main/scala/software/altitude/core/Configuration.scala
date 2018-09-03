@@ -16,7 +16,7 @@ class Configuration(configOverride: Map[String, Any] = new HashMap()) {
     "dataDir" -> "data",
     "previewDir" -> "p",
 
-    "datasource" -> C.DatasourceType.POSTGRES,
+    "datasource" -> C.DatasourceType.SQLITE,
     "filestore" -> C.FileStoreType.FS,
     "importMode" -> C.ImportMode.COPY,
 

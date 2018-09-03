@@ -32,6 +32,20 @@ abstract class SearchQueryBuilder(sqlColsForSelect: List[String], tableNames: Se
     _tablesNames.toList
   }
 
+  override def buildCountSql(query: SearchQuery)(implicit ctx: Context): SqlQuery = {
+    // the COUNT clause is a more complicated subquery case when it's parameter search
+    if (query.isParametarized) {
+      // get the base SELECT query
+      val selectSqlQuery = buildSelectSql(query)
+      // make it a subquery of the main SELECT COUNT(*) query
+      val countSql = s"SELECT COUNT(*) as count FROM (${selectSqlQuery.sqlAsString}) AS assets"
+      SqlQuery(countSql, selectSqlQuery.bindValues)
+    }
+    else {
+      super.buildCountSql(query)
+    }
+  }
+
   override protected def where(searchQuery: SearchQuery, ctx: Context): ClauseComponents = {
     val repoIdElements = tableNames(searchQuery).map(tableName => s"$tableName.${C.Base.REPO_ID} = ?")
     val repoIdBindVals = tableNames(searchQuery).map(_ => ctx.repo.id.get)
@@ -61,7 +75,6 @@ abstract class SearchQueryBuilder(sqlColsForSelect: List[String], tableNames: Se
   }
 
   protected def fieldFilter(searchQuery: SearchQuery): ClauseComponents = {
-
     val filters = searchQuery.params.map { el: (String, Any) =>
       val (_, value) = el
       value match {
