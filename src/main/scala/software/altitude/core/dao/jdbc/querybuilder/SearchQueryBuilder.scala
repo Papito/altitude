@@ -36,7 +36,7 @@ abstract class SearchQueryBuilder(sqlColsForSelect: List[String])
       (if (searchQuery.isParametarized) Set(searchParamTable) else Set()) ++
       (if (searchQuery.isText) Set(searchDocumentTable) else Set())
 
-    _tablesNames.toList
+    _tablesNames
   }
 
   override def buildCountSql(query: SearchQuery)(implicit ctx: Context): SqlQuery = {
@@ -54,12 +54,10 @@ abstract class SearchQueryBuilder(sqlColsForSelect: List[String])
   }
 
   override protected def where(searchQuery: SearchQuery, ctx: Context): ClauseComponents = {
-    // this narrows down all assets to the current repository
-    val repoIdClauseComp = ClauseComponents(
-      elements = List(s"${SearchQueryBuilder.ASSET_TABLE_NAME}.${C.Base.REPO_ID} = ?"),
-      bindVals = List(ctx.repo.id.get))
+    val repoIdElements = allTableNames(searchQuery).map(tableName => s"$tableName.${C.Base.REPO_ID} = ?")
+    val repoIdBindVals = allTableNames(searchQuery).map(_ => ctx.repo.id.get)
 
-    repoIdClauseComp +
+    ClauseComponents(repoIdElements, repoIdBindVals) +
       textSearch(searchQuery) +
       notRecycledFilter +
       folderFilter(searchQuery) +

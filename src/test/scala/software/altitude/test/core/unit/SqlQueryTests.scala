@@ -4,7 +4,7 @@ import org.scalatest.FunSuite
 import org.scalatest.Matchers._
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models.Repository
-import software.altitude.core.util.Query
+import software.altitude.core.util.{Query, Sort, SortDirection}
 import software.altitude.core.{Const, Context}
 import software.altitude.test.core.TestFocus
 
@@ -22,7 +22,7 @@ class SqlQueryTests extends FunSuite with TestFocus {
     user = null
   )
 
-  test("Basic WHERE SQL query is built correctly") {
+  test("Basic WHERE SQL query is built correctly", Focused) {
     val builder = new SqlQueryBuilder[Query](List("col1", "col2"), Set("table1", "table2"))
     val q = new Query(params = Map("searchValue" -> 3))
     val sqlQuery = builder.buildSelectSql(q)
@@ -30,11 +30,22 @@ class SqlQueryTests extends FunSuite with TestFocus {
     sqlQuery.bindValues.size shouldBe 3
   }
 
-  test("WHERE SQL query with pagination is built correctly") {
+  test("WHERE SQL query with pagination is built correctly", Focused) {
     val builder = new SqlQueryBuilder[Query](List("*"), Set("table1"))
     val q = new Query(params = Map("searchValue" -> 3), rpp = 10, page = 2)
     val sqlQuery = builder.buildSelectSql(q)
     sqlQuery.sqlAsString shouldBe "SELECT * FROM table1 WHERE searchValue = ? AND table1.repository_id = ? LIMIT 10 OFFSET 10"
     sqlQuery.bindValues.size shouldBe 2
+  }
+
+  test("Query with sorting is built correctly", Focused) {
+    val builder = new SqlQueryBuilder[Query](List("*"), Set("table1"))
+    val q = new Query(
+      rpp = 10,
+      page = 2,
+      sort = Some(Sort("column", SortDirection.ASC))
+    )
+    val sqlQuery = builder.buildSelectSql(q)
+    sqlQuery.sqlAsString shouldBe "SELECT * FROM table1 WHERE table1.repository_id = ? ORDER BY column ASC LIMIT 10 OFFSET 10"
   }
 }

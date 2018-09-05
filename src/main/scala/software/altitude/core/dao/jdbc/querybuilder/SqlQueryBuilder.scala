@@ -1,7 +1,7 @@
 package software.altitude.core.dao.jdbc.querybuilder
 
 import org.slf4j.LoggerFactory
-import software.altitude.core.util.Query
+import software.altitude.core.util.{Query, Sort}
 import software.altitude.core.util.Query.QueryParam
 import software.altitude.core.{Context, Const => C}
 
@@ -30,6 +30,7 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
     (SqlQueryBuilder.FROM, this.from),
     (SqlQueryBuilder.WHERE, this.where),
     (SqlQueryBuilder.GROUP_BY, this.groupBy),
+    (SqlQueryBuilder.ORDER_BY, this.orderBy),
     (SqlQueryBuilder.HAVING, this.having)
   )
 
@@ -40,6 +41,7 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
       fromStr(allClauses(SqlQueryBuilder.FROM)) +
       whereStr(allClauses(SqlQueryBuilder.WHERE)) +
       groupByStr(allClauses(SqlQueryBuilder.GROUP_BY)) +
+      orderByStr(allClauses(SqlQueryBuilder.ORDER_BY)) +
       havingStr(allClauses(SqlQueryBuilder.HAVING)) +
       limitStr(query) +
       offsetStr(query)
@@ -54,7 +56,7 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
   }
 
   def buildCountSql(query: QueryT)(implicit ctx: Context): SqlQuery = {
-    // the SQL is the same but the SELECT clause is just the COUNT
+    // the SQL is the same but the SELECT clause is just the COUNT, so override it
     val selectClauseForCount = ClauseComponents(List("COUNT(*) AS count"))
     val allClauses = compileClauses(query, ctx) + (
       SqlQueryBuilder.SELECT -> selectClauseForCount)
@@ -143,6 +145,17 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
   protected def groupByStr(clauseComponents: ClauseComponents): String = {
     if (clauseComponents.isEmpty) return ""
     s" GROUP BY ${clauseComponents.elements.mkString(", ")}"
+  }
+
+  protected def orderBy(query: QueryT, ctx: Context): ClauseComponents = {
+   if (query.sort.isEmpty) return ClauseComponents()
+   val sort: Sort = query.sort.get
+   ClauseComponents(elements = List(s"${sort.param} ${sort.direction}"))
+  }
+
+  protected def orderByStr(clauseComponents: ClauseComponents): String = {
+    if (clauseComponents.isEmpty) return ""
+    s" ORDER BY ${clauseComponents.elements.mkString(", ")}"
   }
 
   protected def having(query: QueryT, ctx: Context): ClauseComponents = ClauseComponents()

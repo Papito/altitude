@@ -3,7 +3,7 @@ package software.altitude.test.core.integration
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
 import software.altitude.core.models._
-import software.altitude.core.util.{Query, QueryResult, SearchQuery}
+import software.altitude.core.util._
 
 @DoNotDiscover class SearchServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
@@ -246,7 +246,7 @@ import software.altitude.core.util.{Query, QueryResult, SearchQuery}
         fieldType = FieldType.NUMBER))
 
     val asset1: Asset = altitude.service.library.add(
-      makeAsset(altitude.service.folder.triageFolder))
+             makeAsset(altitude.service.folder.triageFolder))
 
     altitude.service.library.addMetadataValue(asset1.id.get, fieldId = field1.id.get, newValue = "one")
     // it's the only value for this field so get it
@@ -291,5 +291,47 @@ import software.altitude.core.util.{Query, QueryResult, SearchQuery}
 
     results = altitude.service.library.search(new SearchQuery(text = Some("one")))
     results.isEmpty shouldBe true
+  }
+
+  test("Can sort in ASC and DESC order on a user meta field", Focused) {
+    val kwField = altitude.service.metadata.addField(
+      MetadataField(
+        name = "keyword field",
+        fieldType = FieldType.KEYWORD))
+    val numField = altitude.service.metadata.addField(
+      MetadataField(
+        name = "number field",
+        fieldType = FieldType.NUMBER))
+    val boolField = altitude.service.metadata.addField(
+      MetadataField(
+        name = "boolean field",
+        fieldType = FieldType.BOOL))
+
+    val asset1: Asset = altitude.service.library.add(
+      makeAsset(altitude.service.folder.triageFolder))
+
+    val asset2: Asset = altitude.service.library.add(
+      makeAsset(altitude.service.folder.triageFolder))
+
+    val asset3: Asset = altitude.service.library.add(
+      makeAsset(altitude.service.folder.triageFolder))
+
+    altitude.service.library.addMetadataValue(asset1.id.get, fieldId = kwField.id.get, newValue = "c")
+    altitude.service.library.addMetadataValue(asset2.id.get, fieldId = kwField.id.get, newValue = "a")
+    altitude.service.library.addMetadataValue(asset3.id.get, fieldId = kwField.id.get, newValue = "b")
+
+    altitude.service.library.addMetadataValue(asset1.id.get, fieldId = numField.id.get, newValue = 50)
+    altitude.service.library.addMetadataValue(asset2.id.get, fieldId = numField.id.get, newValue = 300)
+    altitude.service.library.addMetadataValue(asset3.id.get, fieldId = numField.id.get, newValue = 200)
+
+    altitude.service.library.addMetadataValue(asset1.id.get, fieldId = boolField.id.get, newValue = false)
+    altitude.service.library.addMetadataValue(asset2.id.get, fieldId = boolField.id.get, newValue = true)
+    altitude.service.library.addMetadataValue(asset3.id.get, fieldId = boolField.id.get, newValue = false)
+
+    val sortByKwField = Sort(
+      param = kwField.id.get, direction = SortDirection.ASC)
+
+    var results = altitude.service.library.search(new SearchQuery(sort = Some(sortByKwField)))
+    results.total shouldBe 3
   }
 }

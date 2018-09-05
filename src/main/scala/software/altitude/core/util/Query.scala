@@ -58,9 +58,16 @@ object Query {
   // scalastyle:on
 }
 
+object SortDirection extends Enumeration {
+  val ASC, DESC = Value
+}
+
+case class Sort(param: String, direction: SortDirection.Value)
+
 class Query(val params: Map[String, Any] = Map(),
             val rpp: Int = 0,
-            val page: Int = 1) {
+            val page: Int = 1,
+            val sort: Option[Sort] = None) {
   if (rpp < 0) throw new IllegalArgumentException(s"Invalid results per page value: $rpp")
   if (page < 1) throw new IllegalArgumentException(s"Invalid page value: $page")
 
@@ -68,6 +75,7 @@ class Query(val params: Map[String, Any] = Map(),
   def add(_params: (String, Any)*): Query = new Query(
     params = params ++ _params,
     rpp = rpp,
-    page = page)
+    page = page,
+    sort = sort)
 
 }
