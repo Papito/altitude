@@ -41,13 +41,14 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
       fromStr(allClauses(SqlQueryBuilder.FROM)) +
       whereStr(allClauses(SqlQueryBuilder.WHERE)) +
       groupByStr(allClauses(SqlQueryBuilder.GROUP_BY)) +
-      orderByStr(allClauses(SqlQueryBuilder.ORDER_BY)) +
       havingStr(allClauses(SqlQueryBuilder.HAVING)) +
+      orderByStr(allClauses(SqlQueryBuilder.ORDER_BY)) +
       limitStr(query) +
       offsetStr(query)
 
-    val bindVals = allClauses.foldLeft(List[Any]()) { (res, comp) =>
-      res ++ comp._2.bindVals
+    val bindValClauses = List(allClauses(SqlQueryBuilder.WHERE))
+    val bindVals = bindValClauses.foldLeft(List[Any]()) { (res, clause) =>
+      res ++ clause.bindVals
     }
 
     log.debug(s"Select SQL: $sql with $bindVals")

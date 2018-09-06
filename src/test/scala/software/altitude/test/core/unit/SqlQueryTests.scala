@@ -22,7 +22,7 @@ class SqlQueryTests extends FunSuite with TestFocus {
     user = null
   )
 
-  test("Basic WHERE SQL query is built correctly", Focused) {
+  test("Basic WHERE SQL query is built correctly") {
     val builder = new SqlQueryBuilder[Query](List("col1", "col2"), Set("table1", "table2"))
     val q = new Query(params = Map("searchValue" -> 3))
     val sqlQuery = builder.buildSelectSql(q)
@@ -30,7 +30,7 @@ class SqlQueryTests extends FunSuite with TestFocus {
     sqlQuery.bindValues.size shouldBe 3
   }
 
-  test("WHERE SQL query with pagination is built correctly", Focused) {
+  test("WHERE SQL query with pagination is built correctly") {
     val builder = new SqlQueryBuilder[Query](List("*"), Set("table1"))
     val q = new Query(params = Map("searchValue" -> 3), rpp = 10, page = 2)
     val sqlQuery = builder.buildSelectSql(q)
@@ -38,7 +38,7 @@ class SqlQueryTests extends FunSuite with TestFocus {
     sqlQuery.bindValues.size shouldBe 2
   }
 
-  test("Query with sorting is built correctly", Focused) {
+  test("Query with sorting is built correctly") {
     val builder = new SqlQueryBuilder[Query](List("*"), Set("table1"))
     val q = new Query(
       rpp = 10,

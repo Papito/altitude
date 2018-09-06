@@ -268,6 +268,7 @@ import software.altitude.core.util._
         )
       )
     )
+    results.records.length shouldBe 1
     results.total shouldBe 1
 
     // update the value and search again
@@ -284,6 +285,7 @@ import software.altitude.core.util._
         )
       )
     )
+    results.records.length shouldBe 1
     results.total shouldBe 1
 
     // remove the value and search again
@@ -293,7 +295,7 @@ import software.altitude.core.util._
     results.isEmpty shouldBe true
   }
 
-  test("Can sort in ASC and DESC order on a user meta field", Focused) {
+  test("Can sort in ASC and DESC order on a user meta field") {
     val kwField = altitude.service.metadata.addField(
       MetadataField(
         name = "keyword field",
@@ -328,10 +330,26 @@ import software.altitude.core.util._
     altitude.service.library.addMetadataValue(asset2.id.get, fieldId = boolField.id.get, newValue = true)
     altitude.service.library.addMetadataValue(asset3.id.get, fieldId = boolField.id.get, newValue = false)
 
-    val sortByKwField = Sort(
+    var sort = Sort(
       param = kwField.id.get, direction = SortDirection.ASC)
 
-    var results = altitude.service.library.search(new SearchQuery(sort = Some(sortByKwField)))
+    var results = altitude.service.library.search(new SearchQuery(sort = Some(sort)))
     results.total shouldBe 3
+
+    results.records.foreach{ rec =>
+      val a = rec: Asset
+      print(a.metadata, "\n")
+    }
+
+    sort = Sort(
+      param = kwField.id.get, direction = SortDirection.DESC)
+
+    results = altitude.service.library.search(new SearchQuery(sort = Some(sort)))
+    results.total shouldBe 3
+
+    results.records.foreach{ rec =>
+      val a = rec: Asset
+      print(a.metadata, "\n")
+    }
   }
 }

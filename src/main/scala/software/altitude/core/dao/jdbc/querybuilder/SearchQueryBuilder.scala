@@ -1,7 +1,8 @@
 package software.altitude.core.dao.jdbc.querybuilder
 
+import org.slf4j.LoggerFactory
 import software.altitude.core.util.Query.QueryParam
-import software.altitude.core.util.{Query, SearchQuery}
+import software.altitude.core.util.{Query, SearchQuery, Sort}
 import software.altitude.core.{Context, Const => C}
 
 
@@ -14,6 +15,8 @@ object SearchQueryBuilder {
   */
 abstract class SearchQueryBuilder(sqlColsForSelect: List[String])
   extends SqlQueryBuilder[SearchQuery](sqlColsForSelect, Set(SearchQueryBuilder.ASSET_TABLE_NAME)) {
+
+  private final val log = LoggerFactory.getLogger(getClass)
 
   protected val searchParamTable = "search_parameter"
   protected val searchDocumentTable = "search_document"
@@ -29,7 +32,7 @@ abstract class SearchQueryBuilder(sqlColsForSelect: List[String])
   }
 
   /**
-    * If we are joining a table - this will also include its name
+    * If we are joining a table - this will also include its name(s)
     */
   private def allTableNames(searchQuery: SearchQuery): List[String] = {
     val _tablesNames = List(SearchQueryBuilder.ASSET_TABLE_NAME) ++
@@ -39,18 +42,49 @@ abstract class SearchQueryBuilder(sqlColsForSelect: List[String])
     _tablesNames
   }
 
+  override def buildSelectSql(query: SearchQuery)(implicit ctx: Context): SqlQuery = {
+    if ( query.isSorted) {
+      buildSelectSqlAsSubquery(query)
+    } else {
+      super.buildSelectSql(query)
+    }
+  }
+
   override def buildCountSql(query: SearchQuery)(implicit ctx: Context): SqlQuery = {
-    // the COUNT clause is a more complicated subquery case when it's parameter search
-    if (query.isParametarized) {
-      // get the base SELECT query
-      val selectSqlQuery = buildSelectSql(query)
-      // make it a subquery of the main SELECT COUNT(*) query
-      val countSql = s"SELECT COUNT(*) as count FROM (${selectSqlQuery.sqlAsString}) AS assets"
-      SqlQuery(countSql, selectSqlQuery.bindValues)
+    // get the base SELECT query
+    val subquerySql = buildSelectSql(query)
+    // make it a subquery of the main SELECT COUNT(*) query
+    val countSql = s"SELECT COUNT(*) AS count FROM (${subquerySql.sqlAsString}) AS asset"
+    SqlQuery(countSql, subquerySql.bindValues)
+  }
+
+  private def buildSelectSqlAsSubquery(query: SearchQuery)(implicit ctx: Context): SqlQuery = {
+    val allClauses = compileClauses(query, ctx)
+
+    val subquerySql: String = s"SELECT ${SearchQueryBuilder.ASSET_TABLE_NAME}.*" +
+      fromStr(allClauses(SqlQueryBuilder.FROM)) +
+      whereStr(allClauses(SqlQueryBuilder.WHERE)) +
+      groupByStr(allClauses(SqlQueryBuilder.GROUP_BY)) +
+      havingStr(allClauses(SqlQueryBuilder.HAVING))
+
+    val sql =
+      selectStr(allClauses(SqlQueryBuilder.SELECT)) +
+      s" FROM ($subquerySql) AS asset" +
+        orderByStr(allClauses(SqlQueryBuilder.ORDER_BY)) +
+        limitStr(query) +
+        offsetStr(query)
+
+    val bindValClauses = List(
+      allClauses(SqlQueryBuilder.WHERE),
+      allClauses(SqlQueryBuilder.ORDER_BY)
+    )
+    val bindVals = bindValClauses.foldLeft(List[Any]()) { (res, clause) =>
+      res ++ clause.bindVals
     }
-    else {
-      super.buildCountSql(query)
-    }
+
+    log.debug(s"Select SQL: $sql with $bindVals")
+    // println("SELECT", sql, bindVals)
+    SqlQuery(sql, bindVals)
   }
 
   override protected def where(searchQuery: SearchQuery, ctx: Context): ClauseComponents = {
@@ -146,4 +180,21 @@ abstract class SearchQueryBuilder(sqlColsForSelect: List[String])
     if (!searchQuery.isParametarized) return ClauseComponents()
     ClauseComponents(elements = List(s"count(asset.${C.Asset.ID}) >= ${searchQuery.params.size}"))
   }
+
+  override protected def orderBy(query: SearchQuery, ctx: Context): ClauseComponents = {
+    if (!query.isSorted) return ClauseComponents()
+
+    val sql = ", search_parameter AS sort_param WHERE sort_param.repository_id = ? " +
+      "AND sort_param.asset_id = asset.id " +
+      "AND sort_param.field_id = ? " +
+      s"ORDER BY sort_param.field_value_sort ${query.sort.get.direction}"
+
+    ClauseComponents(List(sql), List(ctx.repo.id.get, query.sort.get.param))
+  }
+
+  override protected def orderByStr(clauseComponents: ClauseComponents): String = {
+    if (clauseComponents.isEmpty) return ""
+    clauseComponents.elements.mkString("")
+  }
+
 }

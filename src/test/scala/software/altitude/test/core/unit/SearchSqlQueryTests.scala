@@ -23,7 +23,7 @@ class SearchSqlQueryTests extends FunSuite with TestFocus {
     user = null
   )
 
-  test("Basic WHERE SQL asset query is built correctly", Focused) {
+  test("Basic WHERE SQL asset query is built correctly") {
     val builder = new SqliteAssetSearchQueryBuilder(List("*"))
     val q = new SearchQuery()
     val sqlQuery = builder.buildSelectSql(q)
@@ -31,7 +31,7 @@ class SearchSqlQueryTests extends FunSuite with TestFocus {
     sqlQuery.bindValues.size shouldBe 2
   }
 
-  test("WHERE asset query can be narrowed down by folders", Focused) {
+  test("WHERE asset query can be narrowed down by folders") {
     val builder = new SqliteAssetSearchQueryBuilder(List("*"))
     val q = new SearchQuery(folderIds = Set("1", "2", "3"))
     val sqlQuery = builder.buildSelectSql(q)
@@ -39,7 +39,7 @@ class SearchSqlQueryTests extends FunSuite with TestFocus {
     sqlQuery.bindValues.size shouldBe 5
   }
 
-  test("Sqlite text search SQL query is built correctly", Focused) {
+  test("Sqlite text search SQL query is built correctly") {
     val builder = new SqliteAssetSearchQueryBuilder(List("*"))
     val q = new SearchQuery(text = Some("my text"))
     val sqlQuery = builder.buildSelectSql(q)
@@ -47,7 +47,7 @@ class SearchSqlQueryTests extends FunSuite with TestFocus {
     sqlQuery.bindValues.size shouldBe 4
   }
 
-  test("Postgres text search SQL query is built correctly", Focused) {
+  test("Postgres text search SQL query is built correctly") {
     val builder = new PostgresAssetSearchQueryBuilder(List("*"))
     val q = new SearchQuery(text = Some("my text"))
     val sqlQuery = builder.buildSelectSql(q)
@@ -55,18 +55,18 @@ class SearchSqlQueryTests extends FunSuite with TestFocus {
     sqlQuery.bindValues.size shouldBe 4
   }
 
-  test("Text search  SQL query with sorting is built correctly", Focused) {
+  test("Text search SQL query with sorting is built correctly") {
     val builder = new SqliteAssetSearchQueryBuilder(List("*"))
     val q = new SearchQuery(
       text = Some("my text"),
       sort = Some(Sort("field_id", SortDirection.ASC)))
 
     val sqlQuery = builder.buildSelectSql(q)
-    sqlQuery.sqlAsString shouldBe "SELECT * FROM asset, search_document WHERE asset.repository_id = ? AND search_document.repository_id = ? AND body MATCH ? AND is_recycled = ? AND search_document.asset_id = asset.id"
-    sqlQuery.bindValues.size shouldBe 4
+    sqlQuery.sqlAsString shouldBe "SELECT * FROM (SELECT asset.* FROM asset, search_document WHERE asset.repository_id = ? AND search_document.repository_id = ? AND body MATCH ? AND is_recycled = ? AND search_document.asset_id = asset.id) AS asset, search_parameter AS sort_param WHERE sort_param.repository_id = ? AND sort_param.asset_id = asset.id AND sort_param.field_id = ? ORDER BY sort_param.field_value_sort ASC"
+    sqlQuery.bindValues.size shouldBe 6
   }
 
-  test("Parametarized asset search SQL is built correctly", Focused) {
+  test("Parametarized asset search SQL is built correctly") {
     val builder = new PostgresAssetSearchQueryBuilder(List("*"))
     val q = new SearchQuery(
       params = Map(
@@ -80,19 +80,18 @@ class SearchSqlQueryTests extends FunSuite with TestFocus {
     sqlQuery.bindValues.size shouldBe 9
   }
 
-/*
-  test("Parametarized asset search SQL with sorting is built correctly", Focused) {
+  test("Parametarized asset search SQL with sorting is built correctly") {
     val builder = new PostgresAssetSearchQueryBuilder(List("*"))
     val q = new SearchQuery(
       params = Map(
         "text_field_id" -> "lol",
         "number_field_id" -> 12,
         "boolean_field_id" -> Query.EQUALS(false)
-      )
+      ),
+      sort = Some(Sort("field_id", SortDirection.ASC))
     )
     val sqlQuery = builder.buildSelectSql(q)
-    sqlQuery.sqlAsString shouldBe "SELECT * FROM asset, search_parameter WHERE asset.repository_id = ? AND search_parameter.repository_id = ? AND is_recycled = ? AND ((field_id = ? AND field_value_kw = ?) OR (field_id = ? AND field_value_num = ?) OR (field_id = ? AND field_value_bool = ?)) AND search_parameter.asset_id = asset.id GROUP BY asset.id HAVING count(asset.id) >= 3"
-    sqlQuery.bindValues.size shouldBe 9
+    sqlQuery.sqlAsString shouldBe "SELECT * FROM (SELECT asset.* FROM asset, search_parameter WHERE asset.repository_id = ? AND search_parameter.repository_id = ? AND is_recycled = ? AND ((field_id = ? AND field_value_kw = ?) OR (field_id = ? AND field_value_num = ?) OR (field_id = ? AND field_value_bool = ?)) AND search_parameter.asset_id = asset.id GROUP BY asset.id HAVING count(asset.id) >= 3) AS asset, search_parameter AS sort_param WHERE sort_param.repository_id = ? AND sort_param.asset_id = asset.id AND sort_param.field_id = ? ORDER BY sort_param.field_value_sort ASC"
+    sqlQuery.bindValues.size shouldBe 11
   }
-*/
 }

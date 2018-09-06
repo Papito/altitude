@@ -10,7 +10,7 @@ class SearchQuery(val text: Option[String] = None,
 
   val isParametarized: Boolean = params.nonEmpty
   val isText: Boolean = text.nonEmpty
-  val sorted: Boolean = sort.isDefined
+  val isSorted: Boolean = sort.isDefined
 
   override def add(_params: (String, Any)*): SearchQuery = new SearchQuery(
     text = text,
