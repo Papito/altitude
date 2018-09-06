@@ -295,7 +295,7 @@ import software.altitude.core.util._
     results.isEmpty shouldBe true
   }
 
-  test("Can sort in ASC and DESC order on a user meta field") {
+  test("Can sort in ASC and DESC order on a user meta field", Focused) {
     val kwField = altitude.service.metadata.addField(
       MetadataField(
         name = "keyword field",
@@ -330,26 +330,34 @@ import software.altitude.core.util._
     altitude.service.library.addMetadataValue(asset2.id.get, fieldId = boolField.id.get, newValue = true)
     altitude.service.library.addMetadataValue(asset3.id.get, fieldId = boolField.id.get, newValue = false)
 
+    // sort by string field
     var sort = Sort(
       param = kwField.id.get, direction = SortDirection.ASC)
 
     var results = altitude.service.library.search(new SearchQuery(sort = Some(sort)))
-    results.total shouldBe 3
 
-    results.records.foreach{ rec =>
-      val a = rec: Asset
-      print(a.metadata, "\n")
-    }
+    (results.records.head: Asset).metadata.get(kwField.id.get).value.head.value shouldBe "a"
 
     sort = Sort(
       param = kwField.id.get, direction = SortDirection.DESC)
 
     results = altitude.service.library.search(new SearchQuery(sort = Some(sort)))
-    results.total shouldBe 3
 
-    results.records.foreach{ rec =>
-      val a = rec: Asset
-      print(a.metadata, "\n")
-    }
+    (results.records.head: Asset).metadata.get(kwField.id.get).value.head.value shouldBe "c"
+
+    // sort by number field
+    sort = Sort(
+      param = numField.id.get, direction = SortDirection.ASC)
+
+    results = altitude.service.library.search(new SearchQuery(sort = Some(sort)))
+
+    (results.records.head: Asset).metadata.get(numField.id.get).value.head.value shouldBe "300"
+
+    sort = Sort(
+      param = numField.id.get, direction = SortDirection.DESC)
+
+    results = altitude.service.library.search(new SearchQuery(sort = Some(sort)))
+
+    (results.records.head: Asset).metadata.get(numField.id.get).value.head.value shouldBe "50"
   }
 }

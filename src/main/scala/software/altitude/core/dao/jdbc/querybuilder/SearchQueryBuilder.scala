@@ -83,7 +83,7 @@ abstract class SearchQueryBuilder(sqlColsForSelect: List[String])
     }
 
     log.debug(s"Select SQL: $sql with $bindVals")
-    // println("SELECT", sql, bindVals)
+    println("SELECT", sql, bindVals)
     SqlQuery(sql, bindVals)
   }
 
