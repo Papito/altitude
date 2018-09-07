@@ -9,12 +9,12 @@ class SearchQuery(val text: Option[String] = None,
                   val folderIds: Set[String] = Set(),
                   rpp: Int = 0,
                   page: Int = 1,
-                  val searchSort: Option[SearchSort] = None)
-  extends Query(params = params, rpp = rpp, page = page) {
+                  sort: Option[SearchSort] = None)
+  extends Query(params = params, rpp = rpp, page = page, sort = sort) {
 
-  val isParametarized: Boolean = params.nonEmpty
+  val isParameterized: Boolean = params.nonEmpty
   val isText: Boolean = text.nonEmpty
-  val isSorted: Boolean = searchSort.isDefined
+  val isSorted: Boolean = sort.isDefined
 
   override def add(_params: (String, Any)*): SearchQuery = new SearchQuery(
     text = text,
@@ -22,5 +22,5 @@ class SearchQuery(val text: Option[String] = None,
     params = params ++ _params,
     rpp = rpp,
     page = page,
-    searchSort = searchSort)
+    sort = sort)
 }

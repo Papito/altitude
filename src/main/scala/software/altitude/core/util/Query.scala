@@ -67,7 +67,7 @@ case class Sort(param: String, direction: SortDirection.Value)
 class Query(val params: Map[String, Any] = Map(),
             val rpp: Int = 0,
             val page: Int = 1,
-            val sort: Option[Sort] = None) {
+            val sort: Option[Any] = None) {
   if (rpp < 0) throw new IllegalArgumentException(s"Invalid results per page value: $rpp")
   if (page < 1) throw new IllegalArgumentException(s"Invalid page value: $page")
 

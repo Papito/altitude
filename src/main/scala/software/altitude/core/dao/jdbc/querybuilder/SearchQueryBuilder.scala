@@ -3,7 +3,7 @@ package software.altitude.core.dao.jdbc.querybuilder
 import org.slf4j.LoggerFactory
 import software.altitude.core.util.Query.QueryParam
 import software.altitude.core.models.FieldType
-import software.altitude.core.util.{Query, SearchQuery, Sort}
+import software.altitude.core.util.{Query, SearchQuery, SearchSort, Sort}
 import software.altitude.core.{Context, Const => C}
 
 
@@ -37,7 +37,7 @@ abstract class SearchQueryBuilder(selColumnNames: List[String])
     */
   private def allTableNames(searchQuery: SearchQuery): List[String] = {
     val _tablesNames = List(SearchQueryBuilder.ASSET_TABLE_NAME) ++
-      (if (searchQuery.isParametarized) Set(searchParamTable) else Set()) ++
+      (if (searchQuery.isParameterized) Set(searchParamTable) else Set()) ++
       (if (searchQuery.isText) Set(searchDocumentTable) else Set())
 
     _tablesNames
@@ -164,7 +164,7 @@ abstract class SearchQueryBuilder(selColumnNames: List[String])
   }
 
   protected def searchParameterJoin(searchQuery: SearchQuery): ClauseComponents = {
-    if (searchQuery.isParametarized) {
+    if (searchQuery.isParameterized) {
       ClauseComponents(elements = List(s"$searchParamTable.asset_id = asset.id"))
     }
     else {
@@ -173,32 +173,37 @@ abstract class SearchQueryBuilder(selColumnNames: List[String])
   }
 
   override protected def groupBy(searchQuery: SearchQuery, ctx: Context): ClauseComponents = {
-    if (!searchQuery.isParametarized) return ClauseComponents()
+    if (!searchQuery.isParameterized) return ClauseComponents()
     ClauseComponents(elements = List(s"asset.${C.Asset.ID}"))
   }
 
   override protected def having(searchQuery: SearchQuery, ctx: Context): ClauseComponents = {
-    if (!searchQuery.isParametarized) return ClauseComponents()
+    if (!searchQuery.isParameterized) return ClauseComponents()
     ClauseComponents(elements = List(s"count(asset.${C.Asset.ID}) >= ${searchQuery.params.size}"))
   }
 
   override protected def orderBy(query: SearchQuery, ctx: Context): ClauseComponents = {
     if (!query.isSorted) return ClauseComponents()
 
-    val sortColumn = query.searchSort.get.field.fieldType match {
+    if (!query.sort.get.isInstanceOf[SearchSort]) {
+      throw new IllegalArgumentException(s"Can only work with sort argument of type [${SearchSort.toString}]")
+    }
+
+    val sort = query.sort.get.asInstanceOf[SearchSort]
+    val sortColumn = sort.field.fieldType match {
       case FieldType.NUMBER => "field_value_num"
       case FieldType.BOOL => "field_value_bool"
       case FieldType.KEYWORD => "field_value_kw"
       case FieldType.DATETIME => "field_value_dt"
-      case _ => throw new IllegalArgumentException(s"This type of sort parameter is not supported: ${query.searchSort.get.field}")
+      case _ => throw new IllegalArgumentException(s"This type of sort parameter is not supported: ${sort.field}")
     }
 
     val sql = ", search_parameter AS sort_param WHERE sort_param.repository_id = ? " +
       "AND sort_param.asset_id = asset.id " +
       "AND sort_param.field_id = ? " +
-      s"ORDER BY sort_param.${sortColumn} ${query.searchSort.get.direction}"
+      s"ORDER BY sort_param.$sortColumn ${sort.direction}"
 
-    ClauseComponents(List(sql), List(ctx.repo.id.get, query.searchSort.get.field.id.get))
+    ClauseComponents(List(sql), List(ctx.repo.id.get, sort.field.id.get))
   }
 
   override protected def orderByStr(clauseComponents: ClauseComponents): String = {
