@@ -4,7 +4,7 @@ import software.altitude.core.dao.jdbc.querybuilder.{ClauseComponents, SearchQue
 import software.altitude.core.util.SearchQuery
 
 class AssetSearchQueryBuilder(sqlColsForSelect: List[String])
-    extends SearchQueryBuilder(sqlColsForSelect = sqlColsForSelect) {
+    extends SearchQueryBuilder(selColumnNames = sqlColsForSelect) {
 
   protected def textSearch(searchQuery: SearchQuery): ClauseComponents = {
     if (searchQuery.isText) {

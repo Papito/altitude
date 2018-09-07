@@ -2,6 +2,7 @@ package software.altitude.core.dao.jdbc.querybuilder
 
 import org.slf4j.LoggerFactory
 import software.altitude.core.util.Query.QueryParam
+import software.altitude.core.models.FieldType
 import software.altitude.core.util.{Query, SearchQuery, Sort}
 import software.altitude.core.{Context, Const => C}
 
@@ -13,8 +14,8 @@ object SearchQueryBuilder {
 /**
   * Common code for JDBC search query builders
   */
-abstract class SearchQueryBuilder(sqlColsForSelect: List[String])
-  extends SqlQueryBuilder[SearchQuery](sqlColsForSelect, Set(SearchQueryBuilder.ASSET_TABLE_NAME)) {
+abstract class SearchQueryBuilder(selColumnNames: List[String])
+  extends SqlQueryBuilder[SearchQuery](selColumnNames, Set(SearchQueryBuilder.ASSET_TABLE_NAME)) {
 
   private final val log = LoggerFactory.getLogger(getClass)
 
@@ -83,7 +84,7 @@ abstract class SearchQueryBuilder(sqlColsForSelect: List[String])
     }
 
     log.debug(s"Select SQL: $sql with $bindVals")
-    println("SELECT", sql, bindVals)
+    // println("SELECT", sql, bindVals)
     SqlQuery(sql, bindVals)
   }
 
@@ -184,12 +185,20 @@ abstract class SearchQueryBuilder(sqlColsForSelect: List[String])
   override protected def orderBy(query: SearchQuery, ctx: Context): ClauseComponents = {
     if (!query.isSorted) return ClauseComponents()
 
+    val sortColumn = query.searchSort.get.field.fieldType match {
+      case FieldType.NUMBER => "field_value_num"
+      case FieldType.BOOL => "field_value_bool"
+      case FieldType.KEYWORD => "field_value_kw"
+      case FieldType.DATETIME => "field_value_dt"
+      case _ => throw new IllegalArgumentException(s"This type of sort parameter is not supported: ${query.searchSort.get.field}")
+    }
+
     val sql = ", search_parameter AS sort_param WHERE sort_param.repository_id = ? " +
       "AND sort_param.asset_id = asset.id " +
       "AND sort_param.field_id = ? " +
-      s"ORDER BY sort_param.field_value_sort ${query.sort.get.direction}"
+      s"ORDER BY sort_param.${sortColumn} ${query.searchSort.get.direction}"
 
-    ClauseComponents(List(sql), List(ctx.repo.id.get, query.sort.get.param))
+    ClauseComponents(List(sql), List(ctx.repo.id.get, query.searchSort.get.field.id.get))
   }
 
   override protected def orderByStr(clauseComponents: ClauseComponents): String = {

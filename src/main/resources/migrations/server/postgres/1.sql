@@ -98,8 +98,7 @@ CREATE TABLE search_parameter (
   field_value_kw TEXT NULL,
   field_value_num DECIMAL,
   field_value_bool BOOLEAN,
-  field_value_dt TIMESTAMP WITH TIME ZONE,
-  field_value_sort TEXT NOT NULL
+  field_value_dt TIMESTAMP WITH TIME ZONE
 );
 --//END
 CREATE INDEX search_parameter_01 ON search_parameter(repository_id, field_id, field_value_kw);
@@ -109,8 +108,6 @@ CREATE INDEX search_parameter_02 ON search_parameter(repository_id, field_id, fi
 CREATE INDEX search_parameter_03 ON search_parameter(repository_id, field_id, field_value_bool);
 --//END
 CREATE INDEX search_parameter_04 ON search_parameter(repository_id, field_id, field_value_dt);
---//END
-CREATE INDEX search_parameter_05 ON search_parameter(repository_id, asset_id, field_id, field_value_sort);
 --//END
 
 CREATE TABLE search_document (

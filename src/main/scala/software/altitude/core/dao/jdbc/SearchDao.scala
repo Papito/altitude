@@ -17,9 +17,8 @@ object SearchDao {
                         ${C.SearchToken.FIELD_ID},
                         ${C.SearchToken.FIELD_VALUE_KW},
                         ${C.SearchToken.FIELD_VALUE_NUM},
-                        ${C.SearchToken.FIELD_VALUE_BOOL},
-                        ${C.SearchToken.FIELD_VALUE_SORT})
-                 VALUES (?, ?, ?, ?, ?, ?, ?)
+                        ${C.SearchToken.FIELD_VALUE_BOOL})
+                 VALUES (?, ?, ?, ?, ?, ?)
             """
 }
 
@@ -128,8 +127,6 @@ abstract class SearchDao(override val app: Altitude)
           preparedStatement.setNull(6, Types.BOOLEAN)
         }
 
-        // set the sort value
-        preparedStatement.setString(7, value.toString)
         preparedStatement.execute()
       }
 

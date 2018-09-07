@@ -111,7 +111,6 @@ CREATE TABLE search_parameter (
   field_value_num DECIMAL,
   field_value_bool BOOLEAN,
   field_value_dt DATE,
-  field_value_sort TEXT NOT NULL,
   FOREIGN KEY(repository_id) REFERENCES repository(id),
   FOREIGN KEY(asset_id) REFERENCES asset(id),
   FOREIGN KEY(field_id) REFERENCES metadata_field(id)
@@ -124,8 +123,6 @@ CREATE INDEX search_parameter_02 ON search_parameter(repository_id, field_id, fi
 CREATE INDEX search_parameter_03 ON search_parameter(repository_id, field_id, field_value_bool);
 --//END
 CREATE INDEX search_parameter_04 ON search_parameter(repository_id, field_id, field_value_dt);
---//END
-CREATE INDEX search_parameter_05 ON search_parameter(repository_id, asset_id, field_id, field_value_sort);
 --//END
 
 CREATE VIRTUAL TABLE search_document USING fts4(repository_id, asset_id, body);

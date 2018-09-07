@@ -119,7 +119,6 @@ object Const {
     val FIELD_VALUE_NUM = "field_value_num"
     val FIELD_VALUE_BOOL = "field_value_bool"
     val FIELD_VALUE_DT = "field_value_dt"
-    val FIELD_VALUE_SORT = "field_value_sort"
   }
 
   object Api {
