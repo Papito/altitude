@@ -421,8 +421,8 @@ import software.altitude.core.{DuplicateException, IllegalOperationException, No
     val folder1_1_1: Folder = altitude.service.library.addFolder(
       "folder1_1_1", parentId = folder1_1.id)
 
-    val asset1: Asset = altitude.service.library.add(makeAsset(folder1))
-    val asset2: Asset = altitude.service.library.add(makeAsset(folder1_1))
+    altitude.service.library.add(makeAsset(folder1))
+    altitude.service.library.add(makeAsset(folder1_1))
 
     // delete the parent folder
     altitude.service.library.deleteFolderById(folder1.id.get)

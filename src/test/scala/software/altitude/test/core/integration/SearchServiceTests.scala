@@ -125,6 +125,50 @@ import software.altitude.core.util._
     results.total shouldBe 1
   }
 
+  test("Pagination", Focused) {
+    1 to 6 foreach { n =>
+      altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+    }
+
+    val q = new SearchQuery(rpp = 2, page = 1)
+    val results = altitude.service.library.search(q)
+    results.total shouldBe 6
+    results.records.length shouldBe 2
+    results.nonEmpty shouldBe true
+    results.totalPages shouldBe 3
+
+    val q2 = new SearchQuery(rpp = 2, page = 2)
+    val results2 = altitude.service.library.search(q2)
+    results2.total shouldBe 6
+    results2.records.length shouldBe 2
+    results2.totalPages shouldBe 3
+
+    val q3 = new SearchQuery(rpp = 2, page = 3)
+    val results3 = altitude.service.library.search(q3)
+    results3.total shouldBe 6
+    results3.records.length shouldBe 2
+    results3.totalPages shouldBe 3
+
+    // page too far
+    val q4 = new SearchQuery(rpp = 2, page = 4)
+    val results4 = altitude.service.library.search(q4)
+    results4.total shouldBe 6
+    results4.records.length shouldBe 0
+    results4.totalPages shouldBe 3
+
+    val q5 = new SearchQuery(rpp = 6, page = 1)
+    val results5 = altitude.service.library.search(q5)
+    results5.total shouldBe 6
+    results5.records.length shouldBe 6
+    results5.totalPages shouldBe 1
+
+    val q6 = new SearchQuery(rpp = 20, page = 1)
+    val results6 = altitude.service.library.search(q6)
+    results6.total shouldBe 6
+    results6.records.length shouldBe 6
+    results6.totalPages shouldBe 1
+  }
+
   test("Create assets and search by metadata") {
     val field1 = altitude.service.metadata.addField(
       MetadataField(

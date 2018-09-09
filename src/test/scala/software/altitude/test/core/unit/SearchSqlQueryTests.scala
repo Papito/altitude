@@ -2,7 +2,6 @@ package software.altitude.test.core.unit
 
 import org.scalatest.FunSuite
 import org.scalatest.Matchers._
-import software.altitude.core.Const.MetadataField
 import software.altitude.core.dao.postgres.querybuilder.{AssetSearchQueryBuilder => PostgresAssetSearchQueryBuilder}
 import software.altitude.core.dao.sqlite.querybuilder.{AssetSearchQueryBuilder => SqliteAssetSearchQueryBuilder}
 import software.altitude.core.models.{FieldType, MetadataField, Repository}

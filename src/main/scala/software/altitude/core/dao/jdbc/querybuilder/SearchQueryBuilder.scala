@@ -44,7 +44,7 @@ abstract class SearchQueryBuilder(selColumnNames: List[String])
   }
 
   override def buildSelectSql(query: SearchQuery)(implicit ctx: Context): SqlQuery = {
-    if ( query.isSorted) {
+    if (query.isSorted) {
       buildSelectSqlAsSubquery(query)
     } else {
       super.buildSelectSql(query)
@@ -53,10 +53,22 @@ abstract class SearchQueryBuilder(selColumnNames: List[String])
 
   override def buildCountSql(query: SearchQuery)(implicit ctx: Context): SqlQuery = {
     // get the base SELECT query
-    val subquerySql = buildSelectSql(query)
     // make it a subquery of the main SELECT COUNT(*) query
-    val countSql = s"SELECT COUNT(*) AS count FROM (${subquerySql.sqlAsString}) AS asset"
-    SqlQuery(countSql, subquerySql.bindValues)
+    val allClauses = compileClauses(query, ctx)
+
+    val subquerySql: String = selectStr(allClauses(SqlQueryBuilder.SELECT)) +
+      fromStr(allClauses(SqlQueryBuilder.FROM)) +
+      whereStr(allClauses(SqlQueryBuilder.WHERE)) +
+      groupByStr(allClauses(SqlQueryBuilder.GROUP_BY)) +
+      havingStr(allClauses(SqlQueryBuilder.HAVING))
+
+    val bindValClauses = List(allClauses(SqlQueryBuilder.WHERE))
+    val bindVals = bindValClauses.foldLeft(List[Any]()) { (res, clause) =>
+      res ++ clause.bindVals
+    }
+
+    val countSql = s"SELECT COUNT(*) AS count FROM ($subquerySql) AS asset"
+    SqlQuery(countSql, bindVals)
   }
 
   private def buildSelectSqlAsSubquery(query: SearchQuery)(implicit ctx: Context): SqlQuery = {
