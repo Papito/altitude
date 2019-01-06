@@ -125,7 +125,7 @@ import software.altitude.core.util._
     results.total shouldBe 1
   }
 
-  test("Pagination", Focused) {
+  test("Pagination") {
     1 to 6 foreach { n =>
       altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
     }
