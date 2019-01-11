@@ -9,7 +9,8 @@ import software.altitude.core.util.{QueryResult, SearchQuery}
 import software.altitude.core.{Altitude, Context}
 
 object SearchService {
-  val NON_INDEXABLE_FIELD_TYPES = Set(FieldType.TEXT)
+  // TODO: sound weird. Non-indexable? It's indexable, but can't be a facet
+  val NON_INDEXABLE_FIELD_TYPES: Set[FieldType.Value] = Set(FieldType.TEXT)
 }
 
 class SearchService(val app: Altitude) {
