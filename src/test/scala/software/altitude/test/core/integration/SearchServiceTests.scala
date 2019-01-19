@@ -65,7 +65,7 @@ import software.altitude.core.util._
     val assetData2 = makeAsset(altitude.service.folder.triageFolder, Metadata(data))
     altitude.service.library.add(assetData2)
 
-    var results: QueryResult = altitude.service.library.search(new SearchQuery(text = Some("keanu")))
+    var results: SearchResult = altitude.service.library.search(new SearchQuery(text = Some("keanu")))
     results.nonEmpty shouldBe true
     results.total shouldBe 1
     // check that the document is indeed - an asset
@@ -102,7 +102,7 @@ import software.altitude.core.util._
     }
 
     val qFolder1_1 = new SearchQuery(text = Some("space"), folderIds = Set(folder1_1.id.get))
-    var results: QueryResult = altitude.service.library.search(qFolder1_1)
+    var results: SearchResult = altitude.service.library.search(qFolder1_1)
     results.total shouldBe 3
 
     val qFolder1 = new SearchQuery(text = Some("space"), folderIds = Set(folder1.id.get))

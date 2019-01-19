@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.models.{Folder, _}
 import software.altitude.core.transactions.{AbstractTransactionManager, TransactionId}
-import software.altitude.core.util.{Query, QueryResult, SearchQuery}
+import software.altitude.core.util.{Query, QueryResult, SearchQuery, SearchResult}
 import software.altitude.core.{Altitude, Context, Const => C, _}
 
 /**
@@ -308,8 +308,8 @@ class LibraryService(val app: Altitude) {
   }
 
   def search(query: SearchQuery)
-            (implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
-    txManager.asReadOnly[QueryResult] {
+            (implicit ctx: Context, txId: TransactionId = new TransactionId): SearchResult = {
+    txManager.asReadOnly[SearchResult] {
       val _query: SearchQuery = if (query.folderIds.nonEmpty) {
         // create a new query, with the new folder set
         val allFolderIds = app.service.folder.flatChildrenIds(parentIds = query.folderIds)

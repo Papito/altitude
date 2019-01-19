@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import software.altitude.core.dao.sqlite.querybuilder.AssetSearchQueryBuilder
 import software.altitude.core.models.Asset
 import software.altitude.core.transactions.TransactionId
-import software.altitude.core.util.{QueryResult, SearchQuery}
+import software.altitude.core.util.{QueryResult, SearchQuery, SearchResult}
 import software.altitude.core.{Altitude, Context, Const => C}
 
 class SearchDao(override val app: Altitude) extends software.altitude.core.dao.jdbc.SearchDao(app) with Sqlite {
@@ -54,7 +54,7 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
     runner.update(conn, docSql, sqlVals.map(_.asInstanceOf[Object]): _*)
   }
 
-  override def search(searchQuery: SearchQuery)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+  override def search(searchQuery: SearchQuery)(implicit ctx: Context, txId: TransactionId): SearchResult = {
     val sqlQueryBuilder = new AssetSearchQueryBuilder(sqlColsForSelect = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT)
 
     val sqlQuery = sqlQueryBuilder.buildSelectSql(query = searchQuery)
@@ -73,6 +73,6 @@ class SearchDao(override val app: Altitude) extends software.altitude.core.dao.j
       log.debug(recs.map(_.toString()).mkString("\n"))
     }
 
-    QueryResult(records = recs.map{makeModel}, total = count, rpp = searchQuery.rpp)
+    SearchResult(records = recs.map{makeModel}, total = count, rpp = searchQuery.rpp, sort = searchQuery.searchSort)
   }
 }

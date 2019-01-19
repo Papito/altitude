@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.models._
 import software.altitude.core.transactions.TransactionId
-import software.altitude.core.util.{QueryResult, SearchQuery}
+import software.altitude.core.util.{QueryResult, SearchQuery, SearchResult}
 import software.altitude.core.{Altitude, Context, Const => C}
 
 object SearchDao {
@@ -28,7 +28,7 @@ abstract class SearchDao(override val app: Altitude)
 
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override def search(query: SearchQuery)(implicit ctx: Context, txId: TransactionId): QueryResult =
+  override def search(query: SearchQuery)(implicit ctx: Context, txId: TransactionId): SearchResult =
     throw new NotImplementedError
 
   protected def addSearchDocument(asset: Asset)(implicit ctx: Context, txId: TransactionId): Unit =
