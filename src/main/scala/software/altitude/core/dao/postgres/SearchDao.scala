@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import software.altitude.core.dao.postgres.querybuilder.AssetSearchQueryBuilder
 import software.altitude.core.models.Asset
 import software.altitude.core.transactions.TransactionId
-import software.altitude.core.util.{QueryResult, SearchQuery, SearchResult}
+import software.altitude.core.util.{SearchQuery, SearchResult}
 import software.altitude.core.{Altitude, Context, Const => C}
 
 class SearchDao(override val app: Altitude) extends software.altitude.core.dao.jdbc.SearchDao(app) with Postgres {

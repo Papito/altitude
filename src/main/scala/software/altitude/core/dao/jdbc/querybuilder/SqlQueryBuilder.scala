@@ -1,8 +1,8 @@
 package software.altitude.core.dao.jdbc.querybuilder
 
 import org.slf4j.LoggerFactory
-import software.altitude.core.util.{Query, Sort}
 import software.altitude.core.util.Query.QueryParam
+import software.altitude.core.util.{Query, Sort}
 import software.altitude.core.{Context, Const => C}
 
 protected object SqlQueryBuilder {

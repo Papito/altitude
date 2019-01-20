@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import software.altitude.core.dao.SearchDao
 import software.altitude.core.models.{Asset, FieldType, MetadataField}
 import software.altitude.core.transactions.TransactionId
-import software.altitude.core.util.{QueryResult, SearchQuery, SearchResult}
+import software.altitude.core.util.{SearchQuery, SearchResult}
 import software.altitude.core.{Altitude, Context}
 
 object SearchService {

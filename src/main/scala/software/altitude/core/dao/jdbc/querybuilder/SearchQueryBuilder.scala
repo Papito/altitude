@@ -1,9 +1,9 @@
 package software.altitude.core.dao.jdbc.querybuilder
 
 import org.slf4j.LoggerFactory
-import software.altitude.core.util.Query.QueryParam
 import software.altitude.core.models.FieldType
-import software.altitude.core.util.{Query, SearchQuery, SearchSort, Sort}
+import software.altitude.core.util.Query.QueryParam
+import software.altitude.core.util.{Query, SearchQuery, SearchSort}
 import software.altitude.core.{Context, Const => C}
 
 
