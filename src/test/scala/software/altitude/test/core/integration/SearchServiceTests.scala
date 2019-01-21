@@ -417,13 +417,13 @@ import software.altitude.core.util._
     // try with no sort info at all
     var results = altitude.service.library.search(new SearchQuery())
 
-    results.sort shouldBe None
+    results.sort shouldBe empty
 
     val sort = SearchSort(field = kwField, direction = SortDirection.ASC)
     results = altitude.service.library.search(new SearchQuery(searchSort = Some(sort)))
-    results.sort shouldBe defined
-    results.sort.value.direction shouldBe SortDirection.ASC
-    results.sort.value.field.name shouldBe kwField.name
+    results.sort shouldNot be(empty)
+    results.sort.head.direction shouldBe SortDirection.ASC
+    results.sort.head.field.name shouldBe kwField.name
   }
 
 }
