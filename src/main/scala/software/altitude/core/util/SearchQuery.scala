@@ -12,6 +12,10 @@ class SearchQuery(val text: Option[String] = None,
                   val searchSort: Option[SearchSort] = None)
   extends Query(params = params, rpp = rpp, page = page) {
 
+  if (sort.isDefined) {
+    throw new IllegalArgumentException("Cannot use 'sort' in this context - use 'searchSort'")
+  }
+
   val isParameterized: Boolean = params.nonEmpty
   val isText: Boolean = text.nonEmpty
   val isSorted: Boolean = searchSort.isDefined

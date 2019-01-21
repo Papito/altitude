@@ -401,4 +401,29 @@ import software.altitude.core.util._
     results = altitude.service.library.search(new SearchQuery(searchSort = Some(sort)))
     (results.records.head: Asset).metadata.get(boolField.id.get).value.head.value shouldBe "true"
   }
+
+  test("Sort info should be returned with query results", Focused) {
+    val kwField = altitude.service.metadata.addField(
+      MetadataField(
+        name = "keyword field",
+        fieldType = FieldType.NUMBER
+      ))
+
+    1 to 5 foreach { idx =>
+      val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+      altitude.service.library.addMetadataValue(asset.id.get, fieldId = kwField.id.get, newValue = idx)
+    }
+
+    // try with no sort info at all
+    var results = altitude.service.library.search(new SearchQuery())
+
+    results.sort shouldBe None
+
+    val sort = SearchSort(field = kwField, direction = SortDirection.ASC)
+    results = altitude.service.library.search(new SearchQuery(searchSort = Some(sort)))
+    results.sort shouldBe defined
+    results.sort.value.direction shouldBe SortDirection.ASC
+    results.sort.value.field.name shouldBe kwField.name
+  }
+
 }

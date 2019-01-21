@@ -2,8 +2,9 @@ package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
 import org.scalatest.Matchers._
-import software.altitude.core.models.{Asset, AssetType}
-import software.altitude.core.util.Query
+import software.altitude.core.models.MetadataField
+import software.altitude.core.models.{Asset, AssetType, FieldType}
+import software.altitude.core.util.{Query, SearchSort, SortDirection}
 import software.altitude.core.{Const => C}
 
 @DoNotDiscover class AssetQueryTests(val config: Map[String, Any]) extends IntegrationTestCore {
@@ -108,5 +109,4 @@ import software.altitude.core.{Const => C}
     results.records.length shouldBe 1
     results.total shouldBe 1
   }
-
 }
