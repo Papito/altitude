@@ -197,11 +197,7 @@ abstract class SearchQueryBuilder(selColumnNames: List[String])
   override protected def orderBy(query: SearchQuery, ctx: Context): ClauseComponents = {
     if (!query.isSorted) return ClauseComponents()
 
-    if (!query.searchSort.get.isInstanceOf[SearchSort]) {
-      throw new IllegalArgumentException(s"Can only work with sort argument of type [${SearchSort.toString}]")
-    }
-
-    val sort = query.searchSort.get
+    val sort = query.searchSort.head
     val sortColumn = sort.field.fieldType match {
       case FieldType.NUMBER => "field_value_num"
       case FieldType.BOOL => "field_value_bool"

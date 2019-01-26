@@ -43,7 +43,7 @@ class SqlQueryTests extends FunSuite with TestFocus {
     val q = new Query(
       rpp = 10,
       page = 2,
-      sort = Some(Sort("column", SortDirection.ASC))
+      sort = List(Sort("column", SortDirection.ASC))
     )
     val sqlQuery = builder.buildSelectSql(q)
     sqlQuery.sqlAsString shouldBe "SELECT * FROM table1 WHERE table1.repository_id = ? ORDER BY column ASC LIMIT 10 OFFSET 10"

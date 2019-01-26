@@ -149,13 +149,9 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
   }
 
   protected def orderBy(query: QueryT, ctx: Context): ClauseComponents = {
-   if (query.sort.isEmpty) return ClauseComponents()
+    if (!query.isSorted) return ClauseComponents()
 
-    if (!query.sort.get.isInstanceOf[Sort]) {
-      throw new IllegalArgumentException(s"Can only work with sort argument of type [${Sort.toString}]")
-    }
-
-   val sort = query.sort.get.asInstanceOf[Sort]
+   val sort = query.sort.head
    ClauseComponents(elements = List(s"${sort.param} ${sort.direction}"))
   }
 

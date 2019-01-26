@@ -67,9 +67,15 @@ case class Sort(param: String, direction: SortDirection.Value)
 class Query(val params: Map[String, Any] = Map(),
             val rpp: Int = 0,
             val page: Int = 1,
-            val sort: Option[Sort] = None) {
+            val sort: List[Sort] = List()) {
   if (rpp < 0) throw new IllegalArgumentException(s"Invalid results per page value: $rpp")
   if (page < 1) throw new IllegalArgumentException(s"Invalid page value: $page")
+
+  if (sort.size > 1) {
+    throw new IllegalArgumentException("Only one sort currently supported'")
+  }
+
+  val isSorted: Boolean = sort.nonEmpty
 
   // append new params to the query and return a new copy
   def add(_params: (String, Any)*): Query = new Query(

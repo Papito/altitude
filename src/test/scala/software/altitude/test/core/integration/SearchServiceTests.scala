@@ -376,29 +376,29 @@ import software.altitude.core.util._
 
     // sort by string field
     var sort = SearchSort(field = kwField, direction = SortDirection.ASC)
-    var results = altitude.service.library.search(new SearchQuery(searchSort = Some(sort)))
+    var results = altitude.service.library.search(new SearchQuery(searchSort = List(sort)))
     (results.records.head: Asset).metadata.get(kwField.id.get).value.head.value shouldBe "a"
 
     sort = SearchSort(field = kwField, direction = SortDirection.DESC)
-    results = altitude.service.library.search(new SearchQuery(searchSort = Some(sort)))
+    results = altitude.service.library.search(new SearchQuery(searchSort = List(sort)))
     (results.records.head: Asset).metadata.get(kwField.id.get).value.head.value shouldBe "c"
 
     // sort by number field
     sort = SearchSort(field = numField, direction = SortDirection.ASC)
-    results = altitude.service.library.search(new SearchQuery(searchSort = Some(sort)))
+    results = altitude.service.library.search(new SearchQuery(searchSort = List(sort)))
     (results.records.head: Asset).metadata.get(numField.id.get).value.head.value shouldBe "50"
 
     sort = SearchSort(field = numField, direction = SortDirection.DESC)
-    results = altitude.service.library.search(new SearchQuery(searchSort = Some(sort)))
+    results = altitude.service.library.search(new SearchQuery(searchSort = List(sort)))
     (results.records.head: Asset).metadata.get(numField.id.get).value.head.value shouldBe "300"
 
     // sort by number field
     sort = SearchSort(field = boolField, direction = SortDirection.ASC)
-    results = altitude.service.library.search(new SearchQuery(searchSort = Some(sort)))
+    results = altitude.service.library.search(new SearchQuery(searchSort = List(sort)))
     (results.records.head: Asset).metadata.get(boolField.id.get).value.head.value shouldBe "false"
 
     sort = SearchSort(field = boolField, direction = SortDirection.DESC)
-    results = altitude.service.library.search(new SearchQuery(searchSort = Some(sort)))
+    results = altitude.service.library.search(new SearchQuery(searchSort = List(sort)))
     (results.records.head: Asset).metadata.get(boolField.id.get).value.head.value shouldBe "true"
   }
 
@@ -420,7 +420,7 @@ import software.altitude.core.util._
     results.sort shouldBe empty
 
     val sort = SearchSort(field = kwField, direction = SortDirection.ASC)
-    results = altitude.service.library.search(new SearchQuery(searchSort = Some(sort)))
+    results = altitude.service.library.search(new SearchQuery(searchSort = List(sort)))
     results.sort shouldNot be(empty)
     results.sort.head.direction shouldBe SortDirection.ASC
     results.sort.head.field.name shouldBe kwField.name
