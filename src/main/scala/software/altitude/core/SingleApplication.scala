@@ -16,7 +16,7 @@ object SingleApplication {
 
   def mountEndpoints(context: ServletContext): Unit = {
     context.mount(new AssetController, "/api/v1/assets/*")
-    context.mount(new QueryController, "/api/v1/search/*")
+    context.mount(new SearchController, "/api/v1/search/*")
     context.mount(new FolderController, "/api/v1/folders/*")
     context.mount(new TrashController, "/api/v1/trash/*")
     context.mount(new StatsController, "/api/v1/stats/*")

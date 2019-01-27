@@ -2,13 +2,13 @@ package software.altitude.core.controllers.api
 
 import org.scalatra.{ActionResult, Ok}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.Json
+import play.api.libs.json.{JsNull, Json}
 import software.altitude.core.controllers.Util
 import software.altitude.core.models.Asset
-import software.altitude.core.util.SearchQuery
+import software.altitude.core.util.{SearchQuery, SearchSort}
 import software.altitude.core.{Const => C}
 
-class QueryController extends BaseApiController {
+class SearchController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
   get("/") {
@@ -23,7 +23,18 @@ class QueryController extends BaseApiController {
     val rpp = params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, C.DEFAULT_RPP).toInt
     val page = params.getOrElse(C.Api.Search.PAGE, "1").toInt
     val queryText = params.get(C.Api.Search.QUERY_TEXT)
+    val sortArg = params.get(C.Api.Search.SORT)
     log.info(s"Query string: $queryText")
+
+    log.info(s"Sort: $sortArg")
+
+    val sort: List[SearchSort] = if (sortArg.isDefined) {
+      val fieldId :: directionInt :: _ = sortArg.get.split("\\|").toList
+      log.info(s"Sort field ID: $fieldId, direction: $directionInt")
+      List()
+    } else {
+      List()
+    }
 
     // TODO: if there is query text, do not specify folder ids. Search everything
     val foldersQuery = params.getOrElse(C.Api.Search.FOLDERS, "")
@@ -32,7 +43,8 @@ class QueryController extends BaseApiController {
     val q = new SearchQuery(
       text = queryText,
       rpp = rpp, page = page,
-      folderIds = Util.parseFolderIds(folderIds = folderIdsArg)
+      folderIds = Util.parseFolderIds(folderIds = folderIdsArg),
+      searchSort = sort
     )
 
     query(q)
@@ -70,7 +82,8 @@ class QueryController extends BaseApiController {
       C.Api.TOTAL_RECORDS -> results.total,
       C.Api.CURRENT_PAGE -> q.page,
       C.Api.TOTAL_PAGES -> results.totalPages,
-      C.Api.RESULTS_PER_PAGE -> q.rpp
+      C.Api.RESULTS_PER_PAGE -> q.rpp,
+      C.Api.Search.SORT -> (if (results.sort.isEmpty) JsNull else results.sort.head.toJson)
     ))
   }
 
@@ -85,7 +98,8 @@ class QueryController extends BaseApiController {
       C.Api.TOTAL_RECORDS -> results.total,
       C.Api.CURRENT_PAGE -> q.page,
       C.Api.TOTAL_PAGES -> results.totalPages,
-      C.Api.RESULTS_PER_PAGE -> q.rpp
+      C.Api.RESULTS_PER_PAGE -> q.rpp,
+      C.Api.Search.SORT -> (if (results.sort.isEmpty) JsNull else results.sort.head.toJson)
     ))
   }
 }

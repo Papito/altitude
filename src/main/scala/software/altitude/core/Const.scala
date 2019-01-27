@@ -168,6 +168,17 @@ object Const {
       val RESULTS_PER_PAGE = "rpp"
       val PAGE = "p"
       val FOLDERS = "folders"
+      val SORT = "sort"
+    }
+
+    object Sort {
+      val DIRECTION = "direction"
+      val PARAMETER = "param"
+    }
+
+    object SearchSort {
+      val DIRECTION = "direction"
+      val FIELD = "field"
     }
 
     object Folder {
