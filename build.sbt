@@ -1,7 +1,7 @@
 organization := "software.altitude"
 name := "altitude"
 version := "0.1.0-SNAPSHOT"
-scalaVersion := "2.11.11"
+scalaVersion := "2.11.12"
 
 val json4sversion = "3.5.3"
 val ScalatraVersion = "2.6.2"
@@ -14,7 +14,7 @@ libraryDependencies ++= Seq(
   "org.scalatra"                %% "scalatra-scalate"      % ScalatraVersion,
   "org.scalatra"                %% "scalatra-atmosphere"   % ScalatraVersion,
   "org.scalatra"                %% "scalatra-scalatest"    % ScalatraVersion % Test,
-  "org.mockito"                  % "mockito-core"          % "2.17.0" % Test,
+  "org.mockito"                  % "mockito-core"          % "2.23.0" % Test,
 
   "com.typesafe.play"           %% "play-json"             % "2.6.8",
 

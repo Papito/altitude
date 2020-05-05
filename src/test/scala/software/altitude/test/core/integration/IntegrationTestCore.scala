@@ -70,7 +70,7 @@ abstract class IntegrationTestCore
 
   final val datasource = config("datasource").asInstanceOf[C.DatasourceType.Value]
 
-  protected def altitude = datasource match {
+  protected def altitude: Altitude = datasource match {
     case C.DatasourceType.POSTGRES => PostgresSuite.app
     case C.DatasourceType.SQLITE => SqliteSuite.app
     case _ => throw new IllegalArgumentException(s"Do not know of datasource: $datasource")

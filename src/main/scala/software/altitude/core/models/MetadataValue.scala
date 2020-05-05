@@ -1,5 +1,7 @@
 package software.altitude.core.models
 
+import java.util.Base64
+
 import play.api.libs.json._
 import software.altitude.core.{Const => C}
 
@@ -19,7 +21,11 @@ object MetadataValue {
 case class MetadataValue(id: Option[String] = None,
                          value: String) extends BaseModel {
   private val md = java.security.MessageDigest.getInstance("SHA-1")
-  val checksum: String = new sun.misc.BASE64Encoder().encode(md.digest(value.toLowerCase.getBytes("UTF-8")))
+  val checksum: String = Base64.getEncoder.encodeToString(
+    md.digest(
+      value.toLowerCase.getBytes("UTF-8")
+    )
+  )
 
   override def canEqual(other: Any): Boolean = other.isInstanceOf[MetadataValue]
 
