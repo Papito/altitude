@@ -12,7 +12,7 @@ import scala.compat.Platform
 class BaseApiController extends BaseController with ContentEncodingSupport {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  val OK = Ok("{}")
+  val OK: ActionResult = Ok("{}")
 
   val HTTP_POST_VALIDATOR: Option[ApiRequestValidator] = None
   val HTTP_DELETE_VALIDATOR: Option[ApiRequestValidator] = None

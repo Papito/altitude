@@ -130,5 +130,8 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeCor
     }
   }
 
+  //F FIXME: temporary
+  val USER_ID = "100000000000000000000000000000000000"
+  val REPOSITORY_ID = "100000000000000000000000000000000000"
   log.info(s"Altitude Server instance initialized")
 }

@@ -7,10 +7,11 @@ import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.models.Folder
 import software.altitude.core.{Context, Const => C}
 
+// FIXME: what's this? Rename!
 class FolderController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override val HTTP_POST_VALIDATOR = Some(ApiRequestValidator(List(
+  override val HTTP_POST_VALIDATOR: Option[ApiRequestValidator] = Some(ApiRequestValidator(List(
     C.Api.Folder.NAME, C.Api.Folder.PARENT_ID
   )))
 
