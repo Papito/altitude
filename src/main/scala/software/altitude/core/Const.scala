@@ -141,8 +141,8 @@ object Const {
     val ID = "id"
     val DATA = "data"
     val PATH = "path"
-    val DIRECTORY_NAMES = "directory_names"
-    val OS_DIR_SEPARATOR = "os_dir_separator"
+    val DIRECTORY_LIST = "directory_list"
+    val OS_PATH_SEPARATOR = "os_path_separator"
     val CURRENT_PATH = "current_path"
 
     object Import {
