@@ -71,6 +71,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     require(folder.path.get.nonEmpty)
 
     val srcFile = absoluteFile(folder.path.get)
+    //FIXME: replace with Paths.get()
     val newPath = FilenameUtils.concat(srcFile.getParent, newName)
     val destFile = new File(newPath)
     log.info(s"Renaming folder [$srcFile] to [$destFile]")

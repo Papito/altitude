@@ -3,8 +3,8 @@ package software.altitude.core
 import javax.servlet.ServletContext
 import org.scalatra.servlet.ServletApiImplicits._
 import org.slf4j.LoggerFactory
-import software.altitude.core.controllers.ImportController
 import software.altitude.core.controllers.api._
+import software.altitude.core.controllers.api.navigate.FileSystemBrowserController
 
 /**
  * The singleton that makes sure we are only launching one instance of the app,
@@ -23,8 +23,7 @@ object SingleApplication {
     context.mount(new StatsController, "/api/v1/stats/*")
     context.mount(new MetadataController, "/api/v1/metadata/*")
     context.mount(new admin.MetadataController, "/api/v1/admin/metadata/*")
-    context.mount(new ImportController, "/import/*")
-    context.initParameters("org.scalatra.cors.allowedOrigins") = "http://localhost:3000"
+    context.mount(new FileSystemBrowserController, "/navigate/*")
 
   }
 }

@@ -142,8 +142,10 @@ object Const {
     val DATA = "data"
     val PATH = "path"
     val DIRECTORY_LIST = "directory_list"
-    val OS_PATH_SEPARATOR = "os_path_separator"
     val CURRENT_PATH = "current_path"
+    val CURRENT_PATH_BREADCRUMBS = "path_breadcrumbs"
+    val PATH_POS = "pos"
+    val CHILD_DIR = "dir"
 
     object Import {
       val IMPORTED = "imported"

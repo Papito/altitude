@@ -12,8 +12,9 @@ class ScalatraBootstrap extends LifeCycle with SingleApplication {
       case Environment.PROD => "production"
     }
 
+    // FIXME: hardcoded
+    context.initParameters("org.scalatra.cors.allowedOrigins") = "http://localhost:3000"
     SingleApplication.mountEndpoints(context)
-
     SingleApplication.app.runMigrations()
   }
 
