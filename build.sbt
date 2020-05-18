@@ -11,7 +11,6 @@ libraryDependencies ++= Seq(
   "org.json4s"                  %% "json4s-jackson"        % "3.5.3",
 
   "org.scalatra"                %% "scalatra"              % ScalatraVersion,
-  "org.scalatra"                %% "scalatra-scalate"      % ScalatraVersion,
   "org.scalatra"                %% "scalatra-atmosphere"   % ScalatraVersion,
   "org.scalatra"                %% "scalatra-scalatest"    % ScalatraVersion % Test,
   "org.mockito"                  % "mockito-core"          % "2.23.0" % Test,
@@ -32,7 +31,7 @@ libraryDependencies ++= Seq(
 
   "ch.qos.logback"               % "logback-classic"       % "1.1.2" % "runtime",
 
-  "org.eclipse.jetty"            % "jetty-webapp"          % jettyVersion % "container;compile",
+  "org.eclipse.jetty"            % "jetty-webapp"          % jettyVersion % Provided,
   "javax.servlet"                % "javax.servlet-api"     % "3.1.0" % Provided
 ).map(_.exclude("commons-logging", "commons-logging"))
  .map(_.exclude("org.apache.cxf", "cxf-core"))

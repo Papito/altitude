@@ -16,4 +16,5 @@
   <logger name="software.altitude.core.dao" level="INFO" />
   <logger name="org.scalatra.servlet" level="INFO" />
   <logger name="org.eclipse.jetty" level="INFO" />
+  <logger name="org.eclipse.jetty.annotations.AnnotationParser" level="ERROR" />
 </configuration>
