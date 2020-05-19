@@ -38,13 +38,8 @@ class FileSystemBrowserController extends ScalatraServlet with CorsSupport {
   get("/fs/listing/jump") {
     val currentPathFile: File = new File(params.getOrElse(C.Api.PATH, ""))
     val position = params.getOrElse(C.Api.PATH_POS, "1").toInt
-    val pathComponents: List[String] = currentPathFile.getAbsolutePath.split(File.separator).toList
-    // drop path components from the back of the path, based on the final index we want to jump to
-    val newPathComponents: List[String] = pathComponents.drop(pathComponents.size - position - 1)
-    log.info(newPathComponents.toString())
-    val jumpToDirPath = Paths.get("", newPathComponents: _*)
-    log.info(jumpToDirPath.toAbsolutePath.toString)
-    getDirectoryListing(jumpToDirPath.toFile)
+    val paths: List[File] = Iterator.iterate(currentPathFile)(_.getParentFile).takeWhile(_ != null).toList.reverse
+    getDirectoryListing(paths(position + 1))
   }
 
   private def getDirectoryListing(file: File): JsObject = {
