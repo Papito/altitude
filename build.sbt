@@ -65,3 +65,5 @@ commands += Command.command("testSqlite") { state =>
 commands += Command.command("testPostgres") { state =>
   "testOnly software.altitude.test.core.suites.PostgresSuite" :: state
 }
+
+javaOptions ++= Seq( "-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005" )

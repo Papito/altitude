@@ -3,9 +3,8 @@
 ## Build & Run ##
 
 ```sh
-$ cd Altitude
-$ ./sbt
-> container:start
+$ sbt
+> jettyr:start
 ```
 
 ## Running tests against a particular database:
@@ -13,5 +12,12 @@ $ ./sbt
     sbt> testOnly software.altitude.test.core.suites.[SqliteSuite|PostgresSuite]
 
 ## Running a tagged test(s):
-    sbt> testOnly -- -n focused
-    sbt> testOnly software.altitude.test.core.suites.SqliteSuite -- -n focused
+    sbt> testFocused
+    sbt> tetestFocusedSqlite
+    sbt> tetestFocusedPostgres
+    
+## Remote debugging
+
+1. Create a regular `Remote` run configuration (port 5005)
+2. Start Jetty server via SBT as usual
+3. Run the configuration created in Step 1
