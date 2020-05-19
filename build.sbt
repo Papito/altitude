@@ -31,7 +31,7 @@ libraryDependencies ++= Seq(
 
   "ch.qos.logback"               % "logback-classic"       % "1.1.2" % "runtime",
 
-  "org.eclipse.jetty"            % "jetty-webapp"          % jettyVersion % Provided,
+  "org.eclipse.jetty"            % "jetty-webapp"          % jettyVersion % "container;compile",
   "javax.servlet"                % "javax.servlet-api"     % "3.1.0" % Provided
 ).map(_.exclude("commons-logging", "commons-logging"))
  .map(_.exclude("org.apache.cxf", "cxf-core"))
@@ -64,6 +64,9 @@ commands += Command.command("testSqlite") { state =>
 }
 commands += Command.command("testPostgres") { state =>
   "testOnly software.altitude.test.core.suites.PostgresSuite" :: state
+}
+commands += Command.command("watch") { state =>
+  "~;jetty:stop;jetty:start" :: state
 }
 
 javaOptions ++= Seq( "-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005" )

@@ -4,7 +4,14 @@
 
 ```sh
 $ sbt
-> jettyr:start
+> jetty:start
+```
+
+To hot reload the dev server on code changes:
+
+```sh
+$ sbt
+> watch
 ```
 
 ## Running tests against a particular database:
@@ -15,7 +22,7 @@ $ sbt
     sbt> testFocused
     sbt> tetestFocusedSqlite
     sbt> tetestFocusedPostgres
-    
+
 ## Remote debugging
 
 1. Create a regular `Remote` run configuration (port 5005)
