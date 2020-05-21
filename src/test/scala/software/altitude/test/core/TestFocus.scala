@@ -6,7 +6,7 @@ trait TestFocus {
   /**
     * Scalatest tag to run a specific test[s]
     *
-    * test("work in progress", focused) {
+    * test("work in progress", Focused) {
     *
     * }
     *

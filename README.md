@@ -4,24 +4,25 @@
 
 ```sh
 $ sbt
-> jetty:start
-```
-
-To hot reload the dev server on code changes:
-
-```sh
-$ sbt
 > watch
 ```
+
+`watch` starts Jetty server while watching files for changes. 
+
+## Running a tagged test(s):
+Update your test as such:
+
+```
+test("work in progress", Focused) {
+}
+```
+    sbt> testFocused
+    sbt> tetestFocusedSqlite
+    sbt> tetestFocusedPostgres
 
 ## Running tests against a particular database:
 
     sbt> testOnly software.altitude.test.core.suites.[SqliteSuite|PostgresSuite]
-
-## Running a tagged test(s):
-    sbt> testFocused
-    sbt> tetestFocusedSqlite
-    sbt> tetestFocusedPostgres
 
 ## Remote debugging
 
