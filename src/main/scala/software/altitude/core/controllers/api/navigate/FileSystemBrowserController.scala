@@ -12,6 +12,8 @@ class FileSystemBrowserController extends ScalatraServlet with CorsSupport {
   private final val log = LoggerFactory.getLogger(getClass)
   private val userHomeDir = System.getProperty("user.home")
 
+  // OPTIMIZE: Does this even work in Windows?
+
   before() {
     contentType = "application/json; charset=UTF-8"
   }
@@ -44,15 +46,26 @@ class FileSystemBrowserController extends ScalatraServlet with CorsSupport {
 
   private def getDirectoryListing(file: File): JsObject = {
     log.debug(s"Getting directory name list for $file")
-    val files: Seq[File] = file.listFiles().toSeq
-    val directoryList: Seq[String] = files
-      .filter(f => f.isDirectory && !f.getName.startsWith("."))
+    val allContents: Seq[File] = file.listFiles().toSeq
+
+    val files: Seq[String] = allContents
+      .filter(_.isFile)
       .map(_.getName)
+      .filter(!_.startsWith("."))
       .sorted
 
+    val directories: Seq[String] = allContents
+      .filter(_.isDirectory)
+      .map(_.getName)
+      .filter(!_.startsWith("."))
+      .sorted
+
+    // FIXME: bush league - use proper Path ways to do this
     val pathBreadcrumbs = file.getAbsolutePath.split(File.separator.toCharArray).filter(!_.isBlank).toList
+
     Json.obj(
-      C.Api.DIRECTORY_LIST -> directoryList,
+      C.Api.FILES -> files,
+      C.Api.DIRECTORIES -> directories,
       C.Api.CURRENT_PATH -> file.getAbsolutePath,
       C.Api.CURRENT_PATH_BREADCRUMBS -> pathBreadcrumbs
     )
