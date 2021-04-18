@@ -1,7 +1,6 @@
 package software.altitude.test.core.integration
 
 import java.io.File
-
 import com.google.inject.{AbstractModule, Guice}
 import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule

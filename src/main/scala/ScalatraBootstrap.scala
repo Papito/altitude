@@ -7,13 +7,14 @@ class ScalatraBootstrap extends LifeCycle with SingleApplication {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override def init(context: javax.servlet.ServletContext) {
-    context.initParameters("org.scalatra.environment") = Environment.ENV match {
+    val environment =  Environment.ENV match {
       case Environment.DEV => "development"
       case Environment.PROD => "production"
     }
+    context.setInitParameter("org.scalatra.environment", environment)
 
     // FIXME: hardcoded
-    context.initParameters("org.scalatra.cors.allowedOrigins") = "http://localhost:3000"
+    context.setInitParameter("org.scalatra.cors.allowedOrigins", "http://localhost:3000")
     SingleApplication.mountEndpoints(context)
     SingleApplication.app.runMigrations()
   }
