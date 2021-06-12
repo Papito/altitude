@@ -1,10 +1,13 @@
 package software.altitude.core
 
+import akka.actor.ActorSystem
+
 import javax.servlet.ServletContext
 import org.scalatra.servlet.ServletApiImplicits._
 import org.slf4j.LoggerFactory
 import software.altitude.core.controllers.api._
 import software.altitude.core.controllers.api.navigate.FileSystemBrowserController
+import software.altitude.core.controllers.web.ImportController
 
 /**
  * The singleton that makes sure we are only launching one instance of the app,
@@ -15,6 +18,8 @@ object SingleApplication {
   log.info("Initializing single application... ")
   val app: Altitude = new Altitude
 
+  private val actorSystem = ActorSystem()
+
   def mountEndpoints(context: ServletContext): Unit = {
     context.mount(new AssetController, "/api/v1/assets/*")
     context.mount(new SearchController, "/api/v1/search/*")
@@ -24,7 +29,7 @@ object SingleApplication {
     context.mount(new MetadataController, "/api/v1/metadata/*")
     context.mount(new admin.MetadataController, "/api/v1/admin/metadata/*")
     context.mount(new FileSystemBrowserController, "/navigate/*")
-
+    context.mount(new ImportController(actorSystem), "/import/*")
   }
 }
 

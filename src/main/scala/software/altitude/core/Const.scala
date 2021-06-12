@@ -142,6 +142,8 @@ object Const {
     val DATA = "data"
     val PATH = "path"
     val DIRECTORIES = "directories"
+    val DIRECTORY_NAMES = "directory_names"
+    val OS_DIR_SEPARATOR = "os_dir_separator"
     val FILES = "files"
     val CURRENT_PATH = "current_path"
     val CURRENT_PATH_BREADCRUMBS = "path_breadcrumbs"
