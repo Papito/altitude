@@ -29,3 +29,5 @@ test("work in progress", Focused) {
 1. Create a regular `Remote` run configuration (port 5005)
 2. Start Jetty server via SBT as usual
 3. Run the configuration created in Step 1
+
+TEST
