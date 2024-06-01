@@ -1,4 +1,4 @@
-package software.altitude.core.controllers.web
+/*package software.altitude.core.controllers.web
 
 import org.scalatra.InternalServerError
 import org.slf4j.LoggerFactory
@@ -26,3 +26,4 @@ class PassThroughWebController extends AltitudeStack with SingleApplication {
       InternalServerError(sw.toString)
   }
 }
+*/
