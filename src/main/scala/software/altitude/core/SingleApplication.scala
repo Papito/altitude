@@ -1,7 +1,5 @@
 package software.altitude.core
 
-import akka.actor.ActorSystem
-
 import javax.servlet.ServletContext
 import org.scalatra.servlet.ServletApiImplicits._
 import org.slf4j.LoggerFactory
@@ -17,7 +15,7 @@ object SingleApplication {
   log.info("Initializing single application... ")
   val app: Altitude = new Altitude
 
-  private val actorSystem = ActorSystem()
+  // private val actorSystem = ActorSystem()
 
   def mountEndpoints(context: ServletContext): Unit = {
     context.mount(new AssetController, "/api/v1/assets/*")
@@ -34,5 +32,4 @@ object SingleApplication {
 
 trait SingleApplication {
   val app: Altitude = SingleApplication.app
-
 }

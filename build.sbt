@@ -13,14 +13,14 @@ libraryDependencies ++= Seq(
   "org.scalatra"                %% "scalatra"              % scalatraVersion,
   "org.scalatra"                %% "scalatra-atmosphere"   % scalatraVersion,
   "org.scalatra"                %% "scalatra-scalatest"    % scalatraVersion % Test,
-  "org.mockito"                  % "mockito-core"          % "2.23.0" % Test,
+  "org.mockito"                  % "mockito-core"          % "5.11.0" % Test,
 
   "com.typesafe.play"           %% "play-json"             % "2.10.5",
 
   "org.apache.tika"              % "tika-parsers"          % "1.14",
   "org.apache.tika"              % "tika-serialization"    % "1.14",
 
-  "commons-io"                   % "commons-io"            % "2.5",
+  "commons-io"                   % "commons-io"            % "2.16.1",
   "commons-dbutils"              % "commons-dbutils"       % "1.8.1",
   "org.postgresql"               % "postgresql"            % "42.7.3",
   "org.xerial"                   % "sqlite-jdbc"           % "3.15.1",
@@ -29,7 +29,7 @@ libraryDependencies ++= Seq(
   "net.codingwell"              %% "scala-guice"           % "7.0.0",
   "org.imgscalr"                 % "imgscalr-lib"          % "4.2",
 
-  "ch.qos.logback"               % "logback-classic"       % "1.1.2" % "runtime",
+  "ch.qos.logback"               % "logback-classic"       % "1.5.6" % "runtime",
 
   "org.eclipse.jetty"            % "jetty-webapp"          % jettyVersion % "container;compile",
   "javax.servlet"                % "javax.servlet-api"     % "3.1.0" % Provided
@@ -69,4 +69,4 @@ commands += Command.command("watch") { state =>
   "~;jetty:stop;jetty:start" :: state
 }
 
-javaOptions ++= Seq( "-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005" )
+javaOptions ++= Seq( "-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005")
