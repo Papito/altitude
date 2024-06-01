@@ -67,15 +67,18 @@ abstract class CoreMigrationService {
     }
   }
 
-  def parseMigrationCommands(version: Int): List[String] = {
+  private def parseMigrationCommands(version: Int): List[String] = {
     log.info(s"RUNNING MIGRATION TO VERSION ^^$version^^")
 
     val path = new File(MIGRATIONS_DIR, s"$version$FILE_EXTENSION").toString
     log.info(s"PATH: $path")
 
     val r = getClass.getResource(path)
-    Source.fromURL(r).mkString.split("--//END").map(_.trim).toList.filter(_.nonEmpty)
+    val source = Source.fromURL(r)
+    val commands = source.mkString.split("--//END").map(_.trim).toList.filter(_.nonEmpty)
+    source.close()
 
+    commands
   }
 
 }
