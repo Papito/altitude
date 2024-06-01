@@ -53,7 +53,7 @@ trait AnswerSugar {
 }
 
 abstract class IntegrationTestCore
-  extends FunSuite
+  extends funsuite.AnyFunSuite
     with BeforeAndAfter
     with BeforeAndAfterEach
     with OptionValues

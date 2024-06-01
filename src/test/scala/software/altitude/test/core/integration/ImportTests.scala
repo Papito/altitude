@@ -2,8 +2,9 @@ package software.altitude.test.core.integration
 
 import java.io.File
 
+import org.scalatest.matchers.must.Matchers.{equal, not, empty}
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatest.DoNotDiscover
-import org.scalatest.Matchers._
 import software.altitude.core.DuplicateException
 import software.altitude.core.models.{Asset, Preview}
 

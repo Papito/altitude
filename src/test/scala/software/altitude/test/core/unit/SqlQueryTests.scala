@@ -1,14 +1,14 @@
 package software.altitude.test.core.unit
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.funsuite
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models.Repository
 import software.altitude.core.util.{Query, Sort, SortDirection}
 import software.altitude.core.{Const, Context}
 import software.altitude.test.core.TestFocus
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 
-class SqlQueryTests extends FunSuite with TestFocus {
+class SqlQueryTests extends funsuite.AnyFunSuite with TestFocus {
   private val repo = new Repository(
     id = Some("1"),
     name = "repo name",

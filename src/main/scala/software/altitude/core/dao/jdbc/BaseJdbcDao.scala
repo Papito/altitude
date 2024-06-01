@@ -1,7 +1,6 @@
 package software.altitude.core.dao.jdbc
 
 import java.sql.Connection
-
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.apache.commons.dbutils.QueryRunner
 import org.apache.commons.dbutils.handlers.{MapListHandler, ScalarHandler}
@@ -15,7 +14,7 @@ import software.altitude.core.transactions.{JdbcTransactionManager, TransactionI
 import software.altitude.core.util.{Query, QueryResult}
 import software.altitude.core.{ConstraintException, Context, Util, Const => C}
 
-import scala.collection.JavaConversions._
+import scala.jdk.CollectionConverters._
 
 abstract class BaseJdbcDao extends BaseDao {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -68,7 +67,7 @@ abstract class BaseJdbcDao extends BaseDao {
   }
 
   override def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
-    log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
+    log.debug(s"Getting by ID '$id' from '$tableName'")
     val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneRecSelectSql, List(id, ctx.repo.id.get))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
@@ -179,25 +178,15 @@ abstract class BaseJdbcDao extends BaseDao {
   protected def combineInsertValues(id: String, vals: List[Any])(implicit  ctx: Context): List[Any] =
     id :: ctx.repo.id.get :: vals
 
-  /**
-   * Quick and dirty way to insert multiple records with SQL. Fast but not desireable to use,
-   * as it bypasses checks like valid record IDs. Constraint failures are delegated to the database.
-   * @return number of records inserted
-   */
-  protected def addRecords(q: String, values: List[Any])
-                          (implicit ctx: Context, txId: TransactionId): Int = {
-    log.debug(s"INSERT MULTIPLE SQL: $q. ARGS: ${values.toString()}")
-    new QueryRunner().update(conn, q, values.map(_.asInstanceOf[Object]): _*)
-  }
-
   protected def manyBySqlQuery(sql: String, values: List[Any] = List())
                               (implicit ctx: Context, txId: TransactionId): List[Map[String, AnyRef]] = {
     log.debug(s"Running SQL query [$sql] with $values")
+
     val runner: QueryRunner = new QueryRunner()
-    val res = runner.query(conn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]): _*)
-    log.debug(s"Found ${res.size()} records", C.LogTag.DB)
+    val res = runner.query(conn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]): _*).asScala.toList
+    log.debug(s"Found ${res.length} records")
     // FIXME: is spacing here a scala Style violation?
-    res.map{_.toMap[String, AnyRef]}.toList
+    res.map{_.asScala.toMap[String, AnyRef]}.toList
   }
 
   /**
@@ -208,23 +197,23 @@ abstract class BaseJdbcDao extends BaseDao {
   protected def oneBySqlQuery(sql: String, values: List[Any] = List())
                              (implicit ctx: Context, txId: TransactionId): Option[Map[String, AnyRef]] = {
     log.debug(s"Running SQL query [$sql] with $values")
+
     val runner: QueryRunner = new QueryRunner()
-    val res = runner.query(conn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]): _*)
+    val res = runner.query(conn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]): _*).asScala.toList
+    log.debug(s"Found ${res.length} records")
 
-    log.debug(s"Found ${res.size()} records", C.LogTag.DB)
-
-    if (res.size() == 0) {
+    if (res.isEmpty) {
       return None
     }
 
-    if (res.size() > 1) {
+    if (res.length > 1) {
       throw ConstraintException("getById should return only a single result")
     }
 
     val rec = res.head
 
     log.debug(s"RECORD: $rec")
-    Some(rec.toMap[String, AnyRef])
+    Some(rec.asScala.toMap)
   }
 
   override def getByIds(ids: Set[String])
@@ -239,9 +228,9 @@ abstract class BaseJdbcDao extends BaseDao {
     log.debug(s"SQL: $sql with values: ${ids.toList}")
 
     val runner: QueryRunner = new QueryRunner()
-    val res = runner.query(conn, sql, new MapListHandler(), ctx.repo.id.get :: ids.toList: _*)
-    log.debug(s"Found ${res.size()} records", C.LogTag.DB)
-    val recs = res.map{_.toMap[String, AnyRef]}.toList
+    val res = runner.query(conn, sql, new MapListHandler(), ctx.repo.id.get :: ids.toList: _*).asScala.toList
+    log.debug(s"Found ${res.length} records")
+    val recs = res.map{_.asScala.toMap[String, AnyRef]}
     recs.map{makeModel}
   }
 

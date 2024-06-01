@@ -1,10 +1,10 @@
 package software.altitude.test.core.unit
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite
 import software.altitude.core.models.{BaseModel, User}
 import software.altitude.core.util.SearchQuery
 
-class SearchQueryModelTests extends FunSuite {
+class SearchQueryModelTests extends funsuite.AnyFunSuite {
 
   var user: User = User(id = Some(BaseModel.genId))
 

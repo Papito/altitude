@@ -1,7 +1,8 @@
 package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
-import org.scalatest.Matchers._
+import org.scalatest.matchers.must.Matchers.{be, empty}
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.models._
 import software.altitude.core.util._
 
@@ -402,7 +403,7 @@ import software.altitude.core.util._
     (results.records.head: Asset).metadata.get(boolField.id.get).value.head.value shouldBe "true"
   }
 
-  test("Sort info should be returned with query results", Focused) {
+  test("Sort info should be returned with query results") {
     val kwField = altitude.service.metadata.addField(
       MetadataField(
         name = "keyword field",

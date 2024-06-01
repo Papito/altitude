@@ -4,7 +4,8 @@ import java.io.File
 
 import org.apache.commons.io.{FileUtils, FilenameUtils}
 import org.scalatest.DoNotDiscover
-import org.scalatest.Matchers._
+import org.scalatest.matchers.must.Matchers.{equal, not, empty}
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import play.api.libs.json.{JsObject, Json}
 import software.altitude.core.models.{Asset, Folder, Repository}
 import software.altitude.core.{NotFoundException, StorageException, Util, Const => C}

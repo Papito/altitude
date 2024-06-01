@@ -1,11 +1,11 @@
 package software.altitude.test.core.unit
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.funsuite
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Util
 import software.altitude.core.models.{BaseModel, Folder}
 
-class FolderModelTests extends FunSuite {
+class FolderModelTests extends funsuite.AnyFunSuite {
 
   test("uniqueness") {
     val folder1 = new Folder(

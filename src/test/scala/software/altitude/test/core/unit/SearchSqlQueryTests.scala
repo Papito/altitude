@@ -1,15 +1,15 @@
 package software.altitude.test.core.unit
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers._
+import org.scalatest.funsuite
 import software.altitude.core.dao.postgres.querybuilder.{AssetSearchQueryBuilder => PostgresAssetSearchQueryBuilder}
 import software.altitude.core.dao.sqlite.querybuilder.{AssetSearchQueryBuilder => SqliteAssetSearchQueryBuilder}
 import software.altitude.core.models.{FieldType, MetadataField, Repository}
 import software.altitude.core.util._
 import software.altitude.core.{Context, Const => C}
 import software.altitude.test.core.TestFocus
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 
-class SearchSqlQueryTests extends FunSuite with TestFocus {
+class SearchSqlQueryTests extends funsuite.AnyFunSuite with TestFocus {
   private val repo = new Repository(
     id = Some("1"),
     name = "repo name",

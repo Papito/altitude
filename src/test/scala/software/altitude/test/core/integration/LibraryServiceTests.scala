@@ -4,7 +4,8 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.invocation.InvocationOnMock
 import org.scalatest.DoNotDiscover
-import org.scalatest.Matchers._
+import org.scalatest.matchers.must.Matchers.{not, endWith}
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.models._
 import software.altitude.core.util.Query
 import software.altitude.core.{DuplicateException, IllegalOperationException, NotFoundException, StorageException, Util, Const => C}

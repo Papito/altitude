@@ -9,8 +9,6 @@
 
 ## Build & Run
 
-
-
 ```sh
 $ make up
 $ sbt

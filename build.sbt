@@ -1,10 +1,10 @@
 organization := "software.altitude"
 name := "altitude"
 version := "0.1.0-SNAPSHOT"
-scalaVersion := "2.12.13"
+scalaVersion := "2.13.14"
 
-val json4sVersion = "3.6.11"
-val scalatraVersion = "2.6.2"
+val json4sVersion = "4.0.7"
+val scalatraVersion = "2.8.4"
 val jettyVersion = "9.4.20.v20190813"
 
 libraryDependencies ++= Seq(
@@ -15,18 +15,18 @@ libraryDependencies ++= Seq(
   "org.scalatra"                %% "scalatra-scalatest"    % scalatraVersion % Test,
   "org.mockito"                  % "mockito-core"          % "2.23.0" % Test,
 
-  "com.typesafe.play"           %% "play-json"             % "2.6.8",
+  "com.typesafe.play"           %% "play-json"             % "2.10.5",
 
   "org.apache.tika"              % "tika-parsers"          % "1.14",
   "org.apache.tika"              % "tika-serialization"    % "1.14",
 
   "commons-io"                   % "commons-io"            % "2.5",
-  "commons-dbutils"              % "commons-dbutils"       % "1.6",
-  "org.postgresql"               % "postgresql"            % "9.4-1201-jdbc41",
+  "commons-dbutils"              % "commons-dbutils"       % "1.8.1",
+  "org.postgresql"               % "postgresql"            % "42.7.3",
   "org.xerial"                   % "sqlite-jdbc"           % "3.15.1",
 
   "com.google.guava"             % "guava"                 % "19.0",
-  "net.codingwell"              %% "scala-guice"           % "4.1.1",
+  "net.codingwell"              %% "scala-guice"           % "7.0.0",
   "org.imgscalr"                 % "imgscalr-lib"          % "4.2",
 
   "ch.qos.logback"               % "logback-classic"       % "1.1.2" % "runtime",

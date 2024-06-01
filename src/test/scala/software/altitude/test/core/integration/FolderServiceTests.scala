@@ -1,7 +1,8 @@
 package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
-import org.scalatest.Matchers._
+import org.scalatest.matchers.must.Matchers.{contain, equal, not, empty}
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.models.Folder
 import software.altitude.core.{IllegalOperationException, NotFoundException, ValidationException}
 

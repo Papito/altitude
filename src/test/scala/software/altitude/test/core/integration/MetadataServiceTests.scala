@@ -1,7 +1,8 @@
 package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
-import org.scalatest.Matchers._
+import org.scalatest.matchers.must.Matchers.{contain, not, empty}
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.models._
 import software.altitude.core.{DuplicateException, NotFoundException, Util, ValidationException}
 

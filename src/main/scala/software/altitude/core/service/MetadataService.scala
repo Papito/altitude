@@ -408,7 +408,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
         )
       }
 
-      val res = metadata.data.foldLeft(scala.collection.immutable.Stack[JsValue]()) { (res, m) =>
+      val res = metadata.data.foldLeft(scala.collection.Seq[JsValue]()) { (res, m) =>
         val fieldId = m._1
         val field: MetadataField = allFields(fieldId)
         res :+ toJson(field, m._2)

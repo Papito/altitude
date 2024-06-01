@@ -55,5 +55,5 @@ abstract class AbstractTransactionManager {
   def withTransaction[A](f: => A)(implicit txId: TransactionId): A
   def savepoint()(implicit txId: TransactionId): Unit = throw new NotImplementedError
   def asReadOnly[A](f: => A)(implicit txId: TransactionId): A
-  def freeResources(): Unit = Unit
+  def freeResources(): Unit = ()
 }
