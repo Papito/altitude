@@ -23,8 +23,8 @@ abstract class CoreMigrationService {
 
   def migrateVersion(ctx: Context, version: Int)(implicit txId: TransactionId = new TransactionId): Unit
 
-  def runMigration(version: Int)
-                  (implicit ctx: Context = new Context(repo = null, user = null),
+  private def runMigration(version: Int)
+                          (implicit ctx: Context = new Context(repo = null, user = null),
                    txId: TransactionId = new TransactionId): Unit = {
     val migrationCommands = parseMigrationCommands(version)
 
@@ -75,6 +75,7 @@ abstract class CoreMigrationService {
 
     val r = getClass.getResource(path)
     Source.fromURL(r).mkString.split("--//END").map(_.trim).toList.filter(_.nonEmpty)
+
   }
 
 }

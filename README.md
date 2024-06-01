@@ -1,12 +1,23 @@
 # Altitude #
 
-## Build & Run ##
+## DEVELOPMENT SETUP
+
+### Core system requirements
+
+* Java (11)
+* Postgres database (13)
+
+## Build & Run
+
+
 
 ```sh
+$ make up
 $ sbt
-> watch
+> jetty:start
 ```
 
+FIXME: does not seem to work anymore with newer sbt
 `watch` starts Jetty server while watching files for changes. 
 
 ## Running a tagged test(s):
@@ -29,3 +40,17 @@ test("work in progress", Focused) {
 1. Create a regular `Remote` run configuration (port 5005)
 2. Start Jetty server via SBT as usual
 3. Run the configuration created in Step 1
+
+## Packaging
+* Update `Environment` to `PROD`
+
+        assembly
+
+The jar will be in `target/`. The jar needs to reside along these assets:
+
+* data/
+* client/ (from src/main/webapp/WEB-INF/client)
+* static/ (js/ css/ i/ from src/main/webapp)
+
+
+    java -jar [jar]
