@@ -8,11 +8,9 @@ abstract class MetadataExtractionService {
 
   /**
    * This structure defines how we construct the final metadata object.
-   * Metadata can have a lot of fields that are related or identical -
-   * this sets the priority for them, so we know which field to take
-   * from source metadata, depending on availability.
+   * Metadata can have a lot of fields that are related or identical
    */
-  val FIELD_BIBLE: Map[String, List[String]] = Map(
+  val FIELD_REFERENCE: Map[String, List[String]] = Map(
     /*
         FINAL_FIELD_1 -> [
           POSSIBLE_FIELD_1_PRIORITY_1,
@@ -22,65 +20,61 @@ abstract class MetadataExtractionService {
           POSSIBLE_FIELD_2_PRIORITY_2,
           POSSIBLE_FIELD_2_PRIORITY_3]
      */
-    "X Resolution" -> List(),
-    "Y Resolution" -> List(),
-    "tiff:Orientation" -> List(),
-
     "Image Width" -> List(
       "tiff:ImageWidth",
-      "Image Width",
-      "Exif Image Width"),
+      "exif:ImageWidth",
+      "Image Width"
+    ),
 
     "Image Height" -> List(
       "tiff:ImageLength",
-      "Image Height",
-      "Exif Image Height"),
+      "exif:Image Height",
+      "Image Height"
+    ),
 
-    "tiff:Make" -> List(
+    "Make" -> List(
       "tiff:Make",
+      "exif:Make",
       "Make"
     ),
 
-    "tiff:Model" -> List(
+    "Model" -> List(
       "tiff:Model",
+      "exif:Model",
       "Model"
     ),
 
-    "tiff:Software" -> List(),
-    "Lens Information" -> List(
+    "Software" -> List(),
+
+    "Lens" -> List(
       "Lens Information",
       "Lens",
       "Lens Model"
     ),
 
-    "exif:IsoSpeedRatings" -> List(
+    "Iso Speed" -> List(
       "exif:IsoSpeedRatings",
-      "Shutter Speed Value",
       "ISO Speed Ratings"),
 
-    "exif:FocalLength" -> List(
+    "Focal Length" -> List(
       "exif:FocalLength",
       "Focal Length",
       "Aperture Value"
     ),
 
-    "exif:FNumber" -> List(
+    "F-Number" -> List(
       "exif:FNumber",
       "F-Number"),
 
-    "exif:ExposureTime" -> List(
+    "Exposure Time" -> List(
       "exif:ExposureTime",
       "Exposure Time"
     ),
 
-    "exif:Flash" -> List(
+    "Flash" -> List(
       "exif:Flash",
       "Flash"
     ),
-
-    "Exposure Mode" -> List(),
-    "Exposure Program" -> List(),
-    "JPEG Quality" -> List(),
 
     "User Comment" -> List(
       "User Comment",

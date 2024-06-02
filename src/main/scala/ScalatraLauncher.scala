@@ -5,14 +5,14 @@ import org.scalatra.servlet.ScalatraListener
 import software.altitude.core.SingleApplication
 
 object ScalatraLauncher extends App  with SingleApplication {
-  val host = "localhost"
-  val port = 9010
+  private val host = "localhost"
+  private val port = 9010
 
-  val server = new Server
+  private val server = new Server
   server.setStopTimeout(5000)
   server.setStopAtShutdown(true)
 
-  val connector = new ServerConnector(server)
+  private val connector = new ServerConnector(server)
   connector.setHost(host)
   connector.setPort(port)
   server.addConnector(connector)
@@ -21,7 +21,7 @@ object ScalatraLauncher extends App  with SingleApplication {
   val context = new WebAppContext(getClass.getClassLoader.getResource("webapp").toExternalForm, "/")
   context.setEventListeners(Array(new ScalatraListener))
 
-  val contexts = new ContextHandlerCollection()
+  private val contexts = new ContextHandlerCollection()
   contexts.setHandlers(List[Handler](context).toArray)
 
   server.setHandler(contexts)

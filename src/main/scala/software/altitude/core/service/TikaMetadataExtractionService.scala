@@ -1,45 +1,25 @@
 package software.altitude.core.service
 
-import java.io.InputStream
-
+import java.io.{File, InputStream}
 import org.apache.tika.detect.{DefaultDetector, Detector}
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
-import org.apache.tika.parser.AbstractParser
-import org.apache.tika.parser.audio.AudioParser
-import org.apache.tika.parser.image.TiffParser
-import org.apache.tika.parser.jpeg.JpegParser
-import org.apache.tika.parser.mp3.Mp3Parser
+
+import org.apache.tika.parser.AutoDetectParser
+import org.apache.tika.sax.BodyContentHandler
 import org.slf4j.LoggerFactory
-import org.xml.sax.helpers.DefaultHandler
 import software.altitude.core.models.{AssetType, ImportAsset, Metadata, MetadataValue}
-import software.altitude.core.{AllDone, Const => C}
+
+
+
+import java.nio.file.Paths
 
 class TikaMetadataExtractionService extends MetadataExtractionService {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  private object PARSERS {
-    final val IMAGE = List(new JpegParser, new TiffParser)
-    final val MPEG_AUDIO = new Mp3Parser
-    final val ANY_AUDIO = new AudioParser
-  }
-
-  final private val TIKA_HANDLER = new DefaultHandler
-
   override def extract(importAsset: ImportAsset, mediaType: AssetType, asRaw: Boolean = false): Metadata = {
-    val raw: Option[TikaMetadata] = mediaType match {
-      case mt: AssetType if mt.mediaType == "image" => extractMetadata(importAsset, PARSERS.IMAGE)
-      /*
-          case mt: MediaType if mt.mediaType == "audio" && mt.mediaSubtype == "mpeg" =>
-            extractMetadata(importAsset, List(PARSERS.MPEG_AUDIO))
-          case mt: MediaType if mt.mediaType == "audio" =>
-            extractMetadata(importAsset, List(PARSERS.ANY_AUDIO))
-      */
-      case _ =>
-        log.warn(s"No metadata extractor found for $importAsset of type '$mediaType'", C.LogTag.SERVICE)
-        None
-    }
+    val raw: Option[TikaMetadata] = extractMetadata(importAsset)
 
     val metadata = rawToMetadata(raw)
 
@@ -49,7 +29,7 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
 
   private def rawToMetadata(raw: Option[TikaMetadata]): Metadata = {
     if (raw.isEmpty) {
-      return Metadata()
+      Metadata()
     }
 
     val data = scala.collection.mutable.Map[String, Set[String]]()
@@ -61,44 +41,33 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
     Metadata(data.toMap)
   }
 
-  private def extractMetadata(importAsset: ImportAsset, parsers: List[AbstractParser]): Option[TikaMetadata] = {
-    var inputStream: Option[InputStream] = None
-    var metadata: Option[TikaMetadata] = None
-
+  private def extractMetadata(importAsset: ImportAsset): Option[TikaMetadata] = {
+    log.info(s"Extracting metadata for '$importAsset'")
     try {
-      for (parser <- parsers) {
-        log.info(s"Extracting metadata for '$importAsset' with ${parser.getClass.getSimpleName}")
-        metadata = None
+      val filePath = Paths.get(importAsset.path)
+      val metadata = new TikaMetadata()
+      val inputStream = TikaInputStream.get(filePath, metadata)
+      val parser = new AutoDetectParser()
+      val handler = new BodyContentHandler()
 
-        try {
-          metadata = Some(new TikaMetadata)
-          inputStream = Some(TikaInputStream.get(importAsset.data, metadata.get))
-          parser.parse(inputStream.get, TIKA_HANDLER, metadata.get, null)
-          throw AllDone()
-        }
-        catch {
-          case ex: AllDone => throw ex
-          case ex: Exception =>
-            ex.printStackTrace()
-            log.error(
-              s"Error extracting metadata for '$importAsset' with ${parser.getClass.getSimpleName}: ${ex.toString}")
-        }
-        finally {
-          if (inputStream.isDefined) inputStream.get.close()
-        }
-      }
+      // new ImageMetadataExtractor(metadata).parseTiff(tis.getFile());
+      parser.parse(inputStream, handler, metadata)
+      inputStream.close()
+      Some(metadata)
     }
     catch {
-      case _: AllDone =>
-    }
-
-    metadata
+      case ex: Exception =>
+        ex.printStackTrace()
+        log.error(s"Error extracting metadata for '$importAsset': ${ex.toString}")
+        None
+      }
   }
 
-  private def normalize(metadata: Metadata): Metadata = {
+private def normalize(metadata: Metadata): Metadata = {
     val normalizedData = scala.collection.mutable.Map[String, Set[MetadataValue]]()
 
-    FIELD_BIBLE.foreach { case (destField, srcFields) =>
+
+    FIELD_REFERENCE.foreach { case (destField, srcFields) =>
       if (srcFields.isEmpty && metadata.contains(destField)) {
         normalizedData(destField) = metadata.data(destField)
       }
@@ -111,6 +80,8 @@ class TikaMetadataExtractionService extends MetadataExtractionService {
         }
       }
     }
+
+    // copy over the raw fields in
     Metadata(normalizedData.toMap)
   }
 

@@ -17,10 +17,13 @@ libraryDependencies ++= Seq(
 
   "com.typesafe.play"           %% "play-json"             % "2.10.5",
 
-  "org.apache.tika"              % "tika-parsers"          % "1.14",
-  "org.apache.tika"              % "tika-serialization"    % "1.14",
+  "org.apache.tika"              % "tika-core"             % "2.9.2",
+  "org.apache.tika"              % "tika-parsers" % "2.9.2",
+  "org.apache.tika"              % "tika-parser-image-module" % "2.9.2",
 
+  "joda-time"              % "joda-time"             % "2.12.7",
   "commons-io"                   % "commons-io"            % "2.16.1",
+  "commons-codec"                % "commons-codec"         % "1.17.0",
   "commons-dbutils"              % "commons-dbutils"       % "1.8.1",
   "org.postgresql"               % "postgresql"            % "42.7.3",
   "org.xerial"                   % "sqlite-jdbc"           % "3.15.1",
