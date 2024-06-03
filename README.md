@@ -18,6 +18,10 @@ $ sbt
 FIXME: does not seem to work anymore with newer sbt
 `watch` starts Jetty server while watching files for changes. 
 
+## Logging
+
+See `logback.xml` for configuration.
+
 ## Running a tagged test(s):
 Update your test as such:
 
