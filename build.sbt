@@ -15,7 +15,7 @@ libraryDependencies ++= Seq(
   "org.scalatra"                %% "scalatra-scalatest"       % scalatraVersion % Test,
   "org.scalatra.scalate"        %% "scalate-core"             % "1.10.1",
   "org.scalatra"                %% "scalatra-scalate"         % scalatraVersion,
-"org.mockito"                   % "mockito-core"              % "5.11.0" % Test,
+  "org.mockito"                   % "mockito-core"              % "5.11.0" % Test,
 
   "com.typesafe.play"           %% "play-json"                % "2.10.5",
 
@@ -27,6 +27,7 @@ libraryDependencies ++= Seq(
   "commons-io"                   % "commons-io"               % "2.16.1",
   "commons-codec"                % "commons-codec"            % "1.17.0",
   "commons-dbutils"              % "commons-dbutils"          % "1.8.1",
+
   "org.postgresql"               % "postgresql"               % "42.7.3",
   "org.xerial"                   % "sqlite-jdbc"              % "3.15.1",
 
