@@ -26,7 +26,6 @@ libraryDependencies ++= Seq(
   "org.mockito"                   % "mockito-core"              % "5.11.0" % Test,
 
   "com.typesafe.play"           %% "play-json"                % "2.10.5",
-
   "org.apache.tika"              % "tika-core"                % "2.9.2",
   "org.apache.tika"              % "tika-parsers" % "2.9.2",
   "org.apache.tika"              % "tika-parser-image-module" % "2.9.2",
