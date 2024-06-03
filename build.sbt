@@ -7,6 +7,14 @@ val json4sVersion = "4.0.7"
 val scalatraVersion = "2.8.4"
 val jettyVersion = "9.4.20.v20190813"
 
+scalacOptions := Seq(
+  "-deprecation",
+  "-language:postfixOps",
+  "-opt:l:method",
+  "-feature",
+  "-Wunused:imports",
+)
+
 libraryDependencies ++= Seq(
   "org.json4s"                  %% "json4s-jackson"           % json4sVersion,
 
@@ -45,6 +53,14 @@ libraryDependencies ++= Seq(
  .map(_.exclude("org.apache.cxf", "cxf-cxf-rt-transports-http"))
 
 enablePlugins(ScalatraPlugin)
+
+inThisBuild(
+  List(
+    scalaVersion := scalaVersion.value,
+    semanticdbEnabled := true,
+    semanticdbVersion := scalafixSemanticdb.revision
+  )
+)
 
 test in assembly := {}
 
