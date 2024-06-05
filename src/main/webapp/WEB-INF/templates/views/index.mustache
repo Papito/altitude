@@ -5,8 +5,203 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ALTITUDE</title>
     <link rel="stylesheet" href="/css/core.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <style>
+        main {
+            height: calc(100vh - 4.1em);
+        }
+
+        footer {
+            background: #333;
+            color: #fff;
+            bottom: 0;
+            display: grid;
+            align-items: center;
+        }
+
+        #vuePort {
+            display: grid;
+            grid-template-rows: [header]  2em
+                            [content] 1fr
+                            [footer]  2em;
+            min-height: 100vh;
+        }
+
+        .split {
+            box-sizing: border-box;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+
+        .split.split-horizontal,
+        .gutter.gutter-horizontal {
+            height: 100%;
+            float: left;
+        }
+
+        .gutter {
+            background-color: transparent;
+            background-repeat: no-repeat;
+            background-position: 50%;
+        }
+
+        .gutter.gutter-vertical {
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
+            cursor: ns-resize;
+        }
+
+        .gutter.gutter-horizontal {
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+            cursor: ew-resize;
+        }
+
+        #missionControl {
+            border-right: 1px solid var(--panel-border-color);
+            box-shadow: rgba(255, 255, 255, 0.07) 0 1px 0;
+            text-shadow: rgba(0,0,0,0.75) 0 1px;
+        }
+
+        #assets {
+            border-left: 1px solid var(--panel-border-color);
+            box-shadow: rgba(255, 255, 255, 0.07) 0 1px 0;
+            text-shadow: rgba(0,0,0,0.75) 0 1px;
+        }
+
+        #assetNav {
+            padding: .3em;
+            border-bottom: 1px solid var(--panel-border-color);
+            box-shadow: rgba(255, 255, 255, 0.07) 0 1px 0;
+            text-shadow: rgba(0,0,0,0.75) 0 1px;
+        }
+
+        #metadata {
+            border-top: 1px solid var(--panel-border-color);
+            box-shadow: rgba(255, 255, 255, 0.07) 0 1px 0;
+            text-shadow: rgba(0,0,0,0.75) 0 1px;
+        }
+
+        nav {
+            display: grid;
+            grid-template-columns: 1fr repeat(5, 1fr);
+            grid-column-gap: 10px;
+            background: #333;
+            color: #fff;
+            align-items: center;
+            box-shadow: rgba(255, 255, 255, 0.07) 0 1px 0;
+            border-bottom: 2px solid #272727;
+            text-shadow: rgba(0,0,0,0.75) 0 1px;
+        }
+        nav span, nav a {
+            color: #FFF;
+            text-decoration: none;
+            font-size: .8em;
+            font-family: var(--font);
+            text-transform: uppercase;
+        }
+        nav .brand a {
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: #979393;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+        nav div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        nav .menu {
+            letter-spacing: .10em;
+            color: #9399b4;
+            cursor: pointer;
+        }
+        nav .menu.import {
+            letter-spacing: .09em;
+            color: #6ef13c;
+        }
+        nav input {
+            border-radius: .4em;
+            color: white;
+            border: 2px groove #5a5855;
+            padding: .3em;
+            background-color: #666562;
+            width: 100%;
+        }
+        nav input::placeholder {
+            color: #a5a2a2;
+        }
+    </style>
 </head>
 <body>
-    THE START
+
+<div id="app">
+    <div id="vuePort">
+            <div>
+                <nav>
+                    <div class="brand">
+                        <a href="/">Altitude</a>
+                    </div>
+                    <div class="menu import">
+                        <i class="fas fa-download"
+                           @click="showDirBrowseModal = true">&nbsp;<span>Import</span></i>
+                    </div>
+                    <div class="menu">
+                        <i class="fas fa-database"><a href="">&nbsp;Repository</a></i>
+                    </div>
+                    <div class="menu">
+                        <i class="fas fa-user-astronaut">&nbsp;<a href="">&nbsp;Admin</a></i>
+                    </div>
+                    <div class="menu">
+                        <i class="fas fa-user">&nbsp;<a href="">&nbsp;User</a></i>
+                    </div>
+                    <div class="search">
+                        <label for="search"></label>
+                        <input
+                                id="search"
+                                type="text"
+                                name="search"
+                                placeholder="Search">
+                    </div>
+                </nav>
+            </div>
+        <main>
+            <div id="missionControl" class="split content split-horizontal">
+                <div id="assetNav" class="split content">
+                    <div id="folders">
+                    </div>
+                </div>
+                <div id="metadata" class="split content">
+                </div>
+            </div>
+
+            <div id="assets" class="split content split-horizontal">
+            </div>
+        </main>
+
+        <footer>
+            <div>
+                Footer!
+            </div>
+        </footer>
+    </div>
+</div>
+
+<script type="module" lang="js">
+    /*********************************************************************
+     * IMPORTS
+     *********************************************************************/
+    import Split from '/js/split.es.js'
+    Split(["#missionControl", "#assets"], {
+        sizes: [25, 75]
+    })
+    Split(["#assetNav", "#metadata"], {
+        sizes: [50, 50],
+        direction: 'vertical'
+    })
+</script>
+
 </body>
 </html>
