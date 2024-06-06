@@ -20,11 +20,11 @@
             align-items: center;
         }
 
-        #vuePort {
+        body {
             display: grid;
             grid-template-rows: [header]  2em
-                            [content] 1fr
-                            [footer]  2em;
+                                [content] 1fr
+                                [footer]  2em;
             min-height: 100vh;
         }
 
@@ -32,29 +32,6 @@
             box-sizing: border-box;
             overflow-y: auto;
             overflow-x: hidden;
-        }
-
-
-        .split.split-horizontal,
-        .gutter.gutter-horizontal {
-            height: 100%;
-            float: left;
-        }
-
-        .gutter {
-            background-color: transparent;
-            background-repeat: no-repeat;
-            background-position: 50%;
-        }
-
-        .gutter.gutter-vertical {
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
-            cursor: ns-resize;
-        }
-
-        .gutter.gutter-horizontal {
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
-            cursor: ew-resize;
         }
 
         #missionControl {
@@ -119,7 +96,7 @@
             cursor: pointer;
         }
         nav .menu.import {
-            letter-spacing: .09em;
+            letter-spacing: .1em;
             color: #6ef13c;
         }
         nav input {
@@ -137,57 +114,53 @@
 </head>
 <body>
 
-<div id="app">
-    <div id="vuePort">
-            <div>
-                <nav>
-                    <div class="brand">
-                        <a href="/">Altitude</a>
-                    </div>
-                    <div class="menu import">
-                        <i class="fas fa-download"
-                           @click="showDirBrowseModal = true">&nbsp;<span>Import</span></i>
-                    </div>
-                    <div class="menu">
-                        <i class="fas fa-database"><a href="">&nbsp;Repository</a></i>
-                    </div>
-                    <div class="menu">
-                        <i class="fas fa-user-astronaut">&nbsp;<a href="">&nbsp;Admin</a></i>
-                    </div>
-                    <div class="menu">
-                        <i class="fas fa-user">&nbsp;<a href="">&nbsp;User</a></i>
-                    </div>
-                    <div class="search">
-                        <label for="search"></label>
-                        <input
-                                id="search"
-                                type="text"
-                                name="search"
-                                placeholder="Search">
-                    </div>
-                </nav>
-            </div>
-        <main>
-            <div id="missionControl" class="split content split-horizontal">
-                <div id="assetNav" class="split content">
-                    <div id="folders">
-                    </div>
-                </div>
-                <div id="metadata" class="split content">
-                </div>
-            </div>
-
-            <div id="assets" class="split content split-horizontal">
-            </div>
-        </main>
-
-        <footer>
-            <div>
-                Footer!
-            </div>
-        </footer>
-    </div>
+<div>
+    <nav>
+        <div class="brand">
+            <a href="/">Altitude</a>
+        </div>
+        <div class="menu import">
+            <i class="fas fa-download"
+               @click="showDirBrowseModal = true">&nbsp;<span>Import</span></i>
+        </div>
+        <div class="menu">
+            <i class="fas fa-database"><a href="">&nbsp;Repository</a></i>
+        </div>
+        <div class="menu">
+            <i class="fas fa-user-astronaut">&nbsp;<a href="">&nbsp;Admin</a></i>
+        </div>
+        <div class="menu">
+            <i class="fas fa-user">&nbsp;<a href="">&nbsp;User</a></i>
+        </div>
+        <div class="search">
+            <label for="search"></label>
+            <input
+                    id="search"
+                    type="text"
+                    name="search"
+                    placeholder="Search">
+        </div>
+    </nav>
 </div>
+<main>
+    <div id="missionControl" class="split content split-horizontal">
+        <div id="assetNav" class="split content">
+            <div id="folders">
+            </div>
+        </div>
+        <div id="metadata" class="split content">
+        </div>
+    </div>
+
+    <div id="assets" class="split content split-horizontal">
+    </div>
+</main>
+
+<footer>
+    <div>
+        Footer!
+    </div>
+</footer>
 
 <script type="module" lang="js">
     /*********************************************************************

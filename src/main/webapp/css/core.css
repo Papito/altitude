@@ -9,51 +9,27 @@ body {
     margin: 0;
     background-color: var(--background-color);
     color: #c6c6c6;
-    font-size: .9em;
     font-family: var(--font);
 }
 
-::-webkit-scrollbar {
-    width: 10px;
+.split.split-horizontal,
+.gutter.gutter-horizontal {
+    height: 100%;
+    float: left;
 }
 
-/* Track */
-::-webkit-scrollbar-track {
-    background: #2f2e2e;
+.gutter {
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: 50%;
 }
 
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: #888;
+.gutter.gutter-vertical {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
+    cursor: ns-resize;
 }
 
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
-.button-success,
-.button-error,
-.button-warning,
-.button-secondary {
-    border: none;
-    border-radius: 4px;
-    color: white;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-}
-
-.button-success {
-    background: rgb(20, 137, 49);
-}
-
-.button-error {
-    background: rgb(202, 60, 60);
-}
-
-.button-warning {
-    background: rgb(223, 117, 20);
-}
-
-.button-secondary {
-    background: rgb(66, 184, 221);
+.gutter.gutter-horizontal {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+    cursor: ew-resize;
 }
