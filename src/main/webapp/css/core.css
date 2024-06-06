@@ -12,6 +12,38 @@ body {
     font-family: var(--font);
 }
 
+main {
+    height: calc(100vh - 4.1em);
+}
+
+footer {
+    background: #333;
+    color: #fff;
+    bottom: 0;
+    display: grid;
+    align-items: center;
+}
+
+body {
+    display: grid;
+    grid-template-rows: [header]  2em
+                        [content] 1fr
+                        [footer]  2em;
+    min-height: 100vh;
+}
+
+main {
+    height: calc(100vh - 4.1em);
+}
+
+footer {
+    background: #333;
+    color: #fff;
+    bottom: 0;
+    display: grid;
+    align-items: center;
+}
+
 .split.split-horizontal,
 .gutter.gutter-horizontal {
     height: 100%;
@@ -32,4 +64,10 @@ body {
 .gutter.gutter-horizontal {
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
     cursor: ew-resize;
+}
+
+.split {
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
