@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/css/font-awesome.min.css">
 
     <style>
-        #missionControl {
+        #browser {
             border-right: 1px solid var(--panel-border-color);
             box-shadow: rgba(255, 255, 255, 0.07) 0 1px 0;
             text-shadow: rgba(0,0,0,0.75) 0 1px;
@@ -20,14 +20,12 @@
             text-shadow: rgba(0,0,0,0.75) 0 1px;
         }
 
-        #assetNav {
-            padding: .3em;
-            border-bottom: 1px solid var(--panel-border-color);
+        #folders {
             box-shadow: rgba(255, 255, 255, 0.07) 0 1px 0;
             text-shadow: rgba(0,0,0,0.75) 0 1px;
         }
 
-        #metadata {
+        #albums {
             border-top: 1px solid var(--panel-border-color);
             box-shadow: rgba(255, 255, 255, 0.07) 0 1px 0;
             text-shadow: rgba(0,0,0,0.75) 0 1px;
@@ -41,12 +39,12 @@
 </div>
 
 <main>
-    <div id="missionControl" class="split content split-horizontal">
-        <div id="assetNav" class="split content">
+    <div id="browser" class="split content split-horizontal">
+        <div id="folders" class="split content">
             <div id="folders">
             </div>
         </div>
-        <div id="metadata" class="split content">
+        <div id="albums" class="split content">
         </div>
     </div>
 
@@ -55,9 +53,6 @@
 </main>
 
 <footer>
-    <div>
-        Index Footer
-    </div>
 </footer>
 
 <script type="module" lang="js">
@@ -65,10 +60,11 @@
      * IMPORTS
      *********************************************************************/
     import Split from '/js/split.es.js'
-    Split(["#missionControl", "#assets"], {
+
+    Split(["#browser", "#assets"], {
         sizes: [25, 75]
     })
-    Split(["#assetNav", "#metadata"], {
+    Split(["#folders", "#albums"], {
         sizes: [50, 50],
         direction: 'vertical'
     })

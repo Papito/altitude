@@ -1,7 +1,7 @@
 <style>
     nav {
         display: grid;
-        grid-template-columns: 1fr repeat(5, 1fr);
+        grid-template-columns: 150px repeat(4, 1fr) 250px;
         grid-column-gap: 10px;
         background: #333;
         color: #fff;
@@ -13,7 +13,7 @@
     nav span, nav a {
         color: #FFF;
         text-decoration: none;
-        font-size: .8em;
+        font-size: .9em;
         font-family: var(--font);
         text-transform: uppercase;
     }
@@ -50,31 +50,31 @@
     nav input::placeholder {
         color: #a5a2a2;
     }
+
+    nav .menu span {
+        margin-left: .5em;
+    }
 </style>
 
 <nav>
     <div class="brand">
         <a href="/">Altitude</a>
     </div>
+    <div class="menu">
+        <i class="fas fa-database"><a href=""><span>Default</span></a></i>
+    </div>
     <div class="menu import">
         <i class="fas fa-download"
-           @click="showDirBrowseModal = true">&nbsp;<span>Import</span></i>
+           @click="showDirBrowseModal = true"><span>Import</span></i>
     </div>
     <div class="menu">
-        <i class="fas fa-database"><a href="">&nbsp;Repository</a></i>
+        <i class="fas fa-search"><a href=""><span>Advanced Search</span></a></i>
     </div>
     <div class="menu">
-        <i class="fas fa-user-astronaut">&nbsp;<a href="">&nbsp;Admin</a></i>
-    </div>
-    <div class="menu">
-        <i class="fas fa-user">&nbsp;<a href="">&nbsp;User</a></i>
+        <i class="fas fa-adjust"><a href=""><span>Settings</span></a></i>
     </div>
     <div class="search">
         <label for="search"></label>
-        <input
-                id="search"
-                type="text"
-                name="search"
-                placeholder="Search">
+        <input id="search" type="text" name="search" placeholder="Search">
     </div>
 </nav>

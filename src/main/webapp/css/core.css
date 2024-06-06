@@ -32,10 +32,6 @@ body {
     min-height: 100vh;
 }
 
-main {
-    height: calc(100vh - 4.1em);
-}
-
 footer {
     background: #333;
     color: #fff;
