@@ -4,8 +4,7 @@ import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
-import software.altitude.core.Util
-import software.altitude.core.{Const => C}
+import software.altitude.core.{Util, Const => C}
 
 import java.util.UUID
 import scala.language.implicitConversions
@@ -94,7 +93,7 @@ abstract class BaseModel {
   }
 
   /**
-    * Returns core JSON attributes that most models should have
+   * Returns core JSON attributes that all models should have
     */
   protected def coreJsonAttrs: JsObject = JsObject(Map(
     C.Base.ID -> {id match {

@@ -1,8 +1,6 @@
 package software.altitude.core.models
 
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsValue
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, JsValue, Json}
 import software.altitude.core.{Const => C}
 
 import scala.language.implicitConversions
@@ -20,4 +18,8 @@ case class User(id: Option[String] = None) extends BaseModel {
   ) ++ coreJsonAttrs
 
   override def toString: String = s"<user> ${id.getOrElse("NO ID")}"
+
+  def forgetMe(): Unit = {
+    println("User: this is where you'd invalidate the saved token in you User model")
+  }
 }
