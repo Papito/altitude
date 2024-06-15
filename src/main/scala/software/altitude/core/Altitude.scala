@@ -59,11 +59,11 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeCor
     val migrationService: MigrationService = dataSourceType match {
       case C.DatasourceType.SQLITE => new MigrationService(app) with JdbcMigrationService with SqliteMigration {
         override final val CURRENT_VERSION = schemaVersion
-        override final val MIGRATIONS_DIR = "/migrations/server/sqlite"
+        override final val MIGRATIONS_DIR = "/migrations/sqlite"
       }
       case C.DatasourceType.POSTGRES => new MigrationService(app) with JdbcMigrationService with PostgresMigration {
         override final val CURRENT_VERSION = schemaVersion
-        override final val MIGRATIONS_DIR = "/migrations/server/postgres"
+        override final val MIGRATIONS_DIR = "/migrations/postgres"
       }
     }
   }
