@@ -74,13 +74,13 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeCor
   class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
 
+      val jdbcTxManager = new software.altitude.core.transactions.TransactionManager(app)
+
       dataSourceType match {
         case C.DatasourceType.POSTGRES =>
           DriverManager.registerDriver(new org.postgresql.Driver)
-
-          val jdbcTxManager = new software.altitude.core.transactions.JdbcTransactionManager(app)
           bind[AbstractTransactionManager].toInstance(jdbcTxManager)
-          bind[JdbcTransactionManager].toInstance(jdbcTxManager)
+          bind[TransactionManager].toInstance(jdbcTxManager)
 
           bind[UserDao].toInstance(new jdbc.UserDao(app) with dao.postgres.Postgres)
           bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.postgres.Postgres)
@@ -94,9 +94,8 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeCor
         case C.DatasourceType.SQLITE =>
           DriverManager.registerDriver(new org.sqlite.JDBC)
 
-          val jdbcTxManager = new SqliteTransactionManager(app)
           bind[AbstractTransactionManager].toInstance(jdbcTxManager)
-          bind[JdbcTransactionManager].toInstance(jdbcTxManager)
+          bind[TransactionManager].toInstance(jdbcTxManager)
 
           bind[UserDao].toInstance(new jdbc.UserDao(app) with dao.sqlite.Sqlite)
           bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.sqlite.Sqlite)

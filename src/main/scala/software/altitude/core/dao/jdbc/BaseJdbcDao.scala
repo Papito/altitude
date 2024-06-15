@@ -14,8 +14,8 @@ import software.altitude.core.dao.BaseDao
 import software.altitude.core.dao.jdbc.querybuilder.SqlQuery
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models.BaseModel
-import software.altitude.core.transactions.JdbcTransactionManager
 import software.altitude.core.transactions.TransactionId
+import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 import software.altitude.core.{Const => C}
@@ -28,7 +28,7 @@ abstract class BaseJdbcDao extends BaseDao {
 
   val tableName: String
 
-  protected final def txManager: JdbcTransactionManager = app.injector.instance[JdbcTransactionManager]
+  protected final def txManager: TransactionManager = app.injector.instance[TransactionManager]
 
   protected def conn(implicit ctx: Context, txId: TransactionId): Connection = {
     // get the connection associated with this transaction

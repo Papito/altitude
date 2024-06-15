@@ -1,6 +1,7 @@
 package software.altitude.core.transactions
 
 import org.slf4j.LoggerFactory
+import org.sqlite.SQLiteConfig
 import software.altitude.core.AltitudeCoreApp
 import software.altitude.core.{Const => C}
 
@@ -8,7 +9,7 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.util.Properties
 
-class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransactionManager {
+class TransactionManager(val app: AltitudeCoreApp) extends AbstractTransactionManager {
   private final val log = LoggerFactory.getLogger(getClass)
 
   /**
@@ -55,29 +56,42 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
     tx.close()
   }
 
-  /**
-   * JDBC-specific connection snooze-fest
-   */
-  // FIXME: Should be in (new) Postgres manager
   def connection(readOnly: Boolean): Connection = {
-    val props = new Properties
-    val user = app.config.getString("db.postgres.user")
-    props.setProperty("user", user)
-    val password = app.config.getString("db.postgres.password")
-    props.setProperty("password", password)
-    val url = app.config.getString("db.postgres.url")
-    val conn = DriverManager.getConnection(url, props)
-    log.debug(s"Opening connection $conn. Read-only: $readOnly")
+    app.config.datasourceType match {
+      case C.DatasourceType.POSTGRES =>
+        val props = new Properties
+        val user = app.config.getString("db.postgres.user")
+        props.setProperty("user", user)
+        val password = app.config.getString("db.postgres.password")
+        props.setProperty("password", password)
+        val url = app.config.getString("db.postgres.url")
+        val conn = DriverManager.getConnection(url, props)
+        log.debug(s"Opening connection $conn. Read-only: $readOnly")
 
-    if (readOnly) {
-      conn.setReadOnly(true)
-    }
-    else {
-      conn.setReadOnly(false)
-      conn.setAutoCommit(false)
-    }
+        if (readOnly) {
+          conn.setReadOnly(true)
+        }
+        else {
+          conn.setReadOnly(false)
+          conn.setAutoCommit(false)
+        }
 
-    conn
+        conn
+
+      case C.DatasourceType.SQLITE =>
+        val url: String = app.config.getString("db.sqlite.url")
+
+        val sqliteConfig: SQLiteConfig = new SQLiteConfig()
+        sqliteConfig.setReadOnly(true)
+        if (readOnly) {
+          DriverManager.getConnection(url, sqliteConfig.toProperties)
+        } else {
+          val writeConnection = DriverManager.getConnection(url)
+          writeConnection.setAutoCommit(false)
+
+          writeConnection
+        }
+    }
   }
 
   /**
@@ -123,7 +137,7 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
     finally {
       // clean up, if we are done with this transaction
       if (!tx.hasParents) {
-        log.debug(s"Closing: ${tx.id}", C.LogTag.DB)
+        log.debug(s"Closing: ${tx.id}")
         txRegistry.remove(txId.id)
         closeTransaction(tx)
         transactions.CLOSED += 1
@@ -151,8 +165,8 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
       tx.down()
 
       if (!tx.hasParents) {
-        log.debug(s"End: ${tx.id}", C.LogTag.DB)
-        log.debug(s"Closing: ${tx.id}", C.LogTag.DB)
+        log.debug(s"End: ${tx.id}")
+        log.debug(s"Closing: ${tx.id}")
         txRegistry.remove(txId.id)
         closeTransaction(tx)
         transactions.CLOSED += 1
