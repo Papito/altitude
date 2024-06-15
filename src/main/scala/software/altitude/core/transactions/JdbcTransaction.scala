@@ -1,7 +1,6 @@
 package software.altitude.core.transactions
 
 import org.slf4j.LoggerFactory
-import software.altitude.core.{Const => C}
 
 import java.sql.Connection
 import java.sql.SQLException
@@ -37,7 +36,7 @@ class JdbcTransaction(private val conn: Connection, val isReadOnly: Boolean)
     }
   }
 
-  def rollbackSavepoint(): Unit = {
+  private def rollbackSavepoint(): Unit = {
     if (savePoints.isEmpty) {
       return
     }
@@ -55,11 +54,11 @@ class JdbcTransaction(private val conn: Connection, val isReadOnly: Boolean)
     }
   }
 
-  def hasSavepoints: Boolean = savePoints.nonEmpty
+  private def hasSavepoints: Boolean = savePoints.nonEmpty
 
   override def close(): Unit = {
     if (!hasParents) {
-      log.debug(s"Closing connection for transaction $id", C.LogTag.DB)
+      log.debug(s"Closing connection for transaction $id")
       try {
         conn.close()
       }
@@ -73,7 +72,7 @@ class JdbcTransaction(private val conn: Connection, val isReadOnly: Boolean)
   override def commit(): Unit = {
     if (!hasParents) {
       try {
-        log.info(s"!COMMIT! $id", C.LogTag.DB)
+        log.info(s"!COMMIT! $id")
         conn.commit()
         savePoints.clear()
       }
@@ -86,13 +85,13 @@ class JdbcTransaction(private val conn: Connection, val isReadOnly: Boolean)
   override def rollback(): Unit = {
     try {
       if (!hasParents && !conn.isReadOnly) {
-        log.warn(s"!ROLLBACK! $id", C.LogTag.DB)
+        log.warn(s"!ROLLBACK! $id")
         conn.rollback()
         savePoints.clear()
       }
       // it's a savepoint
       else if (hasParents && hasSavepoints) {
-        log.info(s"!ROLLBACK SAVEPOINT! for $id", C.LogTag.DB)
+        log.info(s"!ROLLBACK SAVEPOINT! for $id")
         rollbackSavepoint()
       }
     }

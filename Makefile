@@ -1,5 +1,8 @@
 SHELL=/bin/sh
 
+watch:
+	sbt watch
+
 test:
 	sbt test
 

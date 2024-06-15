@@ -1,3 +1,9 @@
+DROP SCHEMA public CASCADE;
+--//END
+
+CREATE SCHEMA public;
+--//END
+
 CREATE TABLE _core (
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() AT TIME ZONE 'utc'),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
@@ -12,7 +18,7 @@ CREATE TABLE system (
 --//END
 CREATE UNIQUE INDEX system_01 ON system(id);
 --//END
-INSERT INTO system(version, initialized) VALUES(0, False);
+INSERT INTO system(version, initialized) VALUES(1, False);
 --//END
 
 CREATE TABLE account(

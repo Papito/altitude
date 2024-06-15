@@ -95,7 +95,7 @@ class JdbcTransactionManager(val app: AltitudeCoreApp) extends AbstractTransacti
     }
 
     try {
-      lock(tx) // this is a no-op for a "real" database
+      lock(tx) // this is a no-op for Postgres
       // level up - any new transactions within will be "nested" and not committed
       tx.up()
 

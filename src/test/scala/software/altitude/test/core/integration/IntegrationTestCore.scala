@@ -1,10 +1,5 @@
 package software.altitude.test.core.integration
 
-import com.google.inject.AbstractModule
-import com.google.inject.Guice
-import com.google.inject.Injector
-import net.codingwell.scalaguice.InjectorExtensions._
-import net.codingwell.scalaguice.ScalaModule
 import org.apache.commons.io.FileUtils
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
@@ -18,7 +13,6 @@ import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C, _}
 import software.altitude.test.core.TestFocus
 import software.altitude.test.core.integration.util.dao.UtilitiesDao
-import software.altitude.test.core.integration.util.dao.jdbc
 import software.altitude.test.core.suites.PostgresSuite
 import software.altitude.test.core.suites.SqliteSuite
 
@@ -82,11 +76,7 @@ abstract class IntegrationTestCore
     case _ => throw new IllegalArgumentException(s"Do not know of datasource: $datasource")
   }
 
-  /**
-   * Inject DB utilities, based on current data source
-   */
-  final val injector: Injector = Guice.createInjector(new InjectionModule)
-  final protected val dbUtilities: UtilitiesDao = injector.instance[UtilitiesDao]
+  final protected val dbUtilities: UtilitiesDao = new UtilitiesDao(altitude.app)
 
   /**
    * Extremely important! This is the one and only transaction id for tests.
@@ -201,18 +191,6 @@ abstract class IntegrationTestCore
         log.error(s"${altitude.txManager.transactions.CREATED} transactions instead of 1!")
       }
       require(altitude.txManager.transactions.CREATED == 1)
-    }
-  }
-
-  class InjectionModule extends AbstractModule with ScalaModule  {
-    override def configure(): Unit = {
-      log.info(s"Datasource type: ${altitude.dataSourceType}")
-
-      altitude.dataSourceType match {
-        case C.DatasourceType.POSTGRES | C.DatasourceType.SQLITE =>
-          bind[UtilitiesDao].toInstance(new jdbc.UtilitiesDao(altitude))
-        case _ => throw new IllegalArgumentException(s"Do not know of datasource: ${altitude.dataSourceType}")
-      }
     }
   }
 
