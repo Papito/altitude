@@ -1,18 +1,14 @@
 package software.altitude.core.controllers
 
 import org.scalatra.InternalServerError
-import org.slf4j.LoggerFactory
-import org.slf4j.MDC
-import software.altitude.core.Context
-import software.altitude.core.SingleApplication
-import software.altitude.core.models.Repository
-import software.altitude.core.models.User
+import org.slf4j.{LoggerFactory, MDC}
+import software.altitude.core.{AltitudeApplicationContext, Context}
+import software.altitude.core.models.{Repository, User}
 
-import java.io.PrintWriter
-import java.io.StringWriter
+import java.io.{PrintWriter, StringWriter}
 import scala.compat.Platform
 
-abstract class BaseController extends AltitudeStack with SingleApplication {
+abstract class BaseController extends AltitudeStack with AltitudeApplicationContext {
   private final val log = LoggerFactory.getLogger(getClass)
 
   final def user: User = request.getAttribute("user").asInstanceOf[User]

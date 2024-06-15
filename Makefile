@@ -1,5 +1,14 @@
 SHELL=/bin/sh
 
+test:
+	sbt test
+
+test-focused:
+	sbt testFocused
+
+lint:
+	sbt scalafixAll
+
 clean:
 	rm -rf data/db
 	rm -rf data/p/*

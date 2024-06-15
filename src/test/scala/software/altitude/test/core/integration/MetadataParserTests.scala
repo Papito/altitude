@@ -9,7 +9,7 @@ import java.io.File
 
 @DoNotDiscover class MetadataParserTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
-  test("normalize metadata", Focused) {
+  test("normalize metadata") {
     val metadata: Metadata = getMetadata("images/6.jpg")
     // metadata.data.toSeq.sortBy(_._1).foreach{case (key, value) => println(s"$key -> $value")}
     val verify = Map(

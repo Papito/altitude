@@ -7,13 +7,9 @@ import software.altitude.core.controllers.web.{SessionController, WebIndexContro
 
 import javax.servlet.ServletContext
 
-/**
- * The singleton that makes sure we are only launching one instance of the app,
- * in a servlet environment.
- */
-object SingleApplication {
+object AltitudeApplicationContext {
   private final val log = LoggerFactory.getLogger(getClass)
-  log.info("Initializing single application... ")
+  log.info("Initializing application context... ")
   val app: Altitude = new Altitude
 
   // private val actorSystem = ActorSystem()
@@ -34,6 +30,6 @@ object SingleApplication {
   }
 }
 
-trait SingleApplication {
-  val app: Altitude = SingleApplication.app
+trait AltitudeApplicationContext {
+  val app: Altitude = AltitudeApplicationContext.app
 }
