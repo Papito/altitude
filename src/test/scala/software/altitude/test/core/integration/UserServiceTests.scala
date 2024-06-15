@@ -7,7 +7,7 @@ import software.altitude.core.models.User
 
 @DoNotDiscover class UserServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
-  test("Can create and get a new user") {
+  test("Can create and get a new user", Focused) {
     val user: User = altitude.service.user.addUser(User())
     user.id should not be None
 

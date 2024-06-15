@@ -206,7 +206,7 @@ abstract class IntegrationTestCore
 
   class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
-      log.info(s"Datasource type: ${altitude.dataSourceType}", C.LogTag.APP)
+      log.info(s"Datasource type: ${altitude.dataSourceType}")
 
       altitude.dataSourceType match {
         case C.DatasourceType.POSTGRES | C.DatasourceType.SQLITE =>

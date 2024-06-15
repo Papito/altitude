@@ -11,7 +11,7 @@ import software.altitude.core.{Const => C}
 abstract class UserDao(val app: AltitudeCoreApp) extends BaseJdbcDao with software.altitude.core.dao.UserDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override final val tableName = "repository_user"
+  override final val tableName = "account"
 
   override protected val oneRecSelectSql: String = s"""
       SELECT ${defaultSqlColsForSelect.mkString(", ")}

@@ -4,6 +4,7 @@ import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import software.altitude.core.AltitudeCoreApp
 import software.altitude.core.Context
+import software.altitude.core.Environment
 import software.altitude.core.dao.MigrationDao
 import software.altitude.core.transactions.AbstractTransactionManager
 import software.altitude.core.transactions.TransactionId
@@ -71,8 +72,20 @@ abstract class CoreMigrationService {
   private def parseMigrationCommands(version: Int): List[String] = {
     log.info(s"RUNNING MIGRATION TO VERSION ^^$version^^")
 
-    val path = new File(MIGRATIONS_DIR, s"$version$FILE_EXTENSION").toString
-    log.info(s"PATH: $path")
+    val entireSchemaPath = new File(MIGRATIONS_DIR, "all.sql").toString
+
+    /* We load the entire schema as the one and only migration in the following cases:
+        * 1. In test and dev environments
+        * 2. When migrating to version 1 in prod
+     */
+    val path = Environment.ENV match {
+      case Environment.TEST | Environment.DEV =>entireSchemaPath
+      case Environment.PROD => if (version == 1) entireSchemaPath
+        else
+          new File(MIGRATIONS_DIR, s"$version$FILE_EXTENSION").toString
+    }
+
+    log.info(s"Migration path: $path")
 
     val r = getClass.getResource(path)
     val source = Source.fromURL(r)
