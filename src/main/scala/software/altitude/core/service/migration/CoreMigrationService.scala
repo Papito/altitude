@@ -28,13 +28,10 @@ abstract class CoreMigrationService {
   private def runMigration(version: Int)
                           (implicit ctx: Context = new Context(repo = null, user = null),
                    txId: TransactionId = new TransactionId): Unit = {
-    val migrationCommands = parseMigrationCommands(version)
 
+    val sqlCommands = parseMigrationCommands(version)
     txManager.withTransaction {
-      for (command <- migrationCommands) {
-        log.info(s"Executing $command")
-        DAO.executeCommand(command)
-      }
+        DAO.executeCommand(sqlCommands)
     }
 
     // must have schema changes committed
@@ -69,7 +66,7 @@ abstract class CoreMigrationService {
     }
   }
 
-  private def parseMigrationCommands(version: Int): List[String] = {
+  private def parseMigrationCommands(version: Int): String = {
     log.info(s"RUNNING MIGRATION TO VERSION ^^$version^^")
 
     val entireSchemaPath = new File(MIGRATIONS_DIR, "all.sql").toString
@@ -89,7 +86,7 @@ abstract class CoreMigrationService {
 
     val r = getClass.getResource(path)
     val source = Source.fromURL(r)
-    val commands = source.mkString.split("--//END").map(_.trim).toList.filter(_.nonEmpty)
+    val commands = source.mkString
     source.close()
 
     commands

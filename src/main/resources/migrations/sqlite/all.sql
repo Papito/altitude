@@ -3,18 +3,14 @@ CREATE TABLE system (
   version INT NOT NULL,
   initialized TINYINT NOT NULL
 );
---//END
 CREATE UNIQUE INDEX system_01 ON system(id);
---//END
 INSERT INTO system(version, initialized) VALUES(0, 0);
---//END
 
 CREATE TABLE account(
   id CHAR(36) PRIMARY KEY,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );
---//END
 
 CREATE TABLE repository(
   id CHAR(36) PRIMARY KEY,
@@ -27,7 +23,6 @@ CREATE TABLE repository(
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );
---//END
 
 CREATE TABLE stats (
   repository_id CHAR(36) NOT NULL,
@@ -35,11 +30,8 @@ CREATE TABLE stats (
   dim_val INT NOT NULL DEFAULT 0,
   FOREIGN KEY(repository_id) REFERENCES repository(id)
 );
---//END
 CREATE INDEX stats_01 ON stats(repository_id);
---//END
 CREATE UNIQUE INDEX stats_02 ON stats(repository_id, dimension);
---//END
 
 CREATE TABLE asset  (
   id CHAR(36) PRIMARY KEY,
@@ -61,11 +53,8 @@ CREATE TABLE asset  (
   FOREIGN KEY(repository_id) REFERENCES repository(id),
   FOREIGN KEY(user_id) REFERENCES account(id)
 );
---//END
 CREATE UNIQUE INDEX asset_01 ON asset(repository_id, checksum, is_recycled);
---//END
 CREATE UNIQUE INDEX asset_02 ON asset(repository_id, folder_id, filename, is_recycled);
---//END
 
 CREATE TABLE metadata_field (
   id CHAR(36) PRIMARY KEY,
@@ -77,11 +66,8 @@ CREATE TABLE metadata_field (
   updated_at DATE DEFAULT NULL,
   FOREIGN KEY(repository_id) REFERENCES repository(id)
 );
---//END
 CREATE INDEX metadata_field_01 ON metadata_field(repository_id);
---//END
 CREATE UNIQUE INDEX metadata_field_02 ON metadata_field(repository_id, name_lc);
---//END
 
 
 CREATE TABLE folder (
@@ -96,13 +82,9 @@ CREATE TABLE folder (
   updated_at DATE DEFAULT NULL,
   FOREIGN KEY(repository_id) REFERENCES repository(id)
 );
---//END
 CREATE INDEX folder_01 ON folder(repository_id, parent_id);
---//END
 CREATE UNIQUE INDEX folder_02 ON folder(repository_id, parent_id, name_lc);
---//END
 CREATE UNIQUE INDEX folder_03 ON folder(repository_id, parent_id, name_lc);
---//END
 
 CREATE TABLE search_parameter (
   repository_id CHAR(36) NOT NULL,
@@ -116,15 +98,9 @@ CREATE TABLE search_parameter (
   FOREIGN KEY(asset_id) REFERENCES asset(id),
   FOREIGN KEY(field_id) REFERENCES metadata_field(id)
 );
---//END
 CREATE INDEX search_parameter_01 ON search_parameter(repository_id, field_id, field_value_kw);
---//END
 CREATE INDEX search_parameter_02 ON search_parameter(repository_id, field_id, field_value_num);
---//END
 CREATE INDEX search_parameter_03 ON search_parameter(repository_id, field_id, field_value_bool);
---//END
 CREATE INDEX search_parameter_04 ON search_parameter(repository_id, field_id, field_value_dt);
---//END
 
 CREATE VIRTUAL TABLE search_document USING fts4(repository_id, asset_id, body);
---//END
