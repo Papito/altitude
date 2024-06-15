@@ -1,12 +1,16 @@
 package software.altitude.core.controllers
 
 import org.scalatra.InternalServerError
-import org.slf4j.{LoggerFactory, MDC}
-import software.altitude.core.{AltitudeApplicationContext, Context}
-import software.altitude.core.models.{Repository, User}
+import org.slf4j.LoggerFactory
+import org.slf4j.MDC
+import software.altitude.core.AltitudeApplicationContext
+import software.altitude.core.Context
+import software.altitude.core.models.Repository
+import software.altitude.core.models.User
 
-import java.io.{PrintWriter, StringWriter}
-import scala.compat.Platform
+import java.io.PrintWriter
+import java.io.StringWriter
+import java.lang.System.currentTimeMillis
 
 abstract class BaseController extends AltitudeStack with AltitudeApplicationContext {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -21,7 +25,7 @@ abstract class BaseController extends AltitudeStack with AltitudeApplicationCont
     val requestId = software.altitude.core.Util.randomStr(size = 6)
     request.setAttribute("request_id", requestId)
     MDC.put("REQUEST_ID", s"[$requestId]")
-    request.setAttribute("startTime", Platform.currentTime)
+    request.setAttribute("startTime", currentTimeMillis)
     logRequestStart()
     setUser()
     setRepository()
@@ -38,10 +42,10 @@ abstract class BaseController extends AltitudeStack with AltitudeApplicationCont
 
   protected def logRequestEnd(): Unit = {
     val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
-    log.info(s"Request END: ${request.getRequestURI} in ${Platform.currentTime - startTime}ms")
+    log.info(s"Request END: ${request.getRequestURI} in ${currentTimeMillis - startTime}ms")
   }
 
-  protected def setUser(): Unit = {
+  private def setUser(): Unit = {
     val userId =
       Option(request.getAttribute("user_id").asInstanceOf[String]) orElse params.get("user_id")
 
@@ -56,7 +60,7 @@ abstract class BaseController extends AltitudeStack with AltitudeApplicationCont
     request.setAttribute("user", user)
   }
 
-  protected def setRepository(): Unit = {
+  private def setRepository(): Unit = {
     val repositoryId =
       Option(request.getAttribute("repository_id").asInstanceOf[String]) orElse params.get("repository_id")
 

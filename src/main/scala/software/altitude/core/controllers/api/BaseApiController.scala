@@ -11,7 +11,7 @@ import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.BaseController
 import software.altitude.core.{Const => C}
 
-import scala.compat.Platform
+import java.lang.System.currentTimeMillis
 
 class BaseApiController extends BaseController with ContentEncodingSupport {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -19,14 +19,14 @@ class BaseApiController extends BaseController with ContentEncodingSupport {
   val OK: ActionResult = Ok("{}")
 
   val HTTP_POST_VALIDATOR: Option[ApiRequestValidator] = None
-  val HTTP_DELETE_VALIDATOR: Option[ApiRequestValidator] = None
-  val HTTP_UPDATE_VALIDATOR: Option[ApiRequestValidator] = None
+  private val HTTP_DELETE_VALIDATOR: Option[ApiRequestValidator] = None
+  private val HTTP_UPDATE_VALIDATOR: Option[ApiRequestValidator] = None
 
   def requestJson: Option[JsObject] = Some(
     if (request.body.isEmpty) Json.obj() else Json.parse(request.body).as[JsObject]
   )
 
-  def requestMethod: String = request.getMethod.toLowerCase
+  private def requestMethod: String = request.getMethod.toLowerCase
 
   before() {
     // verify that requests with request body are not empty
@@ -71,7 +71,7 @@ class BaseApiController extends BaseController with ContentEncodingSupport {
 
   override def logRequestEnd(): Unit = {
     val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
-    log.info(s"API request END: ${request.getRequestURI} in ${Platform.currentTime - startTime}ms")
+    log.info(s"API request END: ${request.getRequestURI} in ${currentTimeMillis - startTime}ms")
   }
 
   // override to disable this check in controllers that do not require a JSON payload for post and put
@@ -82,7 +82,7 @@ class BaseApiController extends BaseController with ContentEncodingSupport {
   }
 
   error {
-    case ex: ValidationException => {
+    case ex: ValidationException =>
       val jsonErrors = ex.errors.keys.foldLeft(Json.obj()) {(res, field) => {
         val key = field.toString
         res ++ Json.obj(key -> ex.errors(key))}
@@ -92,16 +92,13 @@ class BaseApiController extends BaseController with ContentEncodingSupport {
         C.Api.VALIDATION_ERROR -> ex.message,
         C.Api.VALIDATION_ERRORS -> (if (ex.errors.isEmpty) JsNull else jsonErrors)
       ))
-    }
-    case _: NotFoundException => {
+    case _: NotFoundException =>
       NotFound(Json.obj())
-    }
-    case ex: Exception => {
+    case ex: Exception =>
       val strStacktrace = software.altitude.core.Util.logStacktrace(ex)
 
       InternalServerError(Json.obj(
         C.Api.ERROR -> (if (ex.getMessage!= null) ex.getMessage else ex.getClass.getName),
         C.Api.STACKTRACE -> strStacktrace))
-    }
   }
 }

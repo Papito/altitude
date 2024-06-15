@@ -1,6 +1,7 @@
 import org.scalatra._
 import org.slf4j.LoggerFactory
-import software.altitude.core.{AltitudeApplicationContext, Environment}
+import software.altitude.core.AltitudeApplicationContext
+import software.altitude.core.Environment
 
 import javax.servlet.ServletContext
 
