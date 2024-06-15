@@ -1,11 +1,12 @@
 CREATE TABLE system (
-  id INT NOT NULL,
-  version INT NOT NULL
+  id INT NOT NULL DEFAULT 1,
+  version INT NOT NULL,
+  initialized TINYINT NOT NULL
 );
 --//END
 CREATE UNIQUE INDEX system_01 ON system(id);
 --//END
-INSERT INTO system(id, version) VALUES(0, 0);
+INSERT INTO system(version, initialized) VALUES(0, 0);
 --//END
 
 CREATE TABLE account(

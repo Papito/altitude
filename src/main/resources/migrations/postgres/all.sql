@@ -5,13 +5,14 @@ CREATE TABLE _core (
 --//END
 
 CREATE TABLE system (
-  id INT NOT NULL,
-  version INT NOT NULL
+  id INT NOT NULL DEFAULT 1,
+  version INT NOT NULL,
+  initialized BOOL NOT NULL DEFAULT FALSE
 );
 --//END
 CREATE UNIQUE INDEX system_01 ON system(id);
 --//END
-INSERT INTO system(id, version) VALUES(0, 0);
+INSERT INTO system(version, initialized) VALUES(0, False);
 --//END
 
 CREATE TABLE account(
