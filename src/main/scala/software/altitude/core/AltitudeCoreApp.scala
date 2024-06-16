@@ -2,7 +2,7 @@ package software.altitude.core
 
 import com.google.inject.Injector
 import org.slf4j.LoggerFactory
-import software.altitude.core.transactions.AbstractTransactionManager
+import software.altitude.core.transactions.TransactionManager
 
 trait AltitudeCoreApp {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -16,10 +16,7 @@ trait AltitudeCoreApp {
    */
   val injector: Injector
 
-  /**
-   * This is our injected transaction manager, determined based on our database.
-   */
-  val txManager: AbstractTransactionManager
+  val txManager: TransactionManager
 
   // ID for this application - which we may have multiple of in the same environment
   final val id: Int = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)

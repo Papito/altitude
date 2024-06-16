@@ -1,6 +1,5 @@
 package software.altitude.core.dao.jdbc
 
-import net.codingwell.scalaguice.InjectorExtensions._
 import org.apache.commons.dbutils.QueryRunner
 import org.apache.commons.dbutils.handlers.MapListHandler
 import org.apache.commons.dbutils.handlers.ScalarHandler
@@ -28,7 +27,7 @@ abstract class BaseJdbcDao extends BaseDao {
 
   val tableName: String
 
-  protected final def txManager: TransactionManager = app.injector.instance[TransactionManager]
+  protected final def txManager: TransactionManager = app.txManager
 
   protected def conn(implicit ctx: Context, txId: TransactionId): Connection = {
     // get the connection associated with this transaction

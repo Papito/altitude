@@ -3,7 +3,6 @@ package software.altitude.core
 import com.google.inject.AbstractModule
 import com.google.inject.Guice
 import com.google.inject.Injector
-import net.codingwell.scalaguice.InjectorExtensions._
 import net.codingwell.scalaguice.ScalaModule
 import org.slf4j.LoggerFactory
 import software.altitude.core.dao._
@@ -35,7 +34,7 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeCor
   /**
    * Injected transaction manager, determined based on our database.
    */
-  override val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
+  override val txManager: TransactionManager = new software.altitude.core.transactions.TransactionManager(app)
 
   object service {
     val user = new UserService(app)
@@ -74,13 +73,9 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeCor
   class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
 
-      val jdbcTxManager = new software.altitude.core.transactions.TransactionManager(app)
-
       dataSourceType match {
         case C.DatasourceType.POSTGRES =>
           DriverManager.registerDriver(new org.postgresql.Driver)
-          bind[AbstractTransactionManager].toInstance(jdbcTxManager)
-          bind[TransactionManager].toInstance(jdbcTxManager)
 
           bind[UserDao].toInstance(new jdbc.UserDao(app) with dao.postgres.Postgres)
           bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.postgres.Postgres)
@@ -93,9 +88,6 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeCor
 
         case C.DatasourceType.SQLITE =>
           DriverManager.registerDriver(new org.sqlite.JDBC)
-
-          bind[AbstractTransactionManager].toInstance(jdbcTxManager)
-          bind[TransactionManager].toInstance(jdbcTxManager)
 
           bind[UserDao].toInstance(new jdbc.UserDao(app) with dao.sqlite.Sqlite)
           bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.sqlite.Sqlite)
@@ -112,9 +104,7 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeCor
     }
   }
 
-  def freeResources(): Unit = {
-    txManager.freeResources()
-  }
+  def freeResources(): Unit = {}
 
   override def runMigrations(): Unit = {
     if (service.migrationService.migrationRequired) {

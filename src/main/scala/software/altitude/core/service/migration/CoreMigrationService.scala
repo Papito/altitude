@@ -6,8 +6,8 @@ import software.altitude.core.AltitudeCoreApp
 import software.altitude.core.Context
 import software.altitude.core.Environment
 import software.altitude.core.dao.MigrationDao
-import software.altitude.core.transactions.AbstractTransactionManager
 import software.altitude.core.transactions.TransactionId
+import software.altitude.core.transactions.TransactionManager
 
 import java.io.File
 import scala.io.Source
@@ -17,7 +17,7 @@ abstract class CoreMigrationService {
 
   protected val app: AltitudeCoreApp
   protected val DAO: MigrationDao = app.injector.instance[MigrationDao]
-  protected val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
+  protected val txManager: TransactionManager = app.txManager
   protected val CURRENT_VERSION: Int
 
   protected val MIGRATIONS_DIR: String

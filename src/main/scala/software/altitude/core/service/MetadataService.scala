@@ -7,8 +7,8 @@ import software.altitude.core.Validators.ModelDataValidator
 import software.altitude.core.dao.AssetDao
 import software.altitude.core.dao.MetadataFieldDao
 import software.altitude.core.models._
-import software.altitude.core.transactions.AbstractTransactionManager
 import software.altitude.core.transactions.TransactionId
+import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.Query
 import software.altitude.core.{Const => C, _}
 
@@ -31,7 +31,7 @@ object MetadataService {
 class MetadataService(val app: Altitude) extends ModelValidation {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  protected val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
+  protected val txManager: TransactionManager = app.txManager
   protected val metadataFieldDao: MetadataFieldDao = app.injector.instance[MetadataFieldDao]
   protected val assetDao: AssetDao = app.injector.instance[AssetDao]
 

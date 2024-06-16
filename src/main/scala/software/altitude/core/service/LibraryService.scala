@@ -1,6 +1,5 @@
 package software.altitude.core.service
 
-import net.codingwell.scalaguice.InjectorExtensions._
 import org.imgscalr.Scalr
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
@@ -8,8 +7,8 @@ import software.altitude.core.Altitude
 import software.altitude.core.Context
 import software.altitude.core.models.Folder
 import software.altitude.core.models._
-import software.altitude.core.transactions.AbstractTransactionManager
 import software.altitude.core.transactions.TransactionId
+import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 import software.altitude.core.util.SearchQuery
@@ -34,7 +33,7 @@ import javax.imageio.ImageIO
   */
 class LibraryService(val app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
-  protected val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
+  protected val txManager: TransactionManager = app.txManager
 
   // FIXME: does not belong here - image specific
   val previewBoxSize: Int = app.config.getInt("preview.box.pixels")

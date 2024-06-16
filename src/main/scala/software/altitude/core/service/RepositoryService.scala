@@ -13,14 +13,14 @@ import software.altitude.core.models.BaseModel
 import software.altitude.core.models.Repository
 import software.altitude.core.models.Stats
 import software.altitude.core.models.User
-import software.altitude.core.transactions.AbstractTransactionManager
 import software.altitude.core.transactions.TransactionId
+import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.{Const => C}
 
 class RepositoryService(val app: Altitude) extends BaseService[Repository] {
   private final val log = LoggerFactory.getLogger(getClass)
   protected val dao: RepositoryDao = app.injector.instance[RepositoryDao]
-  override protected val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
+  override protected val txManager: TransactionManager = app.txManager
 
   override def getById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
     throw new NotImplementedError
@@ -28,7 +28,7 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
 
   def getRepositoryById(id: String)(implicit txId: TransactionId = new TransactionId): Repository = {
     txManager.asReadOnly[JsObject] {
-      implicit val context = Context.EMPTY
+      implicit val context: Context = Context.EMPTY
 
       dao.getById(id) match {
         case Some(obj) => obj
@@ -85,4 +85,3 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
     }
   }
 }
-

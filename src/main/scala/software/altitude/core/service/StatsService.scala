@@ -9,14 +9,14 @@ import software.altitude.core.dao.StatDao
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Stat
 import software.altitude.core.models.Stats
-import software.altitude.core.transactions.AbstractTransactionManager
 import software.altitude.core.transactions.TransactionId
+import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.Query
 
 class StatsService(val app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
   protected val dao: StatDao = app.injector.instance[StatDao]
-  protected val txManager: AbstractTransactionManager = app.injector.instance[AbstractTransactionManager]
+  protected val txManager: TransactionManager = app.txManager
 
   def getStats(implicit ctx: Context, txId: TransactionId = new TransactionId): Stats = {
     txManager.asReadOnly[Stats] {
@@ -189,4 +189,3 @@ class StatsService(val app: Altitude) {
   }
 
 }
-

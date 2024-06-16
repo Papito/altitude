@@ -1,13 +1,12 @@
 package software.altitude.test.core.integration.util.dao
 
-import net.codingwell.scalaguice.InjectorExtensions._
 import software.altitude.core.AltitudeCoreApp
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.transactions.TransactionManager
 
 class UtilitiesDao(app: AltitudeCoreApp)  {
 
-  protected final def txManager: TransactionManager = app.injector.instance[TransactionManager]
+  protected final def txManager: TransactionManager = app.txManager
 
   def rollback(): Unit = {
 

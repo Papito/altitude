@@ -9,7 +9,20 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.util.Properties
 
-class TransactionManager(val app: AltitudeCoreApp) extends AbstractTransactionManager {
+class TransactionManager(val app: AltitudeCoreApp) {
+
+  object transactions {
+    var CREATED = 0
+    var COMMITTED = 0
+    var CLOSED = 0
+
+    def reset(): Unit = {
+      CREATED = 0
+      COMMITTED = 0
+      CLOSED = 0
+    }
+  }
+
   private final val log = LoggerFactory.getLogger(getClass)
 
   /**
@@ -45,11 +58,6 @@ class TransactionManager(val app: AltitudeCoreApp) extends AbstractTransactionMa
     log.debug(s"CREATING TRANSACTION ${txId.id}")
     transactions.CREATED += 1
     tx
-  }
-
-  def closeConnection(conn: Connection): Unit = {
-    log.info(s"Closing connection $conn")
-    conn.close()
   }
 
   def closeTransaction(tx: JdbcTransaction): Unit = {
@@ -94,13 +102,7 @@ class TransactionManager(val app: AltitudeCoreApp) extends AbstractTransactionMa
     }
   }
 
-  /**
-   * This is defined for any JDBC driver that is not thread-safe for writes (Sqlite)
-   */
-  protected def lock(tx: Transaction): Unit = {}
-  protected def unlock(tx: Transaction): Unit = {}
-
-  override def withTransaction[A](f: => A)(implicit txId: TransactionId = new TransactionId): A = {
+  def withTransaction[A](f: => A)(implicit txId: TransactionId = new TransactionId): A = {
     log.debug("WRITE transaction")
     val tx = transaction()
 
@@ -109,7 +111,6 @@ class TransactionManager(val app: AltitudeCoreApp) extends AbstractTransactionMa
     }
 
     try {
-      lock(tx) // this is a no-op for Postgres
       // level up - any new transactions within will be "nested" and not committed
       tx.up()
 
@@ -142,12 +143,10 @@ class TransactionManager(val app: AltitudeCoreApp) extends AbstractTransactionMa
         closeTransaction(tx)
         transactions.CLOSED += 1
       }
-
-      unlock(tx)
     }
   }
 
-  override def asReadOnly[A](f: => A)(implicit txId: TransactionId = new TransactionId): A = {
+  def asReadOnly[A](f: => A)(implicit txId: TransactionId = new TransactionId): A = {
     log.debug("READ transaction")
     val tx = transaction(readOnly = true)
 
@@ -174,7 +173,7 @@ class TransactionManager(val app: AltitudeCoreApp) extends AbstractTransactionMa
     }
   }
 
-  override def savepoint()(implicit txId: TransactionId): Unit = {
+  def savepoint()(implicit txId: TransactionId): Unit = {
     transaction().addSavepoint()
   }
 }
