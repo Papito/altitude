@@ -106,7 +106,7 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeApp
 
   def freeResources(): Unit = {}
 
-  override def runMigrations(): Unit = {
+  def runMigrations(): Unit = {
     if (service.migrationService.migrationRequired) {
       log.warn("Migration is required!")
       if (Environment.ENV != Environment.TEST) {

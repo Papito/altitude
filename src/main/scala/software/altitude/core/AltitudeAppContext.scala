@@ -7,8 +7,6 @@ import software.altitude.core.transactions.TransactionManager
 trait AltitudeAppContext {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  def runMigrations(): Unit
-
   /**
    * At this point determine which data access classes we are loading, which
    * transaction manager we are using for the data sources of choice, load the drivers,
