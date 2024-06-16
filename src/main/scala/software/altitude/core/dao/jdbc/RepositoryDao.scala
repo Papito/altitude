@@ -10,7 +10,7 @@ import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C}
 
 abstract class RepositoryDao(val app: AltitudeCoreApp)
-  extends BaseJdbcDao
+  extends BaseDao
     with software.altitude.core.dao.RepositoryDao {
   private final val log = LoggerFactory.getLogger(getClass)
 

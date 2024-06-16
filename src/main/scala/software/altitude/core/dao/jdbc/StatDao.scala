@@ -9,7 +9,7 @@ import software.altitude.core.models.Stat
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C}
 
-abstract class StatDao(val app: AltitudeCoreApp) extends BaseJdbcDao with software.altitude.core.dao.StatDao {
+abstract class StatDao(val app: AltitudeCoreApp) extends BaseDao with software.altitude.core.dao.StatDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override final val tableName = "stats"

@@ -1,14 +1,14 @@
 package software.altitude.core.dao.postgres
 
 import org.joda.time.DateTime
-import software.altitude.core.dao.jdbc.BaseJdbcDao
+import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.BaseModel
 import software.altitude.core.{Const => C}
 
 import java.sql.Timestamp
 
 
-trait Postgres { this: BaseJdbcDao =>
+trait Postgres { this: BaseDao =>
 
   override protected def defaultSqlColsForSelect: List[String] = List(
     C.Base.ID,
@@ -49,4 +49,3 @@ trait Postgres { this: BaseJdbcDao =>
   }
 
 }
-

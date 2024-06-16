@@ -1,6 +1,7 @@
 package software.altitude.core.dao
 
 import software.altitude.core.Context
+import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.transactions.TransactionId
 
 trait StatDao extends BaseDao {

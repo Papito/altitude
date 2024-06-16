@@ -4,11 +4,11 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
-import software.altitude.core.dao.jdbc.BaseJdbcDao
+import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.BaseModel
 import software.altitude.core.{Const => C}
 
-trait Sqlite { this: BaseJdbcDao =>
+trait Sqlite { this: BaseDao =>
 
   override protected def defaultSqlColsForSelect: List[String] = List(
     C.Base.ID,

@@ -8,7 +8,7 @@ import software.altitude.core.Context
 import software.altitude.core.transactions.TransactionId
 
 abstract class MigrationDao(val app: AltitudeCoreApp)
-  extends BaseJdbcDao with software.altitude.core.dao.MigrationDao {
+  extends BaseDao with software.altitude.core.dao.MigrationDao {
 
   private final val log = LoggerFactory.getLogger(getClass)
 

@@ -6,7 +6,7 @@ import software.altitude.core.Altitude
 import software.altitude.core.Context
 import software.altitude.core.DuplicateException
 import software.altitude.core.NotFoundException
-import software.altitude.core.dao.BaseDao
+import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.BaseModel
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.transactions.TransactionManager

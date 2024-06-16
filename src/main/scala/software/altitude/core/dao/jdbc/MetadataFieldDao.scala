@@ -9,7 +9,7 @@ import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C}
 
 abstract class MetadataFieldDao(val app: AltitudeCoreApp)
-  extends BaseJdbcDao with software.altitude.core.dao.MetadataFieldDao {
+  extends BaseDao with software.altitude.core.dao.MetadataFieldDao {
 
   override final val tableName = "metadata_field"
 

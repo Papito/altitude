@@ -6,10 +6,10 @@ import org.apache.commons.dbutils.handlers.ScalarHandler
 import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
+import software.altitude.core.AltitudeCoreApp
 import software.altitude.core.ConstraintException
 import software.altitude.core.Context
 import software.altitude.core.Util
-import software.altitude.core.dao.BaseDao
 import software.altitude.core.dao.jdbc.querybuilder.SqlQuery
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models.BaseModel
@@ -20,9 +20,13 @@ import software.altitude.core.util.QueryResult
 import software.altitude.core.{Const => C}
 
 import java.sql.Connection
+import java.util.regex.Pattern
 import scala.jdk.CollectionConverters._
 
-abstract class BaseJdbcDao extends BaseDao {
+
+abstract class BaseDao {
+  val app: AltitudeCoreApp
+
   private final val log = LoggerFactory.getLogger(getClass)
 
   val tableName: String
@@ -58,13 +62,38 @@ abstract class BaseJdbcDao extends BaseDao {
   // datetime as a JSON value
   protected def dtAsJsString(dt: DateTime): JsString = JsString(Util.isoDateTime(Some(dt)))
 
+  // this is the valid ID pattern
+  private val VALID_ID_PATTERN = Pattern.compile("[a-z0-9]+")
+
+  /**
+   * Verify that a DB id to be used is valid
+   */
+  def verifyId(id: String): Unit = {
+    if (id == null) {
+      throw new IllegalArgumentException("ID is not defined")
+    }
+
+    if (id.length != BaseModel.ID_LEN) {
+      throw new IllegalArgumentException(s"ID length should be ${BaseModel.ID_LEN}. Was: [${id.length}]")
+    }
+
+    if (!VALID_ID_PATTERN.matcher(id).find()) {
+      throw new IllegalArgumentException(s"ID [$id] is not alphanumeric")
+    }
+  }
+
   // SQL to select the whole record, in very simple cases
   protected val oneRecSelectSql: String = s"""
       SELECT ${defaultSqlColsForSelect.mkString(", ")}
         FROM $tableName
        WHERE ${C.Base.ID} = ? AND ${C.Base.REPO_ID} = ?"""
 
-  override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
+  /**
+   * Add a single record
+   * @param jsonIn JsObject OR a model
+   * @return JsObject of the added record, with ID of the record in the databases
+   */
+  def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
     val sql: String = s"""
       INSERT INTO $tableName (${coreSqlColsForInsert.mkString(", ")})
            VALUES ($coreSqlValsForInsert)"""
@@ -72,13 +101,53 @@ abstract class BaseJdbcDao extends BaseDao {
     addRecord(jsonIn, sql, List[Any]())
   }
 
-  override def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
+  /**
+   * Gert a single record by ID
+   *
+   * @param id record id as string
+   * @return optional JsObject, which implicitly can be turned into an instance of a concrete domain
+   *         model. This method does NOT throw a NotFound error, as it is not assumed it is always
+   *         and error.
+   */
+  def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'")
     val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneRecSelectSql, List(id, ctx.repo.id.get))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
 
-  override def deleteByQuery(q: Query)(implicit ctx: Context, txId: TransactionId): Int = {
+  def getAll(implicit ctx: Context, txId: TransactionId): List[JsObject] = query(new Query()).records
+
+  /**
+   * Delete a document by its ID
+   *
+   * @return number of documents deleted - 0 or 1
+   */
+  def deleteById(id: String)(implicit ctx: Context, txId: TransactionId): Int = {
+    val q: Query = new Query().add(C.Base.ID -> id)
+    deleteByQuery(q)
+  }
+
+  /**
+   * Update a document by ID with select field values (does not overwrite the document)
+   *
+   * @param id id of the document to be updated
+   * @param data JSON data for the update document, which is NOT used to overwrite the existing one
+   * @param fields fields to be updated with new values, taken from <code>data</code>
+   *
+   * @return number of documents updated - 0 or 1
+   */
+  def updateById(id: String, data: JsObject, fields: List[String])
+                (implicit ctx: Context, txId: TransactionId): Int = {
+    val q: Query = new Query().add(C.Base.ID -> id)
+    updateByQuery(q, data, fields)
+  }
+
+  /**
+   * Delete one or more document by query.
+   *
+   * @return number of documents deleted
+   */
+  def deleteByQuery(q: Query)(implicit ctx: Context, txId: TransactionId): Int = {
     log.debug(s"Deleting record by query: $q")
     val fieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
 
@@ -96,7 +165,12 @@ abstract class BaseJdbcDao extends BaseDao {
     numDeleted
   }
 
-  override def deleteBySql(sql: String, bindValues: List[Object])(implicit ctx: Context, txId: TransactionId): Int = {
+  /**
+   * Delete by SQL.
+   *
+   * @return number of documents deleted
+   */
+  def deleteBySql(sql: String, bindValues: List[Object])(implicit ctx: Context, txId: TransactionId): Int = {
     log.debug("Deleting records by SQL")
     log.debug(s"Delete SQL: $sql, with values: $bindValues")
     val runner: QueryRunner = new QueryRunner()
@@ -105,7 +179,10 @@ abstract class BaseJdbcDao extends BaseDao {
     numDeleted
   }
 
-  override def query(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+  /**
+   * Get multiple documents using a Query
+   */
+  def query(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
     this.query(q, sqlQueryBuilder)
   }
 
@@ -157,7 +234,7 @@ abstract class BaseJdbcDao extends BaseDao {
 
     // create ID unless there is an override
     val id = if (existingObjId.isDefined) existingObjId.get else BaseModel.genId
-    BaseDao.verifyId(id)
+    verifyId(id)
 
     // prepend ID and REPO ID, as it is required for most records
     val _values: List[Any] = combineInsertValues(id, values)
@@ -222,7 +299,7 @@ abstract class BaseJdbcDao extends BaseDao {
     Some(rec.asScala.toMap)
   }
 
-  override def getByIds(ids: Set[String])
+  def getByIds(ids: Set[String])
                        (implicit ctx: Context, txId: TransactionId): List[JsObject] = {
     val placeholders = ids.toSeq.map(_ => "?")
     val sql = s"""
@@ -240,7 +317,7 @@ abstract class BaseJdbcDao extends BaseDao {
     recs.map{makeModel}
   }
 
-  override def updateByQuery(q: Query, json: JsObject, fields: List[String])
+  def updateByQuery(q: Query, json: JsObject, fields: List[String])
                             (implicit ctx: Context, txId: TransactionId): Int = {
     log.debug(s"Updating record by query $q with data $json for fields: $fields")
 
@@ -279,7 +356,7 @@ abstract class BaseJdbcDao extends BaseDao {
     numUpdated
   }
 
-  override def increment(id: String, field: String, count: Int = 1)
+  def increment(id: String, field: String, count: Int = 1)
                         (implicit ctx: Context, txId: TransactionId): Unit = {
     val sql = s"""
       UPDATE $tableName
@@ -292,7 +369,7 @@ abstract class BaseJdbcDao extends BaseDao {
     runner.update(conn, sql, ctx.repo.id.get, id)
   }
 
-  override def decrement(id: String, field: String, count: Int = 1)
+  def decrement(id: String, field: String, count: Int = 1)
                         (implicit ctx: Context, txId: TransactionId): Unit = {
     increment(id, field, -count)
   }
