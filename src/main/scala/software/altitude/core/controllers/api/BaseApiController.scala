@@ -13,7 +13,7 @@ import software.altitude.core.{Const => C}
 
 import java.lang.System.currentTimeMillis
 
-class BaseApiController extends BaseController with ContentEncodingSupport {
+class BaseApiController extends BaseController {
   private final val log = LoggerFactory.getLogger(getClass)
 
   val OK: ActionResult = Ok("{}")

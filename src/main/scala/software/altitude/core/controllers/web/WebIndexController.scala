@@ -1,17 +1,33 @@
 package software.altitude.core.controllers.web
 
-import org.scalatra.ScalatraServlet
+import net.codingwell.scalaguice.InjectorExtensions._
 import org.scalatra.scalate.ScalateSupport
-import software.altitude.core.auth.AuthenticationSupport
+import software.altitude.core.AltitudeApplicationContext
+import software.altitude.core.controllers.AltitudeStack
+import software.altitude.core.dao.FolderDao
 
-class WebIndexController extends ScalatraServlet with ScalateSupport with AuthenticationSupport {
+class WebIndexController extends AltitudeStack with ScalateSupport with AltitudeApplicationContext {
 
-  before() {
-    requireLogin()
-  }
+  val dao: FolderDao = app.injector.instance[FolderDao]
+//  before() {
+//    requireLogin()
+//  }
 
   get("/") {
     contentType = "text/html"
     mustache("/index")
+  }
+
+  get("/read") {
+    contentType = "text/html"
+    app.txManager.asReadOnly {
+      "read"
+    }
+    "read"
+  }
+
+  get("/write") {
+    contentType = "text/html"
+    "write"
   }
 }
