@@ -4,7 +4,7 @@ import com.google.inject.Injector
 import org.slf4j.LoggerFactory
 import software.altitude.core.transactions.TransactionManager
 
-trait AltitudeCoreApp {
+trait AltitudeAppContext {
   private final val log = LoggerFactory.getLogger(getClass)
 
   def runMigrations(): Unit

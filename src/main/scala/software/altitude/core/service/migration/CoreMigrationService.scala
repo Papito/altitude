@@ -2,7 +2,7 @@ package software.altitude.core.service.migration
 
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
-import software.altitude.core.AltitudeCoreApp
+import software.altitude.core.AltitudeAppContext
 import software.altitude.core.Context
 import software.altitude.core.Environment
 import software.altitude.core.dao.MigrationDao
@@ -15,7 +15,7 @@ import scala.io.Source
 abstract class CoreMigrationService {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  protected val app: AltitudeCoreApp
+  protected val app: AltitudeAppContext
   protected val DAO: MigrationDao = app.injector.instance[MigrationDao]
   protected val txManager: TransactionManager = app.txManager
   protected val CURRENT_VERSION: Int

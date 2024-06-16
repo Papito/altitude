@@ -3,11 +3,11 @@ package software.altitude.core.dao.jdbc
 import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
-import software.altitude.core.AltitudeCoreApp
+import software.altitude.core.AltitudeAppContext
 import software.altitude.core.Context
 import software.altitude.core.transactions.TransactionId
 
-abstract class MigrationDao(val app: AltitudeCoreApp)
+abstract class MigrationDao(val appContext: AltitudeAppContext)
   extends BaseDao with software.altitude.core.dao.MigrationDao {
 
   private final val log = LoggerFactory.getLogger(getClass)

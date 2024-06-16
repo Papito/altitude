@@ -3,7 +3,7 @@ package software.altitude.core.controllers
 import org.scalatra.InternalServerError
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
-import software.altitude.core.AltitudeApplicationContext
+import software.altitude.core.AltitudeServletContext
 import software.altitude.core.Context
 import software.altitude.core.models.Repository
 import software.altitude.core.models.User
@@ -12,7 +12,7 @@ import java.io.PrintWriter
 import java.io.StringWriter
 import java.lang.System.currentTimeMillis
 
-abstract class BaseController extends AltitudeStack with AltitudeApplicationContext {
+abstract class BaseController extends AltitudeStack with AltitudeServletContext {
   private final val log = LoggerFactory.getLogger(getClass)
 
   final def user: User = request.getAttribute("user").asInstanceOf[User]

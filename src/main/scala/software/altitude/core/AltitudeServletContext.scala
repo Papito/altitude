@@ -3,11 +3,12 @@ package software.altitude.core
 import org.scalatra.servlet.ServletApiImplicits._
 import org.slf4j.LoggerFactory
 import software.altitude.core.controllers.api._
-import software.altitude.core.controllers.web.{SessionController, WebIndexController}
+import software.altitude.core.controllers.web.SessionController
+import software.altitude.core.controllers.web.WebIndexController
 
 import javax.servlet.ServletContext
 
-object AltitudeApplicationContext {
+object AltitudeServletContext {
   private final val log = LoggerFactory.getLogger(getClass)
   log.info("Initializing application context... ")
   val app: Altitude = new Altitude
@@ -30,6 +31,6 @@ object AltitudeApplicationContext {
   }
 }
 
-trait AltitudeApplicationContext {
-  val app: Altitude = AltitudeApplicationContext.app
+trait AltitudeServletContext {
+  val app: Altitude = AltitudeServletContext.app
 }

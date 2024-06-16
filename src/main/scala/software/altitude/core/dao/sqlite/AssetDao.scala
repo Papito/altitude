@@ -1,6 +1,6 @@
 package software.altitude.core.dao.sqlite
 
-import software.altitude.core.AltitudeCoreApp
+import software.altitude.core.AltitudeAppContext
 
 object AssetDao {
   val DEFAULT_SQL_COLS_FOR_SELECT: List[String] = List(
@@ -10,7 +10,6 @@ object AssetDao {
   )
 }
 
-class AssetDao(app: AltitudeCoreApp) extends software.altitude.core.dao.jdbc.AssetDao(app) with Sqlite {
+class AssetDao(app: AltitudeAppContext) extends software.altitude.core.dao.jdbc.AssetDao(app) with Sqlite {
   override protected def defaultSqlColsForSelect: List[String] = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT
 }
-

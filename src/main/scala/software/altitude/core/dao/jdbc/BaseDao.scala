@@ -6,7 +6,7 @@ import org.apache.commons.dbutils.handlers.ScalarHandler
 import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
-import software.altitude.core.AltitudeCoreApp
+import software.altitude.core.AltitudeAppContext
 import software.altitude.core.ConstraintException
 import software.altitude.core.Context
 import software.altitude.core.Util
@@ -25,13 +25,13 @@ import scala.jdk.CollectionConverters._
 
 
 abstract class BaseDao {
-  val app: AltitudeCoreApp
+  val appContext: AltitudeAppContext
 
   private final val log = LoggerFactory.getLogger(getClass)
 
   val tableName: String
 
-  protected final def txManager: TransactionManager = app.txManager
+  protected final def txManager: TransactionManager = appContext.txManager
 
   protected def conn(implicit ctx: Context, txId: TransactionId): Connection = {
     // get the connection associated with this transaction

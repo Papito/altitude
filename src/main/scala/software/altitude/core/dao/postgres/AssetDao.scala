@@ -2,7 +2,7 @@ package software.altitude.core.dao.postgres
 
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import software.altitude.core.AltitudeCoreApp
+import software.altitude.core.AltitudeAppContext
 import software.altitude.core.Context
 import software.altitude.core.models.Metadata
 import software.altitude.core.transactions.TransactionId
@@ -18,7 +18,7 @@ object AssetDao {
     )
 }
 
-class AssetDao(app: AltitudeCoreApp) extends software.altitude.core.dao.jdbc.AssetDao(app) with Postgres {
+class AssetDao(app: AltitudeAppContext) extends software.altitude.core.dao.jdbc.AssetDao(app) with Postgres {
   override protected def defaultSqlColsForSelect: List[String] = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT
 
   override def getMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Option[Metadata] = {

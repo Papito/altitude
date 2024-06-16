@@ -2,9 +2,9 @@ import org.eclipse.jetty.server._
 import org.eclipse.jetty.server.handler.ContextHandlerCollection
 import org.eclipse.jetty.webapp.WebAppContext
 import org.scalatra.servlet.ScalatraListener
-import software.altitude.core.AltitudeApplicationContext
+import software.altitude.core.AltitudeServletContext
 
-object ScalatraLauncher extends App with AltitudeApplicationContext {
+object ScalatraLauncher extends App with AltitudeServletContext {
   private val host = "localhost"
   private val port = 9010
 

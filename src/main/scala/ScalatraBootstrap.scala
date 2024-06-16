@@ -1,11 +1,11 @@
 import org.scalatra._
 import org.slf4j.LoggerFactory
-import software.altitude.core.AltitudeApplicationContext
+import software.altitude.core.AltitudeServletContext
 import software.altitude.core.Environment
 
 import javax.servlet.ServletContext
 
-class ScalatraBootstrap extends LifeCycle with AltitudeApplicationContext {
+class ScalatraBootstrap extends LifeCycle with AltitudeServletContext {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override def init(context: javax.servlet.ServletContext): Unit = {
@@ -17,8 +17,8 @@ class ScalatraBootstrap extends LifeCycle with AltitudeApplicationContext {
 
     // FIXME: hardcoded
     context.setInitParameter("org.scalatra.cors.allowedOrigins", "http://localhost:3000")
-    AltitudeApplicationContext.mountEndpoints(context)
-    AltitudeApplicationContext.app.runMigrations()
+    AltitudeServletContext.mountEndpoints(context)
+    AltitudeServletContext.app.runMigrations()
   }
 
   override def destroy(context: ServletContext): Unit = {

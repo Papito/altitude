@@ -1,14 +1,14 @@
 package software.altitude.core.dao.jdbc
 
 import play.api.libs.json.JsObject
-import software.altitude.core.AltitudeCoreApp
+import software.altitude.core.AltitudeAppContext
 import software.altitude.core.Context
 import software.altitude.core.models.FieldType
 import software.altitude.core.models.MetadataField
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C}
 
-abstract class MetadataFieldDao(val app: AltitudeCoreApp)
+abstract class MetadataFieldDao(val appContext: AltitudeAppContext)
   extends BaseDao with software.altitude.core.dao.MetadataFieldDao {
 
   override final val tableName = "metadata_field"

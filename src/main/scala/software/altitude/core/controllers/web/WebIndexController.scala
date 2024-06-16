@@ -2,11 +2,11 @@ package software.altitude.core.controllers.web
 
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.scalatra.scalate.ScalateSupport
-import software.altitude.core.AltitudeApplicationContext
+import software.altitude.core.AltitudeServletContext
 import software.altitude.core.controllers.AltitudeStack
 import software.altitude.core.dao.FolderDao
 
-class WebIndexController extends AltitudeStack with ScalateSupport with AltitudeApplicationContext {
+class WebIndexController extends AltitudeStack with ScalateSupport with AltitudeServletContext {
 
   val dao: FolderDao = app.injector.instance[FolderDao]
 //  before() {

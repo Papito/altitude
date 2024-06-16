@@ -26,8 +26,8 @@ object SearchDao {
             """
 }
 
-abstract class SearchDao(override val app: Altitude)
-  extends AssetDao(app)
+abstract class SearchDao(override val appContext: Altitude)
+  extends AssetDao(appContext)
     with software.altitude.core.dao.SearchDao {
 
   private final val log = LoggerFactory.getLogger(getClass)
@@ -145,4 +145,3 @@ abstract class SearchDao(override val app: Altitude)
   }
 
 }
-

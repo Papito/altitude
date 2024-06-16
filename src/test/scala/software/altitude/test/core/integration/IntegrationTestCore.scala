@@ -21,7 +21,7 @@ import scala.language.implicitConversions
 
 
 object IntegrationTestCore {
-  def createTestDir(altitude: AltitudeCoreApp): Unit = {
+  def createTestDir(altitude: AltitudeAppContext): Unit = {
     val testDir = new File(altitude.config.getString("testDir"))
 
     if (!testDir.exists()) {
@@ -29,7 +29,7 @@ object IntegrationTestCore {
     }
   }
 
-  def createFileStoreDir(altitude: AltitudeCoreApp): Unit = {
+  def createFileStoreDir(altitude: AltitudeAppContext): Unit = {
     val testDir = new File(altitude.config.getString("fileStoreDir"))
 
     if (testDir.exists()) {

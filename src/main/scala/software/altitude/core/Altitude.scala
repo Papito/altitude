@@ -15,7 +15,7 @@ import software.altitude.core.{Const => C}
 
 import java.sql.DriverManager
 
-class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeCoreApp  {
+class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeAppContext  {
   private final val log = LoggerFactory.getLogger(getClass)
   log.info(s"Initializing Altitude Server application instance with ID [$id]")
 

@@ -3,7 +3,7 @@ package software.altitude.core.dao.jdbc
 import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
-import software.altitude.core.AltitudeCoreApp
+import software.altitude.core.AltitudeAppContext
 import software.altitude.core.Context
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models.Asset
@@ -14,7 +14,7 @@ import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 import software.altitude.core.{Const => C}
 
-abstract class AssetDao(val app: AltitudeCoreApp) extends BaseDao with software.altitude.core.dao.AssetDao {
+abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with software.altitude.core.dao.AssetDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override final val tableName = "asset"

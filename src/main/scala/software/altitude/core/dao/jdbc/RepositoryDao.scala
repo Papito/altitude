@@ -3,13 +3,13 @@ package software.altitude.core.dao.jdbc
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import software.altitude.core.AltitudeCoreApp
+import software.altitude.core.AltitudeAppContext
 import software.altitude.core.Context
 import software.altitude.core.models.Repository
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C}
 
-abstract class RepositoryDao(val app: AltitudeCoreApp)
+abstract class RepositoryDao(val appContext: AltitudeAppContext)
   extends BaseDao
     with software.altitude.core.dao.RepositoryDao {
   private final val log = LoggerFactory.getLogger(getClass)

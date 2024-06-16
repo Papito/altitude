@@ -1,10 +1,10 @@
 package software.altitude.test.core.integration.util.dao
 
-import software.altitude.core.AltitudeCoreApp
+import software.altitude.core.AltitudeAppContext
 import software.altitude.core.transactions.TransactionId
 import software.altitude.core.transactions.TransactionManager
 
-class UtilitiesDao(app: AltitudeCoreApp)  {
+class UtilitiesDao(app: AltitudeAppContext)  {
 
   protected final def txManager: TransactionManager = app.txManager
 

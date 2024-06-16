@@ -2,14 +2,14 @@ package software.altitude.core.transactions
 
 import org.slf4j.LoggerFactory
 import org.sqlite.SQLiteConfig
-import software.altitude.core.AltitudeCoreApp
+import software.altitude.core.AltitudeAppContext
 import software.altitude.core.{Const => C}
 
 import java.sql.Connection
 import java.sql.DriverManager
 import java.util.Properties
 
-class TransactionManager(val app: AltitudeCoreApp) {
+class TransactionManager(val app: AltitudeAppContext) {
 
   object transactions {
     var CREATED = 0
