@@ -2,7 +2,7 @@ package software.altitude.test.core.unit
 
 import org.scalatest.funsuite
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import software.altitude.core.Context
+import software.altitude.core.RequestContext
 import software.altitude.core.dao.postgres.querybuilder.{AssetSearchQueryBuilder => PostgresAssetSearchQueryBuilder}
 import software.altitude.core.dao.sqlite.querybuilder.{AssetSearchQueryBuilder => SqliteAssetSearchQueryBuilder}
 import software.altitude.core.models.FieldType
@@ -21,10 +21,8 @@ class SearchSqlQueryTests extends funsuite.AnyFunSuite with TestFocus {
     fileStoreConfig = Map(),
     fileStoreType = C.FileStoreType.FS)
 
-  implicit val ctx: Context = new Context(
-    repo = repo,
-    user = null
-  )
+  RequestContext.repository.value = Some(repo)
+  RequestContext.account.value = None
 
   test("Basic WHERE SQL asset query is built correctly") {
     val builder = new SqliteAssetSearchQueryBuilder(List("*"))

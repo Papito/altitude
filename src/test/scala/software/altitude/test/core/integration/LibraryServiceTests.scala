@@ -10,6 +10,7 @@ import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.DuplicateException
 import software.altitude.core.IllegalOperationException
 import software.altitude.core.NotFoundException
+import software.altitude.core.RequestContext
 import software.altitude.core.StorageException
 import software.altitude.core.Util
 import software.altitude.core.models._
@@ -58,7 +59,7 @@ import software.altitude.core.{Const => C}
     val systemFolders = altitude.service.folder.sysFoldersByIdMap()
 
     // we do not increment triage folder - this is recorded in Stats
-    systemFolders(ctx.repo.triageFolderId).numOfAssets shouldBe 0
+    systemFolders(RequestContext.repository.value.get.triageFolderId).numOfAssets shouldBe 0
 
     // prefetch all folders for speed
     val all = altitude.service.folder.repositoryFolders()
@@ -72,11 +73,11 @@ import software.altitude.core.{Const => C}
     (altitude.service.folder.getByIdWithChildAssetCounts(folder2.id.get, all): Folder).numOfAssets shouldBe 10
 
     // test counts for immediate children
-    val rootChildren = altitude.service.folder.immediateChildren(ctx.repo.rootFolderId, all)
+    val rootChildren = altitude.service.folder.immediateChildren(RequestContext.repository.value.get.rootFolderId, all)
     rootChildren.head.numOfAssets shouldBe 2
     rootChildren.last.numOfAssets shouldBe 10
 
-    val rootChildren2 = altitude.service.folder.immediateChildren(ctx.repo.rootFolderId)
+    val rootChildren2 = altitude.service.folder.immediateChildren(RequestContext.repository.value.get.rootFolderId)
     rootChildren2.head.numOfAssets shouldBe 2
     rootChildren2.last.numOfAssets shouldBe 10
 
@@ -342,7 +343,7 @@ import software.altitude.core.{Const => C}
     }
   }
 
-  test("Restore recycled asset twice") {
+  test("Restore recycled asset twice", Focused) {
     val folder1: Folder = altitude.service.library.addFolder("folder1")
 
     val asset1: Asset = altitude.service.library.add(makeAsset(folder1))
@@ -356,6 +357,8 @@ import software.altitude.core.{Const => C}
     altitude.service.library.restoreRecycledAsset(asset1.id.get)
     // asset 1 in folder 1; assets 2, 3 in trash bin
 
+    savepoint()
+
     // throw an exception during file move
     val altitudeSpy = Mockito.spy(altitude)
     val serviceSpy = Mockito.spy(altitude.service)
@@ -366,8 +369,6 @@ import software.altitude.core.{Const => C}
     Mockito.doReturn(librarySpy, Array.empty: _*).when(serviceSpy).library
     Mockito.doReturn(altitudeSpy, Array.empty: _*).when(librarySpy).app
 
-    savepoint()
-
     // error
     var numOfCalls = 0 // throw on *second* asset being restored in storage
     Mockito.doAnswer((_: InvocationOnMock) => {
@@ -375,9 +376,10 @@ import software.altitude.core.{Const => C}
 
       val doThrow = numOfCalls == 2
       if (doThrow) {
+        this.altitude.txManager.rollback()
         throw StorageException("test")
       }
-    }).when(fileStoreSpy).restoreAsset(any())(any(), any())
+    }).when(fileStoreSpy).restoreAsset(any())
 
     intercept[StorageException] {
       altitudeSpy.service.library.restoreRecycledAssets(Set(asset2.id.get, asset3.id.get))
@@ -391,7 +393,7 @@ import software.altitude.core.{Const => C}
     stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 2
 
     // success
-    Mockito.doCallRealMethod().when(fileStoreSpy).restoreAsset(any())(any(), any())
+    Mockito.doCallRealMethod().when(fileStoreSpy).restoreAsset(any())
     altitudeSpy.service.library.restoreRecycledAssets(Set(asset3.id.get))
     // assets 1, 2, 3 in folder 1
 

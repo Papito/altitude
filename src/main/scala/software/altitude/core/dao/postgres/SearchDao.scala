@@ -3,10 +3,9 @@ package software.altitude.core.dao.postgres
 import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
-import software.altitude.core.Context
+import software.altitude.core.RequestContext
 import software.altitude.core.dao.postgres.querybuilder.AssetSearchQueryBuilder
 import software.altitude.core.models.Asset
-import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchResult
 import software.altitude.core.{Const => C}
@@ -14,7 +13,7 @@ import software.altitude.core.{Const => C}
 class SearchDao(override val appContext: Altitude) extends software.altitude.core.dao.jdbc.SearchDao(appContext) with Postgres {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override protected def addSearchDocument(asset: Asset)(implicit ctx: Context, txId: TransactionId): Unit = {
+  override protected def addSearchDocument(asset: Asset): Unit = {
     val docSql =
       s"""
          INSERT INTO search_document (
@@ -28,7 +27,7 @@ class SearchDao(override val appContext: Altitude) extends software.altitude.cor
     }
 
     val sqlVals: List[Any] = List(
-      ctx.repo.id.get,
+      RequestContext.repository.value.get.id.get,
       asset.id.get,
       metadataValues.mkString(" "),
       "" /* body */)
@@ -36,7 +35,7 @@ class SearchDao(override val appContext: Altitude) extends software.altitude.cor
     addRecord(asset, docSql, sqlVals)
   }
 
-  override protected def replaceSearchDocument(asset: Asset)(implicit ctx: Context, txId: TransactionId): Unit = {
+  override protected def replaceSearchDocument(asset: Asset): Unit = {
     val docSql =
       s"""
          UPDATE search_document
@@ -50,13 +49,13 @@ class SearchDao(override val appContext: Altitude) extends software.altitude.cor
     }
 
     val sqlVals: List[Any] = List(
-      metadataValues.mkString(" "), ctx.repo.id.get, asset.id.get)
+      metadataValues.mkString(" "), repo.id.get, asset.id.get)
 
     val runner: QueryRunner = new QueryRunner()
     runner.update(conn, docSql, sqlVals.map(_.asInstanceOf[Object]): _*)
   }
 
-  override def search(searchQuery: SearchQuery)(implicit ctx: Context, txId: TransactionId): SearchResult = {
+  override def search(searchQuery: SearchQuery): SearchResult = {
     val sqlQueryBuilder = new AssetSearchQueryBuilder(sqlColsForSelect = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT)
 
     val sqlQuery = sqlQueryBuilder.buildSelectSql(query = searchQuery)

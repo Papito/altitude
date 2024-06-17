@@ -4,10 +4,9 @@ import org.imgscalr.Scalr
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.Altitude
-import software.altitude.core.Context
+import software.altitude.core.RequestContext
 import software.altitude.core.models.Folder
 import software.altitude.core.models._
-import software.altitude.core.transactions.TransactionId
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
@@ -42,7 +41,7 @@ class LibraryService(val app: Altitude) {
     * ASSETS
     * *********************************************************************** */
 
-  def add(assetIn: Asset)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
+  def add(assetIn: Asset): JsObject = {
     log.info(s"Preparing to add asset [$assetIn]")
 
     if (app.service.folder.isRootFolder(assetIn.folderId)) {
@@ -104,11 +103,11 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def deleteById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+  def deleteById(id: String): Unit = {
     throw new NotImplementedError
   }
 
-  def getById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
+  def getById(id: String): JsObject = {
     txManager.asReadOnly[JsObject] {
       val asset: Asset = app.service.asset.getById(id)
       val path = app.service.fileStore.getAssetPath(asset)
@@ -116,7 +115,7 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def getByChecksum(checksum: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Option[Asset] = {
+  def getByChecksum(checksum: String): Option[Asset] = {
     txManager.asReadOnly[Option[Asset]] {
       val query = new Query(params = Map(C.Asset.CHECKSUM -> checksum))
       val existing = app.service.asset.query(query)
@@ -125,7 +124,7 @@ class LibraryService(val app: Altitude) {
   }
 
   def moveAssetToFolder(assetId: String, folderId: String)
-                       (implicit ctx: Context, txId: TransactionId = new TransactionId): Asset = {
+                       : Asset = {
     txManager.withTransaction[Asset] {
       moveAssetsToFolder(Set(assetId), folderId)
       getById(assetId)
@@ -133,21 +132,21 @@ class LibraryService(val app: Altitude) {
   }
 
   def moveAssetToTriage(assetId: String)
-                       (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+                       : Unit = {
     txManager.withTransaction {
       moveAssetsToTriage(Set(assetId))
     }
   }
 
   def moveAssetsToTriage(assetIds: Set[String])
-                        (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+                        : Unit = {
     txManager.withTransaction {
-      moveAssetsToFolder(assetIds, ctx.repo.triageFolderId)
+      moveAssetsToFolder(assetIds, RequestContext.repository.value.get.triageFolderId)
     }
   }
 
   def moveAssetsToFolder(assetIds: Set[String], destFolderId: String)
-                        (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+                        : Unit = {
 
     def move(asset: Asset): Unit = {
       // cannot move to the same folder
@@ -190,7 +189,7 @@ class LibraryService(val app: Altitude) {
   }
 
   def renameAsset(assetId: String, newFilename: String)
-                 (implicit ctx: Context, txId: TransactionId = new TransactionId): Asset = {
+                 : Asset = {
 
     txManager.withTransaction[Asset] {
       val asset: Asset = getById(assetId)
@@ -219,7 +218,7 @@ class LibraryService(val app: Altitude) {
     * *********************************************************************** */
 
   def genPreviewData(asset: Asset)
-                    (implicit ctx: Context, txId: TransactionId = new TransactionId): Array[Byte] = {
+                    : Array[Byte] = {
     asset.assetType.mediaType match {
       case "image" =>
         makeImageThumbnail(asset)
@@ -227,7 +226,7 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  private def addPreview(asset: Asset)(implicit ctx: Context, txId: TransactionId): Option[Preview] = {
+  private def addPreview(asset: Asset): Option[Preview] = {
     require(asset.id.nonEmpty)
 
     val previewData: Array[Byte] = genPreviewData(asset)
@@ -249,7 +248,7 @@ class LibraryService(val app: Altitude) {
 
   // FIXME: this is temporary as only image-specific
   private def makeImageThumbnail(asset: Asset)
-                                (implicit ctx: Context, txId: TransactionId): Array[Byte] = {
+                                : Array[Byte] = {
     try {
       require(asset.data.length != 0)
       val dataStream: InputStream = new ByteArrayInputStream(asset.data)
@@ -282,11 +281,11 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def getPreview(assetId: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Preview = {
+  def getPreview(assetId: String): Preview = {
     app.service.fileStore.getPreviewById(assetId)
   }
 
-  def getData(assetId: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Data = {
+  def getData(assetId: String): Data = {
     app.service.fileStore.getById(assetId)
   }
 
@@ -296,7 +295,7 @@ class LibraryService(val app: Altitude) {
     * *********************************************************************** */
 
   def query(query: Query)
-           (implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
+           : QueryResult = {
     txManager.asReadOnly[QueryResult] {
       val folderId = query.params.get(C.Asset.FOLDER_ID).asInstanceOf[Option[String]]
 
@@ -315,7 +314,7 @@ class LibraryService(val app: Altitude) {
   }
 
   def search(query: SearchQuery)
-            (implicit ctx: Context, txId: TransactionId = new TransactionId): SearchResult = {
+            : SearchResult = {
     txManager.asReadOnly[SearchResult] {
       val _query: SearchQuery = if (query.folderIds.nonEmpty) {
         // create a new query, with the new folder set
@@ -335,11 +334,11 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def queryRecycled(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
+  def queryRecycled(query: Query): QueryResult = {
     app.service.asset.queryRecycled(query)
   }
 
-  def queryAll(query: Query)(implicit ctx: Context, txId: TransactionId = new TransactionId): QueryResult = {
+  def queryAll(query: Query): QueryResult = {
     app.service.asset.queryAll(query)
   }
 
@@ -349,9 +348,9 @@ class LibraryService(val app: Altitude) {
     * *********************************************************************** */
 
   def addFolder(name: String, parentId: Option[String] = None)
-               (implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
+               : JsObject = {
     txManager.withTransaction[JsObject] {
-      val _parentId = if (parentId.isDefined) parentId.get else ctx.repo.rootFolderId
+      val _parentId = if (parentId.isDefined) parentId.get else RequestContext.repository.value.get.rootFolderId
       val folder = Folder(name = name, parentId = _parentId)
       val addedFolder = app.service.folder.add(folder)
       app.service.fileStore.addFolder(addedFolder)
@@ -366,7 +365,7 @@ class LibraryService(val app: Altitude) {
     * Recycle all the assets in the tree.
     */
   def deleteFolderById(id: String)
-                      (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+                      : Unit = {
     if (app.service.folder.isRootFolder(id)) {
       throw IllegalOperationException("Cannot delete the root folder")
     }
@@ -435,7 +434,7 @@ class LibraryService(val app: Altitude) {
   }
 
   def renameFolder(folderId: String, newName: String)
-                  (implicit ctx: Context, txId: TransactionId = new TransactionId): Folder = {
+                  : Folder = {
     txManager.withTransaction[Folder] {
       val folder: Folder = app.service.folder.getById(folderId)
       val updatedFolder = app.service.folder.rename(folderId, newName)
@@ -445,7 +444,7 @@ class LibraryService(val app: Altitude) {
   }
 
   def moveFolder(folderBeingMovedId: String, destFolderId: String)
-                (implicit ctx: Context, txId: TransactionId = new TransactionId): Folder = {
+                : Folder = {
     txManager.withTransaction[Folder] {
       val (movedFolder, newParent) = app.service.folder.move(folderBeingMovedId, destFolderId)
       app.service.fileStore.moveFolder(movedFolder, newParent)
@@ -459,7 +458,7 @@ class LibraryService(val app: Altitude) {
     * *********************************************************************** */
 
   def restoreRecycledAsset(assetId: String)
-                          (implicit ctx: Context, txId: TransactionId = new TransactionId): Asset = {
+                          : Asset = {
     txManager.withTransaction[Asset] {
       restoreRecycledAssets(Set(assetId))
       getById(assetId)
@@ -467,7 +466,7 @@ class LibraryService(val app: Altitude) {
   }
 
   def restoreRecycledAssets(assetIds: Set[String])
-                           (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+                           : Unit = {
     log.info(s"Restoring recycled assets [${assetIds.mkString(",")}]")
 
     assetIds.foreach { assetId =>
@@ -501,7 +500,7 @@ class LibraryService(val app: Altitude) {
   }
 
   def recycleAsset(assetId: String)
-                  (implicit ctx: Context, txId: TransactionId = new TransactionId): Asset = {
+                  : Asset = {
     txManager.withTransaction {
       recycleAssets(Set(assetId))
       getById(assetId)
@@ -509,7 +508,7 @@ class LibraryService(val app: Altitude) {
   }
 
   def recycleFolder(folderId: String)
-                   (implicit ctx: Context, txId: TransactionId = new TransactionId): Folder = {
+                   : Folder = {
 
     txManager.withTransaction {
       val folder: Folder = app.service.folder.getById(folderId)
@@ -519,7 +518,7 @@ class LibraryService(val app: Altitude) {
   }
 
   def recycleAssets(assetIds: Set[String])
-                   (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+                   : Unit = {
 
     assetIds.foreach { assetId =>
       txManager.withTransaction {
@@ -538,7 +537,7 @@ class LibraryService(val app: Altitude) {
     * *********************************************************************** */
 
   def addMetadataValue(assetId: String, fieldId: String, newValue: Any)
-                      (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+                      : Unit = {
     txManager.withTransaction {
       app.service.metadata.addFieldValue(assetId, fieldId, newValue.toString)
       val field: MetadataField = app.service.metadata.getFieldById(fieldId)
@@ -548,7 +547,7 @@ class LibraryService(val app: Altitude) {
   }
 
   def deleteMetadataValue(assetId: String, valueId: String)
-                         (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+                         : Unit = {
     txManager.withTransaction {
       app.service.metadata.deleteFieldValue(assetId, valueId)
       val asset: Asset = getById(assetId)
@@ -558,7 +557,7 @@ class LibraryService(val app: Altitude) {
   }
 
   def updateMetadataValue(assetId: String, valueId: String, newValue: Any)
-                         (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+                         : Unit = {
 
     txManager.withTransaction {
       app.service.metadata.updateFieldValue(assetId, valueId, newValue.toString)

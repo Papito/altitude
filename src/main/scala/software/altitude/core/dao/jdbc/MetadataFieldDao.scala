@@ -2,10 +2,8 @@ package software.altitude.core.dao.jdbc
 
 import play.api.libs.json.JsObject
 import software.altitude.core.AltitudeAppContext
-import software.altitude.core.Context
 import software.altitude.core.models.FieldType
 import software.altitude.core.models.MetadataField
-import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C}
 
 abstract class MetadataFieldDao(val appContext: AltitudeAppContext)
@@ -23,7 +21,7 @@ abstract class MetadataFieldDao(val appContext: AltitudeAppContext)
     addCoreAttrs(model, rec)
   }
 
-  override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
+  override def add(jsonIn: JsObject): JsObject = {
     val metadataField = jsonIn: MetadataField
 
     val sql = s"""

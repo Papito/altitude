@@ -4,8 +4,6 @@ import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.AltitudeAppContext
-import software.altitude.core.Context
-import software.altitude.core.transactions.TransactionId
 
 abstract class MigrationDao(val appContext: AltitudeAppContext)
   extends BaseDao with software.altitude.core.dao.MigrationDao {
@@ -19,7 +17,7 @@ abstract class MigrationDao(val appContext: AltitudeAppContext)
    *
    * @return The integer version
    */
-  override def currentVersion(implicit ctx: Context, txId: TransactionId = new TransactionId): Int = {
+  override def currentVersion: Int = {
     val sql = s"SELECT version FROM $tableName"
     val version = try {
       val rec = oneBySqlQuery(sql)
@@ -35,7 +33,7 @@ abstract class MigrationDao(val appContext: AltitudeAppContext)
   /**
    * Execute an arbitrary command
    */
-  override def executeCommand(command: String)(implicit ctx: Context, txId: TransactionId): Unit = {
+  override def executeCommand(command: String): Unit = {
     val stmt = conn.createStatement()
     stmt.executeUpdate(command)
     stmt.close()
@@ -44,7 +42,7 @@ abstract class MigrationDao(val appContext: AltitudeAppContext)
   /**
    * Up the schema version by one after completion
    */
-  override def versionUp()(implicit ctx: Context, txId: TransactionId): Unit = {
+  override def versionUp(): Unit = {
     log.info("VERSION UP")
     val runner: QueryRunner = new QueryRunner()
     val sql = s"UPDATE $tableName SET version = 1 WHERE id = 0"

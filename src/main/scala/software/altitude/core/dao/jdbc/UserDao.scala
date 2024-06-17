@@ -3,9 +3,7 @@ package software.altitude.core.dao.jdbc
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.AltitudeAppContext
-import software.altitude.core.Context
 import software.altitude.core.models.User
-import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C}
 
 abstract class UserDao(val appContext: AltitudeAppContext) extends BaseDao with software.altitude.core.dao.UserDao {
@@ -27,7 +25,7 @@ abstract class UserDao(val appContext: AltitudeAppContext) extends BaseDao with 
     addCoreAttrs(model, rec)
   }
 
-  override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
+  override def add(jsonIn: JsObject): JsObject = {
     val sql = s"""
         INSERT INTO $tableName (${C.Base.ID})
              VALUES (?)
@@ -36,12 +34,12 @@ abstract class UserDao(val appContext: AltitudeAppContext) extends BaseDao with 
     addRecord(jsonIn, sql, List())
   }
 
-  override def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
+  override def getById(id: String): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
     val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneRecSelectSql, List(id))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
 
-  override protected def combineInsertValues(id: String, vals: List[Any])(implicit  ctx: Context): List[Any] =
+  override protected def combineInsertValues(id: String, vals: List[Any]): List[Any] =
     id :: vals
 }

@@ -3,10 +3,8 @@ package software.altitude.core.service
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
-import software.altitude.core.Context
 import software.altitude.core.dao.AssetDao
 import software.altitude.core.models.Asset
-import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 import software.altitude.core.{Const => C}
@@ -23,7 +21,7 @@ class AssetService(val app: Altitude) extends BaseService[Asset] {
   override protected val dao: AssetDao = app.injector.instance[AssetDao]
 
   def setRecycledProp(asset: Asset, isRecycled: Boolean)
-                     (implicit ctx: Context, txId: TransactionId): Unit = {
+                     : Unit = {
 
     if (asset.isRecycled == isRecycled) {
       return
@@ -36,15 +34,15 @@ class AssetService(val app: Altitude) extends BaseService[Asset] {
     }
   }
 
-  override def query(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+  override def query(q: Query): QueryResult = {
     dao.queryNotRecycled(q)
   }
 
-  def queryRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+  def queryRecycled(q: Query): QueryResult = {
     dao.queryRecycled(q)
   }
 
-  def queryAll(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+  def queryAll(q: Query): QueryResult = {
     dao.queryAll(q)
   }
 

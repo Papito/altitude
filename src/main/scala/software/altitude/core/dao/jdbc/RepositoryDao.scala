@@ -4,9 +4,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
 import software.altitude.core.AltitudeAppContext
-import software.altitude.core.Context
 import software.altitude.core.models.Repository
-import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C}
 
 abstract class RepositoryDao(val appContext: AltitudeAppContext)
@@ -44,13 +42,13 @@ abstract class RepositoryDao(val appContext: AltitudeAppContext)
     addCoreAttrs(model, rec)
   }
 
-  override def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
+  override def getById(id: String): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
     val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneRecSelectSql, List(id))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
 
-  override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
+  override def add(jsonIn: JsObject): JsObject = {
     val repo = jsonIn: Repository
 
     val sql = s"""
@@ -72,6 +70,6 @@ abstract class RepositoryDao(val appContext: AltitudeAppContext)
   }
 
   // we do not use repository ID
-  override protected def combineInsertValues(id: String, vals: List[Any])(implicit  ctx: Context): List[Any] =
+  override protected def combineInsertValues(id: String, vals: List[Any]): List[Any] =
     id :: vals
 }

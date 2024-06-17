@@ -6,14 +6,13 @@ import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.Altitude
-import software.altitude.core.Context
 import software.altitude.core.NotFoundException
+import software.altitude.core.RequestContext
 import software.altitude.core.dao.RepositoryDao
 import software.altitude.core.models.BaseModel
 import software.altitude.core.models.Repository
 import software.altitude.core.models.Stats
 import software.altitude.core.models.User
-import software.altitude.core.transactions.TransactionId
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.{Const => C}
 
@@ -22,14 +21,12 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
   protected val dao: RepositoryDao = app.injector.instance[RepositoryDao]
   override protected val txManager: TransactionManager = app.txManager
 
-  override def getById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject = {
+  override def getById(id: String): JsObject = {
     throw new NotImplementedError
   }
 
-  def getRepositoryById(id: String)(implicit txId: TransactionId = new TransactionId): Repository = {
+  def getRepositoryById(id: String): Repository = {
     txManager.asReadOnly[JsObject] {
-      implicit val context: Context = Context.EMPTY
-
       dao.getById(id) match {
         case Some(obj) => obj
         case None => throw NotFoundException(s"Cannot find ID '$id'")
@@ -37,8 +34,7 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
     }
   }
 
-  def addRepository(name: String, fileStoreType: C.FileStoreType.Value, user: User, id: Option[String] = None)
-         (implicit txId: TransactionId = new TransactionId): JsObject = {
+  def addRepository(name: String, fileStoreType: C.FileStoreType.Value, user: User, id: Option[String] = None): JsObject = {
 
     log.info(s"Creating repository [$name]")
 
@@ -59,10 +55,11 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
       fileStoreConfig = Map(C.Repository.Config.PATH -> dataPath))
 
     txManager.withTransaction[JsObject] {
-      val repo: Repository = super.add(repoToSave)(txId = txId, ctx = new Context(repo = null, user = user))
-      implicit val ctx: Context = new Context(repo = repo, user = user)
+      val repo: Repository = super.add(repoToSave)
+      RequestContext.repository.value = Some(repo)
+      RequestContext.account.value = Some(user)
 
-      log.info(s"Creating repository [${ctx.repo.name}] system folders")
+      log.info(s"Creating repository [${repo.name}] system folders")
 
       val rootFolder = app.service.folder.add(app.service.folder.rootFolder)
       app.service.fileStore.addFolder(rootFolder)
@@ -73,7 +70,7 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
       // trash does not have an explicit folder record - just the storage location
       app.service.fileStore.createPath(app.service.fileStore.trashFolderPath)
 
-      log.info(s"Setting up repository [${ctx.repo.name}] statistics")
+      log.info(s"Setting up repository [${RequestContext.repository.value.get.name}] statistics")
       app.service.stats.createStat(Stats.SORTED_ASSETS)
       app.service.stats.createStat(Stats.SORTED_BYTES)
       app.service.stats.createStat(Stats.TRIAGE_ASSETS)

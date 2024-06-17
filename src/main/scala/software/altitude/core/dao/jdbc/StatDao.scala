@@ -4,9 +4,7 @@ import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.AltitudeAppContext
-import software.altitude.core.Context
 import software.altitude.core.models.Stat
-import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C}
 
 abstract class StatDao(val appContext: AltitudeAppContext) extends BaseDao with software.altitude.core.dao.StatDao {
@@ -18,19 +16,19 @@ abstract class StatDao(val appContext: AltitudeAppContext) extends BaseDao with 
     rec(C.Stat.DIMENSION).asInstanceOf[String],
     rec(C.Stat.DIM_VAL).asInstanceOf[Int])
 
-  override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
+  override def add(jsonIn: JsObject): JsObject = {
     val sql: String = s"""
       INSERT INTO $tableName (${C.Base.REPO_ID}, ${C.Stat.DIMENSION})
            VALUES (? ,?)"""
 
     val stat: Stat = jsonIn
-    val values: List[Any] = ctx.repo.id.get :: stat.dimension :: Nil
+    val values: List[Any] = repo.id.get :: stat.dimension :: Nil
 
     addRecord(jsonIn, sql, values)
   }
 
   override protected def addRecord(jsonIn: JsObject, q: String, values: List[Any])
-                         (implicit ctx: Context, txId: TransactionId): JsObject = {
+                         : JsObject = {
     log.info(s"JDBC INSERT: $jsonIn")
     val runner: QueryRunner = new QueryRunner()
     runner.update(conn, q, values.map(_.asInstanceOf[Object]): _*)
@@ -43,7 +41,7 @@ abstract class StatDao(val appContext: AltitudeAppContext) extends BaseDao with 
    * @param count the value to increment by - CAN be negative
    */
   def incrementStat(statName: String, count: Long = 1)
-                   (implicit ctx: Context, txId: TransactionId): Unit = {
+                   : Unit = {
     val sql = s"""
       UPDATE $tableName
          SET ${C.Stat.DIM_VAL} = ${C.Stat.DIM_VAL} + $count
@@ -52,6 +50,6 @@ abstract class StatDao(val appContext: AltitudeAppContext) extends BaseDao with 
     log.debug(s"INCR STAT SQL: $sql, for $statName")
 
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, sql, ctx.repo.id.get, statName)
+    runner.update(conn, sql, repo.id.get, statName)
   }
 }

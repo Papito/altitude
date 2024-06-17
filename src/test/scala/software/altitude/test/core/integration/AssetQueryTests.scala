@@ -2,6 +2,7 @@ package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import software.altitude.core.RequestContext
 import software.altitude.core.models.Asset
 import software.altitude.core.models.AssetType
 import software.altitude.core.util.Query
@@ -22,7 +23,7 @@ import software.altitude.core.{Const => C}
       fileName = "filename.ext",
       path = Some("path"),
       checksum = "checksum",
-      folderId = ctx.repo.triageFolderId,
+      folderId = RequestContext.repository.value.get.triageFolderId,
       sizeBytes = 1L)
     altitude.service.asset.add(asset)
 
@@ -38,11 +39,11 @@ import software.altitude.core.{Const => C}
       fileName = "filename.ext",
       path = Some("path"),
       checksum = "checksum",
-      folderId = ctx.repo.triageFolderId,
+      folderId = RequestContext.repository.value.get.triageFolderId,
       sizeBytes = 1L)
     altitude.service.asset.add(asset)
 
-    val query = new Query(Map(C.Asset.FOLDER_ID -> ctx.repo.triageFolderId))
+    val query = new Query(Map(C.Asset.FOLDER_ID -> RequestContext.repository.value.get.triageFolderId))
     val assets = altitude.service.library.query(query).records
     assets.length shouldBe 1
   }
@@ -100,7 +101,7 @@ import software.altitude.core.{Const => C}
     /* We now have two assets. One in triage, one trash. Each of the totals should be "1" not "2"
      */
 
-    val query = new Query(Map(C.Asset.FOLDER_ID -> ctx.repo.triageFolderId))
+    val query = new Query(Map(C.Asset.FOLDER_ID -> RequestContext.repository.value.get.triageFolderId))
     var results = altitude.service.library.query(query)
     results.records.length shouldBe 1
     results.total shouldBe 1

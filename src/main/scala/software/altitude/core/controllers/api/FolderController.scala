@@ -4,7 +4,7 @@ import org.scalatra.Ok
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import software.altitude.core.Context
+import software.altitude.core.RequestContext
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.models.Folder
 import software.altitude.core.{Const => C}
@@ -86,9 +86,9 @@ class FolderController extends BaseApiController {
     OK
   }
 
-  private def realId(aliasOrId: String)(implicit ctx: Context): String = aliasOrId match {
-    case C.Folder.Alias.ROOT => ctx.repo.rootFolderId
-    case C.Folder.Alias.TRIAGE => ctx.repo.triageFolderId
+  private def realId(aliasOrId: String): String = aliasOrId match {
+    case C.Folder.Alias.ROOT => RequestContext.repository.value.get.rootFolderId
+    case C.Folder.Alias.TRIAGE => RequestContext.repository.value.get.triageFolderId
     case _ => aliasOrId
   }
 

@@ -7,7 +7,6 @@ import software.altitude.core.Validators.ModelDataValidator
 import software.altitude.core.dao.AssetDao
 import software.altitude.core.dao.MetadataFieldDao
 import software.altitude.core.models._
-import software.altitude.core.transactions.TransactionId
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.Query
 import software.altitude.core.{Const => C, _}
@@ -36,7 +35,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
   protected val assetDao: AssetDao = app.injector.instance[AssetDao]
 
   def addField(metadataField: MetadataField)
-              (implicit ctx: Context, txId: TransactionId = new TransactionId): MetadataField = {
+              : MetadataField = {
 
     txManager.withTransaction[MetadataField] {
       val cleaned: MetadataField = cleanAndValidate(
@@ -59,7 +58,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
   /**
    * Returns a lookup map (by ID) of all configured fields in this repository
    */
-  def getAllFields(implicit ctx: Context, txId: TransactionId = new TransactionId): Map[String, MetadataField] =
+  def getAllFields: Map[String, MetadataField] =
     txManager.asReadOnly[Map[String, MetadataField]] {
       metadataFieldDao.getAll.map{ res =>
         val metadataField: MetadataField = res
@@ -67,7 +66,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
       }.toMap
     }
 
-  def getFieldById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): JsObject =
+  def getFieldById(id: String): JsObject =
     txManager.asReadOnly[JsObject] {
       metadataFieldDao.getById(id) match {
         case Some(obj) => obj
@@ -75,13 +74,13 @@ class MetadataService(val app: Altitude) extends ModelValidation {
       }
     }
 
-  def deleteFieldById(id: String)(implicit ctx: Context, txId: TransactionId = new TransactionId): Int =
+  def deleteFieldById(id: String): Int =
     txManager.withTransaction[Int] {
       metadataFieldDao.deleteById(id)
     }
 
   def getMetadata(assetId: String)
-                 (implicit ctx: Context, txId: TransactionId = new TransactionId): Metadata =
+                 : Metadata =
     // return the metadata or a new empty one if blank
     assetDao.getMetadata(assetId) match {
       case Some(metadata) => metadata
@@ -89,7 +88,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     }
 
   def setMetadata(assetId: String, metadata: Metadata)
-               (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+               : Unit = {
     log.info(s"Setting metadata for asset [$assetId]: $metadata")
 
     txManager.withTransaction {
@@ -101,7 +100,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
 
   // OPTIMIZE: this cleans and validates existing values (the ones that have IDs)
   def updateMetadata(assetId: String, metadata: Metadata)
-                 (implicit ctx: Context, txId: TransactionId = new TransactionId): Unit = {
+                 : Unit = {
     log.info(s"Updating metadata for asset [$assetId]: $metadata")
 
     txManager.withTransaction {
@@ -117,7 +116,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
   }
 
   def addFieldValue(assetId: String, fieldId: String, newValue: String)
-                    (implicit ctx: Context, txId: TransactionId): Unit = {
+                    : Unit = {
     log.info(s"Adding value [$newValue] for field [$fieldId] on asset [$assetId] ")
 
     txManager.withTransaction {
@@ -166,8 +165,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     }
   }
 
-  def deleteFieldValue(assetId: String, valueId: String)
-                      (implicit ctx: Context, txId: TransactionId ): Unit = {
+  def deleteFieldValue(assetId: String, valueId: String): Unit = {
     log.info(s"Deleting value [$valueId] for on asset [$assetId] ")
 
     txManager.withTransaction {
@@ -187,7 +185,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
   }
 
   def updateFieldValue(assetId: String, valueId: String, newValue: String)
-                      (implicit ctx: Context, txId: TransactionId): Unit = {
+                      : Unit = {
 
     log.info(s"Updating value [$valueId] for on asset [$assetId] with [$newValue] ")
 
@@ -254,7 +252,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
   }
 
   def clean(metadata: Metadata)
-           (implicit ctx: Context, txId: TransactionId): Metadata = {
+           : Metadata = {
     // get all metadata fields configured for this repository
     val fields = getAllFields
 
@@ -316,7 +314,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     cleanMetadata
   }
 
-  def validate(metadata: Metadata)(implicit ctx: Context, txId: TransactionId): Unit = {
+  def validate(metadata: Metadata): Unit = {
     if (metadata.data.isEmpty) {
       return
     }
@@ -360,7 +358,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
    * @return clean, de-duplicated copy of the metadata
    */
   def cleanAndValidate(metadata: Metadata)
-                      (implicit ctx: Context, txId: TransactionId): Metadata = {
+                      : Metadata = {
     val cleanMetadata = clean(metadata)
     validate(cleanMetadata)
     cleanMetadata
@@ -395,7 +393,7 @@ class MetadataService(val app: Altitude) extends ModelValidation {
     * ]
     */
   def toJson(metadata: Metadata, allMetadataFields: Option[Map[String, MetadataField]] = None)
-            (implicit ctx: Context, txId: TransactionId = new TransactionId): JsArray = {
+            : JsArray = {
 
     txManager.asReadOnly[JsArray] {
       val allFields = if (allMetadataFields.isDefined) allMetadataFields.get else getAllFields

@@ -1,7 +1,7 @@
 package software.altitude.core.dao.jdbc.querybuilder
 
 import org.slf4j.LoggerFactory
-import software.altitude.core.Context
+import software.altitude.core.RequestContext
 import software.altitude.core.models.FieldType
 import software.altitude.core.util.Query
 import software.altitude.core.util.Query.QueryParam
@@ -30,7 +30,7 @@ abstract class SearchQueryBuilder(selColumnNames: List[String])
 
   protected def textSearch(searchQuery: SearchQuery): ClauseComponents
 
-  override protected def from(searchQuery: SearchQuery, ctx: Context): ClauseComponents = {
+  override protected def from(searchQuery: SearchQuery): ClauseComponents = {
     ClauseComponents(elements = allTableNames(searchQuery))
   }
 
@@ -45,7 +45,7 @@ abstract class SearchQueryBuilder(selColumnNames: List[String])
     _tablesNames
   }
 
-  override def buildSelectSql(query: SearchQuery)(implicit ctx: Context): SqlQuery = {
+  override def buildSelectSql(query: SearchQuery): SqlQuery = {
     if (query.isSorted) {
       buildSelectSqlAsSubquery(query)
     } else {
@@ -53,10 +53,10 @@ abstract class SearchQueryBuilder(selColumnNames: List[String])
     }
   }
 
-  override def buildCountSql(query: SearchQuery)(implicit ctx: Context): SqlQuery = {
+  override def buildCountSql(query: SearchQuery): SqlQuery = {
     // get the base SELECT query
     // make it a subquery of the main SELECT COUNT(*) query
-    val allClauses = compileClauses(query, ctx)
+    val allClauses = compileClauses(query)
 
     val subquerySql: String = selectStr(allClauses(SqlQueryBuilder.SELECT)) +
       fromStr(allClauses(SqlQueryBuilder.FROM)) +
@@ -73,8 +73,8 @@ abstract class SearchQueryBuilder(selColumnNames: List[String])
     SqlQuery(countSql, bindVals)
   }
 
-  private def buildSelectSqlAsSubquery(query: SearchQuery)(implicit ctx: Context): SqlQuery = {
-    val allClauses = compileClauses(query, ctx)
+  private def buildSelectSqlAsSubquery(query: SearchQuery): SqlQuery = {
+    val allClauses = compileClauses(query)
 
     val subquerySql: String = s"SELECT ${SearchQueryBuilder.ASSET_TABLE_NAME}.*" +
       fromStr(allClauses(SqlQueryBuilder.FROM)) +
@@ -102,9 +102,9 @@ abstract class SearchQueryBuilder(selColumnNames: List[String])
     SqlQuery(sql, bindVals)
   }
 
-  override protected def where(searchQuery: SearchQuery, ctx: Context): ClauseComponents = {
+  override protected def where(searchQuery: SearchQuery): ClauseComponents = {
     val repoIdElements = allTableNames(searchQuery).map(tableName => s"$tableName.${C.Base.REPO_ID} = ?")
-    val repoIdBindVals = allTableNames(searchQuery).map(_ => ctx.repo.id.get)
+    val repoIdBindVals = allTableNames(searchQuery).map(_ => RequestContext.repository.value.get.id.get)
 
     ClauseComponents(repoIdElements, repoIdBindVals) +
       textSearch(searchQuery) +
@@ -186,17 +186,17 @@ abstract class SearchQueryBuilder(selColumnNames: List[String])
     }
   }
 
-  override protected def groupBy(searchQuery: SearchQuery, ctx: Context): ClauseComponents = {
+  override protected def groupBy(searchQuery: SearchQuery): ClauseComponents = {
     if (!searchQuery.isParameterized) return ClauseComponents()
     ClauseComponents(elements = List(s"asset.${C.Asset.ID}"))
   }
 
-  override protected def having(searchQuery: SearchQuery, ctx: Context): ClauseComponents = {
+  override protected def having(searchQuery: SearchQuery): ClauseComponents = {
     if (!searchQuery.isParameterized) return ClauseComponents()
     ClauseComponents(elements = List(s"count(asset.${C.Asset.ID}) >= ${searchQuery.params.size}"))
   }
 
-  override protected def orderBy(query: SearchQuery, ctx: Context): ClauseComponents = {
+  override protected def orderBy(query: SearchQuery): ClauseComponents = {
     if (!query.isSorted) return ClauseComponents()
 
     val sort = query.searchSort.head
@@ -213,7 +213,7 @@ abstract class SearchQueryBuilder(selColumnNames: List[String])
       "AND sort_param.field_id = ? " +
       s"ORDER BY sort_param.$sortColumn ${sort.direction}"
 
-    ClauseComponents(List(sql), List(ctx.repo.id.get, sort.field.id.get))
+    ClauseComponents(List(sql), List(RequestContext.repository.value.get.id.get, sort.field.id.get))
   }
 
   override protected def orderByStr(clauseComponents: ClauseComponents): String = {

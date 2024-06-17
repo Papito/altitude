@@ -3,9 +3,7 @@ package software.altitude.core.dao.jdbc
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.AltitudeAppContext
-import software.altitude.core.Context
 import software.altitude.core.models.Folder
-import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C}
 
 abstract class FolderDao(val appContext: AltitudeAppContext) extends BaseDao with software.altitude.core.dao.FolderDao {
@@ -27,7 +25,7 @@ abstract class FolderDao(val appContext: AltitudeAppContext) extends BaseDao wit
     addCoreAttrs(model, rec)
   }
 
-  override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
+  override def add(jsonIn: JsObject): JsObject = {
     val folder = jsonIn: Folder
 
     val sql = s"""

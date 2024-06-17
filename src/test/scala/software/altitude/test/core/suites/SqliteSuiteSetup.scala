@@ -4,11 +4,9 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.Suite
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import software.altitude.core.Configuration
 import software.altitude.core.Environment
+import software.altitude.core.RequestContext
 import software.altitude.test.core.integration.IntegrationTestCore
-
-import java.sql.DriverManager
 
 trait SqliteSuiteSetup extends Suite with BeforeAndAfterAll {
   Environment.ENV = Environment.TEST
@@ -17,11 +15,7 @@ trait SqliteSuiteSetup extends Suite with BeforeAndAfterAll {
   override def beforeAll(): Unit = {
     IntegrationTestCore.createTestDir(SqliteSuite.app)
 
-    log.info("TEST. Resetting DB schema once")
-    val url: String = new Configuration().getString("db.sqlite.url")
-    DriverManager.registerDriver(new org.sqlite.JDBC)
-
-    log.info("Clearing sqlite database")
+    log.info("Clearing Sqlite database")
     val sql =
       """
         PRAGMA writable_schema = 1;
@@ -31,18 +25,26 @@ trait SqliteSuiteSetup extends Suite with BeforeAndAfterAll {
         PRAGMA INTEGRITY_CHECK;
       """.stripMargin
 
-    val conn = DriverManager.getConnection(url)
+    val conn = SqliteSuite.app.txManager.connection(readOnly = false)
+    // disables transaction for this connection (cannot user VACUUM in a transaction)
+    conn.setAutoCommit(true)
+
     val stmt = conn.createStatement()
 
     try {
       stmt.executeUpdate(sql)
     }
     finally {
-      if (stmt != null) stmt.close()
-      if (conn != null) conn.close()
+      stmt.close()
+      conn.close()
     }
 
     SqliteSuite.app.service.migrationService.migrate()
-    log.info("END SETUP")
+
+    RequestContext.conn.value = Some(SqliteSuite.app.txManager.connection(readOnly = false))
+  }
+
+  override def afterAll(): Unit = {
+    SqliteSuite.app.txManager.close()
   }
 }

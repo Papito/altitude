@@ -3,9 +3,7 @@ package software.altitude.core.dao.postgres
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
 import software.altitude.core.AltitudeAppContext
-import software.altitude.core.Context
 import software.altitude.core.models.Metadata
-import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C}
 
 object AssetDao {
@@ -21,14 +19,14 @@ object AssetDao {
 class AssetDao(app: AltitudeAppContext) extends software.altitude.core.dao.jdbc.AssetDao(app) with Postgres {
   override protected def defaultSqlColsForSelect: List[String] = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT
 
-  override def getMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Option[Metadata] = {
+  override def getMetadata(assetId: String): Option[Metadata] = {
     val sql = s"""
       SELECT (${C.Asset.METADATA}#>>'{}')::text as ${C.Asset.METADATA}
          FROM $tableName
        WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
       """
 
-    oneBySqlQuery(sql, List(ctx.repo.id.get, assetId)) match {
+    oneBySqlQuery(sql, List(repo.id.get, assetId)) match {
       case Some(rec) =>
         val metadataCol = rec(C.Asset.METADATA)
         val metadataJsonStr: String = if (metadataCol == null) "{}" else metadataCol.asInstanceOf[String]

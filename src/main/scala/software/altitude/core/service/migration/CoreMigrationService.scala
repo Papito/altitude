@@ -3,10 +3,8 @@ package software.altitude.core.service.migration
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import software.altitude.core.AltitudeAppContext
-import software.altitude.core.Context
 import software.altitude.core.Environment
 import software.altitude.core.dao.MigrationDao
-import software.altitude.core.transactions.TransactionId
 import software.altitude.core.transactions.TransactionManager
 
 import java.io.File
@@ -23,11 +21,9 @@ abstract class CoreMigrationService {
   protected val MIGRATIONS_DIR: String
   protected val FILE_EXTENSION: String
 
-  def migrateVersion(ctx: Context, version: Int)(implicit txId: TransactionId = new TransactionId): Unit
+  def migrateVersion(version: Int): Unit
 
-  private def runMigration(version: Int)
-                          (implicit ctx: Context = new Context(repo = null, user = null),
-                   txId: TransactionId = new TransactionId): Unit = {
+  private def runMigration(version: Int): Unit = {
 
     val sqlCommands = parseMigrationCommands(version)
     txManager.withTransaction {
@@ -36,19 +32,18 @@ abstract class CoreMigrationService {
 
     // must have schema changes committed
     txManager.withTransaction {
-      migrateVersion(ctx, version)
+      migrateVersion(version)
       DAO.versionUp()
     }
   }
 
-  def existingVersion(implicit ctx: Context = new Context(repo = null, user = null),
-                      txId: TransactionId = new TransactionId): Int = {
+  def existingVersion: Int = {
     txManager.asReadOnly[Int] {
       DAO.currentVersion
     }
   }
 
-  def migrationRequired(implicit txId: TransactionId = new TransactionId): Boolean = {
+  def migrationRequired: Boolean = {
     log.info("Checking if migration is required")
     val version = existingVersion
     log.info(s"Current database version is @ $version")

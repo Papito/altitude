@@ -4,12 +4,10 @@ import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
 import software.altitude.core.AltitudeAppContext
-import software.altitude.core.Context
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models.Asset
 import software.altitude.core.models.AssetType
 import software.altitude.core.models.Metadata
-import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 import software.altitude.core.{Const => C}
@@ -54,26 +52,26 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
     addCoreAttrs(model, rec)
   }
 
-  override def queryNotRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+  override def queryNotRecycled(q: Query): QueryResult = {
     this.query(q.add(C.Asset.IS_RECYCLED -> false), sqlQueryBuilder)
   }
 
-  override def queryRecycled(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+  override def queryRecycled(q: Query): QueryResult = {
     this.query(q.add(C.Asset.IS_RECYCLED -> true), sqlQueryBuilder)
   }
 
-  override def queryAll(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+  override def queryAll(q: Query): QueryResult = {
     this.query(q, sqlQueryBuilder)
   }
 
-  override def getMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Option[Metadata] = {
+  override def getMetadata(assetId: String): Option[Metadata] = {
     val sql = s"""
       SELECT ${C.Asset.METADATA}
          FROM $tableName
        WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
       """
 
-    oneBySqlQuery(sql, List(ctx.repo.id.get, assetId)) match {
+    oneBySqlQuery(sql, List(repo.id.get, assetId)) match {
       case Some(rec) =>
         val metadataJsonStr: String = rec.getOrElse(C.Asset.METADATA, "{}").asInstanceOf[String]
         val metadataJson = Json.parse(metadataJsonStr).as[JsObject]
@@ -83,7 +81,7 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
     }
   }
 
-  override def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
+  override def add(jsonIn: JsObject): JsObject = {
     val asset = jsonIn: Asset
 
     val metadataWithIds = Metadata.withIds(asset.metadata)
@@ -116,7 +114,7 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
   }
 
   override def setMetadata(assetId: String, metadata: Metadata)
-                          (implicit ctx: Context, txId: TransactionId): Unit = {
+                          : Unit = {
 
     val metadataWithIds = Metadata.withIds(metadata)
 
@@ -126,7 +124,7 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
        WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
       """
 
-    val updateValues = List(metadataWithIds.toString, ctx.repo.id.get, assetId)
+    val updateValues = List(metadataWithIds.toString, repo.id.get, assetId)
     log.debug(s"Update SQL: [$sql] with values: $updateValues")
     val runner: QueryRunner = new QueryRunner()
 

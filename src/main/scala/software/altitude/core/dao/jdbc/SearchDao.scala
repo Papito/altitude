@@ -4,9 +4,7 @@ import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.Altitude
-import software.altitude.core.Context
 import software.altitude.core.models._
-import software.altitude.core.transactions.TransactionId
 import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchResult
 import software.altitude.core.{Const => C}
@@ -32,24 +30,24 @@ abstract class SearchDao(override val appContext: Altitude)
 
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override def search(query: SearchQuery)(implicit ctx: Context, txId: TransactionId): SearchResult =
+  override def search(query: SearchQuery): SearchResult =
     throw new NotImplementedError
 
-  protected def addSearchDocument(asset: Asset)(implicit ctx: Context, txId: TransactionId): Unit =
+  protected def addSearchDocument(asset: Asset): Unit =
     throw new NotImplementedError
 
-  protected def replaceSearchDocument(asset: Asset)(implicit ctx: Context, txId: TransactionId): Unit =
+  protected def replaceSearchDocument(asset: Asset): Unit =
     throw new NotImplementedError
 
   override def indexAsset(asset: Asset, metadataFields: Map[String, MetadataField])
-                         (implicit ctx: Context, txId: TransactionId): Unit = {
+                         : Unit = {
     log.debug(s"Indexing asset $asset with metadata [${asset.metadata}]")
     indexMetadata(asset, metadataFields)
     addSearchDocument(asset)
   }
 
   def reindexAsset(asset: Asset, metadataFields: Map[String, MetadataField])
-                  (implicit ctx: Context, txId: TransactionId): Unit = {
+                  : Unit = {
     log.debug(s"Reindexing asset $asset with metadata [${asset.metadata}]")
 
     clearMetadata(asset.id.get)
@@ -57,7 +55,7 @@ abstract class SearchDao(override val appContext: Altitude)
     replaceSearchDocument(asset)
   }
 
-  def clearMetadata(assetId: String)(implicit ctx: Context, txId: TransactionId): Unit = {
+  def clearMetadata(assetId: String): Unit = {
     log.debug(s"Clearing asset $assetId metadata")
 
     val sql =
@@ -67,7 +65,7 @@ abstract class SearchDao(override val appContext: Altitude)
                  AND ${C.SearchToken.ASSET_ID} = ?
       """
 
-    val bindValues = List[Object](ctx.repo.id.get, assetId)
+    val bindValues = List[Object](repo.id.get, assetId)
 
     log.debug(s"Delete SQL: $sql, with values: $bindValues")
     val runner: QueryRunner = new QueryRunner()
@@ -76,7 +74,7 @@ abstract class SearchDao(override val appContext: Altitude)
   }
 
   def indexMetadata(asset: Asset, metadataFields: Map[String, MetadataField])
-                             (implicit ctx: Context, txId: TransactionId): Unit = {
+                             : Unit = {
     log.debug(s"Indexing metadata for asset $asset: [${asset.metadata}]")
 
     asset.metadata.data.foreach { m =>
@@ -96,19 +94,19 @@ abstract class SearchDao(override val appContext: Altitude)
   }
 
   override def addMetadataValue(asset: Asset, field: MetadataField, value: String)
-                               (implicit ctx: Context, txId: TransactionId): Unit = {
+                               : Unit = {
     addMetadataValues(asset = asset, field = field, values = Set(value))
   }
 
   override def addMetadataValues(asset: Asset, field: MetadataField, values: Set[String])
-                                (implicit ctx: Context, txId: TransactionId): Unit = {
+                                : Unit = {
     log.debug(s"INSERT SQL: ${SearchDao.VALUE_INSERT_SQL}. ARGS: ${values.toString()}")
 
     val preparedStatement: PreparedStatement = conn.prepareStatement(SearchDao.VALUE_INSERT_SQL)
 
       values.foreach { value: String =>
         preparedStatement.clearParameters()
-        preparedStatement.setString(1, ctx.repo.id.get)
+        preparedStatement.setString(1, repo.id.get)
         preparedStatement.setString(2, asset.id.get)
         preparedStatement.setString(3, field.id.get)
 
@@ -138,7 +136,7 @@ abstract class SearchDao(override val appContext: Altitude)
   }
 
   override protected def addRecord(jsonIn: JsObject, q: String, values: List[Any])
-                                  (implicit ctx: Context, txId: TransactionId): JsObject = {
+                                  : JsObject = {
     val runner: QueryRunner = new QueryRunner()
     runner.update(conn, q, values.map(_.asInstanceOf[Object]): _*)
     jsonIn

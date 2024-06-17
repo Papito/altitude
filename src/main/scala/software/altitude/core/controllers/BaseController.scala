@@ -4,7 +4,6 @@ import org.scalatra.InternalServerError
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import software.altitude.core.AltitudeServletContext
-import software.altitude.core.Context
 import software.altitude.core.models.Repository
 import software.altitude.core.models.User
 
@@ -18,8 +17,6 @@ abstract class BaseController extends AltitudeStack with AltitudeServletContext 
   final def user: User = request.getAttribute("user").asInstanceOf[User]
 
   final def repository: Repository = request.getAttribute("repository").asInstanceOf[Repository]
-
-  implicit lazy val context: Context = new Context(repo = repository, user = user)
 
   before() {
     val requestId = software.altitude.core.Util.randomStr(size = 6)

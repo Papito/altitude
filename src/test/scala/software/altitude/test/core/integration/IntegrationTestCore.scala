@@ -9,10 +9,8 @@ import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import software.altitude.core.Const
 import software.altitude.core.models._
-import software.altitude.core.transactions.TransactionId
 import software.altitude.core.{Const => C, _}
 import software.altitude.test.core.TestFocus
-import software.altitude.test.core.integration.util.dao.UtilitiesDao
 import software.altitude.test.core.suites.PostgresSuite
 import software.altitude.test.core.suites.SqliteSuite
 
@@ -76,16 +74,6 @@ abstract class IntegrationTestCore
     case _ => throw new IllegalArgumentException(s"Do not know of datasource: $datasource")
   }
 
-  final protected val dbUtilities: UtilitiesDao = new UtilitiesDao(altitude.app)
-
-  /**
-   * Extremely important! This is the one and only transaction id for tests.
-   * This has to be controlled by us here, and always be implicitly defined.
-   * The transaction managers will not commit transactions if it's an existing
-   * transaction ID. This allows us to rollback every test, keeping the database
-   * clean.
-   */
-  implicit val txId: TransactionId = new TransactionId
 
   /**
    * Our test users. We may alternate between them to make sure there is proper
@@ -106,28 +94,28 @@ abstract class IntegrationTestCore
 
   var currentRepo: Repository = repo
 
-  /**
-   * Our implicit context for all tests.
-   * Note that it is a function, so it will dynamically set the current
-   * user and repository.
-   */
-  implicit final def ctx: Context = new Context(repo = currentRepo, user = currentUser)
+  RequestContext.repository.value = Some(currentRepo)
+  RequestContext.account.value = Some(currentUser)
 
   /**
    * Methods to toggle between different user and repositories.
    */
   def SET_FIRST_USER(): Unit = {
+    RequestContext.account.value = Some(user)
     currentUser = user
   }
   def SET_SECOND_USER(): Unit = {
+    RequestContext.account.value = Some(secondUser)
     currentUser = secondUser
   }
 
   def SET_FIRST_REPO(): Unit = {
+    RequestContext.repository.value = Some(repo)
     currentRepo = repo
   }
 
   def SET_SECOND_REPO(): Unit = {
+    RequestContext.repository.value = Some(secondRepo)
     currentRepo = secondRepo
   }
 
@@ -167,11 +155,6 @@ abstract class IntegrationTestCore
     IntegrationTestCore.createFileStoreDir(altitude)
     createFixtures()
 
-    // keep transaction stats clean after DB migration dirties them
-    altitude.txManager.transactions.reset()
-
-    dbUtilities.createTransaction(txId)
-
     SET_FIRST_USER()
     SET_FIRST_REPO()
   }
@@ -181,17 +164,7 @@ abstract class IntegrationTestCore
   }
 
   override def afterEach(): Unit = {
-    dbUtilities.cleanupTest()
-
-    if (datasource == C.DatasourceType.SQLITE || datasource == C.DatasourceType.POSTGRES) {
-      // should not have committed anything for tests
-      require(altitude.txManager.transactions.COMMITTED == 0)
-      // should only have had one transaction - if this fails, implicit transaction logic is likely broken
-      if (altitude.txManager.transactions.CREATED != 1) {
-        log.error(s"${altitude.txManager.transactions.CREATED} transactions instead of 1!")
-      }
-      require(altitude.txManager.transactions.CREATED == 1)
-    }
+    altitude.txManager.rollback()
   }
 
   def createFixtures(): Unit = {

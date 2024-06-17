@@ -3,6 +3,7 @@ package software.altitude.core.transactions
 import org.slf4j.LoggerFactory
 import org.sqlite.SQLiteConfig
 import software.altitude.core.AltitudeAppContext
+import software.altitude.core.RequestContext
 import software.altitude.core.{Const => C}
 
 import java.sql.Connection
@@ -11,58 +12,7 @@ import java.util.Properties
 
 class TransactionManager(val app: AltitudeAppContext) {
 
-  object transactions {
-    var CREATED = 0
-    var COMMITTED = 0
-    var CLOSED = 0
-
-    def reset(): Unit = {
-      CREATED = 0
-      COMMITTED = 0
-      CLOSED = 0
-    }
-  }
-
   private final val log = LoggerFactory.getLogger(getClass)
-
-  /**
-   * This transaction registry is the heart of it all - we use it to keep track of existing
-   * transactions, creating new ones, and cleaning up after a transaction ends.
-   */
-  val txRegistry: scala.collection.mutable.Map[Int, JdbcTransaction] =
-    scala.collection.mutable.Map[Int, JdbcTransaction]()
-
-  /**
-   *  Get an existing transaction if we are already within a transaction context, else,
-   *  create a new transaction - AND a JDBC connection
-   */
-  def transaction(readOnly: Boolean = false)(implicit txId: TransactionId): JdbcTransaction = {
-    log.debug(s"Getting transaction for ${txId.id}")
-
-    // see if we already have a transaction ID defined
-    if (txRegistry.contains(txId.id)) {
-      // we do - do nothing, return the transaction
-      return txRegistry(txId.id)
-    }
-
-    // get a connection and a new transaction, read-only if so requested
-    val conn: Connection = connection(readOnly)
-
-    val tx: JdbcTransaction = new JdbcTransaction(conn, readOnly)
-
-    // add this to our transaction registry
-    txRegistry += (tx.id -> tx)
-
-    // assign the integer transaction ID to the mutable transaction id "carrier" object
-    txId.id = tx.id
-    log.debug(s"CREATING TRANSACTION ${txId.id}")
-    transactions.CREATED += 1
-    tx
-  }
-
-  def closeTransaction(tx: JdbcTransaction): Unit = {
-    tx.close()
-  }
 
   def connection(readOnly: Boolean): Connection = {
     app.config.datasourceType match {
@@ -84,6 +34,7 @@ class TransactionManager(val app: AltitudeAppContext) {
           conn.setAutoCommit(false)
         }
 
+        // println(s"NEW PSQL CONN ${System.identityHashCode(conn)}")
         conn
 
       case C.DatasourceType.SQLITE =>
@@ -97,61 +48,45 @@ class TransactionManager(val app: AltitudeAppContext) {
           val writeConnection = DriverManager.getConnection(url)
           writeConnection.setAutoCommit(false)
 
+          // println(s"NEW SQLITE CONN ${System.identityHashCode(writeConnection)}")
           writeConnection
         }
     }
   }
 
-  def withTransaction[A](f: => A)(implicit txId: TransactionId = new TransactionId): A = {
-    log.debug("WRITE transaction")
-    val tx = transaction()
-
-    if (tx.isReadOnly) {
-      throw new IllegalStateException("The parent for this transaction is read-only!")
+  def withTransaction[A](f: => A): A = {
+    if (RequestContext.conn.value.isDefined) {
+        // println("EXISTING CONNECTION")
+        return f
     }
 
-    try {
-      // level up - any new transactions within will be "nested" and not committed
-      tx.up()
+    RequestContext.conn.value = Some(connection(readOnly=false))
 
+    try {
       // actual function call
       val res: A = f
-
-      // level down - if the transaction is not nested after this - it will be committed
-      tx.down()
-
-      // commit exiting transactions
-      tx.commit()
-      if (tx.mustCommit) {
-        transactions.COMMITTED += 1
-      }
-
+      commit()
       res
     }
     catch {
       case ex: Exception =>
-        tx.down()
-        log.error(s"Error (${ex.getClass.getName}): ${ex.getMessage}")
-        tx.rollback()
+        rollback()
         throw ex
     }
     finally {
-      // clean up, if we are done with this transaction
-      if (!tx.hasParents) {
-        log.debug(s"Closing: ${tx.id}")
-        txRegistry.remove(txId.id)
-        closeTransaction(tx)
-        transactions.CLOSED += 1
-      }
+      close()
     }
   }
 
-  def asReadOnly[A](f: => A)(implicit txId: TransactionId = new TransactionId): A = {
-    log.debug("READ transaction")
-    val tx = transaction(readOnly = true)
+  def asReadOnly[A](f: => A): A = {
+    if (RequestContext.conn.value.isDefined) {
+      return f
+    }
+
+    RequestContext.conn.value = Some(connection(readOnly=true))
 
     try {
-      tx.up()  // level up - any new transactions within will be "nested" and use the same connection
+      // actual function call
       f
     }
     catch {
@@ -160,20 +95,52 @@ class TransactionManager(val app: AltitudeAppContext) {
         throw ex
     }
     finally {
-      // unlike write transactions, we can level down here, as we are not committing read-only connections
-      tx.down()
-
-      if (!tx.hasParents) {
-        log.debug(s"End: ${tx.id}")
-        log.debug(s"Closing: ${tx.id}")
-        txRegistry.remove(txId.id)
-        closeTransaction(tx)
-        transactions.CLOSED += 1
-      }
+        close()
     }
   }
 
-  def savepoint()(implicit txId: TransactionId): Unit = {
-    transaction().addSavepoint()
+  def rollback(): Unit = {
+    /* If there are savepoints, rollback to the last one, NOT the entire transaction */
+    if (RequestContext.savepoints.value.nonEmpty) {
+      rollbackSavepoint()
+      return
+    }
+
+    // println("ROLLBACK")
+    RequestContext.conn.value.get.rollback()
+    RequestContext.savepoints.value.clear()
+  }
+
+  def close(): Unit = {
+    if (RequestContext.conn.value.isDefined && RequestContext.conn.value.get.isClosed) {
+      log.warn("Connection already closed")
+      return
+    }
+
+    // println(s"CLOSE ${System.identityHashCode(RequestContext.conn.value.get)}")
+    RequestContext.conn.value.get.close()
+    RequestContext.conn.value = None
+    RequestContext.savepoints.value.clear()
+  }
+
+  private def rollbackSavepoint(): Unit = {
+    if (RequestContext.savepoints.value.isEmpty) {
+      return
+    }
+
+    // println("PARTIAL ROLLBACK")
+    val savepoint = RequestContext.savepoints.value.pop()
+    RequestContext.conn.value.get.rollback(savepoint)
+  }
+
+  def savepoint(): Unit = {
+    val savepoint = RequestContext.conn.value.get.setSavepoint()
+    RequestContext.savepoints.value.push(savepoint)
+  }
+
+  private def commit(): Unit = {
+    // println(s"COMMIT ${System.identityHashCode(RequestContext.conn.value.get)}")
+    RequestContext.conn.value.get.commit()
+    RequestContext.savepoints.value.clear()
   }
 }

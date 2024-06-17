@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json._
 import software.altitude.core.AltitudeAppContext
 import software.altitude.core.ConstraintException
-import software.altitude.core.Context
+import software.altitude.core.RequestContext
 import software.altitude.core.Util
 import software.altitude.core.dao.jdbc.querybuilder.SqlQuery
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models.BaseModel
-import software.altitude.core.transactions.TransactionId
+import software.altitude.core.models.Repository
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
@@ -33,9 +33,14 @@ abstract class BaseDao {
 
   protected final def txManager: TransactionManager = appContext.txManager
 
-  protected def conn(implicit ctx: Context, txId: TransactionId): Connection = {
-    // get the connection associated with this transaction
-    txManager.transaction().getConnection
+  protected def conn: Connection = {
+    // get the connection associated with this request
+    RequestContext.conn.value.get
+  }
+
+  protected def repo: Repository = {
+    // get the connection associated with this request
+    RequestContext.repository.value.get
   }
 
   protected def defaultSqlColsForSelect: List[String]
@@ -68,7 +73,7 @@ abstract class BaseDao {
   /**
    * Verify that a DB id to be used is valid
    */
-  def verifyId(id: String): Unit = {
+  private def verifyId(id: String): Unit = {
     if (id == null) {
       throw new IllegalArgumentException("ID is not defined")
     }
@@ -93,7 +98,7 @@ abstract class BaseDao {
    * @param jsonIn JsObject OR a model
    * @return JsObject of the added record, with ID of the record in the databases
    */
-  def add(jsonIn: JsObject)(implicit ctx: Context, txId: TransactionId): JsObject = {
+  def add(jsonIn: JsObject): JsObject = {
     val sql: String = s"""
       INSERT INTO $tableName (${coreSqlColsForInsert.mkString(", ")})
            VALUES ($coreSqlValsForInsert)"""
@@ -109,20 +114,20 @@ abstract class BaseDao {
    *         model. This method does NOT throw a NotFound error, as it is not assumed it is always
    *         and error.
    */
-  def getById(id: String)(implicit ctx: Context, txId: TransactionId): Option[JsObject] = {
+  def getById(id: String): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'")
-    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneRecSelectSql, List(id, ctx.repo.id.get))
+    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneRecSelectSql, List(id, repo.id.get))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
 
-  def getAll(implicit ctx: Context, txId: TransactionId): List[JsObject] = query(new Query()).records
+  def getAll: List[JsObject] = query(new Query()).records
 
   /**
    * Delete a document by its ID
    *
    * @return number of documents deleted - 0 or 1
    */
-  def deleteById(id: String)(implicit ctx: Context, txId: TransactionId): Int = {
+  def deleteById(id: String): Int = {
     val q: Query = new Query().add(C.Base.ID -> id)
     deleteByQuery(q)
   }
@@ -137,7 +142,7 @@ abstract class BaseDao {
    * @return number of documents updated - 0 or 1
    */
   def updateById(id: String, data: JsObject, fields: List[String])
-                (implicit ctx: Context, txId: TransactionId): Int = {
+                : Int = {
     val q: Query = new Query().add(C.Base.ID -> id)
     updateByQuery(q, data, fields)
   }
@@ -147,7 +152,7 @@ abstract class BaseDao {
    *
    * @return number of documents deleted
    */
-  def deleteByQuery(q: Query)(implicit ctx: Context, txId: TransactionId): Int = {
+  def deleteByQuery(q: Query): Int = {
     log.debug(s"Deleting record by query: $q")
     val fieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
 
@@ -160,7 +165,7 @@ abstract class BaseDao {
     log.debug(s"Delete SQL: $sql, with values: ${q.params.values.toList}")
     val runner: QueryRunner = new QueryRunner()
     val numDeleted = runner.update(
-      conn, sql, ctx.repo.id.get :: q.params.values.toList.map(_.asInstanceOf[Object]): _*)
+      conn, sql, repo.id.get :: q.params.values.toList.map(_.asInstanceOf[Object]): _*)
     log.debug(s"Deleted records: $numDeleted")
     numDeleted
   }
@@ -170,7 +175,7 @@ abstract class BaseDao {
    *
    * @return number of documents deleted
    */
-  def deleteBySql(sql: String, bindValues: List[Object])(implicit ctx: Context, txId: TransactionId): Int = {
+  def deleteBySql(sql: String, bindValues: List[Object]): Int = {
     log.debug("Deleting records by SQL")
     log.debug(s"Delete SQL: $sql, with values: $bindValues")
     val runner: QueryRunner = new QueryRunner()
@@ -182,7 +187,7 @@ abstract class BaseDao {
   /**
    * Get multiple documents using a Query
    */
-  def query(q: Query)(implicit ctx: Context, txId: TransactionId): QueryResult = {
+  def query(q: Query): QueryResult = {
     this.query(q, sqlQueryBuilder)
   }
 
@@ -190,7 +195,7 @@ abstract class BaseDao {
    * Internal version for querying with a customized query builder
    */
   protected def query(query: Query, sqlQueryBuilder: SqlQueryBuilder[Query])
-           (implicit ctx: Context, txId: TransactionId): QueryResult = {
+           : QueryResult = {
     val sqlQuery: SqlQuery = sqlQueryBuilder.buildSelectSql(query)
 
     val recs = manyBySqlQuery(sqlQuery.sqlAsString, sqlQuery.bindValues)
@@ -204,13 +209,13 @@ abstract class BaseDao {
   }
 
   protected def getQueryResultCount(query: Query, sqlQueryBuilder: SqlQueryBuilder[Query], values: List[Any] = List())
-                                   (implicit  ctx: Context, txId: TransactionId): Int = {
+                                   : Int = {
     val sqlCountQuery: SqlQuery = sqlQueryBuilder.buildCountSql(query)
     getQueryResultCountBySql(sqlCountQuery.sqlAsString, values)
   }
 
   protected def getQueryResultCountBySql(sql: String, values: List[Any] = List())
-                                   (implicit  ctx: Context, txId: TransactionId): Int = {
+                                   : Int = {
     val runner: QueryRunner = new QueryRunner()
 
     // We are defensive with different JDBC drivers operating with either java.lang.Int or java.lang.Long
@@ -227,7 +232,7 @@ abstract class BaseDao {
    * This function takes care of the actual plumbing common to all add() methods.
    */
   protected def addRecord(jsonIn: JsObject, sql: String, values: List[Any])
-                         (implicit  ctx: Context, txId: TransactionId): JsObject = {
+                         : JsObject = {
     log.info(s"JDBC INSERT: $jsonIn")
 
     val existingObjId: Option[String] = (jsonIn \ C.Base.ID).asOpt[String]
@@ -258,11 +263,11 @@ abstract class BaseDao {
    * @param vals any arbitrary values
    * @return array of values to be bound to columns
    */
-  protected def combineInsertValues(id: String, vals: List[Any])(implicit  ctx: Context): List[Any] =
-    id :: ctx.repo.id.get :: vals
+  protected def combineInsertValues(id: String, vals: List[Any]): List[Any] =
+    id :: repo.id.get :: vals
 
   protected def manyBySqlQuery(sql: String, values: List[Any] = List())
-                              (implicit ctx: Context, txId: TransactionId): List[Map[String, AnyRef]] = {
+                              : List[Map[String, AnyRef]] = {
     log.debug(s"Running SQL query [$sql] with $values")
 
     val runner: QueryRunner = new QueryRunner()
@@ -277,8 +282,7 @@ abstract class BaseDao {
    *
    * @throws ConstraintException if a DB constraint is missed and more than one record is found
    */
-  protected def oneBySqlQuery(sql: String, values: List[Any] = List())
-                             (implicit ctx: Context, txId: TransactionId): Option[Map[String, AnyRef]] = {
+  def oneBySqlQuery(sql: String, values: List[Any] = List()): Option[Map[String, AnyRef]] = {
     log.debug(s"Running SQL query [$sql] with $values")
 
     val runner: QueryRunner = new QueryRunner()
@@ -300,7 +304,7 @@ abstract class BaseDao {
   }
 
   def getByIds(ids: Set[String])
-                       (implicit ctx: Context, txId: TransactionId): List[JsObject] = {
+                       : List[JsObject] = {
     val placeholders = ids.toSeq.map(_ => "?")
     val sql = s"""
       SELECT ${defaultSqlColsForSelect.mkString(", ")}
@@ -311,14 +315,14 @@ abstract class BaseDao {
     log.debug(s"SQL: $sql with values: ${ids.toList}")
 
     val runner: QueryRunner = new QueryRunner()
-    val res = runner.query(conn, sql, new MapListHandler(), ctx.repo.id.get :: ids.toList: _*).asScala.toList
+    val res = runner.query(conn, sql, new MapListHandler(), repo.id.get :: ids.toList: _*).asScala.toList
     log.debug(s"Found ${res.length} records")
     val recs = res.map{_.asScala.toMap[String, AnyRef]}
     recs.map{makeModel}
   }
 
   def updateByQuery(q: Query, json: JsObject, fields: List[String])
-                            (implicit ctx: Context, txId: TransactionId): Int = {
+                            : Int = {
     log.debug(s"Updating record by query $q with data $json for fields: $fields")
 
     val queryFieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
@@ -349,7 +353,7 @@ abstract class BaseDao {
       }
     }.toList
 
-    val valuesForAllPlaceholders = dataUpdateValues ::: List(ctx.repo.id.get) ::: q.params.values.toList
+    val valuesForAllPlaceholders = dataUpdateValues ::: List(repo.id.get) ::: q.params.values.toList
     val runner: QueryRunner = new QueryRunner()
 
     val numUpdated = runner.update(conn, sql, valuesForAllPlaceholders.map(_.asInstanceOf[Object]): _*)
@@ -357,7 +361,7 @@ abstract class BaseDao {
   }
 
   def increment(id: String, field: String, count: Int = 1)
-                        (implicit ctx: Context, txId: TransactionId): Unit = {
+                        : Unit = {
     val sql = s"""
       UPDATE $tableName
          SET $field = $field + $count
@@ -366,11 +370,11 @@ abstract class BaseDao {
     log.debug(s"INCR SQL: $sql, for $id")
 
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, sql, ctx.repo.id.get, id)
+    runner.update(conn, sql, repo.id.get, id)
   }
 
   def decrement(id: String, field: String, count: Int = 1)
-                        (implicit ctx: Context, txId: TransactionId): Unit = {
+                        : Unit = {
     increment(id, field, -count)
   }
 
