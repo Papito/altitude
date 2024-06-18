@@ -4,6 +4,7 @@ import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.Altitude
+import software.altitude.core.RequestContext
 import software.altitude.core.models._
 import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchResult
@@ -69,7 +70,7 @@ abstract class SearchDao(override val appContext: Altitude)
 
     log.debug(s"Delete SQL: $sql, with values: $bindValues")
     val runner: QueryRunner = new QueryRunner()
-    val numDeleted = runner.update(conn, sql, bindValues: _*)
+    val numDeleted = runner.update(RequestContext.getConn, sql, bindValues: _*)
     log.debug(s"Deleted records: $numDeleted")
   }
 
@@ -102,7 +103,7 @@ abstract class SearchDao(override val appContext: Altitude)
                                 : Unit = {
     log.debug(s"INSERT SQL: ${SearchDao.VALUE_INSERT_SQL}. ARGS: ${values.toString()}")
 
-    val preparedStatement: PreparedStatement = conn.prepareStatement(SearchDao.VALUE_INSERT_SQL)
+    val preparedStatement: PreparedStatement = RequestContext.getConn.prepareStatement(SearchDao.VALUE_INSERT_SQL)
 
       values.foreach { value: String =>
         preparedStatement.clearParameters()
@@ -138,7 +139,7 @@ abstract class SearchDao(override val appContext: Altitude)
   override protected def addRecord(jsonIn: JsObject, q: String, values: List[Any])
                                   : JsObject = {
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, q, values.map(_.asInstanceOf[Object]): _*)
+    runner.update(RequestContext.getConn, q, values.map(_.asInstanceOf[Object]): _*)
     jsonIn
   }
 

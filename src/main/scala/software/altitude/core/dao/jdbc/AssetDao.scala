@@ -4,6 +4,7 @@ import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
 import software.altitude.core.AltitudeAppContext
+import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models.Asset
 import software.altitude.core.models.AssetType
@@ -128,6 +129,6 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
     log.debug(s"Update SQL: [$sql] with values: $updateValues")
     val runner: QueryRunner = new QueryRunner()
 
-    runner.update(conn, sql, updateValues: _*)
+    runner.update(RequestContext.getConn, sql, updateValues: _*)
   }
 }

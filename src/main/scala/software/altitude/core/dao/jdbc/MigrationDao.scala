@@ -4,6 +4,7 @@ import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.AltitudeAppContext
+import software.altitude.core.RequestContext
 
 abstract class MigrationDao(val appContext: AltitudeAppContext)
   extends BaseDao with software.altitude.core.dao.MigrationDao {
@@ -34,7 +35,7 @@ abstract class MigrationDao(val appContext: AltitudeAppContext)
    * Execute an arbitrary command
    */
   override def executeCommand(command: String): Unit = {
-    val stmt = conn.createStatement()
+    val stmt = RequestContext.getConn.createStatement()
     stmt.executeUpdate(command)
     stmt.close()
   }
@@ -47,7 +48,7 @@ abstract class MigrationDao(val appContext: AltitudeAppContext)
     val runner: QueryRunner = new QueryRunner()
     val sql = s"UPDATE $tableName SET version = 1 WHERE id = 0"
     log.info(sql)
-    runner.update(conn, sql)
+    runner.update(RequestContext.getConn, sql)
   }
 
   protected override  def makeModel(rec: Map[String, AnyRef]): JsObject = throw new NotImplementedError

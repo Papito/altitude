@@ -19,7 +19,6 @@ import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 import software.altitude.core.{Const => C}
 
-import java.sql.Connection
 import java.util.regex.Pattern
 import scala.jdk.CollectionConverters._
 
@@ -32,11 +31,6 @@ abstract class BaseDao {
   val tableName: String
 
   protected final def txManager: TransactionManager = appContext.txManager
-
-  protected def conn: Connection = {
-    // get the connection associated with this request
-    RequestContext.conn.value.get
-  }
 
   protected def repo: Repository = {
     // get the connection associated with this request
@@ -165,7 +159,7 @@ abstract class BaseDao {
     log.debug(s"Delete SQL: $sql, with values: ${q.params.values.toList}")
     val runner: QueryRunner = new QueryRunner()
     val numDeleted = runner.update(
-      conn, sql, repo.id.get :: q.params.values.toList.map(_.asInstanceOf[Object]): _*)
+      RequestContext.getConn, sql, repo.id.get :: q.params.values.toList.map(_.asInstanceOf[Object]): _*)
     log.debug(s"Deleted records: $numDeleted")
     numDeleted
   }
@@ -179,7 +173,7 @@ abstract class BaseDao {
     log.debug("Deleting records by SQL")
     log.debug(s"Delete SQL: $sql, with values: $bindValues")
     val runner: QueryRunner = new QueryRunner()
-    val numDeleted = runner.update(conn, sql, bindValues: _*)
+    val numDeleted = runner.update(RequestContext.getConn, sql, bindValues: _*)
     log.debug(s"Deleted records: $numDeleted")
     numDeleted
   }
@@ -219,7 +213,7 @@ abstract class BaseDao {
     val runner: QueryRunner = new QueryRunner()
 
     // We are defensive with different JDBC drivers operating with either java.lang.Int or java.lang.Long
-    runner.query(conn, sql, new ScalarHandler[AnyRef]("count"), values.map(_.asInstanceOf[Object]): _*) match {
+    runner.query(RequestContext.getConn, sql, new ScalarHandler[AnyRef]("count"), values.map(_.asInstanceOf[Object]): _*) match {
       case v: java.lang.Integer => v.intValue
       case v: java.lang.Long => v.asInstanceOf[Long].toInt
       case null => 0
@@ -246,7 +240,7 @@ abstract class BaseDao {
     log.debug(s"INSERT SQL: $sql. ARGS: ${_values.toString()}")
 
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, sql, _values.map(_.asInstanceOf[Object]): _*)
+    runner.update(RequestContext.getConn, sql, _values.map(_.asInstanceOf[Object]): _*)
 
     val recordJson = jsonIn ++ Json.obj(C.Base.ID -> id)
 
@@ -271,7 +265,7 @@ abstract class BaseDao {
     log.debug(s"Running SQL query [$sql] with $values")
 
     val runner: QueryRunner = new QueryRunner()
-    val res = runner.query(conn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]): _*).asScala.toList
+    val res = runner.query(RequestContext.getConn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]): _*).asScala.toList
     log.debug(s"Found ${res.length} records")
     // FIXME: is spacing here a scala Style violation?
     res.map{_.asScala.toMap[String, AnyRef]}.toList
@@ -286,7 +280,7 @@ abstract class BaseDao {
     log.debug(s"Running SQL query [$sql] with $values")
 
     val runner: QueryRunner = new QueryRunner()
-    val res = runner.query(conn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]): _*).asScala.toList
+    val res = runner.query(RequestContext.getConn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]): _*).asScala.toList
     log.debug(s"Found ${res.length} records")
 
     if (res.isEmpty) {
@@ -315,7 +309,7 @@ abstract class BaseDao {
     log.debug(s"SQL: $sql with values: ${ids.toList}")
 
     val runner: QueryRunner = new QueryRunner()
-    val res = runner.query(conn, sql, new MapListHandler(), repo.id.get :: ids.toList: _*).asScala.toList
+    val res = runner.query(RequestContext.getConn, sql, new MapListHandler(), repo.id.get :: ids.toList: _*).asScala.toList
     log.debug(s"Found ${res.length} records")
     val recs = res.map{_.asScala.toMap[String, AnyRef]}
     recs.map{makeModel}
@@ -356,7 +350,7 @@ abstract class BaseDao {
     val valuesForAllPlaceholders = dataUpdateValues ::: List(repo.id.get) ::: q.params.values.toList
     val runner: QueryRunner = new QueryRunner()
 
-    val numUpdated = runner.update(conn, sql, valuesForAllPlaceholders.map(_.asInstanceOf[Object]): _*)
+    val numUpdated = runner.update(RequestContext.getConn, sql, valuesForAllPlaceholders.map(_.asInstanceOf[Object]): _*)
     numUpdated
   }
 
@@ -370,7 +364,7 @@ abstract class BaseDao {
     log.debug(s"INCR SQL: $sql, for $id")
 
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, sql, repo.id.get, id)
+    runner.update(RequestContext.getConn, sql, repo.id.get, id)
   }
 
   def decrement(id: String, field: String, count: Int = 1)

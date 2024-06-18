@@ -14,4 +14,8 @@ object RequestContext {
   val account: DynamicVariable[Option[User]] = new DynamicVariable(None)
   val repository: DynamicVariable[Option[Repository]] = new DynamicVariable(None)
   val savepoints: DynamicVariable[mutable.Stack[Savepoint]] = new DynamicVariable(new mutable.Stack[Savepoint])
+
+  def getConn: Connection = conn.value.getOrElse(throw new RuntimeException("No connection in context"))
+  def getAccount: User = account.value.getOrElse(throw new RuntimeException("No account in context"))
+  def getRepository: Repository = repository.value.getOrElse(throw new RuntimeException("No repository in context"))
 }

@@ -3,6 +3,7 @@ package software.altitude.core.dao.sqlite
 import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
+import software.altitude.core.RequestContext
 import software.altitude.core.dao.sqlite.querybuilder.AssetSearchQueryBuilder
 import software.altitude.core.models.Asset
 import software.altitude.core.util.SearchQuery
@@ -52,7 +53,7 @@ class SearchDao(override val appContext: Altitude) extends software.altitude.cor
     addRecord(asset, docSql, sqlVals)
 
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, docSql, sqlVals.map(_.asInstanceOf[Object]): _*)
+    runner.update(RequestContext.getConn, docSql, sqlVals.map(_.asInstanceOf[Object]): _*)
   }
 
   override def search(searchQuery: SearchQuery): SearchResult = {

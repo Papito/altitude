@@ -52,7 +52,7 @@ class SearchDao(override val appContext: Altitude) extends software.altitude.cor
       metadataValues.mkString(" "), repo.id.get, asset.id.get)
 
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, docSql, sqlVals.map(_.asInstanceOf[Object]): _*)
+    runner.update(RequestContext.getConn, docSql, sqlVals.map(_.asInstanceOf[Object]): _*)
   }
 
   override def search(searchQuery: SearchQuery): SearchResult = {

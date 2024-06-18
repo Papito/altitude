@@ -41,7 +41,7 @@ class WebIndexController extends AltitudeStack with ScalateSupport with Altitude
       app.txManager.withTransaction {
         app.txManager.withTransaction {
           val runner: QueryRunner = new QueryRunner()
-          runner.execute(RequestContext.conn.value.get, "UPDATE system SET initialized = ? WHERE id = ?", false, 1)
+          runner.execute(RequestContext.getConn, "UPDATE system SET initialized = ? WHERE id = ?", false, 1)
         }
       }
     }

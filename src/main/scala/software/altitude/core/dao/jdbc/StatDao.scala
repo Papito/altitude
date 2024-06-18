@@ -4,6 +4,7 @@ import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.AltitudeAppContext
+import software.altitude.core.RequestContext
 import software.altitude.core.models.Stat
 import software.altitude.core.{Const => C}
 
@@ -31,7 +32,7 @@ abstract class StatDao(val appContext: AltitudeAppContext) extends BaseDao with 
                          : JsObject = {
     log.info(s"JDBC INSERT: $jsonIn")
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, q, values.map(_.asInstanceOf[Object]): _*)
+    runner.update(RequestContext.getConn, q, values.map(_.asInstanceOf[Object]): _*)
     jsonIn
   }
 
@@ -50,6 +51,6 @@ abstract class StatDao(val appContext: AltitudeAppContext) extends BaseDao with 
     log.debug(s"INCR STAT SQL: $sql, for $statName")
 
     val runner: QueryRunner = new QueryRunner()
-    runner.update(conn, sql, repo.id.get, statName)
+    runner.update(RequestContext.getConn, sql, repo.id.get, statName)
   }
 }
