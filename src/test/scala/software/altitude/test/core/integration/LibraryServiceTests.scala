@@ -246,7 +246,7 @@ import software.altitude.core.{Const => C}
 
     // SECOND REPO
     val repo2 = testContext.persistRepository()
-    altitude.service.repository.switchContextToRepository(repo2)
+    switchContextRepo(repo2)
 
     altitude.service.library.query(new Query()).isEmpty shouldBe true
 
@@ -281,7 +281,7 @@ import software.altitude.core.{Const => C}
     testContext.persistAsset(user = Some(user2))
 
     // FIRST USER
-    altitude.service.user.switchContextToUser(testContext.users.head)
+    switchContextUser(testContext.users.head)
     altitude.service.asset.query(new Query()).records.length shouldBe 2
 
     val asset: Asset = altitude.service.asset.query(new Query()).records.head
@@ -292,7 +292,7 @@ import software.altitude.core.{Const => C}
 
     // SECOND REPO
     val repo2 = testContext.persistRepository(user=Some(user2))
-    altitude.service.repository.switchContextToRepository(repo2)
+    switchContextRepo(repo2)
 
     altitude.service.asset.queryRecycled(new Query()).records.length shouldBe 0
   }

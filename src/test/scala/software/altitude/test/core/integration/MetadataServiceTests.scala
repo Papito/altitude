@@ -220,18 +220,18 @@ import software.altitude.core.models._
 
     // SECOND USER
     val user2 = testContext.persistUser()
-    altitude.service.user.switchContextToUser(user2)
+    switchContextUser(user2)
 
     altitude.service.metadata.addField(
       MetadataField(name = Util.randomStr(), fieldType = FieldType.KEYWORD))
 
     // FIRST USER
-    altitude.service.user.switchContextToUser(testContext.users.head)
+    switchContextUser(testContext.users.head)
     altitude.service.metadata.getAllFields.size shouldBe 3
 
     // THIRD USER
     val user3 = testContext.persistUser()
-    altitude.service.user.switchContextToUser(user3)
+    switchContextUser(user3)
     altitude.service.metadata.getAllFields.size shouldBe 3
   }
 

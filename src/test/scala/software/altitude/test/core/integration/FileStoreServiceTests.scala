@@ -13,6 +13,7 @@ import software.altitude.core.Util
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Folder
 import software.altitude.core.{Const => C}
+import software.altitude.test.core.integration.IntegrationTestCore.fileToImportAsset
 
 import java.io.File
 
@@ -300,7 +301,7 @@ import java.io.File
   }
 
   private def importFile(path: String): Asset = {
-    altitude.service.repository.switchContextToRepository(testContext.repository)
+    switchContextRepo(testContext.repository)
 
     val _path = getClass.getResource(s"/import/$path").getPath
     val fileImportAsset = fileToImportAsset(new File(_path))

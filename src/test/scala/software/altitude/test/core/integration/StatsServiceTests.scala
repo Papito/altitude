@@ -51,8 +51,9 @@ import software.altitude.core.util.Query
     stats.getStatValue(Stats.TOTAL_BYTES) shouldBe
       stats.getStatValue(Stats.TOTAL_ASSETS) * ASSET_SIZE
 
+    // SECOND REPO
     val repo2 = testContext.persistRepository()
-    altitude.service.repository.switchContextToRepository(repo2)
+    switchContextRepo(repo2)
 
     val stats3 = altitude.service.stats.getStats
 
@@ -147,12 +148,12 @@ import software.altitude.core.util.Query
 
     // SECOND REPO
     val repo2 = testContext.persistRepository()
-    altitude.service.repository.switchContextToRepository(repo2)
+    switchContextRepo(repo2)
 
     testContext.persistAsset(repository = Some(repo2))
 
     // FIRST REPO
-    altitude.service.repository.switchContextToRepository(testContext.repositories.head)
+    switchContextRepo(testContext.repositories.head)
 
     val stats = altitude.service.stats.getStats
     stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 2
@@ -165,7 +166,7 @@ import software.altitude.core.util.Query
     stats.getStatValue(Stats.RECYCLED_BYTES) shouldBe 0
 
     // SECOND REPO
-    altitude.service.repository.switchContextToRepository(repo2)
+    switchContextRepo(repo2)
 
     val stats2 = altitude.service.stats.getStats
 

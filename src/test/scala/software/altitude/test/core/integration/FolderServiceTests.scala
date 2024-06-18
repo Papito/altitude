@@ -78,9 +78,9 @@ import software.altitude.core.models.Folder
         path(1).id shouldBe folder2.id
         path.last.id shouldBe folder2_1_1.id
 
-        // Switch to second repository context
+        // SECOND REPO
         val repo2 = testContext.persistRepository()
-        altitude.service.repository.switchContextToRepository(repo2)
+        switchContextRepo(repo2)
 
         val hierarchy2 = altitude.service.folder.hierarchy()
         hierarchy2 shouldBe empty
