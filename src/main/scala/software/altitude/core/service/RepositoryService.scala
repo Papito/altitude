@@ -35,7 +35,6 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
   }
 
   def addRepository(name: String, fileStoreType: C.FileStoreType.Value, user: User, id: Option[String] = None): JsObject = {
-
     log.info(s"Creating repository [$name]")
 
     val workPath = System.getProperty("user.dir")
@@ -56,8 +55,9 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
 
     txManager.withTransaction[JsObject] {
       val repo: Repository = super.add(repoToSave)
-      RequestContext.repository.value = Some(repo)
-      RequestContext.account.value = Some(user)
+
+      // we must force the context to the new repository because following operations depend on this
+      switchContextToRepository(repo)
 
       log.info(s"Creating repository [${repo.name}] system folders")
 
@@ -80,5 +80,9 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
 
       repo
     }
+  }
+
+  def switchContextToRepository(repo: Repository): Unit = {
+    RequestContext.repository.value = Some(repo)
   }
 }

@@ -29,4 +29,8 @@ class UserService(val app: Altitude) extends BaseService[User] {
       super.add(user)
     }
   }
+
+  def switchContextToUser(repo: User): Unit = {
+    RequestContext.account.value = Some(repo)
+  }
 }

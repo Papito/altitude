@@ -74,64 +74,7 @@ abstract class IntegrationTestCore
     case _ => throw new IllegalArgumentException(s"Do not know of datasource: $datasource")
   }
 
-
-  /**
-   * Our test users. We may alternate between them to make sure there is proper
-   * separation between data users are allowed to see.
-   */
-  private var user: User = null
-  private var secondUser: User = null
-
-  var currentUser: User = user
-
-  /**
-   * Just as with users, we need at least two repositories to make sure repository
-   * bounds are not broken. Normally, no request should ever be able to peek into
-   * data from other repositories. This is enforced in the DAO layer.
-   */
-  private var repo: Repository = null
-  private var secondRepo: Repository = null
-
-  var currentRepo: Repository = repo
-
-  RequestContext.repository.value = Some(currentRepo)
-  RequestContext.account.value = Some(currentUser)
-
-  /**
-   * Methods to toggle between different user and repositories.
-   */
-  def SET_FIRST_USER(): Unit = {
-    RequestContext.account.value = Some(user)
-    currentUser = user
-  }
-  def SET_SECOND_USER(): Unit = {
-    RequestContext.account.value = Some(secondUser)
-    currentUser = secondUser
-  }
-
-  def SET_FIRST_REPO(): Unit = {
-    RequestContext.repository.value = Some(repo)
-    currentRepo = repo
-  }
-
-  def SET_SECOND_REPO(): Unit = {
-    RequestContext.repository.value = Some(secondRepo)
-    currentRepo = secondRepo
-  }
-
-  /**
-   * A helper method to quickly cook a test asset
-   */
-  protected def makeAsset(folder: Folder, metadata: Metadata = Metadata()): Asset = Asset(
-    userId = currentUser.id.get,
-    folderId = folder.id.get,
-    assetType = new AssetType(
-      mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime"),
-    fileName = Util.randomStr(50),
-    path = Some(Util.randomStr(50)),
-    checksum = Util.randomStr(32),
-    metadata = metadata,
-    sizeBytes = 1000L)
+  var testContext: TestContext = new TestContext(altitude)
 
   /**
    * Convert a file system resource to an import asset
@@ -147,16 +90,22 @@ abstract class IntegrationTestCore
   private var count = 0
 
   override def beforeEach(): Unit = {
+    testContext = new TestContext(altitude)
+
+    /*
+     Every integration test has at least one repository to start with - you can't do anything otherwise
+     This also creates the first user (owner of the repository).
+
+     Tests then can create additional repos and users to test the boundaries of repository and user separation.
+     */
+    testContext.persistRepository()
+
     // this is for logging context
-    MDC.put("USER", s"[USR:$currentUser]")
+    MDC.put("USER", s"[USR:$testContext.user]")
     count = count + 1
     MDC.put("REQUEST_ID", s"[TEST: $count]")
 
     IntegrationTestCore.createFileStoreDir(altitude)
-    createFixtures()
-
-    SET_FIRST_USER()
-    SET_FIRST_REPO()
   }
 
   def savepoint(): Unit = {
@@ -165,20 +114,5 @@ abstract class IntegrationTestCore
 
   override def afterEach(): Unit = {
     altitude.txManager.rollback()
-  }
-
-  def createFixtures(): Unit = {
-    user = altitude.service.user.add(User())
-    secondUser = altitude.service.user.add(User())
-
-    repo = altitude.service.repository.addRepository(
-      name = "Test Repository 1",
-      fileStoreType = C.FileStoreType.FS,
-      user = user)
-
-    secondRepo = altitude.service.repository.addRepository(
-      name = "Test Repository 2",
-      fileStoreType = C.FileStoreType.FS,
-      user = secondUser)
   }
 }

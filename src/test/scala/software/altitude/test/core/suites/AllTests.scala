@@ -5,11 +5,11 @@ import software.altitude.test.core.integration._
 import software.altitude.test.core.unit._
 
 abstract class AllTests(val config: Map[String, Any]) extends Suites(
+  new AssetQueryTests(config),
   new ModelTests,
   new SearchQueryModelTests,
   new AssetServiceTests(config),
   new MetadataParserTests(config),
-  new AssetQueryTests(config),
   new SearchServiceTests(config),
   new RepositoryServiceTests(config),
   new ImportTests(config),
@@ -18,9 +18,9 @@ abstract class AllTests(val config: Map[String, Any]) extends Suites(
   new SearchSqlQueryTests,
   new FolderServiceTests(config),
   new FileStoreServiceTests(config),
-  new LibraryServiceTests(config),
   new StatsServiceTests(config),
   new UserServiceTests(config),
+  new LibraryServiceTests(config),
   new MetadataServiceTests(config),
   // new AssetApiControllerTests
 )

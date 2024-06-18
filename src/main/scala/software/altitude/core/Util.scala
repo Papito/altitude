@@ -32,4 +32,6 @@ object Util {
   }
 
   def randomStr(size: Int = 10): String = scala.util.Random.alphanumeric.take(size).mkString
+
+  def randomLongInt(): Long = scala.util.Random.nextLong(1000000000L)
 }

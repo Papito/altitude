@@ -14,7 +14,7 @@ import software.altitude.core.{Const => C}
     val repo: Repository = altitude.service.repository.addRepository(
       name = Util.randomStr(),
       fileStoreType = C.FileStoreType.FS,
-      user = this.currentUser)
+      user = testContext.user)
 
     repo.fileStoreConfig.keys should contain(C.Repository.Config.PATH)
 

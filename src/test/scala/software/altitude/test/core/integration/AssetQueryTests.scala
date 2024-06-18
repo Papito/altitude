@@ -4,7 +4,6 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.RequestContext
 import software.altitude.core.models.Asset
-import software.altitude.core.models.AssetType
 import software.altitude.core.util.Query
 import software.altitude.core.{Const => C}
 
@@ -16,41 +15,23 @@ import software.altitude.core.{Const => C}
   }
 
   test("Search root folder") {
-    val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
-    val asset = new Asset(
-      userId = currentUser.id.get,
-      assetType = mediaType,
-      fileName = "filename.ext",
-      path = Some("path"),
-      checksum = "checksum",
-      folderId = RequestContext.repository.value.get.triageFolderId,
-      sizeBytes = 1L)
-    altitude.service.asset.add(asset)
+    testContext.persistAsset()
 
     val assets = altitude.service.library.query(new Query()).records
     assets.length shouldBe 1
   }
 
   test("Search triage folder") {
-    val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
-    val asset = new Asset(
-      userId = currentUser.id.get,
-      assetType = mediaType,
-      fileName = "filename.ext",
-      path = Some("path"),
-      checksum = "checksum",
-      folderId = RequestContext.repository.value.get.triageFolderId,
-      sizeBytes = 1L)
-    altitude.service.asset.add(asset)
+    testContext.persistAsset()
 
-    val query = new Query(Map(C.Asset.FOLDER_ID -> RequestContext.repository.value.get.triageFolderId))
+    val query = new Query(Map(C.Asset.FOLDER_ID -> testContext.repository.triageFolderId))
     val assets = altitude.service.library.query(query).records
     assets.length shouldBe 1
   }
 
   test("Pagination") {
     1 to 6 foreach { n =>
-      altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+      testContext.persistAsset()
     }
 
     val q = new Query(rpp = 2, page = 1)
@@ -93,8 +74,8 @@ import software.altitude.core.{Const => C}
   }
 
   test("Triage and Trash should have correct totals in query results") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
-    altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+    val asset: Asset = testContext.persistAsset()
+    testContext.persistAsset()
 
     altitude.service.library.recycleAsset(asset.id.get)
 

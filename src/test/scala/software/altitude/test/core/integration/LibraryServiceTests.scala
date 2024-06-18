@@ -46,13 +46,13 @@ import software.altitude.core.{Const => C}
 
     // fill up the hierarchy with assets x times over
     1 to 2 foreach {_ =>
-      altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
-      altitude.service.library.add(makeAsset(folder1))
-      altitude.service.library.add(makeAsset(folder2))
-      altitude.service.library.add(makeAsset(folder2_1))
-      altitude.service.library.add(makeAsset(folder2_2))
-      altitude.service.library.add(makeAsset(folder2_2_1))
-      altitude.service.library.add(makeAsset(folder2_2_2))
+      testContext.persistAsset()
+      testContext.persistAsset(folder = Some(folder1))
+      testContext.persistAsset(folder = Some(folder2))
+      testContext.persistAsset(folder = Some(folder2_1))
+      testContext.persistAsset(folder = Some(folder2_2))
+      testContext.persistAsset(folder = Some(folder2_2_1))
+      testContext.persistAsset(folder = Some(folder2_2_2))
     }
 
     // check counts
@@ -88,7 +88,7 @@ import software.altitude.core.{Const => C}
   }
 
   test("Rename asset and attempt to rename a recycled asset") {
-    var asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+    var asset: Asset = testContext.persistAsset()
     var updatedAsset: Asset = altitude.service.library.renameAsset(asset.id.get, "newName")
     updatedAsset.fileName shouldBe "newName"
     updatedAsset.path.get should endWith("newName")
@@ -107,7 +107,7 @@ import software.altitude.core.{Const => C}
   }
 
   test("Move recycled asset to folder") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+    var asset: Asset = testContext.persistAsset()
     altitude.service.asset.query(new Query()).records.length shouldBe 1
     altitude.service.asset.queryRecycled(new Query()).records.length shouldBe 0
     altitude.service.library.recycleAsset(asset.id.get)
@@ -128,7 +128,7 @@ import software.altitude.core.{Const => C}
     (altitude.service.folder.getByIdWithChildAssetCounts(folder1.id.get, all): Folder).numOfAssets shouldBe 1
   }
 
-  test("Search by folder hierarchy should return assets in subfolders") {
+  test("Search by folder hierarchy should return assets in sub-folders") {
     /*
   folder1
     folder1_1
@@ -147,8 +147,8 @@ import software.altitude.core.{Const => C}
     val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
 
     altitude.service.asset.add(new Asset(
-      folderId = folder1_1.id.get.toString,
-      userId = currentUser.id.get,
+      folderId = folder1_1.id.get,
+      userId = testContext.user.id.get,
       assetType = mediaType,
       fileName = "filename.ext",
       path = Some(Util.randomStr(30)),
@@ -156,8 +156,8 @@ import software.altitude.core.{Const => C}
       sizeBytes = 1L))
 
     altitude.service.asset.add(new Asset(
-      folderId = folder1_2.id.get.toString,
-      userId = currentUser.id.get,
+      folderId = folder1_2.id.get,
+      userId = testContext.user.id.get,
       assetType = mediaType,
       fileName = "filename.ext",
       path = Some(Util.randomStr(30)),
@@ -165,8 +165,8 @@ import software.altitude.core.{Const => C}
       sizeBytes = 1L))
 
     altitude.service.asset.add(new Asset(
-      folderId = folder1.id.get.toString,
-      userId = currentUser.id.get,
+      folderId = folder1.id.get,
+      userId = testContext.user.id.get,
       assetType = mediaType,
       fileName = "filename.ext",
       path = Some(Util.randomStr(30)),
@@ -201,9 +201,9 @@ import software.altitude.core.{Const => C}
 
     // fill up the hierarchy with assets x times over
     1 to 2 foreach {n =>
-      altitude.service.library.add(makeAsset(folder1))
-      altitude.service.library.add(makeAsset(folder2))
-      altitude.service.library.add(makeAsset(folder2_1))
+      testContext.persistAsset(folder = Some(folder1))
+      testContext.persistAsset(folder = Some(folder2))
+      testContext.persistAsset(folder = Some(folder2_1))
     }
 
     altitude.service.library.query(
@@ -228,7 +228,7 @@ import software.altitude.core.{Const => C}
 
     val folder2: Folder = altitude.service.library.addFolder("folder2")
 
-    val asset: Asset = altitude.service.library.add(makeAsset(folder1))
+    val asset: Asset = testContext.persistAsset(folder = Some(folder1))
 
     altitude.service.library.query(
       new Query(Map(C.Asset.FOLDER_ID -> folder1.id.get))
@@ -244,7 +244,9 @@ import software.altitude.core.{Const => C}
       new Query(Map(C.Asset.FOLDER_ID -> folder2.id.get))
     ).records.length shouldBe 1
 
-    SET_SECOND_REPO()
+    // SECOND REPO
+    val repo2 = testContext.persistRepository()
+    altitude.service.repository.switchContextToRepository(repo2)
 
     altitude.service.library.query(new Query()).isEmpty shouldBe true
 
@@ -260,7 +262,7 @@ import software.altitude.core.{Const => C}
     */
     val folder1: Folder = altitude.service.library.addFolder("folder1")
 
-    val asset: Asset = altitude.service.library.add(makeAsset(folder1))
+    val asset: Asset = testContext.persistAsset(folder = Some(folder1))
 
     altitude.service.library.moveAssetToFolder(asset.id.get, folder1.id.get)
 
@@ -270,12 +272,16 @@ import software.altitude.core.{Const => C}
   }
 
   test("Recycle asset") {
-    altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+    testContext.persistAsset()
 
-    SET_SECOND_USER()
-    altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+    // SECOND USER
+    val user2 = testContext.persistUser()
+    altitude.service.user.switchContextToUser(user2)
 
-    SET_FIRST_USER()
+    testContext.persistAsset(user = Some(user2))
+
+    // FIRST USER
+    altitude.service.user.switchContextToUser(testContext.users.head)
     altitude.service.asset.query(new Query()).records.length shouldBe 2
 
     val asset: Asset = altitude.service.asset.query(new Query()).records.head
@@ -284,25 +290,27 @@ import software.altitude.core.{Const => C}
     altitude.service.asset.query(new Query()).records.length shouldBe 1
     altitude.service.asset.queryRecycled(new Query()).records.length shouldBe 1
 
-    SET_SECOND_REPO()
+    // SECOND REPO
+    val repo2 = testContext.persistRepository(user=Some(user2))
+    altitude.service.repository.switchContextToRepository(repo2)
 
     altitude.service.asset.queryRecycled(new Query()).records.length shouldBe 0
   }
 
   test("Get recycled asset") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+    val asset: Asset = testContext.persistAsset()
     altitude.service.library.recycleAsset(asset.id.get)
   }
 
   test("Restore recycled asset") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+    val asset: Asset = testContext.persistAsset()
     val trashed: Asset = altitude.service.library.recycleAsset(asset.id.get)
     altitude.service.library.restoreRecycledAsset(trashed.id.get)
     altitude.service.asset.query(new Query()).isEmpty shouldBe false
   }
 
   test("Restore recycled asset to non-existing folder") {
-    val asset: Asset = altitude.service.library.add(makeAsset(altitude.service.folder.triageFolder))
+    val asset: Asset = testContext.persistAsset()
     altitude.service.library.recycleAsset(asset.id.get)
 
     intercept[NotFoundException] {
@@ -318,9 +326,9 @@ import software.altitude.core.{Const => C}
     val folder2_1: Folder = altitude.service.library.addFolder(
       name = "folder2_1", parentId = folder2.id)
 
-    var asset1: Asset = altitude.service.library.add(makeAsset(folder1))
-    var asset2: Asset = altitude.service.library.add(makeAsset(folder2))
-    var asset3: Asset = altitude.service.library.add(makeAsset(folder2_1))
+    var asset1: Asset = testContext.persistAsset(folder=Some(folder1))
+    var asset2: Asset = testContext.persistAsset(folder=Some(folder2))
+    var asset3: Asset = testContext.persistAsset(folder=Some(folder2_1))
 
     altitude.service.library.deleteFolderById(folder1.id.get)
     altitude.service.library.deleteFolderById(folder2.id.get)
@@ -343,12 +351,12 @@ import software.altitude.core.{Const => C}
     }
   }
 
-  test("Restore recycled asset twice", Focused) {
+  test("Restore recycled asset twice") {
     val folder1: Folder = altitude.service.library.addFolder("folder1")
 
-    val asset1: Asset = altitude.service.library.add(makeAsset(folder1))
-    val asset2: Asset = altitude.service.library.add(makeAsset(folder1))
-    val asset3: Asset = altitude.service.library.add(makeAsset(folder1))
+    val asset1: Asset = testContext.persistAsset(folder = Some(folder1))
+    val asset2: Asset = testContext.persistAsset(folder = Some(folder1))
+    val asset3: Asset = testContext.persistAsset(folder = Some(folder1))
     // assets 1, 2, 3 in folder 1
 
     altitude.service.library.recycleAssets(Set(asset1.id.get, asset2.id.get, asset3.id.get))
@@ -407,18 +415,17 @@ import software.altitude.core.{Const => C}
   test("Restore an asset that was imported again") {
     val folder1: Folder = altitude.service.library.addFolder("folder1")
 
-    val assetToImport: Asset = makeAsset(folder1)
-    val importedAsset: Asset = altitude.service.library.add(assetToImport)
+    val asset: Asset = testContext.persistAsset(folder=Some(folder1))
 
     // recycle the asset
-    altitude.service.library.recycleAsset(importedAsset.id.get)
+    altitude.service.library.recycleAsset(asset.id.get)
 
     // import a new copy of it (should be allowed)
-    altitude.service.library.add(assetToImport)
+    altitude.service.library.add(asset)
 
     // now restore the previously deleted copy into itself
     intercept[DuplicateException] {
-      altitude.service.library.restoreRecycledAsset(importedAsset.id.get)
+      altitude.service.library.restoreRecycledAsset(asset.id.get)
     }
   }
 
@@ -430,8 +437,8 @@ import software.altitude.core.{Const => C}
     val folder1_1_1: Folder = altitude.service.library.addFolder(
       "folder1_1_1", parentId = folder1_1.id)
 
-    altitude.service.library.add(makeAsset(folder1))
-    altitude.service.library.add(makeAsset(folder1_1))
+    testContext.persistAsset(folder=Some(folder1))
+    testContext.persistAsset(folder=Some(folder1_1))
 
     // delete the parent folder
     altitude.service.library.deleteFolderById(folder1.id.get)
@@ -456,8 +463,8 @@ import software.altitude.core.{Const => C}
     val folder1_1_1: Folder = altitude.service.library.addFolder(
       "folder1_1_1", parentId = folder1_1.id)
 
-    val asset1: Asset = altitude.service.library.add(makeAsset(folder1))
-    val asset2: Asset = altitude.service.library.add(makeAsset(folder1_1))
+    val asset1: Asset = testContext.persistAsset(folder=Some(folder1))
+    val asset2: Asset = testContext.persistAsset(folder=Some(folder1_1))
 
     altitude.service.library.recycleAsset(asset1.id.get)
     altitude.service.library.recycleAsset(asset2.id.get)
@@ -480,15 +487,15 @@ import software.altitude.core.{Const => C}
   test("Restoring an asset into a recycled folder should recreate the folder") {
     val folder1: Folder = altitude.service.library.addFolder("folder1")
 
-    val assetToImport: Asset = makeAsset(folder1)
-    val importedAsset: Asset = altitude.service.library.add(assetToImport)
-    altitude.service.library.recycleAsset(importedAsset.id.get)
+    val asset: Asset = testContext.persistAsset(folder = Some(folder1))
+    altitude.service.library.recycleAsset(asset.id.get)
+
     altitude.service.library.deleteFolderById(folder1.id.get)
 
     val deletedFolder: Folder = altitude.service.folder.getById(folder1.id.get)
     deletedFolder.isRecycled shouldBe true
 
-    altitude.service.library.restoreRecycledAsset(importedAsset.id.get)
+    altitude.service.library.restoreRecycledAsset(asset.id.get)
 
     val restoredFolder: Folder = altitude.service.folder.getById(folder1.id.get)
     restoredFolder.isRecycled shouldBe false

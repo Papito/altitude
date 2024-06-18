@@ -27,7 +27,7 @@ abstract class BaseService[Model <: BaseModel] extends ModelValidation {
     RequestContext.conn.value.get
   }
 
-  protected def repo: Repository = {
+  protected def contextRepo: Repository = {
     // get the connection associated with this request
     RequestContext.repository.value.get
   }

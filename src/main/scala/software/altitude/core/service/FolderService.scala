@@ -68,8 +68,8 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
    * Get root folder object for this repository.
    */
   def rootFolder: Folder = Folder(
-    id = Some(repo.rootFolderId),
-    parentId = repo.rootFolderId,
+    id = Some(contextRepo.rootFolderId),
+    parentId = contextRepo.rootFolderId,
     name = C.Folder.Name.ROOT,
     path = Some(app.service.fileStore.sortedFolderPath)
   )
@@ -78,8 +78,8 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
    * Get the Triage folder for this repository
    */
   def triageFolder: Folder = Folder(
-    id = Some(repo.triageFolderId),
-    parentId = repo.rootFolderId,
+    id = Some(contextRepo.triageFolderId),
+    parentId = contextRepo.rootFolderId,
     name = C.Folder.Name.TRIAGE,
     path = Some(app.service.fileStore.triageFolderPath)
   )
@@ -91,10 +91,10 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     List(triageFolder)
 
   def isRootFolder(id: String): Boolean =
-    id == repo.rootFolderId
+    id == contextRepo.rootFolderId
 
   def isTriageFolder(id: String): Boolean =
-    id == repo.triageFolderId
+    id == contextRepo.triageFolderId
 
   def isSystemFolder(id: Option[String]): Boolean =
     systemFolders.exists(_.id == id)
@@ -149,7 +149,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   def hierarchy(rootId: Option[String] = None, allRepoFolders: List[JsObject] = List())
                : List[Folder] = {
 
-    val _rootId = if (rootId.isDefined) rootId.get else repo.rootFolderId
+    val _rootId = if (rootId.isDefined) rootId.get else contextRepo.rootFolderId
 
     txManager.asReadOnly {
       val repoFolders = repositoryFolders(allRepoFolders)
