@@ -13,7 +13,6 @@ import software.altitude.core.Util
 import software.altitude.core.dao.jdbc.querybuilder.SqlQuery
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models.BaseModel
-import software.altitude.core.models.Repository
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
@@ -32,11 +31,6 @@ abstract class BaseDao {
 
   protected final def txManager: TransactionManager = appContext.txManager
 
-  protected def repo: Repository = {
-    // get the connection associated with this request
-    RequestContext.repository.value.get
-  }
-
   protected def defaultSqlColsForSelect: List[String]
 
   protected val sqlQueryBuilder: SqlQueryBuilder[Query] = new SqlQueryBuilder[Query](defaultSqlColsForSelect, tableName)
@@ -54,12 +48,6 @@ abstract class BaseDao {
   // common fields for new records, and their placeholders - mostly to avoid repetition
   protected val coreSqlColsForInsert: List[String] = List(C.Base.ID, C.Base.REPO_ID)
   protected def coreSqlValsForInsert: String = "?, ?"
-
-  // how we get current timestamp
-  protected def utcNow: DateTime = Util.utcNow
-
-  // datetime as a JSON value
-  protected def dtAsJsString(dt: DateTime): JsString = JsString(Util.isoDateTime(Some(dt)))
 
   // this is the valid ID pattern
   private val VALID_ID_PATTERN = Pattern.compile("[a-z0-9]+")
@@ -110,7 +98,7 @@ abstract class BaseDao {
    */
   def getById(id: String): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'")
-    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneRecSelectSql, List(id, repo.id.get))
+    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneRecSelectSql, List(id, RequestContext.getRepository.id.get))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
 
@@ -159,7 +147,7 @@ abstract class BaseDao {
     log.debug(s"Delete SQL: $sql, with values: ${q.params.values.toList}")
     val runner: QueryRunner = new QueryRunner()
     val numDeleted = runner.update(
-      RequestContext.getConn, sql, repo.id.get :: q.params.values.toList.map(_.asInstanceOf[Object]): _*)
+      RequestContext.getConn, sql, RequestContext.getRepository.id.get :: q.params.values.toList.map(_.asInstanceOf[Object]): _*)
     log.debug(s"Deleted records: $numDeleted")
     numDeleted
   }
@@ -170,7 +158,6 @@ abstract class BaseDao {
    * @return number of documents deleted
    */
   def deleteBySql(sql: String, bindValues: List[Object]): Int = {
-    log.debug("Deleting records by SQL")
     log.debug(s"Delete SQL: $sql, with values: $bindValues")
     val runner: QueryRunner = new QueryRunner()
     val numDeleted = runner.update(RequestContext.getConn, sql, bindValues: _*)
@@ -258,7 +245,7 @@ abstract class BaseDao {
    * @return array of values to be bound to columns
    */
   protected def combineInsertValues(id: String, vals: List[Any]): List[Any] =
-    id :: repo.id.get :: vals
+    id :: RequestContext.getRepository.id.get :: vals
 
   protected def manyBySqlQuery(sql: String, values: List[Any] = List())
                               : List[Map[String, AnyRef]] = {
@@ -309,7 +296,7 @@ abstract class BaseDao {
     log.debug(s"SQL: $sql with values: ${ids.toList}")
 
     val runner: QueryRunner = new QueryRunner()
-    val res = runner.query(RequestContext.getConn, sql, new MapListHandler(), repo.id.get :: ids.toList: _*).asScala.toList
+    val res = runner.query(RequestContext.getConn, sql, new MapListHandler(), RequestContext.getRepository.id.get :: ids.toList: _*).asScala.toList
     log.debug(s"Found ${res.length} records")
     val recs = res.map{_.asScala.toMap[String, AnyRef]}
     recs.map{makeModel}
@@ -347,7 +334,7 @@ abstract class BaseDao {
       }
     }.toList
 
-    val valuesForAllPlaceholders = dataUpdateValues ::: List(repo.id.get) ::: q.params.values.toList
+    val valuesForAllPlaceholders = dataUpdateValues ::: List(RequestContext.getRepository.id.get) ::: q.params.values.toList
     val runner: QueryRunner = new QueryRunner()
 
     val numUpdated = runner.update(RequestContext.getConn, sql, valuesForAllPlaceholders.map(_.asInstanceOf[Object]): _*)
@@ -364,7 +351,7 @@ abstract class BaseDao {
     log.debug(s"INCR SQL: $sql, for $id")
 
     val runner: QueryRunner = new QueryRunner()
-    runner.update(RequestContext.getConn, sql, repo.id.get, id)
+    runner.update(RequestContext.getConn, sql, RequestContext.getRepository.id.get, id)
   }
 
   def decrement(id: String, field: String, count: Int = 1)

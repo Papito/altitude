@@ -72,7 +72,7 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
        WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
       """
 
-    oneBySqlQuery(sql, List(repo.id.get, assetId)) match {
+    oneBySqlQuery(sql, List(RequestContext.getRepository.id.get, assetId)) match {
       case Some(rec) =>
         val metadataJsonStr: String = rec.getOrElse(C.Asset.METADATA, "{}").asInstanceOf[String]
         val metadataJson = Json.parse(metadataJsonStr).as[JsObject]
@@ -125,7 +125,7 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
        WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
       """
 
-    val updateValues = List(metadataWithIds.toString, repo.id.get, assetId)
+    val updateValues = List(metadataWithIds.toString, RequestContext.getRepository.id.get, assetId)
     log.debug(s"Update SQL: [$sql] with values: $updateValues")
     val runner: QueryRunner = new QueryRunner()
 

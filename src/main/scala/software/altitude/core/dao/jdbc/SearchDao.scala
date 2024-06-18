@@ -66,7 +66,7 @@ abstract class SearchDao(override val appContext: Altitude)
                  AND ${C.SearchToken.ASSET_ID} = ?
       """
 
-    val bindValues = List[Object](repo.id.get, assetId)
+    val bindValues = List[Object](RequestContext.getRepository.id.get, assetId)
 
     log.debug(s"Delete SQL: $sql, with values: $bindValues")
     val runner: QueryRunner = new QueryRunner()
@@ -107,7 +107,7 @@ abstract class SearchDao(override val appContext: Altitude)
 
       values.foreach { value: String =>
         preparedStatement.clearParameters()
-        preparedStatement.setString(1, repo.id.get)
+        preparedStatement.setString(1, RequestContext.getRepository.id.get)
         preparedStatement.setString(2, asset.id.get)
         preparedStatement.setString(3, field.id.get)
 

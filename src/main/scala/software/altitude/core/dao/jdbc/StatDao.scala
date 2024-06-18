@@ -23,7 +23,7 @@ abstract class StatDao(val appContext: AltitudeAppContext) extends BaseDao with 
            VALUES (? ,?)"""
 
     val stat: Stat = jsonIn
-    val values: List[Any] = repo.id.get :: stat.dimension :: Nil
+    val values: List[Any] = RequestContext.getRepository.id.get :: stat.dimension :: Nil
 
     addRecord(jsonIn, sql, values)
   }
@@ -51,6 +51,6 @@ abstract class StatDao(val appContext: AltitudeAppContext) extends BaseDao with 
     log.debug(s"INCR STAT SQL: $sql, for $statName")
 
     val runner: QueryRunner = new QueryRunner()
-    runner.update(RequestContext.getConn, sql, repo.id.get, statName)
+    runner.update(RequestContext.getConn, sql, RequestContext.getRepository.id.get, statName)
   }
 }

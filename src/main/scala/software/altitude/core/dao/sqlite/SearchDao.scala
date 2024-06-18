@@ -27,7 +27,7 @@ class SearchDao(override val appContext: Altitude) extends software.altitude.cor
     val body = metadataValues.mkString(" ")
 
     val sqlVals: List[Any] = List(
-      repo.id.get, asset.id.get, body)
+      RequestContext.getRepository.id.get, asset.id.get, body)
 
     addRecord(asset, docSql, sqlVals)
   }
@@ -48,7 +48,7 @@ class SearchDao(override val appContext: Altitude) extends software.altitude.cor
     val body = metadataValues.mkString(" ")
 
     val sqlVals: List[Any] = List(
-      body, repo.id.get, asset.id.get)
+      body, RequestContext.getRepository.id.get, asset.id.get)
 
     addRecord(asset, docSql, sqlVals)
 
