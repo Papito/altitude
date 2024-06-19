@@ -9,6 +9,7 @@ import software.altitude.core.DuplicateException
 import software.altitude.core.NotFoundException
 import software.altitude.core.Util
 import software.altitude.core.ValidationException
+import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models._
 
 
@@ -94,7 +95,7 @@ import software.altitude.core.models._
     // add a field we do not expect
     val badData = Map[String, Set[String]](
         keywordMetadataField.id.get -> Set("one", "two", "three"),
-        BaseModel.genId -> Set("four"))
+        BaseDao.genId -> Set("four"))
 
     intercept[NotFoundException] {
         altitude.service.metadata.setMetadata(asset.id.get, Metadata(badData))

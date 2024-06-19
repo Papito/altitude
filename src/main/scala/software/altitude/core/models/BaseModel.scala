@@ -4,17 +4,12 @@ import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
-import software.altitude.core.{Util, Const => C}
+import software.altitude.core.Util
+import software.altitude.core.{Const => C}
 
-import java.util.UUID
 import scala.language.implicitConversions
 
 object BaseModel {
-  final val ID_LEN = 36
-
-  // make a new model ID
-  final def genId: String = UUID.randomUUID.toString
-
   // implicit converter to go from a model to JSON
   implicit def toJson(obj: BaseModel): JsObject = obj.toJson
 }
@@ -25,7 +20,7 @@ abstract class BaseModel {
   def toJson: JsObject
 
   // created at - mutable, but can only be set once
-  protected var _createdAt: Option[DateTime] = None
+  private var _createdAt: Option[DateTime] = None
 
   def createdAt: Option[DateTime] = _createdAt
 
@@ -37,7 +32,7 @@ abstract class BaseModel {
   }
 
   // updated at - mutable, but can only be set once
-  protected var _updatedAt: Option[DateTime] = None
+  private var _updatedAt: Option[DateTime] = None
 
   def updatedAt: Option[DateTime] = _updatedAt
 
@@ -49,7 +44,7 @@ abstract class BaseModel {
   }
 
   // is clean (for validation) - mutable, but can only be set once
-  protected var _isClean = false
+  private var _isClean = false
 
   def isClean: Boolean = _isClean
 
@@ -62,7 +57,7 @@ abstract class BaseModel {
   }
 
   // is validated - mutable, but can only be set once
-  protected var _isValidated = false
+  private var _isValidated = false
 
   def isValidated: Boolean = _isValidated
 
