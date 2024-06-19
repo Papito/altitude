@@ -1,11 +1,15 @@
 package software.altitude.core.auth.strategies
 
-import org.scalatra.{CookieOptions, ScalatraBase}
+import org.scalatra.CookieOptions
+import org.scalatra.ScalatraBase
 import org.scalatra.auth.ScentryStrategy
-import org.slf4j.{Logger, LoggerFactory}
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import software.altitude.core.models.AccountType
 import software.altitude.core.models.User
 
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 class RememberMeStrategy(protected val app: ScalatraBase)(implicit request: HttpServletRequest, response: HttpServletResponse)
   extends ScentryStrategy[User] {
@@ -41,7 +45,7 @@ class RememberMeStrategy(protected val app: ScalatraBase)(implicit request: Http
    */
   def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse): Option[User] = {
     logger.info("RememberMeStrategy: attempting authentication")
-    if (tokenVal == "foobar") Some(User(Some("foo")))
+    if (tokenVal == "foobar") Some(User(Some("foo"), accountType = AccountType.User, email="email"))
     else None
   }
 

@@ -43,7 +43,7 @@ abstract class RepositoryDao(val appContext: AltitudeAppContext)
   }
 
   override def getById(id: String): Option[JsObject] = {
-    log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
+    log.debug(s"Getting by ID '$id' from '$tableName'")
     val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneRecSelectSql, List(id))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
@@ -53,13 +53,16 @@ abstract class RepositoryDao(val appContext: AltitudeAppContext)
 
     val sql = s"""
         INSERT INTO $tableName (
-             ${C.Base.ID}, ${C.Repository.NAME}, ${C.Repository.FILE_STORE_TYPE},
+             ${C.Repository.ID}, ${C.Repository.NAME}, ${C.Repository.FILE_STORE_TYPE},
              ${C.Repository.ROOT_FOLDER_ID}, ${C.Repository.TRIAGE_FOLDER_ID},
              ${C.Repository.FILES_STORE_CONFIG})
             VALUES (?, ?, ?, ?, ?, $jsonFunc)
     """
 
+    val id = BaseDao.genId
+
     val sqlVals: List[Any] = List(
+      id,
       repo.name,
       repo.fileStoreType.toString,
       repo.rootFolderId,
@@ -67,9 +70,7 @@ abstract class RepositoryDao(val appContext: AltitudeAppContext)
       Json.toJson(repo.fileStoreConfig).toString())
 
     addRecord(jsonIn, sql, sqlVals)
-  }
 
-  // we do not use repository ID
-  override protected def combineInsertValues(id: String, vals: List[Any]): List[Any] =
-    id :: vals
+    jsonIn ++ Json.obj(C.Base.ID -> id)
+  }
 }

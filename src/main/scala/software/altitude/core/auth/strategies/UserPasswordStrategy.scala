@@ -2,10 +2,13 @@ package software.altitude.core.auth.strategies
 
 import org.scalatra.ScalatraBase
 import org.scalatra.auth.ScentryStrategy
-import org.slf4j.{Logger, LoggerFactory}
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import software.altitude.core.models.AccountType
 import software.altitude.core.models.User
 
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 class UserPasswordStrategy(protected val app: ScalatraBase)(implicit request: HttpServletRequest, response: HttpServletResponse)
   extends ScentryStrategy[User] {
@@ -34,7 +37,7 @@ class UserPasswordStrategy(protected val app: ScalatraBase)(implicit request: Ht
 
     if (login == "admin" && password == "admin") {
       logger.info("UserPasswordStrategy: login succeeded")
-      Some(User(Some("myfakeid")))
+      Some(User(Some("foo"), accountType = AccountType.User, email="email"))
     } else {
       logger.info("UserPasswordStrategy: login failed")
       None

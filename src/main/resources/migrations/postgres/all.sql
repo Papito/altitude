@@ -15,7 +15,11 @@ CREATE UNIQUE INDEX system_01 ON system(id);
 INSERT INTO system(version, initialized) VALUES(1, False);
 
 CREATE TABLE account(
-  id CHAR(36) PRIMARY KEY
+  id CHAR(36) PRIMARY KEY,
+  email TEXT NOT NULL,
+  account_type TEXT NOT NULL
+               CHECK(account_type IN ('ADMIN','USER','GUEST')),
+  password_hash TEXT NOT NULL
 ) INHERITS (_core);
 
 CREATE TABLE repository(

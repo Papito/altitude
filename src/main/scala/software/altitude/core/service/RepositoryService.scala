@@ -9,7 +9,7 @@ import software.altitude.core.Altitude
 import software.altitude.core.NotFoundException
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.RepositoryDao
-import software.altitude.core.models.BaseModel
+import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.Repository
 import software.altitude.core.models.Stats
 import software.altitude.core.models.User
@@ -48,8 +48,8 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
     val repoToSave = Repository(
       id = id,
       name = name,
-      rootFolderId = BaseModel.genId,
-      triageFolderId = BaseModel.genId,
+      rootFolderId = BaseDao.genId,
+      triageFolderId = BaseDao.genId,
       fileStoreType = fileStoreType,
       fileStoreConfig = Map(C.Repository.Config.PATH -> dataPath))
 

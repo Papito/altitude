@@ -8,6 +8,10 @@ INSERT INTO system(version, initialized) VALUES(0, 0);
 
 CREATE TABLE account(
   id CHAR(36) PRIMARY KEY,
+  email TEXT NOT NULL,
+  account_type TEXT NOT NULL
+               CHECK(account_type IN ('ADMIN','USER','GUEST')),
+  password_hash TEXT NOT NULL,
   created_at DATE DEFAULT (datetime('now', 'utc')),
   updated_at DATE DEFAULT NULL
 );

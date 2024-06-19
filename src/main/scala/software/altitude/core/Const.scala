@@ -49,6 +49,9 @@ object Const {
   }
 
   object User extends Common {
+    val EMAIL = "email"
+    val PASSWORD_HASH = "password_hash"
+    val ACCOUNT_TYPE = "account_type"
   }
 
   object Asset extends Common {

@@ -1,15 +1,19 @@
 package software.altitude.core.auth
 
 import org.scalatra.ScalatraBase
-import org.scalatra.auth.{ScentryConfig, ScentrySupport}
-import org.slf4j.{Logger, LoggerFactory}
-import software.altitude.core.auth.strategies.{RememberMeStrategy, UserPasswordStrategy}
+import org.scalatra.auth.ScentryConfig
+import org.scalatra.auth.ScentrySupport
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import software.altitude.core.auth.strategies.RememberMeStrategy
+import software.altitude.core.auth.strategies.UserPasswordStrategy
+import software.altitude.core.models.AccountType
 import software.altitude.core.models.User
 
 trait AuthenticationSupport extends ScalatraBase with ScentrySupport[User] {
   self: ScalatraBase =>
 
-  protected def fromSession: PartialFunction[String, User] = { case id: String => User(Some(id)) }
+  protected def fromSession: PartialFunction[String, User] = { case id: String => User(id=Some(id), accountType = AccountType.User, email = "email") }
   protected def toSession: PartialFunction[User, String] = {
     case usr: User =>
       if (usr.id.isDefined)

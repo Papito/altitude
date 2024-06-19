@@ -2,7 +2,9 @@ package software.altitude.core.dao.jdbc
 
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
+import play.api.libs.json.Json
 import software.altitude.core.AltitudeAppContext
+import software.altitude.core.RequestContext
 import software.altitude.core.models.Folder
 import software.altitude.core.{Const => C}
 
@@ -28,18 +30,26 @@ abstract class FolderDao(val appContext: AltitudeAppContext) extends BaseDao wit
   override def add(jsonIn: JsObject): JsObject = {
     val folder = jsonIn: Folder
 
+    val id = folder.id match {
+      case Some(id) => id
+      case None => BaseDao.genId
+    }
+
     val sql = s"""
         INSERT INTO $tableName (
-             ${coreSqlColsForInsert.mkString(", ")},
-             ${C.Folder.NAME}, ${C.Folder.NAME_LC}, ${C.Folder.PARENT_ID})
-            VALUES ($coreSqlValsForInsert, ?, ?, ?)
+                      ${C.Folder.ID}, ${C.Folder.REPO_ID}, ${C.Folder.NAME}, ${C.Folder.NAME_LC}, ${C.Folder.PARENT_ID}
+                    )
+             VALUES (?, ? , ?, ?, ?)
     """
 
     val sqlVals: List[Any] = List(
+      id,
+      RequestContext.getRepository.id.get,
       folder.name,
       folder.nameLowercase,
       folder.parentId)
 
     addRecord(jsonIn, sql, sqlVals)
+    jsonIn ++ Json.obj(C.Base.ID -> id)
   }
 }

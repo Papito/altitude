@@ -9,7 +9,6 @@ import play.api.libs.json._
 import software.altitude.core.AltitudeAppContext
 import software.altitude.core.ConstraintException
 import software.altitude.core.RequestContext
-import software.altitude.core.Util
 import software.altitude.core.dao.jdbc.querybuilder.SqlQuery
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models.BaseModel
@@ -18,9 +17,12 @@ import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 import software.altitude.core.{Const => C}
 
-import java.util.regex.Pattern
+import java.util.UUID
 import scala.jdk.CollectionConverters._
 
+object BaseDao {
+  final def genId: String = UUID.randomUUID.toString
+}
 
 abstract class BaseDao {
   val appContext: AltitudeAppContext
@@ -48,26 +50,6 @@ abstract class BaseDao {
   // common fields for new records, and their placeholders - mostly to avoid repetition
   protected val coreSqlColsForInsert: List[String] = List(C.Base.ID, C.Base.REPO_ID)
   protected def coreSqlValsForInsert: String = "?, ?"
-
-  // this is the valid ID pattern
-  private val VALID_ID_PATTERN = Pattern.compile("[a-z0-9]+")
-
-  /**
-   * Verify that a DB id to be used is valid
-   */
-  private def verifyId(id: String): Unit = {
-    if (id == null) {
-      throw new IllegalArgumentException("ID is not defined")
-    }
-
-    if (id.length != BaseModel.ID_LEN) {
-      throw new IllegalArgumentException(s"ID length should be ${BaseModel.ID_LEN}. Was: [${id.length}]")
-    }
-
-    if (!VALID_ID_PATTERN.matcher(id).find()) {
-      throw new IllegalArgumentException(s"ID [$id] is not alphanumeric")
-    }
-  }
 
   // SQL to select the whole record, in very simple cases
   protected val oneRecSelectSql: String = s"""
@@ -207,43 +189,19 @@ abstract class BaseDao {
     }
   }
 
-  /**
-   * Internally used method to add records. It's convenient for classes overriding
-   * the add() method, as it accepts a ready-to-go SQL query, with bind methods.
-   * This function takes care of the actual plumbing common to all add() methods.
-   */
   protected def addRecord(jsonIn: JsObject, sql: String, values: List[Any])
                          : JsObject = {
     log.info(s"JDBC INSERT: $jsonIn")
 
-    val existingObjId: Option[String] = (jsonIn \ C.Base.ID).asOpt[String]
-
-    // create ID unless there is an override
-    val id = if (existingObjId.isDefined) existingObjId.get else BaseModel.genId
-    verifyId(id)
-
     // prepend ID and REPO ID, as it is required for most records
-    val _values: List[Any] = combineInsertValues(id, values)
-    log.debug(s"INSERT SQL: $sql. ARGS: ${_values.toString()}")
+    log.debug(s"INSERT SQL: $sql. ARGS: ${values.toString()}")
 
     val runner: QueryRunner = new QueryRunner()
-    runner.update(RequestContext.getConn, sql, _values.map(_.asInstanceOf[Object]): _*)
+    runner.update(RequestContext.getConn, sql, values.map(_.asInstanceOf[Object]): _*)
 
-    val recordJson = jsonIn ++ Json.obj(C.Base.ID -> id)
-
-    log.debug(s"Added: $recordJson")
-    recordJson
+    jsonIn
   }
 
-  /**
-   * Create an array of values to insert, joining them in proper order.
-   * The base implementation assumes that it's [ID, REPO ID] + [THE REST],
-   * but it may not always be the case.
-   *
-   * @param id is always required
-   * @param vals any arbitrary values
-   * @return array of values to be bound to columns
-   */
   protected def combineInsertValues(id: String, vals: List[Any]): List[Any] =
     id :: RequestContext.getRepository.id.get :: vals
 

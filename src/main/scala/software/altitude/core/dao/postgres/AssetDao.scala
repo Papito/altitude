@@ -2,8 +2,10 @@ package software.altitude.core.dao.postgres
 
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import software.altitude.core.{AltitudeAppContext, RequestContext, Const => C}
+import software.altitude.core.AltitudeAppContext
+import software.altitude.core.RequestContext
 import software.altitude.core.models.Metadata
+import software.altitude.core.{Const => C}
 
 object AssetDao {
     val DEFAULT_SQL_COLS_FOR_SELECT: List[String] = List(

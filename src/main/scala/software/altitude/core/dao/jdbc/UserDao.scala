@@ -1,14 +1,13 @@
 package software.altitude.core.dao.jdbc
 
-import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
+import play.api.libs.json.Json
 import software.altitude.core.AltitudeAppContext
+import software.altitude.core.models.AccountType.AccountType
 import software.altitude.core.models.User
 import software.altitude.core.{Const => C}
 
 abstract class UserDao(val appContext: AltitudeAppContext) extends BaseDao with software.altitude.core.dao.UserDao {
-  private final val log = LoggerFactory.getLogger(getClass)
-
   override final val tableName = "account"
 
   override protected val oneRecSelectSql: String = s"""
@@ -16,10 +15,11 @@ abstract class UserDao(val appContext: AltitudeAppContext) extends BaseDao with 
         FROM $tableName
        WHERE ${C.Base.ID} = ?"""
 
-
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val model = User(
-      id = Some(rec(C.Base.ID).asInstanceOf[String])
+      id = Some(rec(C.Base.ID).asInstanceOf[String]),
+      email = rec(C.User.EMAIL).asInstanceOf[String],
+      accountType = rec(C.User.ACCOUNT_TYPE).asInstanceOf[AccountType],
     )
 
     addCoreAttrs(model, rec)
@@ -27,19 +27,28 @@ abstract class UserDao(val appContext: AltitudeAppContext) extends BaseDao with 
 
   override def add(jsonIn: JsObject): JsObject = {
     val sql = s"""
-        INSERT INTO $tableName (${C.Base.ID})
-             VALUES (?)
+        INSERT INTO $tableName (
+                      ${C.User.ID}, ${C.User.EMAIL}, ${C.User.ACCOUNT_TYPE}, ${C.User.PASSWORD_HASH}
+                    )
+             VALUES (?, ?, ?, ?)
     """
 
-    addRecord(jsonIn, sql, List())
+    val user: User = jsonIn: User
+
+    val id = BaseDao.genId
+
+    val sqlVals: List[Any] = List(
+      id,
+      user.email,
+      user.accountType,
+      user.passwordHash.getOrElse("hash"))
+
+    addRecord(jsonIn, sql, sqlVals)
+    jsonIn ++ Json.obj(C.Base.ID -> id)
   }
 
   override def getById(id: String): Option[JsObject] = {
-    log.debug(s"Getting by ID '$id' from '$tableName'", C.LogTag.DB)
     val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneRecSelectSql, List(id))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
-
-  override protected def combineInsertValues(id: String, vals: List[Any]): List[Any] =
-    id :: vals
 }

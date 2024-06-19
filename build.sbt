@@ -34,9 +34,9 @@ libraryDependencies ++= Seq(
   "commons-io"                   % "commons-io"               % "2.16.1",
   "commons-codec"                % "commons-codec"            % "1.17.0",
   "commons-dbutils"              % "commons-dbutils"          % "1.8.1",
-
+  "org.mindrot"                  % "jbcrypt"                  % "0.4",
   "org.postgresql"               % "postgresql"               % "42.7.3",
-  "org.xerial"                   % "sqlite-jdbc"              % "3.15.1",
+  "org.xerial"                   % "sqlite-jdbc"              % "3.46.0.0",
 
   "com.google.guava"             % "guava"                    % "19.0",
   "net.codingwell"              %% "scala-guice"              % "7.0.0",

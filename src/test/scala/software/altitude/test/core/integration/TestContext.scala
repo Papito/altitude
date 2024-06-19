@@ -2,6 +2,7 @@ package software.altitude.test.core.integration
 
 import software.altitude.core.Altitude
 import software.altitude.core.Util
+import software.altitude.core.models.AccountType
 import software.altitude.core.models.Asset
 import software.altitude.core.models.AssetType
 import software.altitude.core.models.Folder
@@ -15,8 +16,15 @@ class TestContext(val altitude: Altitude) {
   var repositories: List[Repository] = List()
   var assets: List[Asset] = List()
 
+  def makeUser(): User = User(
+    email = Util.randomStr(),
+    accountType = AccountType.User,
+    passwordHash = Some(Util.randomStr(32))
+  )
+
   def persistUser(user: Option[User] = None): User = {
-    val userModel = user.getOrElse(User())
+    val userModel = user.getOrElse(makeUser())
+
     val persistedUser: User = altitude.service.user.add(userModel)
     users = users ::: persistedUser :: Nil
 
@@ -39,7 +47,7 @@ class TestContext(val altitude: Altitude) {
     }
 
     // use supplied user, then existing single user, then new user
-    val persistedUser = user.getOrElse(users.headOption.getOrElse(User()))
+    val persistedUser = user.getOrElse(users.headOption.getOrElse(makeUser()))
 
     val persistedRepo: Repository = altitude.service.repository.addRepository(
       name = "Test Repository 1",

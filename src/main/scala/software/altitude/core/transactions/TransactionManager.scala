@@ -138,7 +138,7 @@ class TransactionManager(val app: AltitudeAppContext) {
     RequestContext.savepoints.value.push(savepoint)
   }
 
-  private def commit(): Unit = {
+  def commit(): Unit = {
     // println(s"COMMIT ${System.identityHashCode(RequestContext.conn.value.get)}")
     RequestContext.conn.value.get.commit()
     RequestContext.savepoints.value.clear()

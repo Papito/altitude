@@ -9,6 +9,18 @@ test:
 test-focused:
 	sbt testFocused
 
+test-focused-psql:
+	sbt testFocusedPostgres
+
+test-focused-sqlite:
+	sbt testFocusedSqlite
+
+test-psql:
+	sbt testPostgres
+
+test-sqlite:
+	sbt testSqlite
+
 lint:
 	sbt scalafixAll
 

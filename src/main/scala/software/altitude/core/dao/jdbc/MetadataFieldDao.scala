@@ -1,7 +1,9 @@
 package software.altitude.core.dao.jdbc
 
 import play.api.libs.json.JsObject
+import play.api.libs.json.Json
 import software.altitude.core.AltitudeAppContext
+import software.altitude.core.RequestContext
 import software.altitude.core.models.FieldType
 import software.altitude.core.models.MetadataField
 import software.altitude.core.{Const => C}
@@ -26,18 +28,25 @@ abstract class MetadataFieldDao(val appContext: AltitudeAppContext)
 
     val sql = s"""
         INSERT INTO $tableName (
-             ${coreSqlColsForInsert.mkString(", ")},
+             ${C.MetadataField.ID},
+             ${C.MetadataField.REPO_ID},
              ${C.MetadataField.NAME},
              ${C.MetadataField.NAME_LC},
              ${C.MetadataField.FIELD_TYPE})
-            VALUES ($coreSqlValsForInsert, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?)
         """
 
+    val id = BaseDao.genId
+
     val sqlVals: List[Any] = List(
+      id,
+      RequestContext.getRepository.id.get,
       metadataField.name,
       metadataField.nameLowercase,
       metadataField.fieldType.toString)
 
     addRecord(jsonIn, sql, sqlVals)
+
+    jsonIn ++ Json.obj(C.Base.ID -> id)
   }
 }

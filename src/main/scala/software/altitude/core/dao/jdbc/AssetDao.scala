@@ -92,14 +92,21 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
 
     val sql = s"""
         INSERT INTO $tableName (
-             ${coreSqlColsForInsert.mkString(", ")}, ${C.Base.USER_ID}, ${C.Asset.CHECKSUM},
+             ${C.Asset.ID}, ${C.Asset.REPO_ID}, ${C.Base.USER_ID}, ${C.Asset.CHECKSUM},
              ${C.Asset.FILENAME}, ${C.Asset.SIZE_BYTES},
              ${C.AssetType.MEDIA_TYPE}, ${C.AssetType.MEDIA_SUBTYPE}, ${C.AssetType.MIME_TYPE},
              ${C.Asset.FOLDER_ID}, ${C.Asset.METADATA}, ${C.Asset.EXTRACTED_METADATA})
-            VALUES( $coreSqlValsForInsert, ?, ?, ?, ?, ?, ?, ?, ?, $jsonFunc, $jsonFunc)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, $jsonFunc, $jsonFunc)
     """
 
+    val id = asset.id match {
+      case Some(id) => id
+      case None => BaseDao.genId
+    }
+
     val sqlVals: List[Any] = List(
+      id,
+      RequestContext.getRepository.id.get,
       asset.userId,
       asset.checksum,
       asset.fileName,
@@ -112,6 +119,7 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
       extractedMetadata)
 
     addRecord(jsonIn, sql, sqlVals)
+    jsonIn ++ Json.obj(C.Base.ID -> id)
   }
 
   override def setMetadata(assetId: String, metadata: Metadata)

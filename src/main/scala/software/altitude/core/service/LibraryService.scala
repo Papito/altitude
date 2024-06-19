@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.Altitude
 import software.altitude.core.RequestContext
+import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.Folder
 import software.altitude.core.models._
 import software.altitude.core.transactions.TransactionManager
@@ -62,7 +63,7 @@ class LibraryService(val app: Altitude) {
         */
       val metadata = app.service.metadata.cleanAndValidate(assetIn.metadata)
 
-      val assetId = BaseModel.genId
+      val assetId = BaseDao.genId
 
       val fileName = app.service.fileStore.calculateNextAvailableFilename(assetIn)
 
