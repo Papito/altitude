@@ -47,10 +47,6 @@ abstract class BaseDao {
   // opposite of the above
   protected def getDateTimeFromRec(field: String, rec: Map[String, AnyRef]): Option[DateTime]
 
-  // common fields for new records, and their placeholders - mostly to avoid repetition
-  protected val coreSqlColsForInsert: List[String] = List(C.Base.ID, C.Base.REPO_ID)
-  protected def coreSqlValsForInsert: String = "?, ?"
-
   // SQL to select the whole record, in very simple cases
   protected val oneRecSelectSql: String = s"""
       SELECT ${defaultSqlColsForSelect.mkString(", ")}
@@ -62,13 +58,7 @@ abstract class BaseDao {
    * @param jsonIn JsObject OR a model
    * @return JsObject of the added record, with ID of the record in the databases
    */
-  def add(jsonIn: JsObject): JsObject = {
-    val sql: String = s"""
-      INSERT INTO $tableName (${coreSqlColsForInsert.mkString(", ")})
-           VALUES ($coreSqlValsForInsert)"""
-
-    addRecord(jsonIn, sql, List[Any]())
-  }
+  def add(jsonIn: JsObject): JsObject = throw new NotImplementedError("add method must be implemented")
 
   /**
    * Gert a single record by ID
