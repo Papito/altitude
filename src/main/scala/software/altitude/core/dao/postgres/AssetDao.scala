@@ -12,8 +12,6 @@ object AssetDao {
       "asset.*",
       s"(asset.${C.Asset.METADATA}#>>'{}')::text as ${C.Asset.METADATA}",
       s"(asset.${C.Asset.EXTRACTED_METADATA}#>>'{}')::text as ${C.Asset.EXTRACTED_METADATA}",
-      "EXTRACT(EPOCH FROM asset.created_at) AS created_at",
-      "EXTRACT(EPOCH FROM asset.updated_at) AS updated_at"
     )
 }
 

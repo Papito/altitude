@@ -3,6 +3,7 @@ CREATE TABLE system (
   version INT NOT NULL,
   initialized TINYINT NOT NULL
 );
+
 CREATE UNIQUE INDEX system_01 ON system(id);
 INSERT INTO system(version, initialized) VALUES(0, 0);
 
@@ -12,8 +13,8 @@ CREATE TABLE account(
   account_type TEXT NOT NULL
                CHECK(account_type IN ('ADMIN','USER','GUEST')),
   password_hash TEXT NOT NULL,
-  created_at DATE DEFAULT (datetime('now', 'utc')),
-  updated_at DATE DEFAULT NULL
+  created_at DATETIME DEFAULT (datetime('now', 'utc')),
+  updated_at DATETIME DEFAULT NULL
 );
 
 CREATE TABLE repository(
@@ -24,8 +25,8 @@ CREATE TABLE repository(
   triage_folder_id CHAR(36) NOT NULL,
   file_store_type VARCHAR NOT NULL,
   file_store_config TEXT NOT NULL,
-  created_at DATE DEFAULT (datetime('now', 'utc')),
-  updated_at DATE DEFAULT NULL
+  created_at DATETIME DEFAULT (datetime('now', 'utc')),
+  updated_at DATETIME DEFAULT NULL
 );
 
 CREATE TABLE stats (
@@ -52,8 +53,8 @@ CREATE TABLE asset  (
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
   is_recycled TINYINT NOT NULL DEFAULT 0,
-  created_at DATE DEFAULT (datetime('now', 'utc')),
-  updated_at DATE DEFAULT NULL,
+  created_at DATETIME DEFAULT (datetime('now', 'utc')),
+  updated_at DATETIME DEFAULT NULL,
   FOREIGN KEY(repository_id) REFERENCES repository(id),
   FOREIGN KEY(user_id) REFERENCES account(id)
 );
@@ -66,8 +67,8 @@ CREATE TABLE metadata_field (
   name VARCHAR(255) NOT NULL,
   name_lc VARCHAR(255) NOT NULL,
   field_type VARCHAR(255) NOT NULL,
-  created_at DATE DEFAULT (datetime('now', 'utc')),
-  updated_at DATE DEFAULT NULL,
+  created_at DATETIME DEFAULT (datetime('now', 'utc')),
+  updated_at DATETIME DEFAULT NULL,
   FOREIGN KEY(repository_id) REFERENCES repository(id)
 );
 CREATE INDEX metadata_field_01 ON metadata_field(repository_id);
@@ -82,8 +83,8 @@ CREATE TABLE folder (
   parent_id CHAR(36) NOT NULL,
   num_of_assets INTEGER NOT NULL DEFAULT 0,
   is_recycled TINYINT NOT NULL DEFAULT 0,
-  created_at DATE DEFAULT (datetime('now', 'utc')),
-  updated_at DATE DEFAULT NULL,
+  created_at DATETIME DEFAULT (datetime('now', 'utc')),
+  updated_at DATETIME DEFAULT NULL,
   FOREIGN KEY(repository_id) REFERENCES repository(id)
 );
 CREATE INDEX folder_01 ON folder(repository_id, parent_id);
@@ -97,7 +98,7 @@ CREATE TABLE search_parameter (
   field_value_kw TEXT NULL,
   field_value_num DECIMAL,
   field_value_bool BOOLEAN,
-  field_value_dt DATE,
+  field_value_dt DATEN,
   FOREIGN KEY(repository_id) REFERENCES repository(id),
   FOREIGN KEY(asset_id) REFERENCES asset(id),
   FOREIGN KEY(field_id) REFERENCES metadata_field(id)

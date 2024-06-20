@@ -41,11 +41,12 @@ class TransactionManager(val app: AltitudeAppContext) {
         val url: String = app.config.getString("db.sqlite.url")
 
         val sqliteConfig: SQLiteConfig = new SQLiteConfig()
-        sqliteConfig.setReadOnly(true)
+
         if (readOnly) {
+          sqliteConfig.setReadOnly(true)
           DriverManager.getConnection(url, sqliteConfig.toProperties)
         } else {
-          val writeConnection = DriverManager.getConnection(url)
+          val writeConnection = DriverManager.getConnection(url, sqliteConfig.toProperties)
           writeConnection.setAutoCommit(false)
 
           // println(s"NEW SQLITE CONN ${System.identityHashCode(writeConnection)}")

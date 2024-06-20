@@ -3,7 +3,6 @@ package software.altitude.core.dao.jdbc
 import org.apache.commons.dbutils.QueryRunner
 import org.apache.commons.dbutils.handlers.MapListHandler
 import org.apache.commons.dbutils.handlers.ScalarHandler
-import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
 import software.altitude.core.AltitudeAppContext
@@ -33,7 +32,7 @@ abstract class BaseDao {
 
   protected final def txManager: TransactionManager = appContext.txManager
 
-  protected def selectColumns: List[String]
+  protected def selectColumns: List[String] = List("*")
 
   protected val sqlQueryBuilder: SqlQueryBuilder[Query] = new SqlQueryBuilder[Query](selectColumns, tableName)
 
@@ -41,11 +40,6 @@ abstract class BaseDao {
   protected def jsonFunc: String
   // DB current time function
   protected def nowTimeFunc: String
-
-  // conversion function to go from Java time to DB time
-  protected def dateTimeToDbFunc(datetime2: Option[DateTime]): String
-  // opposite of the above
-  protected def getDateTimeFromRec(field: String, rec: Map[String, AnyRef]): Option[DateTime]
 
   // SQL to select the whole record, in very simple cases
   protected val oneRecSelectSql: String = s"""
