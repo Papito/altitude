@@ -5,7 +5,7 @@ import software.altitude.core.dao.jdbc
 import software.altitude.core.{Const => C}
 
 class RepositoryDao(app: AltitudeAppContext) extends jdbc.RepositoryDao(app) with Postgres {
-  override protected def selectColumns: List[String] = List(
+  override protected def columnsForSelect: List[String] = List(
     "*",
     s"(repository.${C.Repository.FILES_STORE_CONFIG}#>>'{}')::text as ${C.Repository.FILES_STORE_CONFIG}",
   )

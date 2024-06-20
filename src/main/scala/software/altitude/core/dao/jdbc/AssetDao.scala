@@ -18,7 +18,7 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
 
   override final val tableName = "asset"
 
-  override protected val sqlQueryBuilder = new SqlQueryBuilder[Query](selectColumns, tableName)
+  override protected val sqlQueryBuilder = new SqlQueryBuilder[Query](columnsForSelect, tableName)
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val assetType = new AssetType(

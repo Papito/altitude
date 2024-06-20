@@ -32,16 +32,16 @@ abstract class BaseDao {
 
   protected final def txManager: TransactionManager = appContext.txManager
 
-  protected def selectColumns: List[String] = List("*")
+  protected def columnsForSelect: List[String] = List("*")
 
-  protected val sqlQueryBuilder: SqlQueryBuilder[Query] = new SqlQueryBuilder[Query](selectColumns, tableName)
+  protected val sqlQueryBuilder: SqlQueryBuilder[Query] = new SqlQueryBuilder[Query](columnsForSelect, tableName)
 
   // if supported, DB function to store native JSON data
   protected def jsonFunc: String
 
   // SQL to select the whole record, in very simple cases
   protected val oneRecSelectSql: String = s"""
-      SELECT ${selectColumns.mkString(", ")}
+      SELECT ${columnsForSelect.mkString(", ")}
         FROM $tableName
        WHERE ${C.Base.ID} = ? AND ${C.Base.REPO_ID} = ?"""
 

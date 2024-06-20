@@ -57,7 +57,7 @@ class SearchDao(override val appContext: Altitude) extends software.altitude.cor
   }
 
   override def search(searchQuery: SearchQuery): SearchResult = {
-    val sqlQueryBuilder = new AssetSearchQueryBuilder(sqlColsForSelect = selectColumns)
+    val sqlQueryBuilder = new AssetSearchQueryBuilder(sqlColsForSelect = columnsForSelect)
 
     val sqlQuery = sqlQueryBuilder.buildSelectSql(query = searchQuery)
     val recs = manyBySqlQuery(sqlQuery.sqlAsString, sqlQuery.bindValues)

@@ -16,7 +16,7 @@ abstract class RepositoryDao(val appContext: AltitudeAppContext)
 
   // this is the same as the base one - minus the repository ID, which this model does not have
   override protected val oneRecSelectSql: String = s"""
-      SELECT ${selectColumns.mkString(", ")}
+      SELECT ${columnsForSelect.mkString(", ")}
         FROM $tableName
        WHERE ${C.Base.ID} = ?"""
 

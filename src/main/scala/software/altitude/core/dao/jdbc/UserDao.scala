@@ -11,7 +11,7 @@ abstract class UserDao(val appContext: AltitudeAppContext) extends BaseDao with 
   override final val tableName = "account"
 
   override protected val oneRecSelectSql: String = s"""
-      SELECT ${selectColumns.mkString(", ")}
+      SELECT ${columnsForSelect.mkString(", ")}
         FROM $tableName
        WHERE ${C.Base.ID} = ?"""
 
