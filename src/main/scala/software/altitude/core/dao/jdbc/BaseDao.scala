@@ -42,12 +42,6 @@ abstract class BaseDao {
   // if supported, DB function to store native JSON data
   protected def jsonFunc: String
 
-  // SQL to select the whole record, in very simple cases
-  protected val oneRecSelectSql: String = s"""
-      SELECT ${columnsForSelect.mkString(", ")}
-        FROM $tableName
-       WHERE ${C.Base.ID} = ? AND ${C.Base.REPO_ID} = ?"""
-
   /**
    * Add a single record
    * @param jsonIn JsObject OR a model
@@ -65,7 +59,12 @@ abstract class BaseDao {
    */
   def getById(id: String): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'")
-    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneRecSelectSql, List(id, RequestContext.getRepository.id.get))
+
+    val sql: String = s"""
+      SELECT ${columnsForSelect.mkString(", ")}
+        FROM $tableName
+       WHERE ${C.Base.ID} = ? AND ${C.Base.REPO_ID} = ?"""
+    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(sql, List(id, RequestContext.getRepository.id.get))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
 

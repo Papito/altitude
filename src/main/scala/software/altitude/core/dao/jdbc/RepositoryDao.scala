@@ -1,6 +1,5 @@
 package software.altitude.core.dao.jdbc
 
-import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
 import software.altitude.core.AltitudeAppContext
@@ -10,15 +9,8 @@ import software.altitude.core.{Const => C}
 abstract class RepositoryDao(val appContext: AltitudeAppContext)
   extends BaseDao
     with software.altitude.core.dao.RepositoryDao {
-  private final val log = LoggerFactory.getLogger(getClass)
 
   override final val tableName = "repository"
-
-  // this is the same as the base one - minus the repository ID, which this model does not have
-  override protected val oneRecSelectSql: String = s"""
-      SELECT ${columnsForSelect.mkString(", ")}
-        FROM $tableName
-       WHERE ${C.Base.ID} = ?"""
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val fileStoreConfigCol = rec(C.Repository.FILES_STORE_CONFIG)
@@ -44,8 +36,13 @@ abstract class RepositoryDao(val appContext: AltitudeAppContext)
 
   // overriding the base method since there is no repository relation in this model
   override def getById(id: String): Option[JsObject] = {
-    log.debug(s"Getting by ID '$id' from '$tableName'")
-    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneRecSelectSql, List(id))
+
+    val sql: String = s"""
+      SELECT ${columnsForSelect.mkString(", ")}
+        FROM $tableName
+       WHERE ${C.Base.ID} = ?"""
+
+    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(sql, List(id))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
 

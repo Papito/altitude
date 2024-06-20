@@ -10,11 +10,6 @@ import software.altitude.core.{Const => C}
 abstract class UserDao(val appContext: AltitudeAppContext) extends BaseDao with software.altitude.core.dao.UserDao {
   override final val tableName = "account"
 
-  override protected val oneRecSelectSql: String = s"""
-      SELECT ${columnsForSelect.mkString(", ")}
-        FROM $tableName
-       WHERE ${C.Base.ID} = ?"""
-
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val model = User(
       id = Some(rec(C.Base.ID).asInstanceOf[String]),
@@ -49,7 +44,12 @@ abstract class UserDao(val appContext: AltitudeAppContext) extends BaseDao with 
 
   // overriding the base method since there is no repository relation in this model
   override def getById(id: String): Option[JsObject] = {
-    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneRecSelectSql, List(id))
+    val sql: String = s"""
+      SELECT ${columnsForSelect.mkString(", ")}
+        FROM $tableName
+       WHERE ${C.Base.ID} = ?"""
+
+    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(sql, List(id))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
 }
