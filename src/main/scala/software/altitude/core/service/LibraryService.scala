@@ -428,7 +428,7 @@ class LibraryService(val app: Altitude) {
           app.service.folder.setRecycledProp(childFolder, isRecycled = true)
         }
 
-        treeAssetCount // accumulates total asset cound for the next step in the fold
+        treeAssetCount // accumulates total asset count for the next step in the fold
       }
     }
   }

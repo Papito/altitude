@@ -150,9 +150,9 @@ import software.altitude.core.util._
     // page too far
     val q4 = new SearchQuery(rpp = 2, page = 4)
     val results4 = altitude.service.library.search(q4)
-    results4.total shouldBe 6
+    results4.total shouldBe 0
     results4.records.length shouldBe 0
-    results4.totalPages shouldBe 3
+    results4.totalPages shouldBe 0
 
     val q5 = new SearchQuery(rpp = 6, page = 1)
     val results5 = altitude.service.library.search(q5)

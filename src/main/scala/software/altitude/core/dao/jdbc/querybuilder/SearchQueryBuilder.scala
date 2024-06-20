@@ -53,26 +53,6 @@ abstract class SearchQueryBuilder(selColumnNames: List[String])
     }
   }
 
-  override def buildCountSql(query: SearchQuery): SqlQuery = {
-    // get the base SELECT query
-    // make it a subquery of the main SELECT COUNT(*) query
-    val allClauses = compileClauses(query)
-
-    val subquerySql: String = selectStr(allClauses(SqlQueryBuilder.SELECT)) +
-      fromStr(allClauses(SqlQueryBuilder.FROM)) +
-      whereStr(allClauses(SqlQueryBuilder.WHERE)) +
-      groupByStr(allClauses(SqlQueryBuilder.GROUP_BY)) +
-      havingStr(allClauses(SqlQueryBuilder.HAVING))
-
-    val bindValClauses = List(allClauses(SqlQueryBuilder.WHERE))
-    val bindVals = bindValClauses.foldLeft(List[Any]()) { (res, clause) =>
-      res ++ clause.bindVals
-    }
-
-    val countSql = s"SELECT COUNT(*) AS count FROM ($subquerySql) AS asset"
-    SqlQuery(countSql, bindVals)
-  }
-
   private def buildSelectSqlAsSubquery(query: SearchQuery): SqlQuery = {
     val allClauses = compileClauses(query)
 

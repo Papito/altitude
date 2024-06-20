@@ -4,6 +4,7 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.Json
 import software.altitude.core.AltitudeAppContext
 import software.altitude.core.RequestContext
+import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.Metadata
 import software.altitude.core.{Const => C}
 
@@ -12,6 +13,7 @@ object AssetDao {
       "asset.*",
       s"(asset.${C.Asset.METADATA}#>>'{}')::text AS ${C.Asset.METADATA}",
       s"(asset.${C.Asset.EXTRACTED_METADATA}#>>'{}')::text AS ${C.Asset.EXTRACTED_METADATA}",
+      BaseDao.totalsWindowFunction
     )
 }
 

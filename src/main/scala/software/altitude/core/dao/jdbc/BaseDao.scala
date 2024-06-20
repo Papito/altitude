@@ -2,7 +2,6 @@ package software.altitude.core.dao.jdbc
 
 import org.apache.commons.dbutils.QueryRunner
 import org.apache.commons.dbutils.handlers.MapListHandler
-import org.apache.commons.dbutils.handlers.ScalarHandler
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
 import software.altitude.core.AltitudeAppContext
@@ -21,6 +20,8 @@ import scala.jdk.CollectionConverters._
 
 object BaseDao {
   final def genId: String = UUID.randomUUID.toString
+  val totalsWindowFunction: String = "count(*) OVER() AS total"
+
 }
 
 abstract class BaseDao {
@@ -32,9 +33,11 @@ abstract class BaseDao {
 
   protected final def txManager: TransactionManager = appContext.txManager
 
-  protected def columnsForSelect: List[String] = List("*")
+  protected def columnsForSelect: List[String] = List(s"*, ${BaseDao.totalsWindowFunction}")
 
   protected val sqlQueryBuilder: SqlQueryBuilder[Query] = new SqlQueryBuilder[Query](columnsForSelect, tableName)
+
+  def count(recs: List[Map[String, AnyRef]]): Int
 
   // if supported, DB function to store native JSON data
   protected def jsonFunc: String
@@ -144,31 +147,14 @@ abstract class BaseDao {
     val sqlQuery: SqlQuery = sqlQueryBuilder.buildSelectSql(query)
 
     val recs = manyBySqlQuery(sqlQuery.sqlAsString, sqlQuery.bindValues)
-    val count: Int = getQueryResultCount(query, sqlQueryBuilder, sqlQuery.bindValues)
+    val total: Int = count(recs)
 
-    log.debug(s"Found [$count] records. Retrieved [${recs.length}] records")
+    log.debug(s"Found [$total] records. Retrieved [${recs.length}] records")
+
     if (recs.nonEmpty) {
       log.debug(recs.map(_.toString()).mkString("\n"))
     }
-    QueryResult(records = recs.map{makeModel}, total = count, rpp = query.rpp, sort = query.sort.toList)
-  }
-
-  protected def getQueryResultCount(query: Query, sqlQueryBuilder: SqlQueryBuilder[Query], values: List[Any] = List())
-                                   : Int = {
-    val sqlCountQuery: SqlQuery = sqlQueryBuilder.buildCountSql(query)
-    getQueryResultCountBySql(sqlCountQuery.sqlAsString, values)
-  }
-
-  protected def getQueryResultCountBySql(sql: String, values: List[Any] = List())
-                                   : Int = {
-    val runner: QueryRunner = new QueryRunner()
-
-    // We are defensive with different JDBC drivers operating with either java.lang.Int or java.lang.Long
-    runner.query(RequestContext.getConn, sql, new ScalarHandler[AnyRef]("count"), values.map(_.asInstanceOf[Object]): _*) match {
-      case v: java.lang.Integer => v.intValue
-      case v: java.lang.Long => v.asInstanceOf[Long].toInt
-      case null => 0
-    }
+    QueryResult(records = recs.map{makeModel}, total = total, rpp = query.rpp, sort = query.sort.toList)
   }
 
   protected def addRecord(jsonIn: JsObject, sql: String, values: List[Any])

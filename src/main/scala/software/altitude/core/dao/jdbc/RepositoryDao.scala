@@ -42,6 +42,7 @@ abstract class RepositoryDao(val appContext: AltitudeAppContext)
     addCoreAttrs(model, rec)
   }
 
+  // overriding the base method since there is no repository relation in this model
   override def getById(id: String): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'")
     val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(oneRecSelectSql, List(id))

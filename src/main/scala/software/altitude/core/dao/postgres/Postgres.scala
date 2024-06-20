@@ -20,4 +20,6 @@ trait Postgres { this: BaseDao =>
 
     model
   }
+
+  def count(recs: List[Map[String, AnyRef]]): Int = if (recs.nonEmpty) recs.head("total").asInstanceOf[Long].toInt else 0
 }

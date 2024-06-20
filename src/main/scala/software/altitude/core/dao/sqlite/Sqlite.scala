@@ -31,4 +31,5 @@ trait Sqlite { this: BaseDao =>
     date.toInstant.atZone(ZoneId.systemDefault).toLocalDateTime
   }
 
+  def count(recs: List[Map[String, AnyRef]]): Int = if (recs.nonEmpty) recs.head("total").asInstanceOf[Int] else 0
 }
