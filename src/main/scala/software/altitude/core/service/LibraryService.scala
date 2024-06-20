@@ -302,9 +302,8 @@ class LibraryService(val app: Altitude) {
 
       val _query: Query = if (folderId.isDefined) {
         val allFolderIds = app.service.folder.flatChildrenIds(parentIds = Set(folderId.get))
-        val foldersQueryParam = Query.IN(allFolderIds.asInstanceOf[Set[Any]])
 
-        query.add(C.Asset.FOLDER_ID -> foldersQueryParam)
+        query.add(C.Asset.FOLDER_ID ->  Query.IN(allFolderIds.asInstanceOf[Set[Any]]))
       }
       else {
         query

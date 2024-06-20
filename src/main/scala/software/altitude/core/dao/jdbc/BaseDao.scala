@@ -234,17 +234,23 @@ abstract class BaseDao {
 
   def getByIds(ids: Set[String])
                        : List[JsObject] = {
-    val placeholders = ids.toSeq.map(_ => "?")
-    val sql = s"""
-      SELECT ${selectColumns.mkString(", ")}
-        FROM $tableName
-       WHERE ${C.Base.REPO_ID} = ? AND id IN (${placeholders.mkString(",")})
-      """
 
-    log.debug(s"SQL: $sql with values: ${ids.toList}")
+    val query = new Query()
+    query.add(C.Base.ID ->  Query.IN(ids.asInstanceOf[Set[Any]]))
+    query.add(C.Base.REPO_ID -> RequestContext.getRepository.id.get)
+
+    val sqlQuery = sqlQueryBuilder.buildSelectSql(query)
+
+    log.debug(s"SQL: ${sqlQuery.sqlAsString} with values: ${ids.toList}")
 
     val runner: QueryRunner = new QueryRunner()
-    val res = runner.query(RequestContext.getConn, sql, new MapListHandler(), RequestContext.getRepository.id.get :: ids.toList: _*).asScala.toList
+
+    val res = runner.query(
+      RequestContext.getConn,
+      sqlQuery.sqlAsString,
+      new MapListHandler(),
+      sqlQuery.bindValues:_*).asScala.toList
+
     log.debug(s"Found ${res.length} records")
     val recs = res.map{_.asScala.toMap[String, AnyRef]}
     recs.map{makeModel}
