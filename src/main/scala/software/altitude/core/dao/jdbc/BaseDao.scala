@@ -117,7 +117,7 @@ abstract class BaseDao {
   }
 
   protected def addRecord(jsonIn: JsObject, sql: String, values: List[Any])
-                         : JsObject = {
+                         : Unit = {
     log.info(s"JDBC INSERT: $jsonIn")
 
     // prepend ID and REPO ID, as it is required for most records
@@ -125,8 +125,6 @@ abstract class BaseDao {
 
     val runner = queryRunner
     runner.update(RequestContext.getConn, sql, values.map(_.asInstanceOf[Object]): _*)
-
-    jsonIn
   }
 
   private def getResults(sql: String, values: List[Any]): List[Map[String, AnyRef]] = {

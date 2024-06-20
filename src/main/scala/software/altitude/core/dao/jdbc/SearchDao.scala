@@ -137,10 +137,9 @@ abstract class SearchDao(override val appContext: Altitude)
   }
 
   override protected def addRecord(jsonIn: JsObject, q: String, values: List[Any])
-                                  : JsObject = {
+                                  : Unit = {
     val runner: QueryRunner = new QueryRunner()
     runner.update(RequestContext.getConn, q, values.map(_.asInstanceOf[Object]): _*)
-    jsonIn
   }
 
 }

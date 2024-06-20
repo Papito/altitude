@@ -26,14 +26,14 @@ abstract class StatDao(val appContext: AltitudeAppContext) extends BaseDao with 
     val values: List[Any] = RequestContext.getRepository.id.get :: stat.dimension :: Nil
 
     addRecord(jsonIn, sql, values)
+    jsonIn
   }
 
   override protected def addRecord(jsonIn: JsObject, q: String, values: List[Any])
-                         : JsObject = {
+                         : Unit = {
     log.info(s"JDBC INSERT: $jsonIn")
     val runner: QueryRunner = new QueryRunner()
     runner.update(RequestContext.getConn, q, values.map(_.asInstanceOf[Object]): _*)
-    jsonIn
   }
 
   /**
