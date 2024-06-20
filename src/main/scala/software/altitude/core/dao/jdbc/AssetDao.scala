@@ -129,7 +129,7 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
 
     val sql = s"""
       UPDATE $tableName
-         SET ${C.Base.UPDATED_AT} = $nowTimeFunc, ${C.Asset.METADATA} = $jsonFunc
+         SET ${C.Asset.METADATA} = $jsonFunc
        WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
       """
 

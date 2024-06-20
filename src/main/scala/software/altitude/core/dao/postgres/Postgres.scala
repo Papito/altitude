@@ -5,8 +5,6 @@ import software.altitude.core.{Const => C}
 
 
 trait Postgres { this: BaseDao =>
-  override protected def nowTimeFunc = "current_timestamp"
-
   override protected def jsonFunc = "CAST(? as jsonb)"
 
   override protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): model.type = {

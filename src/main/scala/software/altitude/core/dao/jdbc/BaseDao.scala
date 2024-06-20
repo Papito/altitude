@@ -38,8 +38,6 @@ abstract class BaseDao {
 
   // if supported, DB function to store native JSON data
   protected def jsonFunc: String
-  // DB current time function
-  protected def nowTimeFunc: String
 
   // SQL to select the whole record, in very simple cases
   protected val oneRecSelectSql: String = s"""
@@ -263,7 +261,7 @@ abstract class BaseDao {
 
     val sql = s"""
       UPDATE $tableName
-         SET ${C.Base.UPDATED_AT} = $nowTimeFunc, ${updateFieldPlaceholders.mkString(", ")}
+         SET ${updateFieldPlaceholders.mkString(", ")}
        WHERE ${C.Base.REPO_ID} = ? AND ${queryFieldPlaceholders.mkString(",")}
       """
 

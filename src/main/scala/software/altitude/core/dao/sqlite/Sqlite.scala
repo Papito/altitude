@@ -9,8 +9,6 @@ import java.time.ZoneId
 
 trait Sqlite { this: BaseDao =>
 
-  override protected def nowTimeFunc = "datetime('now', 'localtime')"
-
   override protected def jsonFunc = "?"
 
   override protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): model.type = {
