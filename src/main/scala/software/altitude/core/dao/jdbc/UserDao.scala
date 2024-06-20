@@ -49,7 +49,7 @@ abstract class UserDao(val appContext: AltitudeAppContext) extends BaseDao with 
         FROM $tableName
        WHERE ${C.Base.ID} = ?"""
 
-    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(sql, List(id))
+    val rec = oneBySqlQuery(sql, List(id))
     if (rec.isDefined) Some(makeModel(rec.get)) else None
   }
 }

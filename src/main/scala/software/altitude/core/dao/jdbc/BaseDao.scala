@@ -42,21 +42,10 @@ abstract class BaseDao {
   // if supported, DB function to store native JSON data
   protected def jsonFunc: String
 
-  /**
-   * Add a single record
-   * @param jsonIn JsObject OR a model
-   * @return JsObject of the added record, with ID of the record in the databases
-   */
+  private def queryRunner = new QueryRunner()
+
   def add(jsonIn: JsObject): JsObject = throw new NotImplementedError("add method must be implemented")
 
-  /**
-   * Gert a single record by ID
-   *
-   * @param id record id as string
-   * @return optional JsObject, which implicitly can be turned into an instance of a concrete domain
-   *         model. This method does NOT throw a NotFound error, as it is not assumed it is always
-   *         and error.
-   */
   def getById(id: String): Option[JsObject] = {
     log.debug(s"Getting by ID '$id' from '$tableName'")
 
@@ -70,11 +59,6 @@ abstract class BaseDao {
 
   def getAll: List[JsObject] = query(new Query()).records
 
-  /**
-   * Delete a document by its ID
-   *
-   * @return number of documents deleted - 0 or 1
-   */
   def deleteById(id: String): Int = {
     val q: Query = new Query().add(C.Base.ID -> id)
     deleteByQuery(q)
@@ -95,11 +79,6 @@ abstract class BaseDao {
     updateByQuery(q, data, fields)
   }
 
-  /**
-   * Delete one or more document by query.
-   *
-   * @return number of documents deleted
-   */
   def deleteByQuery(q: Query): Int = {
     log.debug(s"Deleting record by query: $q")
     val fieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
@@ -111,36 +90,17 @@ abstract class BaseDao {
       """
 
     log.debug(s"Delete SQL: $sql, with values: ${q.params.values.toList}")
-    val runner: QueryRunner = new QueryRunner()
+    val runner = queryRunner
     val numDeleted = runner.update(
       RequestContext.getConn, sql, RequestContext.getRepository.id.get :: q.params.values.toList.map(_.asInstanceOf[Object]): _*)
     log.debug(s"Deleted records: $numDeleted")
     numDeleted
   }
 
-  /**
-   * Delete by SQL.
-   *
-   * @return number of documents deleted
-   */
-  def deleteBySql(sql: String, bindValues: List[Object]): Int = {
-    log.debug(s"Delete SQL: $sql, with values: $bindValues")
-    val runner: QueryRunner = new QueryRunner()
-    val numDeleted = runner.update(RequestContext.getConn, sql, bindValues: _*)
-    log.debug(s"Deleted records: $numDeleted")
-    numDeleted
-  }
-
-  /**
-   * Get multiple documents using a Query
-   */
   def query(q: Query): QueryResult = {
     this.query(q, sqlQueryBuilder)
   }
 
-  /**
-   * Internal version for querying with a customized query builder
-   */
   protected def query(query: Query, sqlQueryBuilder: SqlQueryBuilder[Query])
            : QueryResult = {
     val sqlQuery: SqlQuery = sqlQueryBuilder.buildSelectSql(query)
@@ -163,36 +123,29 @@ abstract class BaseDao {
     // prepend ID and REPO ID, as it is required for most records
     log.debug(s"INSERT SQL: $sql. ARGS: ${values.toString()}")
 
-    val runner: QueryRunner = new QueryRunner()
+    val runner = queryRunner
     runner.update(RequestContext.getConn, sql, values.map(_.asInstanceOf[Object]): _*)
 
     jsonIn
   }
 
-  protected def combineInsertValues(id: String, vals: List[Any]): List[Any] =
-    id :: RequestContext.getRepository.id.get :: vals
+  private def getResults(sql: String, values: List[Any]): List[Map[String, AnyRef]] = {
+    val res = queryRunner.query(
+      RequestContext.getConn,
+      sql, new MapListHandler(),
+      values.map(_.asInstanceOf[Object]): _*).asScala.toList
+
+    res.map{_.asScala.toMap[String, AnyRef]}
+  }
 
   protected def manyBySqlQuery(sql: String, values: List[Any] = List())
                               : List[Map[String, AnyRef]] = {
-    log.debug(s"Running SQL query [$sql] with $values")
-
-    val runner: QueryRunner = new QueryRunner()
-    val res = runner.query(RequestContext.getConn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]): _*).asScala.toList
-    log.debug(s"Found ${res.length} records")
-    // FIXME: is spacing here a scala Style violation?
-    res.map{_.asScala.toMap[String, AnyRef]}.toList
+    getResults(sql, values)
   }
 
-  /**
-   * Internal method to return a UNIQUE object from DB. Does not just get the first one.
-   *
-   * @throws ConstraintException if a DB constraint is missed and more than one record is found
-   */
   def oneBySqlQuery(sql: String, values: List[Any] = List()): Option[Map[String, AnyRef]] = {
-    log.debug(s"Running SQL query [$sql] with $values")
+    val res = getResults(sql, values)
 
-    val runner: QueryRunner = new QueryRunner()
-    val res = runner.query(RequestContext.getConn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]): _*).asScala.toList
     log.debug(s"Found ${res.length} records")
 
     if (res.isEmpty) {
@@ -206,7 +159,7 @@ abstract class BaseDao {
     val rec = res.head
 
     log.debug(s"RECORD: $rec")
-    Some(rec.asScala.toMap)
+    Some(rec)
   }
 
   def getByIds(ids: Set[String])
@@ -266,8 +219,8 @@ abstract class BaseDao {
     }.toList
 
     val valuesForAllPlaceholders = dataUpdateValues ::: List(RequestContext.getRepository.id.get) ::: q.params.values.toList
-    val runner: QueryRunner = new QueryRunner()
 
+    val runner = queryRunner
     val numUpdated = runner.update(RequestContext.getConn, sql, valuesForAllPlaceholders.map(_.asInstanceOf[Object]): _*)
     numUpdated
   }
@@ -281,7 +234,7 @@ abstract class BaseDao {
       """
     log.debug(s"INCR SQL: $sql, for $id")
 
-    val runner: QueryRunner = new QueryRunner()
+    val runner = queryRunner
     runner.update(RequestContext.getConn, sql, RequestContext.getRepository.id.get, id)
   }
 
@@ -289,11 +242,6 @@ abstract class BaseDao {
                         : Unit = {
     increment(id, field, -count)
   }
-
-  /**
-   * Make a string of SQL placeholders for a list - such as "? , ? ,?, ?"
-   */
-  protected def makeSqlPlaceholders(s: Seq[AnyRef]): String = s.map(_ => "?").mkString(",")
 
   /**
    * Implementations should define this method, which returns an optional

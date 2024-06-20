@@ -61,10 +61,10 @@ class SearchDao(override val appContext: Altitude) extends software.altitude.cor
 
     val sqlQuery = sqlQueryBuilder.buildSelectSql(query = searchQuery)
     val recs = manyBySqlQuery(sqlQuery.sqlAsString, sqlQuery.bindValues)
-
     val total: Int = count(recs)
 
     log.debug(s"Found [$total] records. Retrieved [${recs.length}] records")
+
     if (recs.nonEmpty) {
       log.debug(recs.map(_.toString()).mkString("\n"))
     }
