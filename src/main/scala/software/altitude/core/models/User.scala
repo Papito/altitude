@@ -15,6 +15,7 @@ object User {
     accountType = (json \ C.User.ACCOUNT_TYPE).as[AccountType],
     passwordHash = (json \ C.User.PASSWORD_HASH).asOpt[String]
   ).withCoreAttr(json)
+
 }
 
 case class User(id: Option[String] = None,

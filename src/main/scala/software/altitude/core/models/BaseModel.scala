@@ -16,7 +16,8 @@ object BaseModel {
 abstract class BaseModel {
   val id: Option[String]
 
-  def toJson: JsObject
+  // implicit converter to go from a JSON to model
+  implicit def toJson: JsObject
 
   // created at - mutable, but can only be set once
   private var _createdAt: Option[LocalDateTime] = None
