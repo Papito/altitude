@@ -20,7 +20,7 @@ import scala.jdk.CollectionConverters._
 
 object BaseDao {
   final def genId: String = UUID.randomUUID.toString
-  val totalsWindowFunction: String = "count(*) OVER() AS total"
+  val totalRecsWindowFunction: String = "count(*) OVER() AS total"
 
 }
 
@@ -33,7 +33,7 @@ abstract class BaseDao {
 
   protected final def txManager: TransactionManager = appContext.txManager
 
-  protected def columnsForSelect: List[String] = List(s"*, ${BaseDao.totalsWindowFunction}")
+  protected def columnsForSelect: List[String] = List(s"*, ${BaseDao.totalRecsWindowFunction}")
 
   protected val sqlQueryBuilder: SqlQueryBuilder[Query] = new SqlQueryBuilder[Query](columnsForSelect, tableName)
 

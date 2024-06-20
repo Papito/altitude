@@ -20,15 +20,18 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
 
   override protected val sqlQueryBuilder = new SqlQueryBuilder[Query](columnsForSelect, tableName)
 
+  def getMetadataJsonFromColumn(metadataCol: AnyRef): JsObject = {
+    val metadataJsonStr: String = if (metadataCol == null) "{}" else metadataCol.asInstanceOf[String]
+    Json.parse(metadataJsonStr).as[JsObject]
+  }
+
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val assetType = new AssetType(
       mediaType = rec(C.AssetType.MEDIA_TYPE).asInstanceOf[String],
       mediaSubtype = rec(C.AssetType.MEDIA_SUBTYPE).asInstanceOf[String],
       mime = rec(C.AssetType.MIME_TYPE).asInstanceOf[String])
 
-    val metadataCol = rec(C.Asset.METADATA)
-    val metadataJsonStr: String = if (metadataCol == null) "{}" else metadataCol.asInstanceOf[String]
-    val metadataJson = Json.parse(metadataJsonStr).as[JsObject]
+    val metadataJson = getMetadataJsonFromColumn(rec(C.Asset.METADATA))
 
     val extractedMetadataCol = rec(C.Asset.EXTRACTED_METADATA)
     val extractedMetadataJsonStr: String =

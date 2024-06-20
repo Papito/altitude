@@ -1,7 +1,5 @@
 package software.altitude.core.dao.postgres
 
-import play.api.libs.json.JsObject
-import play.api.libs.json.Json
 import software.altitude.core.AltitudeAppContext
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.BaseDao
@@ -13,7 +11,7 @@ object AssetDao {
       "asset.*",
       s"(asset.${C.Asset.METADATA}#>>'{}')::text AS ${C.Asset.METADATA}",
       s"(asset.${C.Asset.EXTRACTED_METADATA}#>>'{}')::text AS ${C.Asset.EXTRACTED_METADATA}",
-      BaseDao.totalsWindowFunction
+      BaseDao.totalRecsWindowFunction
     )
 }
 
@@ -29,11 +27,7 @@ class AssetDao(app: AltitudeAppContext) extends software.altitude.core.dao.jdbc.
 
     oneBySqlQuery(sql, List(RequestContext.getRepository.id.get, assetId)) match {
       case Some(rec) =>
-        val metadataCol = rec(C.Asset.METADATA)
-        val metadataJsonStr: String = if (metadataCol == null) "{}" else metadataCol.asInstanceOf[String]
-        val metadataJson = Json.parse(metadataJsonStr).as[JsObject]
-        val metadata = Metadata.fromJson(metadataJson)
-        Some(metadata)
+        Some(getMetadataJsonFromColumn(rec(C.Asset.METADATA)))
       case None => None
     }
   }
