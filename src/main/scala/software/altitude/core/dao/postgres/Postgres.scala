@@ -10,7 +10,7 @@ import java.sql.Timestamp
 
 trait Postgres { this: BaseDao =>
 
-  override protected def defaultSqlColsForSelect: List[String] = List(
+  override protected def selectColumns: List[String] = List(
     C.Base.ID,
     "*",
     "EXTRACT(EPOCH FROM created_at) AS created_at",

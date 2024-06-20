@@ -33,9 +33,9 @@ abstract class BaseDao {
 
   protected final def txManager: TransactionManager = appContext.txManager
 
-  protected def defaultSqlColsForSelect: List[String]
+  protected def selectColumns: List[String]
 
-  protected val sqlQueryBuilder: SqlQueryBuilder[Query] = new SqlQueryBuilder[Query](defaultSqlColsForSelect, tableName)
+  protected val sqlQueryBuilder: SqlQueryBuilder[Query] = new SqlQueryBuilder[Query](selectColumns, tableName)
 
   // if supported, DB function to store native JSON data
   protected def jsonFunc: String
@@ -43,13 +43,13 @@ abstract class BaseDao {
   protected def nowTimeFunc: String
 
   // conversion function to go from Java time to DB time
-  protected def dateTimeToDbFunc(datetime: Option[DateTime]): String
+  protected def dateTimeToDbFunc(datetime2: Option[DateTime]): String
   // opposite of the above
   protected def getDateTimeFromRec(field: String, rec: Map[String, AnyRef]): Option[DateTime]
 
   // SQL to select the whole record, in very simple cases
   protected val oneRecSelectSql: String = s"""
-      SELECT ${defaultSqlColsForSelect.mkString(", ")}
+      SELECT ${selectColumns.mkString(", ")}
         FROM $tableName
        WHERE ${C.Base.ID} = ? AND ${C.Base.REPO_ID} = ?"""
 
@@ -236,7 +236,7 @@ abstract class BaseDao {
                        : List[JsObject] = {
     val placeholders = ids.toSeq.map(_ => "?")
     val sql = s"""
-      SELECT ${defaultSqlColsForSelect.mkString(", ")}
+      SELECT ${selectColumns.mkString(", ")}
         FROM $tableName
        WHERE ${C.Base.REPO_ID} = ? AND id IN (${placeholders.mkString(",")})
       """

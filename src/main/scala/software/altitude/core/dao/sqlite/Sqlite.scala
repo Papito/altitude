@@ -10,7 +10,7 @@ import software.altitude.core.{Const => C}
 
 trait Sqlite { this: BaseDao =>
 
-  override protected def defaultSqlColsForSelect: List[String] = List(
+  override protected def selectColumns: List[String] = List(
     C.Base.ID,
     "*",
     "CAST(STRFTIME('%s', created_at) AS INT) AS created_at",
