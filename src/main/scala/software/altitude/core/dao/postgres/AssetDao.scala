@@ -10,8 +10,8 @@ import software.altitude.core.{Const => C}
 object AssetDao {
     val DEFAULT_SQL_COLS_FOR_SELECT: List[String] = List(
       "asset.*",
-      s"(asset.${C.Asset.METADATA}#>>'{}')::text as ${C.Asset.METADATA}",
-      s"(asset.${C.Asset.EXTRACTED_METADATA}#>>'{}')::text as ${C.Asset.EXTRACTED_METADATA}",
+      s"(asset.${C.Asset.METADATA}#>>'{}')::text AS ${C.Asset.METADATA}",
+      s"(asset.${C.Asset.EXTRACTED_METADATA}#>>'{}')::text AS ${C.Asset.EXTRACTED_METADATA}",
     )
 }
 
@@ -20,7 +20,7 @@ class AssetDao(app: AltitudeAppContext) extends software.altitude.core.dao.jdbc.
 
   override def getMetadata(assetId: String): Option[Metadata] = {
     val sql = s"""
-      SELECT (${C.Asset.METADATA}#>>'{}')::text as ${C.Asset.METADATA}
+      SELECT (${C.Asset.METADATA}#>>'{}')::text AS ${C.Asset.METADATA}
          FROM $tableName
        WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
       """
