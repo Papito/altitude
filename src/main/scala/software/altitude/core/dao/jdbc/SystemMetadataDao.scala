@@ -4,15 +4,9 @@ import org.apache.commons.dbutils.QueryRunner
 import play.api.libs.json.JsObject
 import software.altitude.core.AltitudeAppContext
 import software.altitude.core.RequestContext
+import software.altitude.core.dao.SystemMetadataDao
 import software.altitude.core.models.SystemMetadata
 import software.altitude.core.{Const => C}
-
-import java.sql.SQLException
-
-object SystemMetadataDao {
-  // we only have one record in the system table at all times
-  private val SYSTEM_RECORD_ID = 1
-}
 
 abstract class SystemMetadataDao(val appContext: AltitudeAppContext)
   extends BaseDao with software.altitude.core.dao.SystemMetadataDao {
@@ -23,22 +17,6 @@ abstract class SystemMetadataDao(val appContext: AltitudeAppContext)
     version = rec(C.SystemMetadata.VERSION).asInstanceOf[Int],
     isInitialized = getBooleanField(rec(C.SystemMetadata.IS_INITIALIZED))
   ).toJson
-
-  override def read: SystemMetadata = {
-    txManager.asReadOnly[SystemMetadata] {
-      getById(SystemMetadataDao.SYSTEM_RECORD_ID.toString).get
-    }
-  }
-
-  override def version: Int = {
-    try {
-      read.version
-    }
-    catch {
-      case _: SQLException => 0 // new installation
-      case ex: Exception => throw ex
-    }
-  }
 
   def updateVersion(toVersion: Int): Unit = {
     txManager.withTransaction {

@@ -1,11 +1,13 @@
 package software.altitude.core.dao
 
 import software.altitude.core.dao.jdbc.BaseDao
-import software.altitude.core.models.SystemMetadata
+
+object SystemMetadataDao {
+  // we only have one record in the system table at all times
+  val SYSTEM_RECORD_ID = 1
+}
 
 
 trait SystemMetadataDao extends BaseDao {
-  def version: Int
-  def read: SystemMetadata
   def updateVersion(toVersion: Int): Unit
 }

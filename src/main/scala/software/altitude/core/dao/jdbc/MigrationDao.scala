@@ -1,6 +1,4 @@
 package software.altitude.core.dao.jdbc
-
-import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.AltitudeAppContext
@@ -38,17 +36,6 @@ abstract class MigrationDao(val appContext: AltitudeAppContext)
     val stmt = RequestContext.getConn.createStatement()
     stmt.executeUpdate(command)
     stmt.close()
-  }
-
-  /**
-   * Up the schema version by one after completion
-   */
-  override def versionUp(): Unit = {
-    log.info("VERSION UP")
-    val runner: QueryRunner = new QueryRunner()
-    val sql = s"UPDATE $tableName SET version = 1 WHERE id = 0"
-    log.info(sql)
-    runner.update(RequestContext.getConn, sql)
   }
 
   protected override  def makeModel(rec: Map[String, AnyRef]): JsObject = throw new NotImplementedError

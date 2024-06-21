@@ -15,7 +15,6 @@ import scala.io.Source
 abstract class MigrationService(val app: Altitude)  {
   protected val log: Logger = LoggerFactory.getLogger(getClass)
 
-  private val systemMetadataDao: SystemMetadataDao = app.injector.instance[SystemMetadataDao]
   protected val txManager: TransactionManager = app.txManager
   protected val CURRENT_VERSION: Int
 
@@ -40,15 +39,6 @@ abstract class MigrationService(val app: Altitude)  {
     stmt.close()
   }
 
-  /**
-   * Up the schema version by one after completion
-   */
-  private def versionUp(): Unit = {
-    log.info("VERSION UP")
-    val toVersion = systemMetadataDao.version + 1
-    systemMetadataDao.updateVersion(toVersion=toVersion)
-  }
-
   private def runMigration(version: Int): Unit = {
     val sqlCommands = parseMigrationCommands(version)
     txManager.withTransaction {
@@ -58,13 +48,13 @@ abstract class MigrationService(val app: Altitude)  {
     // must have schema changes committed
     txManager.withTransaction {
       migrateVersion(version)
-      versionUp()
+      app.service.system.versionUp()
     }
   }
 
   def migrationRequired: Boolean = {
     log.info("Checking if migration is required")
-    val version = systemMetadataDao.version
+    val version = app.service.system.version
     log.info(s"Current database version is @ $version")
     val isRequired = version < CURRENT_VERSION
     log.info(s"Migration required? : $isRequired")
@@ -72,7 +62,7 @@ abstract class MigrationService(val app: Altitude)  {
   }
 
   def migrate(): Unit = {
-    val oldVersion = systemMetadataDao.version
+    val oldVersion = app.service.system.version
     log.warn("!!!! MIGRATING !!!!")
     log.info(s"From version $oldVersion to $CURRENT_VERSION")
     for (version <- oldVersion + 1 to CURRENT_VERSION) {

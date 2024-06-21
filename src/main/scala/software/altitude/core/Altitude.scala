@@ -50,6 +50,7 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeApp
       }
     }
 
+    val system = new SystemMetadataService(app)
     val user = new UserService(app)
     val repository = new RepositoryService(app)
     val assetImport = new AssetImportService(app)
