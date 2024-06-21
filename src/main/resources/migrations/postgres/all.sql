@@ -7,12 +7,12 @@ CREATE TABLE _core (
 );
 
 CREATE TABLE system (
-  id INT NOT NULL DEFAULT 1,
+  id INT NOT NULL DEFAULT 1, -- this is the ONLY ID in the system table
   version INT NOT NULL,
-  initialized BOOL NOT NULL DEFAULT FALSE
+  is_initialized BOOL NOT NULL DEFAULT FALSE
 );
 CREATE UNIQUE INDEX system_01 ON system(id);
-INSERT INTO system(version, initialized) VALUES(1, False);
+INSERT INTO system(version, is_initialized) VALUES(1, False);
 
 CREATE TABLE account(
   id CHAR(36) PRIMARY KEY,

@@ -70,13 +70,14 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeApp
   /**
    * Inject dependencies
    */
-  class InjectionModule extends AbstractModule with ScalaModule  {
+  private class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
 
       dataSourceType match {
         case C.DatasourceType.POSTGRES =>
           DriverManager.registerDriver(new org.postgresql.Driver)
 
+          bind[SystemMetadataDao].toInstance(new jdbc.SystemMetadataDao(app) with dao.postgres.Postgres)
           bind[UserDao].toInstance(new jdbc.UserDao(app) with dao.postgres.Postgres)
           bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.postgres.Postgres)
           bind[RepositoryDao].toInstance(new postgres.RepositoryDao(app))
@@ -89,6 +90,7 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeApp
         case C.DatasourceType.SQLITE =>
           DriverManager.registerDriver(new org.sqlite.JDBC)
 
+          bind[SystemMetadataDao].toInstance(new jdbc.SystemMetadataDao(app) with dao.sqlite.Sqlite)
           bind[UserDao].toInstance(new jdbc.UserDao(app) with dao.sqlite.Sqlite)
           bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.sqlite.Sqlite)
           bind[RepositoryDao].toInstance(new jdbc.RepositoryDao(app) with dao.sqlite.Sqlite)

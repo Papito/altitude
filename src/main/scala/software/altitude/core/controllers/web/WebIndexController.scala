@@ -11,9 +11,9 @@ import software.altitude.core.dao.FolderDao
 class WebIndexController extends AltitudeStack with ScalateSupport with AltitudeServletContext {
 
   val dao: FolderDao = app.injector.instance[FolderDao]
-//  before() {
-//    requireLogin()
-//  }
+  before() {
+    // requireLogin()
+  }
 
   get("/") {
     contentType = "text/html"

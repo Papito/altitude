@@ -21,6 +21,12 @@ object Const {
   /**
    * MODEL FIELDS (in JSON and database)
    */
+
+  object SystemMetadata {
+    val VERSION = "version"
+    val IS_INITIALIZED = "is_initialized"
+  }
+
   trait Common {
     val ID = "id"
     val REPO_ID = "repository_id"

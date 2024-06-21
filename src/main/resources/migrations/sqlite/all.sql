@@ -1,11 +1,11 @@
 CREATE TABLE system (
   id INT NOT NULL DEFAULT 1,
   version INT NOT NULL,
-  initialized TINYINT NOT NULL
+  is_initialized BOOL NOT NULL DEFAULT FALSE
 );
 
 CREATE UNIQUE INDEX system_01 ON system(id);
-INSERT INTO system(version, initialized) VALUES(0, 0);
+INSERT INTO system(version, is_initialized) VALUES(0, 0);
 
 CREATE TABLE account(
   id CHAR(36) PRIMARY KEY,
