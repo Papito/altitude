@@ -1,51 +1,75 @@
-package software.altitude.core.service.migration
+package software.altitude.core.service
 
-import net.codingwell.scalaguice.InjectorExtensions._
+import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
+import org.apache.commons.dbutils.QueryRunner
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import software.altitude.core.AltitudeAppContext
+import software.altitude.core.Altitude
 import software.altitude.core.Environment
-import software.altitude.core.dao.MigrationDao
+import software.altitude.core.RequestContext
+import software.altitude.core.dao.SystemMetadataDao
 import software.altitude.core.transactions.TransactionManager
 
 import java.io.File
 import scala.io.Source
 
-abstract class CoreMigrationService {
-  private final val log = LoggerFactory.getLogger(getClass)
+abstract class MigrationService(val app: Altitude)  {
+  protected val log: Logger = LoggerFactory.getLogger(getClass)
 
-  protected val app: AltitudeAppContext
-  protected val DAO: MigrationDao = app.injector.instance[MigrationDao]
+  private val systemMetadataDao: SystemMetadataDao = app.injector.instance[SystemMetadataDao]
   protected val txManager: TransactionManager = app.txManager
   protected val CURRENT_VERSION: Int
 
-  protected val MIGRATIONS_DIR: String
-  protected val FILE_EXTENSION: String
+  private def migrateVersion(version: Int): Unit = {
+      version match {
+        case 1 => v1()
+      }
+  }
 
-  def migrateVersion(version: Int): Unit
+  private def v1(): Unit = {
+  }
+
+  protected val MIGRATIONS_DIR: String
+  private val FILE_EXTENSION = ".sql"
+
+  /**
+   * Execute an arbitrary command
+   */
+  private def executeCommand(command: String): Unit = {
+    val stmt = RequestContext.getConn.createStatement()
+    stmt.executeUpdate(command)
+    stmt.close()
+  }
+
+  /**
+   * Up the schema version by one after completion
+   */
+  def versionUp(): Unit = {
+    log.info("VERSION UP")
+    val runner: QueryRunner = new QueryRunner()
+    val sql = "UPDATE system SET version = 1 WHERE id = 0"
+    log.info(sql)
+    runner.update(RequestContext.getConn, sql)
+  }
+
 
   private def runMigration(version: Int): Unit = {
 
     val sqlCommands = parseMigrationCommands(version)
     txManager.withTransaction {
-        DAO.executeCommand(sqlCommands)
+      executeCommand(sqlCommands)
     }
 
     // must have schema changes committed
     txManager.withTransaction {
       migrateVersion(version)
-      DAO.versionUp()
-    }
-  }
-
-  def existingVersion: Int = {
-    txManager.asReadOnly[Int] {
-      DAO.currentVersion
+      versionUp()
     }
   }
 
   def migrationRequired: Boolean = {
     log.info("Checking if migration is required")
-    val version = existingVersion
+    val version = systemMetadataDao.version
     log.info(s"Current database version is @ $version")
     val isRequired = version < CURRENT_VERSION
     log.info(s"Migration required? : $isRequired")
@@ -53,7 +77,7 @@ abstract class CoreMigrationService {
   }
 
   def migrate(): Unit = {
-    val oldVersion = existingVersion
+    val oldVersion = systemMetadataDao.version
     log.warn("!!!! MIGRATING !!!!")
     log.info(s"From version $oldVersion to $CURRENT_VERSION")
     for (version <- oldVersion + 1 to CURRENT_VERSION) {
@@ -73,8 +97,8 @@ abstract class CoreMigrationService {
     val path = Environment.ENV match {
       case Environment.TEST | Environment.DEV =>entireSchemaPath
       case Environment.PROD => if (version == 1) entireSchemaPath
-        else
-          new File(MIGRATIONS_DIR, s"$version$FILE_EXTENSION").toString
+      else
+        new File(MIGRATIONS_DIR, s"$version$FILE_EXTENSION").toString
     }
 
     log.info(s"Migration path: $path")
@@ -86,5 +110,4 @@ abstract class CoreMigrationService {
 
     commands
   }
-
 }

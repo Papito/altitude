@@ -9,7 +9,6 @@ import software.altitude.core.dao._
 import software.altitude.core.service._
 import software.altitude.core.service.filestore.FileStoreService
 import software.altitude.core.service.filestore.FileSystemStoreService
-import software.altitude.core.service.migration._
 import software.altitude.core.transactions._
 import software.altitude.core.{Const => C}
 
@@ -36,7 +35,21 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeApp
    */
   override val txManager: TransactionManager = new software.altitude.core.transactions.TransactionManager(app)
 
+  private final val schemaVersion = 1
+
   object service {
+
+    val migrationService: MigrationService = dataSourceType match {
+      case C.DatasourceType.SQLITE => new MigrationService(app) {
+        override final val CURRENT_VERSION = schemaVersion
+        override final val MIGRATIONS_DIR = "/migrations/sqlite"
+      }
+      case C.DatasourceType.POSTGRES => new MigrationService(app) {
+        override final val CURRENT_VERSION = schemaVersion
+        override final val MIGRATIONS_DIR = "/migrations/postgres"
+      }
+    }
+
     val user = new UserService(app)
     val repository = new RepositoryService(app)
     val assetImport = new AssetImportService(app)
@@ -51,19 +64,6 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeApp
     val fileStore: FileStoreService = fileStoreType match {
       case C.FileStoreType.FS => new FileSystemStoreService(app)
       case _ => throw new NotImplementedError
-    }
-
-    private final val schemaVersion = 1
-
-    val migrationService: MigrationService = dataSourceType match {
-      case C.DatasourceType.SQLITE => new MigrationService(app) with JdbcMigrationService with SqliteMigration {
-        override final val CURRENT_VERSION = schemaVersion
-        override final val MIGRATIONS_DIR = "/migrations/sqlite"
-      }
-      case C.DatasourceType.POSTGRES => new MigrationService(app) with JdbcMigrationService with PostgresMigration {
-        override final val CURRENT_VERSION = schemaVersion
-        override final val MIGRATIONS_DIR = "/migrations/postgres"
-      }
     }
   }
 
