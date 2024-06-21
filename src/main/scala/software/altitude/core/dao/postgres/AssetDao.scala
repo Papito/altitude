@@ -15,7 +15,7 @@ object AssetDao {
     )
 }
 
-class AssetDao(app: AltitudeAppContext) extends software.altitude.core.dao.jdbc.AssetDao(app) with Postgres {
+class AssetDao(app: AltitudeAppContext) extends software.altitude.core.dao.jdbc.AssetDao(app) with PostgresOverrides {
   override protected def columnsForSelect: List[String] = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT
 
   override def getMetadata(assetId: String): Option[Metadata] = {

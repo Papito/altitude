@@ -77,27 +77,27 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeApp
         case C.DatasourceType.POSTGRES =>
           DriverManager.registerDriver(new org.postgresql.Driver)
 
-          bind[SystemMetadataDao].toInstance(new jdbc.SystemMetadataDao(app) with dao.postgres.Postgres)
-          bind[UserDao].toInstance(new jdbc.UserDao(app) with dao.postgres.Postgres)
-          bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.postgres.Postgres)
+          bind[SystemMetadataDao].toInstance(new jdbc.SystemMetadataDao(app) with dao.postgres.PostgresOverrides)
+          bind[UserDao].toInstance(new jdbc.UserDao(app) with dao.postgres.PostgresOverrides)
+          bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.postgres.PostgresOverrides)
           bind[RepositoryDao].toInstance(new postgres.RepositoryDao(app))
-          bind[AssetDao].toInstance(new postgres.AssetDao(app) with dao.postgres.Postgres)
-          bind[FolderDao].toInstance(new jdbc.FolderDao(app) with dao.postgres.Postgres)
-          bind[StatDao].toInstance(new jdbc.StatDao(app) with dao.postgres.Postgres with dao.jdbc.Stats)
-          bind[MetadataFieldDao].toInstance(new jdbc.MetadataFieldDao(app) with dao.postgres.Postgres)
+          bind[AssetDao].toInstance(new postgres.AssetDao(app) with dao.postgres.PostgresOverrides)
+          bind[FolderDao].toInstance(new jdbc.FolderDao(app) with dao.postgres.PostgresOverrides)
+          bind[StatDao].toInstance(new jdbc.StatDao(app) with dao.postgres.PostgresOverrides)
+          bind[MetadataFieldDao].toInstance(new jdbc.MetadataFieldDao(app) with dao.postgres.PostgresOverrides)
           bind[SearchDao].toInstance(new postgres.SearchDao(app))
 
         case C.DatasourceType.SQLITE =>
           DriverManager.registerDriver(new org.sqlite.JDBC)
 
-          bind[SystemMetadataDao].toInstance(new jdbc.SystemMetadataDao(app) with dao.sqlite.Sqlite)
-          bind[UserDao].toInstance(new jdbc.UserDao(app) with dao.sqlite.Sqlite)
-          bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.sqlite.Sqlite)
-          bind[RepositoryDao].toInstance(new jdbc.RepositoryDao(app) with dao.sqlite.Sqlite)
-          bind[AssetDao].toInstance(new jdbc.AssetDao(app) with dao.sqlite.Sqlite)
-          bind[FolderDao].toInstance(new jdbc.FolderDao(app) with dao.sqlite.Sqlite)
-          bind[StatDao].toInstance(new jdbc.StatDao(app) with dao.sqlite.Sqlite with dao.jdbc.Stats)
-          bind[MetadataFieldDao].toInstance(new jdbc.MetadataFieldDao(app) with dao.sqlite.Sqlite)
+          bind[SystemMetadataDao].toInstance(new jdbc.SystemMetadataDao(app) with dao.sqlite.SqliteOverrides)
+          bind[UserDao].toInstance(new jdbc.UserDao(app) with dao.sqlite.SqliteOverrides)
+          bind[MigrationDao].toInstance(new jdbc.MigrationDao(app) with dao.sqlite.SqliteOverrides)
+          bind[RepositoryDao].toInstance(new jdbc.RepositoryDao(app) with dao.sqlite.SqliteOverrides)
+          bind[AssetDao].toInstance(new jdbc.AssetDao(app) with dao.sqlite.SqliteOverrides)
+          bind[FolderDao].toInstance(new jdbc.FolderDao(app) with dao.sqlite.SqliteOverrides)
+          bind[StatDao].toInstance(new jdbc.StatDao(app) with dao.sqlite.SqliteOverrides)
+          bind[MetadataFieldDao].toInstance(new jdbc.MetadataFieldDao(app) with dao.sqlite.SqliteOverrides)
           bind[SearchDao].toInstance(new sqlite.SearchDao(app))
 
         case _ =>

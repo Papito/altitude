@@ -7,7 +7,7 @@ import software.altitude.core.{Const => C}
 import java.text.SimpleDateFormat
 import java.time.ZoneId
 
-trait Sqlite { this: BaseDao =>
+trait SqliteOverrides { this: BaseDao =>
 
   override protected def jsonFunc = "?"
 
