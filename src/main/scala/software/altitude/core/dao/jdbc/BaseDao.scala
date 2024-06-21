@@ -106,7 +106,6 @@ abstract class BaseDao {
   protected def query(query: Query, sqlQueryBuilder: SqlQueryBuilder[Query])
            : QueryResult = {
     val sqlQuery: SqlQuery = sqlQueryBuilder.buildSelectSql(query)
-
     val recs = manyBySqlQuery(sqlQuery.sqlAsString, sqlQuery.bindValues)
     val total: Int = count(recs)
 
@@ -211,8 +210,8 @@ abstract class BaseDao {
         val jsVal: JsValue = v._2
 
         jsVal match {
-          case JsTrue => 1
-          case JsFalse => 0
+          case JsTrue => true
+          case JsFalse => false
           case _ => jsVal.as[String]
         }
       }

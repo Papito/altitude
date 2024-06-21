@@ -55,6 +55,7 @@ class SearchDao(override val appContext: Altitude) extends software.altitude.cor
     runner.update(RequestContext.getConn, docSql, sqlVals.map(_.asInstanceOf[Object]): _*)
   }
 
+  // overriding for Postgres as AssetSearchQueryBuilder here is specific to Postgres
   override def search(searchQuery: SearchQuery): SearchResult = {
     val sqlQueryBuilder = new AssetSearchQueryBuilder(sqlColsForSelect = AssetDao.DEFAULT_SQL_COLS_FOR_SELECT)
 

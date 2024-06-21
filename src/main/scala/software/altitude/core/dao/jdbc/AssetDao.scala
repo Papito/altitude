@@ -42,10 +42,7 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
       id = Some(rec(C.Base.ID).asInstanceOf[String]),
       userId = rec(C.Base.USER_ID).asInstanceOf[String],
       fileName = rec(C.Asset.FILENAME).asInstanceOf[String],
-      isRecycled = rec(C.Asset.IS_RECYCLED).asInstanceOf[Int] match {
-        case 0 => false
-        case 1 => true
-      },
+      isRecycled = getBooleanField(rec(C.Asset.IS_RECYCLED)),
       checksum = rec(C.Asset.CHECKSUM).asInstanceOf[String],
       assetType = assetType,
       sizeBytes = rec(C.Asset.SIZE_BYTES).asInstanceOf[Int],

@@ -21,12 +21,12 @@ abstract class SearchQueryBuilder(selColumnNames: List[String])
 
   private final val log = LoggerFactory.getLogger(getClass)
 
-  protected val searchParamTable = "search_parameter"
+  private val searchParamTable = "search_parameter"
   protected val searchDocumentTable = "search_document"
 
-  protected val notRecycledFilter: ClauseComponents = ClauseComponents(
+  private val notRecycledFilter: ClauseComponents = ClauseComponents(
     elements = List(s"${C.Asset.IS_RECYCLED} = ?"),
-    bindVals = List(0))
+    bindVals = List(false))
 
   protected def textSearch(searchQuery: SearchQuery): ClauseComponents
 

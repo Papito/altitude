@@ -56,6 +56,7 @@ class SearchDao(override val appContext: Altitude) extends software.altitude.cor
     runner.update(RequestContext.getConn, docSql, sqlVals.map(_.asInstanceOf[Object]): _*)
   }
 
+  // overriding for Sqlite as AssetSearchQueryBuilder here is specific to Sqlite
   override def search(searchQuery: SearchQuery): SearchResult = {
     val sqlQueryBuilder = new AssetSearchQueryBuilder(sqlColsForSelect = columnsForSelect)
 

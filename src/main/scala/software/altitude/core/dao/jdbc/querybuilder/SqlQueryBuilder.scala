@@ -56,27 +56,6 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
     SqlQuery(sql, bindVals)
   }
 
-  def buildCountSql(query: QueryT): SqlQuery = {
-    // the SQL is the same but the SELECT clause is just the COUNT, so override it
-    val selectClauseForCount = ClauseComponents(List("COUNT(*) AS count"))
-    val allClauses = compileClauses(query) + (
-      SqlQueryBuilder.SELECT -> selectClauseForCount)
-
-    val sql: String = selectStr(allClauses(SqlQueryBuilder.SELECT)) +
-      fromStr(allClauses(SqlQueryBuilder.FROM)) +
-      whereStr(allClauses(SqlQueryBuilder.WHERE)) +
-      groupByStr(allClauses(SqlQueryBuilder.GROUP_BY)) +
-      havingStr(allClauses(SqlQueryBuilder.HAVING))
-
-    val bindVals = allClauses.foldLeft(List[Any]()) { (res, comp) =>
-      res ++ comp._2.bindVals
-    }
-
-    log.debug(s"Count SQL: $sql with $bindVals")
-    // println("COUNT", sql, bindVals)
-    SqlQuery(sql, bindVals)
-  }
-
   protected def compileClauses(query: QueryT): Map[String, ClauseComponents] = {
     // collect clauses so we can refer to them when we build the SQL string
     chainMethods.foldLeft(Map[String, ClauseComponents]()) { (res, m) =>
@@ -87,7 +66,7 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
     }
   }
 
-  protected def select(query: QueryT): ClauseComponents = ClauseComponents(elements = selColumnNames)
+  private def select(query: QueryT): ClauseComponents = ClauseComponents(elements = selColumnNames)
   protected def selectStr(clauseComponents: ClauseComponents): String = {
     val columnNames = clauseComponents.elements
     s"SELECT ${columnNames.mkString(", ")}"
@@ -122,11 +101,10 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
     val bindVals = query.params.foldLeft(List[Any]()) { (res, el: (String, Any)) =>
       val value = el._2
       value match {
-        // string or integer values as is
+        // string, integer or boolean values as is
         case _: String => res :+ value
         case _: Number => res :+ value
-        // boolean becomes 0 or 1
-        case _: Boolean => res :+ (if (value == true) 1 else 0)
+        case _: Boolean => res :+ value
         // extract all values from qParam
         case qParam: QueryParam => res ::: qParam.values.toList
         case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: $value")
