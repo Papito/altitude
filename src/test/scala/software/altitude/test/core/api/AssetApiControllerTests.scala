@@ -3,7 +3,5 @@ package software.altitude.test.core.api
 import org.scalatest.DoNotDiscover
 
 
-@DoNotDiscover class AssetApiControllerTests extends ApiTestCore {
-  test("Add assets") {
-  }
+@DoNotDiscover class AssetApiControllerTests(val config: Map[String, Any]) extends ApiTestCore {
 }

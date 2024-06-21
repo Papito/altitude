@@ -9,7 +9,6 @@ import software.altitude.test.core.TestFocus
 import scala.language.implicitConversions
 
 
-
 class ModelTests extends funsuite.AnyFunSuite with TestFocus {
 
   /**

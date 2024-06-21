@@ -19,6 +19,7 @@ class ScalatraBootstrap extends LifeCycle with AltitudeServletContext {
     context.setInitParameter("org.scalatra.cors.allowedOrigins", "http://localhost:3000")
     AltitudeServletContext.mountEndpoints(context)
     AltitudeServletContext.app.runMigrations()
+    AltitudeServletContext.app.setIsInitializedState()
   }
 
   override def destroy(context: ServletContext): Unit = {

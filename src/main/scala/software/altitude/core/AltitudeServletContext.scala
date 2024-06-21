@@ -16,7 +16,7 @@ object AltitudeServletContext {
   // private val actorSystem = ActorSystem()
 
   def mountEndpoints(context: ServletContext): Unit = {
-    context.mount(new WebIndexController, "/")
+    context.mount(new WebIndexController, "/*")
 
     context.mount(new AssetController, "/api/v1/assets/*")
     context.mount(new SearchController, "/api/v1/search/*")

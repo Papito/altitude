@@ -20,6 +20,8 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeApp
 
   final val app: Altitude = this
 
+  var isInitialized = false
+
   final val fileStoreType = config.fileStoreType
   log.info(s"File store type: $fileStoreType")
 
@@ -108,6 +110,13 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeApp
   }
 
   def freeResources(): Unit = {}
+
+  def setIsInitializedState(): Unit = {
+    this.isInitialized = service.system.read.isInitialized
+    if (!this.isInitialized) {
+      log.warn("Instance NOT YET INITIALIZED!")
+    }
+  }
 
   def runMigrations(): Unit = {
     if (service.migrationService.migrationRequired) {
