@@ -1,7 +1,7 @@
 CREATE TABLE system (
   id INT NOT NULL DEFAULT 1,
   version INT NOT NULL,
-  is_initialized BOOL NOT NULL DEFAULT FALSE
+  is_initialized TINYINT NOT NULL DEFAULT FALSE
 );
 
 CREATE UNIQUE INDEX system_01 ON system(id);

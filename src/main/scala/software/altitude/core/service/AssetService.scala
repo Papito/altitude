@@ -10,11 +10,9 @@ import software.altitude.core.util.QueryResult
 import software.altitude.core.{Const => C}
 
 /**
- * This is a "dumb" service - meaning it delegates everything to to the base service implementation
- * and the base DAO. It does the basics, but shall not do anything more than that.
+ * This is a "dumb" DAO service for asset table.
  *
- * If there is anything special to be done with an asset, it's under
- * the jurisdiction of the Library service - it does all the counter decrementin' and wrist slappin'
+ * All the actual asset management logic is handled by the LibraryService exclusively.
  */
 class AssetService(val app: Altitude) extends BaseService[Asset] {
   private final val log = LoggerFactory.getLogger(getClass)

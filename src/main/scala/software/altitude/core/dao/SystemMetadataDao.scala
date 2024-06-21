@@ -7,4 +7,5 @@ import software.altitude.core.models.SystemMetadata
 trait SystemMetadataDao extends BaseDao {
   def version: Int
   def read: SystemMetadata
+  def updateVersion(toVersion: Int): Unit
 }

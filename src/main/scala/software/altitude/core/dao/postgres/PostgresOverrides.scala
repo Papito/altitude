@@ -22,4 +22,7 @@ trait PostgresOverrides { this: BaseDao =>
   }
 
   def count(recs: List[Map[String, AnyRef]]): Int = if (recs.nonEmpty) recs.head("total").asInstanceOf[Long].toInt else 0
+
+  override protected def getBooleanField(value: AnyRef): Boolean = value.asInstanceOf[Boolean]
+
 }

@@ -1,7 +1,6 @@
 package software.altitude.core.service
 
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
-import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
@@ -44,17 +43,13 @@ abstract class MigrationService(val app: Altitude)  {
   /**
    * Up the schema version by one after completion
    */
-  def versionUp(): Unit = {
+  private def versionUp(): Unit = {
     log.info("VERSION UP")
-    val runner: QueryRunner = new QueryRunner()
-    val sql = "UPDATE system SET version = 1 WHERE id = 0"
-    log.info(sql)
-    runner.update(RequestContext.getConn, sql)
+    val toVersion = systemMetadataDao.version + 1
+    systemMetadataDao.updateVersion(toVersion=toVersion)
   }
 
-
   private def runMigration(version: Int): Unit = {
-
     val sqlCommands = parseMigrationCommands(version)
     txManager.withTransaction {
       executeCommand(sqlCommands)
