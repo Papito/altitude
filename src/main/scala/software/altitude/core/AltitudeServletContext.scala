@@ -1,5 +1,6 @@
 package software.altitude.core
 
+import org.scalatra.ScalatraServlet
 import org.scalatra.servlet.ServletApiImplicits._
 import org.slf4j.LoggerFactory
 import software.altitude.core.controllers.api._
@@ -15,19 +16,26 @@ object AltitudeServletContext {
 
   // private val actorSystem = ActorSystem()
 
-  def mountEndpoints(context: ServletContext): Unit = {
-    context.mount(new WebIndexController, "/*")
+  val endpoints: Seq[(ScalatraServlet, String)] = List(
+    (new WebIndexController, "/*"),
 
-    context.mount(new AssetController, "/api/v1/assets/*")
-    context.mount(new SearchController, "/api/v1/search/*")
-    context.mount(new FolderController, "/api/v1/folders/*")
-    context.mount(new TrashController, "/api/v1/trash/*")
-    context.mount(new StatsController, "/api/v1/stats/*")
-    context.mount(new MetadataController, "/api/v1/metadata/*")
-    context.mount(new SessionController, "/sessions/*")
-    context.mount(new admin.MetadataController, "/api/v1/admin/metadata/*")
-//    context.mount(new FileSystemBrowserController, "/navigate/*")
-    // context.mount(new ImportController(actorSystem), "/import/*")
+    (new AssetController, "/api/v1/assets/*"),
+    (new SearchController, "/api/v1/search/*"),
+    (new FolderController, "/api/v1/folders/*"),
+    (new TrashController, "/api/v1/trash/*"),
+    (new StatsController, "/api/v1/stats/*"),
+    (new MetadataController, "/api/v1/metadata/*"),
+    (new SessionController, "/sessions/*"),
+    (new admin.MetadataController, "/api/v1/admin/metadata/*"),
+
+    // (new FileSystemBrowserController, "/navigate/*"),
+    // (new ImportController(actorSystem), "/import/*")
+  )
+
+  def mountEndpoints(context: ServletContext): Unit = {
+    endpoints.foreach { case (servlet, path) =>
+      context.mount(servlet, path)
+    }
   }
 }
 
