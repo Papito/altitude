@@ -1,10 +1,10 @@
 package software.altitude.core.controllers.web
 
-import org.scalatra.scalate.ScalateSupport
-import software.altitude.core.AltitudeServletContext
-import software.altitude.core.controllers.AltitudeStack
+import org.slf4j.LoggerFactory
+import software.altitude.core.controllers.BaseWebController
 
-class WebIndexController extends AltitudeStack with ScalateSupport with AltitudeServletContext {
+class WebIndexController extends BaseWebController {
+  private final val log = LoggerFactory.getLogger(getClass)
 
   before() {
     // requireLogin()
@@ -13,6 +13,7 @@ class WebIndexController extends AltitudeStack with ScalateSupport with Altitude
   get("/") {
     // Kick to setup if this is a new install
     if (!app.isInitialized) {
+      logger.warn("App is not initialized, redirecting to setup")
       redirect("/setup")
     }
 

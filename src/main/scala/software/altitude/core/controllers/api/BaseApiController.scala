@@ -29,13 +29,15 @@ class BaseApiController extends BaseController {
   private def requestMethod: String = request.getMethod.toLowerCase
 
   before() {
+    contentType = "application/json; charset=UTF-8"
+
     // verify that requests with request body are not empty
-    checkPayload()
+    // checkPayload()
 
     /*
     Process all validators that may be set for this controller/method.
      */
-    HTTP_POST_VALIDATOR match {
+/*    HTTP_POST_VALIDATOR match {
       case Some(ApiRequestValidator(_)) if requestMethod == "post" =>
         HTTP_POST_VALIDATOR.get.validate(requestJson.get)
       case _ if requestMethod == "post" =>
@@ -58,16 +60,13 @@ class BaseApiController extends BaseController {
         log.debug(s"No PUT validator specified for ${this.getClass.getName}")
       case _ =>
     }
-
+*/
     // all responses are of type:
-    contentType = "application/json; charset=UTF-8"
   }
 
-  override def logRequestStart(): Unit = {
-    log.info(
-      s"API ${request.getRequestURI} ${requestMethod.toUpperCase} " +
-        s"with {${request.body}} and ${request.getParameterMap}")
-  }
+  override def logRequestStart(): Unit = log.info(
+      s"API ${request.getRequestURI} ${requestMethod.toUpperCase}, Body {${request.body}} Args: ${request.getParameterMap}"
+  )
 
   override def logRequestEnd(): Unit = {
     val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
@@ -100,5 +99,11 @@ class BaseApiController extends BaseController {
       InternalServerError(Json.obj(
         C.Api.ERROR -> (if (ex.getMessage!= null) ex.getMessage else ex.getClass.getName),
         C.Api.STACKTRACE -> strStacktrace))
+  }
+
+  override def setUser(): Unit = {
+  }
+
+  override def setRepository(): Unit = {
   }
 }

@@ -34,16 +34,24 @@ abstract class BaseController extends AltitudeStack with AltitudeServletContext 
   }
 
   protected def logRequestStart(): Unit = {
+    if (isAssetRequest) return
+
     log.info(s"Request START: ${request.getRequestURI} args: {${request.getParameterMap}}")
   }
 
   protected def logRequestEnd(): Unit = {
+    if (isAssetRequest) return
+
     val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
     log.info(s"Request END: ${request.getRequestURI} in ${currentTimeMillis - startTime}ms")
   }
 
-  private def setUser(): Unit = {
-    val userId =
+  private def isAssetRequest =  request.pathInfo.startsWith("/css") ||
+    request.pathInfo.startsWith("/js") ||
+    request.pathInfo.startsWith("/images")
+4
+  protected def setUser(): Unit = {
+/*    val userId =
       Option(request.getAttribute("user_id").asInstanceOf[String]) orElse params.get("user_id")
 
     if (userId.isEmpty) {
@@ -55,10 +63,10 @@ abstract class BaseController extends AltitudeStack with AltitudeServletContext 
     val user: User = app.service.user.getUserById(userId.get)
     MDC.put("USER", s"[$user]")
     request.setAttribute("user", user)
-  }
+*/  }
 
-  private def setRepository(): Unit = {
-    val repositoryId =
+  protected def setRepository(): Unit = {
+  /*  val repositoryId =
       Option(request.getAttribute("repository_id").asInstanceOf[String]) orElse params.get("repository_id")
 
     if (repositoryId.isEmpty) {
@@ -70,7 +78,7 @@ abstract class BaseController extends AltitudeStack with AltitudeServletContext 
     val repository: Repository = app.service.repository.getRepositoryById(repositoryId.get)
     MDC.put("REPO", s"[$repository]")
     request.setAttribute("repository", repository)
-  }
+  */}
 
   error {
     case ex: Exception =>
