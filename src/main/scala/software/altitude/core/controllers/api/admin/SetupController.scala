@@ -1,6 +1,8 @@
 package software.altitude.core.controllers.api.admin
 
+import org.scalatra.BadRequest
 import org.slf4j.LoggerFactory
+import play.api.libs.json.Json
 import software.altitude.core.controllers.api.BaseApiController
 
 class SetupController extends BaseApiController  {
@@ -14,8 +16,14 @@ class SetupController extends BaseApiController  {
     }
 
     log.warn("Initializing up the instance...")
-    response.addHeader("HX-Redirect", "/")
-    OK
+
+    val email = (requestJson.get \ "adminEmail").as[String]
+
+    if (email.isEmpty) {
+      BadRequest(Json.obj("adminEmail" -> "required"))
+    }
+
+    // response.addHeader("HX-Redirect", "/")
   }
 
 }

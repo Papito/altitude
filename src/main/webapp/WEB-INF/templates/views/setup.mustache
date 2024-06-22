@@ -15,13 +15,16 @@
         }
 
         main {
-            padding-top: calc(var(--section-vertical-space) * 3);
+            padding-top: calc(var(--section-vertical-space) * 2);
             display: grid;
             grid-template-columns: 1fr 400px 1fr;
         }
 
-        #setupForm {
+        main > div {
             grid-column: 2;
+            display: grid;
+            grid-auto-rows: min-content;
+            grid-row-gap: var(--section-vertical-space);
         }
 
         #setupForm {
@@ -69,39 +72,66 @@
 </div>
 
 <main>
-    <form action="#" id="setupForm">
-        <div>
-            <label for="repositoryName">Library name</label>
-            <input type="text" id="repositoryName" name="repositoryName" placeholder="Library name" value="Personal"/>
-        </div>
-        <div>
-            <label for="fileStore">File storage type</label>
-            <input type="text" id="fileStore" name="fileStore" class="readonly" readonly value="filesystem"/>
-        </div>
-        <div>
-            <label for="dataStore">Metadata storage type</label>
-            <input type="text" id="dataStore" name="dataStore" class="readonly" readonly value="postgres"/>
-        </div>
-        <div>
-            <label for="email">Administrator Email</label>
-            <input type="email" id="email" name="adminEmail"/>
-        </div>
-        <div>
-            <label for="password">Administrator Password</label>
-            <input type="password" id="password" name="password"/>
-        </div>
-        <div>
-            <label for="password2">Confirm Password</label>
-            <input type="password" id="password2" name="password2"/>
-        </div>
-        <div class="submit">
-            <button hx-trigger="click"
-                    hx-post="/api/v1/admin/setup"
-                    hx-ext="json-enc"
-                    class="action-button"
-                    id="initialize">Dazzle Me</button>
-        </div>
-    </form>
+    <div>
+        <div id="htmx-alert" hidden class="alert alert-warning sticky-top">LOL</div>
+        <form action="#" id="setupForm">
+            <div>
+                <label for="repositoryName">Library name</label>
+                <input type="text"
+                       id="repositoryName"
+                       name="repositoryName"
+                       placeholder="Library name"
+                       value="Personal"
+                       maxlength="80"/>
+            </div>
+            <div>
+                <label for="fileStore">File storage type</label>
+                <input type="text"
+                       id="fileStore"
+                       name="fileStore"
+                       class="readonly"
+                       readonly
+                       value="filesystem"/>
+            </div>
+            <div>
+                <label for="dataStore">Metadata storage type</label>
+                <input type="text"
+                       id="dataStore"
+                       name="dataStore"
+                       class="readonly"
+                       readonly
+                       value="postgres"/>
+            </div>
+            <div>
+                <label for="email">Administrator Email</label>
+                <input type="email"
+                       id="email"
+                       name="adminEmail"
+                       maxlength="80"/>
+            </div>
+            <div>
+                <label for="password">Administrator Password</label>
+                <input type="password"
+                       id="password"
+                       name="password"
+                       maxlength="50"/>
+            </div>
+            <div>
+                <label for="password2">Confirm Password</label>
+                <input type="password"
+                       id="password2"
+                       name="password2"
+                       maxlength="50"/>
+            </div>
+            <div class="submit">
+                <button hx-trigger="click"
+                        hx-post="/api/v1/admin/setup"
+                        hx-ext="json-enc"
+                        class="action-button"
+                        id="initialize">Dazzle Me</button>
+            </div>
+        </form>
+    </div>
 </main>
 
 <footer>
@@ -109,6 +139,29 @@
 </footer>
 
 <script type="module" lang="js">
+    document.body.addEventListener('htmx:afterRequest', function (evt) {
+        const errorTarget = document.getElementById("htmx-alert")
+        if (evt.detail.successful) {
+            // Successful request, clear out alert
+            errorTarget.setAttribute("hidden", "true")
+            errorTarget.innerText = "";
+        } else if (evt.detail.failed && evt.detail.xhr) {
+            // Server error with response contents, equivalent to htmx:responseError
+            console.warn("Server error", evt.detail)
+
+            const jsonResponse = JSON.parse(evt.detail.xhr.responseText);
+            console.log(jsonResponse);
+
+            const xhr = evt.detail.xhr;
+            errorTarget.innerText = `Unexpected server error: ${xhr.status} - ${xhr.statusText}`;
+            errorTarget.removeAttribute("hidden");
+        } else {
+            // Unspecified failure, usually caused by network error
+            console.error("Unexpected htmx error", evt.detail)
+            errorTarget.innerText = "Unexpected error, check your connection and try to refresh the page.";
+            errorTarget.removeAttribute("hidden");
+        }
+    });
 </script>
 
 </body>

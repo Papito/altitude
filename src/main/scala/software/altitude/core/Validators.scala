@@ -6,7 +6,7 @@ import software.altitude.core.{Const => C}
 object Validators {
 
   /**
-   * Base model validator implementation that is used by services.
+   * Base model validator implementation
    */
   case class ModelDataValidator(required: Option[List[String]] = None,
                        maxLengths: Option[Map[String, Int]] = None) {
@@ -23,7 +23,7 @@ object Validators {
       ex
     }
 
-    protected def checkRequired(json: JsObject, ex: ValidationException): ValidationException = {
+    private def checkRequired(json: JsObject, ex: ValidationException): ValidationException = {
       required.getOrElse(List[String]()) foreach { field =>
         if (json.keys.contains(field)) {
           (json \ field).asOpt[String] match {

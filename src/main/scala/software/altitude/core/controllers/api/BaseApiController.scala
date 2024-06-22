@@ -18,9 +18,9 @@ class BaseApiController extends BaseController {
 
   val OK: ActionResult = Ok("{}")
 
-  val HTTP_POST_VALIDATOR: Option[ApiRequestValidator] = None
-  private val HTTP_DELETE_VALIDATOR: Option[ApiRequestValidator] = None
-  private val HTTP_UPDATE_VALIDATOR: Option[ApiRequestValidator] = None
+  protected val HTTP_POST_VALIDATOR: Option[ApiRequestValidator] = None
+  protected val HTTP_DELETE_VALIDATOR: Option[ApiRequestValidator] = None
+  protected val HTTP_UPDATE_VALIDATOR: Option[ApiRequestValidator] = None
 
   def requestJson: Option[JsObject] = Some(
     if (request.body.isEmpty) Json.obj() else Json.parse(request.body).as[JsObject]
@@ -32,7 +32,7 @@ class BaseApiController extends BaseController {
     contentType = "application/json; charset=UTF-8"
 
     // verify that requests with request body are not empty
-    // checkPayload()
+     checkPayload()
 
     /*
     Process all validators that may be set for this controller/method.
