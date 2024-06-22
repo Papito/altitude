@@ -11,6 +11,7 @@ class WebIndexController extends AltitudeStack with ScalateSupport with Altitude
   }
 
   get("/") {
+    // Kick to setup if this is a new install
     if (!app.isInitialized) {
       redirect("/setup")
     }
@@ -25,6 +26,6 @@ class WebIndexController extends AltitudeStack with ScalateSupport with Altitude
     if (app.isInitialized) {
       redirect("/")
     } else
-    "SETUP"
+    mustache("/setup")
   }
 }

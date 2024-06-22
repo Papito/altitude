@@ -3,12 +3,12 @@
         display: grid;
         grid-template-columns: 150px repeat(4, 1fr) 250px;
         grid-column-gap: 10px;
-        background: #333;
+        background: var(--background-aux-color);
         color: #fff;
         align-items: center;
-        box-shadow: rgba(255, 255, 255, 0.07) 0 1px 0;
-        border-bottom: 2px solid #272727;
-        text-shadow: rgba(0,0,0,0.75) 0 1px;
+        box-shadow: var(--box-shadow);
+        border-bottom: var(--navbar-border);
+        text-shadow: var(--navbar-text-shadow);
     }
     nav span, nav a {
         color: #FFF;
@@ -64,8 +64,8 @@
         <i class="fas fa-database"><a href=""><span>Default</span></a></i>
     </div>
     <div class="menu import">
-        <i class="fas fa-download"
-           @click="showDirBrowseModal = true"><span>Import</span></i>
+        <i class="fas fa-download">
+            <span>Import</span></i>
     </div>
     <div class="menu">
         <i class="fas fa-search"><a href=""><span>Advanced Search</span></a></i>

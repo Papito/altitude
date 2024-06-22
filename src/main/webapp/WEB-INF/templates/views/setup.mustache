@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ALTITUDE SETUP</title>
+
+    {{> includes/header_common }}
+
+    <style>
+        body {
+            display: grid;
+            grid-template-rows: [header]  3em
+                                [content] auto
+                                [footer]  2em;
+            min-height: 100vh;
+        }
+
+        main {
+            padding-top: var(--section-vertical-space);
+            display: grid;
+            grid-template-columns: 1fr 600px 1fr;
+        }
+
+        #setupForm {
+            grid-column: 2;
+        }
+
+        #setupForm {
+            display: grid;
+            grid-auto-rows: min-content;
+            grid-row-gap: var(--control-vertical-space);
+        }
+
+        input {
+            line-height: 1.2em;
+            font-size: 1em;
+            width: 100%
+        }
+
+        input.readonly {
+            background-color: #868080;
+        }
+    </style>
+</head>
+
+<body>
+
+<div>
+    {{> includes/brand }}
+</div>
+
+<main>
+    <form action="/api/initialize" id="setupForm" method="post">
+        <div>
+            <input type="text" name="repositoryName" placeholder="Library name" value="Personal"/>
+        </div>
+        <div>
+            <input class="readonly" type="text" name="dataStore" readonly value="Postgres"/>
+        </div>
+        <div>
+            <input type="email" name="adminEmail"/>
+        </div>
+        <div>
+            <input type="password" name="password"/>
+        </div>
+        <div>
+            <input type="password" name="password2"/>
+        </div>
+        <div>
+            <input type="submit" value="Let's Go">
+        </div>
+    </form></main>
+
+<footer>
+    By Renegade Otter
+</footer>
+
+<script type="module" lang="js">
+</script>
+
+</body>
+</html>
