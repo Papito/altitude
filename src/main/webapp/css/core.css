@@ -7,9 +7,9 @@
     --navbar-text-shadow: rgba(0,0,0,0.75) 0 1px;
     --box-shadow: rgba(255, 255, 255, 0.07) 0 1px 0;
     /* Larger spacing for larger app areas, like panels and page paddings */
-    --section-vertical-space: 2em;
+    --section-vertical-space: 35px;
     /* Standard vertical spacing for individual elements and lists */
-    --control-vertical-space: 1em;
+    --control-vertical-space: 15px;
     --font: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"
 }
 
@@ -17,8 +17,11 @@
     box-sizing: border-box;
 }
 
+/*              */
 /* DEFAULT CORE */
+/*              */
 body {
+    font-size: 14px;
     margin: 0;
     background-color: var(--background-color);
     color: #c6c6c6;
@@ -51,40 +54,38 @@ footer {
     align-items: center;
 }
 
+/*       */
 /* FORMS */
-input {
-    border-radius: .4em;
-    color: black;
-    border: 2px groove #5a5855;
-    padding: .3em;
-    background-color: #cbc7c7;
+/*       */
+
+input, textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    color: #2C3E50;
+    font-size: 1.2em;
 }
 
-/* SPLIT */
-.split.split-horizontal,
-.gutter.gutter-horizontal {
-    height: 100%;
-    float: left;
+input.readonly {
+    background-color: #ada8a8;
 }
 
-.gutter {
-    background-color: transparent;
-    background-repeat: no-repeat;
-    background-position: 50%;
-}
+/*         */
+/* BUTTONS */
+/*         */
 
-.gutter.gutter-vertical {
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
-    cursor: ns-resize;
+.action-button {
+    background: #4dae27;
+    font-weight: bold;
+    color: white;
+    border: 0 none;
+    border-radius: 3px;
+    cursor: pointer;
+    padding: 10px;
+    margin: 10px 5px;
+    text-decoration: none;
+    text-shadow: rgba(72, 70, 70, 0.45) 1px 1px 1px;
+    font-size: 1em;
 }
-
-.gutter.gutter-horizontal {
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
-    cursor: ew-resize;
-}
-
-.split {
-    box-sizing: border-box;
-    overflow-y: auto;
-    overflow-x: hidden;
+.action-button:hover, .action-button:focus {
+    box-shadow: var(--box-shadow);
 }
