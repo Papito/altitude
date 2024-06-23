@@ -1,5 +1,12 @@
 package software.altitude.test.core.unit
 
-class ApiValidatorTests {
+import org.scalatest.DoNotDiscover
+import org.scalatest.funsuite
+import software.altitude.test.core.TestFocus
 
+@DoNotDiscover class ApiValidatorTests extends funsuite.AnyFunSuite with TestFocus {
+
+  test("Setup validation", Focused) {
+
+  }
 }

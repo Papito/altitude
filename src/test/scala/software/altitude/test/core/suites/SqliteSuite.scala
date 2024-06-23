@@ -8,5 +8,5 @@ object SqliteSuite {
 }
 
 class SqliteSuite
-  extends AllTests(config = Map("datasource" -> C.DatasourceType.SQLITE))
+  extends AllIntegrationTests(config = Map("datasource" -> C.DatasourceType.SQLITE))
   with SqliteSuiteSetup

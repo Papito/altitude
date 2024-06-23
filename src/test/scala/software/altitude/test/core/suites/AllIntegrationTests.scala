@@ -6,13 +6,7 @@ import software.altitude.test.core.integration._
 import software.altitude.test.core.unit._
 import software.altitude.test.core.web.IndexControllerTests
 
-abstract class AllTests(val config: Map[String, Any]) extends Suites(
-  // UNIT
-  new ModelTests,
-  new FolderModelTests,
-  new SqlQueryTests,
-  new SearchSqlQueryTests,
-
+abstract class AllIntegrationTests(val config: Map[String, Any]) extends Suites (
   // INTEGRATION (services)
   new AssetQueryTests(config),
   new SearchQueryModelTests,

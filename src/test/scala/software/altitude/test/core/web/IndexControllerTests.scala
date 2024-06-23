@@ -5,9 +5,7 @@ import software.altitude.test.core.api.WebTestCore
 
 @DoNotDiscover class IndexControllerTests(val config: Map[String, Any]) extends WebTestCore {
 
-  override def header = null
-
-  test("New installation goes to setup page", Focused) {
+  test("New installation goes to setup page") {
     get("/") {
       altitude.isInitialized should equal(false)
       status should equal(302)

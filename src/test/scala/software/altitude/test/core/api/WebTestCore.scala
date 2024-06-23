@@ -7,6 +7,8 @@ import software.altitude.test.core.integration.IntegrationTestCore
 
 abstract class WebTestCore extends IntegrationTestCore with ScalatraTests with ScalatraFunSuite {
 
+  override def header = null
+
   // mount all controllers, just as we do in ScalatraBootstrap
   AltitudeServletContext.endpoints.foreach { case (servlet, path) =>
     mount(servlet, path)

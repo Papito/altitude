@@ -21,6 +21,9 @@ test-psql:
 test-sqlite:
 	sbt testSqlite
 
+test-unit:
+	sbt testUnit
+
 lint:
 	sbt scalafixAll
 
