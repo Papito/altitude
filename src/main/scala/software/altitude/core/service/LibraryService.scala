@@ -349,9 +349,11 @@ class LibraryService(val app: Altitude) {
 
   def addFolder(name: String, parentId: Option[String] = None)
                : JsObject = {
+    val nameTrimmed = name.trim
+
     txManager.withTransaction[JsObject] {
       val _parentId = if (parentId.isDefined) parentId.get else RequestContext.repository.value.get.rootFolderId
-      val folder = Folder(name = name, parentId = _parentId)
+      val folder = Folder(name = name.trim, parentId = _parentId)
       val addedFolder = app.service.folder.add(folder)
       app.service.fileStore.addFolder(addedFolder)
       addedFolder

@@ -3,27 +3,14 @@ package software.altitude.core.service
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
-import software.altitude.core.Validators.ModelDataValidator
 import software.altitude.core.dao.FolderDao
 import software.altitude.core.models.Folder
 import software.altitude.core.util.Query
 import software.altitude.core.{Const => C, _}
 
-object FolderService {
-  class FolderValidator
-    extends ModelDataValidator(
-      required = Some(List(C.Folder.NAME, C.Folder.PARENT_ID)))
-}
-
 class FolderService(val app: Altitude) extends BaseService[Folder] {
   private final val log = LoggerFactory.getLogger(getClass)
   override protected val dao: FolderDao = app.injector.instance[FolderDao]
-
-  override final val cleaner: Some[Cleaners.Cleaner] = Some(
-    Cleaners.Cleaner(
-      trim = Some(List(C.Folder.NAME, C.Folder.PARENT_ID))))
-
-  override final val validator: Some[FolderService.FolderValidator] = Some(new FolderService.FolderValidator)
 
   /**
    * Add a new folder - THIS SHOULD NOT BE USED DIRECTLY. Use <code>addFolder</code>

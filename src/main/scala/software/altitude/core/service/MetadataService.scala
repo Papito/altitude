@@ -3,7 +3,6 @@ package software.altitude.core.service
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
-import software.altitude.core.Validators.ModelDataValidator
 import software.altitude.core.dao.AssetDao
 import software.altitude.core.dao.MetadataFieldDao
 import software.altitude.core.models._
@@ -14,44 +13,33 @@ import software.altitude.core.{Const => C, _}
 import scala.util.control.Breaks._
 
 object MetadataService {
-  class MetadataFieldValidator
-    extends ModelDataValidator(
-      required = Some(
-        List(C.MetadataField.NAME, C.MetadataField.FIELD_TYPE)))
-
-  final val METADATA_FIELD_VALIDATOR = new MetadataService.MetadataFieldValidator
-
-  final val METADATA_FIELD_CLEANER: Cleaners.Cleaner = Cleaners.Cleaner(
-    trim = Some(List(C.MetadataField.NAME, C.MetadataField.FIELD_TYPE)))
-
-  final val VALID_BOOLEAN_VALUES: Set[String] = Set("0", "1", "true", "false")
+  private final val VALID_BOOLEAN_VALUES: Set[String] = Set("0", "1", "true", "false")
 }
 
-class MetadataService(val app: Altitude) extends ModelValidation {
+
+class MetadataService(val app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
 
   protected val txManager: TransactionManager = app.txManager
-  protected val metadataFieldDao: MetadataFieldDao = app.injector.instance[MetadataFieldDao]
-  protected val assetDao: AssetDao = app.injector.instance[AssetDao]
+  private val metadataFieldDao: MetadataFieldDao = app.injector.instance[MetadataFieldDao]
+  private val assetDao: AssetDao = app.injector.instance[AssetDao]
 
   def addField(metadataField: MetadataField)
               : MetadataField = {
 
     txManager.withTransaction[MetadataField] {
-      val cleaned: MetadataField = cleanAndValidate(
-        metadataField, Some(MetadataService.METADATA_FIELD_CLEANER), Some(MetadataService.METADATA_FIELD_VALIDATOR))
 
       val existing = metadataFieldDao.query(new Query(params = Map(
-        C.MetadataField.NAME_LC -> cleaned.nameLowercase
+        C.MetadataField.NAME_LC -> metadataField.nameLowercase
       )))
 
       if (existing.nonEmpty) {
         val existingField: MetadataField = existing.records.head
-        log.debug(s"Duplicate found for field [${cleaned.name}]")
+        log.debug(s"Duplicate found for field [${metadataField.name}]")
         throw DuplicateException(existingField.id.get)
       }
 
-      metadataFieldDao.add(cleaned)
+      metadataFieldDao.add(metadataField)
     }
   }
 

@@ -16,7 +16,7 @@ import software.altitude.core.{Const => C}
 
 import java.sql.Connection
 
-abstract class BaseService[Model <: BaseModel] extends ModelValidation {
+abstract class BaseService[Model <: BaseModel] {
   protected val app: Altitude
   private final val log = LoggerFactory.getLogger(getClass)
   protected val dao: BaseDao
@@ -41,7 +41,6 @@ abstract class BaseService[Model <: BaseModel] extends ModelValidation {
    */
   def add(objIn: Model, queryForDup: Option[Query] = None)
          : JsObject = {
-    val cleaned = cleanAndValidate(objIn)
 
     val existing = if (queryForDup.isDefined) query(queryForDup.get) else QueryResult.EMPTY
 
@@ -52,7 +51,7 @@ abstract class BaseService[Model <: BaseModel] extends ModelValidation {
     }
 
     txManager.withTransaction[JsObject] {
-      dao.add(cleaned)
+      dao.add(objIn)
     }
   }
 
@@ -72,7 +71,6 @@ abstract class BaseService[Model <: BaseModel] extends ModelValidation {
    */
   def updateById(id: String, data: Model, fields: List[String], queryForDup: Option[Query] = None)
                 : Int = {
-    val cleaned: JsObject = cleanAndValidate(data)
 
     val existing = if (queryForDup.isDefined) query(queryForDup.get) else QueryResult.EMPTY
 
@@ -83,7 +81,7 @@ abstract class BaseService[Model <: BaseModel] extends ModelValidation {
     }
 
     txManager.withTransaction[Int] {
-      dao.updateById(id, cleaned, fields)
+      dao.updateById(id, data, fields)
     }
   }
 

@@ -4,9 +4,10 @@ import org.scalatest.funsuite
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import play.api.libs.json.Json
+import software.altitude.core.ValidationException
 import software.altitude.core.Validators.ApiRequestValidator
+import software.altitude.core.{Const => C}
 import software.altitude.test.core.TestFocus
-import software.altitude.core.{ValidationException, Const => C}
 
 
 class ApiValidatorTests extends funsuite.AnyFunSuite with TestFocus {

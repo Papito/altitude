@@ -247,30 +247,6 @@ import software.altitude.core.models._
         }
   }
 
-  test("Sanitizing field names") {
-    val metadataField = altitude.service.metadata.addField(
-      MetadataField(name = " new field\n ", fieldType = FieldType.NUMBER))
-
-    metadataField.name shouldBe "new field"
-  }
-
-  test("Failing validation cases") {
-    intercept[ValidationException] {
-          altitude.service.metadata.addField(
-            MetadataField(name = "  ", fieldType = FieldType.KEYWORD))
-    }
-
-    intercept[ValidationException] {
-          altitude.service.metadata.addField(
-            MetadataField(name = "\t\n\r   ", fieldType = FieldType.KEYWORD))
-    }
-
-    intercept[ValidationException] {
-          altitude.service.metadata.addField(
-            MetadataField(name = "", fieldType = FieldType.KEYWORD))
-    }
-  }
-
   test("Metadata added initially should be present") {
     val field = altitude.service.metadata.addField(
       MetadataField(
