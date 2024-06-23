@@ -47,8 +47,8 @@ class FolderController extends BaseApiController {
   }
 
   post("/") {
-    val name = (requestJson.get \ C.Api.Folder.NAME).as[String]
-    val parentId = realId((requestJson.get \ C.Api.Folder.PARENT_ID).as[String])
+    val name = (unscrubbedReqJson.get \ C.Api.Folder.NAME).as[String]
+    val parentId = realId((unscrubbedReqJson.get \ C.Api.Folder.PARENT_ID).as[String])
 
     val newFolder: Folder = app.service.library.addFolder(name = name, parentId = Some(parentId))
     log.debug(s"New folder: $newFolder")
@@ -67,8 +67,8 @@ class FolderController extends BaseApiController {
   put("/:id") {
     val id = realId(params.get(C.Api.ID).get)
     log.info(s"Updating folder: $id")
-    val newName = (requestJson.get \ C.Api.Folder.NAME).asOpt[String]
-    val newParentId = (requestJson.get \ C.Api.Folder.PARENT_ID).asOpt[String]
+    val newName = (unscrubbedReqJson.get \ C.Api.Folder.NAME).asOpt[String]
+    val newParentId = (unscrubbedReqJson.get \ C.Api.Folder.PARENT_ID).asOpt[String]
 
     if (newName.isDefined) {
       app.service.library.renameFolder(id, newName.get)

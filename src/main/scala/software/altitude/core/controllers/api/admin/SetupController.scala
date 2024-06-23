@@ -3,7 +3,7 @@ package software.altitude.core.controllers.api.admin
 import org.scalatra.BadRequest
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
-import software.altitude.core.DataScrubber
+import software.altitude.core.{DataScrubber, ValidationException}
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.api.BaseApiController
 
@@ -34,13 +34,23 @@ class SetupController extends BaseApiController  {
 
     log.warn("Initializing up the instance...")
 
-    val email = (requestJson.get \ "adminEmail").as[String]
-
-    if (email.isEmpty) {
-      BadRequest(Json.obj("adminEmail" -> "required"))
+    val json = try {
+      scrubAndValidatedJson(scrubber=dataScrubber, validator=ApiRequestValidator)
+    }
+    catch {
+      case validationEx: ValidationException =>
+        halt(BadRequest(
+          Json.obj(
+            "fieldErrors" -> validationEx.errors))
+        )
     }
 
-    // response.addHeader("HX-Redirect", "/")
+    val repositoryName = (json \ "repositoryName").as[String]
+    val email = (json \ "adminEmail").as[String]
+    val password = (json \ "password").as[String]
+    val password2 = (json \ "password2").as[String]
+
+    response.addHeader("HX-Redirect", "/")
   }
 
 }

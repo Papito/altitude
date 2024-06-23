@@ -31,9 +31,9 @@ class TrashController extends BaseApiController {
       required=List(Folder.ASSET_IDS)
     )
 
-    validator.validate(requestJson.get)
+    validator.validate(unscrubbedReqJson.get)
 
-    val assetIds = (requestJson.get \ Api.Folder.ASSET_IDS).as[Set[String]]
+    val assetIds = (unscrubbedReqJson.get \ Api.Folder.ASSET_IDS).as[Set[String]]
     log.debug(s"Assets to move to trash: $assetIds")
 
     app.service.library.recycleAssets(assetIds)
@@ -59,9 +59,9 @@ class TrashController extends BaseApiController {
       required=List(Trash.ASSET_IDS)
     )
 
-    validator.validate(requestJson.get)
+    validator.validate(unscrubbedReqJson.get)
 
-    val assetIds = (requestJson.get \ Api.Trash.ASSET_IDS).as[Set[String]]
+    val assetIds = (unscrubbedReqJson.get \ Api.Trash.ASSET_IDS).as[Set[String]]
     log.debug(s"Recycled assets to move: $assetIds")
 
     app.service.library.moveAssetsToFolder(assetIds, folderId)
@@ -85,9 +85,9 @@ class TrashController extends BaseApiController {
       required=List(Api.Trash.ASSET_IDS)
     )
 
-    validator.validate(requestJson.get)
+    validator.validate(unscrubbedReqJson.get)
 
-    val assetIds = (requestJson.get \ Api.Trash.ASSET_IDS).as[Set[String]]
+    val assetIds = (unscrubbedReqJson.get \ Api.Trash.ASSET_IDS).as[Set[String]]
     log.debug(s"Recycled assets to restore: $assetIds")
 
     app.service.library.restoreRecycledAssets(assetIds)

@@ -99,4 +99,20 @@ import software.altitude.test.core.TestFocus
     validationException.errors(C.Api.Folder.NAME) should be(C.Msg.Err.REQUIRED)
 
   }
+
+  test("Test empty strings fail the required check") {
+    val validator: ApiRequestValidator = ApiRequestValidator(
+      required=List(C.Api.Folder.NAME)
+    )
+
+    val jsonIn = Json.obj(
+      C.Api.Folder.NAME -> ""
+    )
+
+    val validationException = intercept[ValidationException] {
+      validator.validate(jsonIn)
+    }
+
+    validationException.errors.size should be(validator.required.size)
+  }
 }

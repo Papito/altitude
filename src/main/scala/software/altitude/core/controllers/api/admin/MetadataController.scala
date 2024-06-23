@@ -10,8 +10,8 @@ class MetadataController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
   post("/") {
-    val name = (requestJson.get \ C.Api.Metadata.Field.NAME).as[String]
-    val fieldType = (requestJson.get \ C.Api.Metadata.Field.TYPE).as[String]
+    val name = (unscrubbedReqJson.get \ C.Api.Metadata.Field.NAME).as[String]
+    val fieldType = (unscrubbedReqJson.get \ C.Api.Metadata.Field.TYPE).as[String]
     log.info(s"Adding metadata field [$name] of type [$fieldType]")
 
     val newField = MetadataField(name = name, fieldType = FieldType.withName(fieldType.toUpperCase))

@@ -19,7 +19,7 @@ object Validators {
       val ex: ValidationException = ValidationException()
 
       required.foreach { field =>
-        if (!json.keys.contains(field)) {
+        if (!json.keys.contains(field) || json(field).as[String].isEmpty) {
           ex.errors += (field -> C.Msg.Err.REQUIRED)
         }
       }

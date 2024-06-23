@@ -232,7 +232,7 @@ object Const {
     }
 
     object Err {
-      val REQUIRED = "This field is equired"
+      val REQUIRED = "This field is required"
       val CANNOT_BE_EMPTY = "Cannot be empty"
       val VALUE_TOO_LONG = "Value is longer than %s characters"
       val VALIDATION_ERROR = "Validation error"

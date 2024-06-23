@@ -19,7 +19,7 @@ class BaseApiController extends BaseController {
 
   val OK: ActionResult = Ok("{}")
 
-  def requestJson: Option[JsObject] = Some(
+  def unscrubbedReqJson: Option[JsObject] = Some(
     if (request.body.isEmpty) Json.obj() else Json.parse(request.body).as[JsObject]
   )
 
@@ -48,10 +48,10 @@ class BaseApiController extends BaseController {
     }
   }
 
-  def scrubAndValidatedJson(dataScrubber: Option[DataScrubber] = None,
-                            apiRequestValidator: Option[ApiRequestValidator] = None): JsObject = {
-    val scrubbedJson = if (dataScrubber.isDefined) dataScrubber.get.scrub(requestJson.get) else requestJson.get
-    if (apiRequestValidator.isDefined) apiRequestValidator.get.validate(scrubbedJson)
+  def scrubAndValidatedJson(scrubber: DataScrubber = DataScrubber(),
+                            validator: ApiRequestValidator): JsObject = {
+    val scrubbedJson = scrubber.scrub(unscrubbedReqJson.get)
+    validator.validate(scrubbedJson)
     scrubbedJson
   }
 

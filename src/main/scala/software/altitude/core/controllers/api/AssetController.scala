@@ -46,7 +46,7 @@ class AssetController extends BaseApiController {
   post(s"/:${C.Api.ID}/metadata/:${C.Api.Asset.METADATA_FIELD_ID}") {
     val assetId = params.get(C.Api.ID).get
     val fieldId = params.get(C.Api.Asset.METADATA_FIELD_ID).get
-    val newValue = (requestJson.get \ C.Api.Metadata.VALUE).as[String]
+    val newValue = (unscrubbedReqJson.get \ C.Api.Metadata.VALUE).as[String]
 
     log.info(s"Adding metadata value [$newValue] for field [$fieldId] on asset [$assetId]")
 
@@ -62,7 +62,7 @@ class AssetController extends BaseApiController {
   put(s"/:${C.Api.ID}/metadata/value/:${C.Api.Asset.METADATA_VALUE_ID}") {
     val assetId = params.get(C.Api.ID).get
     val valueId = params.get(C.Api.Asset.METADATA_VALUE_ID).get
-    val newValue = (requestJson.get \ C.Api.Metadata.VALUE).as[String]
+    val newValue = (unscrubbedReqJson.get \ C.Api.Metadata.VALUE).as[String]
 
     log.info(s"Updating metadata value [$newValue] for value ID [$valueId] on asset [$assetId]")
 
@@ -107,9 +107,9 @@ class AssetController extends BaseApiController {
 
     log.info(s"Moving assets to $folderId")
 
-    assetIdValidator.validate(requestJson.get)
+    assetIdValidator.validate(unscrubbedReqJson.get)
 
-    val assetIds = (requestJson.get \ C.Api.Folder.ASSET_IDS).as[Set[String]]
+    val assetIds = (unscrubbedReqJson.get \ C.Api.Folder.ASSET_IDS).as[Set[String]]
 
     log.debug(s"Assets to move: $assetIds")
 
@@ -131,9 +131,9 @@ class AssetController extends BaseApiController {
   post("/move/to/triage") {
     log.info("Clearing category")
 
-    assetIdValidator.validate(requestJson.get)
+    assetIdValidator.validate(unscrubbedReqJson.get)
 
-    val assetIds = (requestJson.get \ C.Api.Folder.ASSET_IDS).as[Set[String]]
+    val assetIds = (unscrubbedReqJson.get \ C.Api.Folder.ASSET_IDS).as[Set[String]]
 
     log.debug(s"Assets to move to traige: $assetIds")
 
