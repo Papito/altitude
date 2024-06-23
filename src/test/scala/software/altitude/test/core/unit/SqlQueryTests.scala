@@ -3,8 +3,7 @@ package software.altitude.test.core.unit
 import org.scalatest.DoNotDiscover
 import org.scalatest.funsuite
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import software.altitude.core.Const
-import software.altitude.core.RequestContext
+import software.altitude.core.{Const, RequestContext, Util}
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models.Repository
 import software.altitude.core.util.Query
@@ -16,6 +15,7 @@ import software.altitude.test.core.TestFocus
   private val repo = new Repository(
     id = Some("1"),
     name = "repo name",
+    ownerAccountId = Util.randomStr(),
     rootFolderId = "1",
     triageFolderId = "2",
     fileStoreConfig = Map(),

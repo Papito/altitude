@@ -49,7 +49,7 @@ abstract class BaseController extends AltitudeStack with AltitudeServletContext 
   private def isAssetRequest =  request.pathInfo.startsWith("/css") ||
     request.pathInfo.startsWith("/js") ||
     request.pathInfo.startsWith("/images")
-4
+
   protected def setUser(): Unit = {
 /*    val userId =
       Option(request.getAttribute("user_id").asInstanceOf[String]) orElse params.get("user_id")

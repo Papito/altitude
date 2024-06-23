@@ -52,7 +52,7 @@ class TestContext(val altitude: Altitude) {
     val persistedRepo: Repository = altitude.service.repository.addRepository(
       name = "Test Repository 1",
       fileStoreType = C.FileStoreType.FS,
-      user = persistedUser)
+      owner = persistedUser)
     repositories = repositories ::: persistedRepo :: Nil
 
     // if this is the only (or the first repo), set current request context

@@ -10,11 +10,11 @@ import software.altitude.core.{Const => C}
 
 @DoNotDiscover class RepositoryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
-  test("create repository") {
+  test("create repository", Focused) {
     val repo: Repository = altitude.service.repository.addRepository(
       name = Util.randomStr(),
       fileStoreType = C.FileStoreType.FS,
-      user = testContext.user)
+      owner = testContext.user)
 
     repo.fileStoreConfig.keys should contain(C.Repository.Config.PATH)
 

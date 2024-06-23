@@ -26,6 +26,7 @@ CREATE TABLE repository(
   id CHAR(36) PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   description TEXT,
+  owner_account_id CHAR(36) REFERENCES account(id) NOT NULL,
   root_folder_id CHAR(36) NOT NULL,
   triage_folder_id CHAR(36) NOT NULL,
   file_store_type VARCHAR NOT NULL,

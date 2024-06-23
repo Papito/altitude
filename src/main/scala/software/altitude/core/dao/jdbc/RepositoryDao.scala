@@ -25,6 +25,7 @@ abstract class RepositoryDao(val appContext: AltitudeAppContext)
     val model = Repository(
       id = Some(rec(C.Base.ID).asInstanceOf[String]),
       name = rec(C.Repository.NAME).asInstanceOf[String],
+      ownerAccountId = rec(C.Repository.OWNER_ACCOUNT_ID).asInstanceOf[String],
       rootFolderId = rec(C.Repository.ROOT_FOLDER_ID).asInstanceOf[String],
       triageFolderId = rec(C.Repository.TRIAGE_FOLDER_ID).asInstanceOf[String],
       fileStoreType = C.FileStoreType.withName(rec(C.Repository.FILE_STORE_TYPE).asInstanceOf[String]),
@@ -51,10 +52,10 @@ abstract class RepositoryDao(val appContext: AltitudeAppContext)
 
     val sql = s"""
         INSERT INTO $tableName (
-             ${C.Repository.ID}, ${C.Repository.NAME}, ${C.Repository.FILE_STORE_TYPE},
+             ${C.Repository.ID}, ${C.Repository.NAME}, ${C.Repository.OWNER_ACCOUNT_ID}, ${C.Repository.FILE_STORE_TYPE},
              ${C.Repository.ROOT_FOLDER_ID}, ${C.Repository.TRIAGE_FOLDER_ID},
              ${C.Repository.FILES_STORE_CONFIG})
-            VALUES (?, ?, ?, ?, ?, $jsonFunc)
+            VALUES (?, ?, ?, ?, ?, ?,$jsonFunc)
     """
 
     val id = BaseDao.genId
@@ -62,6 +63,7 @@ abstract class RepositoryDao(val appContext: AltitudeAppContext)
     val sqlVals: List[Any] = List(
       id,
       repo.name,
+      repo.ownerAccountId,
       repo.fileStoreType.toString,
       repo.rootFolderId,
       repo.triageFolderId,

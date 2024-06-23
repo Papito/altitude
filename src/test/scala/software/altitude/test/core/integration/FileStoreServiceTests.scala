@@ -251,7 +251,7 @@ import java.io.File
     altitude.service.repository.addRepository(
       name = Util.randomStr(),
       fileStoreType = C.FileStoreType.FS,
-      user = testContext.user)
+      owner = testContext.user)
 
     checkRepositoryDirPath(C.Path.ROOT)
     checkRepositoryDirPath(C.Path.TRIAGE)

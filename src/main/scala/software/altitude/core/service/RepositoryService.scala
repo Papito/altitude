@@ -34,7 +34,7 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
     }
   }
 
-  def addRepository(name: String, fileStoreType: C.FileStoreType.Value, user: User, id: Option[String] = None): JsObject = {
+  def addRepository(name: String, fileStoreType: C.FileStoreType.Value, owner: User, id: Option[String] = None): JsObject = {
     log.info(s"Creating repository [$name]")
 
     val workPath = System.getProperty("user.dir")
@@ -48,6 +48,7 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
     val repoToSave = Repository(
       id = id,
       name = name,
+      ownerAccountId = owner.id.get,
       rootFolderId = BaseDao.genId,
       triageFolderId = BaseDao.genId,
       fileStoreType = fileStoreType,
