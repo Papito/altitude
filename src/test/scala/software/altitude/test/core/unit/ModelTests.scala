@@ -1,6 +1,5 @@
 package software.altitude.test.core.unit
 
-import org.scalatest.DoNotDiscover
 import org.scalatest.funsuite
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import play.api.libs.json._
@@ -10,7 +9,7 @@ import software.altitude.test.core.TestFocus
 import scala.language.implicitConversions
 
 
-@DoNotDiscover class ModelTests extends funsuite.AnyFunSuite with TestFocus {
+class ModelTests extends funsuite.AnyFunSuite with TestFocus {
 
   /**
     * Start test model definition

@@ -1,13 +1,12 @@
 package software.altitude.test.core.unit
 
-import org.scalatest.DoNotDiscover
 import org.scalatest.funsuite
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Util
 import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.Folder
 
-@DoNotDiscover class FolderModelTests extends funsuite.AnyFunSuite {
+class FolderModelTests extends funsuite.AnyFunSuite {
 
   test("uniqueness") {
     val folder1 = new Folder(

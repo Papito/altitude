@@ -1,6 +1,5 @@
 package software.altitude.test.core.unit
 
-import org.scalatest.DoNotDiscover
 import org.scalatest.funsuite
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Const
@@ -12,7 +11,7 @@ import software.altitude.core.util.Sort
 import software.altitude.core.util.SortDirection
 import software.altitude.test.core.TestFocus
 
-@DoNotDiscover class SqlQueryTests extends funsuite.AnyFunSuite with TestFocus {
+class SqlQueryTests extends funsuite.AnyFunSuite with TestFocus {
   private val repo = new Repository(
     id = Some("1"),
     name = "repo name",
