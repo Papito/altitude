@@ -63,6 +63,15 @@ class SetupController extends BaseApiController  {
     val password = (json \ C.Api.Fields.PASSWORD).as[String]
     val password2 = (json \ C.Api.Fields.PASSWORD2).as[String]
 
+    if (!email.contains("@")) {
+      halt(BadRequest(
+        Json.obj(
+          C.Api.Fields.FIELD_ERRORS -> Json.obj(
+            C.Api.Fields.ADMIN_EMAIL -> C.Msg.Err.NOT_A_VALID_EMAIL
+          )))
+      )
+    }
+
     if (password != password2) {
       halt(BadRequest(
         Json.obj(

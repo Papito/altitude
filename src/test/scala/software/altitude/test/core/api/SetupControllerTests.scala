@@ -20,7 +20,7 @@ import software.altitude.core.{Const => C}
     val payload = Json.obj(
       C.Api.Fields.ADMIN_EMAIL -> "me@me.com",
       C.Api.Fields.REPOSITORY_NAME -> "My Repository",
-      C.Api.Fields.PASSWORD -> C.Api.Fields.PASSWORD,
+      C.Api.Fields.PASSWORD -> "password",
       C.Api.Fields.PASSWORD2 -> "oops"
     )
     post("/api/v1/admin/setup", body = payload.toString(), headers = getHeaders) {
@@ -29,6 +29,19 @@ import software.altitude.core.{Const => C}
       (jsonResponse.get \ C.Api.Fields.FIELD_ERRORS \ C.Api.Fields.PASSWORD2).asOpt[String] should be(None)
       // only the primary password field should have an error
       (jsonResponse.get \ C.Api.Fields.FIELD_ERRORS \ C.Api.Fields.PASSWORD).as[String] should be(C.Msg.Err.PASSWORDS_DO_NOT_MATCH)
+    }
+  }
+
+  test("Should not allow an email that does not look like an email") {
+    val payload = Json.obj(
+      C.Api.Fields.ADMIN_EMAIL -> "mee.com",
+      C.Api.Fields.REPOSITORY_NAME -> "My Repository",
+      C.Api.Fields.PASSWORD -> "password",
+      C.Api.Fields.PASSWORD2 -> "password"
+    )
+
+    post("/api/v1/admin/setup", body = payload.toString(), headers = getHeaders) {
+      (jsonResponse.get \ C.Api.Fields.FIELD_ERRORS \ C.Api.Fields.ADMIN_EMAIL).as[String] should be(C.Msg.Err.NOT_A_VALID_EMAIL)
     }
   }
 }

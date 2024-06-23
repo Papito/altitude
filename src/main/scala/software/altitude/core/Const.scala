@@ -242,6 +242,7 @@ object Const {
       val REQUIRED = "This field is required"
       val CANNOT_BE_EMPTY = "Cannot be empty"
       val VALUE_TOO_LONG = "Value is longer than %s characters"
+      val NOT_A_VALID_EMAIL = "Not a valid email address"
       val VALUE_TOO_SHORT = "Value should be at least %s characters long"
       val VALIDATION_ERROR = "Validation error"
       val VALIDATION_ERRORS = "There are validation errors in: %s"
