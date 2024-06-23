@@ -3,10 +3,27 @@ package software.altitude.core.controllers.api.admin
 import org.scalatra.BadRequest
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
+import software.altitude.core.DataScrubber
+import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.api.BaseApiController
 
 class SetupController extends BaseApiController  {
   private final val log = LoggerFactory.getLogger(getClass)
+
+  private val dataScrubber = DataScrubber(
+    trim = Some(List("repositoryName", "adminEmail", "password", "password2")),
+    lower = Some(List("adminEmail"))
+  )
+
+  private val ApiRequestValidator = new ApiRequestValidator(
+    required = Some(List("repositoryName", "adminEmail", "password", "password2")),
+    maxLengths = Some(Map(
+      "repositoryName" -> 80,
+      "adminEmail" -> 80,
+      "password" -> 50,
+      "password2" -> 50
+    )),
+  )
 
   post("/") {
     if (app.isInitialized) {

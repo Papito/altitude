@@ -5,10 +5,9 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsNull
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import software.altitude.core.NotFoundException
-import software.altitude.core.ValidationException
+import software.altitude.core.Validators.ApiRequestValidator
+import software.altitude.core.{DataScrubber, NotFoundException, ValidationException, Const => C}
 import software.altitude.core.controllers.BaseController
-import software.altitude.core.{Const => C}
 
 import java.lang.System.currentTimeMillis
 
@@ -46,10 +45,17 @@ class BaseApiController extends BaseController {
     }
   }
 
+  def scrubAndValidatedJson(dataScrubber: Option[DataScrubber] = None,
+                            apiRequestValidator: Option[ApiRequestValidator] = None): JsObject = {
+    val scrubbedJson = if (dataScrubber.isDefined) dataScrubber.get.scrub(requestJson.get) else requestJson.get
+    if (apiRequestValidator.isDefined) apiRequestValidator.get.validate(scrubbedJson)
+    scrubbedJson
+  }
+
   error {
     case ex: ValidationException =>
       val jsonErrors = ex.errors.keys.foldLeft(Json.obj()) {(res, field) => {
-        val key = field.toString
+        val key = field
         res ++ Json.obj(key -> ex.errors(key))}
       }
 
