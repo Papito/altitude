@@ -297,9 +297,7 @@ class MetadataService(val app: Altitude) {
       if (trimmed.nonEmpty) res + (fieldId -> trimmed) else res
     }
 
-    val cleanMetadata = Metadata(data = cleanData)
-    cleanMetadata.isClean = true
-    cleanMetadata
+    Metadata(data = cleanData)
   }
 
   def validate(metadata: Metadata): Unit = {

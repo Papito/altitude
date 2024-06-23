@@ -43,32 +43,6 @@ abstract class BaseModel {
     _updatedAt = Some(arg)
   }
 
-  // is clean (for validation) - mutable, but can only be set once
-  private var _isClean = false
-
-  def isClean: Boolean = _isClean
-
-  def isClean_= (arg: Boolean): Boolean = {
-    if (!_isClean && arg) {
-      _isClean = true
-    }
-
-    isClean
-  }
-
-  // is validated - mutable, but can only be set once
-  private var _isValidated = false
-
-  def isValidated: Boolean = _isValidated
-
-  def isValidated_= (arg: Boolean): Boolean = {
-    if (!_isValidated && arg) {
-      _isValidated = true
-    }
-
-    isClean
-  }
-
   def modify(fields: (String, JsValueWrapper)*): JsObject = {
     // get a set of property names that we are updating
     val updatedPropNames: Set[String] = fields.map(pair => pair._1).toSet
