@@ -1,4 +1,4 @@
-package software.altitude.test.core.api
+package software.altitude.test.core.web
 
 import org.scalatra.test.ScalatraTests
 import org.scalatra.test.scalatest.ScalatraFunSuite

@@ -1,6 +1,7 @@
 package software.altitude.test.core.suites
 
 import org.scalatest.Suites
+import software.altitude.test.core.api.SetupControllerTests
 import software.altitude.test.core.integration._
 import software.altitude.test.core.unit._
 import software.altitude.test.core.web.IndexControllerTests
@@ -22,6 +23,7 @@ abstract class AllIntegrationTests(val config: Map[String, Any]) extends Suites 
   new MetadataServiceTests(config),
 
   // HTTP:API
+  new SetupControllerTests(config),
 
   // HTTP:WEB
   new IndexControllerTests(config)

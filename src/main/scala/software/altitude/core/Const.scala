@@ -1,6 +1,5 @@
 package software.altitude.core
 
-
 object Const {
 
   /**
@@ -133,8 +132,6 @@ object Const {
     val USER_ID = "user_id"
     val ERROR = "error"
     val STACKTRACE = "stacktrace"
-    val WARNING = "warning"
-    val CRITICAL = "critical"
     val VALIDATION_ERROR = "validation_error"
     val VALIDATION_ERRORS = "validation_errors"
     val MULTI_VALUE_DELIM = "+"
@@ -150,21 +147,11 @@ object Const {
     val DATA = "data"
     val PATH = "path"
     val DIRECTORIES = "directories"
-    val DIRECTORY_NAMES = "directory_names"
-    val OS_DIR_SEPARATOR = "os_dir_separator"
     val FILES = "files"
     val CURRENT_PATH = "current_path"
     val CURRENT_PATH_BREADCRUMBS = "path_breadcrumbs"
     val PATH_POS = "pos"
     val CHILD_DIR = "dir"
-
-    object Import {
-      val IMPORTED = "imported"
-    }
-
-    object ImportAsset {
-      val IMPORT_ASSET = "import_asset"
-    }
 
     object Asset {
       val ASSET = "asset"
@@ -224,6 +211,15 @@ object Const {
         val TYPE = "type"
       }
     }
+
+    object Fields {
+      val ADMIN_EMAIL = "adminEmail"
+      val REPOSITORY_NAME = "repositoryName"
+      val PASSWORD = "password"
+      val PASSWORD2 = "password2"
+      val FIELD_ERRORS = "fieldErrors"
+
+    }
   }
 
   object Msg {
@@ -237,18 +233,10 @@ object Const {
       val VALUE_TOO_LONG = "Value is longer than %s characters"
       val VALIDATION_ERROR = "Validation error"
       val VALIDATION_ERRORS = "There are validation errors in: %s"
-      val WRONG_TYPE = "Does not match required type (%s)"
-      val WRONG_VALUE = "Not an allowed value. Allowed values are: %s"
       val EMPTY_REQUEST_BODY = "Empty request body"
       val DUPLICATE = "Duplicate"
-      val NOT_SUPPORTED = "Not supported"
-      val DUPLICATE_FIELD_VALUE = "Duplicate values in [%s]"
       val INCORRECT_VALUE_TYPE = "Incorrect value type"
-      val VALUES_TOO_LONG = "Values are too long: [%s]"
-      val NOT_IN_CONSTRAINT_LIST = "Some values are not in the field constraint list: [%s]"
-      val META_FIELD_DOES_NOT_SUPPORT_MULTIVALUE = "The field [%s] does not accept multiple values"
-      val DOES_NOT_SUPPORT_MULTIVALUE = "Cannot add multiple values"
-      val META_FIELD_DOES_NOT_SUPPORT_CONSTRAINTS = "The field does not support constraints"
+      val PASSWORDS_DO_NOT_MATCH = "Passwords do not match"
     }
   }
 
@@ -264,14 +252,4 @@ object Const {
 
   // default results per page
   final val DEFAULT_RPP = "20"
-
-  object LogTag {
-    val APP = "APP"
-    val API = "API"
-    val DAO = "DAO"
-    val WEB = "WEB"
-    val SERVICE = "SERVICE"
-    val DB = "DB"
-  }
-
 }
