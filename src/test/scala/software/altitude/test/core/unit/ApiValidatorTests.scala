@@ -29,7 +29,7 @@ import software.altitude.test.core.TestFocus
     validationException.errors.size should be(validator.required.size)
   }
 
-  test("Test failed length") {
+  test("Test failed max length") {
     val maxFieldLength = 5
     val validator: ApiRequestValidator = ApiRequestValidator(
       maxLengths=Map(C.Api.Folder.NAME -> maxFieldLength)
@@ -45,6 +45,41 @@ import software.altitude.test.core.TestFocus
 
     validationException.errors.size should be(1)
     validationException.errors.head._2 should be(C.Msg.Err.VALUE_TOO_LONG.format(maxFieldLength))
+  }
+
+  test("Test failed min length") {
+    val minPasswordLength = 6
+    val validator: ApiRequestValidator = ApiRequestValidator(
+      minLengths=Map(C.Api.Fields.PASSWORD -> minPasswordLength)
+    )
+
+    val jsonIn = Json.obj(
+      C.Api.Fields.PASSWORD -> "lol/$",
+    )
+
+    val validationException = intercept[ValidationException] {
+      validator.validate(jsonIn)
+    }
+
+    validationException.errors.size should be(1)
+    validationException.errors.head._2 should be(C.Msg.Err.VALUE_TOO_SHORT.format(minPasswordLength))
+  }
+
+  test("Test min length error should not override the REQUIRED error") {
+    val minPasswordLength = 6
+    val validator: ApiRequestValidator = ApiRequestValidator(
+      required=List(C.Api.Fields.PASSWORD),
+      minLengths=Map(C.Api.Fields.PASSWORD -> minPasswordLength)
+    )
+
+    val jsonIn = Json.obj()
+
+    val validationException = intercept[ValidationException] {
+      validator.validate(jsonIn)
+    }
+
+    validationException.errors.size should be(1)
+    validationException.errors.head._2 should be(C.Msg.Err.REQUIRED)
   }
 
   test("Test multiple failed length checks") {

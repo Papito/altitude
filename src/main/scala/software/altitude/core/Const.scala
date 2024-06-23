@@ -220,6 +220,17 @@ object Const {
       val FIELD_ERRORS = "fieldErrors"
 
     }
+
+    object Constraints {
+      val MAX_EMAIL_LENGTH = 80
+      val MIN_EMAIL_LENGTH = 3
+
+      val MAX_PASSWORD_LENGTH = 50
+      val MIN_PASSWORD_LENGTH = 8
+
+      val MAX_REPOSITORY_NAME_LENGTH = 80
+      val MIN_REPOSITORY_NAME_LENGTH = 2
+    }
   }
 
   object Msg {
@@ -231,6 +242,7 @@ object Const {
       val REQUIRED = "This field is required"
       val CANNOT_BE_EMPTY = "Cannot be empty"
       val VALUE_TOO_LONG = "Value is longer than %s characters"
+      val VALUE_TOO_SHORT = "Value should be at least %s characters long"
       val VALIDATION_ERROR = "Validation error"
       val VALIDATION_ERRORS = "There are validation errors in: %s"
       val EMPTY_REQUEST_BODY = "Empty request body"

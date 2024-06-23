@@ -2,6 +2,7 @@ package software.altitude.core.controllers.web
 
 import org.slf4j.LoggerFactory
 import software.altitude.core.controllers.BaseWebController
+import software.altitude.core.{Const => C}
 
 class WebIndexController extends BaseWebController {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -27,6 +28,7 @@ class WebIndexController extends BaseWebController {
     if (app.isInitialized) {
       redirect("/")
     } else
-    mustache("/setup")
+    mustache("/setup", "fields" -> C.Api.Fields, "constr" -> C.Api.Constraints)
+
   }
 }

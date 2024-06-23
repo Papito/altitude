@@ -12,17 +12,29 @@ class SetupController extends BaseApiController  {
   private final val log = LoggerFactory.getLogger(getClass)
 
   private val dataScrubber = DataScrubber(
-    trim = List(C.Api.Fields.REPOSITORY_NAME, C.Api.Fields.ADMIN_EMAIL, C.Api.Fields.PASSWORD, C.Api.Fields.PASSWORD2),
+    trim = List(
+      C.Api.Fields.REPOSITORY_NAME,
+      C.Api.Fields.ADMIN_EMAIL,
+      C.Api.Fields.PASSWORD,
+      C.Api.Fields.PASSWORD2),
     lower = List("adminEmail")
   )
 
   private val ApiRequestValidator = new ApiRequestValidator(
-    required = List(C.Api.Fields.REPOSITORY_NAME, C.Api.Fields.ADMIN_EMAIL, C.Api.Fields.PASSWORD, C.Api.Fields.PASSWORD2),
+    required = List(
+      C.Api.Fields.REPOSITORY_NAME,
+      C.Api.Fields.ADMIN_EMAIL,
+      C.Api.Fields.PASSWORD,
+      C.Api.Fields.PASSWORD2),
     maxLengths = Map(
-      C.Api.Fields.REPOSITORY_NAME -> 80,
-      C.Api.Fields.ADMIN_EMAIL -> 80,
-      C.Api.Fields.PASSWORD -> 50,
-      C.Api.Fields.PASSWORD2 -> 50
+      C.Api.Fields.REPOSITORY_NAME -> C.Api.Constraints.MAX_REPOSITORY_NAME_LENGTH,
+      C.Api.Fields.ADMIN_EMAIL -> C.Api.Constraints.MAX_EMAIL_LENGTH,
+      C.Api.Fields.PASSWORD -> C.Api.Constraints.MAX_PASSWORD_LENGTH,
+    ),
+    minLengths = Map(
+      C.Api.Fields.REPOSITORY_NAME -> C.Api.Constraints.MIN_REPOSITORY_NAME_LENGTH,
+      C.Api.Fields.ADMIN_EMAIL -> C.Api.Constraints.MIN_EMAIL_LENGTH,
+      C.Api.Fields.PASSWORD -> C.Api.Constraints.MIN_PASSWORD_LENGTH,
     ),
   )
 
