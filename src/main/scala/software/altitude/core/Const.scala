@@ -233,9 +233,9 @@ object Const {
     }
 
     object Err {
-      val REQUIRED = "Required"
+      val REQUIRED = "This field is equired"
       val CANNOT_BE_EMPTY = "Cannot be empty"
-      val VALUE_TOO_LONG = "Cannot be more than %s characters long"
+      val VALUE_TOO_LONG = "Value is longer than %s characters"
       val VALIDATION_ERROR = "Validation error"
       val VALIDATION_ERRORS = "There are validation errors in: %s"
       val WRONG_TYPE = "Does not match required type (%s)"

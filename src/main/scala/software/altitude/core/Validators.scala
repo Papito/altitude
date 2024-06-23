@@ -24,6 +24,12 @@ object Validators {
         }
       }
 
+      maxLengths.getOrElse(Map()) foreach { case (field, maxLength) =>
+        if (json.keys.contains(field) && json(field).as[String].length > maxLength) {
+          ex.errors += (field -> C.Msg.Err.VALUE_TOO_LONG.format(maxLength))
+        }
+      }
+
       ex.trigger()
     }
   }
