@@ -13,6 +13,10 @@ trait PostgresSuiteSetup extends Suite with BeforeAndAfterAll {
   protected final val log: Logger = LoggerFactory.getLogger(getClass)
 
   override def beforeAll(): Unit = {
+    println("\n@@@@@@@@@@@@@@@@@@@@@@@@@@")
+    println("POSTGRES INTEGRATION TESTS")
+    println("@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
+
     IntegrationTestCore.createTestDir(PostgresSuite.app)
     PostgresSuite.app.service.migrationService.migrate()
 

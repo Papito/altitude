@@ -1,9 +1,10 @@
 package software.altitude.test.core.unit
 
+import org.scalatest.DoNotDiscover
 import org.scalatest.funsuite
 import software.altitude.core.util.SearchQuery
 
-class SearchQueryModelTests extends funsuite.AnyFunSuite {
+@DoNotDiscover class SearchQueryModelTests extends funsuite.AnyFunSuite {
 
   test("Invalid RPP") {
     intercept[IllegalArgumentException] {

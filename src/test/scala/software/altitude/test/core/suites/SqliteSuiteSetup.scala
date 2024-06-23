@@ -13,6 +13,10 @@ trait SqliteSuiteSetup extends Suite with BeforeAndAfterAll {
   protected final val log: Logger = LoggerFactory.getLogger(getClass)
 
   override def beforeAll(): Unit = {
+    println("\n@@@@@@@@@@@@@@@@@@@@@@@@")
+    println("SQLITE INTEGRATION TESTS")
+    println("@@@@@@@@@@@@@@@@@@@@@@@@\n")
+
     IntegrationTestCore.createTestDir(SqliteSuite.app)
 
     log.info("Clearing Sqlite database")

@@ -1,5 +1,6 @@
 package software.altitude.test.core.unit
 
+import org.scalatest.DoNotDiscover
 import org.scalatest.funsuite
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
@@ -10,7 +11,7 @@ import software.altitude.core.{Const => C}
 import software.altitude.test.core.TestFocus
 
 
-class ApiValidatorTests extends funsuite.AnyFunSuite with TestFocus {
+@DoNotDiscover class ApiValidatorTests extends funsuite.AnyFunSuite with TestFocus {
 
   test("Test multiple failed required fields") {
     val validator: ApiRequestValidator = ApiRequestValidator(
