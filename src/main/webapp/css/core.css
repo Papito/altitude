@@ -10,6 +10,10 @@
     --section-vertical-space: 35px;
     /* Standard vertical spacing for individual elements and lists */
     --control-vertical-space: 15px;
+    --success-color: #4dae27;
+    --error-color: #fc1e1e;
+    /* For messages such as form validation and server response status */
+    --message-background-color: #2f2e2e;
     --font: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"
 }
 
@@ -74,7 +78,7 @@ input.readonly {
 /*         */
 
 .action-button {
-    background: #4dae27;
+    background: var(--success-color);
     font-weight: bold;
     color: white;
     border: 0 none;
@@ -88,4 +92,16 @@ input.readonly {
 }
 .action-button:hover, .action-button:focus {
     box-shadow: var(--box-shadow);
+}
+
+/*          */
+/* MESSAGES */
+/*          */
+
+#serverError {
+    color: var(--error-color);
+    background-color: var(--message-background-color);
+    border: 1px solid var(--error-color);
+    padding: 8px;
+    font-size: 1.1em;
 }

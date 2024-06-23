@@ -9,6 +9,7 @@
         body {
             display: grid;
             grid-template-rows: [header]  3em
+                                [messages] min-content
                                 [content] auto
                                 [footer]  2em;
             min-height: 100vh;
@@ -57,9 +58,17 @@
             width: 50%
         }
 
-        .action-button {
+        #setupForm .action-button {
             padding: 10px 36px;
             font-size: 1.3em;
+        }
+
+        #setupForm div.error {
+            padding: 5px;
+            margin-top: 5px;
+            background-color: var(--message-background-color);
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
         }
 
     </style>
@@ -71,9 +80,13 @@
     {{> includes/brand }}
 </div>
 
+<div id="messages">
+    <div id="serverError" hidden></div>
+    <div id="serverWarning" hidden></div>
+</div>
+
 <main>
     <div>
-        <div id="htmx-alert" hidden class="alert alert-warning sticky-top">LOL</div>
         <form action="#" id="setupForm">
             <div>
                 <label for="repositoryName">Library name</label>
@@ -83,6 +96,7 @@
                        placeholder="Library name"
                        value="Personal"
                        maxlength="80"/>
+                <div class="error" hidden></div>
             </div>
             <div>
                 <label for="fileStore">File storage type</label>
@@ -92,6 +106,7 @@
                        class="readonly"
                        readonly
                        value="filesystem"/>
+                <div class="error" hidden></div>
             </div>
             <div>
                 <label for="dataStore">Metadata storage type</label>
@@ -101,6 +116,7 @@
                        class="readonly"
                        readonly
                        value="postgres"/>
+                <div class="error" hidden></div>
             </div>
             <div>
                 <label for="adminEmail">Administrator Email</label>
@@ -108,6 +124,7 @@
                        id="adminEmail"
                        name="adminEmail"
                        maxlength="80"/>
+                <div class="error" hidden></div>
             </div>
             <div>
                 <label for="password">Administrator Password</label>
@@ -115,6 +132,7 @@
                        id="password"
                        name="password"
                        maxlength="50"/>
+                <div class="error" hidden></div>
             </div>
             <div>
                 <label for="password2">Confirm Password</label>
@@ -122,6 +140,7 @@
                        id="password2"
                        name="password2"
                        maxlength="50"/>
+                <div class="error" hidden></div>
             </div>
             <div class="submit">
                 <button hx-trigger="click"
@@ -139,27 +158,50 @@
 </footer>
 
 <script type="module" lang="js">
-    document.body.addEventListener('htmx:afterRequest', function (evt) {
-        const errorTarget = document.getElementById("htmx-alert")
-        if (evt.detail.successful) {
-            // Successful request, clear out alert
-            errorTarget.setAttribute("hidden", "true")
-            errorTarget.innerText = "";
-        } else if (evt.detail.failed && evt.detail.xhr) {
+    const formEl = document.getElementById("setupForm")
+    const errorMsgEl = document.getElementById("serverError")
+
+    document.body.addEventListener('htmx:beforeRequest', function (evt) {
+        const fieldErrorElements = formEl.querySelectorAll("div.error")
+        fieldErrorElements.forEach(errorElement => {
+            errorElement.setAttribute("hidden", "true")
+        })
+
+        errorMsgEl.setAttribute("hidden", "true")
+    });
+
+    formEl.addEventListener('htmx:afterRequest', function (evt) {
+        console.log(evt.detail)
+
+        if (evt.detail.xhr.status === 200){
+            // Success, redirects to landing so nothing to do here
+        } else if (evt.detail["failed"] && evt.detail.xhr) {
+            const xhr = evt.detail.xhr
             // Server error with response contents, equivalent to htmx:responseError
             console.warn("Server error", evt.detail)
 
-            const jsonResponse = JSON.parse(evt.detail.xhr.responseText);
-            console.log(jsonResponse);
+            const jsonResponse = JSON.parse(evt.detail.xhr.responseText)
 
-            const xhr = evt.detail.xhr;
-            errorTarget.innerText = `Unexpected server error: ${xhr.status} - ${xhr.statusText}`;
-            errorTarget.removeAttribute("hidden");
+            // Populate error messages for this form if we get field errors
+            const fieldErrors = jsonResponse["fieldErrors"]
+
+            if (xhr.status === 400 && fieldErrors) {
+                Object.keys(fieldErrors).forEach(field => {
+                    const errorMessages = fieldErrors[field]
+                    const errorTarget = formEl.querySelector(`div > input[name='${field}'] + div.error`)
+                    errorTarget.innerText = errorMessages
+                    errorTarget.removeAttribute("hidden")
+                });
+                return
+            }
+
+            errorMsgEl.innerText = `Unexpected server error: ${xhr.status} - ${xhr.statusText}`
+            errorMsgEl.removeAttribute("hidden")
         } else {
             // Unspecified failure, usually caused by network error
             console.error("Unexpected htmx error", evt.detail)
-            errorTarget.innerText = "Unexpected error, check your connection and try to refresh the page.";
-            errorTarget.removeAttribute("hidden");
+            errorMsgEl.innerText = `Unknown error!`;
+            errorMsgEl.removeAttribute("hidden")
         }
     });
 </script>
