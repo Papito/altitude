@@ -79,7 +79,7 @@ import software.altitude.test.core.TestFocus
     validationException.errors.size should be(1)
   }
 
-  test("Test multiple types of checks failed", Focused) {
+  test("Test multiple types of checks failed") {
     val maxFieldLength = 10
 
     val validator: ApiRequestValidator = ApiRequestValidator(

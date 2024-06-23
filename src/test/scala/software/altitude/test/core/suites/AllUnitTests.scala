@@ -1,11 +1,7 @@
 package software.altitude.test.core.suites
 
 import org.scalatest.Suites
-import software.altitude.test.core.unit.ApiValidatorTests
-import software.altitude.test.core.unit.FolderModelTests
-import software.altitude.test.core.unit.ModelTests
-import software.altitude.test.core.unit.SearchSqlQueryTests
-import software.altitude.test.core.unit.SqlQueryTests
+import software.altitude.test.core.unit.{ApiValidatorTests, DataScrubberTests, FolderModelTests, ModelTests, SearchSqlQueryTests, SqlQueryTests}
 
 abstract class AllUnitTests extends Suites (
   new ModelTests,
@@ -13,4 +9,5 @@ abstract class AllUnitTests extends Suites (
   new SqlQueryTests,
   new SearchSqlQueryTests,
   new ApiValidatorTests,
+  new DataScrubberTests,
 )

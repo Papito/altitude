@@ -4,26 +4,32 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.Json
 
 /**
- * Cleaners are used for data hygiene, before validation.
- */
-/**
- * Base version of the cleaner.
+ * API JSON payload data scrubber.
  *
- * @param trim fields to trim leading and trailing spaces from
- * @param lower fields to lowercase
- * @param defaults fields to set defaults for, if they are not given
+ * @param trim a list of fields to be trimmed
+ * @param lower a list of fields to be converted to lower case
  */
 case class DataScrubber(trim: List[String] = List(),
-                        lower: List[String] = List(),
-                        defaults: Map[String, String] = Map.empty) {
+                        lower: List[String] = List()) {
 
+  /**
+   * Scrubs the given JSON object by trimming and converting to lower case the specified fields.
+   *
+   * @param json the JSON object to be scrubbed
+   * @return a new JSON object with the specified fields trimmed and converted to lower case
+   */
   def scrub(json: JsObject): JsObject = {
     val trimmed = doTrim(json)
-    val wDefaults = doDefaults(trimmed)
-    val lowerCased = doLower(wDefaults)
+    val lowerCased = doLower(trimmed)
     lowerCased
   }
 
+  /**
+   * Trims the specified fields in the given JSON object.
+   *
+   * @param json the JSON object whose fields are to be trimmed
+   * @return a new JSON object with the specified fields trimmed
+   */
   private def doTrim(json: JsObject): JsObject = {
     json ++ trim.foldLeft(Json.obj()) { (res, field) =>
       (json \ field).asOpt[String] match {
@@ -33,20 +39,16 @@ case class DataScrubber(trim: List[String] = List(),
     }
   }
 
+  /**
+   * Converts the specified fields in the given JSON object to lower case.
+   *
+   * @param json the JSON object whose fields are to be converted to lower case
+   * @return a new JSON object with the specified fields converted to lower case
+   */
   private def doLower(json: JsObject): JsObject = {
     json ++ lower.foldLeft(Json.obj()) { (res, field) =>
       (json \ field).asOpt[String] match {
         case v: Some[String] if v.nonEmpty => res ++ Json.obj(field -> v.get.toLowerCase)
-        case _ => res
-      }
-    }
-  }
-
-  private def doDefaults(json: JsObject): JsObject = {
-    json ++ defaults.keys.foldLeft(Json.obj()) { (res, field) =>
-      (json \ field).asOpt[String] match {
-        case v: Some[String] if v.isEmpty => res ++ Json.obj(
-          field -> defaults.get(field) )
         case _ => res
       }
     }
