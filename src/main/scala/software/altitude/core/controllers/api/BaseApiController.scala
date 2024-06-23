@@ -7,7 +7,6 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.Json
 import software.altitude.core.NotFoundException
 import software.altitude.core.ValidationException
-import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.BaseController
 import software.altitude.core.{Const => C}
 
@@ -17,10 +16,6 @@ class BaseApiController extends BaseController {
   private final val log = LoggerFactory.getLogger(getClass)
 
   val OK: ActionResult = Ok("{}")
-
-  protected val HTTP_POST_VALIDATOR: Option[ApiRequestValidator] = None
-  protected val HTTP_DELETE_VALIDATOR: Option[ApiRequestValidator] = None
-  protected val HTTP_UPDATE_VALIDATOR: Option[ApiRequestValidator] = None
 
   def requestJson: Option[JsObject] = Some(
     if (request.body.isEmpty) Json.obj() else Json.parse(request.body).as[JsObject]
@@ -33,35 +28,6 @@ class BaseApiController extends BaseController {
 
     // verify that requests with request body are not empty
      checkPayload()
-
-    /*
-    Process all validators that may be set for this controller/method.
-     */
-/*    HTTP_POST_VALIDATOR match {
-      case Some(ApiRequestValidator(_)) if requestMethod == "post" =>
-        HTTP_POST_VALIDATOR.get.validate(requestJson.get)
-      case _ if requestMethod == "post" =>
-        log.debug(s"No POST validator specified for ${this.getClass.getName}")
-      case _ =>
-    }
-
-    HTTP_DELETE_VALIDATOR match {
-      case Some(ApiRequestValidator(_)) if requestMethod == "delete" =>
-        HTTP_DELETE_VALIDATOR.get.validate(requestJson.get)
-      case _ if requestMethod == "delete" =>
-        log.debug(s"No DELETE validator specified for ${this.getClass.getName}")
-      case _ =>
-    }
-
-    HTTP_UPDATE_VALIDATOR match {
-      case Some(ApiRequestValidator(_)) if requestMethod == "put" =>
-        HTTP_UPDATE_VALIDATOR.get.validate(requestJson.get)
-      case _ if requestMethod == "update" =>
-        log.debug(s"No PUT validator specified for ${this.getClass.getName}")
-      case _ =>
-    }
-*/
-    // all responses are of type:
   }
 
   override def logRequestStart(): Unit = log.info(

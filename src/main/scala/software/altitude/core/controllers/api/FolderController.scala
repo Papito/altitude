@@ -12,11 +12,6 @@ import software.altitude.core.{Const => C}
 class FolderController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  override val HTTP_POST_VALIDATOR: Option[ApiRequestValidator] = Some(
-    ApiRequestValidator(
-      required=Some(List(C.Api.Folder.NAME, C.Api.Folder.PARENT_ID)))
-  )
-
   get() {
     val folders = app.service.folder.hierarchy()
 
