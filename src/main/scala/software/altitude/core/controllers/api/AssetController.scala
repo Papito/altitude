@@ -102,7 +102,10 @@ class AssetController extends BaseApiController {
 
     log.info(s"Moving assets to $folderId")
 
-    val validator = ApiRequestValidator(List(C.Api.Folder.ASSET_IDS))
+    val validator = ApiRequestValidator(
+      required=Some(List(C.Api.Folder.ASSET_IDS))
+    )
+
     validator.validate(requestJson.get)
 
     val assetIds = (requestJson.get \ C.Api.Folder.ASSET_IDS).as[Set[String]]
@@ -127,7 +130,10 @@ class AssetController extends BaseApiController {
   post("/move/to/triage") {
     log.info("Clearing category")
 
-    val validator = ApiRequestValidator(List(C.Api.Folder.ASSET_IDS))
+    val validator = ApiRequestValidator(
+      required=Some(List(C.Api.Folder.ASSET_IDS))
+    )
+
     validator.validate(requestJson.get)
 
     val assetIds = (requestJson.get \ C.Api.Folder.ASSET_IDS).as[Set[String]]

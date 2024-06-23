@@ -27,7 +27,10 @@ class TrashController extends BaseApiController {
   post("/recycle") {
     log.info("Deleting assets")
 
-    val validator = ApiRequestValidator(List(Folder.ASSET_IDS))
+    val validator = ApiRequestValidator(
+      required=Some(List(Folder.ASSET_IDS))
+    )
+
     validator.validate(requestJson.get)
 
     val assetIds = (requestJson.get \ Api.Folder.ASSET_IDS).as[Set[String]]
@@ -52,7 +55,10 @@ class TrashController extends BaseApiController {
     val folderId = params.get(Api.Asset.FOLDER_ID).get
     log.info(s"Moving recycled assets to $folderId")
 
-    val validator = ApiRequestValidator(List(Trash.ASSET_IDS))
+    val validator = ApiRequestValidator(
+      required=Some(List(Trash.ASSET_IDS))
+    )
+
     validator.validate(requestJson.get)
 
     val assetIds = (requestJson.get \ Api.Trash.ASSET_IDS).as[Set[String]]
@@ -75,7 +81,10 @@ class TrashController extends BaseApiController {
   post("/restore") {
     log.info("Restoring multiple assets")
 
-    val validator = ApiRequestValidator(List(Api.Trash.ASSET_IDS))
+    val validator = ApiRequestValidator(
+      required=Some(List(Api.Trash.ASSET_IDS))
+    )
+
     validator.validate(requestJson.get)
 
     val assetIds = (requestJson.get \ Api.Trash.ASSET_IDS).as[Set[String]]
