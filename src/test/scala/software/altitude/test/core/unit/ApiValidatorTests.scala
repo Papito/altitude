@@ -15,7 +15,7 @@ import software.altitude.test.core.TestFocus
 
   test("Test multiple failed required fields") {
     val validator: ApiRequestValidator = ApiRequestValidator(
-      required=Option(List(C.Api.ID, C.Api.Folder.NAME))
+      required=List(C.Api.ID, C.Api.Folder.NAME)
     )
 
     val jsonIn = Json.obj(
@@ -26,13 +26,13 @@ import software.altitude.test.core.TestFocus
       validator.validate(jsonIn)
     }
 
-    validationException.errors.size should be(validator.required.get.size)
+    validationException.errors.size should be(validator.required.size)
   }
 
   test("Test failed length") {
     val maxFieldLength = 5
     val validator: ApiRequestValidator = ApiRequestValidator(
-      maxLengths=Option(Map(C.Api.Folder.NAME -> maxFieldLength))
+      maxLengths=Map(C.Api.Folder.NAME -> maxFieldLength)
     )
 
     val jsonIn = Json.obj(
@@ -49,7 +49,7 @@ import software.altitude.test.core.TestFocus
 
   test("Test multiple failed length checks") {
     val validator: ApiRequestValidator = ApiRequestValidator(
-      maxLengths=Option(Map(C.Api.Folder.NAME -> 5, C.Api.Folder.PATH -> 10))
+      maxLengths=Map(C.Api.Folder.NAME -> 5, C.Api.Folder.PATH -> 10)
     )
 
     val jsonIn = Json.obj(
@@ -61,13 +61,13 @@ import software.altitude.test.core.TestFocus
       validator.validate(jsonIn)
     }
 
-    validationException.errors.size should be(validator.maxLengths.get.size)
+    validationException.errors.size should be(validator.maxLengths.size)
   }
 
   test("Test missing required field should not be checked for length") {
     val validator: ApiRequestValidator = ApiRequestValidator(
-      required=Option(List(C.Api.Folder.NAME)),
-      maxLengths=Option(Map(C.Api.Folder.NAME -> 5))
+      required=List(C.Api.Folder.NAME),
+      maxLengths=Map(C.Api.Folder.NAME -> 5)
     )
 
     val jsonIn = Json.obj()
@@ -83,8 +83,8 @@ import software.altitude.test.core.TestFocus
     val maxFieldLength = 10
 
     val validator: ApiRequestValidator = ApiRequestValidator(
-      required=Option(List(C.Api.Folder.NAME)),
-      maxLengths=Option(Map(C.Api.Folder.NAME -> maxFieldLength, C.Api.Folder.PATH -> maxFieldLength))
+      required=List(C.Api.Folder.NAME),
+      maxLengths=Map(C.Api.Folder.NAME -> maxFieldLength, C.Api.Folder.PATH -> maxFieldLength)
     )
 
     val jsonIn = Json.obj(

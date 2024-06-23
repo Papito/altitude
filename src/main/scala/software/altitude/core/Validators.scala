@@ -13,18 +13,18 @@ object Validators {
    * API layer validation is blissfully unaware of more complex
    * business-level logic.
    */
-  case class ApiRequestValidator(required: Option[List[String]] = None,
-                                 maxLengths: Option[Map[String, Int]] = None) {
+  case class ApiRequestValidator(required: List[String] = List(),
+                                 maxLengths: Map[String, Int] = Map.empty) {
     def validate(json: JsObject): Unit = {
       val ex: ValidationException = ValidationException()
 
-      required.getOrElse(List()) foreach { field =>
+      required.foreach { field =>
         if (!json.keys.contains(field)) {
           ex.errors += (field -> C.Msg.Err.REQUIRED)
         }
       }
 
-      maxLengths.getOrElse(Map()) foreach { case (field, maxLength) =>
+      maxLengths foreach { case (field, maxLength) =>
         if (json.keys.contains(field) && json(field).as[String].length > maxLength) {
           ex.errors += (field -> C.Msg.Err.VALUE_TOO_LONG.format(maxLength))
         }

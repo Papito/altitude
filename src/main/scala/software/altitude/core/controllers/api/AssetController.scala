@@ -15,6 +15,11 @@ import software.altitude.core.{Const => C}
 class AssetController extends BaseApiController {
   private final val log = LoggerFactory.getLogger(getClass)
 
+  private val assetIdValidator = ApiRequestValidator(
+    required=List(C.Api.Folder.ASSET_IDS)
+  )
+
+
   get(s"/:${C.Api.ID}") {
     val id = params.get(C.Api.ID).get
 
@@ -102,11 +107,7 @@ class AssetController extends BaseApiController {
 
     log.info(s"Moving assets to $folderId")
 
-    val validator = ApiRequestValidator(
-      required=Some(List(C.Api.Folder.ASSET_IDS))
-    )
-
-    validator.validate(requestJson.get)
+    assetIdValidator.validate(requestJson.get)
 
     val assetIds = (requestJson.get \ C.Api.Folder.ASSET_IDS).as[Set[String]]
 
@@ -130,11 +131,7 @@ class AssetController extends BaseApiController {
   post("/move/to/triage") {
     log.info("Clearing category")
 
-    val validator = ApiRequestValidator(
-      required=Some(List(C.Api.Folder.ASSET_IDS))
-    )
-
-    validator.validate(requestJson.get)
+    assetIdValidator.validate(requestJson.get)
 
     val assetIds = (requestJson.get \ C.Api.Folder.ASSET_IDS).as[Set[String]]
 
@@ -154,7 +151,7 @@ class AssetController extends BaseApiController {
       preview.data
     }
     catch {
-      case ex: NotFoundException => redirect("/i/1x1.png")
+      case _: NotFoundException => redirect("/i/1x1.png")
     }
   }
 

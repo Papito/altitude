@@ -11,18 +11,18 @@ class SetupController extends BaseApiController  {
   private final val log = LoggerFactory.getLogger(getClass)
 
   private val dataScrubber = DataScrubber(
-    trim = Some(List("repositoryName", "adminEmail", "password", "password2")),
-    lower = Some(List("adminEmail"))
+    trim = List("repositoryName", "adminEmail", "password", "password2"),
+    lower = List("adminEmail")
   )
 
   private val ApiRequestValidator = new ApiRequestValidator(
-    required = Some(List("repositoryName", "adminEmail", "password", "password2")),
-    maxLengths = Some(Map(
+    required = List("repositoryName", "adminEmail", "password", "password2"),
+    maxLengths = Map(
       "repositoryName" -> 80,
       "adminEmail" -> 80,
       "password" -> 50,
       "password2" -> 50
-    )),
+    ),
   )
 
   post("/") {
