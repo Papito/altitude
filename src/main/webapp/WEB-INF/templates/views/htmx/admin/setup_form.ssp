@@ -46,8 +46,11 @@
 </style>
 
 #import(software.altitude.core.Const)
+#import(play.api.libs.json.Json)
+#import(play.api.libs.json.JsObject)
 
 <%@ val fieldErrors: Map[String, String] = Map.empty %>
+<%@ val formJson: JsObject = Json.obj() %>
 
 <form action="#" id="setupForm"
       hx-swap="outerHTML"
@@ -60,7 +63,8 @@
                id="<%= Const.Api.Fields.REPOSITORY_NAME %>"
                name="<%= Const.Api.Fields.REPOSITORY_NAME %>"
                placeholder="Library name"
-               value="Personal"
+               value='<%= (formJson \ Const.Api.Fields.REPOSITORY_NAME).asOpt[String].getOrElse("Personal") %>'
+               autocomplete="off"
                minlength="<%= Const.Api.Constraints.MIN_REPOSITORY_NAME_LENGTH %>"
                maxlength="<%= Const.Api.Constraints.MAX_REPOSITORY_NAME_LENGTH %>"/>
         <% if (fieldErrors.contains(Const.Api.Fields.REPOSITORY_NAME)) { %>
@@ -88,8 +92,10 @@
     <div>
         <label for="<%= Const.Api.Fields.ADMIN_EMAIL %>">Administrator Email</label>
         <input type="email"
+               autocomplete="off"
                id="<%= Const.Api.Fields.ADMIN_EMAIL %>"
                name="<%= Const.Api.Fields.ADMIN_EMAIL %>"
+               value='<%= (formJson \ Const.Api.Fields.ADMIN_EMAIL).asOpt[String].getOrElse("") %>'
                minlength="<%= Const.Api.Constraints.MIN_EMAIL_LENGTH %>"
                maxlength="<%= Const.Api.Constraints.MAX_EMAIL_LENGTH %>"/>
         <% if (fieldErrors.contains(Const.Api.Fields.ADMIN_EMAIL)) { %>
@@ -101,6 +107,7 @@
         <input type="password"
                id="<%= Const.Api.Fields.PASSWORD %>"
                name="<%= Const.Api.Fields.PASSWORD  %>"
+               value='<%= (formJson \ Const.Api.Fields.PASSWORD).asOpt[String].getOrElse("") %>'
                minlength="<%= Const.Api.Constraints.MIN_PASSWORD_LENGTH %>"
                maxlength="<%= Const.Api.Constraints.MAX_PASSWORD_LENGTH %>"/>
         <% if (fieldErrors.contains(Const.Api.Fields.PASSWORD)) { %>
@@ -112,6 +119,7 @@
         <input type="password"
                id="<%= Const.Api.Fields.PASSWORD2 %>"
                name="<%= Const.Api.Fields.PASSWORD2 %>"
+               value='<%= (formJson \ Const.Api.Fields.PASSWORD2).asOpt[String].getOrElse("") %>'
                minlength="<%= Const.Api.Constraints.MIN_PASSWORD_LENGTH %>"
                maxlength="<%= Const.Api.Constraints.MAX_PASSWORD_LENGTH %>"/>
         <% if (fieldErrors.contains(Const.Api.Fields.PASSWORD2)) { %>
