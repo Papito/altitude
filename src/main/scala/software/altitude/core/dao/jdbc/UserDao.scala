@@ -41,15 +41,4 @@ abstract class UserDao(val appContext: AltitudeAppContext) extends BaseDao with 
     addRecord(jsonIn, sql, sqlVals)
     jsonIn ++ Json.obj(C.Base.ID -> id)
   }
-
-  // overriding the base method since there is no repository relation in this model
-  override def getById(id: String): Option[JsObject] = {
-    val sql: String = s"""
-      SELECT ${columnsForSelect.mkString(", ")}
-        FROM $tableName
-       WHERE ${C.Base.ID} = ?"""
-
-    val rec = oneBySqlQuery(sql, List(id))
-    if (rec.isDefined) Some(makeModel(rec.get)) else None
-  }
 }

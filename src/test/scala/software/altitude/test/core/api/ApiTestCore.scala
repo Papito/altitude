@@ -2,7 +2,8 @@ package software.altitude.test.core.api
 
 import org.scalatra.test.ScalatraTests
 import org.scalatra.test.scalatest.ScalatraFunSuite
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.JsObject
+import play.api.libs.json.Json
 import software.altitude.core.AltitudeServletContext
 import software.altitude.test.core.integration.IntegrationTestCore
 

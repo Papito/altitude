@@ -3,7 +3,8 @@ package software.altitude.core.controllers.api.admin
 import org.scalatra.BadRequest
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
-import software.altitude.core.{DataScrubber, ValidationException}
+import software.altitude.core.DataScrubber
+import software.altitude.core.ValidationException
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.api.BaseApiController
 import software.altitude.core.{Const => C}

@@ -4,7 +4,6 @@ import org.apache.commons.dbutils.QueryRunner
 import play.api.libs.json.JsObject
 import software.altitude.core.AltitudeAppContext
 import software.altitude.core.RequestContext
-import software.altitude.core.dao.SystemMetadataDao
 import software.altitude.core.models.SystemMetadata
 import software.altitude.core.{Const => C}
 
@@ -19,27 +18,23 @@ abstract class SystemMetadataDao(val appContext: AltitudeAppContext)
   ).toJson
 
   def updateVersion(toVersion: Int): Unit = {
-    txManager.withTransaction {
-      val runner: QueryRunner = new QueryRunner()
+    val runner: QueryRunner = new QueryRunner()
 
-      val sql = s"UPDATE $tableName SET ${C.SystemMetadata.VERSION} = ? WHERE id = ?"
+    val sql = s"UPDATE $tableName SET ${C.SystemMetadata.VERSION} = ? WHERE id = ?"
 
-      runner.update(
-        RequestContext.getConn,
-        sql, toVersion, SystemMetadataDao.SYSTEM_RECORD_ID)
-    }
+    runner.update(
+      RequestContext.getConn,
+      sql, toVersion, software.altitude.core.dao.SystemMetadataDao.SYSTEM_RECORD_ID)
   }
 
   // overriding the base method since there is no repository relation in this model
-  override def getById(id: String): Option[JsObject] = {
+  override def getById(id: String): JsObject = {
     val sql: String = s"""
       SELECT *
         FROM $tableName
        WHERE id = ?
      """
 
-    val rec = oneBySqlQuery(sql, List(id.toInt))
-    if (rec.isDefined) Some(makeModel(rec.get)) else None
+    getOneBySql(sql, List(id.toInt))
   }
-
 }

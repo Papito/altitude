@@ -15,8 +15,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   /**
    * Add a new folder - THIS SHOULD NOT BE USED DIRECTLY. Use <code>addFolder</code>
    */
-  override def add(folder: Folder, queryForDup: Option[Query] = None)
-                  : JsObject = {
+  override def add(folder: Folder, queryForDup: Option[Query] = None): JsObject = {
     if (isSystemFolder(Some(folder.parentId))) {
       throw IllegalOperationException("Cannot add a child to a system folder")
     }
@@ -43,9 +42,10 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   /**
    * Return ALL folders - system and non-system
    */
-  override def getAll: List[JsObject] = {
+  def getAll: List[JsObject] = {
     txManager.asReadOnly[List[JsObject]] {
-     val wCounts = addAssetCount(dao.getAll)
+      val q: Query = new Query().withRepository()
+     val wCounts = addAssetCount(dao.query(q).records)
      val wPaths = wCounts
      wPaths
     }

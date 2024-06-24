@@ -6,7 +6,6 @@ import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.Altitude
-import software.altitude.core.NotFoundException
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.RepositoryDao
 import software.altitude.core.dao.jdbc.BaseDao
@@ -20,19 +19,6 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
   private final val log = LoggerFactory.getLogger(getClass)
   protected val dao: RepositoryDao = app.injector.instance[RepositoryDao]
   override protected val txManager: TransactionManager = app.txManager
-
-  override def getById(id: String): JsObject = {
-    throw new NotImplementedError
-  }
-
-  def getRepositoryById(id: String): Repository = {
-    txManager.asReadOnly[JsObject] {
-      dao.getById(id) match {
-        case Some(obj) => obj
-        case None => throw NotFoundException(s"Cannot find ID '$id'")
-      }
-    }
-  }
 
   def addRepository(name: String, fileStoreType: C.FileStoreType.Value, owner: User, id: Option[String] = None): JsObject = {
     log.info(s"Creating repository [$name]")

@@ -38,6 +38,7 @@ abstract class MigrationService(val app: Altitude)  {
 
   private def runMigration(version: Int): Unit = {
     val sqlCommands = parseMigrationCommands(version)
+
     txManager.withTransaction {
       executeCommand(sqlCommands)
     }

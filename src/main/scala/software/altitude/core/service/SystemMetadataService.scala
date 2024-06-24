@@ -17,24 +17,37 @@ class SystemMetadataService(val app: Altitude) {
   protected val txManager: TransactionManager = app.txManager
 
   def version: Int = {
-    try {
-      read.version
-    }
-    catch {
-      case _: SQLException => 0 // new installation
-      case ex: Exception => throw ex
+    txManager.asReadOnly[Int] {
+      try {
+        read.version
+      }
+      catch {
+        case _: SQLException => {
+          /* Uncomment this if you get "current transaction is aborted, commands ignored until end of transaction block".
+             It means the select query failed when it should not have, but the exception itself is normal for new installations
+             AND tests (which makes it super-annoying)
+
+             println(ex)
+           */
+
+          0
+        }
+        case ex: Exception => throw ex
+      }
     }
   }
 
   def versionUp(): Unit = {
-    log.info("VERSION UP")
     val toVersion = version + 1
-    systemMetadataDao.updateVersion(toVersion = toVersion)
+
+    txManager.withTransaction {
+      systemMetadataDao.updateVersion(toVersion = toVersion)
+    }
   }
 
   def read: SystemMetadata = {
     txManager.asReadOnly[SystemMetadata] {
-      systemMetadataDao.getById(SystemMetadataDao.SYSTEM_RECORD_ID.toString).get
+      systemMetadataDao.getById(SystemMetadataDao.SYSTEM_RECORD_ID.toString)
     }
 
   }

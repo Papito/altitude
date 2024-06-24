@@ -3,7 +3,9 @@ package software.altitude.test.core.unit
 import org.scalatest.DoNotDiscover
 import org.scalatest.funsuite
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import software.altitude.core.{Const, RequestContext, Util}
+import software.altitude.core.Const
+import software.altitude.core.RequestContext
+import software.altitude.core.Util
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models.Repository
 import software.altitude.core.util.Query
@@ -24,19 +26,11 @@ import software.altitude.test.core.TestFocus
   RequestContext.repository.value = Some(repo)
   RequestContext.account.value = None
 
-  test("Basic WHERE SQL query is built correctly") {
-    val builder = new SqlQueryBuilder[Query](List("col1", "col2"), Set("table1", "table2"))
-    val q = new Query(params = Map("searchValue" -> 3))
-    val sqlQuery = builder.buildSelectSql(q)
-    sqlQuery.sqlAsString shouldBe "SELECT col1, col2 FROM table1, table2 WHERE searchValue = ? AND table1.repository_id = ? AND table2.repository_id = ?"
-    sqlQuery.bindValues.size shouldBe 3
-  }
-
   test("WHERE SQL query with pagination is built correctly") {
     val builder = new SqlQueryBuilder[Query](List("*"), Set("table1"))
     val q = new Query(params = Map("searchValue" -> 3), rpp = 10, page = 2)
-    val sqlQuery = builder.buildSelectSql(q)
-    sqlQuery.sqlAsString shouldBe "SELECT * FROM table1 WHERE searchValue = ? AND table1.repository_id = ? LIMIT 10 OFFSET 10"
+    val sqlQuery = builder.buildSelectSql(q.withRepository())
+    sqlQuery.sqlAsString shouldBe "SELECT * FROM table1 WHERE searchValue = ? AND repository_id = ? LIMIT 10 OFFSET 10"
     sqlQuery.bindValues.size shouldBe 2
   }
 
@@ -47,7 +41,7 @@ import software.altitude.test.core.TestFocus
       page = 2,
       sort = List(Sort("column", SortDirection.ASC))
     )
-    val sqlQuery = builder.buildSelectSql(q)
-    sqlQuery.sqlAsString shouldBe "SELECT * FROM table1 WHERE table1.repository_id = ? ORDER BY column ASC LIMIT 10 OFFSET 10"
+    val sqlQuery = builder.buildSelectSql(q.withRepository())
+    sqlQuery.sqlAsString shouldBe "SELECT * FROM table1 WHERE repository_id = ? ORDER BY column ASC LIMIT 10 OFFSET 10"
   }
 }

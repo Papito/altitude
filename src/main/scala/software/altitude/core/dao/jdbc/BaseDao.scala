@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json._
 import software.altitude.core.AltitudeAppContext
 import software.altitude.core.ConstraintException
+import software.altitude.core.NotFoundException
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.querybuilder.SqlQuery
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
@@ -48,18 +49,40 @@ abstract class BaseDao {
 
   def add(jsonIn: JsObject): JsObject = throw new NotImplementedError("add method must be implemented")
 
-  def getById(id: String): Option[JsObject] = {
-    log.debug(s"Getting by ID '$id' from '$tableName'")
-
-    val sql: String = s"""
-      SELECT ${columnsForSelect.mkString(", ")}
-        FROM $tableName
-       WHERE ${C.Base.ID} = ? AND ${C.Base.REPO_ID} = ?"""
-    val rec: Option[Map[String, AnyRef]] = oneBySqlQuery(sql, List(id, RequestContext.getRepository.id.get))
-    if (rec.isDefined) Some(makeModel(rec.get)) else None
+  def getJsonFromColumn(column: AnyRef): JsObject = {
+    val jsonStr: String = if (column == null) "{}" else column.asInstanceOf[String]
+    Json.parse(jsonStr).as[JsObject]
   }
 
-  def getAll: List[JsObject] = query(new Query()).records
+  def getOneByQuery(q: Query): JsObject = {
+    val sqlQuery = sqlQueryBuilder.buildSelectSql(q)
+    getOneBySql(sqlQuery.sqlAsString, sqlQuery.bindValues)
+  }
+
+  def getOneRawRecordBySql(sql: String, values: List[Any] = List()): Map[String, AnyRef] = {
+    val res = getResults(sql, values)
+
+    if (res.isEmpty) {
+      throw NotFoundException(s"Cannot find record with SQL: $sql and values: $values")
+    }
+
+    if (res.length > 1) {
+      throw ConstraintException("getById should return only a single result")
+    }
+
+    res.head
+  }
+
+  def getOneBySql(sql: String, values: List[Any] = List()): JsObject = {
+    val rec = getOneRawRecordBySql(sql, values)
+    makeModel(rec)
+  }
+
+  def getById(id: String): JsObject = {
+    log.debug(s"Getting by ID '$id' from '$tableName'")
+    val q: Query = new Query().add(C.Base.ID -> id)
+    getOneByQuery(q)
+  }
 
   def deleteById(id: String): Int = {
     val q: Query = new Query().add(C.Base.ID -> id)
@@ -75,8 +98,7 @@ abstract class BaseDao {
    *
    * @return number of documents updated - 0 or 1
    */
-  def updateById(id: String, data: JsObject, fields: List[String])
-                : Int = {
+  def updateById(id: String, data: JsObject, fields: List[String]): Int = {
     val q: Query = new Query().add(C.Base.ID -> id)
     updateByQuery(q, data, fields)
   }
@@ -88,13 +110,13 @@ abstract class BaseDao {
     val sql = s"""
       DELETE
         FROM $tableName
-       WHERE ${C.Base.REPO_ID} = ? AND ${fieldPlaceholders.mkString(",")}
+       WHERE ${fieldPlaceholders.mkString(",")}
       """
 
     log.debug(s"Delete SQL: $sql, with values: ${q.params.values.toList}")
     val runner = queryRunner
     val numDeleted = runner.update(
-      RequestContext.getConn, sql, RequestContext.getRepository.id.get :: q.params.values.toList.map(_.asInstanceOf[Object]): _*)
+      RequestContext.getConn, sql, q.params.values.toList.map(_.asInstanceOf[Object]): _*)
     log.debug(s"Deleted records: $numDeleted")
     numDeleted
   }
@@ -103,8 +125,7 @@ abstract class BaseDao {
     this.query(q, sqlQueryBuilder)
   }
 
-  protected def query(query: Query, sqlQueryBuilder: SqlQueryBuilder[Query])
-           : QueryResult = {
+  protected def query(query: Query, sqlQueryBuilder: SqlQueryBuilder[Query]): QueryResult = {
     val sqlQuery: SqlQuery = sqlQueryBuilder.buildSelectSql(query)
     val recs = manyBySqlQuery(sqlQuery.sqlAsString, sqlQuery.bindValues)
     val total: Int = count(recs)
@@ -117,14 +138,8 @@ abstract class BaseDao {
     QueryResult(records = recs.map{makeModel}, total = total, rpp = query.rpp, sort = query.sort.toList)
   }
 
-  protected def addRecord(jsonIn: JsObject, sql: String, values: List[Any])
-                         : Unit = {
-    log.info(s"JDBC INSERT: $jsonIn")
-
-    // prepend ID and REPO ID, as it is required for most records
-    log.debug(s"INSERT SQL: $sql. ARGS: ${values.toString()}")
-
-    val runner = queryRunner
+  protected def addRecord(jsonIn: JsObject, sql: String, values: List[Any]): Unit = {
+   val runner = queryRunner
     runner.update(RequestContext.getConn, sql, values.map(_.asInstanceOf[Object]): _*)
   }
 
@@ -137,37 +152,16 @@ abstract class BaseDao {
     res.map{_.asScala.toMap[String, AnyRef]}
   }
 
-  protected def manyBySqlQuery(sql: String, values: List[Any] = List())
-                              : List[Map[String, AnyRef]] = {
+  protected def manyBySqlQuery(sql: String, values: List[Any] = List()): List[Map[String, AnyRef]] = {
     getResults(sql, values)
   }
 
-  def oneBySqlQuery(sql: String, values: List[Any] = List()): Option[Map[String, AnyRef]] = {
-    val res = getResults(sql, values)
-
-    log.debug(s"Found ${res.length} records")
-
-    if (res.isEmpty) {
-      return None
+  def getByIds(ids: Set[String]): List[JsObject] = {
+    if (ids.isEmpty) {
+      return List()
     }
 
-    if (res.length > 1) {
-      throw ConstraintException("getById should return only a single result")
-    }
-
-    val rec = res.head
-
-    log.debug(s"RECORD: $rec")
-    Some(rec)
-  }
-
-  def getByIds(ids: Set[String])
-                       : List[JsObject] = {
-
-    val query = new Query()
-    query.add(C.Base.ID ->  Query.IN(ids.asInstanceOf[Set[Any]]))
-    query.add(C.Base.REPO_ID -> RequestContext.getRepository.id.get)
-
+    val query = new Query().add(C.Base.ID -> Query.IN(ids.asInstanceOf[Set[Any]]))
     val sqlQuery = sqlQueryBuilder.buildSelectSql(query)
 
     log.debug(s"SQL: ${sqlQuery.sqlAsString} with values: ${ids.toList}")
@@ -185,8 +179,7 @@ abstract class BaseDao {
     recs.map{makeModel}
   }
 
-  def updateByQuery(q: Query, json: JsObject, fields: List[String])
-                            : Int = {
+  def updateByQuery(q: Query, json: JsObject, fields: List[String]): Int = {
     log.debug(s"Updating record by query $q with data $json for fields: $fields")
 
     val queryFieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
@@ -199,7 +192,7 @@ abstract class BaseDao {
     val sql = s"""
       UPDATE $tableName
          SET ${updateFieldPlaceholders.mkString(", ")}
-       WHERE ${C.Base.REPO_ID} = ? AND ${queryFieldPlaceholders.mkString(",")}
+       WHERE ${queryFieldPlaceholders.mkString(",")}
       """
 
     val dataUpdateValues: List[Any] = json.fields.filter {
@@ -217,28 +210,26 @@ abstract class BaseDao {
       }
     }.toList
 
-    val valuesForAllPlaceholders = dataUpdateValues ::: List(RequestContext.getRepository.id.get) ::: q.params.values.toList
+    val valuesForAllPlaceholders = dataUpdateValues ::: q.params.values.toList
 
     val runner = queryRunner
     val numUpdated = runner.update(RequestContext.getConn, sql, valuesForAllPlaceholders.map(_.asInstanceOf[Object]): _*)
     numUpdated
   }
 
-  def increment(id: String, field: String, count: Int = 1)
-                        : Unit = {
+  def increment(id: String, field: String, count: Int = 1): Unit = {
     val sql = s"""
       UPDATE $tableName
          SET $field = $field + $count
-       WHERE ${C.Base.REPO_ID} = ? AND id = ?
+       WHERE id = ?
       """
     log.debug(s"INCR SQL: $sql, for $id")
 
     val runner = queryRunner
-    runner.update(RequestContext.getConn, sql, RequestContext.getRepository.id.get, id)
+    runner.update(RequestContext.getConn, sql, id)
   }
 
-  def decrement(id: String, field: String, count: Int = 1)
-                        : Unit = {
+  def decrement(id: String, field: String, count: Int = 1): Unit = {
     increment(id, field, -count)
   }
 

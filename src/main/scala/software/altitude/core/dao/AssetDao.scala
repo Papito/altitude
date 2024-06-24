@@ -1,7 +1,6 @@
 package software.altitude.core.dao
 
 import org.slf4j.LoggerFactory
-import play.api.libs.json.JsObject
 import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.Metadata
 import software.altitude.core.util.Query
@@ -22,9 +21,6 @@ trait AssetDao extends BaseDao {
 
   override def query(q: Query): QueryResult =
     throw new NotImplementedError("Can only directly query recycled and not recycled data sets")
-
-  override def getAll: List[JsObject] =
-    throw new NotImplementedError
 
   def updateMetadata(assetId: String, metadata: Metadata, deletedFields: Set[String])
                              : Unit = {

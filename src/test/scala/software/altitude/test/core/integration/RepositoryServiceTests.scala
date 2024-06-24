@@ -10,7 +10,7 @@ import software.altitude.core.{Const => C}
 
 @DoNotDiscover class RepositoryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
-  test("create repository", Focused) {
+  test("create repository") {
     val repo: Repository = altitude.service.repository.addRepository(
       name = Util.randomStr(),
       fileStoreType = C.FileStoreType.FS,
@@ -18,7 +18,7 @@ import software.altitude.core.{Const => C}
 
     repo.fileStoreConfig.keys should contain(C.Repository.Config.PATH)
 
-    val storedRepo: Repository = altitude.service.repository.getRepositoryById(repo.id.get)
+    val storedRepo: Repository = altitude.service.repository.getById(repo.id.get)
     storedRepo.name shouldEqual repo.name
     storedRepo.fileStoreConfig.keys should contain(C.Repository.Config.PATH)
     storedRepo.createdAt should not be None

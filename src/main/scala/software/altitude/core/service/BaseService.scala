@@ -4,7 +4,6 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.Altitude
 import software.altitude.core.DuplicateException
-import software.altitude.core.NotFoundException
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.BaseModel
@@ -39,8 +38,7 @@ abstract class BaseService[Model <: BaseModel] {
    *
    * @return the document, complete with its ID in the database
    */
-  def add(objIn: Model, queryForDup: Option[Query] = None)
-         : JsObject = {
+  def add(objIn: Model, queryForDup: Option[Query] = None): JsObject = {
 
     val existing = if (queryForDup.isDefined) query(queryForDup.get) else QueryResult.EMPTY
 
@@ -116,19 +114,7 @@ abstract class BaseService[Model <: BaseModel] {
    */
   def getById(id: String): JsObject = {
     txManager.asReadOnly[JsObject] {
-      dao.getById(id) match {
-        case Some(obj) => obj
-        case None => throw NotFoundException(s"Cannot find ID [$id]")
-      }
-    }
-  }
-
-  /**
-   * Get all documents, which you want to do only sporadically, for not-growing sets of data
-   */
-  def getAll: List[JsObject] = {
-    txManager.asReadOnly[List[JsObject]] {
-      dao.getAll
+      dao.getById(id)
     }
   }
 

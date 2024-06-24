@@ -218,8 +218,7 @@ class LibraryService(val app: Altitude) {
     * DATA/PREVIEW
     * *********************************************************************** */
 
-  def genPreviewData(asset: Asset)
-                    : Array[Byte] = {
+  private def genPreviewData(asset: Asset): Array[Byte] = {
     asset.assetType.mediaType match {
       case "image" =>
         makeImageThumbnail(asset)
@@ -248,8 +247,7 @@ class LibraryService(val app: Altitude) {
   }
 
   // FIXME: this is temporary as only image-specific
-  private def makeImageThumbnail(asset: Asset)
-                                : Array[Byte] = {
+  private def makeImageThumbnail(asset: Asset): Array[Byte] = {
     try {
       require(asset.data.length != 0)
       val dataStream: InputStream = new ByteArrayInputStream(asset.data)
@@ -295,26 +293,23 @@ class LibraryService(val app: Altitude) {
     * DISCOVERY
     * *********************************************************************** */
 
-  def query(query: Query)
-           : QueryResult = {
+  def query(query: Query): QueryResult = {
     txManager.asReadOnly[QueryResult] {
       val folderId = query.params.get(C.Asset.FOLDER_ID).asInstanceOf[Option[String]]
 
       val _query: Query = if (folderId.isDefined) {
         val allFolderIds = app.service.folder.flatChildrenIds(parentIds = Set(folderId.get))
-
         query.add(C.Asset.FOLDER_ID ->  Query.IN(allFolderIds.asInstanceOf[Set[Any]]))
       }
       else {
         query
       }
 
-      app.service.asset.query(_query)
+      app.service.asset.query(_query.withRepository())
     }
   }
 
-  def search(query: SearchQuery)
-            : SearchResult = {
+  def search(query: SearchQuery): SearchResult = {
     txManager.asReadOnly[SearchResult] {
       val _query: SearchQuery = if (query.folderIds.nonEmpty) {
         // create a new query, with the new folder set
@@ -349,8 +344,6 @@ class LibraryService(val app: Altitude) {
 
   def addFolder(name: String, parentId: Option[String] = None)
                : JsObject = {
-    val nameTrimmed = name.trim
-
     txManager.withTransaction[JsObject] {
       val _parentId = if (parentId.isDefined) parentId.get else RequestContext.repository.value.get.rootFolderId
       val folder = Folder(name = name.trim, parentId = _parentId)

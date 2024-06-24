@@ -20,22 +20,16 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
 
   override protected val sqlQueryBuilder = new SqlQueryBuilder[Query](columnsForSelect, tableName)
 
-  def getMetadataJsonFromColumn(metadataCol: AnyRef): JsObject = {
-    val metadataJsonStr: String = if (metadataCol == null) "{}" else metadataCol.asInstanceOf[String]
-    Json.parse(metadataJsonStr).as[JsObject]
-  }
-
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val assetType = new AssetType(
       mediaType = rec(C.AssetType.MEDIA_TYPE).asInstanceOf[String],
       mediaSubtype = rec(C.AssetType.MEDIA_SUBTYPE).asInstanceOf[String],
       mime = rec(C.AssetType.MIME_TYPE).asInstanceOf[String])
 
-    val metadataJson = getMetadataJsonFromColumn(rec(C.Asset.METADATA))
+    val metadataJson = getJsonFromColumn(rec(C.Asset.METADATA))
 
     val extractedMetadataCol = rec(C.Asset.EXTRACTED_METADATA)
-    val extractedMetadataJsonStr: String =
-      if (extractedMetadataCol == null) "{}" else extractedMetadataCol.asInstanceOf[String]
+    val extractedMetadataJsonStr: String = if (extractedMetadataCol == null) "{}" else extractedMetadataCol.asInstanceOf[String]
     val extractedMetadataJson = Json.parse(extractedMetadataJsonStr).as[JsObject]
 
     val model = new Asset(
@@ -54,32 +48,28 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
   }
 
   override def queryNotRecycled(q: Query): QueryResult = {
-    this.query(q.add(C.Asset.IS_RECYCLED -> false), sqlQueryBuilder)
+    this.query(q.add(C.Asset.IS_RECYCLED -> false).withRepository(), sqlQueryBuilder)
   }
 
   override def queryRecycled(q: Query): QueryResult = {
-    this.query(q.add(C.Asset.IS_RECYCLED -> true), sqlQueryBuilder)
+    this.query(q.add(C.Asset.IS_RECYCLED -> true).withRepository(), sqlQueryBuilder)
   }
 
   override def queryAll(q: Query): QueryResult = {
-    this.query(q, sqlQueryBuilder)
+    this.query(q.withRepository(), sqlQueryBuilder)
   }
 
   override def getMetadata(assetId: String): Option[Metadata] = {
     val sql = s"""
       SELECT ${C.Asset.METADATA}
          FROM $tableName
-       WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
+       WHERE ${C.Asset.ID} = ?
       """
 
-    oneBySqlQuery(sql, List(RequestContext.getRepository.id.get, assetId)) match {
-      case Some(rec) =>
-        val metadataJsonStr: String = rec.getOrElse(C.Asset.METADATA, "{}").asInstanceOf[String]
-        val metadataJson = Json.parse(metadataJsonStr).as[JsObject]
-        val metadata = Metadata.fromJson(metadataJson)
-        Some(metadata)
-      case None => None
-    }
+    val rec = getOneRawRecordBySql(sql, List(assetId))
+    val metadataJson = getJsonFromColumn(rec(C.Asset.METADATA))
+    val metadata = Metadata.fromJson(metadataJson)
+    Some(metadata)
   }
 
   override def add(jsonIn: JsObject): JsObject = {

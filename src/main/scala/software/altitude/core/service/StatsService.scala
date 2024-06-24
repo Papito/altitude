@@ -18,7 +18,8 @@ class StatsService(val app: Altitude) {
 
   def getStats: Stats = {
     txManager.asReadOnly[Stats] {
-      val stats: List[Stat] = dao.query(new Query()).records.map(Stat.fromJson)
+      val q: Query = new Query().withRepository()
+      val stats: List[Stat] = dao.query(q).records.map(Stat.fromJson)
 
       // Assemble the total stats on-the-fly
       val totalAssetsDims = Stats.SORTED_ASSETS :: Stats.RECYCLED_ASSETS :: Stats.TRIAGE_ASSETS :: Nil
@@ -33,13 +34,11 @@ class StatsService(val app: Altitude) {
     }
   }
 
-  private def incrementStat(statName: String, count: Long = 1)
-                   : Unit = {
+  private def incrementStat(statName: String, count: Long = 1): Unit = {
     dao.incrementStat(statName, count)
   }
 
-  private def decrementStat(statName: String, count: Long = 1)
-                   : Unit = {
+  private def decrementStat(statName: String, count: Long = 1): Unit = {
     dao.decrementStat(statName, count)
   }
 

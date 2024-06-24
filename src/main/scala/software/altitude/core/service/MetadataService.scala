@@ -48,7 +48,10 @@ class MetadataService(val app: Altitude) {
    */
   def getAllFields: Map[String, MetadataField] =
     txManager.asReadOnly[Map[String, MetadataField]] {
-      metadataFieldDao.getAll.map{ res =>
+      val q: Query = new Query().withRepository()
+      val allFields = metadataFieldDao.query(q).records
+
+      allFields.map{ res =>
         val metadataField: MetadataField = res
         metadataField.id.get -> metadataField
       }.toMap
@@ -56,10 +59,7 @@ class MetadataService(val app: Altitude) {
 
   def getFieldById(id: String): JsObject =
     txManager.asReadOnly[JsObject] {
-      metadataFieldDao.getById(id) match {
-        case Some(obj) => obj
-        case None => throw NotFoundException(s"Cannot find field by ID [$id]")
-      }
+      metadataFieldDao.getById(id)
     }
 
   def deleteFieldById(id: String): Int =

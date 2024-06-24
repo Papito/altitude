@@ -1,13 +1,10 @@
 package software.altitude.core.dao.jdbc
-import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.AltitudeAppContext
 import software.altitude.core.RequestContext
 
 abstract class MigrationDao(val appContext: AltitudeAppContext)
   extends BaseDao with software.altitude.core.dao.MigrationDao {
-
-  private final val log = LoggerFactory.getLogger(getClass)
 
   override val tableName = "system"
 
@@ -19,8 +16,8 @@ abstract class MigrationDao(val appContext: AltitudeAppContext)
   override def currentVersion: Int = {
     val sql = s"SELECT version FROM $tableName"
     val version = try {
-      val rec = oneBySqlQuery(sql)
-      rec.get("version").asInstanceOf[Int]
+      val rec = getOneBySql(sql)
+      rec("version").asInstanceOf[Int]
     }
     catch {
       // table does not exist

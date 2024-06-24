@@ -33,15 +33,15 @@ class AssetService(val app: Altitude) extends BaseService[Asset] {
   }
 
   override def query(q: Query): QueryResult = {
-    dao.queryNotRecycled(q)
+    dao.queryNotRecycled(q.withRepository())
   }
 
   def queryRecycled(q: Query): QueryResult = {
-    dao.queryRecycled(q)
+    dao.queryRecycled(q.withRepository())
   }
 
   def queryAll(q: Query): QueryResult = {
-    dao.queryAll(q)
+    dao.queryAll(q.withRepository())
   }
 
   // NO

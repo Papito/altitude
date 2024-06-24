@@ -57,7 +57,6 @@ class TransactionManager(val app: AltitudeAppContext) {
 
   def withTransaction[A](f: => A): A = {
     if (RequestContext.conn.value.isDefined) {
-        // println("EXISTING CONNECTION")
         return f
     }
 
@@ -87,7 +86,6 @@ class TransactionManager(val app: AltitudeAppContext) {
     RequestContext.conn.value = Some(connection(readOnly=true))
 
     try {
-      // actual function call
       f
     }
     catch {
@@ -118,7 +116,6 @@ class TransactionManager(val app: AltitudeAppContext) {
       return
     }
 
-    // println(s"CLOSE ${System.identityHashCode(RequestContext.conn.value.get)}")
     RequestContext.conn.value.get.close()
     RequestContext.conn.value = None
     RequestContext.savepoints.value.clear()

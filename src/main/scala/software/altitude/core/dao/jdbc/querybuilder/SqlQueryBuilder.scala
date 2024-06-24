@@ -1,10 +1,8 @@
 package software.altitude.core.dao.jdbc.querybuilder
 
 import org.slf4j.LoggerFactory
-import software.altitude.core.RequestContext
 import software.altitude.core.util.Query
 import software.altitude.core.util.Query.QueryParam
-import software.altitude.core.{Const => C}
 
 protected object SqlQueryBuilder {
   val SELECT = "select"
@@ -96,7 +94,7 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
         }
         case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: $value")
       }
-    }.toList ::: tableNames.map(tableName => s"$tableName.${C.Base.REPO_ID} = ?").toList
+    }.toList
 
     val bindVals = query.params.foldLeft(List[Any]()) { (res, el: (String, Any)) =>
       val value = el._2
@@ -109,7 +107,7 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
         case qParam: QueryParam => res ::: qParam.values.toList
         case _ => throw new IllegalArgumentException(s"This type of parameter is not supported: $value")
       }
-    } ::: tableNames.toSeq.map(_ => RequestContext.repository.value.get.id.get).toList // repo id for each table
+    }
 
     ClauseComponents(elements, bindVals)
   }
