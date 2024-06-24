@@ -36,10 +36,11 @@
 
     #setupForm div.error {
         padding: 5px;
-        margin-top: 5px;
+        margin-top: 2px;
         background-color: var(--message-background-color);
         color: #FFF;
         border: 1px solid var(--error-color);
+        border-bottom: 2px solid var(--error-color);
         letter-spacing: 1px;
     }
 </style>
