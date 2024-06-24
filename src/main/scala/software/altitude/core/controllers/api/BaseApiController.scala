@@ -77,12 +77,6 @@ class BaseApiController extends BaseController with ScalateSupport {
         C.Api.STACKTRACE -> strStacktrace))
   }
 
-  def validationErrorsForMustache(validationException: ValidationException): Map[String, String] = {
-    validationException.errors.map{
-      case (fieldName, message) =>
-        C.Api.Fields.getFieldName(fieldName) -> message }.toMap
-  }
-
   override def setUser(): Unit = {
   }
 

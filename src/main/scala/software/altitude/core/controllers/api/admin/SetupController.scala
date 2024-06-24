@@ -51,14 +51,11 @@ class SetupController extends BaseApiController  {
     }
     catch {
       case validationEx: ValidationException =>
-        halt(200, mustache(
-          "/htmx/admin/setup_form",
-          "fields" -> C.Api.Fields,
-          "constr" -> C.Api.Constraints,
-          "field_errors" -> validationErrorsForMustache(validationEx))
-        )
+        halt(
+          200,
+          ssp("/htmx/admin/setup_form",
+            "fieldErrors" -> validationEx.errors.toMap))
     }
-
 
     val repositoryName = (json \ C.Api.Fields.REPOSITORY_NAME).as[String]
     val email = (json \ C.Api.Fields.ADMIN_EMAIL).as[String]

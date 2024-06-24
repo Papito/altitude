@@ -1,4 +1,3 @@
-{{! A bare-bones navigation bar, used when there is no user or repository in context (such as the SETUP page) }}
 <style>
     nav {
         display: grid;
