@@ -24,8 +24,7 @@ class MetadataService(val app: Altitude) {
   private val metadataFieldDao: MetadataFieldDao = app.injector.instance[MetadataFieldDao]
   private val assetDao: AssetDao = app.injector.instance[AssetDao]
 
-  def addField(metadataField: MetadataField)
-              : MetadataField = {
+  def addField(metadataField: MetadataField): MetadataField = {
 
     txManager.withTransaction[MetadataField] {
 
@@ -87,8 +86,7 @@ class MetadataService(val app: Altitude) {
   }
 
   // OPTIMIZE: this cleans and validates existing values (the ones that have IDs)
-  def updateMetadata(assetId: String, metadata: Metadata)
-                 : Unit = {
+  def updateMetadata(assetId: String, metadata: Metadata): Unit = {
     log.info(s"Updating metadata for asset [$assetId]: $metadata")
 
     txManager.withTransaction {
@@ -103,8 +101,7 @@ class MetadataService(val app: Altitude) {
     }
   }
 
-  def addFieldValue(assetId: String, fieldId: String, newValue: String)
-                    : Unit = {
+  def addFieldValue(assetId: String, fieldId: String, newValue: String): Unit = {
     log.info(s"Adding value [$newValue] for field [$fieldId] on asset [$assetId] ")
 
     txManager.withTransaction {
@@ -172,8 +169,7 @@ class MetadataService(val app: Altitude) {
     }
   }
 
-  def updateFieldValue(assetId: String, valueId: String, newValue: String)
-                      : Unit = {
+  def updateFieldValue(assetId: String, valueId: String, newValue: String): Unit = {
 
     log.info(s"Updating value [$valueId] for on asset [$assetId] with [$newValue] ")
 
@@ -239,8 +235,7 @@ class MetadataService(val app: Altitude) {
     }
   }
 
-  def clean(metadata: Metadata)
-           : Metadata = {
+  def clean(metadata: Metadata): Metadata = {
     // get all metadata fields configured for this repository
     val fields = getAllFields
 
@@ -343,8 +338,7 @@ class MetadataService(val app: Altitude) {
    *
    * @return clean, de-duplicated copy of the metadata
    */
-  def cleanAndValidate(metadata: Metadata)
-                      : Metadata = {
+  def cleanAndValidate(metadata: Metadata): Metadata = {
     val cleanMetadata = clean(metadata)
     validate(cleanMetadata)
     cleanMetadata
@@ -378,8 +372,7 @@ class MetadataService(val app: Altitude) {
     *     FIELD_TYPE -> field type
     * ]
     */
-  def toJson(metadata: Metadata, allMetadataFields: Option[Map[String, MetadataField]] = None)
-            : JsArray = {
+  def toJson(metadata: Metadata, allMetadataFields: Option[Map[String, MetadataField]] = None): JsArray = {
 
     txManager.asReadOnly[JsArray] {
       val allFields = if (allMetadataFields.isDefined) allMetadataFields.get else getAllFields

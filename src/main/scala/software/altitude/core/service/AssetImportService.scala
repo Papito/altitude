@@ -36,8 +36,7 @@ class AssetImportService(app: Altitude) {
     }
   }
 
-  def importAsset(importAsset: ImportAsset)
-                  : Option[Asset] = {
+  def importAsset(importAsset: ImportAsset): Option[Asset] = {
     log.info(s"Importing file asset '$importAsset'")
     val assetType = detectAssetType(importAsset)
 
@@ -84,6 +83,6 @@ class AssetImportService(app: Altitude) {
     Some(Asset.fromJson(res.get))
   }
 
-  protected def getChecksum(importAsset: ImportAsset): String =
+  private def getChecksum(importAsset: ImportAsset): String =
     DigestUtils.sha1Hex(importAsset.data)
 }

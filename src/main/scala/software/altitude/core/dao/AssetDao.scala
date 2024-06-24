@@ -22,8 +22,7 @@ trait AssetDao extends BaseDao {
   override def query(q: Query): QueryResult =
     throw new NotImplementedError("Can only directly query recycled and not recycled data sets")
 
-  def updateMetadata(assetId: String, metadata: Metadata, deletedFields: Set[String])
-                             : Unit = {
+  def updateMetadata(assetId: String, metadata: Metadata, deletedFields: Set[String]): Unit = {
     /**
      * Pedestrian version of this just overwrites fields for old metadata and re-sets it on the asset.
      * A better implementation - for advanced engines - updates only the metadata fields of interest.

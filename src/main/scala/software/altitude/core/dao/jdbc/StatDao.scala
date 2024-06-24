@@ -29,8 +29,7 @@ abstract class StatDao(val appContext: AltitudeAppContext) extends BaseDao with 
     jsonIn
   }
 
-  override protected def addRecord(jsonIn: JsObject, q: String, values: List[Any])
-                         : Unit = {
+  override protected def addRecord(jsonIn: JsObject, q: String, values: List[Any]): Unit = {
     log.info(s"JDBC INSERT: $jsonIn")
     val runner: QueryRunner = new QueryRunner()
     runner.update(RequestContext.getConn, q, values.map(_.asInstanceOf[Object]): _*)
@@ -41,8 +40,7 @@ abstract class StatDao(val appContext: AltitudeAppContext) extends BaseDao with 
    * @param statName the name of the stat
    * @param count the value to increment by - CAN be negative
    */
-  def incrementStat(statName: String, count: Long = 1)
-                   : Unit = {
+  def incrementStat(statName: String, count: Long = 1): Unit = {
     val sql = s"""
       UPDATE $tableName
          SET ${C.Stat.DIM_VAL} = ${C.Stat.DIM_VAL} + $count

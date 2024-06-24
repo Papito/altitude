@@ -14,7 +14,7 @@ import java.sql.PreparedStatement
 import java.sql.Types
 
 object SearchDao {
-  val VALUE_INSERT_SQL: String = s"""
+  private val VALUE_INSERT_SQL: String = s"""
             INSERT INTO search_parameter (
                         ${C.SearchToken.REPO_ID}, ${C.SearchToken.ASSET_ID},
                         ${C.SearchToken.FIELD_ID},

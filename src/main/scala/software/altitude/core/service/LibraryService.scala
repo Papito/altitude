@@ -132,22 +132,19 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def moveAssetToTriage(assetId: String)
-                       : Unit = {
+  def moveAssetToTriage(assetId: String): Unit = {
     txManager.withTransaction {
       moveAssetsToTriage(Set(assetId))
     }
   }
 
-  def moveAssetsToTriage(assetIds: Set[String])
-                        : Unit = {
+  def moveAssetsToTriage(assetIds: Set[String]): Unit = {
     txManager.withTransaction {
       moveAssetsToFolder(assetIds, RequestContext.repository.value.get.triageFolderId)
     }
   }
 
-  def moveAssetsToFolder(assetIds: Set[String], destFolderId: String)
-                        : Unit = {
+  def moveAssetsToFolder(assetIds: Set[String], destFolderId: String): Unit = {
 
     def move(asset: Asset): Unit = {
       // cannot move to the same folder
@@ -189,8 +186,7 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def renameAsset(assetId: String, newFilename: String)
-                 : Asset = {
+  def renameAsset(assetId: String, newFilename: String): Asset = {
 
     txManager.withTransaction[Asset] {
       val asset: Asset = getById(assetId)
@@ -342,8 +338,7 @@ class LibraryService(val app: Altitude) {
     * FOLDERS
     * *********************************************************************** */
 
-  def addFolder(name: String, parentId: Option[String] = None)
-               : JsObject = {
+  def addFolder(name: String, parentId: Option[String] = None): JsObject = {
     txManager.withTransaction[JsObject] {
       val _parentId = if (parentId.isDefined) parentId.get else RequestContext.repository.value.get.rootFolderId
       val folder = Folder(name = name.trim, parentId = _parentId)
@@ -359,8 +354,7 @@ class LibraryService(val app: Altitude) {
     *
     * Recycle all the assets in the tree.
     */
-  def deleteFolderById(id: String)
-                      : Unit = {
+  def deleteFolderById(id: String): Unit = {
     if (app.service.folder.isRootFolder(id)) {
       throw IllegalOperationException("Cannot delete the root folder")
     }
@@ -428,8 +422,7 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def renameFolder(folderId: String, newName: String)
-                  : Folder = {
+  def renameFolder(folderId: String, newName: String): Folder = {
     txManager.withTransaction[Folder] {
       val folder: Folder = app.service.folder.getById(folderId)
       val updatedFolder = app.service.folder.rename(folderId, newName)
@@ -452,16 +445,14 @@ class LibraryService(val app: Altitude) {
     * RECYCLING
     * *********************************************************************** */
 
-  def restoreRecycledAsset(assetId: String)
-                          : Asset = {
+  def restoreRecycledAsset(assetId: String): Asset = {
     txManager.withTransaction[Asset] {
       restoreRecycledAssets(Set(assetId))
       getById(assetId)
     }
   }
 
-  def restoreRecycledAssets(assetIds: Set[String])
-                           : Unit = {
+  def restoreRecycledAssets(assetIds: Set[String]): Unit = {
     log.info(s"Restoring recycled assets [${assetIds.mkString(",")}]")
 
     assetIds.foreach { assetId =>
@@ -494,16 +485,14 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def recycleAsset(assetId: String)
-                  : Asset = {
+  def recycleAsset(assetId: String): Asset = {
     txManager.withTransaction {
       recycleAssets(Set(assetId))
       getById(assetId)
     }
   }
 
-  def recycleFolder(folderId: String)
-                   : Folder = {
+  def recycleFolder(folderId: String): Folder = {
 
     txManager.withTransaction {
       val folder: Folder = app.service.folder.getById(folderId)
@@ -512,8 +501,7 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def recycleAssets(assetIds: Set[String])
-                   : Unit = {
+  def recycleAssets(assetIds: Set[String]): Unit = {
 
     assetIds.foreach { assetId =>
       txManager.withTransaction {
@@ -531,8 +519,7 @@ class LibraryService(val app: Altitude) {
     * METADATA
     * *********************************************************************** */
 
-  def addMetadataValue(assetId: String, fieldId: String, newValue: Any)
-                      : Unit = {
+  def addMetadataValue(assetId: String, fieldId: String, newValue: Any): Unit = {
     txManager.withTransaction {
       app.service.metadata.addFieldValue(assetId, fieldId, newValue.toString)
       val field: MetadataField = app.service.metadata.getFieldById(fieldId)
@@ -541,8 +528,7 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def deleteMetadataValue(assetId: String, valueId: String)
-                         : Unit = {
+  def deleteMetadataValue(assetId: String, valueId: String): Unit = {
     txManager.withTransaction {
       app.service.metadata.deleteFieldValue(assetId, valueId)
       val asset: Asset = getById(assetId)
@@ -551,8 +537,7 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def updateMetadataValue(assetId: String, valueId: String, newValue: Any)
-                         : Unit = {
+  def updateMetadataValue(assetId: String, valueId: String, newValue: Any): Unit = {
 
     txManager.withTransaction {
       app.service.metadata.updateFieldValue(assetId, valueId, newValue.toString)

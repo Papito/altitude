@@ -19,36 +19,31 @@ class SearchService(val app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
   protected val searchDao: SearchDao = app.injector.instance[SearchDao]
 
-  def indexAsset(asset: Asset)
-                : Unit = {
+  def indexAsset(asset: Asset): Unit = {
     require(asset.path.isEmpty)
     log.info(s"Indexing asset $asset")
     val metadataFields: Map[String, MetadataField] = app.service.metadata.getAllFields
     searchDao.indexAsset(asset, metadataFields)
   }
 
-  def reindexAsset(asset: Asset)
-                : Unit = {
+  def reindexAsset(asset: Asset): Unit = {
     log.info(s"Reindexing asset $asset")
     val metadataFields: Map[String, MetadataField] = app.service.metadata.getAllFields
     searchDao.reindexAsset(asset, metadataFields)
   }
 
-  def search(query: SearchQuery)
-            : SearchResult = {
+  def search(query: SearchQuery): SearchResult = {
     searchDao.search(query)
   }
 
-  def addMetadataValue(asset: Asset, field: MetadataField, value: String)
-                      : Unit = {
+  def addMetadataValue(asset: Asset, field: MetadataField, value: String): Unit = {
     // some fields are not eligible for parametarized search
     if (SearchService.NON_INDEXABLE_FIELD_TYPES.contains(field.fieldType)) return
 
     searchDao.addMetadataValue(asset, field, value)
   }
 
-  def addMetadataValues(asset: Asset, field: MetadataField, values: Set[String])
-                       : Unit = {
+  def addMetadataValues(asset: Asset, field: MetadataField, values: Set[String]): Unit = {
     // some fields are not eligible for parametarized search
     if (SearchService.NON_INDEXABLE_FIELD_TYPES.contains(field.fieldType)) return
 

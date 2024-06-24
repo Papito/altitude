@@ -133,8 +133,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   /**
    * Get the folder hierarchy, with an arbitrary folder ID as the root ID to start with.
    */
-  def hierarchy(rootId: Option[String] = None, allRepoFolders: List[JsObject] = List())
-               : List[Folder] = {
+  def hierarchy(rootId: Option[String] = None, allRepoFolders: List[JsObject] = List()): List[Folder] = {
 
     val _rootId = if (rootId.isDefined) rootId.get else contextRepo.rootFolderId
 
@@ -155,8 +154,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   /**
    * Folder ancestry as a list, top->bottom = root->this folder.
    */
-  def pathComponents(folderId: String)
-                    : List[Folder] = {
+  def pathComponents(folderId: String): List[Folder] = {
     // short-circuit for root folder
     if (isRootFolder(folderId)) {
       return List[Folder]()
@@ -181,8 +179,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   /**
    * Get children for the root given, but only a single level - non-recursive
    */
-  def immediateChildren(rootId: String, allRepoFolders: List[JsObject] = List())
-                       : List[Folder] = {
+  def immediateChildren(rootId: String, allRepoFolders: List[JsObject] = List()): List[Folder] = {
 
     txManager.asReadOnly[List[Folder]] {
       val repoFolders = repositoryFolders(allRepoFolders)
@@ -197,13 +194,11 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     }
   }
 
-  override def deleteById(id: String)
-                         : Int = {
+  override def deleteById(id: String): Int = {
     dao.deleteById(id)
   }
 
-  override def deleteByQuery(query: Query)
-                            : Int = {
+  override def deleteByQuery(query: Query): Int = {
     throw new NotImplementedError("Cannot delete folders by query")
   }
 
@@ -238,8 +233,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
    * Returns a list of parents for a given folder ID.
    * The list goes from closest parent to farthest.
    */
-  private def findParents(folderId: String, allRepoFolders: List[JsObject])
-                         : List[Folder] = {
+  private def findParents(folderId: String, allRepoFolders: List[JsObject]): List[Folder] = {
     val repoFolders = repositoryFolders(allRepoFolders)
     val folderEl = repoFolders.find(json => (json \ C.Base.ID).as[String] == folderId)
 
@@ -274,8 +268,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   /**
    * Get a folder by ID, but with the number of assets in it as well - including child folders
    */
-  def getByIdWithChildAssetCounts(id: String, allRepoFolders: List[JsObject] = List())
-                                 : JsObject = {
+  def getByIdWithChildAssetCounts(id: String, allRepoFolders: List[JsObject] = List()): JsObject = {
     val repoFolders = repositoryFolders(allRepoFolders)
     val matching = repoFolders.filter(j => (j \ C.Base.ID).asOpt[String].contains(id))
 
@@ -308,8 +301,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
    * The difference between the other method is that folder depths are not returned.
    * It's a "raw" list of folder ids.
    */
-  def flatChildrenIds(parentIds: Set[String], allRepoFolders: List[JsObject] = List())
-                     : Set[String] =
+  def flatChildrenIds(parentIds: Set[String], allRepoFolders: List[JsObject] = List()): Set[String] =
     parentIds.foldLeft(Set[String]()) {(s, id) => {
       s ++ app.service.folder.flatChildrenIdsWithDepths(parentId = id, allRepoFolders = allRepoFolders).map(_._2).toSet
     }}
@@ -317,8 +309,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   /**
    * Returns flat children as a set of Folder objects
    */
-  def flatChildren(parentId: String, all: List[JsObject], depth: Int = 0)
-                  : Set[Folder] = {
+  def flatChildren(parentId: String, all: List[JsObject], depth: Int = 0): Set[Folder] = {
     if (isSystemFolder(Some(parentId)) || isRootFolder(parentId)) {
       return Set()
     }
@@ -341,8 +332,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   /**
    * Move a folder from one parent to another
    */
-  def move(folderBeingMovedId: String, destFolderId: String)
-          : (Folder, Folder) = {
+  def move(folderBeingMovedId: String, destFolderId: String): (Folder, Folder) = {
 
     if (isRootFolder(folderBeingMovedId)) {
       throw IllegalOperationException("Cannot move the root folder")
@@ -393,8 +383,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     }
   }
 
-  def rename(folderId: String, newName: String)
-            : Folder = {
+  def rename(folderId: String, newName: String): Folder = {
     if (isRootFolder(folderId)) {
       throw IllegalOperationException("Cannot rename the root folder")
     }
@@ -427,8 +416,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   /**
    * Increase a folder's asset count.
    */
-  def incrAssetCount(folderId: String, count: Int = 1)
-                    : Unit = {
+  def incrAssetCount(folderId: String, count: Int = 1): Unit = {
     log.debug(s"Incrementing folder $folderId count by $count")
 
     txManager.withTransaction {
@@ -439,8 +427,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   /**
    * Decrease a folder's asset count.
    */
-  def decrAssetCount(folderId: String, count: Int = 1)
-                    : Unit = {
+  def decrAssetCount(folderId: String, count: Int = 1): Unit = {
     log.debug(s"Decrementing folder $folderId count by $count")
 
     txManager.withTransaction {
@@ -451,8 +438,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   /**
    * Get the id -> folder map of system folders
    */
-  def sysFoldersByIdMap(allRepoFolders: List[JsObject] = List())
-                   : Map[String, Folder] = {
+  def sysFoldersByIdMap(allRepoFolders: List[JsObject] = List()): Map[String, Folder] = {
 
     txManager.asReadOnly[Map[String, Folder]] {
       val allSysFolders = if (allRepoFolders.isEmpty) {
