@@ -36,7 +36,7 @@ abstract class BaseDao {
 
   protected def columnsForSelect: List[String] = List(s"*, ${BaseDao.totalRecsWindowFunction}")
 
-  protected val sqlQueryBuilder: SqlQueryBuilder[Query] = new SqlQueryBuilder[Query](columnsForSelect, tableName)
+  val sqlQueryBuilder: SqlQueryBuilder[Query] = new SqlQueryBuilder[Query](columnsForSelect, tableName)
 
   def count(recs: List[Map[String, AnyRef]]): Int
 

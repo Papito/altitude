@@ -13,15 +13,13 @@ object User {
     id = (json \ C.Base.ID).asOpt[String],
     email = (json \ C.User.EMAIL).as[String],
     accountType = (json \ C.User.ACCOUNT_TYPE).as[AccountType],
-    passwordHash = (json \ C.User.PASSWORD_HASH).asOpt[String]
   ).withCoreAttr(json)
 
 }
 
 case class User(id: Option[String] = None,
                 email: String,
-                accountType: AccountType,
-                passwordHash: Option[String] = None) extends BaseModel {
+                accountType: AccountType) extends BaseModel {
 
   override def toJson: JsObject = Json.obj(
     C.Base.ID -> id,

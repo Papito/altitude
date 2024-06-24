@@ -9,7 +9,7 @@ import software.altitude.core.models.Folder
 
 @DoNotDiscover class FolderModelTests extends funsuite.AnyFunSuite {
 
-  test("uniqueness") {
+  test("Folder uniqueness") {
     val folder1 = new Folder(
       parentId = BaseDao.genId, name = Util.randomStr(30), path = Some(Util.randomStr()))
     val folder2 = new Folder(

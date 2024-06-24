@@ -2,10 +2,9 @@ package software.altitude.core.dao.jdbc
 
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import software.altitude.core.AltitudeAppContext
+import software.altitude.core.{AltitudeAppContext, Const => C}
 import software.altitude.core.models.AccountType.AccountType
 import software.altitude.core.models.User
-import software.altitude.core.{Const => C}
 
 abstract class UserDao(val appContext: AltitudeAppContext) extends BaseDao with software.altitude.core.dao.UserDao {
   override final val tableName = "account"
@@ -22,21 +21,20 @@ abstract class UserDao(val appContext: AltitudeAppContext) extends BaseDao with 
 
   override def add(jsonIn: JsObject): JsObject = {
     val sql = s"""
-        INSERT INTO $tableName (
-                      ${C.User.ID}, ${C.User.EMAIL}, ${C.User.ACCOUNT_TYPE}, ${C.User.PASSWORD_HASH}
-                    )
+        INSERT INTO $tableName (${C.User.ID}, ${C.User.EMAIL}, ${C.User.ACCOUNT_TYPE}, ${C.User.PASSWORD_HASH})
              VALUES (?, ?, ?, ?)
     """
 
     val user: User = jsonIn: User
 
     val id = BaseDao.genId
+    val passwordHash = (jsonIn \ C.User.PASSWORD_HASH).as[String]
 
     val sqlVals: List[Any] = List(
       id,
       user.email,
       user.accountType,
-      user.passwordHash.getOrElse("hash"))
+      passwordHash)
 
     addRecord(jsonIn, sql, sqlVals)
     jsonIn ++ Json.obj(C.Base.ID -> id)

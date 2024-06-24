@@ -4,7 +4,8 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import software.altitude.core.models.User
+import software.altitude.core.Util
+import software.altitude.core.models.{AccountType, User}
 
 @DoNotDiscover class UserServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
@@ -16,5 +17,20 @@ import software.altitude.core.models.User
     storedUser.updatedAt should be(None)
 
     user.id shouldEqual storedUser.id
+  }
+
+  test("Check valid user password") {
+    val password = "MyPassword123"
+
+    val userModel = User(
+      email = Util.randomStr(),
+      accountType = AccountType.User
+    )
+
+    testContext.persistUser(Some(userModel), password=password)
+
+    val isValidLogin = altitude.service.user.checkUserLogin(userModel.email, password)
+
+    isValidLogin should be(true)
   }
 }

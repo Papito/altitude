@@ -19,13 +19,12 @@ class TestContext(val altitude: Altitude) {
   def makeUser(): User = User(
     email = Util.randomStr(),
     accountType = AccountType.User,
-    passwordHash = Some(Util.randomStr(32))
   )
 
-  def persistUser(user: Option[User] = None): User = {
+  def persistUser(user: Option[User] = None, password: String = "password"): User = {
     val userModel = user.getOrElse(makeUser())
 
-    val persistedUser: User = altitude.service.user.add(userModel)
+    val persistedUser: User = altitude.service.user.add(userModel, password = password)
     users = users ::: persistedUser :: Nil
 
     // if this is the only (or the first user), set current request context
