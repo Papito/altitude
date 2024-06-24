@@ -1,5 +1,7 @@
 package software.altitude.core
 
+import scala.reflect.runtime.universe.{MethodSymbol, runtimeMirror}
+
 object Const {
 
   /**
@@ -220,6 +222,13 @@ object Const {
       val PASSWORD2 = "password2"
       val FIELD_ERRORS = "fieldErrors"
 
+      def getFieldName(value: String): String = {
+        val rm = runtimeMirror(getClass.getClassLoader)
+        val accessors = rm.classSymbol(getClass).toType.members.collect {
+          case m: MethodSymbol if m.isGetter && m.isPublic => m
+        }
+        accessors.find(a => rm.reflect(this).reflectMethod(a).apply().equals(value)).map(_.name.toString).get
+      }
     }
 
     object Constraints {

@@ -27,8 +27,12 @@ class WebIndexController extends BaseWebController {
 
     if (app.isInitialized) {
       redirect("/")
-    } else
-    mustache("/setup", "fields" -> C.Api.Fields, "constr" -> C.Api.Constraints)
+    } else {
+      mustache(
+        "/setup",
+        "fields" -> C.Api.Fields,
+        "constr" -> C.Api.Constraints)
+    }
 
   }
 }

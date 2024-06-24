@@ -1,6 +1,7 @@
 package software.altitude.core.controllers.api
 
 import org.scalatra._
+import org.scalatra.scalate.ScalateSupport
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsNull
 import play.api.libs.json.JsObject
@@ -14,7 +15,7 @@ import software.altitude.core.{Const => C}
 
 import java.lang.System.currentTimeMillis
 
-class BaseApiController extends BaseController {
+class BaseApiController extends BaseController with ScalateSupport {
   private final val log = LoggerFactory.getLogger(getClass)
 
   val OK: ActionResult = Ok("{}")
@@ -26,7 +27,7 @@ class BaseApiController extends BaseController {
   private def requestMethod: String = request.getMethod.toLowerCase
 
   before() {
-    contentType = "application/json; charset=UTF-8"
+//    contentType = "application/json; charset=UTF-8"
 
     // verify that requests with request body are not empty
      checkPayload()
@@ -74,6 +75,12 @@ class BaseApiController extends BaseController {
       InternalServerError(Json.obj(
         C.Api.ERROR -> (if (ex.getMessage!= null) ex.getMessage else ex.getClass.getName),
         C.Api.STACKTRACE -> strStacktrace))
+  }
+
+  def validationErrorsForMustache(validationException: ValidationException): Map[String, String] = {
+    validationException.errors.map{
+      case (fieldName, message) =>
+        C.Api.Fields.getFieldName(fieldName) -> message }.toMap
   }
 
   override def setUser(): Unit = {

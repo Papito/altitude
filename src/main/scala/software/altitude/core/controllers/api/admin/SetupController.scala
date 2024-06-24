@@ -3,11 +3,9 @@ package software.altitude.core.controllers.api.admin
 import org.scalatra.BadRequest
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
-import software.altitude.core.DataScrubber
-import software.altitude.core.ValidationException
+import software.altitude.core.{DataScrubber, ValidationException, Const => C}
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.api.BaseApiController
-import software.altitude.core.{Const => C}
 
 class SetupController extends BaseApiController  {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -53,11 +51,14 @@ class SetupController extends BaseApiController  {
     }
     catch {
       case validationEx: ValidationException =>
-        halt(BadRequest(
-          Json.obj(
-            C.Api.Fields.FIELD_ERRORS -> validationEx.errors))
+        halt(200, mustache(
+          "/htmx/admin/setup_form",
+          "fields" -> C.Api.Fields,
+          "constr" -> C.Api.Constraints,
+          "field_errors" -> validationErrorsForMustache(validationEx))
         )
     }
+
 
     val repositoryName = (json \ C.Api.Fields.REPOSITORY_NAME).as[String]
     val email = (json \ C.Api.Fields.ADMIN_EMAIL).as[String]
@@ -71,6 +72,7 @@ class SetupController extends BaseApiController  {
             C.Api.Fields.ADMIN_EMAIL -> C.Msg.Err.NOT_A_VALID_EMAIL
           )))
       )
+
     }
 
     if (password != password2) {

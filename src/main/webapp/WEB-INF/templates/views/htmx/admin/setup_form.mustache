@@ -1,0 +1,123 @@
+<style>
+    #setupForm {
+        display: grid;
+        grid-auto-rows: min-content;
+        grid-row-gap: var(--section-vertical-space);
+    }
+
+    #setupForm label {
+        display: block;
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+        font-size: 1.2em;
+    }
+
+    #setupForm input:not([type="submit"]) {
+        width: 100%
+    }
+
+    #setupForm .submit {
+        margin-top: var(--control-vertical-space);
+        display: grid;
+        place-items: center;
+    }
+
+    #setupForm input[type="submit"] {
+        line-height: 1.3em;
+        font-size: 1.2em;
+        width: 50%
+    }
+
+    #setupForm .action-button {
+        padding: 10px 36px;
+        font-size: 1.3em;
+    }
+
+    #setupForm div.error {
+        padding: 5px;
+        margin-top: 5px;
+        background-color: var(--message-background-color);
+        color: #FFF;
+        border: 1px solid var(--error-color);
+        letter-spacing: 1px;
+    }
+</style>
+
+<form action="#" id="setupForm"
+      hx-swap="outerHTML"
+      hx-post="/api/v1/admin/setup"
+      hx-ext="json-enc">
+
+    <div>
+        <label for="{{ fields.REPOSITORY_NAME }}">Library name</label>
+        <input type="text"
+               id="{{ fields.REPOSITORY_NAME }}"
+               name="{{ fields.REPOSITORY_NAME }}"
+               placeholder="Library name"
+               value="Personal"
+               minlength="{{ constr.MIN_REPOSITORY_NAME_LENGTH }}"
+               maxlength="{{ constr.MAX_REPOSITORY_NAME_LENGTH }}"/>
+        {{#field_errors.REPOSITORY_NAME}}
+            <div class="error" >{{.}}</div>
+        {{/field_errors.REPOSITORY_NAME}}
+    </div>
+    <div>
+        <label for="fileStore">File storage type</label>
+        <input type="text"
+               id="fileStore"
+               name="fileStore"
+               class="readonly"
+               readonly
+               value="filesystem"/>
+    </div>
+    <div>
+        <label for="dataStore">Metadata storage type</label>
+        <input type="text"
+               id="dataStore"
+               name="dataStore"
+               class="readonly"
+               readonly
+               value="postgres"/>
+    </div>
+    <div>
+        <label for={{ fields.ADMIN_EMAIL }}>Administrator Email</label>
+        <input type="email"
+               id="{{ fields.ADMIN_EMAIL }}"
+               name="{{ fields.ADMIN_EMAIL }}"
+               minlength="{{ constr.MIN_EMAIL_LENGTH }}"
+               maxlength="{{ constr.MAX_EMAIL_LENGTH }}"/>
+        {{#field_errors.ADMIN_EMAIL}}
+            <div class="error" >{{.}}</div>
+        {{/field_errors.ADMIN_EMAIL}}
+    </div>
+    <div>
+        <label for="{{ fields.PASSWORD }}">Administrator Password</label>
+        <input type="password"
+               id="{{ fields.PASSWORD }}"
+               name="{{ fields.PASSWORD }}"
+               minlength="{{ constr.MIN_PASSWORD_LENGTH }}"
+               maxlength="{{ constr.MAX_PASSWORD_LENGTH }}"/>
+        {{#field_errors.PASSWORD}}
+            <div class="error" >{{.}}</div>
+        {{/field_errors.PASSWORD}}
+    </div>
+    <div>
+        <label for="{{ fields.PASSWORD2 }}">Confirm Password</label>
+        <input type="password"
+               id="{{ fields.PASSWORD2 }}"
+               name="{{ fields.PASSWORD2 }}"
+               minlength="{{ constr.MIN_PASSWORD_LENGTH }}"
+               maxlength="{{ constr.MAX_PASSWORD_LENGTH }}"/>
+        {{#field_errors.PASSWORD2}}
+            <div class="error" >{{.}}</div>
+        {{/field_errors.PASSWORD2}}
+    </div>
+    <div class="submit">
+        <button type="submit"
+                class="action-button"
+                id="initialize">
+            Dazzle Me
+        </button>
+    </div>
+</form>

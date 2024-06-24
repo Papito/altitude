@@ -27,51 +27,6 @@
             grid-auto-rows: min-content;
             grid-row-gap: var(--section-vertical-space);
         }
-
-        #setupForm {
-            display: grid;
-            grid-auto-rows: min-content;
-            grid-row-gap: var(--section-vertical-space);
-        }
-
-        #setupForm label {
-            display: block;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-            font-size: 1.2em;
-        }
-
-        #setupForm input:not([type="submit"]) {
-            width: 100%
-        }
-
-        #setupForm .submit {
-            margin-top: var(--control-vertical-space);
-            display: grid;
-            place-items: center;
-        }
-
-        #setupForm input[type="submit"] {
-            line-height: 1.3em;
-            font-size: 1.2em;
-            width: 50%
-        }
-
-        #setupForm .action-button {
-            padding: 10px 36px;
-            font-size: 1.3em;
-        }
-
-        #setupForm div.error {
-            padding: 5px;
-            margin-top: 5px;
-            background-color: var(--message-background-color);
-            color: #FFF;
-            border: 1px solid var(--error-color);
-            letter-spacing: 1px;
-        }
-
     </style>
 </head>
 
@@ -88,128 +43,13 @@
 
 <main>
     <div>
-        <form action="#" id="setupForm">
-            <div>
-                <label for="{{ fields.REPOSITORY_NAME }}">Library name</label>
-                <input type="text"
-                       id="{{ fields.REPOSITORY_NAME }}"
-                       name="{{ fields.REPOSITORY_NAME }}"
-                       placeholder="Library name"
-                       value="Personal"
-                       minlength="{{ constr.MIN_REPOSITORY_NAME_LENGTH }}"
-                       maxlength="{{ constr.MAX_REPOSITORY_NAME_LENGTH }}"/>
-                <div class="error" hidden></div>
-            </div>
-            <div>
-                <label for="fileStore">File storage type</label>
-                <input type="text"
-                       id="fileStore"
-                       name="fileStore"
-                       class="readonly"
-                       readonly
-                       value="filesystem"/>
-                <div class="error" hidden></div>
-            </div>
-            <div>
-                <label for="dataStore">Metadata storage type</label>
-                <input type="text"
-                       id="dataStore"
-                       name="dataStore"
-                       class="readonly"
-                       readonly
-                       value="postgres"/>
-                <div class="error" hidden></div>
-            </div>
-            <div>
-                <label for={{ fields.ADMIN_EMAIL }}>Administrator Email</label>
-                <input type="email"
-                       id="{{ fields.ADMIN_EMAIL }}"
-                       name="{{ fields.ADMIN_EMAIL }}"
-                       minlength="{{ constr.MIN_EMAIL_LENGTH }}"
-                       maxlength="{{ constr.MAX_EMAIL_LENGTH }}"/>
-                <div class="error" hidden></div>
-            </div>
-            <div>
-                <label for="{{ fields.PASSWORD }}">Administrator Password</label>
-                <input type="password"
-                       id="{{ fields.PASSWORD }}"
-                       name="{{ fields.PASSWORD }}"
-                       minlength="{{ constr.MIN_PASSWORD_LENGTH }}"
-                       maxlength="{{ constr.MAX_PASSWORD_LENGTH }}"/>
-                <div class="error" hidden></div>
-            </div>
-            <div>
-                <label for="{{ fields.PASSWORD2 }}">Confirm Password</label>
-                <input type="password"
-                       id="{{ fields.PASSWORD2 }}"
-                       name="{{ fields.PASSWORD2 }}"
-                       minlength="{{ constr.MIN_PASSWORD_LENGTH }}"
-                       maxlength="{{ constr.MAX_PASSWORD_LENGTH }}"/>
-                <div class="error" hidden></div>
-            </div>
-            <div class="submit">
-                <button hx-trigger="click"
-                        hx-post="/api/v1/admin/setup"
-                        hx-ext="json-enc"
-                        class="action-button"
-                        id="initialize">Dazzle Me</button>
-            </div>
-        </form>
+        {{> htmx/admin/setup_form }}
     </div>
 </main>
 
 <footer>
     By Renegade Otter
 </footer>
-
-<script type="module" lang="js">
-    const formEl = document.getElementById("setupForm")
-    const errorMsgEl = document.getElementById("serverError")
-
-    document.body.addEventListener('htmx:beforeRequest', function (evt) {
-        const fieldErrorElements = formEl.querySelectorAll("div.error")
-        fieldErrorElements.forEach(errorElement => {
-            errorElement.setAttribute("hidden", "true")
-        })
-
-        errorMsgEl.setAttribute("hidden", "true")
-    });
-
-    formEl.addEventListener('htmx:afterRequest', function (evt) {
-        console.log(evt.detail)
-
-        if (evt.detail.xhr.status === 200){
-            // Success, redirects to landing so nothing to do here
-        } else if (evt.detail["failed"] && evt.detail.xhr) {
-            const xhr = evt.detail.xhr
-            // Server error with response contents, equivalent to htmx:responseError
-            console.warn("Server error", evt.detail)
-
-            const jsonResponse = JSON.parse(evt.detail.xhr.responseText)
-
-            // Populate error messages for this form if we get field errors
-            const fieldErrors = jsonResponse["{{ fields.FIELD_ERRORS }}"]
-
-            if (xhr.status === 400 && fieldErrors) {
-                Object.keys(fieldErrors).forEach(field => {
-                    const errorMessages = fieldErrors[field]
-                    const errorTarget = formEl.querySelector(`div > input[name='${field}'] + div.error`)
-                    errorTarget.innerText = errorMessages
-                    errorTarget.removeAttribute("hidden")
-                });
-                return
-            }
-
-            errorMsgEl.innerText = `Unexpected server error: ${xhr.status} - ${xhr.statusText}`
-            errorMsgEl.removeAttribute("hidden")
-        } else {
-            // Unspecified failure, usually caused by network error
-            console.error("Unexpected htmx error", evt.detail)
-            errorMsgEl.innerText = `Unknown error!`;
-            errorMsgEl.removeAttribute("hidden")
-        }
-    });
-</script>
 
 </body>
 </html>

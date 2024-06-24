@@ -48,4 +48,5 @@ object Util {
 
   def checkPassword(password: String, hashedPassword: String): Boolean = {
     BCrypt.checkpw(password, hashedPassword)
-  }}
+  }
+}
