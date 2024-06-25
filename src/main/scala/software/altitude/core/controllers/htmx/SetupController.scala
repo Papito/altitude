@@ -47,8 +47,6 @@ class SetupController extends BaseHtmxController  {
       halt(400, message)
     }
 
-    log.warn("Initializing up the instance...")
-
     val jsonIn: JsObject = dataScrubber.scrub(unscrubbedReqJson.get)
 
     val validationException: ValidationException = try {

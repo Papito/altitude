@@ -3,7 +3,7 @@
 <head>
     <title>ALTITUDE</title>
 
-    {{> includes/header_common }}
+    ${include("includes/header_common.ssp")}
 
     <style>
         #browser {
@@ -62,7 +62,7 @@
 <body>
 
 <div>
-    {{> includes/nav}}
+    ${include("includes/nav.ssp")}
 </div>
 
 <main>
