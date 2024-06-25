@@ -27,7 +27,7 @@ class BaseApiController extends BaseController with ScalateSupport {
   private def requestMethod: String = request.getMethod.toLowerCase
 
   before() {
-//    contentType = "application/json; charset=UTF-8"
+    contentType = "application/json; charset=UTF-8"
 
     // verify that requests with request body are not empty
      checkPayload()
