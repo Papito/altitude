@@ -25,4 +25,26 @@ import software.altitude.test.core.HtmxTestCore
       response.body should include ("Passwords do not match")
     }
   }
+
+  /* Since web tests spawn a new instance of the application, it messes with the state and transaction data.
+     The spawned app is also Postgres for both Sqlite and Postgres tests, which makes it even worse.
+     When I have time, I will have to figure out how to make web controller tests less brittle.
+     https://trello.com/c/iM2OSgbm
+  */
+
+    test("Should successfully initialize when the form is valid", Focused) {
+    val payload = Json.obj(
+      C.Api.Fields.ADMIN_EMAIL -> "me@me.com",
+      C.Api.Fields.REPOSITORY_NAME -> "My Repository",
+      C.Api.Fields.PASSWORD -> "password3000",
+      C.Api.Fields.PASSWORD2 -> "password3000"
+    )
+
+    post("/htmx/admin/setup", body = payload.toString(), headers = getHeaders) {
+      status should equal(200)
+
+      // Sends HTMX redirect to the root path
+      response.getHeader("HX-Redirect") should be("/")
+    }
+  }
 }

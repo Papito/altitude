@@ -24,6 +24,9 @@ test-sqlite:
 test-unit:
 	sbt testUnit
 
+test-web:
+	sbt testWeb
+
 lint:
 	sbt scalafixAll
 

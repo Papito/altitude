@@ -1,17 +1,18 @@
 package software.altitude.core.service
 
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
 import software.altitude.core.dao.SystemMetadataDao
 import software.altitude.core.models.SystemMetadata
+import software.altitude.core.models.User
 import software.altitude.core.transactions.TransactionManager
+import software.altitude.core.{Const => C}
 
 import java.sql.SQLException
 
-class SystemMetadataService(val app: Altitude) {
-  protected val log: Logger = LoggerFactory.getLogger(getClass)
+class SystemService(val app: Altitude) {
+  private final val log = LoggerFactory.getLogger(getClass)
 
   private val systemMetadataDao: SystemMetadataDao = app.injector.instance[SystemMetadataDao]
   protected val txManager: TransactionManager = app.txManager
@@ -19,7 +20,7 @@ class SystemMetadataService(val app: Altitude) {
   def version: Int = {
     txManager.asReadOnly[Int] {
       try {
-        read.version
+        readMetadata.version
       }
       catch {
         case _: SQLException => {
@@ -45,10 +46,27 @@ class SystemMetadataService(val app: Altitude) {
     }
   }
 
-  def read: SystemMetadata = {
+
+  def readMetadata: SystemMetadata = {
     txManager.asReadOnly[SystemMetadata] {
       systemMetadataDao.getById(SystemMetadataDao.SYSTEM_RECORD_ID.toString)
     }
+  }
 
+  def initializeSystem(repositoryName: String, adminModel: User, password: String): Unit = {
+    log.warn("INITIALIZING SYSTEM")
+
+    txManager.withTransaction {
+      val admin = app.service.user.add(adminModel, password = password)
+
+      app.service.repository.addRepository(
+        name = repositoryName,
+        fileStoreType = C.FileStoreType.FS,
+        owner = admin)
+
+      systemMetadataDao.setInitialized()
+
+      app.setIsInitializedState()
+    }
   }
 }

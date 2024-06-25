@@ -8,19 +8,11 @@ import software.altitude.core.Environment
 import software.altitude.core.RequestContext
 import software.altitude.test.core.IntegrationTestCore
 
-trait PostgresSuiteSetup extends Suite with BeforeAndAfterAll {
-  Environment.ENV = Environment.TEST
-  protected final val log: Logger = LoggerFactory.getLogger(getClass)
+object PostgresSuiteSetup {
 
-  override def beforeAll(): Unit = {
-    println("\n@@@@@@@@@@@@@@@@@@@@@@@@@@")
-    println("POSTGRES INTEGRATION TESTS")
-    println("@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
-
+  def setup(): Unit = {
     IntegrationTestCore.createTestDir(PostgresSuite.app)
-    PostgresSuite.app.service.migrationService.migrate()
 
-    log.info("Clearing Postgres database")
     val conn = PostgresSuite.app.txManager.connection(readOnly = false)
     val stmt = conn.createStatement()
 
@@ -34,6 +26,19 @@ trait PostgresSuiteSetup extends Suite with BeforeAndAfterAll {
     }
 
     PostgresSuite.app.service.migrationService.migrate()
+  }
+}
+
+trait PostgresSuiteSetup extends Suite with BeforeAndAfterAll {
+  Environment.ENV = Environment.TEST
+  protected final val log: Logger = LoggerFactory.getLogger(getClass)
+
+  override def beforeAll(): Unit = {
+    println("\n@@@@@@@@@@@@@@@@@@@@@@@@@@")
+    println("POSTGRES INTEGRATION TESTS")
+    println("@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
+
+    PostgresSuiteSetup.setup()
 
     RequestContext.conn.value = Some(PostgresSuite.app.txManager.connection(readOnly = false))
   }

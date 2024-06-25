@@ -52,7 +52,7 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeApp
       }
     }
 
-    val system = new SystemMetadataService(app)
+    val system = new SystemService(app)
     val user = new UserService(app)
     val repository = new RepositoryService(app)
     val assetImport = new AssetImportService(app)
@@ -112,7 +112,7 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeApp
   def freeResources(): Unit = {}
 
   def setIsInitializedState(): Unit = {
-    this.isInitialized = service.system.read.isInitialized
+    this.isInitialized = service.system.readMetadata.isInitialized
     if (!this.isInitialized) {
       log.warn("Instance NOT YET INITIALIZED!")
     }

@@ -3,10 +3,9 @@ package software.altitude.test.core.suites
 import org.scalatest.Suites
 import software.altitude.test.core.integration._
 import software.altitude.test.core.unit._
-import software.altitude.test.core.web.{IndexControllerTests, SetupControllerTests}
 
 abstract class AllIntegrationTests(val config: Map[String, Any]) extends Suites (
-  // INTEGRATION (services)
+  new SystemServiceTests(config),
   new AssetQueryTests(config),
   new SearchQueryModelTests,
   new AssetServiceTests(config),
@@ -20,10 +19,4 @@ abstract class AllIntegrationTests(val config: Map[String, Any]) extends Suites 
   new UserServiceTests(config),
   new LibraryServiceTests(config),
   new MetadataServiceTests(config),
-
-  // HTTP:API
-  new SetupControllerTests(config),
-
-  // HTTP:WEB
-  new IndexControllerTests(config)
 )

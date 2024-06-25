@@ -10,4 +10,5 @@ object SystemMetadataDao {
 
 trait SystemMetadataDao extends BaseDao {
   def updateVersion(toVersion: Int): Unit
+  def setInitialized(): Unit
 }

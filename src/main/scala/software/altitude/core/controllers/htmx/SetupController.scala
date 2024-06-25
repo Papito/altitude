@@ -2,9 +2,13 @@ package software.altitude.core.controllers.htmx
 
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
+import software.altitude.core.DataScrubber
+import software.altitude.core.ValidationException
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.BaseHtmxController
-import software.altitude.core.{DataScrubber, ValidationException, Const => C}
+import software.altitude.core.models.AccountType
+import software.altitude.core.models.User
+import software.altitude.core.{Const => C}
 
 class SetupController extends BaseHtmxController  {
   private final val log = LoggerFactory.getLogger(getClass)
@@ -82,6 +86,16 @@ class SetupController extends BaseHtmxController  {
           "formJson" -> jsonIn)
       )
     }
+
+    //
+    // Oh, we are committed at this point
+    //
+    val userModel = new User(email= email, accountType = AccountType.Admin)
+
+    app.service.system.initializeSystem(
+      repositoryName=repositoryName,
+      adminModel=userModel,
+      password=password)
 
     // On OK, send a magical header so that HTMX can redirect to the landing page
     response.addHeader("HX-Redirect", "/")

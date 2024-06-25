@@ -27,6 +27,16 @@ abstract class SystemMetadataDao(val appContext: AltitudeAppContext)
       sql, toVersion, software.altitude.core.dao.SystemMetadataDao.SYSTEM_RECORD_ID)
   }
 
+  def setInitialized(): Unit = {
+    val runner: QueryRunner = new QueryRunner()
+
+    val sql = s"UPDATE $tableName SET ${C.SystemMetadata.IS_INITIALIZED} = ? WHERE id = ?"
+
+    runner.update(
+      RequestContext.getConn,
+      sql, true, software.altitude.core.dao.SystemMetadataDao.SYSTEM_RECORD_ID)
+  }
+
   // overriding the base method since there is no repository relation in this model
   override def getById(id: String): JsObject = {
     val sql: String = s"""

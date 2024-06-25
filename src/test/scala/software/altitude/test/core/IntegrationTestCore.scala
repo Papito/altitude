@@ -4,17 +4,26 @@ import org.apache.commons.io.FileUtils
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest._
-import org.slf4j.{Logger, LoggerFactory, MDC}
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.slf4j.MDC
+import software.altitude.core.Const
 import software.altitude.core.models._
-import software.altitude.core.{Const, Const => C, _}
+import software.altitude.core.{Const => C, _}
 import software.altitude.test.core.integration.TestContext
-import software.altitude.test.core.suites.{PostgresSuite, SqliteSuite}
+import software.altitude.test.core.suites.PostgresSuite
+import software.altitude.test.core.suites.SqliteSuite
 
 import java.io.File
+import scala.Console.println
 import scala.language.implicitConversions
 
 
 object IntegrationTestCore {
+  /*
+  Set to true TEMPORARILY to commit after each test to be able to see the state of the DB
+   */
+  private final val COMMIT_AFTER_EACH_TEST = false
 
   /**
    * Create a directory for testing purposes.
@@ -55,6 +64,7 @@ object IntegrationTestCore {
   /**
    * Convert a file system resource to an import asset
    */
+  // FIXME: should be moved to a more appropriate location (test utils)
   def fileToImportAsset(file: File): ImportAsset = new ImportAsset(
     fileName = file.getName,
     path = file.getAbsolutePath,
@@ -67,6 +77,7 @@ object IntegrationTestCore {
  * The trait provides utility methods for creating Mockito `Answer` instances.
  * These methods simplify the creation of `Answer` instances by allowing the use of lambda expressions.
  */
+// FIXME: also test utils
 trait AnswerSugar {
   /**
    * Converts a function with no arguments to a Mockito `Answer`.
@@ -117,10 +128,20 @@ abstract class IntegrationTestCore
     MDC.put("REQUEST_ID", s"[TEST: $count]")
 
     IntegrationTestCore.createFileStoreDir(altitude)
+
+    if (IntegrationTestCore.COMMIT_AFTER_EACH_TEST) {
+      println("\n\u001B[33mWARNING: Committing after each test.\n" +
+        "To return to the rollback behavior, \nset IntegrationTestCore.COMMIT_AFTER_EACH_TEST to FALSE" +
+        "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\u001B[0m\n\n")
+    }
   }
 
   override def afterEach(): Unit = {
-    altitude.txManager.rollback()
+    if (IntegrationTestCore.COMMIT_AFTER_EACH_TEST) {
+      altitude.txManager.commit()
+    } else {
+      altitude.txManager.rollback()
+    }
   }
 
   // Stores test app config overrides, since we run same tests with a different app setup.

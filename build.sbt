@@ -93,6 +93,9 @@ commands += Command.command("testPostgres") { state =>
 commands += Command.command("testUnit") { state =>
   "testOnly software.altitude.test.core.suites.UnitTestSuite" :: state
 }
+commands += Command.command("testWeb") { state =>
+  "testOnly software.altitude.test.core.suites.WebSuite" :: state
+}
 commands += Command.command("watch") { state =>
   "~;jetty:stop;jetty:start" :: state
 }
