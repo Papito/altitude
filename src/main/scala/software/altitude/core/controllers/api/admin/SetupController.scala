@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import software.altitude.core.{DataScrubber, ValidationException, Const => C}
 import software.altitude.core.Validators.ApiRequestValidator
-import software.altitude.core.controllers.api.BaseApiController
+import software.altitude.core.controllers.BaseApiController
 
 class SetupController extends BaseApiController  {
   private final val log = LoggerFactory.getLogger(getClass)

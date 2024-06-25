@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
 import software.altitude.core.RequestContext
+import software.altitude.core.controllers.BaseApiController
 import software.altitude.core.models.Folder
 import software.altitude.core.{Const => C}
 

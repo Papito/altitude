@@ -6,7 +6,7 @@ import play.api.libs.json.Json
 import software.altitude.core.Const.Api
 import software.altitude.core.NotFoundException
 import software.altitude.core.Validators.ApiRequestValidator
-import software.altitude.core.controllers.Util
+import software.altitude.core.controllers.{BaseApiController, Util}
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Data
 import software.altitude.core.models.Preview
