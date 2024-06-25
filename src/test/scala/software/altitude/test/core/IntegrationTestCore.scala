@@ -112,6 +112,7 @@ abstract class IntegrationTestCore
   protected final val log: Logger = LoggerFactory.getLogger(getClass)
 
   override def beforeEach(): Unit = {
+    AltitudeServletContext.app.isInitialized = false
     testContext = new TestContext(altitude)
 
     /*
