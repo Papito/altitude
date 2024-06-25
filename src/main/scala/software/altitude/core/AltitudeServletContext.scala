@@ -4,7 +4,7 @@ import org.scalatra.ScalatraServlet
 import org.scalatra.servlet.ServletApiImplicits._
 import org.slf4j.LoggerFactory
 import software.altitude.core.controllers.api._
-import software.altitude.core.controllers.api.admin.SetupController
+import software.altitude.core.controllers.htmx.SetupController
 import software.altitude.core.controllers.web.SessionController
 import software.altitude.core.controllers.web.WebIndexController
 
@@ -28,7 +28,7 @@ object AltitudeServletContext {
     (new MetadataController, "/api/v1/metadata/*"),
     (new SessionController, "/sessions/*"),
 
-    (new SetupController, "/api/v1/admin/setup/*"),
+    (new SetupController, "/htmx/admin/setup/*"),
     (new admin.MetadataController, "/api/v1/admin/metadata/*"),
 
     // (new FileSystemBrowserController, "/navigate/*"),

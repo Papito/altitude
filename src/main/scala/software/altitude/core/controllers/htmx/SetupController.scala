@@ -1,12 +1,12 @@
-package software.altitude.core.controllers.api.admin
+package software.altitude.core.controllers.htmx
 
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
-import software.altitude.core.{DataScrubber, ValidationException, Const => C}
 import software.altitude.core.Validators.ApiRequestValidator
-import software.altitude.core.controllers.BaseApiController
+import software.altitude.core.controllers.BaseHtmxController
+import software.altitude.core.{DataScrubber, ValidationException, Const => C}
 
-class SetupController extends BaseApiController  {
+class SetupController extends BaseHtmxController  {
   private final val log = LoggerFactory.getLogger(getClass)
 
   private val dataScrubber = DataScrubber(

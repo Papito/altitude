@@ -1,13 +1,14 @@
-package software.altitude.test.core.api
+package software.altitude.test.core.web
 
 import org.scalatest.DoNotDiscover
 import play.api.libs.json.Json
 import software.altitude.core.{Const => C}
+import software.altitude.test.core.api.ApiTestCore
 
 @DoNotDiscover class SetupControllerTests(val config: Map[String, Any]) extends ApiTestCore {
 
   test("Should return validation errors") {
-    post("/api/v1/admin/setup", body = "{}", headers = getHeaders) {
+    post("/htmx/admin/setup", body = "{}", headers = getHeaders) {
       val requiredCount = "required".r.findAllIn(response.body).toList.size
       requiredCount should be (4)
     }
@@ -20,7 +21,7 @@ import software.altitude.core.{Const => C}
       C.Api.Fields.PASSWORD -> "password",
       C.Api.Fields.PASSWORD2 -> "oops"
     )
-    post("/api/v1/admin/setup", body = payload.toString(), headers = getHeaders) {
+    post("/htmx/admin/setup", body = payload.toString(), headers = getHeaders) {
       response.body should include ("Passwords do not match")
     }
   }

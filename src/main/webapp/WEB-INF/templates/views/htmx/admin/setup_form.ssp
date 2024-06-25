@@ -54,7 +54,7 @@
 
 <form action="#" id="setupForm"
       hx-swap="outerHTML"
-      hx-post="/api/v1/admin/setup"
+      hx-post="/htmx/admin/setup"
       hx-ext="json-enc">
 
     <div>

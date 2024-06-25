@@ -9,7 +9,7 @@ import software.altitude.core.{DataScrubber, NotFoundException, ValidationExcept
 
 import java.lang.System.currentTimeMillis
 
-class BaseApiController extends BaseController {
+class BaseHtmxController extends BaseController with ScalateSupport {
   private final val log = LoggerFactory.getLogger(getClass)
 
   val OK: ActionResult = Ok("{}")
@@ -24,11 +24,11 @@ class BaseApiController extends BaseController {
     contentType = "application/json; charset=UTF-8"
 
     // verify that requests with request body are not empty
-     checkPayload()
+    checkPayload()
   }
 
   override def logRequestStart(): Unit = log.info(
-      s"API ${request.getRequestURI} ${requestMethod.toUpperCase}, Body {${request.body}} Args: ${request.getParameterMap}"
+    s"API ${request.getRequestURI} ${requestMethod.toUpperCase}, Body {${request.body}} Args: ${request.getParameterMap}"
   )
 
   override def logRequestEnd(): Unit = {
@@ -52,9 +52,10 @@ class BaseApiController extends BaseController {
 
   error {
     case ex: ValidationException =>
-      val jsonErrors = ex.errors.keys.foldLeft(Json.obj()) {(res, field) => {
+      val jsonErrors = ex.errors.keys.foldLeft(Json.obj()) { (res, field) => {
         val key = field
-        res ++ Json.obj(key -> ex.errors(key))}
+        res ++ Json.obj(key -> ex.errors(key))
+      }
       }
 
       BadRequest(Json.obj(
@@ -67,7 +68,7 @@ class BaseApiController extends BaseController {
       val strStacktrace = software.altitude.core.Util.logStacktrace(ex)
 
       InternalServerError(Json.obj(
-        C.Api.ERROR -> (if (ex.getMessage!= null) ex.getMessage else ex.getClass.getName),
+        C.Api.ERROR -> (if (ex.getMessage != null) ex.getMessage else ex.getClass.getName),
         C.Api.STACKTRACE -> strStacktrace))
   }
 
