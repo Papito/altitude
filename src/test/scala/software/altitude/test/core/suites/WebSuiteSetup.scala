@@ -12,9 +12,9 @@ trait WebSuiteSetup extends Suite with BeforeAndAfterAll {
   protected final val log: Logger = LoggerFactory.getLogger(getClass)
 
   override def beforeAll(): Unit = {
-    println("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-    println("WEB CONTROLLER INTEGRATION TESTS")
-    println("@@@@@@@@@@@@@@@@@@@@@@@@#@@@@@@@\n")
+    println("\n@@@@@@@@@@@@@@@@@@@@")
+    println("WEB CONTROLLER TESTS")
+    println("@@@@@@@@@@@@@@@@@@@@\n")
 
     // we are testing HTTP server output doing its own thing in a different process, so we cannot
     // and should not write to anything - the connection here is just to explore the state of the DB
