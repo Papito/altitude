@@ -16,6 +16,7 @@ import software.altitude.core.Util
 import software.altitude.core.models._
 import software.altitude.core.util.Query
 import software.altitude.core.{Const => C}
+import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class LibraryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 

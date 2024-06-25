@@ -11,6 +11,7 @@ import software.altitude.core.NotFoundException
 import software.altitude.core.RequestContext
 import software.altitude.core.ValidationException
 import software.altitude.core.models.Folder
+import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class FolderServiceTests (val config: Map[String, Any]) extends IntegrationTestCore {
 

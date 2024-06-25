@@ -13,7 +13,8 @@ import software.altitude.core.Util
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Folder
 import software.altitude.core.{Const => C}
-import software.altitude.test.core.integration.IntegrationTestCore.fileToImportAsset
+import software.altitude.test.core.IntegrationTestCore
+import software.altitude.test.core.IntegrationTestCore.fileToImportAsset
 
 import java.io.File
 

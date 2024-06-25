@@ -4,7 +4,8 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.contain
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.models.Metadata
-import software.altitude.test.core.integration.IntegrationTestCore.fileToImportAsset
+import software.altitude.test.core.IntegrationTestCore
+import software.altitude.test.core.IntegrationTestCore.fileToImportAsset
 
 import java.io.File
 

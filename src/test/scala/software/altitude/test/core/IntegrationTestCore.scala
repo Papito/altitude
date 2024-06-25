@@ -1,18 +1,14 @@
-package software.altitude.test.core.integration
+package software.altitude.test.core
 
 import org.apache.commons.io.FileUtils
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest._
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import org.slf4j.MDC
-import software.altitude.core.Const
+import org.slf4j.{Logger, LoggerFactory, MDC}
 import software.altitude.core.models._
-import software.altitude.core.{Const => C, _}
-import software.altitude.test.core.TestFocus
-import software.altitude.test.core.suites.PostgresSuite
-import software.altitude.test.core.suites.SqliteSuite
+import software.altitude.core.{Const, Const => C, _}
+import software.altitude.test.core.integration.TestContext
+import software.altitude.test.core.suites.{PostgresSuite, SqliteSuite}
 
 import java.io.File
 import scala.language.implicitConversions

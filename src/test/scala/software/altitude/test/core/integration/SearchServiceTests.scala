@@ -6,6 +6,7 @@ import org.scalatest.matchers.must.Matchers.empty
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.models._
 import software.altitude.core.util._
+import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class SearchServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 

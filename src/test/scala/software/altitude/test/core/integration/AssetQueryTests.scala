@@ -6,6 +6,7 @@ import software.altitude.core.RequestContext
 import software.altitude.core.models.Asset
 import software.altitude.core.util.Query
 import software.altitude.core.{Const => C}
+import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class AssetQueryTests(val config: Map[String, Any]) extends IntegrationTestCore {
   test("Empty search") {

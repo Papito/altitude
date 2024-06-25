@@ -6,7 +6,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.Environment
 import software.altitude.core.RequestContext
-import software.altitude.test.core.integration.IntegrationTestCore
+import software.altitude.test.core.IntegrationTestCore
 
 trait SqliteSuiteSetup extends Suite with BeforeAndAfterAll {
   Environment.ENV = Environment.TEST

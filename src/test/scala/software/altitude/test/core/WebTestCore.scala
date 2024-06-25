@@ -1,9 +1,8 @@
-package software.altitude.test.core.web
+package software.altitude.test.core
 
 import org.scalatra.test.ScalatraTests
 import org.scalatra.test.scalatest.ScalatraFunSuite
 import software.altitude.core.AltitudeServletContext
-import software.altitude.test.core.integration.IntegrationTestCore
 
 abstract class WebTestCore extends IntegrationTestCore with ScalatraTests with ScalatraFunSuite {
 

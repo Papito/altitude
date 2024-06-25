@@ -1,6 +1,7 @@
 package software.altitude.test.core.web
 
 import org.scalatest.DoNotDiscover
+import software.altitude.test.core.WebTestCore
 
 @DoNotDiscover class IndexControllerTests(val config: Map[String, Any]) extends WebTestCore {
 

@@ -3,9 +3,9 @@ package software.altitude.test.core.web
 import org.scalatest.DoNotDiscover
 import play.api.libs.json.Json
 import software.altitude.core.{Const => C}
-import software.altitude.test.core.api.ApiTestCore
+import software.altitude.test.core.HtmxTestCore
 
-@DoNotDiscover class SetupControllerTests(val config: Map[String, Any]) extends ApiTestCore {
+@DoNotDiscover class SetupControllerTests(val config: Map[String, Any]) extends HtmxTestCore {
 
   test("Should return validation errors") {
     post("/htmx/admin/setup", body = "{}", headers = getHeaders) {

@@ -7,6 +7,7 @@ import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Util
 import software.altitude.core.models.Repository
 import software.altitude.core.{Const => C}
+import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class RepositoryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 

@@ -6,6 +6,7 @@ import software.altitude.core.models.Asset
 import software.altitude.core.models.Folder
 import software.altitude.core.models.Stats
 import software.altitude.core.util.Query
+import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class StatsServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 

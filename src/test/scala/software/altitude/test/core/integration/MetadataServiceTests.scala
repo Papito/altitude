@@ -11,6 +11,7 @@ import software.altitude.core.Util
 import software.altitude.core.ValidationException
 import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models._
+import software.altitude.test.core.IntegrationTestCore
 
 
 @DoNotDiscover class MetadataServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {

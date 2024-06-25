@@ -6,6 +6,7 @@ import software.altitude.core.NotFoundException
 import software.altitude.core.models.Asset
 import software.altitude.core.util.Query
 import software.altitude.core.{Const => C}
+import software.altitude.test.core.IntegrationTestCore
 
 
 @DoNotDiscover class AssetServiceTests (val config: Map[String, Any]) extends IntegrationTestCore {
