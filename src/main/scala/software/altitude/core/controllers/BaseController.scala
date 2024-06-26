@@ -1,9 +1,10 @@
 package software.altitude.core.controllers
 
-import org.scalatra.InternalServerError
+import org.scalatra.{ContentEncodingSupport, InternalServerError, ScalatraServlet}
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import software.altitude.core.AltitudeServletContext
+import software.altitude.core.auth.AuthenticationSupport
 import software.altitude.core.models.Repository
 import software.altitude.core.models.User
 
@@ -11,7 +12,9 @@ import java.io.PrintWriter
 import java.io.StringWriter
 import java.lang.System.currentTimeMillis
 
-abstract class BaseController extends AltitudeStack with AltitudeServletContext {
+abstract class BaseController extends ScalatraServlet
+  with ContentEncodingSupport with AuthenticationSupport with AltitudeServletContext {
+
   private final val log = LoggerFactory.getLogger(getClass)
 
   final def user: User = request.getAttribute("user").asInstanceOf[User]
@@ -48,6 +51,7 @@ abstract class BaseController extends AltitudeStack with AltitudeServletContext 
 
   private def isAssetRequest =  request.pathInfo.startsWith("/css") ||
     request.pathInfo.startsWith("/js") ||
+    request.pathInfo.startsWith("/webfonts") ||
     request.pathInfo.startsWith("/images")
 
   protected def setUser(): Unit = {
