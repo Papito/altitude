@@ -13,7 +13,12 @@ import software.altitude.core.models.User
 trait AuthenticationSupport extends ScalatraBase with ScentrySupport[User] {
   self: ScalatraBase =>
 
-  protected def fromSession: PartialFunction[String, User] = { case id: String => User(id=Some(id), accountType = AccountType.User, email = "email") }
+  protected def fromSession: PartialFunction[String, User] = {
+    case id: String => User(
+      id=Some(id),
+      accountType = AccountType.User,
+      email = "email") }
+
   protected def toSession: PartialFunction[User, String] = {
     case usr: User =>
       if (usr.id.isDefined)

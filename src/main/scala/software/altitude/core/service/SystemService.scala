@@ -3,6 +3,7 @@ package software.altitude.core.service
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
+import software.altitude.core.RequestContext
 import software.altitude.core.dao.SystemMetadataDao
 import software.altitude.core.models.SystemMetadata
 import software.altitude.core.models.User
@@ -67,6 +68,8 @@ class SystemService(val app: Altitude) {
       systemMetadataDao.setInitialized()
 
       app.setIsInitializedState()
+
+      RequestContext.account.value = Some(admin)
     }
   }
 }

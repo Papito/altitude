@@ -1,6 +1,7 @@
 package software.altitude.core.dao.jdbc.querybuilder
 
 import org.slf4j.LoggerFactory
+import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.util.Query
 import software.altitude.core.util.Query.QueryParam
 
@@ -67,7 +68,8 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
   private def select(query: QueryT): ClauseComponents = ClauseComponents(elements = selColumnNames)
   protected def selectStr(clauseComponents: ClauseComponents): String = {
     val columnNames = clauseComponents.elements
-    s"SELECT ${columnNames.mkString(", ")}"
+    val columnsWithTotalWinFunc = columnNames :+ BaseDao.totalRecsWindowFunction
+    s"SELECT ${columnsWithTotalWinFunc.mkString(", ")}"
   }
 
   protected def from(query: QueryT): ClauseComponents = ClauseComponents(elements = tableNames.toList)
@@ -113,8 +115,10 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
   }
 
   protected def whereStr(clauseComponents: ClauseComponents): String = {
-    val whereClauses = clauseComponents.elements
-    s" WHERE ${whereClauses.mkString(" AND ")}"
+      clauseComponents.elements.length match {
+      case 0 => ""
+      case _ => s" WHERE ${clauseComponents.elements.mkString(" AND ")}"
+    }
   }
 
   protected def groupBy(query: QueryT): ClauseComponents = ClauseComponents()

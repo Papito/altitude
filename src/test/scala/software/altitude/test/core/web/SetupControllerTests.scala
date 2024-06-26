@@ -26,7 +26,7 @@ import software.altitude.test.core.HtmxTestCore
     }
   }
 
-  test("Should successfully initialize when the form is valid", Focused) {
+  test("Should successfully initialize when the form is valid") {
     val payload = Json.obj(
       C.Api.Fields.ADMIN_EMAIL -> "me@me.com",
       C.Api.Fields.REPOSITORY_NAME -> "My Repository",

@@ -170,9 +170,15 @@ abstract class IntegrationTestCore
 
   def switchContextUser(user: User): Unit = {
     altitude.service.user.switchContextToUser(user)
-}
+  }
 
   def switchContextRepo(repository: Repository): Unit = {
     altitude.service.repository.switchContextToRepository(repository)
-}
+  }
+
+  def reset(): Unit = {
+    altitude.txManager.rollback()
+    RequestContext.clear()
+  }
+
 }

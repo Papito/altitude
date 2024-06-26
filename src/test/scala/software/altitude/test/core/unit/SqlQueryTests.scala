@@ -6,6 +6,7 @@ import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Const
 import software.altitude.core.RequestContext
 import software.altitude.core.Util
+import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models.Repository
 import software.altitude.core.util.Query
@@ -30,7 +31,7 @@ import software.altitude.test.core.TestFocus
     val builder = new SqlQueryBuilder[Query](List("*"), Set("table1"))
     val q = new Query(params = Map("searchValue" -> 3), rpp = 10, page = 2)
     val sqlQuery = builder.buildSelectSql(q.withRepository())
-    sqlQuery.sqlAsString shouldBe "SELECT * FROM table1 WHERE searchValue = ? AND repository_id = ? LIMIT 10 OFFSET 10"
+    sqlQuery.sqlAsString shouldBe s"SELECT *, ${BaseDao.totalRecsWindowFunction} FROM table1 WHERE searchValue = ? AND repository_id = ? LIMIT 10 OFFSET 10"
     sqlQuery.bindValues.size shouldBe 2
   }
 
@@ -42,6 +43,6 @@ import software.altitude.test.core.TestFocus
       sort = List(Sort("column", SortDirection.ASC))
     )
     val sqlQuery = builder.buildSelectSql(q.withRepository())
-    sqlQuery.sqlAsString shouldBe "SELECT * FROM table1 WHERE repository_id = ? ORDER BY column ASC LIMIT 10 OFFSET 10"
+    sqlQuery.sqlAsString shouldBe s"SELECT *, ${BaseDao.totalRecsWindowFunction} FROM table1 WHERE repository_id = ? ORDER BY column ASC LIMIT 10 OFFSET 10"
   }
 }

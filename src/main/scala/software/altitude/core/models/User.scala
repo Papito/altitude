@@ -29,7 +29,6 @@ case class User(id: Option[String] = None,
 
   override def toString: String = s"<user> ${id.getOrElse("NO ID")}, email: $email, accountType: $accountType"
 
-  // TODO: AUTH
   def forgetMe(): Unit = {
     println("User: this is where you'd invalidate the saved token in you User model")
   }

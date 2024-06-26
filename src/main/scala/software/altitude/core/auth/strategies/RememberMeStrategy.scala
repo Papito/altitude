@@ -19,7 +19,7 @@ class RememberMeStrategy(protected val app: ScalatraBase)(implicit request: Http
   override def name: String = "RememberMe"
 
   private val COOKIE_KEY = "rememberMe"
-  private val oneWeek = 7 * 24 * 3600
+  private val ONE_WEEK = 7 * 24 * 3600
 
   /**
    * * Grab the value of the rememberMe cookie token.
@@ -45,7 +45,9 @@ class RememberMeStrategy(protected val app: ScalatraBase)(implicit request: Http
    */
   def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse): Option[User] = {
     logger.info("RememberMeStrategy: attempting authentication")
-    if (tokenVal == "foobar") Some(User(Some("foo"), accountType = AccountType.User, email="email"))
+    if (tokenVal == "foobar") {
+      Some(User(Some("foo"), accountType = AccountType.User, email="email"))
+    }
     else None
   }
 
@@ -70,7 +72,7 @@ class RememberMeStrategy(protected val app: ScalatraBase)(implicit request: Http
     ) {
 
       val token = "foobar"
-      app.cookies.set(COOKIE_KEY, token)(CookieOptions(maxAge = oneWeek, path = "/"))
+      app.cookies.set(COOKIE_KEY, token)(CookieOptions(maxAge = ONE_WEEK, path = "/"))
     }
   }
 

@@ -18,4 +18,10 @@ object RequestContext {
   def getConn: Connection = conn.value.getOrElse(throw new RuntimeException("No connection in context"))
   def getAccount: User = account.value.getOrElse(throw new RuntimeException("No account in context"))
   def getRepository: Repository = repository.value.getOrElse(throw new RuntimeException("No repository in context"))
+
+  // This clears everything EXCEPT for the database-related properties
+  def clear(): Unit = {
+    account.value = None
+    repository.value = None
+  }
 }

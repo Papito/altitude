@@ -59,6 +59,9 @@
         }
     </style>
 </head>
+
+#import(software.altitude.core.RequestContext)
+
 <body>
 
 <div>
@@ -80,6 +83,7 @@
 </main>
 
 <footer>
+    <%= RequestContext.account.value.getOrElse("None") %>
 </footer>
 
 <script type="module" lang="js">
