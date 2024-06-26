@@ -24,15 +24,16 @@ class SystemService(val app: Altitude) {
         readMetadata.version
       }
       catch {
-        case _: SQLException => {
+        case ex: SQLException => {
           /* Uncomment this if you get "current transaction is aborted, commands ignored until end of transaction block".
              It means the select query failed when it should not have, but the exception itself is normal for new installations
-             AND tests (which makes it super-annoying)
-
-             println(ex)
+             AND tests (when there is no database yet). Seeing that error when running tests is annoying, so we just
+             swallow it here.
            */
 
-          0
+          // println(ex)
+
+          0 // new installation
         }
         case ex: Exception => throw ex
       }
