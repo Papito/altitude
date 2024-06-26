@@ -18,7 +18,7 @@ class SessionController extends ScalatraServlet with ScalateSupport with Authent
     if (isAuthenticated) redirect("/")
 
     contentType = "text/html"
-    mustache("login")
+    ssp("login")
   }
 
   post("/") {
@@ -27,12 +27,11 @@ class SessionController extends ScalatraServlet with ScalateSupport with Authent
     if (isAuthenticated) {
       redirect("/")
     } else {
-      mustache("login")
+      ssp("login")
     }
   }
 
-  // Never do this in a real app. State changes should never happen as a result of a GET request. However, this does
-  // make it easier to illustrate the logout code.
+  //FIXME: use POST
   get("/logout") {
     scentry.logout()
     redirect("/")

@@ -84,6 +84,9 @@ commands += Command.command("testFocusedSqlite") { state =>
 commands += Command.command("testFocusedPostgres") { state =>
   "testOnly software.altitude.test.core.suites.PostgresSuite -- -n focused" :: state
 }
+commands += Command.command("testFocusedWeb") { state =>
+  "testOnly software.altitude.test.core.suites.WebSuite -- -n focused" :: state
+}
 commands += Command.command("testSqlite") { state =>
   "testOnly software.altitude.test.core.suites.SqliteSuite" :: state
 }

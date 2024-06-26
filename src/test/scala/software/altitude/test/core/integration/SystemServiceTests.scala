@@ -4,6 +4,7 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.RequestContext
+import software.altitude.core.models.AccountType
 import software.altitude.core.util.Query
 import software.altitude.test.core.IntegrationTestCore
 
@@ -16,7 +17,7 @@ import software.altitude.test.core.IntegrationTestCore
     // control shot
     RequestContext.account.value should be(None)
 
-    val userModel = testContext.makeUser()
+    val userModel = testContext.makeAdminUser()
 
     altitude.service.system.initializeSystem(
       repositoryName = "My Repository",
@@ -34,6 +35,8 @@ import software.altitude.test.core.IntegrationTestCore
     val users = altitude.service.user.query(new Query())
     users.records.size should be(1)
 
-    RequestContext.account.value.get.email should be (userModel.email)
+    val adminUser = RequestContext.account.value
+    adminUser.get.email should be (userModel.email)
+    adminUser.get.accountType should be (AccountType.Admin)
   }
 }

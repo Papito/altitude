@@ -4,13 +4,14 @@ import org.scalatra.ScalatraBase
 import org.scalatra.auth.ScentryStrategy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import software.altitude.core.models.AccountType
+import software.altitude.core.AltitudeServletContext
 import software.altitude.core.models.User
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-class UserPasswordStrategy(protected val app: ScalatraBase)(implicit request: HttpServletRequest, response: HttpServletResponse)
+class UserPasswordStrategy(protected val app: ScalatraBase)
+                          (implicit request: HttpServletRequest, response: HttpServletResponse)
   extends ScentryStrategy[User] {
 
   val logger: Logger = LoggerFactory.getLogger(getClass)
@@ -28,20 +29,10 @@ class UserPasswordStrategy(protected val app: ScalatraBase)(implicit request: Ht
     login != "" && password != ""
   }
 
-  /**
-   * In real life, this is where we'd consult our data store, asking it whether the user credentials matched any existing user. Here, we'll
-   * just check for a known login/password combination and return a user if it's found.
-   */
   def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse): Option[User] = {
+    val altitude = AltitudeServletContext.app
     logger.info("UserPasswordStrategy: attempting authentication")
-
-    if (login == "admin" && password == "admin") {
-      logger.info("UserPasswordStrategy: login succeeded")
-      Some(User(Some("foo"), accountType = AccountType.User, email="email"))
-    } else {
-      logger.info("UserPasswordStrategy: login failed")
-      None
-    }
+    altitude.service.user.loginAndGetUser(login, password)
   }
 
   /** What should happen if the user is currently not authenticated? */

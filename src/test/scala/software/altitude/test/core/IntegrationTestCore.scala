@@ -21,7 +21,8 @@ import scala.language.implicitConversions
 
 object IntegrationTestCore {
   /*
-  Set to true TEMPORARILY to commit after each test to be able to see the state of the DB
+  Set to TRUE to TEMPORARILY commit after each test, to be able to explore the state of the DB.
+  You would almost always use this in conjunction with the Focused tag.
    */
   private final val COMMIT_AFTER_EACH_TEST = false
 
@@ -180,5 +181,4 @@ abstract class IntegrationTestCore
     altitude.txManager.rollback()
     RequestContext.clear()
   }
-
 }

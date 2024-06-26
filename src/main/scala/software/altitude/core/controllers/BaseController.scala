@@ -1,6 +1,8 @@
 package software.altitude.core.controllers
 
-import org.scalatra.{ContentEncodingSupport, InternalServerError, ScalatraServlet}
+import org.scalatra.ContentEncodingSupport
+import org.scalatra.InternalServerError
+import org.scalatra.ScalatraServlet
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import software.altitude.core.AltitudeServletContext

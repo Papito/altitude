@@ -1,7 +1,8 @@
 package software.altitude.core.service
 
 import net.codingwell.scalaguice.InjectorExtensions._
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.JsObject
+import play.api.libs.json.Json
 import software.altitude.core._
 import software.altitude.core.dao.UserDao
 import software.altitude.core.models.User
@@ -16,17 +17,26 @@ class UserService(val app: Altitude) extends BaseService[User] {
     RequestContext.account.value = Some(repo)
   }
 
-  def checkUserLogin(email: String, password: String): Boolean = {
-    /*
-    Since the user model does not explicitly store the hashed password,
-    we need to do a low-level query to get the password hash
-     */
-    val query = new Query(params = Map(Const.User.EMAIL -> email))
-    val sqlQuery = dao.sqlQueryBuilder.buildSelectSql(query)
-    val userRec: Map[String, AnyRef] = dao.getOneRawRecordBySql(sqlQuery.sqlAsString, sqlQuery.bindValues)
+  def loginAndGetUser(email: String, password: String): Option[User] = {
+    txManager.asReadOnly {
+      val query = new Query(params = Map(Const.User.EMAIL -> email))
+      val sqlQuery = dao.sqlQueryBuilder.buildSelectSql(query)
 
-    val passwordHash = userRec(Const.User.PASSWORD_HASH).asInstanceOf[String]
-    Util.checkPassword(password, passwordHash)
+      /* Since the user model does not explicitly store the hashed password,
+         we need to do a low-level query to get the password hash */
+      val userRec: Map[String, AnyRef] = dao.getOneRawRecordBySql(sqlQuery.sqlAsString, sqlQuery.bindValues)
+
+      val passwordHash = userRec(Const.User.PASSWORD_HASH).asInstanceOf[String]
+
+      if (Util.checkPassword(password, passwordHash)) {
+        val userId = userRec(Const.User.ID).asInstanceOf[String]
+        val user: User = app.service.user.getById(userId)
+        switchContextToUser(user)
+        Some(user)
+      } else {
+        None
+      }
+    }
   }
 
   override def add(objIn: User, queryForDup: Option[Query] = None): JsObject =

@@ -85,9 +85,7 @@ class SetupController extends BaseHtmxController  {
       )
     }
 
-    //
     // Oh, we are committed at this point
-    //
     val userModel = new User(email= email, accountType = AccountType.Admin)
 
     app.service.system.initializeSystem(

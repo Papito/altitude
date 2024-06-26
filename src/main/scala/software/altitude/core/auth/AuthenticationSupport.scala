@@ -5,19 +5,20 @@ import org.scalatra.auth.ScentryConfig
 import org.scalatra.auth.ScentrySupport
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import software.altitude.core.AltitudeServletContext
+import software.altitude.core.RequestContext
 import software.altitude.core.auth.strategies.RememberMeStrategy
 import software.altitude.core.auth.strategies.UserPasswordStrategy
-import software.altitude.core.models.AccountType
 import software.altitude.core.models.User
 
 trait AuthenticationSupport extends ScalatraBase with ScentrySupport[User] {
   self: ScalatraBase =>
 
   protected def fromSession: PartialFunction[String, User] = {
-    case id: String => User(
-      id=Some(id),
-      accountType = AccountType.User,
-      email = "email") }
+    case id: String =>
+      val altitude = AltitudeServletContext.app
+      altitude.service.user.getById(id)
+  }
 
   protected def toSession: PartialFunction[User, String] = {
     case usr: User =>
@@ -37,6 +38,9 @@ trait AuthenticationSupport extends ScalatraBase with ScentrySupport[User] {
     if (!isAuthenticated) {
       redirect(scentryConfig.login)
     }
+
+    // we can now access the user via the thread-local RequestContext until the end of the request
+    RequestContext.account.value = Some(user)
   }
 
   /**

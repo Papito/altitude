@@ -15,6 +15,9 @@ test-focused-psql:
 test-focused-sqlite:
 	sbt testFocusedSqlite
 
+test-focused-web:
+	sbt testFocusedWeb
+
 test-psql:
 	sbt testPostgres
 

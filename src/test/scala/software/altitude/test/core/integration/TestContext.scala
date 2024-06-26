@@ -21,6 +21,11 @@ class TestContext(val altitude: Altitude) {
     accountType = AccountType.User,
   )
 
+  def makeAdminUser(): User = User(
+    email = Util.randomStr(),
+    accountType = AccountType.Admin,
+  )
+
   def persistUser(user: Option[User] = None, password: String = "password"): User = {
     val userModel = user.getOrElse(makeUser())
 

@@ -6,16 +6,14 @@ import software.altitude.core.controllers.BaseWebController
 class WebIndexController extends BaseWebController {
   private final val log = LoggerFactory.getLogger(getClass)
 
-  before() {
-    // requireLogin()
-  }
-
   get("/") {
     // Kick to setup if this is a new install
     if (!app.isInitialized) {
       logger.warn("App is not initialized, redirecting to setup")
       redirect("/setup")
     }
+
+    requireLogin()
 
     contentType = "text/html"
     ssp("/index")

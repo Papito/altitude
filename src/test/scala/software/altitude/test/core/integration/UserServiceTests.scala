@@ -31,8 +31,8 @@ import software.altitude.test.core.IntegrationTestCore
 
     testContext.persistUser(Some(userModel), password=password)
 
-    val isValidLogin = altitude.service.user.checkUserLogin(userModel.email, password)
+    val user: Option[User] = altitude.service.user.loginAndGetUser(userModel.email, password)
 
-    isValidLogin should be(true)
+    user should not be None
   }
 }
