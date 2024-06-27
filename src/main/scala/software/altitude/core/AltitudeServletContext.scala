@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory
 import software.altitude.core.controllers.api._
 import software.altitude.core.controllers.htmx.SetupController
 import software.altitude.core.controllers.web.SessionController
-import software.altitude.core.controllers.web.WebIndexController
+import software.altitude.core.controllers.web.IndexController
 
 import javax.servlet.ServletContext
 
@@ -18,7 +18,7 @@ object AltitudeServletContext {
   // private val actorSystem = ActorSystem()
 
   val endpoints: Seq[(ScalatraServlet, String)] = List(
-    (new WebIndexController, "/*"),
+    (new IndexController, "/*"),
 
     (new AssetController, "/api/v1/assets/*"),
     (new SearchController, "/api/v1/search/*"),

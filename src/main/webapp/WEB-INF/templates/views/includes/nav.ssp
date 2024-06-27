@@ -71,7 +71,7 @@
     </div>
     <div class="menu import">
         <i class="fas fa-download">
-            <span>Import</span></i>
+            <span><a href="/import">Import</a></span></i>
     </div>
     <div class="menu">
         <i class="fas fa-search"><a href=""><span>Advanced Search</span></a></i>
