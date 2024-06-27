@@ -5,8 +5,7 @@ import org.scalatra.servlet.ServletApiImplicits._
 import org.slf4j.LoggerFactory
 import software.altitude.core.controllers.api._
 import software.altitude.core.controllers.htmx.SetupController
-import software.altitude.core.controllers.web.SessionController
-import software.altitude.core.controllers.web.IndexController
+import software.altitude.core.controllers.web.{ImportController, IndexController, SessionController}
 
 import javax.servlet.ServletContext
 
@@ -19,6 +18,7 @@ object AltitudeServletContext {
 
   val endpoints: Seq[(ScalatraServlet, String)] = List(
     (new IndexController, "/*"),
+    (new ImportController, "/import/*"),
 
     (new AssetController, "/api/v1/assets/*"),
     (new SearchController, "/api/v1/search/*"),

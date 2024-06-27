@@ -44,9 +44,9 @@ footer {
 
 body {
     display: grid;
-    grid-template-rows: [header]  2em
+    grid-template-rows: [header]  60px
                         [content] 1fr
-                        [footer]  2em;
+                        [footer]  40px;
     min-height: 100vh;
 }
 

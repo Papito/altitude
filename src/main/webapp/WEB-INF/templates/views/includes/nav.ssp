@@ -1,7 +1,7 @@
 <style>
     nav {
         display: grid;
-        grid-template-columns: 150px repeat(4, 1fr) 250px;
+        grid-template-columns: 150px repeat(3, 1fr) 250px;
         grid-column-gap: 10px;
         background: var(--background-aux-color);
         color: #fff;
@@ -15,6 +15,7 @@
         color: #FFF;
         text-decoration: none;
         font-size: .9em;
+        font-weight: bold;
         font-family: var(--font);
         text-transform: uppercase;
     }
@@ -39,11 +40,6 @@
         cursor: pointer;
     }
 
-    nav .menu.import {
-        letter-spacing: .1em;
-        color: #6ef13c;
-    }
-
     nav input {
         border-radius: .4em;
         color: white;
@@ -60,6 +56,12 @@
     nav .menu span {
         margin-left: .5em;
     }
+
+    nav .active a, nav .active a span {
+        color: var(--success-color);
+        font-weight: bold;
+        font-size: 1em;
+    }
 </style>
 
 <nav>
@@ -67,17 +69,13 @@
         <a href="/">Altitude</a>
     </div>
     <div class="menu">
-        <i class="fas fa-database"><a href=""><span>Default</span></a></i>
+        <a href=""><i class="fas fa-database"></i><span>Default</span></a>
     </div>
     <div class="menu import">
-        <i class="fas fa-download">
-            <span><a href="/import">Import</a></span></i>
+        <a href="/import"><i class="fas fa-download"></i><span>Import</span></a></span>
     </div>
     <div class="menu">
-        <i class="fas fa-search"><a href=""><span>Advanced Search</span></a></i>
-    </div>
-    <div class="menu">
-        <i class="fas fa-adjust"><a href=""><span>Settings</span></a></i>
+        <a href=""><i class="fas fa-adjust"></i><span>Settings</span></a>
     </div>
     <div class="search">
         <label for="search"></label>
