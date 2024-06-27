@@ -86,12 +86,7 @@
     <%= RequestContext.account.value.getOrElse("None") %>
 </footer>
 
-<script type="module" lang="js">
-    /*********************************************************************
-     * IMPORTS
-     *********************************************************************/
-    import Split from '/js/split.es.js'
-
+<script lang="js">
     Split(["#browser", "#assets"], {
         sizes: [25, 75]
     })

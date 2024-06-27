@@ -48,7 +48,6 @@ class SystemService(val app: Altitude) {
     }
   }
 
-
   def readMetadata: SystemMetadata = {
     txManager.asReadOnly[SystemMetadata] {
       systemMetadataDao.getById(SystemMetadataDao.SYSTEM_RECORD_ID.toString)
