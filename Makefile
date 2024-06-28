@@ -44,5 +44,13 @@ clean:
 	rm -rf data/triage/*
 	rm -rf data/trash/*
 
+publish:
+	rm -rf release
+	sbt assembly
+	# we don't need this
+	rm -rf target
+	mkdir -p release/data/db
+
+
 up:
 	docker-compose -f docker-compose.yml -f docker-compose.test.yml up
