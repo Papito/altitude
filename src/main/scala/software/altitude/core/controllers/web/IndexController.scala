@@ -8,7 +8,7 @@ class IndexController extends BaseWebController {
     // Kick to setup if this is a new install
     if (!app.isInitialized) {
       logger.warn("App is not initialized, redirecting to setup")
-      layoutTemplate("/WEB-INF/templates/views/setup.ssp")
+      redirect("/setup")
     }
 
     requireLogin()
