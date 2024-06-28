@@ -16,7 +16,7 @@ class Configuration(configOverride: Map[String, Any] = new HashMap()) {
     "dataDir" -> "data",
     "previewDir" -> "p",
 
-    "datasource" -> C.DatasourceType.POSTGRES,
+    "datasource" -> C.DatasourceType.SQLITE,
     "filestore" -> C.FileStoreType.FS,
     "importMode" -> C.ImportMode.COPY,
 
@@ -28,7 +28,7 @@ class Configuration(configOverride: Map[String, Any] = new HashMap()) {
     "db.postgres.password" -> "dba",
     "db.postgres.url" -> "jdbc:postgresql://localhost/altitude",
 
-    "db.sqlite.url" -> s"jdbc:sqlite:${Environment.root}data/db"
+    "db.sqlite.url" -> s"jdbc:sqlite:data/db/altitude.db"
   )
 
   private val test = default ++ HashMap(

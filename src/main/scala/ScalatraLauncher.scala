@@ -1,30 +1,23 @@
 import org.eclipse.jetty.server._
-import org.eclipse.jetty.server.handler.ContextHandlerCollection
+import org.eclipse.jetty.servlet.DefaultServlet
 import org.eclipse.jetty.webapp.WebAppContext
 import org.scalatra.servlet.ScalatraListener
 import software.altitude.core.AltitudeServletContext
 
 object ScalatraLauncher extends App with AltitudeServletContext {
-  private val host = "localhost"
   private val port = 9010
 
-  private val server = new Server
+  private val server = new Server(port)
   server.setStopTimeout(5000)
   server.setStopAtShutdown(true)
 
-  private val connector = new ServerConnector(server)
-  connector.setHost(host)
-  connector.setPort(port)
-  server.addConnector(connector)
+  val context = new WebAppContext()
+  context setContextPath "/"
+  context.setResourceBase("src/main/webapp")
+  context.addEventListener(new ScalatraListener)
+  context.addServlet(classOf[DefaultServlet], "/")
 
-
-  val context = new WebAppContext(getClass.getClassLoader.getResource("webapp").toExternalForm, "/")
-  context.setEventListeners(Array(new ScalatraListener))
-
-  private val contexts = new ContextHandlerCollection()
-  contexts.setHandlers(List[Handler](context).toArray)
-
-  server.setHandler(contexts)
+  server.setHandler(context)
 
   server.start()
   server.join()

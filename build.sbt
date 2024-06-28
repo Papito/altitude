@@ -1,6 +1,6 @@
 organization := "software.altitude"
 name := "altitude"
-version := "0.1.0-SNAPSHOT"
+version := "0.1.0"
 scalaVersion := "2.13.14"
 
 val json4sVersion = "4.0.7"
@@ -40,8 +40,8 @@ libraryDependencies ++= Seq(
   "com.google.guava"             % "guava"                    % "19.0",
   "net.codingwell"              %% "scala-guice"              % "7.0.0",
   "org.imgscalr"                 % "imgscalr-lib"             % "4.2",
-
   "ch.qos.logback"               % "logback-classic"          % "1.5.6" % "runtime",
+  "org.slf4j"                     % "slf4j-api"               % "2.0.12" % "runtime",
 
   "org.mockito" % "mockito-core" % "5.11.0" % Test,
 
@@ -50,9 +50,7 @@ libraryDependencies ++= Seq(
   //
   "org.eclipse.jetty"            % "jetty-webapp"             % jettyVersion % "container;compile",
   "javax.servlet"                % "javax.servlet-api"        % "3.1.0" % Provided
-).map(_.exclude("commons-logging", "commons-logging"))
- .map(_.exclude("org.apache.cxf", "cxf-core"))
- .map(_.exclude("org.apache.cxf", "cxf-cxf-rt-transports-http"))
+)
 
 enablePlugins(ScalatraPlugin)
 
@@ -68,11 +66,12 @@ test in assembly := {}
 
 parallelExecution in Test := false
 
+mainClass in Compile := Some("ScalatraLauncher")
+
 assemblyMergeStrategy in assembly := {
-  case x if x.startsWith("META-INF") => MergeStrategy.discard
-  case x =>
-    val oldStrategy = (assemblyMergeStrategy in assembly).value
-    oldStrategy(x)
+  case PathList("META-INF", xs @ _*) if xs.contains("MANIFEST.MF") => MergeStrategy.discard
+  case PathList(ps @ _*) if ps.last endsWith ".class" => MergeStrategy.first
+  case _ => MergeStrategy.first
 }
 
 commands += Command.command("testFocused") { state =>

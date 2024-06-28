@@ -10,6 +10,7 @@ project/project
 project/target
 test-data
 target
+release
 dist
 *.iml
 *.eml
