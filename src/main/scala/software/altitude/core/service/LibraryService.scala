@@ -35,8 +35,7 @@ class LibraryService(val app: Altitude) {
   private final val log = LoggerFactory.getLogger(getClass)
   protected val txManager: TransactionManager = app.txManager
 
-  // FIXME: does not belong here - image specific
-  val previewBoxSize: Int = app.config.getInt("preview.box.pixels")
+  private val previewBoxSize: Int = app.config.getInt("preview.box.pixels")
 
   /** **************************************************************************
     * ASSETS

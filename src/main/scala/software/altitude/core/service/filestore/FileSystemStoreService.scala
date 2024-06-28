@@ -129,8 +129,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     }
   }
 
-  override def getById(id: String)
-             : Data = {
+  override def getById(id: String): Data = {
     val asset: Asset = app.service.library.getById(id)
     val path = getAssetPath(asset)
     val srcFile: File = absoluteFile(path)
@@ -165,8 +164,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     }
   }
 
-  override def moveAsset(srcAsset: Asset, destAsset: Asset)
-                        : Unit = {
+  override def moveAsset(srcAsset: Asset, destAsset: Asset): Unit = {
     val srcFile = absoluteFile(getAssetPath(srcAsset))
     val destFile = absoluteFile(getAssetPath(destAsset))
 
@@ -198,8 +196,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
 
   }
 
-  override def getFolderPath(name: String, parentId: String)
-                                  : String = {
+  override def getFolderPath(name: String, parentId: String): String = {
     val parent: Folder = app.service.folder.getById(parentId)
     new File(parent.path.get, name).getPath
   }
