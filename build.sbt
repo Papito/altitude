@@ -21,9 +21,10 @@ libraryDependencies ++= Seq(
   "org.scalatra"                %% "scalatra"                 % scalatraVersion,
   "org.scalatra"                %% "scalatra-atmosphere"      % scalatraVersion,
   "org.scalatra"                %% "scalatra-scalatest"       % scalatraVersion % Test,
-  "org.scalatra"                %% "scalatra-scalate" % scalatraVersion,
-  "org.scalatra"                %% "scalatra-auth" % scalatraVersion,
+  "org.scalatra"                %% "scalatra-scalate"         % scalatraVersion,
+  "org.scalatra"                %% "scalatra-auth"            % scalatraVersion,
   "org.scalatra.scalate"        %% "scalate-core"             % "1.10.1",
+
   "com.typesafe.play"           %% "play-json"                % "2.10.5",
   "org.apache.tika"              % "tika-core"                % "2.9.2",
   "org.apache.tika"              % "tika-parsers" % "2.9.2",
@@ -33,6 +34,7 @@ libraryDependencies ++= Seq(
   "commons-codec"                % "commons-codec"            % "1.17.0",
   "commons-dbutils"              % "commons-dbutils"          % "1.8.1",
   "commons-logging"             % "commons-logging"           % "1.3.1",
+
   "org.mindrot"                  % "jbcrypt"                  % "0.4",
   "org.postgresql"               % "postgresql"               % "42.7.3",
   "org.xerial"                   % "sqlite-jdbc"              % "3.46.0.0",
@@ -62,16 +64,33 @@ inThisBuild(
   )
 )
 
+ThisBuild / scalacOptions ++= Seq(
+  "-deprecation",
+  "-encoding", "UTF-8",
+  "-feature",
+  "-unchecked",
+  "-Xfatal-warnings",
+)
+
 test in assembly := {}
 
 parallelExecution in Test := false
 
-mainClass in Compile := Some("ScalatraLauncher")
+unmanagedResourceDirectories in Compile += {
+  baseDirectory.value / "src/main/webapp"
+}
 
 assemblyMergeStrategy in assembly := {
   case PathList("META-INF", xs @ _*) if xs.contains("MANIFEST.MF") => MergeStrategy.discard
   case PathList(ps @ _*) if ps.last endsWith ".class" => MergeStrategy.first
   case _ => MergeStrategy.first
+}
+
+assembly / target := baseDirectory.value / "release"
+
+assembly / assemblyJarName := {
+  val base = name.value
+  s"$base-${version.value}.jar"
 }
 
 commands += Command.command("testFocused") { state =>
