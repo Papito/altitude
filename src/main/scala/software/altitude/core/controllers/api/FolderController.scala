@@ -33,17 +33,11 @@ class FolderController extends BaseApiController {
     val parentId = realId(params.getAs[String](C.Api.Folder.PARENT_ID).get)
     val allRepoFolders = app.service.folder.getAll
     val folders = app.service.folder.immediateChildren(parentId, allRepoFolders = allRepoFolders)
-    val sysFolders = app.service.folder.sysFoldersByIdMap(allRepoFolders = allRepoFolders)
     val path = app.service.folder.pathComponents(parentId)
 
     Ok(Json.obj(
       C.Api.Folder.PATH -> path.map(_.toJson),
       C.Api.Folder.FOLDERS -> folders.map(_.toJson),
-      C.Api.Folder.SYSTEM -> JsObject(
-        sysFolders.map { case (folderId, folder) =>
-          folderId -> folder.toJson
-        }.toSeq
-      )
     ))
   }
 

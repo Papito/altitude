@@ -203,22 +203,6 @@ import software.altitude.test.core.IntegrationTestCore
     }
   }
 
-  test("Deleting a system folder should fail") {
-    altitude.service.folder.systemFolders.foreach { sysFolder =>
-      intercept[IllegalOperationException] {
-        altitude.service.library.deleteFolderById(sysFolder.id.get)
-      }
-    }
-  }
-
-  test("Adding a child folder to a system folder shoul fail") {
-    altitude.service.folder.systemFolders.foreach { sysFolder =>
-      intercept[IllegalOperationException] {
-        altitude.service.library.addFolder(name = "folder1", parentId = sysFolder.id)
-       }
-    }
-  }
-
   test("Moving a folder") {
     /*
   folder1

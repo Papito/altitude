@@ -321,10 +321,6 @@ class LibraryService(val app: Altitude) {
       throw IllegalOperationException("Cannot delete the root folder")
     }
 
-    if (app.service.folder.isSystemFolder(Some(id))) {
-      throw IllegalOperationException("Cannot delete system folder")
-    }
-
     txManager.withTransaction {
       val folder: Folder = app.service.folder.getById(id)
 
