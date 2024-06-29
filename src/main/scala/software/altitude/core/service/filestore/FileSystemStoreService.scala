@@ -25,7 +25,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   final override def landfillFolderPath: String = C.Path.LANDFILL
 
   override def createPath(relPath: String): Unit = {
-    val destFile = absoluteFile(relPath)
+    val destFile = fileFromRelPath(relPath)
     log.info(s"Adding FS folder [$destFile]")
 
     try {
@@ -51,7 +51,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     require(folder.path.isDefined)
     require(folder.path.get.nonEmpty)
 
-    val destFile = absoluteFile(folder.path.get)
+    val destFile = fileFromRelPath(folder.path.get)
     log.info(s"Removing FS folder [$destFile]")
 
     // ignore if not here anymore
@@ -77,7 +77,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     require(folder.path.isDefined)
     require(folder.path.get.nonEmpty)
 
-    val srcFile = absoluteFile(folder.path.get)
+    val srcFile = fileFromRelPath(folder.path.get)
     //FIXME: replace with Paths.get()
     val newPath = FilenameUtils.concat(srcFile.getParent, newName)
     val destFile = new File(newPath)
@@ -105,10 +105,10 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     require(folder.path.isDefined)
     require(newParent.path.get.nonEmpty)
 
-    val srcFile = absoluteFile(folder.path.get)
+    val srcFile = fileFromRelPath(folder.path.get)
     val newPath = FilenameUtils.concat(newParent.path.get, folder.name)
 
-    val destFile = absoluteFile(newPath)
+    val destFile = fileFromRelPath(newPath)
     log.info(s"Move folder [$srcFile] to [$destFile]")
 
     if (destFile.exists) {
@@ -132,7 +132,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   override def getById(id: String): Data = {
     val asset: Asset = app.service.library.getById(id)
     val path = getAssetPath(asset)
-    val srcFile: File = absoluteFile(path)
+    val srcFile: File = fileFromRelPath(path)
 
     var byteArray: Option[Array[Byte]] = None
 
@@ -151,11 +151,13 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   }
 
   override def addAsset(asset: Asset): Unit = {
-    val path = getAssetPath(asset)
-    val destFile = absoluteFile(path)
+    require(asset.id.isDefined)
+
+    val destFile = fileFromAsset(asset)
     log.debug(s"Creating asset [$asset] on file system at [$destFile]")
 
     try {
+      println(destFile.getAbsolutePath)
       FileUtils.writeByteArrayToFile(destFile, asset.data)
     }
     catch {
@@ -165,8 +167,8 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   }
 
   override def moveAsset(srcAsset: Asset, destAsset: Asset): Unit = {
-    val srcFile = absoluteFile(getAssetPath(srcAsset))
-    val destFile = absoluteFile(getAssetPath(destAsset))
+    val srcFile = fileFromRelPath(getAssetPath(srcAsset))
+    val destFile = fileFromRelPath(getAssetPath(destAsset))
 
     log.debug(s"Moving asset [$srcAsset] on file system from [$srcFile] to [$destFile]")
     moveFile(srcFile, destFile)
@@ -175,9 +177,9 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   override def recycleAsset(asset: Asset): Unit = {
     log.info(s"Recycling: [$asset]")
 
-    val srcFile = absoluteFile(getAssetPath(asset))
+    val srcFile = fileFromRelPath(getAssetPath(asset))
     val relRecyclePath = getRecycledAssetPath(asset)
-    val destFile = absoluteFile(relRecyclePath)
+    val destFile = fileFromRelPath(relRecyclePath)
 
     moveFile(srcFile, destFile)
   }
@@ -186,8 +188,8 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     log.info(s"Restoring: [$asset]")
 
     val relRecyclePath = getRecycledAssetPath(asset)
-    val srcFile = absoluteFile(relRecyclePath)
-    val destFile = absoluteFile(getAssetPath(asset))
+    val srcFile = fileFromRelPath(relRecyclePath)
+    val destFile = fileFromRelPath(getAssetPath(asset))
 
     moveFile(srcFile, destFile)
   }
@@ -201,11 +203,6 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     new File(parent.path.get, name).getPath
   }
 
-  override def calculateNextAvailableFilename(asset: Asset)
-                                             : String = {
-    findNextAvailableFilename(new File(getAssetPath(asset)))
-  }
-
   def getPathWithNewFilename(asset: Asset, newFilename: String)
                                   : String = {
     val folder: Folder = app.service.folder.getById(asset.folderId)
@@ -213,13 +210,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   }
 
   override def getAssetPath(asset: Asset): String = {
-    if (asset.isRecycled) {
-      getRecycledAssetPath(asset)
-    }
-    else {
-      val folder: Folder = app.service.folder.getById(asset.folderId)
-      FilenameUtils.concat(folder.path.get, asset.fileName)
-    }
+    FilenameUtils.concat(asset.id.get, asset.fileName)
   }
 
   override def getRecycledAssetPath(asset: Asset): String = {
@@ -292,26 +283,16 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
    * Get the absolute path to the asset on file system,
    * given path relative to repository root
    */
-  private def absoluteFile(relativePath: String): File = {
+  private def fileFromRelPath(relativePath: String): File = {
     val repositoryRoot = RequestContext.repository.value.get.fileStoreConfig(C.Repository.Config.PATH)
     new File(repositoryRoot, relativePath)
   }
 
-  private def findNextAvailableFilename(file: File): String = {
-    val path = FilenameUtils.getPath(file.getPath)
-    val ext = FilenameUtils.getExtension(file.getPath)
-    var baseName = FilenameUtils.getBaseName(file.getPath)
-
-    var fileToCheck = new File(path, filenameFromBaseAndExt(baseName, ext))
-
-    var idx = 0
-    while (absoluteFile(fileToCheck.getPath).exists) {
-      idx += 1
-      baseName = s"${baseName}_$idx"
-      fileToCheck = new File(path, filenameFromBaseAndExt(baseName, ext))
-    }
-
-    fileToCheck.getName
+  private def fileFromAsset(asset: Asset): File = {
+    val repositoryRoot = RequestContext.repository.value.get.fileStoreConfig(C.Repository.Config.PATH)
+    val absoluteFilesPath = FilenameUtils.concat(repositoryRoot, "files")
+    val absoluteFilePartitionPath = FilenameUtils.concat(absoluteFilesPath, asset.id.get.substring(0, 2))
+    new File(absoluteFilePartitionPath, asset.id.get)
   }
 
   private def moveFile(srcFile: File, destFile: File): Unit = {

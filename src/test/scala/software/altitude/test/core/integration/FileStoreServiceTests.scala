@@ -25,8 +25,6 @@ import java.io.File
     val importAsset = getImportAsset(("images/1.jpg"))
     val importedAsset: Asset = altitude.service.assetImport.importAsset(importAsset).get
     val asset = altitude.service.library.getById(importedAsset.id.get): Asset
-
-    println(asset.path)
   }
 
   test("move asset") {

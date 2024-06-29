@@ -61,13 +61,11 @@ class LibraryService(val app: Altitude) {
         * Process metadata and append it to the asset
         */
       val metadata = app.service.metadata.cleanAndValidate(assetIn.metadata)
-      val fileName = app.service.fileStore.calculateNextAvailableFilename(assetIn)
 
       val assetId = BaseDao.genId
 
       val assetToAddModel: Asset = assetIn.copy(
         id = Some(assetId),
-        fileName = fileName,
         metadata = metadata,
         data = assetIn.data,
         extractedMetadata = assetIn.extractedMetadata

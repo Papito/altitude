@@ -19,15 +19,6 @@ import scala.language.implicitConversions
 
 
 object IntegrationTestCore {
-  /**
-   * Create a directory for testing purposes.
-   * It takes an instance of `AltitudeAppContext` as an argument.
-   * The `AltitudeAppContext` instance contains the application's configuration.
-   * The function retrieves the path of the test directory from the configuration using the key "testDir".
-   * If the directory does not exist, it is created.
-   *
-   * @param altitude An instance of `AltitudeAppContext` containing the application's configuration.
-   */
   def createTestDir(altitude: AltitudeAppContext): Unit = {
     val testDir = new File(altitude.config.getString("testDir"))
 
@@ -36,22 +27,14 @@ object IntegrationTestCore {
     }
   }
 
-  /**
-   * Create or clean a directory for file storage during testing.
-   * It takes an instance of `AltitudeAppContext` as an argument.
-   * The `AltitudeAppContext` instance contains the application's configuration.
-   * The function retrieves the path of the file storage directory from the configuration using the key "fileStoreDir".
-   * If the directory exists, it is cleaned. If it does not exist, it is created.
-   *
-   * @param altitude An instance of `AltitudeAppContext` containing the application's configuration.
-   */  def createFileStoreDir(altitude: AltitudeAppContext): Unit = {
-    val testDir = new File(altitude.config.getString("fileStoreDir"))
+  def createFileStoreDir(altitude: AltitudeAppContext): Unit = {
+    val dataDir = new File(altitude.config.getString("dataDir"))
 
-    if (testDir.exists()) {
-      FileUtils.cleanDirectory(testDir)
+    if (dataDir.exists()) {
+      FileUtils.cleanDirectory(dataDir)
     }
     else {
-      FileUtils.forceMkdir(testDir)
+      FileUtils.forceMkdir(dataDir)
     }
   }
 

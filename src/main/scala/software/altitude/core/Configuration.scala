@@ -33,8 +33,7 @@ class Configuration(configOverride: Map[String, Any] = new HashMap()) {
 
   private val test = default ++ HashMap(
     "testDir" -> "./test-data",
-    "fileStoreDir" -> "./test-data/file-store",
-    "dataDir" -> "./test-data/file-store/1",
+    "dataDir" -> "./test-data/file-store",
     "importMode" -> C.ImportMode.COPY,
     "filestore" -> C.FileStoreType.FS,
 
