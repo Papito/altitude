@@ -259,9 +259,6 @@ object Const {
    */
   object Path {
     val ROOT = "root"
-    val TRIAGE = "triage"
-    val TRASH = "trash"
-    val LANDFILL = "landfill"
   }
 
   // default results per page

@@ -20,9 +20,6 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
 
   final override val pathSeparator = File.separator
   final override def sortedFolderPath: String = C.Path.ROOT
-  final override def triageFolderPath: String = C.Path.TRIAGE
-  final override def trashFolderPath: String = C.Path.TRASH
-  final override def landfillFolderPath: String = C.Path.LANDFILL
 
   override def createPath(relPath: String): Unit = {
     val destFile = fileFromRelPath(relPath)
@@ -39,18 +36,6 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     if (!(destFile.exists && destFile.isDirectory)) {
       throw StorageException(s"Directory [$destFile] could not be created")
     }
-  }
-
-  override def addFolder(folder: Folder): Unit = {
-  }
-
-  override def deleteFolder(folder: Folder): Unit = {
-  }
-
-  override def renameFolder(folder: Folder, newName: String): Unit = {
-  }
-
-  def moveFolder(folder: Folder, newParent: Folder): Unit = {
   }
 
   override def getById(id: String): Data = {
@@ -89,18 +74,6 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     }
   }
 
-  override def moveAsset(srcAsset: Asset, destAsset: Asset): Unit = {
-  }
-
-  override def recycleAsset(asset: Asset): Unit = {
-  }
-
-  override def restoreAsset(asset: Asset): Unit = {
-  }
-
-  override def purgeAsset(asset: Asset): Unit = {
-  }
-
   override def getFolderPath(name: String, parentId: String): String = {
     val parent: Folder = app.service.folder.getById(parentId)
     new File(parent.path.get, name).getPath
@@ -108,21 +81,6 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
 
   override def getAssetPath(asset: Asset): String = {
     FilenameUtils.concat(asset.id.get, asset.fileName)
-  }
-
-  override def getRecycledAssetPath(asset: Asset): String = {
-    val ext = FilenameUtils.getExtension(asset.fileName)
-
-    // no guarantee there IS an extension
-    if (ext.nonEmpty) {
-      new File(
-        trashFolderPath,
-        s"${asset.id.get}${FilenameUtils.EXTENSION_SEPARATOR}$ext").toString
-    }
-    else {
-      new File(trashFolderPath, s"${asset.id.get}").toString
-
-    }
   }
 
   override def addPreview(preview: Preview): Unit = {
@@ -190,25 +148,5 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     val absoluteFilesPath = FilenameUtils.concat(repositoryRoot, "files")
     val absoluteFilePartitionPath = FilenameUtils.concat(absoluteFilesPath, asset.id.get.substring(0, 2))
     new File(absoluteFilePartitionPath, asset.id.get)
-  }
-
-  private def moveFile(srcFile: File, destFile: File): Unit = {
-    log.info(s"Moving [$srcFile] to [$destFile]")
-
-    try {
-      if (destFile.exists) {
-        throw StorageException(s"Error moving [$srcFile] to [$destFile]: destination exists]")
-      }
-
-      FileUtils.moveFile(srcFile, destFile)
-    }
-    catch {
-      case ex: IOException =>
-        throw StorageException(s"Error moving [$srcFile] to [$destFile]: $ex]")
-    }
-  }
-
-  private def filenameFromBaseAndExt(baseName: String, ext: String): String = {
-    if (ext.isEmpty) baseName else baseName + "." + ext
   }
 }

@@ -305,7 +305,6 @@ class LibraryService(val app: Altitude) {
       val _parentId = if (parentId.isDefined) parentId.get else RequestContext.repository.value.get.rootFolderId
       val folder = Folder(name = name.trim, parentId = _parentId)
       val addedFolder = app.service.folder.add(folder)
-      app.service.fileStore.addFolder(addedFolder)
       addedFolder
     }
   }
@@ -346,7 +345,7 @@ class LibraryService(val app: Altitude) {
 
         val results: QueryResult = app.service.library.queryAll(folderAssetsQuery)
 
-        log.trace(s"Folder ${folderId} has ${results.total} assets")
+        log.trace(s"Folder $folderId has ${results.total} assets")
 
         // OPTIMIZE: bulk deletions.
         results.records.foreach { record =>
@@ -368,7 +367,6 @@ class LibraryService(val app: Altitude) {
         if (treeAssetCount == 0) {
           log.trace(s"DELETING (PURGING) folder $f")
           app.service.folder.deleteById(folderId)
-          app.service.fileStore.deleteFolder(childFolder)
         }
         else {
           log.trace(s"RECYCLING folder $folderId")
@@ -382,9 +380,7 @@ class LibraryService(val app: Altitude) {
 
   def renameFolder(folderId: String, newName: String): Folder = {
     txManager.withTransaction[Folder] {
-      val folder: Folder = app.service.folder.getById(folderId)
       val updatedFolder = app.service.folder.rename(folderId, newName)
-      app.service.fileStore.renameFolder(folder, newName)
       updatedFolder
     }
   }
@@ -392,8 +388,7 @@ class LibraryService(val app: Altitude) {
   def moveFolder(folderBeingMovedId: String, destFolderId: String)
                 : Folder = {
     txManager.withTransaction[Folder] {
-      val (movedFolder, newParent) = app.service.folder.move(folderBeingMovedId, destFolderId)
-      app.service.fileStore.moveFolder(movedFolder, newParent)
+      val (movedFolder, _) = app.service.folder.move(folderBeingMovedId, destFolderId)
       movedFolder
     }
   }
@@ -444,15 +439,6 @@ class LibraryService(val app: Altitude) {
     txManager.withTransaction {
       recycleAssets(Set(assetId))
       getById(assetId)
-    }
-  }
-
-  def recycleFolder(folderId: String): Folder = {
-
-    txManager.withTransaction {
-      val folder: Folder = app.service.folder.getById(folderId)
-      app.service.folder.setRecycledProp(folder, isRecycled = true)
-      folder.copy(isRecycled = true)
     }
   }
 
