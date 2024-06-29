@@ -68,6 +68,7 @@ object Const {
     val METADATA = "metadata"
     val EXTRACTED_METADATA = "extracted_metadata"
     val IS_RECYCLED = "is_recycled"
+    val IS_TRIAGED = "is_triaged"
   }
 
   object AssetType extends Common {

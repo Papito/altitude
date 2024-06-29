@@ -17,6 +17,7 @@ object Asset {
       sizeBytes = (json \ C.Asset.SIZE_BYTES).as[Long],
       metadata = Metadata.fromJson((json \ C.Asset.METADATA).as[JsObject]),
       extractedMetadata = Metadata.fromJson((json \ C.Asset.EXTRACTED_METADATA).as[JsObject]),
+      isTriaged = (json \ C.Asset.IS_TRIAGED).as[Boolean],
       isRecycled = (json \ C.Asset.IS_RECYCLED).as[Boolean]
     ).withCoreAttr(json)
 }
@@ -31,6 +32,7 @@ case class Asset(id: Option[String] = None,
                  sizeBytes: Long,
                  folderId: String,
                  metadata: Metadata = Metadata(),
+                 isTriaged: Boolean = false,
                  isRecycled: Boolean = false,
                  extractedMetadata: Metadata = Metadata())
   extends BaseModel {
@@ -45,9 +47,10 @@ case class Asset(id: Option[String] = None,
     C.Asset.ASSET_TYPE -> (assetType: JsValue),
     C.Asset.METADATA -> metadata.toJson,
     C.Asset.EXTRACTED_METADATA -> extractedMetadata.toJson,
+    C.Asset.IS_TRIAGED -> isTriaged,
     C.Asset.IS_RECYCLED -> isRecycled
   ) ++ coreJsonAttrs
 
   override def toString: String =
-    s"path: [$path] recycled: [$isRecycled] class: [${assetType.mediaType}:${assetType.mediaSubtype}]"
+    s"Asset: [$path] Recycled: [$isRecycled] Triaged: [$isTriaged] Type: [${assetType.mediaType}:${assetType.mediaSubtype}]"
 }

@@ -12,7 +12,7 @@ abstract class AllIntegrationTestSuites(val config: Map[String, Any]) extends Su
   new MetadataParserTests(config),
   new SearchServiceTests(config),
   new RepositoryServiceTests(config),
-  new ImportTests(config),
+  new AssetImportServiceTests(config),
   new FolderServiceTests(config),
   new FileStoreServiceTests(config),
   new StatsServiceTests(config),

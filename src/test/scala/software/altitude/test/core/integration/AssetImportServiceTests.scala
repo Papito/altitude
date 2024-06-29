@@ -13,10 +13,10 @@ import software.altitude.test.core.IntegrationTestCore.fileToImportAsset
 
 import java.io.File
 
-@DoNotDiscover class ImportTests(val config: Map[String, Any]) extends IntegrationTestCore {
+@DoNotDiscover class AssetImportServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
 
-  test("import duplicate") {
-    importFile("images/1.jpg")
+  test("Import duplicate") {
+    getAssetToImport("images/1.jpg")
     val path = getClass.getResource("/import/images/1.jpg").getPath
     val importAsset = fileToImportAsset(new File(path))
 
@@ -25,14 +25,14 @@ import java.io.File
     }
   }
 
-  test("import image") {
-    val asset = importFile("images/1.jpg")
+  test("Imported image should have a preview", Focused) {
+    val asset = getAssetToImport("images/1.jpg")
     val preview: Preview = altitude.service.library.getPreview(asset.id.get)
     preview.mimeType should equal("application/octet-stream")
     preview.data.length should not be 0
   }
 
-  private def importFile(path: String): Asset = {
+  private def getAssetToImport(path: String): Asset = {
     val _path = getClass.getResource(s"/import/$path").getPath
     val fileImportAsset = fileToImportAsset(new File(_path))
     val importedAsset = altitude.service.assetImport.importAsset(fileImportAsset).get
