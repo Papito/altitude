@@ -42,91 +42,15 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   }
 
   override def addFolder(folder: Folder): Unit = {
-    require(folder.path.isDefined)
-    require(folder.path.get.nonEmpty)
-    createPath(folder.path.get)
   }
 
   override def deleteFolder(folder: Folder): Unit = {
-    require(folder.path.isDefined)
-    require(folder.path.get.nonEmpty)
-
-    val destFile = fileFromRelPath(folder.path.get)
-    log.info(s"Removing FS folder [$destFile]")
-
-    // ignore if not here anymore
-    if (!destFile.exists) {
-      log.warn(s"Folder [$destFile] no longer exists. Not trying to delete")
-      return
-    }
-
-    try {
-      FileUtils.deleteDirectory(destFile)
-    }
-    catch {
-      case ex: IOException =>
-        throw StorageException(s"Directory [$destFile] could not be deleted: $ex")
-    }
-
-    if (destFile.exists || destFile.isDirectory) {
-      throw StorageException(s"Directory [$destFile] could not be deleted")
-    }
   }
 
   override def renameFolder(folder: Folder, newName: String): Unit = {
-    require(folder.path.isDefined)
-    require(folder.path.get.nonEmpty)
-
-    val srcFile = fileFromRelPath(folder.path.get)
-    //FIXME: replace with Paths.get()
-    val newPath = FilenameUtils.concat(srcFile.getParent, newName)
-    val destFile = new File(newPath)
-    log.info(s"Renaming folder [$srcFile] to [$destFile]")
-
-    if (destFile.exists) {
-      throw StorageException(
-        s"Cannot rename [$srcFile] to [$destFile]: destination already exists")
-    }
-
-    try {
-      FileUtils.moveDirectory(srcFile, destFile)
-    }
-    catch {
-      case ex: IOException =>
-        throw StorageException(s"Directory [$srcFile] could not be renamed: $ex")
-    }
-
-    if (!(destFile.exists && destFile.isDirectory)) {
-      throw StorageException(s"Directory [$srcFile] could not be renamed")
-    }
   }
 
   def moveFolder(folder: Folder, newParent: Folder): Unit = {
-    require(folder.path.isDefined)
-    require(newParent.path.get.nonEmpty)
-
-    val srcFile = fileFromRelPath(folder.path.get)
-    val newPath = FilenameUtils.concat(newParent.path.get, folder.name)
-
-    val destFile = fileFromRelPath(newPath)
-    log.info(s"Move folder [$srcFile] to [$destFile]")
-
-    if (destFile.exists) {
-      throw StorageException(
-        s"Cannot move [$srcFile] to [$destFile]: destination already exists")
-    }
-
-    try {
-      FileUtils.moveDirectory(srcFile, destFile)
-    }
-    catch {
-      case ex: IOException =>
-        throw StorageException(s"Directory [$srcFile] could not be moved: $ex")
-    }
-
-    if (!(destFile.exists && destFile.isDirectory)) {
-      throw StorageException(s"Directory [$srcFile] could not be moved")
-    }
   }
 
   override def getById(id: String): Data = {
@@ -157,7 +81,6 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     log.debug(s"Creating asset [$asset] on file system at [$destFile]")
 
     try {
-      println(destFile.getAbsolutePath)
       FileUtils.writeByteArrayToFile(destFile, asset.data)
     }
     catch {
@@ -167,35 +90,15 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   }
 
   override def moveAsset(srcAsset: Asset, destAsset: Asset): Unit = {
-    val srcFile = fileFromRelPath(getAssetPath(srcAsset))
-    val destFile = fileFromRelPath(getAssetPath(destAsset))
-
-    log.debug(s"Moving asset [$srcAsset] on file system from [$srcFile] to [$destFile]")
-    moveFile(srcFile, destFile)
   }
 
   override def recycleAsset(asset: Asset): Unit = {
-    log.info(s"Recycling: [$asset]")
-
-    val srcFile = fileFromRelPath(getAssetPath(asset))
-    val relRecyclePath = getRecycledAssetPath(asset)
-    val destFile = fileFromRelPath(relRecyclePath)
-
-    moveFile(srcFile, destFile)
   }
 
   override def restoreAsset(asset: Asset): Unit = {
-    log.info(s"Restoring: [$asset]")
-
-    val relRecyclePath = getRecycledAssetPath(asset)
-    val srcFile = fileFromRelPath(relRecyclePath)
-    val destFile = fileFromRelPath(getAssetPath(asset))
-
-    moveFile(srcFile, destFile)
   }
 
   override def purgeAsset(asset: Asset): Unit = {
-
   }
 
   override def getFolderPath(name: String, parentId: String): String = {
@@ -277,7 +180,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   }
 
   private def previewDirPath: String =
-    new File(RequestContext.repository.value.get.fileStoreConfig(C.Repository.Config.PATH), "p").getPath
+    new File(RequestContext.repository.value.get.fileStoreConfig(C.Repository.Config.PATH), "preview").getPath
 
   /**
    * Get the absolute path to the asset on file system,
