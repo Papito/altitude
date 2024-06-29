@@ -75,26 +75,18 @@ class LibraryService(val app: Altitude) {
 
       log.info(s"Adding asset: $assetToAddModel")
 
-      val storedAsset: Asset = app.service.asset.add(assetToAddModel)
+      app.service.asset.add(assetToAddModel)
 
-      /**
-        * Add to search index
-        */
-      app.service.search.indexAsset(storedAsset)
+      app.service.search.indexAsset(assetToAddModel)
 
-      /**
-        * Update repository counters
-        */
-      app.service.stats.addAsset(storedAsset)
+      app.service.stats.addAsset(assetToAddModel)
 
-      /* NOTE that we are passing the original model object, NOT the persisted one.
-         This is because we need the actual *data* of the file, which we do not get from the database. */
       addPreview(assetToAddModel)
+
       app.service.fileStore.addAsset(assetToAddModel)
 
-      val path = app.service.fileStore.getAssetPath(storedAsset)
-
-      storedAsset.modify(C.Asset.PATH -> path)
+      val path = app.service.fileStore.getAssetPath(assetToAddModel)
+      assetToAddModel.copy(path = Some(path))
     }
   }
 

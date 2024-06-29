@@ -237,7 +237,7 @@ import software.altitude.test.core.IntegrationTestCore
     altitude.service.metadata.getAllFields.size shouldBe 3
   }
 
-  test("Adding a duplicate-named field should not succeed", Focused) {
+  test("Adding a duplicate-named field should not succeed") {
     val fieldName = "field name"
     altitude.service.metadata.addField(
       MetadataField(name = fieldName, fieldType = FieldType.KEYWORD))

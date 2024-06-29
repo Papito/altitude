@@ -13,12 +13,21 @@ import software.altitude.core.Util
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Folder
 import software.altitude.core.{Const => C}
+import software.altitude.test.Util.getImportAsset
 import software.altitude.test.core.IntegrationTestCore
 import software.altitude.test.core.IntegrationTestCore.fileToImportAsset
 
 import java.io.File
 
 @DoNotDiscover class FileStoreServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
+
+  test("Add asset", Focused) {
+    val importAsset = getImportAsset(("images/1.jpg"))
+    val importedAsset: Asset = altitude.service.assetImport.importAsset(importAsset).get
+    val asset = altitude.service.library.getById(importedAsset.id.get): Asset
+
+    println(asset.path)
+  }
 
   test("move asset") {
     val asset = importFile("images/1.jpg")
