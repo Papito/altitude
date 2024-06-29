@@ -89,8 +89,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   /**
    * Given a list of folders, calculate and append asset counts
    */
-  private def addAssetCount(folders: List[JsObject])
-                           : List[JsObject] = {
+  private def addAssetCount(folders: List[JsObject]): List[JsObject] = {
     folders.map { json =>
       val id = (json \ C.Base.ID).as[String]
       val assetCount = flatChildren(id, folders).toSeq.map(_.numOfAssets).sum
@@ -118,8 +117,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   /**
    * Return all NON-system folders.
    */
-  def repositoryFolders(allRepoFolders: List[JsObject] = List())
-                      : List[JsObject] = {
+  def repositoryFolders(allRepoFolders: List[JsObject] = List()): List[JsObject] = {
     txManager.asReadOnly[List[JsObject]] {
       val _all = if (allRepoFolders.isEmpty) getAll else allRepoFolders
 
@@ -206,8 +204,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
    * Returns a nested list of children for a given folder.
    * Not a flat list! Subsequent children are in each folders' "children" element.
     */
-  private def children(parentId: String, allRepoFolders: List[JsObject])
-                      : List[Folder] = {
+  private def children(parentId: String, allRepoFolders: List[JsObject]): List[Folder] = {
     val repoFolders = repositoryFolders(allRepoFolders)
     val immediateChildren = this.immediateChildren(parentId, repoFolders)
 
