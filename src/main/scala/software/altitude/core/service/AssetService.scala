@@ -18,8 +18,7 @@ class AssetService(val app: Altitude) extends BaseService[Asset] {
   private final val log = LoggerFactory.getLogger(getClass)
   override protected val dao: AssetDao = app.injector.instance[AssetDao]
 
-  def setRecycledProp(asset: Asset, isRecycled: Boolean)
-                     : Unit = {
+  def setRecycledProp(asset: Asset, isRecycled: Boolean): Unit = {
 
     if (asset.isRecycled == isRecycled) {
       return
@@ -27,7 +26,7 @@ class AssetService(val app: Altitude) extends BaseService[Asset] {
 
     txManager.withTransaction[Unit] {
       log.info(s"Setting asset [${asset.id.get}] recycled flag to [$isRecycled]")
-      val updatedAsset = asset.modify(C.Asset.IS_RECYCLED -> isRecycled)
+      val updatedAsset: Asset  = asset.copy(isRecycled = isRecycled)
       dao.updateById(asset.id.get, data = updatedAsset, fields = List(C.Asset.IS_RECYCLED))
     }
   }

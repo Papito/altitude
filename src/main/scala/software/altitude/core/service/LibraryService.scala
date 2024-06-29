@@ -98,7 +98,7 @@ class LibraryService(val app: Altitude) {
     txManager.asReadOnly[JsObject] {
       val asset: Asset = app.service.asset.getById(id)
       val path = app.service.fileStore.getAssetPath(asset)
-      asset.modify(C.Asset.PATH -> path)
+      asset.copy(path = Some(path))
     }
   }
 
@@ -144,9 +144,9 @@ class LibraryService(val app: Altitude) {
          It may or may not be recycled, so we update it as not recycled unconditionally
          (saves us a separate update query)
       */
-      val updatedAsset: Asset = asset.modify(
-        C.Asset.FOLDER_ID -> destFolderId,
-        C.Asset.IS_RECYCLED -> false)
+      val updatedAsset: Asset = asset.copy(
+        folderId = destFolderId,
+        isRecycled = false)
 
       app.service.asset.updateById(
         asset.id.get, updatedAsset,
@@ -181,9 +181,10 @@ class LibraryService(val app: Altitude) {
         throw IllegalOperationException(s"Cannot rename a recycled asset: [$asset]")
       }
 
-      val updatedAsset: Asset = asset.modify(
-        C.Asset.FILENAME -> newFilename,
-        C.Asset.PATH -> app.service.fileStore.getPathWithNewFilename(asset, newFilename))
+      val path = app.service.fileStore.getPathWithNewFilename(asset, newFilename)
+      val updatedAsset: Asset = asset.copy(
+        fileName = newFilename,
+        path = Some(path))
 
       // Note that we are not updating the PATH because it does not exist as a property
       app.service.asset.updateById(
@@ -484,7 +485,7 @@ class LibraryService(val app: Altitude) {
     txManager.withTransaction {
       val folder: Folder = app.service.folder.getById(folderId)
       app.service.folder.setRecycledProp(folder, isRecycled = true)
-      folder.modify(C.Folder.IS_RECYCLED -> true)
+      folder.copy(isRecycled = true)
     }
   }
 
