@@ -61,26 +61,21 @@ class LibraryService(val app: Altitude) {
         * Process metadata and append it to the asset
         */
       val metadata = app.service.metadata.cleanAndValidate(assetIn.metadata)
+      val fileName = app.service.fileStore.calculateNextAvailableFilename(assetIn)
 
       val assetId = BaseDao.genId
 
-      val fileName = app.service.fileStore.calculateNextAvailableFilename(assetIn)
-
-      val assetToAdd: Asset = Asset(
+      val assetToAddModel: Asset = assetIn.copy(
         id = Some(assetId),
-        data = assetIn.data,
-        userId = assetIn.userId,
-        assetType = assetIn.assetType,
         fileName = fileName,
-        checksum = assetIn.checksum,
-        sizeBytes = assetIn.sizeBytes,
-        folderId = assetIn.folderId,
         metadata = metadata,
-        extractedMetadata = assetIn.extractedMetadata)
+        data = assetIn.data,
+        extractedMetadata = assetIn.extractedMetadata
+      )
 
-      log.info(s"Adding asset: $assetToAdd")
+      log.info(s"Adding asset: $assetToAddModel")
 
-      val storedAsset: Asset = app.service.asset.add(assetToAdd)
+      val storedAsset: Asset = app.service.asset.add(assetToAddModel)
 
       /**
         * Add to search index
@@ -90,14 +85,14 @@ class LibraryService(val app: Altitude) {
       /**
         * Update repository counters
         */
-      app.service.stats.addAsset(assetToAdd)
+      app.service.stats.addAsset(storedAsset)
 
-      // add preview data
-      addPreview(assetToAdd)
+      /* NOTE that we are passing the original model object, NOT the persisted one.
+         This is because we need the actual *data* of the file, which we do not get from the database. */
+      addPreview(assetToAddModel)
+      app.service.fileStore.addAsset(assetToAddModel)
 
-      app.service.fileStore.addAsset(assetToAdd)
-
-      val path = app.service.fileStore.getAssetPath(assetToAdd)
+      val path = app.service.fileStore.getAssetPath(storedAsset)
 
       storedAsset.modify(C.Asset.PATH -> path)
     }
@@ -222,7 +217,7 @@ class LibraryService(val app: Altitude) {
   }
 
   private def addPreview(asset: Asset): Option[Preview] = {
-    require(asset.id.nonEmpty)
+    require(asset.id.nonEmpty, "Asset ID cannot be empty")
 
     val previewData: Array[Byte] = genPreviewData(asset)
 
@@ -244,7 +239,7 @@ class LibraryService(val app: Altitude) {
   // FIXME: this is temporary as only image-specific
   private def makeImageThumbnail(asset: Asset): Array[Byte] = {
     try {
-      require(asset.data.length != 0)
+      require(asset.data.length != 0, "File length cannot be zero")
       val dataStream: InputStream = new ByteArrayInputStream(asset.data)
       val srcImage: BufferedImage = ImageIO.read(dataStream)
       val scaledImage: BufferedImage = Scalr.resize(srcImage, Scalr.Method.ULTRA_QUALITY, previewBoxSize)
@@ -276,6 +271,7 @@ class LibraryService(val app: Altitude) {
   }
 
   def getPreview(assetId: String): Preview = {
+    require(assetId.nonEmpty, "Asset ID cannot be empty")
     app.service.fileStore.getPreviewById(assetId)
   }
 

@@ -62,13 +62,12 @@ class AssetImportService(app: Altitude) {
       checksum = getChecksum(importAsset),
       assetType = assetType,
       sizeBytes = importAsset.data.length,
+      isTriaged = true,
       folderId = RequestContext.repository.value.get.triageFolderId,
       extractedMetadata = extractedMetadata)
 
-    var res: Option[JsValue] = None
-
-    try {
-      res = Some(app.service.library.add(asset))
+    val storedAsset: Option[Asset] = try {
+      Some(app.service.library.add(asset))
     }
     catch {
       case _: FormatException =>
@@ -80,7 +79,7 @@ class AssetImportService(app: Altitude) {
       throw MetadataExtractorException(asset, metadataParserException.get)
     }
 
-    Some(Asset.fromJson(res.get))
+    storedAsset
   }
 
   private def getChecksum(importAsset: ImportAsset): String =

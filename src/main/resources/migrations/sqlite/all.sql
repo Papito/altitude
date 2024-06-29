@@ -50,17 +50,16 @@ CREATE TABLE asset  (
   extracted_metadata TEXT,
   raw_metadata TEXT,
   metadata TEXT,
-  folder_id CHAR(36) NOT NULL,
+  folder_id CHAR(36),
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
   is_recycled TINYINT NOT NULL DEFAULT 0,
+  is_triaged TINYINT NOT NULL DEFAULT 0,
   created_at DATETIME DEFAULT (datetime('now', 'utc')),
   updated_at DATETIME DEFAULT NULL,
   FOREIGN KEY(repository_id) REFERENCES repository(id),
   FOREIGN KEY(user_id) REFERENCES account(id)
 );
-CREATE UNIQUE INDEX asset_01 ON asset(repository_id, checksum, is_recycled);
-CREATE UNIQUE INDEX asset_02 ON asset(repository_id, folder_id, filename, is_recycled);
 
 CREATE TABLE metadata_field (
   id CHAR(36) PRIMARY KEY,
@@ -72,8 +71,6 @@ CREATE TABLE metadata_field (
   updated_at DATETIME DEFAULT NULL,
   FOREIGN KEY(repository_id) REFERENCES repository(id)
 );
-CREATE INDEX metadata_field_01 ON metadata_field(repository_id);
-CREATE UNIQUE INDEX metadata_field_02 ON metadata_field(repository_id, name_lc);
 
 
 CREATE TABLE folder (
@@ -88,9 +85,6 @@ CREATE TABLE folder (
   updated_at DATETIME DEFAULT NULL,
   FOREIGN KEY(repository_id) REFERENCES repository(id)
 );
-CREATE INDEX folder_01 ON folder(repository_id, parent_id);
-CREATE UNIQUE INDEX folder_02 ON folder(repository_id, parent_id, name_lc);
-CREATE UNIQUE INDEX folder_03 ON folder(repository_id, parent_id, name_lc);
 
 CREATE TABLE search_parameter (
   repository_id CHAR(36) NOT NULL,
@@ -104,9 +98,5 @@ CREATE TABLE search_parameter (
   FOREIGN KEY(asset_id) REFERENCES asset(id),
   FOREIGN KEY(field_id) REFERENCES metadata_field(id)
 );
-CREATE INDEX search_parameter_01 ON search_parameter(repository_id, field_id, field_value_kw);
-CREATE INDEX search_parameter_02 ON search_parameter(repository_id, field_id, field_value_num);
-CREATE INDEX search_parameter_03 ON search_parameter(repository_id, field_id, field_value_bool);
-CREATE INDEX search_parameter_04 ON search_parameter(repository_id, field_id, field_value_dt);
 
 CREATE VIRTUAL TABLE search_document USING fts4(repository_id, asset_id, body);

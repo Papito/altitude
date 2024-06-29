@@ -36,13 +36,15 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
       id = Some(rec(C.Base.ID).asInstanceOf[String]),
       userId = rec(C.Base.USER_ID).asInstanceOf[String],
       fileName = rec(C.Asset.FILENAME).asInstanceOf[String],
-      isRecycled = getBooleanField(rec(C.Asset.IS_RECYCLED)),
       checksum = rec(C.Asset.CHECKSUM).asInstanceOf[String],
       assetType = assetType,
       sizeBytes = rec(C.Asset.SIZE_BYTES).asInstanceOf[Int],
       metadata = metadataJson: Metadata,
       extractedMetadata = extractedMetadataJson: Metadata,
-      folderId = rec(C.Asset.FOLDER_ID).asInstanceOf[String])
+      folderId = rec(C.Asset.FOLDER_ID).asInstanceOf[String],
+      isRecycled = getBooleanField(rec(C.Asset.IS_RECYCLED)),
+      isTriaged = getBooleanField(rec(C.Asset.IS_TRIAGED)),
+    )
 
     addCoreAttrs(model, rec)
   }
@@ -85,8 +87,8 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
              ${C.Asset.ID}, ${C.Asset.REPO_ID}, ${C.Base.USER_ID}, ${C.Asset.CHECKSUM},
              ${C.Asset.FILENAME}, ${C.Asset.SIZE_BYTES},
              ${C.AssetType.MEDIA_TYPE}, ${C.AssetType.MEDIA_SUBTYPE}, ${C.AssetType.MIME_TYPE},
-             ${C.Asset.FOLDER_ID}, ${C.Asset.METADATA}, ${C.Asset.EXTRACTED_METADATA})
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, $jsonFunc, $jsonFunc)
+             ${C.Asset.FOLDER_ID}, ${C.Asset.IS_TRIAGED}, ${C.Asset.METADATA}, ${C.Asset.EXTRACTED_METADATA})
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, $jsonFunc, $jsonFunc)
     """
 
     val id = asset.id match {
@@ -105,6 +107,7 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
       asset.assetType.mediaSubtype,
       asset.assetType.mime,
       asset.folderId,
+      asset.isTriaged,
       metadata,
       extractedMetadata)
 
