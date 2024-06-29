@@ -55,19 +55,9 @@ class SearchController extends BaseApiController {
   }
 
   get("/triage") {
-    defaultQuery(repository.triageFolderId)
   }
 
   get(s"/triage/p/:${C.Api.Search.PAGE}/rpp/:${C.Api.Search.RESULTS_PER_PAGE}") {
-    val rpp = params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, C.DEFAULT_RPP).toInt
-    val page = params.getOrElse(C.Api.Search.PAGE, "1").toInt
-
-    val q = new SearchQuery(
-      rpp = rpp, page = page,
-      folderIds = Set(repository.triageFolderId)
-    )
-
-    query(q)
   }
 
   private def defaultQuery(folderId: String): ActionResult = {

@@ -44,7 +44,6 @@ object Const {
     val NAME = "name"
     val OWNER_ACCOUNT_ID = "owner_account_id"
     val ROOT_FOLDER_ID = "root_folder_id"
-    val TRIAGE_FOLDER_ID = "triage_folder_id"
     val FILE_STORE_TYPE = "file_store_type"
     val FILES_STORE_CONFIG = "file_store_config"
 

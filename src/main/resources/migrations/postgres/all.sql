@@ -28,7 +28,6 @@ CREATE TABLE repository(
   description TEXT,
   owner_account_id CHAR(36) REFERENCES account(id) NOT NULL,
   root_folder_id CHAR(36) NOT NULL,
-  triage_folder_id CHAR(36) NOT NULL,
   file_store_type VARCHAR NOT NULL,
   file_store_config jsonb
 ) INHERITS (_core);

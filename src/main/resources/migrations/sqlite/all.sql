@@ -23,7 +23,6 @@ CREATE TABLE repository(
   owner_account_id CHAR(36) REFERENCES account(id) NOT NULL,
   description TEXT,
   root_folder_id CHAR(36) NOT NULL,
-  triage_folder_id CHAR(36) NOT NULL,
   file_store_type VARCHAR NOT NULL,
   file_store_config TEXT NOT NULL,
   created_at DATETIME DEFAULT (datetime('now', 'utc')),

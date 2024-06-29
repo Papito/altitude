@@ -42,7 +42,6 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
       name = name,
       ownerAccountId = owner.id.get,
       rootFolderId = BaseDao.genId,
-      triageFolderId = BaseDao.genId,
       fileStoreType = fileStoreType,
       fileStoreConfig = Map(
         C.Repository.Config.PATH -> repoDataPath)
