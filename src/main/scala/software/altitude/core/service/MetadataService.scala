@@ -30,7 +30,7 @@ class MetadataService(val app: Altitude) {
 
       val existing = metadataFieldDao.query(new Query(params = Map(
         C.MetadataField.NAME_LC -> metadataField.nameLowercase
-      )))
+      )).withRepository())
 
       if (existing.nonEmpty) {
         val existingField: MetadataField = existing.records.head

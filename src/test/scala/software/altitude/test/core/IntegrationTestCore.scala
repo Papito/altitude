@@ -15,17 +15,10 @@ import software.altitude.test.core.suites.PostgresSuiteBundle
 import software.altitude.test.core.suites.SqliteSuiteBundle
 
 import java.io.File
-import scala.Console.println
 import scala.language.implicitConversions
 
 
 object IntegrationTestCore {
-  /*
-  Set to TRUE to TEMPORARILY commit after each test, to be able to explore the state of the DB.
-  You would almost always use this in conjunction with the Focused tag.
-   */
-  private final val COMMIT_AFTER_EACH_TEST = false
-
   /**
    * Create a directory for testing purposes.
    * It takes an instance of `AltitudeAppContext` as an argument.
@@ -130,20 +123,10 @@ abstract class IntegrationTestCore
     MDC.put("REQUEST_ID", s"[TEST: $count]")
 
     IntegrationTestCore.createFileStoreDir(altitude)
-
-    if (IntegrationTestCore.COMMIT_AFTER_EACH_TEST) {
-      println("\n\u001B[33mWARNING: Committing after each test.\n" +
-        "To return to the rollback behavior, \nset IntegrationTestCore.COMMIT_AFTER_EACH_TEST to FALSE" +
-        "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\u001B[0m\n\n")
-    }
   }
 
   override def afterEach(): Unit = {
-    if (IntegrationTestCore.COMMIT_AFTER_EACH_TEST) {
-      altitude.txManager.commit()
-    } else {
-      altitude.txManager.rollback()
-    }
+    altitude.txManager.commit()
   }
 
   // Stores test app config overrides, since we run same tests with a different app setup.

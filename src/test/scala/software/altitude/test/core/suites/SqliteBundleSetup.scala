@@ -45,6 +45,7 @@ trait SqliteBundleSetup extends Suite with BeforeAndAfterAll {
 
     SqliteSuiteBundle.app.service.migrationService.migrate()
 
+    // See: https://github.com/papito/altitude/wiki/How-the-tests-work#why-do-tests-create-a-top-level-database-connection
     RequestContext.conn.value = Some(SqliteSuiteBundle.app.txManager.connection(readOnly = false))
   }
 

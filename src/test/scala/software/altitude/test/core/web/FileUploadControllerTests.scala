@@ -8,7 +8,7 @@ import java.io.File
 
 @DoNotDiscover class FileUploadControllerTests(val config: Map[String, Any]) extends HtmxTestCore {
 
-  test("Upload with multiple files", Focused) {
+  test("Upload with multiple files") {
     testContext.persistUser()
 
     val file1 = new File(getClass.getResource("/import/images/1.jpg").getPath)

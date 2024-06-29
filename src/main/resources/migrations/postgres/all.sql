@@ -38,8 +38,7 @@ CREATE TABLE stats (
   dimension VARCHAR(60),
   dim_val INT NOT NULL DEFAULT 0
 );
-CREATE INDEX stats_01 ON stats(repository_id);
-CREATE UNIQUE INDEX stats_02 ON stats(repository_id, dimension);
+CREATE UNIQUE INDEX stats_01 ON stats(repository_id, dimension);
 
 CREATE TABLE asset (
   id CHAR(36) PRIMARY KEY,
@@ -58,6 +57,7 @@ CREATE TABLE asset (
   is_triaged BOOLEAN NOT NULL DEFAULT FALSE,
   is_recycled BOOLEAN NOT NULL DEFAULT FALSE
 ) INHERITS (_core);
+CREATE UNIQUE INDEX asset_01 ON asset(repository_id, checksum, is_recycled);
 
 CREATE TABLE metadata_field (
   id CHAR(36) PRIMARY KEY,
@@ -66,6 +66,8 @@ CREATE TABLE metadata_field (
   name_lc VARCHAR(255) NOT NULL,
   field_type VARCHAR(255) NOT NULL
 ) INHERITS (_core);
+CREATE INDEX metadata_field_01 ON metadata_field(repository_id);
+CREATE UNIQUE INDEX metadata_field_02 ON metadata_field(repository_id, name_lc);
 
 CREATE TABLE folder (
   id CHAR(36) PRIMARY KEY,
@@ -76,6 +78,8 @@ CREATE TABLE folder (
   num_of_assets INTEGER NOT NULL DEFAULT 0,
   is_recycled BOOLEAN NOT NULL DEFAULT FALSE
 ) INHERITS (_core);
+CREATE INDEX folder_01 ON folder(repository_id, parent_id);
+CREATE UNIQUE INDEX folder_02 ON folder(repository_id, parent_id, name_lc);
 
 CREATE TABLE search_parameter (
   repository_id CHAR(36) REFERENCES repository(id),
@@ -94,6 +98,8 @@ CREATE TABLE search_document (
   body TEXT NOT NULL,
   tsv TSVECTOR NOT NULL
 );
+CREATE UNIQUE INDEX search_document_01 ON search_document(repository_id, asset_id);
+CREATE INDEX search_document_02 ON search_document USING gin(tsv);
 
 CREATE FUNCTION update_search_document_rank() RETURNS trigger AS $$
 begin

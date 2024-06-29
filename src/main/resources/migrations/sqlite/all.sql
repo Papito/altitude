@@ -60,6 +60,7 @@ CREATE TABLE asset  (
   FOREIGN KEY(repository_id) REFERENCES repository(id),
   FOREIGN KEY(user_id) REFERENCES account(id)
 );
+CREATE UNIQUE INDEX asset_01 ON asset(repository_id, checksum, is_recycled);
 
 CREATE TABLE metadata_field (
   id CHAR(36) PRIMARY KEY,
@@ -71,6 +72,8 @@ CREATE TABLE metadata_field (
   updated_at DATETIME DEFAULT NULL,
   FOREIGN KEY(repository_id) REFERENCES repository(id)
 );
+CREATE INDEX metadata_field_01 ON metadata_field(repository_id);
+CREATE UNIQUE INDEX metadata_field_02 ON metadata_field(repository_id, name_lc);
 
 
 CREATE TABLE folder (
@@ -85,6 +88,8 @@ CREATE TABLE folder (
   updated_at DATETIME DEFAULT NULL,
   FOREIGN KEY(repository_id) REFERENCES repository(id)
 );
+CREATE INDEX folder_01 ON folder(repository_id, parent_id);
+CREATE UNIQUE INDEX folder_02 ON folder(repository_id, parent_id, name_lc);
 
 CREATE TABLE search_parameter (
   repository_id CHAR(36) NOT NULL,

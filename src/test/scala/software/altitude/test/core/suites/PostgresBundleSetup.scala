@@ -40,6 +40,7 @@ trait PostgresBundleSetup extends Suite with BeforeAndAfterAll {
 
     PostgresBundleSetup.setup()
 
+    // See: https://github.com/papito/altitude/wiki/How-the-tests-work#why-do-tests-create-a-top-level-database-connection
     RequestContext.conn.value = Some(PostgresSuiteBundle.app.txManager.connection(readOnly = false))
   }
 
