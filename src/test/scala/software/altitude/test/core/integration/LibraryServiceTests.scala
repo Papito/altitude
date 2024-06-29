@@ -4,18 +4,11 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.invocation.InvocationOnMock
 import org.scalatest.DoNotDiscover
-import org.scalatest.matchers.must.Matchers.endWith
 import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import software.altitude.core.DuplicateException
-import software.altitude.core.IllegalOperationException
-import software.altitude.core.NotFoundException
-import software.altitude.core.RequestContext
-import software.altitude.core.StorageException
-import software.altitude.core.Util
+import software.altitude.core.{DuplicateException, IllegalOperationException, NotFoundException, RequestContext, StorageException, Util, Const => C}
 import software.altitude.core.models._
 import software.altitude.core.util.Query
-import software.altitude.core.{Const => C}
 import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class LibraryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
@@ -56,12 +49,6 @@ import software.altitude.test.core.IntegrationTestCore
       testContext.persistAsset(folder = Some(folder2_2_2))
     }
 
-    // check counts
-    val systemFolders = altitude.service.folder.sysFoldersByIdMap()
-
-    // we do not increment triage folder - this is recorded in Stats
-    systemFolders(RequestContext.repository.value.get.triageFolderId).numOfAssets shouldBe 0
-
     // prefetch all folders for speed
     val all = altitude.service.folder.repositoryFolders()
 
@@ -92,12 +79,10 @@ import software.altitude.test.core.IntegrationTestCore
     var asset: Asset = testContext.persistAsset()
     var updatedAsset: Asset = altitude.service.library.renameAsset(asset.id.get, "newName")
     updatedAsset.fileName shouldBe "newName"
-    updatedAsset.path.get should endWith("newName")
 
     // get the asset again to make sure it has been updated
     updatedAsset = altitude.service.library.getById(asset.id.get)
     updatedAsset.fileName shouldBe "newName"
-    updatedAsset.path.get should endWith("newName")
 
     // attempt to rename a recycled asset
     asset = altitude.service.library.recycleAsset(asset.id.get)
@@ -108,7 +93,7 @@ import software.altitude.test.core.IntegrationTestCore
   }
 
   test("Move recycled asset to folder") {
-    var asset: Asset = testContext.persistAsset()
+    val asset: Asset = testContext.persistAsset()
     altitude.service.asset.query(new Query()).records.length shouldBe 1
     altitude.service.asset.queryRecycled(new Query()).records.length shouldBe 0
     altitude.service.library.recycleAsset(asset.id.get)
@@ -350,67 +335,6 @@ import software.altitude.test.core.IntegrationTestCore
     intercept[NotFoundException] {
       altitude.service.library.deleteFolderById(folder1.id.get)
     }
-  }
-
-  test("Restore recycled asset twice") {
-    val folder1: Folder = altitude.service.library.addFolder("folder1")
-
-    val asset1: Asset = testContext.persistAsset(folder = Some(folder1))
-    val asset2: Asset = testContext.persistAsset(folder = Some(folder1))
-    val asset3: Asset = testContext.persistAsset(folder = Some(folder1))
-    // assets 1, 2, 3 in folder 1
-
-    altitude.service.library.recycleAssets(Set(asset1.id.get, asset2.id.get, asset3.id.get))
-    // assets 1, 2, 3 in trash bin
-
-    altitude.service.library.restoreRecycledAsset(asset1.id.get)
-    // asset 1 in folder 1; assets 2, 3 in trash bin
-
-    savepoint()
-
-    // throw an exception during file move
-    val altitudeSpy = Mockito.spy(altitude)
-    val serviceSpy = Mockito.spy(altitude.service)
-    val librarySpy = Mockito.spy(altitude.service.library)
-    val fileStoreSpy = Mockito.spy(altitude.service.fileStore)
-    Mockito.doReturn(serviceSpy, Array.empty: _*).when(altitudeSpy).service
-    Mockito.doReturn(fileStoreSpy, Array.empty: _*).when(serviceSpy).fileStore
-    Mockito.doReturn(librarySpy, Array.empty: _*).when(serviceSpy).library
-    Mockito.doReturn(altitudeSpy, Array.empty: _*).when(librarySpy).app
-
-    // error
-    var numOfCalls = 0 // throw on *second* asset being restored in storage
-    Mockito.doAnswer((_: InvocationOnMock) => {
-      numOfCalls += 1
-
-      val doThrow = numOfCalls == 2
-      if (doThrow) {
-        this.altitude.txManager.rollback()
-        throw StorageException("test")
-      }
-    }).when(fileStoreSpy).restoreAsset(any())
-
-    intercept[StorageException] {
-      altitudeSpy.service.library.restoreRecycledAssets(Set(asset2.id.get, asset3.id.get))
-    }
-    // asset 1, 2 in folder 1; asset 3 in trash bin
-
-    var stats = altitude.service.stats.getStats
-
-    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 3
-    stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 1
-    stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 2
-
-    // success
-    Mockito.doCallRealMethod().when(fileStoreSpy).restoreAsset(any())
-    altitudeSpy.service.library.restoreRecycledAssets(Set(asset3.id.get))
-    // assets 1, 2, 3 in folder 1
-
-    stats = altitude.service.stats.getStats
-
-    stats.getStatValue(Stats.SORTED_ASSETS) shouldBe 2
-    stats.getStatValue(Stats.TOTAL_ASSETS) shouldBe 3
-    stats.getStatValue(Stats.RECYCLED_ASSETS) shouldBe 1
   }
 
   test("Restore an asset that was imported again") {

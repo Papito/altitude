@@ -15,19 +15,19 @@ import software.altitude.test.core.IntegrationTestCore
     results.totalPages shouldBe 0
   }
 
-  test("Search root folder") {
+  test("Search all") {
     testContext.persistAsset()
 
     val assets = altitude.service.library.query(new Query()).records
     assets.length shouldBe 1
   }
 
-  test("Search triage folder") {
-    testContext.persistAsset()
+  test("Search triage") {
 
-    val query = new Query(Map(C.Asset.FOLDER_ID -> testContext.repository.triageFolderId))
-    val assets = altitude.service.library.query(query).records
-    assets.length shouldBe 1
+  }
+
+  test("Search recycled") {
+
   }
 
   test("Pagination") {
@@ -72,24 +72,5 @@ import software.altitude.test.core.IntegrationTestCore
     results6.total shouldBe 6
     results6.records.length shouldBe 6
     results6.totalPages shouldBe 1
-  }
-
-  test("Triage and Trash should have correct totals in query results") {
-    val asset: Asset = testContext.persistAsset()
-    testContext.persistAsset()
-
-    altitude.service.library.recycleAsset(asset.id.get)
-
-    /* We now have two assets. One in triage, one trash. Each of the totals should be "1" not "2"
-     */
-
-    val query = new Query(Map(C.Asset.FOLDER_ID -> RequestContext.repository.value.get.triageFolderId))
-    var results = altitude.service.library.query(query)
-    results.records.length shouldBe 1
-    results.total shouldBe 1
-
-    results = altitude.service.library.queryRecycled(new Query())
-    results.records.length shouldBe 1
-    results.total shouldBe 1
   }
 }

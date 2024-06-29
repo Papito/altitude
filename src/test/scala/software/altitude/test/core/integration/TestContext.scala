@@ -83,7 +83,7 @@ class TestContext(val altitude: Altitude) {
     }
 
     val currentRepo = repository.getOrElse(repositories.headOption.get)
-    val folderId = if (folder.isDefined) folder.get.id.get else currentRepo.triageFolderId
+    val folderId = if (folder.isDefined) folder.get.id.get else currentRepo.rootFolderId
 
     val currentUser = user.getOrElse(this.user)
 

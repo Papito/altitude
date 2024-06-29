@@ -44,10 +44,6 @@ class LibraryService(val app: Altitude) {
   def add(assetIn: Asset): JsObject = {
     log.info(s"Preparing to add asset [$assetIn]")
 
-    if (app.service.folder.isRootFolder(assetIn.folderId)) {
-      throw IllegalOperationException("Cannot have assets in root folder")
-    }
-
     txManager.withTransaction[JsObject] {
       val existing: Option[Asset] = getByChecksum(assetIn.checksum)
 
@@ -116,22 +112,11 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def moveAssetToTriage(assetId: String): Unit = {
-    txManager.withTransaction {
-      moveAssetsToTriage(Set(assetId))
-    }
-  }
-
-  def moveAssetsToTriage(assetIds: Set[String]): Unit = {
-    txManager.withTransaction {
-      moveAssetsToFolder(assetIds, RequestContext.repository.value.get.triageFolderId)
-    }
-  }
-
   def moveAssetsToFolder(assetIds: Set[String], destFolderId: String): Unit = {
 
     def move(asset: Asset): Unit = {
-      // cannot move to the same folder
+      // Cannot move to the same folder
+      // Note that a recycled asset CAN be restored to its original folder
       if (!asset.isRecycled && asset.folderId == destFolderId) {
         return
       }
@@ -139,18 +124,18 @@ class LibraryService(val app: Altitude) {
       app.service.stats.moveAsset(asset, destFolderId)
 
       /* Point the asset to the new folder.
-         It may or may not be recycled, so we update it as not recycled unconditionally
+         It may or may not be recycled or triaged, so we update it as neither unconditionally
          (saves us a separate update query)
       */
       val updatedAsset: Asset = asset.copy(
         folderId = destFolderId,
-        isRecycled = false)
+        isRecycled = false,
+        isTriaged = false)
 
       app.service.asset.updateById(
         asset.id.get, updatedAsset,
-        fields = List(C.Asset.FOLDER_ID, C.Asset.IS_RECYCLED))
+        fields = List(C.Asset.FOLDER_ID, C.Asset.IS_RECYCLED, C.Asset.IS_TRIAGED))
 
-      app.service.fileStore.moveAsset(asset, updatedAsset)
     }
 
     txManager.withTransaction {
@@ -158,11 +143,6 @@ class LibraryService(val app: Altitude) {
       app.service.folder.getById(destFolderId)
 
       assetIds.foreach { assetId =>
-        // cannot have assets in root folder - just other folders
-        if (app.service.folder.isRootFolder(destFolderId)) {
-          throw IllegalOperationException("Cannot move assets to root folder")
-        }
-
         val asset: Asset = getById(assetId)
 
         move(asset)
@@ -179,17 +159,13 @@ class LibraryService(val app: Altitude) {
         throw IllegalOperationException(s"Cannot rename a recycled asset: [$asset]")
       }
 
-      val path = app.service.fileStore.getPathWithNewFilename(asset, newFilename)
-      val updatedAsset: Asset = asset.copy(
-        fileName = newFilename,
-        path = Some(path))
+      val updatedAsset: Asset = asset.copy(fileName = newFilename)
 
       // Note that we are not updating the PATH because it does not exist as a property
       app.service.asset.updateById(
-        asset.id.get, updatedAsset,
+        asset.id.get,
+        updatedAsset,
         fields = List(C.Asset.FILENAME))
-
-      app.service.fileStore.moveAsset(asset, updatedAsset)
 
       updatedAsset
     }
@@ -459,13 +435,10 @@ class LibraryService(val app: Altitude) {
 
           if (folder.isRecycled) {
             app.service.folder.setRecycledProp(folder = folder, isRecycled = false)
-            // the folder is not in the store.
-            app.service.fileStore.addFolder(folder)
           }
 
           val restoredAsset: Asset = getById(assetId)
           app.service.stats.restoreAsset(restoredAsset)
-          app.service.fileStore.restoreAsset(restoredAsset)
         }
       }
     }
@@ -491,11 +464,9 @@ class LibraryService(val app: Altitude) {
 
     assetIds.foreach { assetId =>
       txManager.withTransaction {
-        val asset = getById(assetId)
+        val asset: Asset = getById(assetId)
         app.service.asset.setRecycledProp(asset, isRecycled = true)
-        val recycledAsset = getById(assetId)
-        app.service.stats.recycleAsset(recycledAsset)
-        app.service.fileStore.recycleAsset(asset)
+        app.service.stats.recycleAsset(asset.copy(isRecycled = true))
       }
     }
   }

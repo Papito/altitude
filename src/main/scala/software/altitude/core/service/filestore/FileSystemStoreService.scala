@@ -106,12 +106,6 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     new File(parent.path.get, name).getPath
   }
 
-  def getPathWithNewFilename(asset: Asset, newFilename: String)
-                                  : String = {
-    val folder: Folder = app.service.folder.getById(asset.folderId)
-    FilenameUtils.concat(folder.path.get, newFilename)
-  }
-
   override def getAssetPath(asset: Asset): String = {
     FilenameUtils.concat(asset.id.get, asset.fileName)
   }

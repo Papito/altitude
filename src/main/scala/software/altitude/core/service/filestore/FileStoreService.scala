@@ -34,8 +34,6 @@ trait FileStoreService {
   def getFolderPath(name: String, parentId: String)
                          : String
 
-  def getPathWithNewFilename(asset: Asset, newFilename: String): String
-
   def getAssetPath(asset: Asset): String
 
   def getRecycledAssetPath(asset: Asset): String

@@ -344,9 +344,6 @@ class MetadataService(val app: Altitude) {
     cleanMetadata
   }
 
-  /*
-   */
-
   /**
     * Presentation-level JSON transformer for metadata. This augments the limiting metadata JSON object to supply
     * the names of fields, pulled from field configuration that the Metadata domain object is not aware of.

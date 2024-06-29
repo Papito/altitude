@@ -119,30 +119,6 @@ class AssetController extends BaseApiController {
     OK
   }
 
-  // FIXME: PUT
-  post(s"/:${C.Api.ID}/move/to/triage") {
-    val id = params.get(C.Api.ID).get
-    log.info(s"Moving $id to TRIAGE")
-    app.service.library.moveAssetToTriage(id)
-
-    OK
-  }
-
-  // FIXME: PUT
-  post("/move/to/triage") {
-    log.info("Clearing category")
-
-    assetIdValidator.validate(unscrubbedReqJson.get)
-
-    val assetIds = (unscrubbedReqJson.get \ C.Api.Folder.ASSET_IDS).as[Set[String]]
-
-    log.debug(s"Assets to move to traige: $assetIds")
-
-    app.service.library.moveAssetsToTriage(assetIds)
-
-    OK
-  }
-
   get("/:id/preview") {
     val id = params(Api.ID)
 
