@@ -1,4 +1,4 @@
-package sofware.altitude.test
+package software.altitude.test.support
 
 import org.scalatra.ScalatraServlet
 import software.altitude.core.AltitudeServletContext

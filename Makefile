@@ -22,8 +22,8 @@ test-focused-sqlite:
 test-focused-web:
 	ENV=test sbt testFocusedWeb
 
-test-web:
-	ENV=test sbt testWeb
+test-controller:
+	ENV=test sbt testController
 
 test-psql:
 	sbt testPostgres

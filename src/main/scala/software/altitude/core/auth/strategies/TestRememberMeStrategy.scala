@@ -24,7 +24,7 @@ class TestRememberMeStrategy(protected val app: ScalatraBase)
     if (Environment.ENV != Environment.TEST)
       throw new RuntimeException("TestRememberMeStrategy can only be used in test environment")
 
-    // persists throughout the lifespan of the test server
+    // See: https://github.com/papito/altitude/wiki/How-the-tests-work#auth-with-controller-tests
     AltitudeServletContext.app.loggedInTestUser match {
       case Some(user) => Some(user)
       case None => throw new RuntimeException("There is no user set in the AltitudeServletContext.app.loggedInTestUser")

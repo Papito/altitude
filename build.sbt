@@ -97,25 +97,25 @@ commands += Command.command("testFocused") { state =>
   "testOnly -- -n focused" :: state
 }
 commands += Command.command("testFocusedSqlite") { state =>
-  "testOnly software.altitude.test.core.suites.SqliteSuite -- -n focused" :: state
+  "testOnly software.altitude.test.core.suites.SqliteSuiteBundle -- -n focused" :: state
 }
 commands += Command.command("testFocusedPostgres") { state =>
-  "testOnly software.altitude.test.core.suites.PostgresSuite -- -n focused" :: state
+  "testOnly software.altitude.test.core.suites.PostgresSuiteBundle -- -n focused" :: state
 }
-commands += Command.command("testFocusedWeb") { state =>
-  "testOnly software.altitude.test.core.suites.WebSuite -- -n focused" :: state
+commands += Command.command("testFocusedController") { state =>
+  "testOnly software.altitude.test.core.suites.ControllerSuiteBundle -- -n focused" :: state
 }
 commands += Command.command("testSqlite") { state =>
-  "testOnly software.altitude.test.core.suites.SqliteSuite" :: state
+  "testOnly software.altitude.test.core.suites.SqliteSuiteBundle" :: state
 }
 commands += Command.command("testPostgres") { state =>
-  "testOnly software.altitude.test.core.suites.PostgresSuite" :: state
+  "testOnly software.altitude.test.core.suites.PostgresSuiteBundle" :: state
 }
 commands += Command.command("testUnit") { state =>
-  "testOnly software.altitude.test.core.suites.UnitTestSuite" :: state
+  "testOnly software.altitude.test.core.suites.UnitSuiteBundle" :: state
 }
-commands += Command.command("testWeb") { state =>
-  "testOnly software.altitude.test.core.suites.WebSuite" :: state
+commands += Command.command("testController") { state =>
+  "testOnly software.altitude.test.core.suites.ControllerSuiteBundle" :: state
 }
 commands += Command.command("watch") { state =>
   "~;jetty:stop;jetty:start" :: state

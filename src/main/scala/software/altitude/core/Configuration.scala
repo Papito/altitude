@@ -28,7 +28,7 @@ class Configuration(configOverride: Map[String, Any] = new HashMap()) {
     "db.postgres.password" -> "dba",
     "db.postgres.url" -> "jdbc:postgresql://localhost/altitude",
 
-    "db.sqlite.url" -> s"jdbc:sqlite:data/db/altitude.db"
+    "db.sqlite.url" -> "jdbc:sqlite:data/db/altitude.db"
   )
 
   private val test = default ++ HashMap(

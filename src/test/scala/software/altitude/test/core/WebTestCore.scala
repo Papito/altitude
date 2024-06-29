@@ -9,9 +9,9 @@ import software.altitude.core.Altitude
 import software.altitude.core.AltitudeServletContext
 import software.altitude.core.Environment
 import software.altitude.test.core.integration.TestContext
-import software.altitude.test.core.suites.PostgresSuite
-import software.altitude.test.core.suites.PostgresSuiteSetup
-import sofware.altitude.test.TestingController
+import software.altitude.test.core.suites.PostgresBundleSetup
+import software.altitude.test.core.suites.PostgresSuiteBundle
+import software.altitude.test.support.TestingController
 
 abstract class WebTestCore
   extends funsuite.AnyFunSuite
@@ -35,13 +35,13 @@ abstract class WebTestCore
   override def beforeEach(): Unit = {
     // the database is dirtied by the separate process (test server)
     // so we need to reset it before each test
-    PostgresSuiteSetup.setup()
+    PostgresBundleSetup.setup()
 
     // the few application state variables should also be rolled back
     AltitudeServletContext.app.isInitialized = false
   }
 
-  protected def altitude: Altitude = PostgresSuite.app
+  protected def altitude: Altitude = PostgresSuiteBundle.app
 
   var testContext: TestContext = new TestContext(altitude)
 

@@ -11,8 +11,8 @@ import software.altitude.core.Const
 import software.altitude.core.models._
 import software.altitude.core.{Const => C, _}
 import software.altitude.test.core.integration.TestContext
-import software.altitude.test.core.suites.PostgresSuite
-import software.altitude.test.core.suites.SqliteSuite
+import software.altitude.test.core.suites.PostgresSuiteBundle
+import software.altitude.test.core.suites.SqliteSuiteBundle
 
 import java.io.File
 import scala.Console.println
@@ -155,8 +155,8 @@ abstract class IntegrationTestCore
   final val datasource: Const.DatasourceType.Value = config("datasource").asInstanceOf[C.DatasourceType.Value]
 
   protected def altitude: Altitude = datasource match {
-    case C.DatasourceType.POSTGRES => PostgresSuite.app
-    case C.DatasourceType.SQLITE => SqliteSuite.app
+    case C.DatasourceType.POSTGRES => PostgresSuiteBundle.app
+    case C.DatasourceType.SQLITE => SqliteSuiteBundle.app
     case _ => throw new IllegalArgumentException(s"Do not know of datasource: $datasource")
   }
 
