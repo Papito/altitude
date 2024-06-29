@@ -141,12 +141,4 @@ class StatsService(val app: Altitude) {
   def restoreAsset(asset: Asset): Unit = {
     moveRecycledAsset(asset, asset.folderId)
   }
-
-  def purgeAsset(asset: Asset): Unit = {
-    if (app.service.folder.isTriageFolder(asset.folderId)) {
-      app.service.stats.decrementStat(Stats.RECYCLED_ASSETS)
-      app.service.stats.decrementStat(Stats.RECYCLED_BYTES, asset.sizeBytes)
-    }
-  }
-
 }

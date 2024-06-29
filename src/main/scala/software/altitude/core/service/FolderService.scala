@@ -54,27 +54,8 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     path = Some(app.service.fileStore.sortedFolderPath)
   )
 
-  /**
-   * Get the Triage folder for this repository
-   */
-  def triageFolder: Folder = Folder(
-    id = Some(contextRepo.triageFolderId),
-    parentId = contextRepo.rootFolderId,
-    name = C.Folder.Name.TRIAGE,
-    path = Some(app.service.fileStore.triageFolderPath)
-  )
-
-  /**
-   * Get all systems folders - the ones the user cannot alter
-   */
-  def systemFolders: List[Folder] =
-    List(triageFolder)
-
   def isRootFolder(id: String): Boolean =
     id == contextRepo.rootFolderId
-
-  def isTriageFolder(id: String): Boolean =
-    id == contextRepo.triageFolderId
 
   /**
    * Given a list of folders, calculate and append asset counts
@@ -91,10 +72,6 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   private def addPath(folder: Folder): Folder = {
     if (isRootFolder(folder.id.get)) {
       return rootFolder
-    }
-
-    if (isTriageFolder(folder.id.get)) {
-      return triageFolder
     }
 
     txManager.asReadOnly[Folder] {
