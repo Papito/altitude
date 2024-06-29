@@ -20,10 +20,6 @@ trait AltitudeAppContext {
 
   val txManager: TransactionManager
 
-  // What farm-fresh cage-free hell is this? See:
-  // https://github.com/papito/altitude/wiki/How-the-tests-work#auth-with-controller-tests
-  var loggedInTestUser: Option[User] = None
-
   // ID for this application - which we may have multiple of in the same environment
   final val id: Int = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
 

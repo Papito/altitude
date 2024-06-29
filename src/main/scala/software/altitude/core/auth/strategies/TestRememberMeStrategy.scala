@@ -4,9 +4,7 @@ import org.scalatra.ScalatraBase
 import org.scalatra.auth.ScentryStrategy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import software.altitude.core.AltitudeServletContext
-import software.altitude.core.Environment
-import software.altitude.core.RequestContext
+import software.altitude.core.{AltitudeServletContext, Const, Environment, RequestContext}
 import software.altitude.core.models.User
 
 import javax.servlet.http.HttpServletRequest
@@ -18,22 +16,22 @@ class TestRememberMeStrategy(protected val app: ScalatraBase)
 
   override def name: String = "RememberMe"
 
-  val log: Logger = LoggerFactory.getLogger(getClass)
+  val logger: Logger = LoggerFactory.getLogger(getClass)
 
   def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse): Option[User] = {
     if (Environment.ENV != Environment.TEST)
       throw new RuntimeException("TestRememberMeStrategy can only be used in test environment")
 
-    // See: https://github.com/papito/altitude/wiki/How-the-tests-work#auth-with-controller-tests
-    AltitudeServletContext.app.loggedInTestUser match {
-      case Some(user) => Some(user)
-      case None => throw new RuntimeException("There is no user set in the AltitudeServletContext.app.loggedInTestUser")
-    }
+    val testUserId: String = request.getHeader(Const.Api.USER_TEST_HEADER_ID)
 
-    // persists only through the lifespan of the request
-    RequestContext.account.value = AltitudeServletContext.app.loggedInTestUser
+    logger.info("TEST AUTHENTICATION VIA HEADER")
+    val altitude = AltitudeServletContext.app
+    val user: Option[User] = if (testUserId != null) Some(altitude.service.user.getById(testUserId)) else None
 
-    log.warn(RequestContext.account.value.toString)
-    RequestContext.account.value
+    // persists through the lifespan of the request
+    RequestContext.account.value = user
+
+    logger.info(RequestContext.account.value.toString)
+    user
   }
 }

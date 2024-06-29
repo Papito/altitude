@@ -138,6 +138,7 @@ object Const {
     val VALIDATION_ERRORS = "validation_errors"
     val MULTI_VALUE_DELIM = "+"
     val DUPLICATE_OF = "duplicate_of"
+    val USER_TEST_HEADER_ID = "TEST-user-id"
 
     // FIXME: wrong naming convention
     val TOTAL_RECORDS = "totalRecords"

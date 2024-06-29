@@ -19,8 +19,8 @@ test-focused-sqlite:
 # as this is picked up by the testing server that is spun up automatically.
 #
 # Other tests run in a single process and force the test environment themselves.
-test-focused-web:
-	ENV=test sbt testFocusedWeb
+test-focused-controller:
+	ENV=test sbt testFocusedController
 
 test-controller:
 	ENV=test sbt testController
