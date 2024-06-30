@@ -40,8 +40,6 @@ libraryDependencies ++= Seq(
   "org.postgresql"               % "postgresql"               % "42.7.3",
   "org.xerial"                   % "sqlite-jdbc"              % "3.46.0.0",
 
-  "com.lightbend.akka"          %% "akka-stream-alpakka-file" % "6.0.2",
-  "com.typesafe.akka"           %% "akka-stream"              % AkkaVersion,
 "com.google.guava"               % "guava"                    % "19.0",
   "net.codingwell"              %% "scala-guice"              % "7.0.0",
   "org.imgscalr"                 % "imgscalr-lib"             % "4.2",
