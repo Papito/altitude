@@ -40,7 +40,7 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
     val repoToSave = Repository(
       id = Some(id),
       name = name,
-      ownerAccountId = owner.id.get,
+      ownerAccountId = owner.persistedId,
       rootFolderId = BaseDao.genId,
       fileStoreType = fileStoreType,
       fileStoreConfig = Map(

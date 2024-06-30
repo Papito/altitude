@@ -55,7 +55,7 @@ class AssetImportService(app: Altitude) {
     }
 
     val asset: Asset = Asset(
-      userId = RequestContext.account.value.get.id.get,
+      userId = RequestContext.account.value.get.persistedId,
       data = importAsset.data,
       fileName = importAsset.fileName,
       checksum = getChecksum(importAsset),

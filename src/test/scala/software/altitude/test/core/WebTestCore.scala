@@ -29,9 +29,9 @@ abstract class WebTestCore
 
   def getUserSessionHeader(user: Option[User] = None): (String, String) = {
     if (user.isEmpty) {
-      Const.Api.USER_TEST_HEADER_ID -> testContext.user.id.get
+      Const.Api.USER_TEST_HEADER_ID -> testContext.user.persistedId
     } else {
-      Const.Api.USER_TEST_HEADER_ID -> user.get.id.get
+      Const.Api.USER_TEST_HEADER_ID -> user.get.persistedId
     }
   }
 

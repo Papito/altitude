@@ -7,14 +7,22 @@ import java.time.LocalDateTime
 import scala.language.implicitConversions
 
 object BaseModel {
-  // implicit converter to go from a model to JSON
+  // implicit converter to go from model to JSON
   implicit def toJson(obj: BaseModel): JsObject = obj.toJson
 }
 
 abstract class BaseModel {
   val id: Option[String]
 
-  // implicit converter to go from a JSON to model
+  // Should be always used to get the ID of an object, unless we are positive that the object has not been persisted yet
+  def persistedId: String = {
+    id match {
+      case None => throw new RuntimeException("Cannot get persisted ID for a model that has not been saved yet")
+      case _ => id.get
+    }
+  }
+
+  // implicit converter to go from JSON to model
   implicit def toJson: JsObject
 
   // created at - mutable, but can only be set once

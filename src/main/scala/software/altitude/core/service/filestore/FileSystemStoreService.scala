@@ -39,8 +39,6 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   }
 
   override def addAsset(asset: Asset): Unit = {
-    require(asset.id.isDefined)
-
     val destFile = fileFromAsset(asset)
     log.debug(s"Creating asset [$asset] on file system at [$destFile]")
 
@@ -54,7 +52,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   }
 
   override def getAssetPath(asset: Asset): String = {
-    FilenameUtils.concat(asset.id.get, asset.fileName)
+    FilenameUtils.concat(asset.persistedId, asset.fileName)
   }
 
   override def addPreview(preview: Preview): Unit = {
@@ -116,7 +114,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   private def fileFromAsset(asset: Asset): File = {
     val repositoryRoot = RequestContext.repository.value.get.fileStoreConfig(C.Repository.Config.PATH)
     val absoluteFilesPath = FilenameUtils.concat(repositoryRoot, "files")
-    val absoluteFilePartitionPath = FilenameUtils.concat(absoluteFilesPath, asset.id.get.substring(0, 2))
-    new File(absoluteFilePartitionPath, asset.id.get)
+    val absoluteFilePartitionPath = FilenameUtils.concat(absoluteFilesPath, asset.persistedId.substring(0, 2))
+    new File(absoluteFilePartitionPath, asset.persistedId)
   }
 }

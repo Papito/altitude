@@ -25,9 +25,9 @@ class AssetService(val app: Altitude) extends BaseService[Asset] {
     }
 
     txManager.withTransaction[Unit] {
-      log.info(s"Setting asset [${asset.id.get}] recycled flag to [$isRecycled]")
+      log.info(s"Setting asset [${asset.persistedId}] recycled flag to [$isRecycled]")
       val updatedAsset: Asset  = asset.copy(isRecycled = isRecycled)
-      dao.updateById(asset.id.get, data = updatedAsset, fields = List(C.Asset.IS_RECYCLED))
+      dao.updateById(asset.persistedId, data = updatedAsset, fields = List(C.Asset.IS_RECYCLED))
     }
   }
 

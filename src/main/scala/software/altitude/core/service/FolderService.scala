@@ -189,7 +189,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
 
     if (parentElements.nonEmpty) {
       val folder = Folder.fromJson(parentElements.head)
-      List(folder) ++ findParents(folderId = folder.id.get, repoFolders)
+      List(folder) ++ findParents(folderId = folder.persistedId, repoFolders)
     }
     else {
       List()
@@ -263,7 +263,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     // recursively combine with the result of deeper child levels + this one (depth-first)
     (parentElement :: childElements.foldLeft(List[Folder]()) {(res, json) =>
       val folder: Folder = json
-      res ++ flatChildren(folder.id.get, all, depth + 1)}).toSet
+      res ++ flatChildren(folder.persistedId, all, depth + 1)}).toSet
   }
 
   /**
@@ -376,9 +376,9 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     }
 
     txManager.withTransaction {
-      log.info(s"Setting folder [${folder.id.get}] recycled flag to [$isRecycled]")
+      log.info(s"Setting folder [${folder.persistedId}] recycled flag to [$isRecycled]")
       val updatedFolder = folder.copy(isRecycled = isRecycled)
-      dao.updateById(folder.id.get, data = updatedFolder, fields = List(C.Folder.IS_RECYCLED))
+      dao.updateById(folder.persistedId, data = updatedFolder, fields = List(C.Folder.IS_RECYCLED))
     }
   }
 

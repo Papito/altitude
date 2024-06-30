@@ -50,11 +50,10 @@ case class Folder(id: Option[String] = None,
 
   override def equals(that: Any): Boolean = that match {
     case that: Folder if !that.canEqual( this) => false
-    case that: Folder => {
+    case that: Folder =>
       val thisStringRepr = this.id.getOrElse("") + this.parentId + this.name.toLowerCase
       val thatStringRepr = that.id.getOrElse("") + that.parentId + that.name.toLowerCase
       thisStringRepr == thatStringRepr
-    }
     case _ => false
   }
 

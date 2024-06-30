@@ -98,7 +98,7 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
 
     val sqlVals: List[Any] = List(
       id,
-      RequestContext.getRepository.id.get,
+      RequestContext.getRepository.persistedId,
       asset.userId,
       asset.checksum,
       asset.fileName,
@@ -126,7 +126,7 @@ abstract class AssetDao(val appContext: AltitudeAppContext) extends BaseDao with
        WHERE ${C.Base.REPO_ID} = ? AND ${C.Asset.ID} = ?
       """
 
-    val updateValues = List(metadataWithIds.toString, RequestContext.getRepository.id.get, assetId)
+    val updateValues = List(metadataWithIds.toString, RequestContext.getRepository.persistedId, assetId)
     log.debug(s"Update SQL: [$sql] with values: $updateValues")
     val runner: QueryRunner = new QueryRunner()
 

@@ -30,7 +30,7 @@ import software.altitude.test.core.IntegrationTestCore
     importedAsset.assetType should equal(importedAsset.assetType)
     importedAsset.checksum should not be empty
 
-    val asset = altitude.service.library.getById(importedAsset.id.get): Asset
+    val asset = altitude.service.library.getById(importedAsset.persistedId): Asset
     asset.assetType should equal(importedAsset.assetType)
     asset.checksum should not be empty
     asset.sizeBytes should not be 0
@@ -39,8 +39,8 @@ import software.altitude.test.core.IntegrationTestCore
   test("Imported image should have a preview") {
     val importAsset = Util.getImportAsset("images/1.jpg")
     val importedAsset: Asset = altitude.service.assetImport.importAsset(importAsset).get
-    val asset = altitude.service.library.getById(importedAsset.id.get): Asset
-    val preview: Preview = altitude.service.library.getPreview(asset.id.get)
+    val asset = altitude.service.library.getById(importedAsset.persistedId): Asset
+    val preview: Preview = altitude.service.library.getPreview(asset.persistedId)
 
     preview.mimeType should equal("application/octet-stream")
     preview.data.length should not be 0
@@ -49,7 +49,7 @@ import software.altitude.test.core.IntegrationTestCore
   test("Imported image is triaged") {
     val importAsset = Util.getImportAsset("images/1.jpg")
     val importedAsset: Asset = altitude.service.assetImport.importAsset(importAsset).get
-    val asset = altitude.service.library.getById(importedAsset.id.get): Asset
+    val asset = altitude.service.library.getById(importedAsset.persistedId): Asset
     asset.isTriaged should be(true)
   }
 

@@ -29,10 +29,10 @@ import software.altitude.test.core.IntegrationTestCore
     val updateAsset: Asset = asset.copy(isRecycled = true)
 
     altitude.service.asset.updateById(
-      asset.id.get, updateAsset,
+      asset.persistedId, updateAsset,
       fields = List(C.Asset.IS_RECYCLED))
 
-    (altitude.service.library.getById(asset.id.get): Asset).isRecycled shouldBe true
+    (altitude.service.library.getById(asset.persistedId): Asset).isRecycled shouldBe true
   }
 
   test("Should be able to query by the recycled property") {

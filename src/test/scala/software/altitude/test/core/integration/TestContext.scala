@@ -83,12 +83,12 @@ class TestContext(val altitude: Altitude) {
     }
 
     val currentRepo = repository.getOrElse(repositories.headOption.get)
-    val folderId = if (folder.isDefined) folder.get.id.get else currentRepo.rootFolderId
+    val folderId = if (folder.isDefined) folder.get.persistedId else currentRepo.rootFolderId
 
     val currentUser = user.getOrElse(this.user)
 
     Asset(
-      userId = currentUser.id.get,
+      userId = currentUser.persistedId,
       folderId = folderId,
       assetType = new AssetType(
         mediaType = "mediaType",

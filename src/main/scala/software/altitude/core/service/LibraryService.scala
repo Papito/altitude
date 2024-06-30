@@ -50,7 +50,7 @@ class LibraryService(val app: Altitude) {
       if (existing.nonEmpty) {
         log.debug(s"Duplicate found for [$assetIn] and checksum: ${assetIn.checksum}")
         val existingAsset: Asset = existing.get
-        throw DuplicateException(existingAsset.id.get)
+        throw DuplicateException(existingAsset.persistedId)
       }
 
       /**
@@ -130,7 +130,7 @@ class LibraryService(val app: Altitude) {
         isTriaged = false)
 
       app.service.asset.updateById(
-        asset.id.get, updatedAsset,
+        asset.persistedId, updatedAsset,
         fields = List(C.Asset.FOLDER_ID, C.Asset.IS_RECYCLED, C.Asset.IS_TRIAGED))
 
     }
@@ -160,7 +160,7 @@ class LibraryService(val app: Altitude) {
 
       // Note that we are not updating the PATH because it does not exist as a property
       app.service.asset.updateById(
-        asset.id.get,
+        asset.persistedId,
         updatedAsset,
         fields = List(C.Asset.FILENAME))
 
@@ -181,15 +181,13 @@ class LibraryService(val app: Altitude) {
   }
 
   private def addPreview(asset: Asset): Option[Preview] = {
-    require(asset.id.nonEmpty, "Asset ID cannot be empty")
-
     val previewData: Array[Byte] = genPreviewData(asset)
 
     previewData.length match {
       case size if size > 0 =>
 
         val preview: Preview = Preview(
-          assetId = asset.id.get,
+          assetId = asset.persistedId,
           mimeType = asset.assetType.mime,
           data = previewData)
 
@@ -353,12 +351,12 @@ class LibraryService(val app: Altitude) {
              has any asset references in the repository. This spares us a second
              query.
            */
-          if (!asset.isRecycled) this.recycleAsset(asset.id.get)
+          if (!asset.isRecycled) this.recycleAsset(asset.persistedId)
         }
 
         val treeAssetCount = assetCount + results.total
 
-        log.trace(s"Total assets in the tree of folder ${folder.id.get}: $treeAssetCount")
+        log.trace(s"Total assets in the tree of folder ${folder.persistedId}: $treeAssetCount")
 
         // delete folder if it has no assets, otherwise - recycle it
         if (treeAssetCount == 0) {
@@ -412,7 +410,7 @@ class LibraryService(val app: Altitude) {
       val existing = getByChecksum(asset.checksum)
 
       if (existing.isDefined) {
-        throw DuplicateException(existingAssetId = existing.get.id.get)
+        throw DuplicateException(existingAssetId = existing.get.persistedId)
       }
 
       txManager.withTransaction {
