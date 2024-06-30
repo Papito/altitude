@@ -58,9 +58,9 @@ class ImportController extends BaseWebController with FileUploadSupport with Atm
 
         case Disconnected(disconnector, Some(error)) =>
           logger.info(s"Disassociating user $userId with client $uuid")
-          userToWsClientLookup.get(userId).foreach { clients =>
-            userToWsClientLookup(userId) = clients.filterNot(_ == this)
-          }
+          val clients = userToWsClientLookup(userId)
+          userToWsClientLookup(userId) = clients.filterNot(_ == this)
+
         case Error(Some(error)) =>
             logger.error(s"WS Error: $error")
 
