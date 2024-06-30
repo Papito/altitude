@@ -2,6 +2,7 @@ package software.altitude.core.controllers.web
 
 import org.scalatra.RequestEntityTooLarge
 import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintExceededException}
+import software.altitude.core.DuplicateException
 import software.altitude.core.controllers.BaseWebController
 import software.altitude.core.models.{ImportAsset, Metadata}
 
@@ -39,7 +40,9 @@ class ImportController extends BaseWebController with FileUploadSupport {
             try {
               app.service.assetImport.importAsset(importAsset)
             } catch {
-              case e: Exception => logger.error("Error importing asset", e)
+              case _: DuplicateException =>
+                logger.warn(s"Duplicate asset: ${importAsset.fileName}")
+              case e: Exception => logger.error("Error importing asset:", e)
             }
           }
         })
