@@ -6,13 +6,10 @@ import software.altitude.core.DuplicateException
 import software.altitude.core.controllers.BaseWebController
 import software.altitude.core.models.{ImportAsset, Metadata}
 
-import java.util.concurrent.{ExecutorService, Executors}
-
 class ImportController extends BaseWebController with FileUploadSupport {
   private val fileSizeLimitGB = 10
 
   configureMultipartHandling(MultipartConfig(maxFileSize = Some(fileSizeLimitGB*1024*1024)))
-  private val executorService: ExecutorService = Executors.newFixedThreadPool(6)
 
   before() {
     requireLogin()
@@ -35,7 +32,7 @@ class ImportController extends BaseWebController with FileUploadSupport {
             data = file.get(),
             metadata = Metadata())
 
-        executorService.submit(new Runnable {
+        app.executorService.submit(new Runnable {4
           override def run(): Unit = {
             try {
               app.service.assetImport.importAsset(importAsset)
