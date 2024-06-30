@@ -16,4 +16,5 @@
   <logger name="org.eclipse.jetty" level="ERROR" />
   <logger name="org.fusesource.scalate" level="ERROR" />
   <logger name="org.apache.tika.config.TikaConfig" level="ERROR" />
+  <logger name="org.atmosphere" level="ERROR" />
 </configuration>
