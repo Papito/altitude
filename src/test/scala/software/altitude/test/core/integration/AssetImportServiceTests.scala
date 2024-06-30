@@ -1,10 +1,14 @@
 package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
-import org.scalatest.matchers.must.Matchers.{be, empty, equal, not}
+import org.scalatest.matchers.must.Matchers.be
+import org.scalatest.matchers.must.Matchers.empty
+import org.scalatest.matchers.must.Matchers.equal
+import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.DuplicateException
-import software.altitude.core.models.{Asset, Preview}
+import software.altitude.core.models.Asset
+import software.altitude.core.models.Preview
 import software.altitude.test.Util
 import software.altitude.test.core.IntegrationTestCore
 
@@ -24,12 +28,10 @@ import software.altitude.test.core.IntegrationTestCore
     val importedAsset: Asset = altitude.service.assetImport.importAsset(importAsset).get
 
     importedAsset.assetType should equal(importedAsset.assetType)
-    importedAsset.path should not be empty
     importedAsset.checksum should not be empty
 
     val asset = altitude.service.library.getById(importedAsset.id.get): Asset
     asset.assetType should equal(importedAsset.assetType)
-    asset.path should not be empty
     asset.checksum should not be empty
     asset.sizeBytes should not be 0
   }
@@ -49,7 +51,6 @@ import software.altitude.test.core.IntegrationTestCore
     val importedAsset: Asset = altitude.service.assetImport.importAsset(importAsset).get
     val asset = altitude.service.library.getById(importedAsset.id.get): Asset
     asset.isTriaged should be(true)
-    importedAsset.path should equal(asset.path)
   }
 
 }

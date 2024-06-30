@@ -1,14 +1,16 @@
 package software.altitude.test.core.integration
 
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito
-import org.mockito.invocation.InvocationOnMock
 import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import software.altitude.core.{DuplicateException, IllegalOperationException, NotFoundException, RequestContext, StorageException, Util, Const => C}
+import software.altitude.core.DuplicateException
+import software.altitude.core.IllegalOperationException
+import software.altitude.core.NotFoundException
+import software.altitude.core.RequestContext
+import software.altitude.core.Util
 import software.altitude.core.models._
 import software.altitude.core.util.Query
+import software.altitude.core.{Const => C}
 import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class LibraryServiceTests(val config: Map[String, Any]) extends IntegrationTestCore {
@@ -137,7 +139,6 @@ import software.altitude.test.core.IntegrationTestCore
       userId = testContext.user.id.get,
       assetType = mediaType,
       fileName = "filename.ext",
-      path = Some(Util.randomStr(30)),
       checksum = Util.randomStr(32),
       sizeBytes = 1L))
 
@@ -146,7 +147,6 @@ import software.altitude.test.core.IntegrationTestCore
       userId = testContext.user.id.get,
       assetType = mediaType,
       fileName = "filename.ext",
-      path = Some(Util.randomStr(30)),
       checksum = Util.randomStr(32),
       sizeBytes = 1L))
 
@@ -155,7 +155,6 @@ import software.altitude.test.core.IntegrationTestCore
       userId = testContext.user.id.get,
       assetType = mediaType,
       fileName = "filename.ext",
-      path = Some(Util.randomStr(30)),
       checksum = Util.randomStr(32),
       sizeBytes = 1L))
 

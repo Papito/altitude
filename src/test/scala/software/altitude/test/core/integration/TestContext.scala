@@ -91,9 +91,10 @@ class TestContext(val altitude: Altitude) {
       userId = currentUser.id.get,
       folderId = folderId,
       assetType = new AssetType(
-        mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime"),
+        mediaType = "mediaType",
+        mediaSubtype = "mediaSubtype",
+        mime = "mime"),
       fileName = filename,
-      path = Some(Util.randomStr(50)),
       checksum = Util.randomStr(32),
       metadata = metadata,
       sizeBytes = 1000L)

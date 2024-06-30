@@ -5,7 +5,10 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funsuite
 import org.scalatra.test.ScalatraTests
 import org.scalatra.test.scalatest.ScalatraFunSuite
-import software.altitude.core.{Altitude, AltitudeServletContext, Const, Environment}
+import software.altitude.core.Altitude
+import software.altitude.core.AltitudeServletContext
+import software.altitude.core.Const
+import software.altitude.core.Environment
 import software.altitude.core.models.User
 import software.altitude.test.core.integration.TestContext
 import software.altitude.test.core.suites.PostgresBundleSetup

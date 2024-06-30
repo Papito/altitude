@@ -1,6 +1,4 @@
 package software.altitude.core.models
-
-import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 import software.altitude.core.Util
 import software.altitude.core.{Const => C}

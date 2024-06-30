@@ -79,8 +79,7 @@ class LibraryService(val app: Altitude) {
 
       app.service.fileStore.addAsset(assetToAddModel)
 
-      val path = app.service.fileStore.getAssetPath(assetToAddModel)
-      assetToAddModel.copy(path = Some(path))
+      assetToAddModel
     }
   }
 
@@ -90,9 +89,7 @@ class LibraryService(val app: Altitude) {
 
   def getById(id: String): JsObject = {
     txManager.asReadOnly[JsObject] {
-      val asset: Asset = app.service.asset.getById(id)
-      val path = app.service.fileStore.getAssetPath(asset)
-      asset.copy(path = Some(path))
+      app.service.asset.getById(id)
     }
   }
 
