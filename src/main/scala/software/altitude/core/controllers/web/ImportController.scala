@@ -7,7 +7,8 @@ import org.scalatra.json.{JValueResult, JacksonJsonSupport}
 import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintExceededException}
 import software.altitude.core.{DuplicateException, RequestContext}
 import software.altitude.core.controllers.BaseWebController
-import software.altitude.core.models.{ImportAsset, Metadata}
+import software.altitude.core.models.{Asset, ImportAsset, Metadata}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ImportController extends BaseWebController with FileUploadSupport with AtmosphereSupport   with JValueResult
@@ -18,6 +19,14 @@ class ImportController extends BaseWebController with FileUploadSupport with Atm
 
   private val userToWsClientLookup = collection.mutable.Map[String, List[AtmosphereClient]]()
 
+  // HTMX WS client expects a div with id "status" to update the status ticker
+  private val successStatusTickerTemplate = "<div id=\"statusText\">%s</div>"
+  private val warningStatusTickerTemplate = "<div id=\"statusText\" class=\"warning\">%s</div>"
+
+  // sent when the status ticker needs to go back in its shell
+  private val wsDoneMsg = ""
+
+  // I don't feel strongly about this
   configureMultipartHandling(MultipartConfig(maxFileSize = Some(fileSizeLimitGB*1024*1024)))
 
   before() {
@@ -28,8 +37,7 @@ class ImportController extends BaseWebController with FileUploadSupport with Atm
     contentType = "text/html"
     layoutTemplate(
       "/WEB-INF/templates/views/import.ssp",
-      // TODO: move into CONSTANTS
-      "userId" -> RequestContext.getAccount.persistedId
+      "userId" -> RequestContext.getAccount.persistedId,
     )
   }
 
@@ -68,7 +76,7 @@ class ImportController extends BaseWebController with FileUploadSupport with Atm
     contentType = "text/html"
 
     fileMultiParams.get("files") match {
-      case Some(files) => files.zipWithIndex.foreach { case (file, index) =>
+      case Some(files) => files.foreach { file =>
           logger.info(s"Received file: $file")
 
           val importAsset = new ImportAsset(
@@ -76,24 +84,21 @@ class ImportController extends BaseWebController with FileUploadSupport with Atm
             data = file.get(),
             metadata = Metadata())
 
-        // To wipe the status ticker on the client clean
-        val isLastFile = index == files.length - 1
-
         app.executorService.submit(new Runnable {
           override def run(): Unit = {
             try {
-              app.service.assetImport.importAsset(importAsset)
-              sendWsStatusToUserClients(message=s"<div id=\"status\">${importAsset.fileName}</div>")
+              val importedAsset: Option[Asset] = app.service.assetImport.importAsset(importAsset)
+              if (importedAsset.isDefined) {
+                sendWsStatusToUserClients(
+                  successStatusTickerTemplate.format("Imported: " + importedAsset.get.fileName))
+              }
             } catch {
               case _: DuplicateException =>
                 logger.warn(s"Duplicate asset: ${importAsset.fileName}")
 
-                sendWsStatusToUserClients(s"<div id=\"status\">DUPLICATE ${importAsset.fileName}</div>")
+                sendWsStatusToUserClients(
+                  warningStatusTickerTemplate.format(s"Ignoring duplicate: ${importAsset.fileName}"))
               case e: Exception => logger.error("Error importing asset:", e)
-            }
-
-            if (isLastFile) {
-              sendWsStatusToUserClients(message = "<div id=\"status\"></div>")
             }
           }
         })
