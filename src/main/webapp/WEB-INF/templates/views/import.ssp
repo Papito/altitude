@@ -35,6 +35,25 @@
 </div>
 
 <main>
+    <script lang="js" type="module">
+        htmx.on('htmx:wsOpen', function(evt) {
+            console.log('Connection is OPEN');
+        });
+        htmx.on('htmx:wsClose', function(evt) {
+            console.log('Connection is CLOSED');
+        });
+        htmx.on('htmx:wsAfterMessage', function(evt) {
+            console.log('wsAfterMessage');
+            console.log(evt.detail.message);
+        });
+    </script>
+
+    <div id="notifications"></div>
+    <%@ val userId: String %>
+    <div hx-ext="ws" hx-target=#notifications" ws-connect="/import/status?userId=<%= userId %>">
+        <div id="status"></div>
+    </div>
+
     <div id="importOptions">
         <div id="browseForFiles">
             ${include("htmx/upload_form.ssp")}

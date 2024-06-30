@@ -1,13 +1,22 @@
 package software.altitude.core.controllers.web
 
-import org.scalatra.RequestEntityTooLarge
+import org.json4s.{DefaultFormats, Formats}
+import org.scalatra.{RequestEntityTooLarge, SessionSupport}
+import org.scalatra.atmosphere.{AtmoReceive, AtmosphereClient, AtmosphereSupport, Connected, Disconnected, Error, JsonMessage, TextMessage}
+import org.scalatra.json.{JValueResult, JacksonJsonSupport}
 import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintExceededException}
-import software.altitude.core.DuplicateException
+import software.altitude.core.{DuplicateException, RequestContext}
 import software.altitude.core.controllers.BaseWebController
 import software.altitude.core.models.{ImportAsset, Metadata}
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class ImportController extends BaseWebController with FileUploadSupport {
+class ImportController extends BaseWebController with FileUploadSupport with AtmosphereSupport   with JValueResult
+  with JacksonJsonSupport with SessionSupport {
   private val fileSizeLimitGB = 10
+
+  implicit protected val jsonFormats: Formats = DefaultFormats
+
+  private val userToWsClientLookup = collection.mutable.Map[String, List[AtmosphereClient]]()
 
   configureMultipartHandling(MultipartConfig(maxFileSize = Some(fileSizeLimitGB*1024*1024)))
 
@@ -17,11 +26,42 @@ class ImportController extends BaseWebController with FileUploadSupport {
 
   get("/") {
     contentType = "text/html"
-    layoutTemplate("/WEB-INF/templates/views/import.ssp")
+    layoutTemplate(
+      "/WEB-INF/templates/views/import.ssp",
+      // TODO: move into CONSTANTS
+      "userId" -> RequestContext.getAccount.persistedId
+    )
+  }
+
+  atmosphere("/status") {
+    val userId = params("userId")
+
+    val client = new AtmosphereClient {
+      def receive: AtmoReceive = {
+        case Connected =>
+          logger.info("Client connected ...")
+          logger.info(s"Associating user $userId with client $uuid")
+
+          if (!userToWsClientLookup.contains(userId)) {
+            userToWsClientLookup += userId -> List(this)
+          } else {
+            userToWsClientLookup(userId) = this :: userToWsClientLookup(userId)
+          }
+
+        case Disconnected(disconnector, Some(error)) =>
+        case Error(Some(error)) => logger.info(s"ERROR: $error")
+        case TextMessage(text) =>
+        case JsonMessage(json) =>
+      }
+    }
+
+    client
   }
 
   post("/upload") {
     contentType = "text/html"
+
+    val userId = RequestContext.getAccount.persistedId
 
     fileMultiParams.get("files") match {
       case Some(files) => files.foreach { file =>
@@ -32,13 +72,16 @@ class ImportController extends BaseWebController with FileUploadSupport {
             data = file.get(),
             metadata = Metadata())
 
-        app.executorService.submit(new Runnable {4
+        app.executorService.submit(new Runnable {
           override def run(): Unit = {
             try {
               app.service.assetImport.importAsset(importAsset)
+              sendWsStatusToUserClients(message=s"<div id=\"status\">${importAsset.fileName}</div>")
             } catch {
               case _: DuplicateException =>
                 logger.warn(s"Duplicate asset: ${importAsset.fileName}")
+
+                sendWsStatusToUserClients(s"<div id=\"status\">DUPLICATE ${importAsset.fileName}</div>")
               case e: Exception => logger.error("Error importing asset:", e)
             }
           }
@@ -50,6 +93,13 @@ class ImportController extends BaseWebController with FileUploadSupport {
     }
 
     layoutTemplate("/WEB-INF/templates/views/htmx/upload_form.ssp")
+  }
+
+  private def sendWsStatusToUserClients(message: String): Unit = {
+    userToWsClientLookup.get(RequestContext.getAccount.persistedId).foreach { clients =>
+      clients.foreach { _.broadcast(message)
+      }
+    }
   }
 
   error {
