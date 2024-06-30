@@ -23,9 +23,6 @@ class ImportController extends BaseWebController with FileUploadSupport with Atm
   private val successStatusTickerTemplate = "<div id=\"statusText\">%s</div>"
   private val warningStatusTickerTemplate = "<div id=\"statusText\" class=\"warning\">%s</div>"
 
-  // sent when the status ticker needs to go back in its shell
-  private val wsDoneMsg = ""
-
   // I don't feel strongly about this
   configureMultipartHandling(MultipartConfig(maxFileSize = Some(fileSizeLimitGB*1024*1024)))
 
