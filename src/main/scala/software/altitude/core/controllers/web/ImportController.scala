@@ -67,16 +67,17 @@ class ImportController extends BaseWebController with FileUploadSupport with Atm
   post("/upload") {
     contentType = "text/html"
 
-    val userId = RequestContext.getAccount.persistedId
-
     fileMultiParams.get("files") match {
-      case Some(files) => files.foreach { file =>
+      case Some(files) => files.zipWithIndex.foreach { case (file, index) =>
           logger.info(s"Received file: $file")
 
           val importAsset = new ImportAsset(
             fileName = file.getName,
             data = file.get(),
             metadata = Metadata())
+
+        // To wipe the status ticker on the client clean
+        val isLastFile = index == files.length - 1
 
         app.executorService.submit(new Runnable {
           override def run(): Unit = {
@@ -89,6 +90,10 @@ class ImportController extends BaseWebController with FileUploadSupport with Atm
 
                 sendWsStatusToUserClients(s"<div id=\"status\">DUPLICATE ${importAsset.fileName}</div>")
               case e: Exception => logger.error("Error importing asset:", e)
+            }
+
+            if (isLastFile) {
+              sendWsStatusToUserClients(message = "<div id=\"status\"></div>")
             }
           }
         })
