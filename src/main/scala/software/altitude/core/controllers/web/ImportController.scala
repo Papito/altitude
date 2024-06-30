@@ -49,7 +49,13 @@ class ImportController extends BaseWebController with FileUploadSupport with Atm
           }
 
         case Disconnected(disconnector, Some(error)) =>
-        case Error(Some(error)) => logger.info(s"ERROR: $error")
+          logger.info(s"Disassociating user $userId with client $uuid")
+          userToWsClientLookup.get(userId).foreach { clients =>
+            userToWsClientLookup(userId) = clients.filterNot(_ == this)
+          }
+        case Error(Some(error)) =>
+            logger.error(s"WS Error: $error")
+
         case TextMessage(text) =>
         case JsonMessage(json) =>
       }
@@ -97,7 +103,7 @@ class ImportController extends BaseWebController with FileUploadSupport with Atm
 
   private def sendWsStatusToUserClients(message: String): Unit = {
     userToWsClientLookup.get(RequestContext.getAccount.persistedId).foreach { clients =>
-      clients.foreach { _.broadcast(message)
+      clients.foreach { client =>client.send(message)
       }
     }
   }
