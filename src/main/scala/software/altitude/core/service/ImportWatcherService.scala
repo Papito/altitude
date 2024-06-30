@@ -38,19 +38,17 @@ class ImportWatcherService(val app: Altitude) {
     changes.runForeach(pair => {
       val changedPath = pair.first
       val change = pair.second
-      if (change != DirectoryChange.Deletion) {
+      if (change == DirectoryChange.Creation) {
         System.out.println("Path: " + changedPath + ", Change: " + change)
 
         val repoResults = app.service.repository.query(new Query())
         if (repoResults.records.nonEmpty) {
           RequestContext.repository.value = Some(repoResults.records.head: Repository)
-          logger.warn(s"Using first found repository: ${RequestContext.repository.value.get.name}")
         }
 
         val userResults = app.service.user.query(new Query())
         if (userResults.records.nonEmpty) {
           RequestContext.account.value = Some(userResults.records.head: User)
-          logger.warn(s"Using first found user: ${RequestContext.account.value.get.email}")
         }
 
         val file = new File(changedPath.toString)
