@@ -69,6 +69,8 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeApp
     val asset = new AssetService(app)
     val folder = new FolderService(app)
     val stats = new StatsService(app)
+    private val importWatcher = new ImportWatcherService(app)
+    importWatcher.start()
 
     val fileStore: FileStoreService = fileStoreType match {
       case C.FileStoreType.FS => new FileSystemStoreService(app)

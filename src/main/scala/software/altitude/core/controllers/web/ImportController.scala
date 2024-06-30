@@ -1,9 +1,7 @@
 package software.altitude.core.controllers.web
 
 import org.scalatra.RequestEntityTooLarge
-import org.scalatra.servlet.FileUploadSupport
-import org.scalatra.servlet.MultipartConfig
-import org.scalatra.servlet.SizeConstraintExceededException
+import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintExceededException}
 import software.altitude.core.controllers.BaseWebController
 
 class ImportController extends BaseWebController with FileUploadSupport {
@@ -27,13 +25,14 @@ class ImportController extends BaseWebController with FileUploadSupport {
       case Some(files) => files.foreach { file =>
           logger.info(s"Received file: $file")
 
-/*        val importAsset = new ImportAsset(
-          fileName = file.getName,
-          data = file.get(),
-          metadata = Metadata())
 
-          app.service.assetImport.importAsset(importAsset)*/
-      }
+        /*          val importAsset = new ImportAsset(
+                  fileName = file.getName,
+                  data = file.get(),
+                  metadata = Metadata())
+
+                  app.service.assetImport.importAsset(importAsset)
+        */      }
 
       case None =>
         logger.warn("No files received for upload")
