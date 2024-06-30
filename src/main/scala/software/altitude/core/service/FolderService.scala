@@ -22,15 +22,12 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
         C.Folder.NAME_LC -> folder.nameLowercase))
 
       try {
-        val addedFolder = addPath(super.add(folder, Some(dupQuery)))
-        require(addedFolder.path.nonEmpty)
-        addedFolder
+        super.add(folder, Some(dupQuery))
       } catch {
-        case _: DuplicateException => {
+        case _: DuplicateException =>
           val ex = ValidationException()
           ex.errors += (C.Folder.NAME -> C.Msg.Err.DUPLICATE)
           throw ex
-        }
       }
     }
   }
@@ -51,7 +48,6 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     id = Some(contextRepo.rootFolderId),
     parentId = contextRepo.rootFolderId,
     name = C.Folder.Name.ROOT,
-    path = Some(app.service.fileStore.sortedFolderPath)
   )
 
   def isRootFolder(id: String): Boolean =
@@ -66,18 +62,6 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       val assetCount = flatChildren(id, folders).toSeq.map(_.numOfAssets).sum
 
       json ++ Json.obj(C.Folder.NUM_OF_ASSETS -> JsNumber(assetCount))
-    }
-  }
-
-  private def addPath(folder: Folder): Folder = {
-    if (isRootFolder(folder.id.get)) {
-      return rootFolder
-    }
-
-    txManager.asReadOnly[Folder] {
-      val _pathComponents = pathComponents(folder.id.get).map(_.name)
-      val relPath = app.service.fileStore.assemblePath(_pathComponents)
-      folder.copy(path = Some(relPath))
     }
   }
 
@@ -147,7 +131,6 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       val repoFolders = repositoryFolders(allRepoFolders)
 
       repoFolders.filter(json => {
-          val id = (json \ C.Base.ID).as[String]
           val parentId = (json \ C.Folder.PARENT_ID).as[String]
           parentId == rootId
         })
@@ -175,13 +158,11 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     val folders = for (folder <- immediateChildren.map(_.toJson)) yield  {
       val id: String = (folder \ C.Base.ID).as[String]
       val name = (folder \ C.Folder.NAME).as[String]
-      val path = (folder \ C.Folder.PATH).as[String]
       val assetCount = (folder \ C.Folder.NUM_OF_ASSETS).as[Int]
 
       Folder(
         id = Some(id),
         name = name,
-        path = Some(path),
         parentId = parentId,
         children = this.children(id, repoFolders),
         numOfAssets = assetCount)
@@ -217,13 +198,8 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
 
   override def getById(id: String): JsObject = {
     txManager.asReadOnly[JsObject] {
-      val folder: Folder = if (isRootFolder(id)) rootFolder else super.getById(id)
-      val ret = addPath(folder)
-
-      require(ret.path.isDefined)
-      require(ret.path.get.nonEmpty)
-      ret
-    }
+      if (isRootFolder(id)) rootFolder else super.getById(id)
+   }
   }
 
   /**
@@ -330,9 +306,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
 
       val folderForUpdate = Folder(
         parentId = destFolderId,
-        name = folderBeingMoved.name,
-        path = Some(app.service.fileStore.getFolderPath(folderBeingMoved.name, destFolderId)))
-
+        name = folderBeingMoved.name)
       try {
         updateById(folderBeingMovedId, folderForUpdate, List(C.Folder.PARENT_ID), Some(dupQuery))
       } catch {
@@ -358,10 +332,8 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
         C.Folder.NAME -> newName))
 
       try {
-        val path = app.service.fileStore.getFolderPath(newName, folder.parentId)
         val folderForUpdate: Folder = folder.copy(
-          name = newName,
-          path = Some(path)
+          name = newName
         )
 
         updateById(folderId, folderForUpdate, List(C.Folder.NAME, C.Folder.NAME_LC), Some(dupQuery))

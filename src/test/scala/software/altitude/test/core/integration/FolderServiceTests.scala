@@ -219,7 +219,7 @@ import software.altitude.test.core.IntegrationTestCore
     val folder1_1_1: Folder = altitude.service.library.addFolder(
       name = "folder1_1_1", parentId = folder1_1.id)
 
-    val folder1_2: Folder = altitude.service.library.addFolder(
+    altitude.service.library.addFolder(
       name = "folder1_2", parentId = folder1.id)
 
     val folder2: Folder = altitude.service.library.addFolder("folder2")
@@ -253,7 +253,7 @@ import software.altitude.test.core.IntegrationTestCore
     val folder1_1_1: Folder = altitude.service.library.addFolder(
       name = "folder1_1_1", parentId = folder1_1.id)
 
-    val folder2: Folder = altitude.service.library.addFolder("folder2")
+    altitude.service.library.addFolder("folder2")
 
     // assert initial state
     altitude.app.service.folder.immediateChildren(rootId = RequestContext.repository.value.get.rootFolderId).length shouldBe 2

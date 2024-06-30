@@ -5,24 +5,10 @@ import software.altitude.core.models.Data
 import software.altitude.core.models.Preview
 
 trait FileStoreService {
-  val pathSeparator: String
-
   def getById(id: String): Data
-
-  def createPath(relPath: String): Unit
-
   def addAsset(asset: Asset): Unit
-
-  def getFolderPath(name: String, parentId: String)
-                         : String
-
-  def getAssetPath(asset: Asset): String
-
-  def sortedFolderPath: String
-
   def addPreview(preview: Preview): Unit
-
   def getPreviewById(assetId: String): Preview
+  protected def getAssetPath(asset: Asset): String
 
-  def assemblePath(pathComponents: List[String]): String
 }

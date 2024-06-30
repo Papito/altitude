@@ -9,7 +9,6 @@ import software.altitude.core.RequestContext
 import software.altitude.core.StorageException
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Data
-import software.altitude.core.models.Folder
 import software.altitude.core.models.Preview
 import software.altitude.core.{Const => C}
 
@@ -17,26 +16,6 @@ import java.io._
 
 class FileSystemStoreService(app: Altitude) extends FileStoreService {
   private final val log = LoggerFactory.getLogger(getClass)
-
-  final override val pathSeparator = File.separator
-  final override def sortedFolderPath: String = C.Path.ROOT
-
-  override def createPath(relPath: String): Unit = {
-    val destFile = fileFromRelPath(relPath)
-    log.info(s"Adding FS folder [$destFile]")
-
-    try {
-      FileUtils.forceMkdir(destFile)
-    }
-    catch {
-      case ex: IOException =>
-        throw StorageException(s"Directory [$destFile] could not be created: $ex")
-    }
-
-    if (!(destFile.exists && destFile.isDirectory)) {
-      throw StorageException(s"Directory [$destFile] could not be created")
-    }
-  }
 
   override def getById(id: String): Data = {
     val asset: Asset = app.service.library.getById(id)
@@ -72,11 +51,6 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
       case ex: IOException =>
         throw StorageException(s"Error creating [$asset] @ [$destFile]: $ex]")
     }
-  }
-
-  override def getFolderPath(name: String, parentId: String): String = {
-    val parent: Folder = app.service.folder.getById(parentId)
-    new File(parent.path.get, name).getPath
   }
 
   override def getAssetPath(asset: Asset): String = {
@@ -120,10 +94,6 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     finally {
       if (is != null) is.close()
     }
-  }
-
-  override def assemblePath(pathComponents: List[String]): String = {
-    pathComponents.mkString(pathSeparator)
   }
 
   private def previewFilePath(assetId: String): String = {

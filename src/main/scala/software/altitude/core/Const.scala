@@ -60,7 +60,6 @@ object Const {
 
   object Asset extends Common {
     val ASSET_TYPE = "asset_type"
-    val PATH = "path"
     val FOLDER_ID = "folder_id"
     val SIZE_BYTES = "size_bytes"
     val FILENAME = "filename"
@@ -80,10 +79,8 @@ object Const {
     val NAME = "name"
     val NAME_LC = "name_lc"
     val PARENT_ID = "parent_id"
-    val PATH = "path"
     val NUM_OF_ASSETS = "num_of_assets"
     val CHILDREN = "children"
-    val IS_ROOT = "is_root"
     val IS_RECYCLED = "is_recycled"
 
     object Name {
