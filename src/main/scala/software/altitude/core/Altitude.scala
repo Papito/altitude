@@ -5,6 +5,7 @@ import com.google.inject.Guice
 import com.google.inject.Injector
 import net.codingwell.scalaguice.ScalaModule
 import org.scalatra.auth.ScentryStrategy
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.auth.strategies.LocalDevRememberMeStrategy
 import software.altitude.core.auth.strategies.RememberMeStrategy
@@ -23,7 +24,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class Altitude(val configOverride: Map[String, Any] = Map())  {
-  private final val logger = LoggerFactory.getLogger(getClass)
+  protected final val logger: Logger = LoggerFactory.getLogger(getClass)
   logger.info(s"Environment is: ${Environment.ENV}")
 
   final val app: Altitude = this

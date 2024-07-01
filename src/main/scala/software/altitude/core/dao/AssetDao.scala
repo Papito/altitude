@@ -1,14 +1,11 @@
 package software.altitude.core.dao
 
-import org.slf4j.LoggerFactory
 import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.Metadata
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 
 trait AssetDao extends BaseDao {
-  private final val logger = LoggerFactory.getLogger(getClass)
-
   def getMetadata(assetId: String): Option[Metadata]
 
   def setMetadata(assetId: String, metadata: Metadata): Unit

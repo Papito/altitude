@@ -1,7 +1,6 @@
 package software.altitude.core.dao.sqlite
 
 import org.apache.commons.dbutils.QueryRunner
-import org.slf4j.LoggerFactory
 import software.altitude.core.Configuration
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.sqlite.querybuilder.AssetSearchQueryBuilder
@@ -11,7 +10,6 @@ import software.altitude.core.util.SearchResult
 import software.altitude.core.{Const => C}
 
 class SearchDao(override val config: Configuration) extends software.altitude.core.dao.jdbc.SearchDao(config) with SqliteOverrides {
-  private final val logger = LoggerFactory.getLogger(getClass)
 
   override protected def addSearchDocument(asset: Asset): Unit = {
     val docSql =

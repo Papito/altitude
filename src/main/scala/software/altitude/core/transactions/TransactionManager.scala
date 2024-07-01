@@ -1,5 +1,6 @@
 package software.altitude.core.transactions
 
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.sqlite.SQLiteConfig
 import software.altitude.core.Configuration
@@ -16,7 +17,7 @@ object TransactionManager {
 
 class TransactionManager(val config: Configuration) {
 
-  private final val log = LoggerFactory.getLogger(getClass)
+  protected final val logger: Logger = LoggerFactory.getLogger(getClass)
 
   def connection(readOnly: Boolean): Connection = {
     config.datasourceType match {
@@ -28,7 +29,7 @@ class TransactionManager(val config: Configuration) {
         props.setProperty("password", password)
         val url = config.getString("db.postgres.url")
         val conn = DriverManager.getConnection(url, props)
-        log.debug(s"Opening connection $conn. Read-only: $readOnly")
+        logger.debug(s"Opening connection $conn. Read-only: $readOnly")
 
         if (readOnly) {
           conn.setReadOnly(true)
@@ -94,7 +95,7 @@ class TransactionManager(val config: Configuration) {
     }
     catch {
       case ex: Exception =>
-        log.error(s"Error (${ex.getClass.getName}): ${ex.getMessage}")
+        logger.error(s"Error (${ex.getClass.getName}): ${ex.getMessage}")
         throw ex
     }
     finally {
@@ -116,7 +117,7 @@ class TransactionManager(val config: Configuration) {
 
   def close(): Unit = {
     if (RequestContext.conn.value.isDefined && RequestContext.conn.value.get.isClosed) {
-      log.warn("Connection already closed")
+      logger.warn("Connection already closed")
       return
     }
 
