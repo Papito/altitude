@@ -22,6 +22,9 @@ import java.sql.DriverManager
 
 class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeAppContext  {
   private final val logger = LoggerFactory.getLogger(getClass)
+
+  // ID for this application
+  final val id: Int = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
   logger.info(s"Initializing Altitude Server application. Instance ID [$id]")
 
   final val app: Altitude = this

@@ -5,7 +5,7 @@ import software.altitude.core.Altitude
 import software.altitude.core.{Const => C}
 
 object PostgresSuiteBundle {
-  val app = new Altitude(Map("datasource" -> C.DatasourceType.POSTGRES))
+  val app = new Altitude(configOverride = Map("datasource" -> C.DatasourceType.POSTGRES))
 }
 
 class PostgresSuiteBundle

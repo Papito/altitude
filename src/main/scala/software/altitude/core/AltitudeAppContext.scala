@@ -12,10 +12,6 @@ import java.util.concurrent.Executors
 trait AltitudeAppContext {
   private final val logger = LoggerFactory.getLogger(getClass)
 
-  // ID for this application
-  final val id: Int = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
-
-
   val scentryStrategies: List[(String, Class[_ <: ScentryStrategy[User]])]
 
   /**

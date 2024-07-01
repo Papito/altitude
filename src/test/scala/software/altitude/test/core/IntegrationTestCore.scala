@@ -6,7 +6,6 @@ import org.mockito.stubbing.Answer
 import org.scalatest._
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import software.altitude.core.Const
 import software.altitude.core.models._
 import software.altitude.core.{Const => C, _}
@@ -88,7 +87,7 @@ abstract class IntegrationTestCore
 
   override def beforeEach(): Unit = {
     AltitudeServletContext.app.isInitialized = false
-    testContext = new TestContext(altitude)
+    testContext = new TestContext(altitudeApp)
 
     /*
      Every integration test has at least one repository to start with - you can't do anything otherwise
@@ -98,16 +97,11 @@ abstract class IntegrationTestCore
      */
     testContext.persistRepository()
 
-    // this is for logging context
-    MDC.put("USER", s"[USR:$testContext.user]")
-    count = count + 1
-    MDC.put("REQUEST_ID", s"[TEST: $count]")
-
-    IntegrationTestCore.createFileStoreDir(altitude)
+    IntegrationTestCore.createFileStoreDir(altitudeApp)
   }
 
   override def afterEach(): Unit = {
-    altitude.txManager.commit()
+    altitudeApp.txManager.commit()
   }
 
   // Stores test app config overrides, since we run same tests with a different app setup.
@@ -118,31 +112,28 @@ abstract class IntegrationTestCore
 
   final val datasource: Const.DatasourceType.Value = config("datasource").asInstanceOf[C.DatasourceType.Value]
 
-  protected def altitude: Altitude = datasource match {
+  protected def altitudeApp: Altitude = datasource match {
     case C.DatasourceType.POSTGRES => PostgresSuiteBundle.app
     case C.DatasourceType.SQLITE => SqliteSuiteBundle.app
     case _ => throw new IllegalArgumentException(s"Do not know of datasource: $datasource")
   }
 
-  var testContext: TestContext = new TestContext(altitude)
-
-  // test count - we use it as a request ID for our logging environment
-  private var count = 0
+  var testContext: TestContext = new TestContext(altitudeApp)
 
   def savepoint(): Unit = {
-    altitude.txManager.savepoint()
+    altitudeApp.txManager.savepoint()
   }
 
   def switchContextUser(user: User): Unit = {
-    altitude.service.user.switchContextToUser(user)
+    altitudeApp.service.user.switchContextToUser(user)
   }
 
   def switchContextRepo(repository: Repository): Unit = {
-    altitude.service.repository.switchContextToRepository(repository)
+    altitudeApp.service.repository.switchContextToRepository(repository)
   }
 
   def reset(): Unit = {
-    altitude.txManager.rollback()
+    altitudeApp.txManager.rollback()
     RequestContext.clear()
   }
 }

@@ -16,21 +16,21 @@ import software.altitude.test.core.IntegrationTestCore
 
   test("Import duplicate") {
     val importAsset = Util.getImportAsset("images/2.jpg")
-    altitude.service.assetImport.importAsset(importAsset).get
+    altitudeApp.service.assetImport.importAsset(importAsset).get
 
     intercept[DuplicateException] {
-      altitude.service.assetImport.importAsset(importAsset).get
+      altitudeApp.service.assetImport.importAsset(importAsset).get
     }
   }
 
   test("Imported image should have all properties set") {
     val importAsset = Util.getImportAsset("images/1.jpg")
-    val importedAsset: Asset = altitude.service.assetImport.importAsset(importAsset).get
+    val importedAsset: Asset = altitudeApp.service.assetImport.importAsset(importAsset).get
 
     importedAsset.assetType should equal(importedAsset.assetType)
     importedAsset.checksum should not be empty
 
-    val asset = altitude.service.library.getById(importedAsset.persistedId): Asset
+    val asset = altitudeApp.service.library.getById(importedAsset.persistedId): Asset
     asset.assetType should equal(importedAsset.assetType)
     asset.checksum should not be empty
     asset.sizeBytes should not be 0
@@ -38,9 +38,9 @@ import software.altitude.test.core.IntegrationTestCore
 
   test("Imported image should have a preview") {
     val importAsset = Util.getImportAsset("images/1.jpg")
-    val importedAsset: Asset = altitude.service.assetImport.importAsset(importAsset).get
-    val asset = altitude.service.library.getById(importedAsset.persistedId): Asset
-    val preview: Preview = altitude.service.library.getPreview(asset.persistedId)
+    val importedAsset: Asset = altitudeApp.service.assetImport.importAsset(importAsset).get
+    val asset = altitudeApp.service.library.getById(importedAsset.persistedId): Asset
+    val preview: Preview = altitudeApp.service.library.getPreview(asset.persistedId)
 
     preview.mimeType should equal("application/octet-stream")
     preview.data.length should not be 0
@@ -48,8 +48,8 @@ import software.altitude.test.core.IntegrationTestCore
 
   test("Imported image is triaged") {
     val importAsset = Util.getImportAsset("images/1.jpg")
-    val importedAsset: Asset = altitude.service.assetImport.importAsset(importAsset).get
-    val asset = altitude.service.library.getById(importedAsset.persistedId): Asset
+    val importedAsset: Asset = altitudeApp.service.assetImport.importAsset(importAsset).get
+    val asset = altitudeApp.service.library.getById(importedAsset.persistedId): Asset
     asset.isTriaged should be(true)
   }
 

@@ -40,7 +40,7 @@ import java.io.File
   private def getMetadata(p: String): Metadata = {
     val path = getClass.getResource(s"/import/$p").getPath
     val importAsset = fileToImportAsset(new File(path))
-    val mediaType = altitude.service.assetImport.detectAssetType(importAsset)
-    altitude.service.metadataExtractor.extract(importAsset, mediaType)
+    val mediaType = altitudeApp.service.assetImport.detectAssetType(importAsset)
+    altitudeApp.service.metadataExtractor.extract(importAsset, mediaType)
   }
 }

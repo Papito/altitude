@@ -13,7 +13,7 @@ import software.altitude.test.core.IntegrationTestCore
 
   test("Can create and get a new user") {
     val user: User = testContext.persistUser()
-    val storedUser: User = altitude.service.user.getById(user.persistedId)
+    val storedUser: User = altitudeApp.service.user.getById(user.persistedId)
 
     storedUser.createdAt should not be None
     storedUser.updatedAt should be(None)
@@ -31,7 +31,7 @@ import software.altitude.test.core.IntegrationTestCore
 
     testContext.persistUser(Some(userModel), password=password)
 
-    val user: Option[User] = altitude.service.user.loginAndGetUser(userModel.email, password)
+    val user: Option[User] = altitudeApp.service.user.loginAndGetUser(userModel.email, password)
 
     user should not be None
   }

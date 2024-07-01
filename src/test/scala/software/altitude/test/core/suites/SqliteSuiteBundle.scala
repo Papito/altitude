@@ -4,7 +4,7 @@ import software.altitude.core.Altitude
 import software.altitude.core.{Const => C}
 
 object SqliteSuiteBundle {
-  val app = new Altitude(Map("datasource" -> C.DatasourceType.SQLITE))
+  val app = new Altitude(configOverride = Map("datasource" -> C.DatasourceType.SQLITE))
 }
 
 class SqliteSuiteBundle

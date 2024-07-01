@@ -19,20 +19,20 @@ import software.altitude.test.core.IntegrationTestCore
 
     val userModel = testContext.makeAdminUser()
 
-    altitude.service.system.initializeSystem(
+    altitudeApp.service.system.initializeSystem(
       repositoryName = "My Repository",
       adminModel=userModel,
       password = "password3000")
 
-    val systemMetadata = altitude.service.system.readMetadata
+    val systemMetadata = altitudeApp.service.system.readMetadata
 
     systemMetadata.isInitialized should be(true)
-    altitude.isInitialized should be(true)
+    altitudeApp.isInitialized should be(true)
 
-    val repos = altitude.service.repository.query(new Query())
+    val repos = altitudeApp.service.repository.query(new Query())
     repos.records.size should be(1)
 
-    val users = altitude.service.user.query(new Query())
+    val users = altitudeApp.service.user.query(new Query())
     users.records.size should be(1)
 
     val adminUser = RequestContext.account.value
