@@ -4,6 +4,7 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.funsuite
 import software.altitude.core.util.SearchQuery
 
+// TODO: these are UNIT tests - move
 @DoNotDiscover class SearchQueryModelTests extends funsuite.AnyFunSuite {
 
   test("Invalid RPP") {

@@ -2,10 +2,11 @@ package software.altitude.test.core.controller
 
 import org.scalatest.DoNotDiscover
 import play.api.libs.json.Json
+import software.altitude.core.Altitude
 import software.altitude.core.{Const => C}
 import software.altitude.test.core.HtmxTestCore
 
-@DoNotDiscover class SetupControllerTests extends HtmxTestCore {
+@DoNotDiscover class SetupControllerTests(override val testApp: Altitude) extends HtmxTestCore {
 
   test("Should return validation errors") {
     post("/htmx/admin/setup", body = "{}", headers = getHeaders) {
