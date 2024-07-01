@@ -9,7 +9,8 @@ import software.altitude.core.Altitude
 import software.altitude.core.AltitudeServletContext
 import software.altitude.core.Const
 import software.altitude.core.Environment
-import software.altitude.core.models.{Repository, User}
+import software.altitude.core.models.Repository
+import software.altitude.core.models.User
 import software.altitude.test.core.integration.TestContext
 import software.altitude.test.core.suites.PostgresBundleSetup
 import software.altitude.test.core.suites.PostgresSuiteBundle

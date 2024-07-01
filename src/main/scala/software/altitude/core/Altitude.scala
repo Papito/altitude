@@ -19,11 +19,10 @@ import software.altitude.core.transactions._
 import software.altitude.core.{Const => C}
 
 import java.sql.DriverManager
-import java.util.concurrent.{ExecutorService, Executors}
 
 class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeAppContext  {
   private final val logger = LoggerFactory.getLogger(getClass)
-  logger.info(s"Initializing Altitude Server application instance with ID [$id]")
+  logger.info(s"Initializing Altitude Server application. Instance ID [$id]")
 
   final val app: Altitude = this
 
@@ -42,7 +41,7 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeApp
   /**
    * Injected transaction manager, determined based on our database.
    */
-  override val txManager: TransactionManager = new software.altitude.core.transactions.TransactionManager(app)
+  override val txManager: TransactionManager = new software.altitude.core.transactions.TransactionManager(app.config)
 
   private final val schemaVersion = 1
 

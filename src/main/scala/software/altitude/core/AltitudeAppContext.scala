@@ -6,10 +6,15 @@ import org.slf4j.LoggerFactory
 import software.altitude.core.models.User
 import software.altitude.core.transactions.TransactionManager
 
-import java.util.concurrent.{ExecutorService, Executors}
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 trait AltitudeAppContext {
   private final val logger = LoggerFactory.getLogger(getClass)
+
+  // ID for this application
+  final val id: Int = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
+
 
   val scentryStrategies: List[(String, Class[_ <: ScentryStrategy[User]])]
 
@@ -21,9 +26,6 @@ trait AltitudeAppContext {
   val injector: Injector
 
   val txManager: TransactionManager
-
-  // ID for this application - which we may have multiple of in the same environment
-  final val id: Int = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
 
   // this is the environment we are running in
   final val environment: String = Environment.ENV match {
