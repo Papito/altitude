@@ -10,5 +10,4 @@ object PostgresSuiteBundle {
 
 class PostgresSuiteBundle
   extends AllIntegrationTestSuites(config = Map("datasource" -> C.DatasourceType.POSTGRES))
-  with PostgresBundleSetup {
-}
+  with PostgresBundleSetup

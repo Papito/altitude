@@ -1,4 +1,4 @@
-package software.altitude.test.core.web
+package software.altitude.test.core.controller
 
 
 import org.scalatest.DoNotDiscover
@@ -6,7 +6,7 @@ import software.altitude.test.core.HtmxTestCore
 
 import java.io.File
 
-@DoNotDiscover class FileUploadControllerTests(val config: Map[String, Any]) extends HtmxTestCore {
+@DoNotDiscover class FileUploadControllerTests extends HtmxTestCore {
 
   test("Upload with multiple files", Focused) {
     testContext.persistRepository()

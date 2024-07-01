@@ -8,13 +8,6 @@ object ControllerSuiteBundle {
 }
 
 /*
- The web suite does NOT run against all DB engines. It only runs against Postgres.
- Since we are testing the web layer, we don't need to test against all DB engines.
-
- In addition, the default app config will choose one of the DB engines, so the test
- client will run on one and the server will run on another type of DB causing major havoc.
+ The web suite does NOT run against all DB engines. It only runs against Postgres..
  */
-class ControllerSuiteBundle
-  extends AllControllerTestSuites(config = Map("datasource" -> C.DatasourceType.POSTGRES))
-  with ControllerBundleSetup {
-}
+class ControllerSuiteBundle extends AllControllerTestSuites with ControllerBundleSetup

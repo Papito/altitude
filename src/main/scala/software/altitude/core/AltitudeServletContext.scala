@@ -16,8 +16,6 @@ object AltitudeServletContext {
   log.info("Initializing application context... ")
   val app: Altitude = new Altitude
 
-  // private val actorSystem = ActorSystem()
-
   val endpoints: Seq[(ScalatraServlet, String)] = List(
     (new IndexController, "/*"),
     (new ImportController, "/import/*"),
