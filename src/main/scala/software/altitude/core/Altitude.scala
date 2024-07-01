@@ -34,6 +34,15 @@ class Altitude(val configOverride: Map[String, Any] = Map())  {
 
   final val config = new Configuration(configOverride = configOverride)
 
+  /**
+   * Has the first admin user been created?
+   * This flag is loaded from the system metadata table upon start and then
+   * cached for the lifetime of the application instance.
+   *
+   * This is to avoid getting the value from the database every time we need it.
+   *
+   * See: setIsInitializedState() in this file.
+   */
   var isInitialized = false
 
   private final val schemaVersion = 1
@@ -41,13 +50,14 @@ class Altitude(val configOverride: Map[String, Any] = Map())  {
   private final val dataSourceType = config.datasourceType
   logger.info(s"Datasource type: $dataSourceType")
 
+  final val fileStoreType = config.fileStoreType
+  logger.info(s"File store type: $fileStoreType")
+
+  // app thread pool, whatever it is needed for
   private val maxThreads: Int = Runtime.getRuntime.availableProcessors()
   logger.info(s"Available processors: $maxThreads")
   val executorService: ExecutorService = Executors.newFixedThreadPool(maxThreads)
   logger.info("Executor service initialized")
-
-  final val fileStoreType = config.fileStoreType
-  logger.info(s"File store type: $fileStoreType")
 
   /**
    * At this point determine which data access and storage classes we are loading,
@@ -89,6 +99,11 @@ class Altitude(val configOverride: Map[String, Any] = Map())  {
     }
   }
 
+  /**
+   * Scentry strategies differ from environment to environment.
+   * Production strategy is different from development and test.
+   * In dev, since the cookie store is cleared on every hot reload, logging in every time is a pain.
+   */
   val scentryStrategies: List[(String, Class[_ <: ScentryStrategy[User]])] = Environment.ENV match {
     case Environment.PROD => List(
       ("UserPasswordStrategy", classOf[UserPasswordStrategy]),
@@ -104,7 +119,7 @@ class Altitude(val configOverride: Map[String, Any] = Map())  {
   }
 
   /**
-   * Inject dependencies
+   * Inject data access classes based on the data source type
    */
   private class InjectionModule extends AbstractModule with ScalaModule  {
     override def configure(): Unit = {
