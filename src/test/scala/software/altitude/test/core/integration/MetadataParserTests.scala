@@ -5,8 +5,8 @@ import org.scalatest.matchers.must.Matchers.contain
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
 import software.altitude.core.models.Metadata
+import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.IntegrationTestCore
-import software.altitude.test.core.IntegrationTestCore.fileToImportAsset
 
 import java.io.File
 
@@ -40,7 +40,7 @@ import java.io.File
 
   private def getMetadata(p: String): Metadata = {
     val path = getClass.getResource(s"/import/$p").getPath
-    val importAsset = fileToImportAsset(new File(path))
+    val importAsset = IntegrationTestUtil.fileToImportAsset(new File(path))
     val mediaType = testApp.service.assetImport.detectAssetType(importAsset)
     testApp.service.metadataExtractor.extract(importAsset, mediaType)
   }

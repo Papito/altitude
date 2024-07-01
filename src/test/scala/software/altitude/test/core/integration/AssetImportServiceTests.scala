@@ -10,13 +10,13 @@ import software.altitude.core.Altitude
 import software.altitude.core.DuplicateException
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Preview
-import software.altitude.test.Util
+import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class AssetImportServiceTests(override val testApp: Altitude) extends IntegrationTestCore {
 
   test("Import duplicate") {
-    val importAsset = Util.getImportAsset("images/2.jpg")
+    val importAsset = IntegrationTestUtil.getImportAsset("images/2.jpg")
     testApp.service.assetImport.importAsset(importAsset).get
 
     intercept[DuplicateException] {
@@ -25,7 +25,7 @@ import software.altitude.test.core.IntegrationTestCore
   }
 
   test("Imported image should have all properties set") {
-    val importAsset = Util.getImportAsset("images/1.jpg")
+    val importAsset = IntegrationTestUtil.getImportAsset("images/1.jpg")
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
 
     importedAsset.assetType should equal(importedAsset.assetType)
@@ -38,7 +38,7 @@ import software.altitude.test.core.IntegrationTestCore
   }
 
   test("Imported image should have a preview") {
-    val importAsset = Util.getImportAsset("images/1.jpg")
+    val importAsset = IntegrationTestUtil.getImportAsset("images/1.jpg")
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
     val asset = testApp.service.library.getById(importedAsset.persistedId): Asset
     val preview: Preview = testApp.service.library.getPreview(asset.persistedId)
@@ -48,7 +48,7 @@ import software.altitude.test.core.IntegrationTestCore
   }
 
   test("Imported image is triaged") {
-    val importAsset = Util.getImportAsset("images/1.jpg")
+    val importAsset = IntegrationTestUtil.getImportAsset("images/1.jpg")
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
     val asset = testApp.service.library.getById(importedAsset.persistedId): Asset
     asset.isTriaged should be(true)

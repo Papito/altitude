@@ -10,6 +10,7 @@ import software.altitude.core.Const
 import software.altitude.core.Environment
 import software.altitude.core.models.Repository
 import software.altitude.core.models.User
+import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.integration.TestContext
 import software.altitude.test.core.suites.PostgresSuiteBundle
 
@@ -49,7 +50,7 @@ abstract class ControllerTestCore
     // the database is dirtied by the separate process (test server)
     // so we need to reset it before each test
     PostgresSuiteBundle.setup(testApp)
-    IntegrationTestCore.createTestDir(testApp.app)
+    IntegrationTestUtil.createTestDir(testApp.app)
 
     // the few application state variables should also be rolled back
     AltitudeServletContext.app.isInitialized = false
@@ -58,5 +59,5 @@ abstract class ControllerTestCore
   var testContext: TestContext = new TestContext(testApp)
 
   // I have no idea what this is for
-  override def header = null
+  override def header: Null = null
 }

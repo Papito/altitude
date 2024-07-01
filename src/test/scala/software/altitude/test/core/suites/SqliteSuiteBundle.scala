@@ -5,7 +5,7 @@ import software.altitude.core.Altitude
 import software.altitude.core.Environment
 import software.altitude.core.RequestContext
 import software.altitude.core.{Const => C}
-import software.altitude.test.core.IntegrationTestCore
+import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.testAltitudeApp
 
 object SqliteSuiteBundle {
@@ -27,7 +27,7 @@ class SqliteSuiteBundle
     println("SQLITE INTEGRATION TESTS")
     println("@@@@@@@@@@@@@@@@@@@@@@@@\n")
 
-    IntegrationTestCore.createTestDir(testApp)
+    IntegrationTestUtil.createTestDir(testApp)
 
     val sql =
       """
