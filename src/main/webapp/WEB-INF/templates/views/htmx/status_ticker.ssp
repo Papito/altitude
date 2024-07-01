@@ -1,10 +1,9 @@
-<div id="statusTicker" hidden>
-    <%@ val userId: String %>
+#import(software.altitude.core.RequestContext)
 
-    <div hx-ext="ws" ws-connect="/import/status?userId=<%= userId %>">
+<div id="statusTicker" hidden>
+    <div hx-ext="ws" ws-connect="/import/status?userId=<%= RequestContext.getAccount.id.get %>">
         <div id="statusText"></div>
     </div>
-
 </div>
 
 <script lang="js" type="module">

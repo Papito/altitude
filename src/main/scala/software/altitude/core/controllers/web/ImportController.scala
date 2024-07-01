@@ -32,10 +32,7 @@ class ImportController extends BaseWebController with FileUploadSupport with Atm
 
   get("/") {
     contentType = "text/html"
-    layoutTemplate(
-      "/WEB-INF/templates/views/import.ssp",
-      "userId" -> RequestContext.getAccount.persistedId,
-    )
+    layoutTemplate("/WEB-INF/templates/views/import.ssp")
   }
 
   atmosphere("/status") {
