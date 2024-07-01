@@ -3,7 +3,7 @@ package software.altitude.core.dao.jdbc
 import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
-import software.altitude.core.Altitude
+import software.altitude.core.Configuration
 import software.altitude.core.RequestContext
 import software.altitude.core.models._
 import software.altitude.core.util.SearchQuery
@@ -25,8 +25,8 @@ object SearchDao {
             """
 }
 
-abstract class SearchDao(override val appContext: Altitude)
-  extends AssetDao(appContext)
+abstract class SearchDao(override val config: Configuration)
+  extends AssetDao(config)
     with software.altitude.core.dao.SearchDao {
 
   private final val log = LoggerFactory.getLogger(getClass)

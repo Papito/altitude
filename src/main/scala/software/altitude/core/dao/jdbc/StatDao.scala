@@ -3,12 +3,12 @@ package software.altitude.core.dao.jdbc
 import org.apache.commons.dbutils.QueryRunner
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
-import software.altitude.core.AltitudeAppContext
+import software.altitude.core.Configuration
 import software.altitude.core.RequestContext
 import software.altitude.core.models.Stat
 import software.altitude.core.{Const => C}
 
-abstract class StatDao(val appContext: AltitudeAppContext) extends BaseDao with software.altitude.core.dao.StatDao {
+abstract class StatDao(override val config: Configuration) extends BaseDao with software.altitude.core.dao.StatDao {
   private final val log = LoggerFactory.getLogger(getClass)
 
   override final val tableName = "stats"

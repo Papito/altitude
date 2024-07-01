@@ -7,7 +7,7 @@ import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 
 trait AssetDao extends BaseDao {
-  private final val log = LoggerFactory.getLogger(getClass)
+  private final val logger = LoggerFactory.getLogger(getClass)
 
   def getMetadata(assetId: String): Option[Metadata]
 
@@ -33,10 +33,10 @@ trait AssetDao extends BaseDao {
       case None => Metadata()
     }
 
-    log.debug(s"Updating $existingMetadata with $metadata")
+    logger.debug(s"Updating $existingMetadata with $metadata")
     val newData = (existingMetadata.data ++ metadata.data).filterNot(m => deletedFields.contains(m._1))
     val newMetadata = new Metadata(newData)
-    log.debug(s"New metadata -> $newMetadata")
+    logger.debug(s"New metadata -> $newMetadata")
 
     setMetadata(assetId, newMetadata)
   }

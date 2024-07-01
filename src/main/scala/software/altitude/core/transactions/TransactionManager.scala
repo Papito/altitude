@@ -10,6 +10,10 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.util.Properties
 
+object TransactionManager {
+  def apply(config: Configuration): TransactionManager = new TransactionManager(config)
+}
+
 class TransactionManager(val config: Configuration) {
 
   private final val log = LoggerFactory.getLogger(getClass)
