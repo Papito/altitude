@@ -2,9 +2,9 @@ package software.altitude.test.core.controller
 
 import org.scalatest.DoNotDiscover
 import software.altitude.core.Altitude
-import software.altitude.test.core.WebTestCore
+import software.altitude.test.core.ControllerTestCore
 
-@DoNotDiscover class IndexControllerTests(override val testApp: Altitude) extends WebTestCore {
+@DoNotDiscover class IndexControllerTests(override val testApp: Altitude) extends ControllerTestCore {
 
   test("New installation goes to setup page") {
     get("/") {

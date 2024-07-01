@@ -13,7 +13,7 @@ import software.altitude.core.models.User
 import software.altitude.test.core.integration.TestContext
 import software.altitude.test.core.suites.PostgresSuiteBundle
 
-abstract class WebTestCore
+abstract class ControllerTestCore
   extends funsuite.AnyFunSuite
   with ScalatraTests
   with ScalatraFunSuite
