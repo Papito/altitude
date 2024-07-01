@@ -22,9 +22,6 @@ class ScalatraBootstrap extends LifeCycle with AltitudeServletContext {
   }
 
   override def destroy(context: ServletContext): Unit = {
-    log.info("Cleaning up after ourselves...")
-    app.freeResources()
     super.destroy(context)
-    log.info("All done.")
   }
 }

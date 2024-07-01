@@ -19,34 +19,43 @@ import software.altitude.core.transactions._
 import software.altitude.core.{Const => C}
 
 import java.sql.DriverManager
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
-class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeAppContext  {
+class Altitude(val configOverride: Map[String, Any] = Map())  {
   private final val logger = LoggerFactory.getLogger(getClass)
+  logger.info(s"Environment is: ${Environment.ENV}")
+
+  final val app: Altitude = this
 
   // ID for this application
   final val id: Int = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
   logger.info(s"Initializing Altitude Server application. Instance ID [$id]")
 
-  final val app: Altitude = this
+  final val config = new Configuration(configOverride = configOverride)
 
   var isInitialized = false
+
+  private final val schemaVersion = 1
+
+  private final val dataSourceType = config.datasourceType
+  logger.info(s"Datasource type: $dataSourceType")
+
+  private val maxThreads: Int = Runtime.getRuntime.availableProcessors()
+  logger.info(s"Available processors: $maxThreads")
+  val executorService: ExecutorService = Executors.newFixedThreadPool(maxThreads)
+  logger.info("Executor service initialized")
 
   final val fileStoreType = config.fileStoreType
   logger.info(s"File store type: $fileStoreType")
 
   /**
-   * At this point determine which data access classes we are loading, which
-   * transaction manager we are using for the data sources of choice, load the drivers,
-   * etc.
+   * At this point determine which data access and storage classes we are loading,
+   * based on data source
    */
-  override val injector: Injector = Guice.createInjector(new InjectionModule)
+  final val injector: Injector = Guice.createInjector(new InjectionModule)
 
-  /**
-   * Injected transaction manager, determined based on our database.
-   */
-  override val txManager: TransactionManager = new software.altitude.core.transactions.TransactionManager(app.config)
-
-  private final val schemaVersion = 1
+  final val txManager: TransactionManager = new software.altitude.core.transactions.TransactionManager(app.config)
 
   object service {
 
@@ -75,6 +84,7 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeApp
 
     val fileStore: FileStoreService = fileStoreType match {
       case C.FileStoreType.FS => new FileSystemStoreService(app)
+      // S3-based file store bigly wants to be here
       case _ => throw new NotImplementedError
     }
   }
@@ -131,8 +141,6 @@ class Altitude(val configOverride: Map[String, Any] = Map()) extends AltitudeApp
       }
     }
   }
-
-  def freeResources(): Unit = {}
 
   def setIsInitializedState(): Unit = {
     this.isInitialized = service.system.readMetadata.isInitialized

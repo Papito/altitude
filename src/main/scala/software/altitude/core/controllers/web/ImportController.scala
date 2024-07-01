@@ -26,8 +26,13 @@ import software.altitude.core.models.Metadata
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ImportController extends BaseWebController with FileUploadSupport with AtmosphereSupport   with JValueResult
-  with JacksonJsonSupport with SessionSupport {
+class ImportController
+  extends BaseWebController
+    with FileUploadSupport
+    with AtmosphereSupport
+    with JValueResult
+    with JacksonJsonSupport
+    with SessionSupport {
   private val fileSizeLimitGB = 10
 
   implicit protected val jsonFormats: Formats = DefaultFormats

@@ -2,7 +2,6 @@ package software.altitude.test
 
 import org.apache.commons.io.FileUtils
 import software.altitude.core.Altitude
-import software.altitude.core.AltitudeAppContext
 import software.altitude.core.models.ImportAsset
 import software.altitude.core.models.Metadata
 
@@ -17,8 +16,8 @@ object IntegrationTestUtil {
     }
   }
 
-  def createFileStoreDir(altitude: AltitudeAppContext): Unit = {
-    val dataDir = new File(altitude.config.getString("dataDir"))
+  def createFileStoreDir(testApp: Altitude): Unit = {
+    val dataDir = new File(testApp.config.getString("dataDir"))
 
     if (dataDir.exists()) {
       FileUtils.cleanDirectory(dataDir)
