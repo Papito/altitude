@@ -1,7 +1,8 @@
 :root {
     --background-color: #3d3d3d;
     --form-background-color: #363535;
-    --background-aux-color: #333;
+    --background-secondary-color: #333;
+    --form-border-color: #646161;
     --modal-background-color: #3b3b3b;
     --panel-border-color: #343434;
     --navbar-border: 2px solid #272727;
@@ -11,7 +12,9 @@
     --section-vertical-space: 35px;
     /* Standard vertical spacing for individual elements and lists */
     --control-vertical-space: 15px;
-    --success-color: #4dae27;
+    --success-font-color: #82da5f;
+    --success-background-color: #377a1c;
+
     --warning-color: #dca051;
     --error-color: #fc1e1e;
     /* For messages such as form validation and server response status */
@@ -30,13 +33,13 @@ body {
     font-size: 14px;
     margin: 0;
     background-color: var(--background-color);
-    color: #c6c6c6;
+    color: #FFFFFF;
     font-family: var(--font);
 }
 
 footer {
     padding: 5px;
-    background: var(--background-aux-color);
+    background: var(--background-secondary-color);
     color: #fff;
     bottom: 0;
     display: grid;
@@ -53,7 +56,7 @@ body {
 }
 
 footer {
-    background: var(--background-aux-color);
+    background: var(--background-secondary-color);
     color: #fff;
     bottom: 0;
     display: grid;
@@ -80,14 +83,13 @@ input.readonly {
 /*         */
 
 .action-button {
-    background: var(--success-color);
+    background: var(--success-background-color);
     font-weight: bold;
     color: white;
     border: 0 none;
     border-radius: 3px;
     cursor: pointer;
     padding: 10px;
-    margin: 10px 5px;
     text-decoration: none;
     text-shadow: rgba(72, 70, 70, 0.45) 1px 1px 1px;
     font-size: 1em;
@@ -111,12 +113,12 @@ input.readonly {
 /* Ticker is in core because appears everywhere  */
 #statusTicker {
     display: grid;
-    background-color: var(--background-aux-color);
+    background-color: var(--background-secondary-color);
     border-bottom: 2px solid #3a5e5e;
 }
 
 #statusText {
-    color: var(--success-color);
+    color: var(--success-font-color);
     font-weight: bold;
     padding: 10px;
     font-size: 1.1em;
