@@ -114,7 +114,7 @@ input.readonly {
 #statusTicker {
     display: grid;
     background-color: var(--background-secondary-color);
-    border-bottom: 2px solid #3a5e5e;
+    border-bottom: 2px solid var(--form-border-color);
 }
 
 #statusText {
@@ -126,4 +126,8 @@ input.readonly {
 
 #statusText.warning {
     color: var(--warning-color);
+}
+
+#statusText span {
+    color: #FFFFFF;
 }
