@@ -7,7 +7,7 @@
 </div>
 
 <script lang="js" type="module">
-    const tickerEl = document.getElementById("statusTicker")
+    const tickerEl = htmx.find("#statusTicker")
 
     htmx.on('htmx:wsOpen', function(evt) {
         console.log('WS connection is OPEN');
@@ -16,10 +16,13 @@
         console.log('WS connection is CLOSED');
     });
     htmx.on('htmx:wsAfterMessage', function(evt) {
-        const statusTextEl = document.getElementById("statusText")
+        const statusTextEl = htmx.find("#statusText")
+        statusTextEl.style.display = 'block';
+        statusTextEl.innerHTML = evt.detail.data
 
         setTimeout(function() {
             statusTextEl.innerHTML = ""
+            statusTextEl.style.display = 'none';
         }, 3000);
     });
 </script>

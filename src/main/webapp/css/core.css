@@ -118,6 +118,7 @@ input.readonly {
 }
 
 #statusText {
+    display: none;
     color: var(--success-font-color);
     font-weight: bold;
     padding: 10px;
