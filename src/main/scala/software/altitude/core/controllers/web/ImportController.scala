@@ -114,13 +114,7 @@ class ImportController
         app.executorService.submit(new Runnable {
           override def run(): Unit = {
             try {
-              val importedAsset: Option[Asset] = app.service.assetImport.importAsset(importAsset)
-
-              if (importedAsset.isDefined) {
-                sendWsStatusToUserClients(
-                  successStatusTickerTemplate.format("Imported: " + importedAsset.get.fileName))
-              }
-//              sleep(500)
+               app.service.assetImport.importAsset(importAsset)
 
               // will be updated in the finally block
               val processedSoFar = processedAndTotal._1.get() + 1

@@ -17,8 +17,7 @@
     });
     htmx.on('htmx:wsAfterMessage', function(evt) {
         const statusTextEl = htmx.find("#statusText")
-        statusTextEl.style.display = 'block';
-        statusTextEl.innerHTML = evt.detail.data
+        statusTextEl.style.display = "block"
 
         setTimeout(function() {
             statusTextEl.innerHTML = ""
