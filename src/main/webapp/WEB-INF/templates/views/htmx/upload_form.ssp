@@ -13,7 +13,7 @@
         width: 100%;
     }
 
-    #uploadForm .counter {
+    #uploadedTextControl {
         font-size: 1.1em;
         font-weight: bold;
     }
@@ -35,18 +35,21 @@
     <div id="progressBarControl" hidden>
         <progress id='progressBar' value='0' max='100'></progress>
     </div>
-    <div class="counter">
-        Uploaded <span id="uploadedCount">1</span> of <span id="totalCount">100</span>
+    <div id="progressTextControl" hidden>
     </div>
     <div>
         <button id="doItButton" class="action-button">Upload from computer</button>
     </div>
     <script>
         htmx.on('#uploadForm', 'htmx:xhr:progress', function(evt) {
-            document.getElementById("progressBarControl").removeAttribute("hidden")
+            htmx.find("#progressBarControl").removeAttribute("hidden")
             htmx.find('#progressBar').setAttribute('value', evt.detail.loaded/evt.detail.total * 100)
             htmx.find('#doItButton').setAttribute('hidden', true)
             htmx.find('#files').setAttribute('disabled', true)
+
+            htmx.find("#progressTextControl").removeAttribute("hidden")
+            const percentLoaded = parseInt((evt.detail.loaded / evt.detail.total) * 100)
+            htmx.find("#progressTextControl").innerText = percentLoaded+ "%"
         });
     </script>
 </form>
