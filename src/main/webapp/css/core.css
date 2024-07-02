@@ -14,8 +14,10 @@
     --control-vertical-space: 15px;
     --success-font-color: #82da5f;
     --success-background-color: #377a1c;
-
-    --warning-color: #dca051;
+    --warning-font-color: #dca051;
+    --warning-background-color: #7c4802;
+    --error-font-color: #fc1e1e;
+    --error-background-color: #a80404;
     --error-color: #fc1e1e;
     /* For messages such as form validation and server response status */
     --message-background-color: #2f2e2e;
@@ -87,15 +89,23 @@ input.readonly {
     font-weight: bold;
     color: white;
     border: 0 none;
-    border-radius: 3px;
+    border-radius: 4px;
     cursor: pointer;
-    padding: 10px;
+    padding: 7px;
     text-decoration: none;
     text-shadow: rgba(72, 70, 70, 0.45) 1px 1px 1px;
     font-size: 1em;
 }
 .action-button:hover, .action-button:focus {
     box-shadow: var(--box-shadow);
+}
+
+.action-button.warning {
+    background: var(--warning-background-color);
+}
+
+.action-button.error {
+    background: var(--error-background-color);
 }
 
 /*          */
@@ -126,7 +136,7 @@ input.readonly {
 }
 
 #statusText.warning {
-    color: var(--warning-color);
+    color: var(--warning-font-color);
 }
 
 #statusText span {
