@@ -17,7 +17,7 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
 
   override protected val txManager: TransactionManager = app.txManager
 
-  def addRepository(name: String, fileStoreType: C.FileStoreType.Value, owner: User): JsObject = {
+  def addRepository(name: String, fileStoreType: String, owner: User): JsObject = {
     logger.info(s"Creating repository [$name]")
 
     val id = BaseDao.genId

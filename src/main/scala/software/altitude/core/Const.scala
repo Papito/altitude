@@ -6,11 +6,13 @@ object Const {
    * TYPES
    */
   object DatasourceType extends Enumeration {
-    val SQLITE, POSTGRES = Value
+    type DatasourceType = String
+    val SQLITE = "sqlite"
+    val POSTGRES = "postgres"
   }
 
   object FileStoreType extends Enumeration {
-    val FS: FileStoreType.Value = Value
+    val FS = "fs"
   }
 
   /**

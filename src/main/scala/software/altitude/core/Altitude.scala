@@ -1,5 +1,6 @@
 package software.altitude.core
 
+import com.typesafe.config.ConfigFactory
 import org.scalatra.auth.ScentryStrategy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -28,8 +29,10 @@ class Altitude(val configOverride: Map[String, Any] = Map())  {
   final val id: Int = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
   logger.info(s"Initializing Altitude Server application. Instance ID [$id]")
 
-  final val config = new Configuration(configOverride = configOverride)
+  private val refConf = ConfigFactory.defaultReference()
+  // private val conf: Config = ConfigFactory.parseFile(new File("application.conf"))
 
+  final val config = new Configuration(configOverride = configOverride)
   /**
    * Has the first admin user been created?
    * This flag is loaded from the system metadata table upon start and then
@@ -43,10 +46,10 @@ class Altitude(val configOverride: Map[String, Any] = Map())  {
 
   private final val schemaVersion = 1
 
-  private final val dataSourceType = config.datasourceType
+  private final val dataSourceType = config.getString("datasource")
   logger.info(s"Datasource type: $dataSourceType")
 
-  final val fileStoreType = config.fileStoreType
+  final val fileStoreType: String =  config.getString("filestore")
   logger.info(s"File store type: $fileStoreType")
 
   /**
