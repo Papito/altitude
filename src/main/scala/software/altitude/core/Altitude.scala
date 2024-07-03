@@ -22,7 +22,9 @@ import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+
 class Altitude(val dataSource: Option[String] = None)  {
+  System.setProperty("FORCED_datasource", C.DatasourceType.POSTGRES)
   protected final val logger: Logger = LoggerFactory.getLogger(getClass)
   logger.info(s"Environment is: ${Environment.CURRENT}")
 
@@ -32,10 +34,11 @@ class Altitude(val dataSource: Option[String] = None)  {
   final val id: Int = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
   logger.info(s"Initializing Altitude Server application. Instance ID [$id]")
 
+
   final val config: Config = dataSource match {
     case Some(ds) =>
+      // DS is overridden ONLY in test so we do not load user app config
       ConfigFactory.defaultReference()
-        .withFallback(ConfigFactory.parseFile(new File("application.conf")))
         .withValue("dataSource", ConfigValueFactory.fromAnyRef(ds))
         .resolve()
     case None =>
@@ -190,7 +193,7 @@ class Altitude(val dataSource: Option[String] = None)  {
     }
 
     if (service.migrationService.migrationRequired) {
-      logger.warn("Migration is required!")
+       logger.warn("Migration is required!")
       service.migrationService.migrate()
     }
   }
