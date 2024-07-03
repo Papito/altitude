@@ -9,7 +9,7 @@ object Environment extends Enumeration {
     val DEV = "dev"
   }
 
-  var CURRENT: String = System.getenv().getOrDefault("ENV", Name.DEV) match {
+  var CURRENT: String = System.getenv().getOrDefault("ENV", Name.PROD) match {
     case "test" | "TEST" => Name.TEST
     case "prod" | "production" | "PROD" | "PRODUCTION" => Name.PROD
     case "dev" | "development" | "DEV" | "DEVELOPMENT" => Name.DEV

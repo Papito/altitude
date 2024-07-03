@@ -44,8 +44,6 @@ abstract class ControllerTestCore
     List(userHeader, repoHeader)
   }
 
-  Environment.CURRENT = Environment.Name.TEST
-
   var testContext: TestContext = new TestContext(testApp)
 
   override def beforeEach(): Unit = {

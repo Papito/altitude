@@ -1,7 +1,7 @@
 SHELL=/bin/sh
 
 watch:
-	sbt watch
+	ENV=dev sbt watch
 
 test:
 	ENV=test sbt test
@@ -15,15 +15,15 @@ test-focused-psql:
 test-focused-sqlite:
 	ENV=test sbt testFocusedSqlite
 
-# WEB tests (controllers) do need the ENV explicitly set,
-# as this is picked up by the testing server that is spun up automatically.
-#
-# Other tests run in a single process and force the test environment themselves.
+# See: https://github.com/papito/altitude/wiki/How-the-tests-work#controller-tests-and-the-forced-postgres-config
 test-focused-controller:
-	ENV=test sbt testFocusedController
+	@# The FORCE directive is CaSe SeNsItIvE
+	ENV=test CONFIG_FORCE_db_engine=postgres sbt testFocusedController
 
+# See: https://github.com/papito/altitude/wiki/How-the-tests-work#controller-tests-and-the-forced-postgres-config
 test-controller:
-	ENV=test sbt testController
+	@# The FORCE directive is CaSe SeNsItIvE
+	ENV=test CONFIG_FORCE_db_engine=postgres sbt testController
 
 test-psql:
 	ENV=test sbt testPostgres

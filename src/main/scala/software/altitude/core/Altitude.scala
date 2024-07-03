@@ -35,26 +35,29 @@ class Altitude(val dbEngineOverride: Option[String] = None)  {
 
   /**
    */
-
   final val config: Config = Environment.CURRENT match {
 
     case Environment.Name.DEV =>
       ConfigFactory.parseFile(new File("application-dev.conf"))
         .withFallback(ConfigFactory.defaultReference())
 
+
     case Environment.Name.PROD =>
       ConfigFactory.parseFile(new File("application.conf"))
         .withFallback(ConfigFactory.defaultReference())
 
+
     case Environment.Name.TEST =>
       dbEngineOverride match {
         case Some(ds) =>
-          ConfigFactory.defaultReference()
-            .withValue(C.Conf.DB_ENGINE, ConfigValueFactory.fromAnyRef(ds))
-            .resolve()
+          ConfigFactory.systemEnvironmentOverrides().withFallback(
+            ConfigFactory.defaultReference()).withValue(C.Conf.DB_ENGINE, ConfigValueFactory.fromAnyRef(ds))
+
         case None =>
-          ConfigFactory.defaultReference()
+          ConfigFactory.systemEnvironmentOverrides().withFallback(
+            ConfigFactory.defaultReference())
       }
+
     case _ =>
       throw new RuntimeException("Unknown environment")
   }

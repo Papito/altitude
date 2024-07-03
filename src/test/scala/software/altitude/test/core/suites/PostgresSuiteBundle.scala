@@ -2,13 +2,11 @@ package software.altitude.test.core.suites
 
 import org.scalatest.BeforeAndAfterAll
 import software.altitude.core.Altitude
-import software.altitude.core.Environment
 import software.altitude.core.RequestContext
 import software.altitude.core.{Const => C}
 import software.altitude.test.core.testAltitudeApp
 
 object PostgresSuiteBundle {
-  Environment.CURRENT = Environment.Name.TEST
   val testApp: Altitude = new Altitude(dbEngineOverride = Some(C.DbEngineName.POSTGRES))
 
   def setup(testApp: Altitude): Unit = {
@@ -32,8 +30,6 @@ object PostgresSuiteBundle {
 class PostgresSuiteBundle
   extends AllIntegrationTestSuites(testApp = PostgresSuiteBundle.testApp)
     with testAltitudeApp with BeforeAndAfterAll {
-
-  Environment.CURRENT = Environment.Name.TEST
 
   override def beforeAll(): Unit = {
     println("\n@@@@@@@@@@@@@@@@@@@@@@@@@@")
