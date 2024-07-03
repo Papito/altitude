@@ -20,7 +20,7 @@ class TransactionManager(val config: Configuration) {
   protected final val logger: Logger = LoggerFactory.getLogger(getClass)
 
   def connection(readOnly: Boolean): Connection = {
-    config.getString("datasource") match {
+    config.getString("dataSource") match {
       case C.DatasourceType.POSTGRES =>
         val props = new Properties
         val user = config.getString("postgresUser")

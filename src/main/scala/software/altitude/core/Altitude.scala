@@ -46,10 +46,10 @@ class Altitude(val configOverride: Map[String, Any] = Map())  {
 
   private final val schemaVersion = 1
 
-  private final val dataSourceType = config.getString("datasource")
+  private final val dataSourceType = config.getString("dataSource")
   logger.info(s"Datasource type: $dataSourceType")
 
-  final val fileStoreType: String =  config.getString("filestore")
+  final val fileStoreType: String =  config.getString("fileStore")
   logger.info(s"File store type: $fileStoreType")
 
   /**

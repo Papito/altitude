@@ -12,8 +12,8 @@ class Configuration(configOverride: Map[String, Any] = new HashMap()) {
   private val default = HashMap(
     "dataDir" -> "data",
 
-    "datasource" -> C.DatasourceType.POSTGRES,
-    "filestore" -> C.FileStoreType.FS,
+    "dataSource" -> C.DatasourceType.POSTGRES,
+    "fileStore" -> C.FileStoreType.FS,
 
     "previewBoxPixels" -> 200,
 
@@ -27,7 +27,7 @@ class Configuration(configOverride: Map[String, Any] = new HashMap()) {
   private val test = default ++ HashMap(
     "testDir" -> "./test-data",
     "dataDir" -> "./test-data/data",
-    "filestore" -> C.FileStoreType.FS,
+    "fileStore" -> C.FileStoreType.FS,
 
     "postgresUrl" -> "jdbc:postgresql://localhost:5433/altitude-test",
     "postgresUser" -> "altitude-test",

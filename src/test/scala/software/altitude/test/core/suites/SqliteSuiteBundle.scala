@@ -10,8 +10,7 @@ import software.altitude.test.core.testAltitudeApp
 
 object SqliteSuiteBundle {
   Environment.ENV = Environment.TEST
-
-  val testApp: Altitude = new Altitude(configOverride = Map("datasource" -> C.DatasourceType.SQLITE))
+  val testApp: Altitude = new Altitude(configOverride = Map("dataSource" -> C.DatasourceType.SQLITE))
 }
 
 class SqliteSuiteBundle
@@ -19,7 +18,7 @@ class SqliteSuiteBundle
     with testAltitudeApp with BeforeAndAfterAll {
 
   Environment.ENV = Environment.TEST
-  override val testApp: Altitude = new Altitude(configOverride = Map("datasource" -> C.DatasourceType.SQLITE))
+  override val testApp: Altitude = SqliteSuiteBundle.testApp
 
 
   override def beforeAll(): Unit = {
