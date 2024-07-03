@@ -95,7 +95,7 @@
 
         .cell {
             display: grid;
-            width:<%= software.altitude.core.AltitudeServletContext.app.config.getInt("previewBoxPixels").toInt + 20 %>px;
+            width:<%= software.altitude.core.AltitudeServletContext.app.config.getInt(Const.Conf.PREVIEW_BOX_PIXELS).toInt + 20 %>px;
             height: 220px;
             place-items: center;
         }

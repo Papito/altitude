@@ -1,10 +1,21 @@
 package software.altitude.core
 
 object Const {
-
   /**
-   * TYPES
+   * CONFIGURATION
    */
+  object Conf {
+    val TEST_DIR = "test.dir"
+    val FS_DATA_DIR = "fs.data.dir"
+    val DEFAULT_STORAGE_ENGINE = "storage.engine.default"
+    val PREVIEW_BOX_PIXELS = "preview.box.pixels"
+    val DB_ENGINE = "db.engine"
+    val POSTGRES_USER = "db.postgres.user"
+    val POSTGRES_PASSWORD = "db.postgres.password"
+    val POSTGRES_URL = "db.postgres.url"
+    val SQLITE_URL = "db.sqlite.url"
+  }
+
   object DatasourceType extends Enumeration {
     type DatasourceType = String
     val SQLITE = "sqlite"
@@ -16,7 +27,7 @@ object Const {
   }
 
   /**
-   * FIELDS
+   * MODELS
    */
   object SystemMetadata {
     val VERSION = "version"
@@ -128,6 +139,9 @@ object Const {
     val REPOSITORIES = "repositories"
   }
 
+  /**
+   * MESSAGES
+   */
   object Msg {
 
     object Err {
@@ -144,6 +158,9 @@ object Const {
     }
   }
 
+  /**
+   * API
+   */
   object Api {
     val USER_ID = "user_id"
     val ERROR = "error"

@@ -20,14 +20,14 @@ class TransactionManager(val config: Config) {
   protected final val logger: Logger = LoggerFactory.getLogger(getClass)
 
   def connection(readOnly: Boolean): Connection = {
-    config.getString("dataSource") match {
+    config.getString(C.Conf.DB_ENGINE) match {
       case C.DatasourceType.POSTGRES =>
         val props = new Properties
-        val user = config.getString("postgresUser")
+        val user = config.getString(C.Conf.POSTGRES_USER)
         props.setProperty("user", user)
-        val password = config.getString("postgresPassword")
+        val password = config.getString(C.Conf.POSTGRES_PASSWORD)
         props.setProperty("password", password)
-        val url = config.getString("postgresUrl")
+        val url = config.getString(C.Conf.POSTGRES_URL)
         val conn = DriverManager.getConnection(url, props)
         logger.debug(s"Opening connection $conn. Read-only: $readOnly")
 
@@ -52,7 +52,7 @@ class TransactionManager(val config: Config) {
          */
         Class.forName("org.sqlite.JDBC")
 
-        val url: String = config.getString("sqliteUrl")
+        val url: String = config.getString(C.Conf.SQLITE_URL)
 
         val sqliteConfig: SQLiteConfig = new SQLiteConfig()
 
