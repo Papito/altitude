@@ -1,12 +1,12 @@
 package software.altitude.core.dao.jdbc
 
+import com.typesafe.config.Config
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import software.altitude.core.Configuration
 import software.altitude.core.models.Repository
 import software.altitude.core.{Const => C}
 
-abstract class RepositoryDao(override val config: Configuration) extends BaseDao
+abstract class RepositoryDao(override val config: Config) extends BaseDao
     with software.altitude.core.dao.RepositoryDao {
 
   override final val tableName = "repository"

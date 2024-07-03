@@ -1,6 +1,8 @@
 package software.altitude.core
 
+import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
+import com.typesafe.config.ConfigValueFactory
 import org.scalatra.auth.ScentryStrategy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -16,10 +18,11 @@ import software.altitude.core.service.filestore.FileSystemStoreService
 import software.altitude.core.transactions._
 import software.altitude.core.{Const => C}
 
+import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class Altitude(val configOverride: Map[String, Any] = Map())  {
+class Altitude(val dataSource: Option[String] = None)  {
   protected final val logger: Logger = LoggerFactory.getLogger(getClass)
   logger.info(s"Environment is: ${Environment.ENV}")
 
@@ -29,10 +32,22 @@ class Altitude(val configOverride: Map[String, Any] = Map())  {
   final val id: Int = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
   logger.info(s"Initializing Altitude Server application. Instance ID [$id]")
 
-  private val refConf = ConfigFactory.defaultReference()
-  // private val conf: Config = ConfigFactory.parseFile(new File("application.conf"))
+//  oldConfig.withValue("something.another.anotherconfig",
+//    ConfigValueFactory.fromAnyRef(456))
 
-  final val config = new Configuration(configOverride = configOverride)
+  final val config: Config = dataSource match {
+    case Some(ds) =>
+      ConfigFactory.defaultReference().withValue("dataSource", ConfigValueFactory.fromAnyRef(ds)).
+        withFallback(ConfigFactory.parseFile(
+          new File("application.conf")))
+        .resolve()
+
+    case None =>
+      ConfigFactory.defaultReference().
+        withFallback(ConfigFactory.parseFile(
+          new File("application.conf"))).resolve()
+  }
+
   /**
    * Has the first admin user been created?
    * This flag is loaded from the system metadata table upon start and then

@@ -1,9 +1,9 @@
 package software.altitude.core.transactions
 
+import com.typesafe.config.Config
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.sqlite.SQLiteConfig
-import software.altitude.core.Configuration
 import software.altitude.core.RequestContext
 import software.altitude.core.{Const => C}
 
@@ -12,10 +12,10 @@ import java.sql.DriverManager
 import java.util.Properties
 
 object TransactionManager {
-  def apply(config: Configuration): TransactionManager = new TransactionManager(config)
+  def apply(config: Config): TransactionManager = new TransactionManager(config)
 }
 
-class TransactionManager(val config: Configuration) {
+class TransactionManager(val config: Config) {
 
   protected final val logger: Logger = LoggerFactory.getLogger(getClass)
 
