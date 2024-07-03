@@ -17,17 +17,17 @@ class BaseWebController extends BaseController with ScalateSupport {
         val repoResults = app.service.repository.query(new Query())
         if (repoResults.records.nonEmpty) {
           RequestContext.repository.value = Some(repoResults.records.head: Repository)
-          logger.warn(s"Using first found repository: ${RequestContext.repository.value.get.name}")
+          // logger.warn(s"Using first found repository: ${RequestContext.repository.value.get.name}")
         }
 
         val userResults = app.service.user.query(new Query())
         if (userResults.records.nonEmpty) {
           RequestContext.account.value = Some(userResults.records.head: User)
-          logger.warn(s"Using first found user: ${RequestContext.account.value.get.email}")
+          // logger.warn(s"Using first found user: ${RequestContext.account.value.get.email}")
         }
 
       case Environment.Name.TEST =>
-        logger.info("TEST AUTHENTICATION VIA HEADER")
+        // logger.info("TEST AUTHENTICATION VIA HEADER")
 
         val testRepoId: String = request.getHeader(Const.Api.REPO_TEST_HEADER_ID)
         if (testRepoId != null) {

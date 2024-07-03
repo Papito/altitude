@@ -9,7 +9,7 @@ import software.altitude.test.core.testAltitudeApp
 
 object PostgresSuiteBundle {
   Environment.CURRENT = Environment.Name.TEST
-  val testApp: Altitude = new Altitude(dataSource = Some(C.DatasourceType.POSTGRES))
+  val testApp: Altitude = new Altitude(dataSource = Some(C.DbEngineName.POSTGRES))
 
   def setup(testApp: Altitude): Unit = {
     val conn = testApp.txManager.connection(readOnly = false)

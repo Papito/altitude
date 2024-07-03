@@ -16,13 +16,14 @@ object Const {
     val SQLITE_URL = "db.sqlite.url"
   }
 
-  object DatasourceType extends Enumeration {
-    type DatasourceType = String
+  object DbEngineName extends Enumeration {
+    type DbEngineName = String
     val SQLITE = "sqlite"
     val POSTGRES = "postgres"
   }
 
-  object FileStoreType extends Enumeration {
+  object StorageEngineName extends Enumeration {
+    type StorageEngineName = String
     val FS = "fs"
   }
 

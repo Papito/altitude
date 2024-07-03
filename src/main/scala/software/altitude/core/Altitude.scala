@@ -72,8 +72,8 @@ class Altitude(val dataSource: Option[String] = None)  {
    * App thread pool, whatever it is needed for
    */
   private val maxThreads: Int = dataSourceType match {
-    case C.DatasourceType.POSTGRES => Runtime.getRuntime.availableProcessors()
-    case C.DatasourceType.SQLITE => 1 // SQLite is single-threaded
+    case C.DbEngineName.POSTGRES => Runtime.getRuntime.availableProcessors()
+    case C.DbEngineName.SQLITE => 1 // SQLite is single-threaded
   }
   logger.info(s"Available processors: $maxThreads")
 
@@ -103,61 +103,61 @@ class Altitude(val dataSource: Option[String] = None)  {
 
   object DAO {
     val systemMetadata: SystemMetadataDao = dataSourceType match {
-      case C.DatasourceType.POSTGRES => new jdbc.SystemMetadataDao(app.config) with dao.postgres.PostgresOverrides
-      case C.DatasourceType.SQLITE => new jdbc.SystemMetadataDao(app.config) with dao.sqlite.SqliteOverrides
+      case C.DbEngineName.POSTGRES => new jdbc.SystemMetadataDao(app.config) with dao.postgres.PostgresOverrides
+      case C.DbEngineName.SQLITE => new jdbc.SystemMetadataDao(app.config) with dao.sqlite.SqliteOverrides
       case _ => throw new IllegalArgumentException(s"Unknown datasource [$dataSourceType]")
     }
 
     val user: UserDao = dataSourceType match {
-      case C.DatasourceType.POSTGRES => new jdbc.UserDao(app.config) with dao.postgres.PostgresOverrides
-      case C.DatasourceType.SQLITE => new jdbc.UserDao(app.config) with dao.sqlite.SqliteOverrides
+      case C.DbEngineName.POSTGRES => new jdbc.UserDao(app.config) with dao.postgres.PostgresOverrides
+      case C.DbEngineName.SQLITE => new jdbc.UserDao(app.config) with dao.sqlite.SqliteOverrides
       case _ => throw new IllegalArgumentException(s"Unknown datasource [$dataSourceType]")
     }
 
     val repository: RepositoryDao = dataSourceType match {
-      case C.DatasourceType.POSTGRES => new postgres.RepositoryDao(app.config)
-      case C.DatasourceType.SQLITE => new jdbc.RepositoryDao(app.config) with dao.sqlite.SqliteOverrides
+      case C.DbEngineName.POSTGRES => new postgres.RepositoryDao(app.config)
+      case C.DbEngineName.SQLITE => new jdbc.RepositoryDao(app.config) with dao.sqlite.SqliteOverrides
       case _ => throw new IllegalArgumentException(s"Unknown datasource [$dataSourceType]")
     }
 
     val asset: AssetDao = dataSourceType match {
-      case C.DatasourceType.POSTGRES => new postgres.AssetDao(app.config) with dao.postgres.PostgresOverrides
-      case C.DatasourceType.SQLITE => new jdbc.AssetDao(app.config) with dao.sqlite.SqliteOverrides
+      case C.DbEngineName.POSTGRES => new postgres.AssetDao(app.config) with dao.postgres.PostgresOverrides
+      case C.DbEngineName.SQLITE => new jdbc.AssetDao(app.config) with dao.sqlite.SqliteOverrides
       case _ => throw new IllegalArgumentException(s"Unknown datasource [$dataSourceType]")
     }
 
     val folder: FolderDao = dataSourceType match {
-      case C.DatasourceType.POSTGRES => new jdbc.FolderDao(app.config) with dao.postgres.PostgresOverrides
-      case C.DatasourceType.SQLITE => new jdbc.FolderDao(app.config) with dao.sqlite.SqliteOverrides
+      case C.DbEngineName.POSTGRES => new jdbc.FolderDao(app.config) with dao.postgres.PostgresOverrides
+      case C.DbEngineName.SQLITE => new jdbc.FolderDao(app.config) with dao.sqlite.SqliteOverrides
       case _ => throw new IllegalArgumentException(s"Unknown datasource [$dataSourceType]")
     }
 
     val stats: StatDao = dataSourceType match {
-      case C.DatasourceType.POSTGRES => new jdbc.StatDao(app.config) with dao.postgres.PostgresOverrides
-      case C.DatasourceType.SQLITE => new jdbc.StatDao(app.config) with dao.sqlite.SqliteOverrides
+      case C.DbEngineName.POSTGRES => new jdbc.StatDao(app.config) with dao.postgres.PostgresOverrides
+      case C.DbEngineName.SQLITE => new jdbc.StatDao(app.config) with dao.sqlite.SqliteOverrides
       case _ => throw new IllegalArgumentException(s"Unknown datasource [$dataSourceType]")
     }
 
     val metadataField: MetadataFieldDao = dataSourceType match {
-      case C.DatasourceType.POSTGRES => new jdbc.MetadataFieldDao(app.config) with dao.postgres.PostgresOverrides
-      case C.DatasourceType.SQLITE => new jdbc.MetadataFieldDao(app.config) with dao.sqlite.SqliteOverrides
+      case C.DbEngineName.POSTGRES => new jdbc.MetadataFieldDao(app.config) with dao.postgres.PostgresOverrides
+      case C.DbEngineName.SQLITE => new jdbc.MetadataFieldDao(app.config) with dao.sqlite.SqliteOverrides
       case _ => throw new IllegalArgumentException(s"Unknown datasource [$dataSourceType]")
     }
 
     val search: SearchDao = dataSourceType match {
-      case C.DatasourceType.POSTGRES => new postgres.SearchDao(app.config)
-      case C.DatasourceType.SQLITE => new sqlite.SearchDao(app.config)
+      case C.DbEngineName.POSTGRES => new postgres.SearchDao(app.config)
+      case C.DbEngineName.SQLITE => new sqlite.SearchDao(app.config)
       case _ => throw new IllegalArgumentException(s"Unknown datasource [$dataSourceType]")
     }
   }
 
   object service {
     val migrationService: MigrationService = dataSourceType match {
-      case C.DatasourceType.SQLITE => new MigrationService(app) {
+      case C.DbEngineName.SQLITE => new MigrationService(app) {
         override final val CURRENT_VERSION = schemaVersion
         override final val MIGRATIONS_DIR = "/migrations/sqlite"
       }
-      case C.DatasourceType.POSTGRES => new MigrationService(app) {
+      case C.DbEngineName.POSTGRES => new MigrationService(app) {
         override final val CURRENT_VERSION = schemaVersion
         override final val MIGRATIONS_DIR = "/migrations/postgres"
       }
@@ -176,7 +176,7 @@ class Altitude(val dataSource: Option[String] = None)  {
     val stats = new StatsService(app)
 
     val fileStore: FileStoreService = fileStoreType match {
-      case C.FileStoreType.FS => new FileSystemStoreService(app)
+      case C.StorageEngineName.FS => new FileSystemStoreService(app)
       // S3-based file store bigly wants to be here
       case _ => throw new NotImplementedError
     }

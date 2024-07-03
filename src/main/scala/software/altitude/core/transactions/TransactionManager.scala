@@ -21,7 +21,7 @@ class TransactionManager(val config: Config) {
 
   def connection(readOnly: Boolean): Connection = {
     config.getString(C.Conf.DB_ENGINE) match {
-      case C.DatasourceType.POSTGRES =>
+      case C.DbEngineName.POSTGRES =>
         val props = new Properties
         val user = config.getString(C.Conf.POSTGRES_USER)
         props.setProperty("user", user)
@@ -42,7 +42,7 @@ class TransactionManager(val config: Config) {
         // println(s"NEW PSQL CONN ${System.identityHashCode(conn)}")
         conn
 
-      case C.DatasourceType.SQLITE =>
+      case C.DbEngineName.SQLITE =>
         /**
          * At some point the prod jar stopped working without this line.
          * This is commonly needed for JDBC drivers to register themselves,
