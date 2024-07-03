@@ -22,7 +22,7 @@ abstract class IntegrationTestCore
   protected final val log: Logger = LoggerFactory.getLogger(getClass)
 
   // Force environment to always be TEST
-  Environment.ENV = Environment.TEST
+  Environment.CURRENT = Environment.Name.TEST
 
   var testContext: TestContext = new TestContext(testApp)
 

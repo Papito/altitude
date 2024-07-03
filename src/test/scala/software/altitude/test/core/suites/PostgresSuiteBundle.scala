@@ -8,7 +8,7 @@ import software.altitude.core.{Const => C}
 import software.altitude.test.core.testAltitudeApp
 
 object PostgresSuiteBundle {
-  Environment.ENV = Environment.TEST
+  Environment.CURRENT = Environment.Name.TEST
   val testApp: Altitude = new Altitude(dataSource = Some(C.DatasourceType.POSTGRES))
 
   def setup(testApp: Altitude): Unit = {
@@ -33,7 +33,7 @@ class PostgresSuiteBundle
   extends AllIntegrationTestSuites(testApp = PostgresSuiteBundle.testApp)
     with testAltitudeApp with BeforeAndAfterAll {
 
-  Environment.ENV = Environment.TEST
+  Environment.CURRENT = Environment.Name.TEST
 
   override def beforeAll(): Unit = {
     println("\n@@@@@@@@@@@@@@@@@@@@@@@@@@")

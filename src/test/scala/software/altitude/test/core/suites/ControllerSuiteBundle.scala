@@ -13,7 +13,7 @@ import software.altitude.test.core.testAltitudeApp
 class ControllerSuiteBundle extends AllControllerTestSuites(testApp = PostgresSuiteBundle.testApp)
   with testAltitudeApp with BeforeAndAfterAll {
 
-  Environment.ENV = Environment.TEST
+  Environment.CURRENT = Environment.Name.TEST
 
   protected final val log: Logger = LoggerFactory.getLogger(getClass)
 

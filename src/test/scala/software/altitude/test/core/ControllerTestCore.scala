@@ -44,7 +44,7 @@ abstract class ControllerTestCore
     List(userHeader, repoHeader)
   }
 
-  Environment.ENV = Environment.TEST
+  Environment.CURRENT = Environment.Name.TEST
 
   var testContext: TestContext = new TestContext(testApp)
 

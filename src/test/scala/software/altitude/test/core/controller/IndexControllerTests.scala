@@ -6,7 +6,7 @@ import software.altitude.test.core.ControllerTestCore
 
 @DoNotDiscover class IndexControllerTests(override val testApp: Altitude) extends ControllerTestCore {
 
-  test("New installation goes to setup page") {
+  test("New installation goes to setup page", Focused) {
     get("/") {
       testApp.service.system.readMetadata.isInitialized should equal(false)
       status should equal(302)

@@ -10,10 +10,10 @@ import software.altitude.core.util.Query
 
 class BaseWebController extends BaseController with ScalateSupport {
   before() {
-    Environment.ENV match {
-      case Environment.PROD =>
+    Environment.CURRENT match {
+      case Environment.Name.PROD =>
 
-      case Environment.DEV =>
+      case Environment.Name.DEV =>
         val repoResults = app.service.repository.query(new Query())
         if (repoResults.records.nonEmpty) {
           RequestContext.repository.value = Some(repoResults.records.head: Repository)
@@ -26,7 +26,7 @@ class BaseWebController extends BaseController with ScalateSupport {
           logger.warn(s"Using first found user: ${RequestContext.account.value.get.email}")
         }
 
-      case Environment.TEST =>
+      case Environment.Name.TEST =>
         logger.info("TEST AUTHENTICATION VIA HEADER")
 
         val testRepoId: String = request.getHeader(Const.Api.REPO_TEST_HEADER_ID)

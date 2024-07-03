@@ -9,7 +9,7 @@ import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.testAltitudeApp
 
 object SqliteSuiteBundle {
-  Environment.ENV = Environment.TEST
+  Environment.CURRENT = Environment.Name.TEST
   val testApp: Altitude = new Altitude(dataSource = Some(C.DatasourceType.SQLITE))
 }
 
@@ -17,7 +17,7 @@ class SqliteSuiteBundle
   extends AllIntegrationTestSuites(testApp = SqliteSuiteBundle.testApp)
     with testAltitudeApp with BeforeAndAfterAll {
 
-  Environment.ENV = Environment.TEST
+  Environment.CURRENT = Environment.Name.TEST
   override val testApp: Altitude = SqliteSuiteBundle.testApp
 
 

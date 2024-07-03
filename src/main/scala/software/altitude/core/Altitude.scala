@@ -24,7 +24,7 @@ import java.util.concurrent.Executors
 
 class Altitude(val dataSource: Option[String] = None)  {
   protected final val logger: Logger = LoggerFactory.getLogger(getClass)
-  logger.info(s"Environment is: ${Environment.ENV}")
+  logger.info(s"Environment is: ${Environment.CURRENT}")
 
   final val app: Altitude = this
 
@@ -32,20 +32,16 @@ class Altitude(val dataSource: Option[String] = None)  {
   final val id: Int = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
   logger.info(s"Initializing Altitude Server application. Instance ID [$id]")
 
-//  oldConfig.withValue("something.another.anotherconfig",
-//    ConfigValueFactory.fromAnyRef(456))
-
   final val config: Config = dataSource match {
     case Some(ds) =>
-      ConfigFactory.defaultReference().withValue("dataSource", ConfigValueFactory.fromAnyRef(ds)).
-        withFallback(ConfigFactory.parseFile(
-          new File("application.conf")))
+      ConfigFactory.defaultReference()
+        .withFallback(ConfigFactory.parseFile(new File("application.conf")))
+        .withValue("dataSource", ConfigValueFactory.fromAnyRef(ds))
         .resolve()
-
     case None =>
-      ConfigFactory.defaultReference().
-        withFallback(ConfigFactory.parseFile(
-          new File("application.conf"))).resolve()
+      ConfigFactory.defaultReference()
+        .withFallback(ConfigFactory.parseFile(new File("application.conf")))
+        .resolve()
   }
 
   /**
@@ -86,15 +82,15 @@ class Altitude(val dataSource: Option[String] = None)  {
    * Production strategy is different from development and test.
    * In dev, since the cookie store is cleared on every hot reload, logging in every time is a pain.
    */
-  val scentryStrategies: List[(String, Class[_ <: ScentryStrategy[User]])] = Environment.ENV match {
-    case Environment.PROD => List(
+  val scentryStrategies: List[(String, Class[_ <: ScentryStrategy[User]])] = Environment.CURRENT match {
+    case Environment.Name.PROD => List(
       ("UserPasswordStrategy", classOf[UserPasswordStrategy]),
       ("RememberMeStrategy", classOf[RememberMeStrategy])
     )
-    case Environment.DEV => List(
+    case Environment.Name.DEV => List(
       ("RememberMeStrategy", classOf[LocalDevRememberMeStrategy])
     )
-    case Environment.TEST => List(
+    case Environment.Name.TEST => List(
       ("RememberMeStrategy", classOf[TestRememberMeStrategy])
     )
     case _ => throw new RuntimeException("Unknown environment")
@@ -189,11 +185,13 @@ class Altitude(val dataSource: Option[String] = None)  {
   }
 
   def runMigrations(): Unit = {
+    if (Environment.CURRENT == Environment.Name.TEST) {
+      return
+    }
+
     if (service.migrationService.migrationRequired) {
       logger.warn("Migration is required!")
-      if (Environment.ENV != Environment.TEST) {
-        service.migrationService.migrate()
-      }
+      service.migrationService.migrate()
     }
   }
 
