@@ -23,7 +23,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 
-class Altitude(val dataSource: Option[String] = None)  {
+class Altitude(val dbEngineOverride: Option[String] = None)  {
   protected final val logger: Logger = LoggerFactory.getLogger(getClass)
   logger.info(s"Environment is: ${Environment.CURRENT}")
 
@@ -33,20 +33,32 @@ class Altitude(val dataSource: Option[String] = None)  {
   final val id: Int = scala.util.Random.nextInt(java.lang.Integer.MAX_VALUE)
   logger.info(s"Initializing Altitude Server application. Instance ID [$id]")
 
-  final val config: Config = dataSource match {
-    case Some(ds) =>
-      require(
-        Environment.CURRENT == Environment.Name.TEST,
-        "Datasource overrides at runtime can only be set in test environment")
+  /**
+   */
 
+  final val config: Config = Environment.CURRENT match {
+
+    case Environment.Name.DEV =>
       ConfigFactory.defaultReference()
-        .withValue(C.Conf.DB_ENGINE, ConfigValueFactory.fromAnyRef(ds))
+        .withFallback(ConfigFactory.parseFile(new File("application-dev.conf")))
         .resolve()
 
-    case None =>
+    case Environment.Name.PROD =>
       ConfigFactory.defaultReference()
         .withFallback(ConfigFactory.parseFile(new File("application.conf")))
         .resolve()
+
+    case Environment.Name.TEST =>
+      dbEngineOverride match {
+        case Some(ds) =>
+          ConfigFactory.defaultReference()
+            .withValue(C.Conf.DB_ENGINE, ConfigValueFactory.fromAnyRef(ds))
+            .resolve()
+        case None =>
+          ConfigFactory.defaultReference()
+      }
+    case _ =>
+      throw new RuntimeException("Unknown environment")
   }
 
   /**

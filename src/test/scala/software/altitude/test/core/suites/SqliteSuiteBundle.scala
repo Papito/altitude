@@ -10,7 +10,7 @@ import software.altitude.test.core.testAltitudeApp
 
 object SqliteSuiteBundle {
   Environment.CURRENT = Environment.Name.TEST
-  val testApp: Altitude = new Altitude(dataSource = Some(C.DbEngineName.SQLITE))
+  val testApp: Altitude = new Altitude(dbEngineOverride = Some(C.DbEngineName.SQLITE))
 }
 
 class SqliteSuiteBundle
