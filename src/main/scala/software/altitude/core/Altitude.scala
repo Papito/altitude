@@ -39,14 +39,12 @@ class Altitude(val dbEngineOverride: Option[String] = None)  {
   final val config: Config = Environment.CURRENT match {
 
     case Environment.Name.DEV =>
-      ConfigFactory.defaultReference()
-        .withFallback(ConfigFactory.parseFile(new File("application-dev.conf")))
-        .resolve()
+      ConfigFactory.parseFile(new File("application-dev.conf"))
+        .withFallback(ConfigFactory.defaultReference())
 
     case Environment.Name.PROD =>
-      ConfigFactory.defaultReference()
-        .withFallback(ConfigFactory.parseFile(new File("application.conf")))
-        .resolve()
+      ConfigFactory.parseFile(new File("application.conf"))
+        .withFallback(ConfigFactory.defaultReference())
 
     case Environment.Name.TEST =>
       dbEngineOverride match {

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 #import(software.altitude.core.Const)
+#import(software.altitude.core.AltitudeServletContext)
 #import(software.altitude.core.RequestContext)
 #import(software.altitude.core.models.Asset)
 #import(software.altitude.core.util.SearchResult)
-#import(software.altitude.core.AltitudeServletContext)
 <%@ val results: SearchResult %>
 <html lang="en">
 <head>
