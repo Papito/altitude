@@ -15,15 +15,11 @@ test-focused-psql:
 test-focused-sqlite:
 	ENV=test sbt testFocusedSqlite
 
-# See: https://github.com/papito/altitude/wiki/How-the-tests-work#controller-tests-and-the-forced-postgres-config
 test-focused-controller:
-	@# The FORCE directive is CaSe SeNsItIvE
-	ENV=test CONFIG_FORCE_db_engine=postgres sbt testFocusedController
+	ENV=test sbt testFocusedController
 
-# See: https://github.com/papito/altitude/wiki/How-the-tests-work#controller-tests-and-the-forced-postgres-config
 test-controller:
-	@# The FORCE directive is CaSe SeNsItIvE
-	ENV=test CONFIG_FORCE_db_engine=postgres sbt testController
+	ENV=test sbt testController
 
 test-psql:
 	ENV=test sbt testPostgres

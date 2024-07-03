@@ -50,12 +50,10 @@ class Altitude(val dbEngineOverride: Option[String] = None)  {
     case Environment.Name.TEST =>
       dbEngineOverride match {
         case Some(ds) =>
-          ConfigFactory.systemEnvironmentOverrides().withFallback(
-            ConfigFactory.defaultReference()).withValue(C.Conf.DB_ENGINE, ConfigValueFactory.fromAnyRef(ds))
+          ConfigFactory.defaultReference().withValue(C.Conf.DB_ENGINE, ConfigValueFactory.fromAnyRef(ds))
 
         case None =>
-          ConfigFactory.systemEnvironmentOverrides().withFallback(
-            ConfigFactory.defaultReference())
+          ConfigFactory.defaultReference()
       }
 
     case _ =>
