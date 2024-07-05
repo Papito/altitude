@@ -4,7 +4,7 @@ import org.scalatra.ContentEncodingSupport
 import org.scalatra.InternalServerError
 import org.scalatra.ScalatraServlet
 import org.slf4j.MDC
-import software.altitude.core.AltitudeServletContext
+import software.altitude.core.{AltitudeServletContext, Const}
 import software.altitude.core.auth.AuthenticationSupport
 import software.altitude.core.models.Repository
 import software.altitude.core.models.User
@@ -51,7 +51,8 @@ abstract class BaseController extends ScalatraServlet
   private def isAssetRequest =  request.pathInfo.startsWith("/css") ||
     request.pathInfo.startsWith("/js") ||
     request.pathInfo.startsWith("/webfonts") ||
-    request.pathInfo.startsWith("/images")
+    request.pathInfo.startsWith("/images") ||
+    request.pathInfo.startsWith(s"/${Const.DataStore.PREVIEW}")
 
   protected def setUser(): Unit = {
 /*    val userId =
