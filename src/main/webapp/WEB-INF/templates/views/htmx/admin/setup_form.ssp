@@ -3,6 +3,10 @@
 #import(play.api.libs.json.Json)
 #import(play.api.libs.json.JsObject)
 
+<%@ val fieldErrors: Map[String, String] = Map.empty %>
+<%@ val formJson: JsObject = Json.obj() %>
+
+
 <style>
     #setupForm {
         display: grid;
@@ -49,9 +53,6 @@
         letter-spacing: 1px;
     }
 </style>
-
-<%@ val fieldErrors: Map[String, String] = Map.empty %>
-<%@ val formJson: JsObject = Json.obj() %>
 
 <form action="#" id="setupForm"
       hx-swap="outerHTML"

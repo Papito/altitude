@@ -5,7 +5,7 @@ import org.scalatra.servlet.ServletApiImplicits._
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.controllers.api._
-import software.altitude.core.controllers.htmx.SetupController
+import software.altitude.core.controllers.htmx.{SetupController, UserInterfaceHtmxController}
 import software.altitude.core.controllers.web.ImportController
 import software.altitude.core.controllers.web.IndexController
 import software.altitude.core.controllers.web.SecuredStaticFileController
@@ -30,6 +30,7 @@ object AltitudeServletContext {
     (new MetadataController, "/api/v1/metadata/*"),
     (new SessionController, "/sessions/*"),
     (new SecuredStaticFileController, "/content/*"),
+    (new UserInterfaceHtmxController, "/htmx/*"),
 
     (new SetupController, "/htmx/admin/setup/*"),
 

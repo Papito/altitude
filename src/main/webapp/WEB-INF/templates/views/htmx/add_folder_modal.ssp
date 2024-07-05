@@ -1,0 +1,7 @@
+I am a folder modal
+
+<%@ val minWidth: Int %>
+<%@ val title: String %>
+<script lang="js" type="module">
+    showModal({minWidthPx: "<%= minWidth %>", title: "<%= title %>"})
+</script>

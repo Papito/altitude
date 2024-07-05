@@ -142,3 +142,86 @@ input.readonly {
 #statusText span {
     color: #FFFFFF;
 }
+
+/*
+       MODAL
+     */
+
+#modalContainer {
+    display: none;
+    position: fixed;
+    z-index: 4;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+#modalBox {
+    display: grid;
+    grid-template-rows: 30px auto;
+    background-color: var(--background-secondary-color);
+    margin: auto;
+    width: fit-content;
+    border: 2px solid var(--panel-border-color);
+}
+
+#modalContainer a {
+    /*color: var(--theme-button-link-color);*/
+}
+
+#modalWarning, #modalError {
+    display: none;
+    padding: .5em 1em .5em 1em;
+    margin: 0 0 .5em 0;
+    color: #fff;
+}
+
+#modalWarning.active, #modalError.active {
+    display: inline-block;
+    width: 100%;
+}
+
+#modalWarning {
+    background-color: var(--warning-font-color);
+}
+
+#modalError {
+    background-color: var(--warning-font-color);
+}
+
+#modalWarning a, #modalError a {
+    text-decoration: underline;
+}
+
+
+#modalToolbar {
+    display: grid;
+    align-items: center;
+    grid-template-columns: 1fr minmax(auto, max-content);
+    background-color: var(--background-secondary-color);
+    border-bottom: 1px solid #44495e;
+}
+
+#closeModal {
+    font-size: 1.6em;
+    font-weight: bold;
+    padding-right: .4em;
+}
+
+#modalTitle {
+    padding-left: .7em;
+    font-size: .9em;
+    font-weight: bold;
+}
+
+#closeModal:hover,
+#closeModal:focus {
+    color: var(--warning-font-color);
+    text-decoration: none;
+    cursor: pointer;
+}
