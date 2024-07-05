@@ -22,6 +22,10 @@
         font-size: 1.2em;
     }
 
+    #setupForm input {
+        background-color: #FFFFFF;
+    }
+
     #setupForm input:not([type="submit"]) {
         width: 100%
     }

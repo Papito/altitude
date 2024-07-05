@@ -1,7 +1,28 @@
-I am a folder modal
+<style>
+    #addFolder input {
+        width: 100%;
+    }
+</style>
+
+<form action="#"
+      id="addFolder"
+      hx-swap="outerHTML"
+      hx-post="/htmx/folder/add"
+      hx-target="#folderList"
+      hx-trigger="submit"
+      hx-ext="json-enc">
+
+    <label for="folderName"></label>
+    <input type="text"
+           id="folderName"
+           name="folderName"
+           autocomplete="off"
+           placeholder="Folder name"
+           maxlength=250>
+</form>
 
 <%@ val minWidth: Int %>
 <%@ val title: String %>
 <script lang="js" type="module">
-    showModal({minWidthPx: "<%= minWidth %>", title: "<%= title %>"})
+    showModal({minWidthPx: "${minWidth}", title: "${title}"})
 </script>
