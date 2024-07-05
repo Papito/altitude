@@ -81,6 +81,10 @@
             max-width: 100%;
         }
 
+        .cell {
+            margin: 3px;
+            border: 1px solid #837c7c;
+        }
         .cell img {
             display: block;
         }
@@ -125,8 +129,8 @@
             #for (idx <- 0 to results.records.length - 1)
                 <div class="cell">
                     <% val asset: Asset = results.records(idx) %>
-                    <img src="/<%= Const.DataStore.CONTENT %>/<%= Const.DataStore.PREVIEW %>/<%= asset.persistedId %>"
-                         alt = "<%= asset.fileName %>"
+                    <img src="/${ Const.DataStore.CONTENT }/${ Const.DataStore.PREVIEW }/${ asset.persistedId }"
+                         alt = "${ asset.fileName }"
                          class="responsive-image"/>
                 </div>
             #end
