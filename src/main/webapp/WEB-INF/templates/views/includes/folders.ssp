@@ -1,7 +1,0 @@
-<button id="showAddFolder"
-        hx-get="/htmx/modals/add-folder"
-        hx-swap-oob="innerHTML"
-        hx-vals='{"minWidth": 400}'
-        hx-target="#modalContent">Add folder</button>
-
-${include("../htmx/folder_list.ssp")}

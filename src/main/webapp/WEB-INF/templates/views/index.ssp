@@ -118,7 +118,7 @@
 
     <div id="browser" class="split content split-horizontal">
         <div id="folders" class="split content">
-            ${include("includes/folders.ssp")}
+            ${include("htmx/folders.ssp")}
         </div>
         <div id="albums" class="split content">
         </div>

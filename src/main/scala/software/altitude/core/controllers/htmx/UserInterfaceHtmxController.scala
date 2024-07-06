@@ -69,7 +69,7 @@ class UserInterfaceHtmxController extends BaseHtmxController{
     val firstLevelFolders: List[Folder] = app.service.folder.immediateChildren(repo.rootFolderId)
 
     halt(200,
-      ssp("htmx/folder_list.ssp", "folders" -> firstLevelFolders)
+      ssp("htmx/folders.ssp", "folders" -> firstLevelFolders)
     )
   }
 
