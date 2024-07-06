@@ -1,14 +1,16 @@
 package software.altitude.core.controllers.htmx
 
 import play.api.libs.json.JsObject
-import software.altitude.core.{DataScrubber, RequestContext, ValidationException, Const => C}
+import software.altitude.core.DataScrubber
+import software.altitude.core.DuplicateException
+import software.altitude.core.RequestContext
+import software.altitude.core.ValidationException
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.BaseHtmxController
 import software.altitude.core.models.Folder
+import software.altitude.core.{Const => C}
 
 class UserInterfaceHtmxController extends BaseHtmxController{
-
-  private val FOLDER_MODAL_MIN_WIDTH = 400
 
   get("/modals/add-folder") {
     ssp("htmx/add_folder_modal",
@@ -34,27 +36,35 @@ class UserInterfaceHtmxController extends BaseHtmxController{
 
     val jsonIn: JsObject = dataScrubber.scrub(unscrubbedReqJson.get)
 
+    def haltWithValidationErrors(errors: Map[String, String]): Unit = {
+      halt(200,
+        ssp(
+          "htmx/add_folder_modal",
+          "minWidth" -> C.UI.ADD_FOLDER_MODAL_MIN_WIDTH,
+          "title" -> C.UI.ADD_FOLDER_MODAL_TITLE,
+          "fieldErrors" -> errors,
+          "formJson" -> jsonIn),
+        // we want to change the folder modal to show the errors, not reload the folder list!
+        headers=Map("HX-Retarget" -> "this", "HX-Reswap" -> "innerHTML")
+      )
+    }
+
     try {
       apiRequestValidator.validate(jsonIn)
     } catch {
       case validationException: ValidationException =>
-        println(validationException.errors.toMap)
-        halt(200,
-          ssp(
-          "htmx/add_folder_modal",
-          "minWidth" -> C.UI.ADD_FOLDER_MODAL_MIN_WIDTH,
-          "title" -> C.UI.ADD_FOLDER_MODAL_TITLE,
-          "fieldErrors" -> validationException.errors.toMap,
-          "formJson" -> jsonIn),
-          // we want to change the folder modal to show the errors, not reload the folder list!
-          headers=Map("HX-Retarget" -> "this", "HX-Reswap" -> "innerHTML")
-        )
+        haltWithValidationErrors(validationException.errors.toMap)
     }
 
     val repo = RequestContext.getRepository
-
     val folderName = (jsonIn \ C.Api.Folder.NAME).as[String]
-    app.service.library.addFolder(folderName)
+
+    try {
+      app.service.library.addFolder(folderName)
+    } catch {
+      case _: DuplicateException =>
+        haltWithValidationErrors(Map(C.Api.Folder.NAME -> "Folder name already exists."))
+    }
 
     val firstLevelFolders: List[Folder] = app.service.folder.immediateChildren(repo.rootFolderId)
 

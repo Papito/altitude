@@ -4,7 +4,8 @@ import org.scalatra.ContentEncodingSupport
 import org.scalatra.InternalServerError
 import org.scalatra.ScalatraServlet
 import org.slf4j.MDC
-import software.altitude.core.{AltitudeServletContext, Const}
+import software.altitude.core.AltitudeServletContext
+import software.altitude.core.Const
 import software.altitude.core.auth.AuthenticationSupport
 import software.altitude.core.models.Repository
 import software.altitude.core.models.User

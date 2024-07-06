@@ -14,18 +14,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
    */
   override def add(folder: Folder, queryForDup: Option[Query] = None): JsObject = {
     txManager.withTransaction[JsObject] {
-      val dupQuery = new Query(params = Map(
-        C.Folder.PARENT_ID -> folder.parentId,
-        C.Folder.NAME_LC -> folder.nameLowercase))
-
-      try {
-        super.add(folder, Some(dupQuery))
-      } catch {
-        case _: DuplicateException =>
-          val ex = ValidationException()
-          ex.errors += (C.Folder.NAME -> C.Msg.Err.DUPLICATE)
-          throw ex
-      }
+      super.add(folder)
     }
   }
 

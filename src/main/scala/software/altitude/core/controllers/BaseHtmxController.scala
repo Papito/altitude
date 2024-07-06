@@ -2,13 +2,9 @@ package software.altitude.core.controllers
 
 import org.scalatra._
 import org.scalatra.scalate.ScalateSupport
-import play.api.libs.json.JsNull
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import software.altitude.core.DataScrubber
-import software.altitude.core.NotFoundException
 import software.altitude.core.ValidationException
-import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.{Const => C}
 
 import java.lang.System.currentTimeMillis
@@ -43,35 +39,6 @@ class BaseHtmxController extends BaseController with ScalateSupport {
     if (List("post", "put").contains(requestMethod) && request.body.isEmpty) {
       throw ValidationException(C.Msg.Err.EMPTY_REQUEST_BODY)
     }
-  }
-
-  def scrubAndValidatedJson(scrubber: DataScrubber = DataScrubber(),
-                            validator: ApiRequestValidator): JsObject = {
-    val scrubbedJson = scrubber.scrub(unscrubbedReqJson.get)
-    validator.validate(scrubbedJson)
-    scrubbedJson
-  }
-
-  error {
-    case ex: ValidationException =>
-      val jsonErrors = ex.errors.keys.foldLeft(Json.obj()) { (res, field) => {
-        val key = field
-        res ++ Json.obj(key -> ex.errors(key))
-      }
-      }
-
-      BadRequest(Json.obj(
-        C.Api.VALIDATION_ERROR -> ex.message,
-        C.Api.VALIDATION_ERRORS -> (if (ex.errors.isEmpty) JsNull else jsonErrors)
-      ))
-    case _: NotFoundException =>
-      NotFound(Json.obj())
-    case ex: Exception =>
-      val strStacktrace = software.altitude.core.Util.logStacktrace(ex)
-
-      InternalServerError(Json.obj(
-        C.Api.ERROR -> (if (ex.getMessage != null) ex.getMessage else ex.getClass.getName),
-        C.Api.STACKTRACE -> strStacktrace))
   }
 
   override def setUser(): Unit = {

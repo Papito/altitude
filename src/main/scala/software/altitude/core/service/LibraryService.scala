@@ -1,7 +1,8 @@
 package software.altitude.core.service
 
 import com.drew.imaging.ImageMetadataReader
-import com.drew.metadata.exif.{ExifDirectoryBase, ExifIFD0Directory}
+import com.drew.metadata.exif.ExifDirectoryBase
+import com.drew.metadata.exif.ExifIFD0Directory
 import org.imgscalr.Scalr
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -18,9 +19,13 @@ import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchResult
 import software.altitude.core.{Const => C, _}
 
-import java.awt.{AlphaComposite, Color, Graphics2D}
+import java.awt.AlphaComposite
+import java.awt.Color
+import java.awt.Graphics2D
 import java.awt.geom.AffineTransform
-import java.awt.image.{AffineTransformOp, BufferedImage, ColorModel}
+import java.awt.image.AffineTransformOp
+import java.awt.image.BufferedImage
+import java.awt.image.ColorModel
 import java.io._
 import javax.imageio.ImageIO
 
@@ -52,8 +57,7 @@ class LibraryService(val app: Altitude) {
 
       if (existing.nonEmpty) {
         logger.debug(s"Duplicate found for [$assetIn] and checksum: ${assetIn.checksum}")
-        val existingAsset: Asset = existing.get
-        throw DuplicateException(existingAsset.persistedId)
+        throw DuplicateException()
       }
 
       /**
@@ -469,7 +473,7 @@ class LibraryService(val app: Altitude) {
       val existing = getByChecksum(asset.checksum)
 
       if (existing.isDefined) {
-        throw DuplicateException(existingAssetId = existing.get.persistedId)
+        throw DuplicateException()
       }
 
       txManager.withTransaction {

@@ -7,6 +7,7 @@ import org.scalatest.matchers.must.Matchers.equal
 import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
+import software.altitude.core.DuplicateException
 import software.altitude.core.IllegalOperationException
 import software.altitude.core.NotFoundException
 import software.altitude.core.RequestContext
@@ -108,9 +109,13 @@ import software.altitude.test.core.IntegrationTestCore
   test("Adding a duplicate folder under the same parent should fail") {
     val folder: Folder = testApp.service.library.addFolder("folder1")
 
-    intercept[ValidationException] {
+    commit()
+
+    intercept[DuplicateException] {
       testApp.service.library.addFolder(folder.name)
     }
+
+    rollback()
 
     val folders = testApp.service.folder.hierarchy()
     folders.length shouldBe 1
