@@ -244,7 +244,7 @@ object Const {
       }
     }
 
-    object Fields {
+    object Setup {
       val ADMIN_EMAIL = "adminEmail"
       val REPOSITORY_NAME = "repositoryName"
       val PASSWORD = "password"
@@ -260,6 +260,14 @@ object Const {
 
       val MAX_REPOSITORY_NAME_LENGTH = 80
       val MIN_REPOSITORY_NAME_LENGTH = 2
+
+      val MAX_FOLDER_NAME_LENGTH = 250
+      val MIN_FOLDER_NAME_LENGTH = 1
     }
+  }
+
+  object UI {
+    val ADD_FOLDER_MODAL_TITLE = "Add a folder"
+    val ADD_FOLDER_MODAL_MIN_WIDTH = 400
   }
 }

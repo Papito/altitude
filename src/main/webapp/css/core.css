@@ -5,6 +5,7 @@
     --form-border: 2px solid #646161;
     --modal-border: 3px solid rgba(129, 128, 128, 0.98);
     --modal-background-color: #3b3b3b;
+    --form-error-border: 2px solid var(--error-color);
     --panel-border-color: #343434;
     --navbar-border: 2px solid #272727;
     --navbar-text-shadow: rgba(0,0,0,0.75) 0 1px;
@@ -81,6 +82,16 @@ input, textarea {
 
 input.readonly {
     background-color: #ada8a8;
+}
+
+form div.error {
+    color: var(--error-font-color);
+    padding: 5px;
+}
+
+form input.error, form input.error:focus {
+    border: var(--form-error-border);
+    outline: none !important;
 }
 
 /*         */

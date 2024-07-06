@@ -4,5 +4,4 @@
         hx-vals='{"minWidth": 400}'
         hx-target="#modalContent">Add folder</button>
 
-<div id="folderList">
-</div>
+${include("../htmx/folder_list.ssp")}

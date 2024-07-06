@@ -1,9 +1,10 @@
 package software.altitude.core.controllers.web
 
 import software.altitude.core.controllers.BaseWebController
+import software.altitude.core.models.Folder
 import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchResult
-import software.altitude.core.{Const => C}
+import software.altitude.core.{RequestContext, Const => C}
 
 class IndexController extends BaseWebController {
 
@@ -24,11 +25,15 @@ class IndexController extends BaseWebController {
 
     val results: SearchResult = app.service.library.search(q)
 
-    println(results.total)
+    val repo = RequestContext.getRepository
+    val firstLevelFolders: List[Folder] = app.service.folder.immediateChildren(repo.rootFolderId)
+
+    println("=== Folders", firstLevelFolders.length)
 
     layoutTemplate(
       "/WEB-INF/templates/views/index.ssp",
         "results" -> results,
+        "folders" -> firstLevelFolders
     )
   }
 
