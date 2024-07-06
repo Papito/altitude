@@ -68,7 +68,7 @@
     <% val rootFolderId = RequestContext.getRepository.rootFolderId %>
     <div class="folder root" id="${rootFolderId}">
         <div class="controls">
-            <i class="fas fa-folder-minus"></i>
+            <i class="fas fa-folder"></i>
             <div class="menu-ctrl">
                 <a href="#"
                    hx-get="/htmx/folder/context-menu"
