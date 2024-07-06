@@ -37,13 +37,12 @@
     }
 
 
-    .folder .controls .menu {
+    .folder .menu-ctrl {
         display: grid;
-        place-items: center;
         padding-left: 4px;
     }
 
-    .folder .controls .menu a {
+    .folder .menu-ctrl a {
         font-size: 1.3em;
         color: #FFFFFF;
         text-decoration: none;
@@ -57,13 +56,30 @@
         color: var(--success-font-color);
     }
 
+    .folder .menu {
+        padding: 6px 6px;
+        display: none;
+        flex-wrap: wrap;
+        gap: 5px;
+        background-color: var(--form-background-color);
+    }
+
+    .folder .menu span {
+        display: flex;
+        padding: 3px 6px;
+        cursor: pointer;
+        border: 1px solid gray;
+        border-radius: 5px;
+        font-size: .9em;
+    }
+
 </style>
 
 <div id="rootFolderList" class="folder-list">
     <div class="folder root" id="${RequestContext.getRepository.rootFolderId}">
         <div class="controls">
             <i class="fas fa-folder-minus"></i>
-            <div class="menu">
+            <div class="menu-ctrl">
                 <a href="">&#10247;</a>
             </div>
             <span>/ Root</span>
@@ -73,13 +89,22 @@
             #for (idx <- 0 to folders.length - 1)
 
                 <% val folder: Folder = folders(idx) %>
-                <div class="folder" id="${folder.persistedId}">
+                <div class="folder" id="folder-${folder.persistedId}">
                     <div class="controls">
                         <i class="fas fa-folder-plus"></i>
-                        <div class="menu">
-                            <a href="">&#10247;</a>
+                        <div class="menu-ctrl">
+                            <div>
+                                <a href="#"
+                                   hx-get="/htmx/folder/context-menu"
+                                   hx-swap="innerHTML"
+                                   hx-target="#menu-${folder.persistedId}"
+                                   hx-vals='{"folderId": "${folder.persistedId}"}'
+                                   hx-trigger="click">&#10247;</a>
+                            </div>
                         </div>
                         <span>${folder.name}</span>
+                    </div>
+                    <div class="menu" id="menu-${folder.persistedId}">
                     </div>
                     <div class="children">
                     </div>
@@ -93,6 +118,47 @@
 </div>
 
 <script lang="js" type="module">
+
+    /**
+     * A hacky but effective way to "close" the menu - if it's open before we even trip to the
+     * server, then we just remove it and prevent the request from going out, like total bosses.
+     */
+    htmx.find("#rootFolderList").addEventListener('htmx:beforeRequest', function(evt) {
+        if (evt.detail.pathInfo.requestPath  !== "/htmx/folder/context-menu") {
+            return
+        }
+
+        const isMenuExpanded = evt.detail.target.querySelector("span") !== null
+
+        if (isMenuExpanded) {
+            evt.preventDefault()
+            evt.detail.target.innerHTML = ""
+            evt.detail.target.style.display = "none"
+        } else {
+            /**
+             * The request will go out, so let's go full Kon Mari on the open menus because
+             * they do not bring us joy.
+             */
+            const openMenus = document.querySelectorAll("#rootFolderList .menu")
+
+            openMenus.forEach(menu => {
+                menu.innerHTML = ""
+                menu.style.display = "none"
+            })
+        }
+
+    });
+
+    htmx.find("#rootFolderList").addEventListener('htmx:afterRequest', function(evt) {
+        if (evt.detail.pathInfo.requestPath  !== "/htmx/folder/context-menu") {
+            return
+        }
+
+        if (evt.detail.successful === true) {
+            evt.detail.target.style.display = "flex"
+        }
+    });
+
     // This fragment is loaded after the "add folder" modal is successful
     closeModal()
 </script>

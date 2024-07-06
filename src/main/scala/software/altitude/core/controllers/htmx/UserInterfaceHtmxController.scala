@@ -73,6 +73,16 @@ class UserInterfaceHtmxController extends BaseHtmxController{
     )
   }
 
+  /**
+   * WARNING - the closing of a context menu is done via JS beforeRequest event, and it looks
+   * for this *URL*, so changing this will break the CLOSE functionality.
+   */
+  get("/folder/context-menu") {
+    val folderId: String = params.get("folderId").get
+
+    ssp("htmx/folder_context_menu", "folderId" -> folderId)
+  }
+
   // This just clears the body of the modal
   get("/close-modal") {
     ssp("htmx/close_modal")

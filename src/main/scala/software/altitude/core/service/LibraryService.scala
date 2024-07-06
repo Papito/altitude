@@ -268,9 +268,9 @@ class LibraryService(val app: Altitude) {
 
       val destinationImage = op.createCompatibleDestImage(scaledImage, colorModel)
 
-      val g = destinationImage.createGraphics()
-      g.setBackground(Color.WHITE)
-      g.clearRect(0, 0, destinationImage.getWidth, destinationImage.getHeight)
+      val graphics = destinationImage.createGraphics()
+      graphics.setBackground(Color.WHITE)
+      graphics.clearRect(0, 0, destinationImage.getWidth, destinationImage.getHeight)
       val rotationCorrectScaledImage = op.filter(scaledImage, destinationImage)
 
       val compositeImage: BufferedImage =
@@ -290,6 +290,7 @@ class LibraryService(val app: Altitude) {
       G2D.drawImage(rotationCorrectScaledImage, x, y, null)
       val byteArray: ByteArrayOutputStream = new ByteArrayOutputStream
       ImageIO.write(compositeImage, "png", byteArray)
+      graphics.dispose()
 
       byteArray.toByteArray
 
