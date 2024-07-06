@@ -220,10 +220,10 @@ object Const {
       val HIERARCHY = "hierarchy"
       val FOLDERS = "folders"
       val FOLDER = "folder"
-      val ASSET_IDS = "asset_ids"
+      val ASSET_IDS = "assetIds"
       val PATH = "path"
       val NAME = "name"
-      val PARENT_ID = "parent_id"
+      val PARENT_ID = "parentId"
     }
 
     object Trash {

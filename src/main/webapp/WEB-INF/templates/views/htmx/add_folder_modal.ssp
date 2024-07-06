@@ -4,6 +4,7 @@
 
 <%@ val fieldErrors: Map[String, String] = Map.empty %>
 <%@ val formJson: JsObject = Json.obj() %>
+<%@ val parentId: String %>
 
 <style>
     #addFolder input {
@@ -13,9 +14,9 @@
 
 <form action="#"
       id="addFolder"
-      hx-swap="outerHTML"
+      hx-swap="innerHTML"
       hx-post="/htmx/folder/add"
-      hx-target="#folderList"
+      hx-target="#children-${parentId}"
       hx-trigger="submit"
       hx-ext="json-enc">
 
@@ -37,6 +38,7 @@
                maxlength="${ Const.Api.Constraints.MAX_FOLDER_NAME_LENGTH }"
                minlength="${ Const.Api.Constraints.MIN_FOLDER_NAME_LENGTH }">
 
+        <input type="hidden" name="${ Const.Api.Folder.PARENT_ID }" value="${ parentId }">
     </div>
 </form>
 
@@ -45,4 +47,11 @@
 <script lang="js" type="module">
     showModal({minWidthPx: "${minWidth}", title: "${title}"})
     htmx.find("#field${ Const.Api.Folder.NAME }").focus()
+
+    htmx.find("#addFolder").addEventListener('htmx:afterRequest', function(evt) {
+        if (evt.detail.successful === true) {
+            closeModal()
+        }
+    });
+
 </script>

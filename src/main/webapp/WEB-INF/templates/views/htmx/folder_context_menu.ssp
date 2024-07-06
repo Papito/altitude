@@ -1,15 +1,23 @@
-<span>
-    New folder here
+#import(software.altitude.core.RequestContext)
+
+<% val rootFolderId = RequestContext.getRepository.rootFolderId %>
+<%@ val folderId: String %>
+
+<span hx-get="/htmx/modals/add-folder"
+      hx-target="#modalContent"
+      hx-vals='{"minWidth": 400, "parentId": "${folderId}"}'
+      hx-trigger="click">
+    Add folder
 </span>
-<span>
-    Move all assets
-</span>
-<span>
-    Rename
-</span>
-<span>
-    Move folder
-</span>
-<span>
-    Delete
-</span>
+
+#if (folderId != rootFolderId)
+    <span>
+        Rename
+    </span>
+    <span>
+        Move
+    </span>
+    <span>
+        Delete
+    </span>
+#end

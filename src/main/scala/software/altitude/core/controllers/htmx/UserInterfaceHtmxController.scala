@@ -3,7 +3,6 @@ package software.altitude.core.controllers.htmx
 import play.api.libs.json.JsObject
 import software.altitude.core.DataScrubber
 import software.altitude.core.DuplicateException
-import software.altitude.core.RequestContext
 import software.altitude.core.ValidationException
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.BaseHtmxController
@@ -13,9 +12,12 @@ import software.altitude.core.{Const => C}
 class UserInterfaceHtmxController extends BaseHtmxController{
 
   get("/modals/add-folder") {
+    val parentId: String = params.get(C.Api.Folder.PARENT_ID).get
+
     ssp("htmx/add_folder_modal",
       "minWidth" -> C.UI.ADD_FOLDER_MODAL_MIN_WIDTH,
-      "title" -> C.UI.ADD_FOLDER_MODAL_TITLE)
+      "title" -> C.UI.ADD_FOLDER_MODAL_TITLE,
+      C.Api.Folder.PARENT_ID -> parentId)
   }
 
   post("/folder/add") {
@@ -25,7 +27,7 @@ class UserInterfaceHtmxController extends BaseHtmxController{
 
     val apiRequestValidator = ApiRequestValidator(
       required = List(
-        C.Api.Folder.NAME),
+        C.Api.Folder.NAME, C.Api.Folder.PARENT_ID),
       maxLengths = Map(
         C.Api.Folder.NAME -> C.Api.Constraints.MAX_FOLDER_NAME_LENGTH,
       ),
@@ -36,14 +38,16 @@ class UserInterfaceHtmxController extends BaseHtmxController{
 
     val jsonIn: JsObject = dataScrubber.scrub(unscrubbedReqJson.get)
 
-    def haltWithValidationErrors(errors: Map[String, String]): Unit = {
+    def haltWithValidationErrors(errors: Map[String, String], parentId: String): Unit = {
       halt(200,
         ssp(
           "htmx/add_folder_modal",
           "minWidth" -> C.UI.ADD_FOLDER_MODAL_MIN_WIDTH,
           "title" -> C.UI.ADD_FOLDER_MODAL_TITLE,
           "fieldErrors" -> errors,
-          "formJson" -> jsonIn),
+          "formJson" -> jsonIn,
+          C.Api.Folder.PARENT_ID -> parentId
+        ),
         // we want to change the folder modal to show the errors, not reload the folder list!
         headers=Map("HX-Retarget" -> "this", "HX-Reswap" -> "innerHTML")
       )
@@ -53,23 +57,26 @@ class UserInterfaceHtmxController extends BaseHtmxController{
       apiRequestValidator.validate(jsonIn)
     } catch {
       case validationException: ValidationException =>
-        haltWithValidationErrors(validationException.errors.toMap)
+        haltWithValidationErrors(
+          validationException.errors.toMap,
+          parentId = (jsonIn \ C.Api.Folder.PARENT_ID).as[String])
     }
 
-    val repo = RequestContext.getRepository
     val folderName = (jsonIn \ C.Api.Folder.NAME).as[String]
+    val parentId = (jsonIn \ C.Api.Folder.PARENT_ID).as[String]
 
     try {
-      app.service.library.addFolder(folderName)
+      app.service.library.addFolder(folderName, parentId = Some(parentId))
     } catch {
       case _: DuplicateException =>
-        haltWithValidationErrors(Map(C.Api.Folder.NAME -> "Folder name already exists."))
+        haltWithValidationErrors(Map(C.Api.Folder.NAME -> "Folder name already exists."), parentId = parentId)
     }
 
-    val firstLevelFolders: List[Folder] = app.service.folder.immediateChildren(repo.rootFolderId)
+    val childFolders: List[Folder] = app.service.folder.immediateChildren(parentId)
 
     halt(200,
-      ssp("htmx/folders.ssp", "folders" -> firstLevelFolders)
+      ssp("htmx/folder_children.ssp",
+        "folders" -> childFolders)
     )
   }
 
@@ -80,7 +87,16 @@ class UserInterfaceHtmxController extends BaseHtmxController{
   get("/folder/context-menu") {
     val folderId: String = params.get("folderId").get
 
-    ssp("htmx/folder_context_menu", "folderId" -> folderId)
+    ssp("htmx/folder_context_menu",
+      "folderId" -> folderId)
+  }
+
+  get("/folder/children") {
+    val parentId: String = params.get(C.Api.Folder.PARENT_ID).get
+    val childFolders: List[Folder] = app.service.folder.immediateChildren(parentId)
+
+    ssp("htmx/folder_children",
+      "folders" -> childFolders)
   }
 
   // This just clears the body of the modal

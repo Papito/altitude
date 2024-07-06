@@ -1,28 +1,15 @@
-#import(software.altitude.core.AltitudeServletContext)
-#import(software.altitude.core.models.Folder)
 #import(software.altitude.core.RequestContext)
 
-<button id="showAddFolder"
-        hx-get="/htmx/modals/add-folder"
-        hx-swap-oob="innerHTML"
-        hx-vals='{"minWidth": 400}'
-        hx-target="#modalContent">Add folder</button>
-
-<%@ val folders: List[Folder] %>
-
 <style>
-    .folder.root {
-    }
-
     .folder.root, .folder-list .children {
         display: grid;
         grid-auto-rows: auto;
-        grid-row-gap: 6px;
+        grid-row-gap: 4px;
     }
 
     .folder .children {
         position: relative;
-        margin-left: 8px;
+        margin-left: 12px;
     }
 
     .folder {
@@ -33,13 +20,15 @@
 
     .folder .controls {
         display: grid;
-        grid-template-columns: max-content 20px 1fr;
+        grid-template-columns: max-content 25px 1fr;
+        align-items: center;
     }
 
 
     .folder .menu-ctrl {
         display: grid;
-        padding-left: 4px;
+        padding-left: 6px;
+        place-items: center;
     }
 
     .folder .menu-ctrl a {
@@ -57,8 +46,8 @@
     }
 
     .folder .menu {
-        padding: 6px 6px;
         display: none;
+        padding: 6px 6px 10px 6px;
         flex-wrap: wrap;
         gap: 5px;
         background-color: var(--form-background-color);
@@ -76,42 +65,28 @@
 </style>
 
 <div id="rootFolderList" class="folder-list">
-    <div class="folder root" id="${RequestContext.getRepository.rootFolderId}">
+    <% val rootFolderId = RequestContext.getRepository.rootFolderId %>
+    <div class="folder root" id="${rootFolderId}">
         <div class="controls">
             <i class="fas fa-folder-minus"></i>
             <div class="menu-ctrl">
-                <a href="">&#10247;</a>
+                <a href="#"
+                   hx-get="/htmx/folder/context-menu"
+                   hx-swap="innerHTML"
+                   hx-target="#menu-${rootFolderId}"
+                   hx-vals='{"folderId": "${rootFolderId}"}'
+                   hx-trigger="click">&#10247;</a>
             </div>
-            <span>/ Root</span>
+            <span>Root /</span>
         </div>
+        <div class="menu" id="menu-${rootFolderId}"></div>
 
-        <div class="children">
-            #for (idx <- 0 to folders.length - 1)
-
-                <% val folder: Folder = folders(idx) %>
-                <div class="folder" id="folder-${folder.persistedId}">
-                    <div class="controls">
-                        <i class="fas fa-folder-plus"></i>
-                        <div class="menu-ctrl">
-                            <div>
-                                <a href="#"
-                                   hx-get="/htmx/folder/context-menu"
-                                   hx-swap="innerHTML"
-                                   hx-target="#menu-${folder.persistedId}"
-                                   hx-vals='{"folderId": "${folder.persistedId}"}'
-                                   hx-trigger="click">&#10247;</a>
-                            </div>
-                        </div>
-                        <span>${folder.name}</span>
-                    </div>
-                    <div class="menu" id="menu-${folder.persistedId}">
-                    </div>
-                    <div class="children">
-                    </div>
-                </div>
-
-            #end
-
+        <div class="children"
+             id="children-${rootFolderId}"
+             hx-swap="innerHTML"
+             hx-get="/htmx/folder/children"
+             hx-vals='{"parentId": "${rootFolderId}"}'
+             hx-trigger="load">
         </div>
 
     </div>
@@ -136,8 +111,8 @@
             evt.detail.target.style.display = "none"
         } else {
             /**
-             * The request will go out, so let's go full Kon Mari on the open menus because
-             * they do not bring us joy.
+             * The request for the context meny will go out, so let's go full Marie Kondo
+             * on the open menus because they do not bring us JOY.
              */
             const openMenus = document.querySelectorAll("#rootFolderList .menu")
 
@@ -159,6 +134,4 @@
         }
     });
 
-    // This fragment is loaded after the "add folder" modal is successful
-    closeModal()
 </script>

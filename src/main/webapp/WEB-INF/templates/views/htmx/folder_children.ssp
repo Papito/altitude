@@ -1,0 +1,27 @@
+#import(software.altitude.core.models.Folder)
+
+<%@ val folders: List[Folder] %>
+
+#for (idx <- 0 to folders.length - 1)
+
+<% val folder: Folder = folders(idx) %>
+<div class="folder" id="folder-${folder.persistedId}">
+    <div class="controls">
+        <i class="fas fa-folder-plus"></i>
+        <div class="menu-ctrl">
+            <div>
+                <a href="#"
+                   hx-get="/htmx/folder/context-menu"
+                   hx-swap="innerHTML"
+                   hx-target="#menu-${folder.persistedId}"
+                   hx-vals='{"folderId": "${folder.persistedId}"}'
+                   hx-trigger="click">&#10247;</a>
+            </div>
+        </div>
+        <span>${folder.name}</span>
+    </div>
+    <div class="menu" id="menu-${folder.persistedId}"></div>
+    <div class="children" id="children-${folder.persistedId}"></div>
+</div>
+
+#end
