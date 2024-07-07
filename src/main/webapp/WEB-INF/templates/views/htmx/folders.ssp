@@ -290,7 +290,6 @@
             event.relatedTarget.classList.remove('can-drop')
         },
         ondrop: function (event) {
-            console.log("DROPPED")
             const draggableElement = event.relatedTarget
             const dropzoneElement = event.target
 

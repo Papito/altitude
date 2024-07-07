@@ -44,7 +44,7 @@ class UserInterfaceHtmxController extends BaseHtmxController{
         C.Api.Folder.NAME -> C.Api.Constraints.MAX_FOLDER_NAME_LENGTH,
       ),
       minLengths = Map(
-        C.Api.Folder.NAME -> C.Api.Constraints.MIN_REPOSITORY_NAME_LENGTH,
+        C.Api.Folder.NAME -> C.Api.Constraints.MIN_FOLDER_NAME_LENGTH,
       ),
     )
 
