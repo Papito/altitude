@@ -5,6 +5,8 @@
 <%@ val fieldErrors: Map[String, String] = Map.empty %>
 <%@ val formJson: JsObject = Json.obj() %>
 <%@ val id: String %>
+<%@ val existingName: Option[String] = None %>
+<% val name: Option[String] = (formJson \ Const.Api.Folder.NAME).asOpt[String] %>
 
 <style>
     #renameFolder input {
@@ -28,12 +30,19 @@
         <label for="${ Const.Api.Folder.NAME }"></label>
         <input type="text"
                id="field-${ Const.Api.Folder.NAME }"
-               #if (fieldErrors.contains(Const.Api.Folder.NAME))
-               class="error"
-               #end
                name="${ Const.Api.Folder.NAME }"
                autocomplete="off"
-               value='<%= (formJson \ Const.Api.Folder.NAME).asOpt[String].getOrElse("") %>'
+
+               #if (fieldErrors.contains(Const.Api.Folder.NAME))
+                class="error"
+               #end
+
+               #if (name.isDefined)
+                value="${ name.get }"
+               #else
+                value="${ existingName }"
+               #end
+
                placeholder="New folder name"
                maxlength="${ Const.Api.Constraints.MAX_FOLDER_NAME_LENGTH }"
                minlength="${ Const.Api.Constraints.MIN_FOLDER_NAME_LENGTH }">

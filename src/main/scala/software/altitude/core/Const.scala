@@ -223,6 +223,7 @@ object Const {
       val ASSET_IDS = "assetIds"
       val PATH = "path"
       val NAME = "name"
+      val EXISTING_NAME = "existingName"
       val PARENT_ID = "parentId"
     }
 

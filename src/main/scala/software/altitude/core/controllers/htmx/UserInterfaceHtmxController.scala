@@ -11,11 +11,6 @@ import software.altitude.core.{Const => C}
 
 class UserInterfaceHtmxController extends BaseHtmxController{
 
-  private val folderDataScrubber = DataScrubber(
-    trim = List(C.Api.Folder.NAME),
-  )
-
-
   get("/modals/add-folder") {
     val parentId: String = params.get(C.Api.Folder.PARENT_ID).get
 
@@ -28,13 +23,20 @@ class UserInterfaceHtmxController extends BaseHtmxController{
   get("/modals/rename-folder") {
     val folderId: String = params.get(C.Api.ID).get
 
+    val folder: Folder = app.service.folder.getById(folderId)
+
     ssp("htmx/rename_folder_modal",
       "minWidth" -> C.UI.RENAME_FOLDER_MODAL_MIN_WIDTH,
       "title" -> C.UI.RENAME_FOLDER_MODAL_TITLE,
+      C.Api.Folder.EXISTING_NAME -> Some(folder.name),
       C.Api.ID -> folderId)
   }
 
   post("/folder/add") {
+    val dataScrubber = DataScrubber(
+      trim = List(C.Api.Folder.NAME),
+    )
+
     val apiRequestValidator = ApiRequestValidator(
       required = List(
         C.Api.Folder.NAME, C.Api.Folder.PARENT_ID),
@@ -46,7 +48,7 @@ class UserInterfaceHtmxController extends BaseHtmxController{
       ),
     )
 
-    val jsonIn: JsObject = folderDataScrubber.scrub(unscrubbedReqJson.get)
+    val jsonIn: JsObject = dataScrubber.scrub(unscrubbedReqJson.get)
 
     def haltWithValidationErrors(errors: Map[String, String], parentId: String): Unit = {
       halt(200,
@@ -91,6 +93,10 @@ class UserInterfaceHtmxController extends BaseHtmxController{
   }
 
   put("/folder/rename") {
+    val dataScrubber = DataScrubber(
+      trim = List(C.Api.Folder.NAME),
+    )
+
     val apiRequestValidator = ApiRequestValidator(
       required = List(
         C.Api.Folder.NAME, C.Api.ID),
@@ -102,7 +108,7 @@ class UserInterfaceHtmxController extends BaseHtmxController{
       ),
     )
 
-    val jsonIn: JsObject = folderDataScrubber.scrub(unscrubbedReqJson.get)
+    val jsonIn: JsObject = dataScrubber.scrub(unscrubbedReqJson.get)
 
     def haltWithValidationErrors(errors: Map[String, String], folderId: String): Unit = {
       halt(200,
@@ -135,7 +141,8 @@ class UserInterfaceHtmxController extends BaseHtmxController{
       app.service.library.renameFolder(folderId=folderId, newName=newName)
     } catch {
       case _: DuplicateException =>
-        haltWithValidationErrors(Map(C.Api.Folder.NAME -> "Folder name already exists at this level"), folderId = folderId)
+        haltWithValidationErrors(
+          Map(C.Api.Folder.NAME -> "Folder name already exists at this level"), folderId = folderId)
     }
 
     halt(200, newName)
