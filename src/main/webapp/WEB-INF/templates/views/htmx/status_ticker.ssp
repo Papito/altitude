@@ -10,12 +10,14 @@
     const tickerEl = htmx.find("#statusTicker")
 
     htmx.on('htmx:wsOpen', function(evt) {
-        console.log('WS connection is OPEN');
+        console.log('WS connection is OPEN')
     });
     htmx.on('htmx:wsClose', function(evt) {
-        console.log('WS connection is CLOSED');
+        console.log('WS connection is CLOSED')
     });
     htmx.on('htmx:wsAfterMessage', function(evt) {
+        console.log('wsAfterMessage')
+        console.log(evt)
         const statusTextEl = htmx.find("#statusText")
         // sometimes empty pings come through
         if (evt.detail.message) {
@@ -24,7 +26,7 @@
 
         setTimeout(function() {
             statusTextEl.innerHTML = ""
-            statusTextEl.style.display = 'none';
+            statusTextEl.style.display = 'none'
         }, 3000);
     });
 </script>
