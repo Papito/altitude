@@ -17,6 +17,23 @@ function closeModal() {
     htmx.find("#modalContainer").style.display = "none"
 }
 
+function clearInnerNodes(node) {
+    while (node.hasChildNodes()) {
+        clearNode(node.firstChild);
+    }
+}
+
+function clearNode(node) {
+    while (node.hasChildNodes()) {
+        clearNode(node.firstChild);
+    }
+    node.parentNode.removeChild(node);
+}
+
+
+/**
+ * Default action of the ESC key is to close the modal
+ */
 document.onkeydown = function(evt) {
     evt = evt || window.event
     let isEscape

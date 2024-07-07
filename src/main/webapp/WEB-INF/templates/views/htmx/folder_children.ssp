@@ -7,7 +7,14 @@
 <% val folder: Folder = folders(idx) %>
 <div class="folder" id="folder-${folder.persistedId}">
     <div class="controls">
-        <i class="fas fa-folder-plus"></i>
+
+        <a href="#" hx-swap="innerHTML"
+           hx-get="/htmx/folder/children"
+           hx-target="#children-${folder.persistedId}"
+           hx-vals='{"parentId": "${folder.persistedId}", "isRoot": false}'>
+           <i class="fas fa-folder-plus"></i>
+        </a>
+
         <div class="menu-ctrl">
             <div>
                 <a href="#"

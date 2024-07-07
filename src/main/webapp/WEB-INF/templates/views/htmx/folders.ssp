@@ -9,7 +9,7 @@
 
     .folder .children {
         position: relative;
-        margin-left: 12px;
+        margin-left: 20px;
     }
 
     .folder {
@@ -45,6 +45,10 @@
         color: var(--success-font-color);
     }
 
+    .folder:not(.root) i.fa-folder-minus {
+        color: var(--warning-font-color);
+    }
+
     .folder .menu {
         display: none;
         padding: 6px 6px 10px 6px;
@@ -61,7 +65,6 @@
         border-radius: 5px;
         font-size: .9em;
     }
-
 </style>
 
 <div id="rootFolderList" class="folder-list">
@@ -85,7 +88,7 @@
              id="children-${rootFolderId}"
              hx-swap="innerHTML"
              hx-get="/htmx/folder/children"
-             hx-vals='{"parentId": "${rootFolderId}"}'
+             hx-vals='{"parentId": "${rootFolderId}", "isRoot": true}'
              hx-trigger="load">
         </div>
 
@@ -93,44 +96,97 @@
 </div>
 
 <script lang="js" type="module">
+    function closeMenu(menuEl) {
+        clearInnerNodes(menuEl)
+        menuEl.innerHTML = ""
+        menuEl.style.display = "none"
+    }
 
-    /**
-     * A hacky but effective way to "close" the menu - if it's open before we even trip to the
-     * server, then we just remove it and prevent the request from going out, like total bosses.
-     */
     htmx.find("#rootFolderList").addEventListener('htmx:beforeRequest', function(evt) {
-        if (evt.detail.pathInfo.requestPath  !== "/htmx/folder/context-menu") {
-            return
+        /**
+         * Context menu potential request
+         */
+        if (evt.detail.pathInfo.requestPath  === "/htmx/folder/context-menu") {
+            const isMenuExpanded = evt.detail.target.querySelector("span") !== null
+
+            // Do not go to the server if the menu is already open, just kill it
+            if (isMenuExpanded) {
+                evt.preventDefault()
+                closeMenu(evt.detail.target)
+            } else {
+                /**
+                 * The request for the context meny will go out, so let's go full Marie Kondo
+                 * on the open menus because they do not bring us JOY.
+                 */
+                const openMenus = document.querySelectorAll("#rootFolderList .menu")
+
+                openMenus.forEach(menu => {
+                    closeMenu(menu)
+                })
+            }
         }
 
-        const isMenuExpanded = evt.detail.target.querySelector("span") !== null
+        /**
+         * Folder children potential request
+         */
+        if (evt.detail.pathInfo.requestPath  === "/htmx/folder/children") {
+            const url = new URL("https://dummy.com" + evt.detail.pathInfo.finalRequestPath)
+            const parentFolderId = url.searchParams.get("parentId")
+            const folderIconEl = htmx.find("#folder-" + parentFolderId + " .expanded")
 
-        if (isMenuExpanded) {
-            evt.preventDefault()
-            evt.detail.target.innerHTML = ""
-            evt.detail.target.style.display = "none"
-        } else {
             /**
-             * The request for the context meny will go out, so let's go full Marie Kondo
-             * on the open menus because they do not bring us JOY.
+             * The folder is currently expanded - abort the req and remove the child nodes
              */
-            const openMenus = document.querySelectorAll("#rootFolderList .menu")
+            if (folderIconEl !== null) {
+                evt.preventDefault()
 
-            openMenus.forEach(menu => {
-                menu.innerHTML = ""
-                menu.style.display = "none"
-            })
+                const childrenEl = htmx.findAll("#children-" + parentFolderId + " .folder")
+
+                childrenEl.forEach(child => {
+                    clearInnerNodes(child)
+                    child.innerHTML = ""
+                    child.style.display = "none"
+                })
+
+                folderIconEl.classList.remove("fa-folder-minus")
+                folderIconEl.classList.add("fa-folder-plus")
+                folderIconEl.classList.remove("expanded")
+
+                // when we close the folder - probably expected that the menu will go as well
+                closeMenu(htmx.find("#menu-" + parentFolderId))
+            }
         }
-
     });
 
     htmx.find("#rootFolderList").addEventListener('htmx:afterRequest', function(evt) {
-        if (evt.detail.pathInfo.requestPath  !== "/htmx/folder/context-menu") {
+        if (evt.detail.successful === false) {
             return
         }
 
-        if (evt.detail.successful === true) {
+        // on successful context menu request, show the menu
+        if (evt.detail.pathInfo.requestPath  === "/htmx/folder/context-menu") {
             evt.detail.target.style.display = "flex"
+        }
+
+        // on successful folder children request, mark the parent as expanded
+        if (evt.detail.pathInfo.requestPath  === "/htmx/folder/children") {
+            const url = new URL("https://dummy.com" + evt.detail.pathInfo.finalRequestPath)
+            const isRoot = url.searchParams.get("isRoot")
+
+            if (isRoot === "true") {
+                return
+            }
+
+            /**
+             * Mark the parent folder as expanded.
+             * High confidence here that the req would fail without parent ID as that's vehemently required.
+             * Vehemently.
+             */
+            const parentFolderId = url.searchParams.get("parentId")
+            const folderIconEl = htmx.find("#folder-" + parentFolderId + " i.fa-folder-plus")
+            folderIconEl.classList.remove("fa-folder-plus")
+            folderIconEl.classList.add("fa-folder-minus")
+            folderIconEl.classList.add("expanded")
         }
     });
 
