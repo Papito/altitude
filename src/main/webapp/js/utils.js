@@ -30,6 +30,11 @@ function clearNode(node) {
     node.parentNode.removeChild(node);
 }
 
+function closeFolderContextMenu(menuEl) {
+    clearInnerNodes(menuEl)
+    menuEl.innerHTML = ""
+    menuEl.style.display = "none"
+}
 
 /**
  * Default action of the ESC key is to close the modal

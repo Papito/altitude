@@ -25,7 +25,7 @@
                    hx-trigger="click">&#10247;</a>
             </div>
         </div>
-        <span>${folder.name}</span>
+        <span id="folderName-${folder.persistedId}">${folder.name}</span>
     </div>
     <div class="menu" id="menu-${folder.persistedId}"></div>
     <div class="children" id="children-${folder.persistedId}"></div>

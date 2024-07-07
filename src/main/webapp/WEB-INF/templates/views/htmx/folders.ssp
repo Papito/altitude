@@ -96,12 +96,6 @@
 </div>
 
 <script lang="js" type="module">
-    function closeMenu(menuEl) {
-        clearInnerNodes(menuEl)
-        menuEl.innerHTML = ""
-        menuEl.style.display = "none"
-    }
-
     htmx.find("#rootFolderList").addEventListener('htmx:beforeRequest', function(evt) {
         /**
          * Context menu potential request
@@ -112,7 +106,7 @@
             // Do not go to the server if the menu is already open, just kill it
             if (isMenuExpanded) {
                 evt.preventDefault()
-                closeMenu(evt.detail.target)
+                closeFolderContextMenu(evt.detail.target)
             } else {
                 /**
                  * The request for the context meny will go out, so let's go full Marie Kondo
@@ -121,7 +115,7 @@
                 const openMenus = document.querySelectorAll("#rootFolderList .menu")
 
                 openMenus.forEach(menu => {
-                    closeMenu(menu)
+                    closeFolderContextMenu(menu)
                 })
             }
         }
@@ -153,7 +147,7 @@
                 folderIconEl.classList.remove("expanded")
 
                 // when we close the folder - probably expected that the menu will go as well
-                closeMenu(htmx.find("#menu-" + parentFolderId))
+                closeFolderContextMenu(htmx.find("#menu-" + parentFolderId))
             }
         }
     });

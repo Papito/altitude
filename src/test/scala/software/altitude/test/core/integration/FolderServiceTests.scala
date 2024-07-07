@@ -345,10 +345,10 @@ import software.altitude.test.core.IntegrationTestCore
     renamedFolder.name shouldEqual "Folder"
   }
 
-  test("Illegal rename actions should throw") {
+  test("Illegal folder rename actions should throw") {
     val folder1: Folder = testApp.service.library.addFolder("folder")
 
-    intercept[ValidationException] {
+    intercept[DuplicateException] {
       testApp.service.library.renameFolder(folder1.persistedId, folder1.name)
     }
 

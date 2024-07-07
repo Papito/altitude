@@ -269,5 +269,8 @@ object Const {
   object UI {
     val ADD_FOLDER_MODAL_TITLE = "Add a folder"
     val ADD_FOLDER_MODAL_MIN_WIDTH = 400
+
+    val RENAME_FOLDER_MODAL_TITLE = "Rename folder"
+    val RENAME_FOLDER_MODAL_MIN_WIDTH: Int = ADD_FOLDER_MODAL_MIN_WIDTH
   }
 }

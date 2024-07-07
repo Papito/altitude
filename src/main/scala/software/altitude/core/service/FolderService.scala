@@ -317,19 +317,12 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
         C.Folder.PARENT_ID -> folder.parentId,
         C.Folder.NAME -> newName))
 
-      try {
-        val folderForUpdate: Folder = folder.copy(
-          name = newName
-        )
+      val folderForUpdate: Folder = folder.copy(
+        name = newName
+      )
 
-        updateById(folderId, folderForUpdate, List(C.Folder.NAME, C.Folder.NAME_LC), Some(dupQuery))
-        folderForUpdate
-      } catch {
-        case _: DuplicateException =>
-          val ex = ValidationException()
-          ex.errors += C.Folder.NAME -> C.Msg.Err.DUPLICATE
-          throw ex
-      }
+      updateById(folderId, folderForUpdate, List(C.Folder.NAME, C.Folder.NAME_LC), Some(dupQuery))
+      folderForUpdate
     }
   }
 

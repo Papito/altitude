@@ -11,6 +11,11 @@ import software.altitude.core.{Const => C}
 
 class UserInterfaceHtmxController extends BaseHtmxController{
 
+  private val folderDataScrubber = DataScrubber(
+    trim = List(C.Api.Folder.NAME),
+  )
+
+
   get("/modals/add-folder") {
     val parentId: String = params.get(C.Api.Folder.PARENT_ID).get
 
@@ -20,11 +25,16 @@ class UserInterfaceHtmxController extends BaseHtmxController{
       C.Api.Folder.PARENT_ID -> parentId)
   }
 
-  post("/folder/add") {
-    val dataScrubber = DataScrubber(
-      trim = List(C.Api.Folder.NAME),
-    )
+  get("/modals/rename-folder") {
+    val folderId: String = params.get(C.Api.ID).get
 
+    ssp("htmx/rename_folder_modal",
+      "minWidth" -> C.UI.RENAME_FOLDER_MODAL_MIN_WIDTH,
+      "title" -> C.UI.RENAME_FOLDER_MODAL_TITLE,
+      C.Api.ID -> folderId)
+  }
+
+  post("/folder/add") {
     val apiRequestValidator = ApiRequestValidator(
       required = List(
         C.Api.Folder.NAME, C.Api.Folder.PARENT_ID),
@@ -36,7 +46,7 @@ class UserInterfaceHtmxController extends BaseHtmxController{
       ),
     )
 
-    val jsonIn: JsObject = dataScrubber.scrub(unscrubbedReqJson.get)
+    val jsonIn: JsObject = folderDataScrubber.scrub(unscrubbedReqJson.get)
 
     def haltWithValidationErrors(errors: Map[String, String], parentId: String): Unit = {
       halt(200,
@@ -69,7 +79,7 @@ class UserInterfaceHtmxController extends BaseHtmxController{
       app.service.library.addFolder(folderName, parentId = Some(parentId))
     } catch {
       case _: DuplicateException =>
-        haltWithValidationErrors(Map(C.Api.Folder.NAME -> "Folder name already exists."), parentId = parentId)
+        haltWithValidationErrors(Map(C.Api.Folder.NAME -> "Folder name already exists at this level"), parentId = parentId)
     }
 
     val childFolders: List[Folder] = app.service.folder.immediateChildren(parentId)
@@ -78,6 +88,57 @@ class UserInterfaceHtmxController extends BaseHtmxController{
       ssp("htmx/folder_children.ssp",
         "folders" -> childFolders)
     )
+  }
+
+  put("/folder/rename") {
+    val apiRequestValidator = ApiRequestValidator(
+      required = List(
+        C.Api.Folder.NAME, C.Api.ID),
+      maxLengths = Map(
+        C.Api.Folder.NAME -> C.Api.Constraints.MAX_FOLDER_NAME_LENGTH,
+      ),
+      minLengths = Map(
+        C.Api.Folder.NAME -> C.Api.Constraints.MIN_REPOSITORY_NAME_LENGTH,
+      ),
+    )
+
+    val jsonIn: JsObject = folderDataScrubber.scrub(unscrubbedReqJson.get)
+
+    def haltWithValidationErrors(errors: Map[String, String], folderId: String): Unit = {
+      halt(200,
+        ssp(
+          "htmx/rename_folder_modal",
+          "minWidth" -> C.UI.RENAME_FOLDER_MODAL_MIN_WIDTH,
+          "title" -> C.UI.RENAME_FOLDER_MODAL_TITLE,
+          "fieldErrors" -> errors,
+          "formJson" -> jsonIn,
+          C.Api.ID -> folderId
+        ),
+        // we want to change the folder modal to show the errors, not reload the folder list!
+        headers=Map("HX-Retarget" -> "this", "HX-Reswap" -> "innerHTML")
+      )
+    }
+
+    try {
+      apiRequestValidator.validate(jsonIn)
+    } catch {
+      case validationException: ValidationException =>
+        haltWithValidationErrors(
+          validationException.errors.toMap,
+          folderId = (jsonIn \ C.Api.ID).as[String])
+    }
+
+    val newName = (jsonIn \ C.Api.Folder.NAME).as[String]
+    val folderId = (jsonIn \ C.Api.ID).as[String]
+
+    try {
+      app.service.library.renameFolder(folderId=folderId, newName=newName)
+    } catch {
+      case _: DuplicateException =>
+        haltWithValidationErrors(Map(C.Api.Folder.NAME -> "Folder name already exists at this level"), folderId = folderId)
+    }
+
+    halt(200, newName)
   }
 
   /**
