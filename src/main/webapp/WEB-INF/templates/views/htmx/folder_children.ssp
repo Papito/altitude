@@ -7,10 +7,10 @@
 <% val folder: Folder = folders(idx) %>
 <div class="folder dropzone"
      id="folder-${folder.persistedId}"
-     folder-id="${folder.persistedId}">
+     folderId="${folder.persistedId}">
 
     <div class="controls draggable drag-drop"
-         folder-id="${folder.persistedId}">
+         folderId="${folder.persistedId}">
         <a href="#" hx-swap="innerHTML"
            hx-get="/htmx/folder/children"
            hx-target="#children-${folder.persistedId}"

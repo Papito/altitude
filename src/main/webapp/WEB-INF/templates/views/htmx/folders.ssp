@@ -89,7 +89,7 @@
 
 <div id="rootFolderList" class="folder-list">
     <% val rootFolderId = RequestContext.getRepository.rootFolderId %>
-    <div class="folder root" id="folder-${rootFolderId}" folder-id="${rootFolderId}">
+    <div class="folder root" id="folder-${rootFolderId}" folderId="${rootFolderId}">
         <div class="controls">
             <i class="fas fa-folder"></i>
             <div class="menu-ctrl">
@@ -248,14 +248,14 @@
         e.target.removeAttribute("data-y")
     }
 
-    interact('.folder .controls.draggable')
+    interact('#rootFolderList .draggable')
             .draggable({
                 // enable inertial throwing
                 inertia: true,
                 // keep the element within the area of it's parent
                 modifiers: [
                     interact.modifiers.restrictRect({
-                        restriction: '#rootFolderList .folder.dropzone',
+                        restriction: '#rootFolderList',
                         endOnly: true,
                         elementRect: {
                             top: 0,
@@ -294,9 +294,9 @@
     }
 
     // enable draggables to be dropped into this
-    interact('.folder.dropzone').dropzone({
+    interact('#rootFolderList .dropzone').dropzone({
         // only accept elements matching this CSS selector
-        accept: '.folder .controls.draggable',
+        accept: '#rootFolderList .draggable',
         // going above seems to break the dropzone
         overlap: 0.50,
 
@@ -330,8 +330,8 @@
 
             draggableElement.classList.remove('can-drop')
 
-            const movedFolderId = draggableElement.getAttribute("folder-id")
-            const newParentFolderId = dropzoneElement.getAttribute("folder-id")
+            const movedFolderId = draggableElement.getAttribute("folderId")
+            const newParentFolderId = dropzoneElement.getAttribute("folderId")
             console.log("Moving folder " + movedFolderId + " to " + newParentFolderId)
 
             const movedName = htmx.find("#folderName-" + movedFolderId).innerText
@@ -363,12 +363,12 @@
         }
     })
 
-    interact('.folder .controls.drag-drop')
+    interact('#rootFolderList .drag-drop')
             .draggable({
                 inertia: true,
                 modifiers: [
                     interact.modifiers.restrictRect({
-                        restriction: '.folder.dropzone',
+                        restriction: '#rootFolderList .dropzone',
                         endOnly: true
                     })
                 ],
