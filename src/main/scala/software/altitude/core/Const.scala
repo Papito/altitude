@@ -157,6 +157,7 @@ object Const {
       val DUPLICATE = "Duplicate"
       val INCORRECT_VALUE_TYPE = "Incorrect value type"
       val PASSWORDS_DO_NOT_MATCH = "Passwords do not match"
+      val INVALID_CONTENT_TYPE = "Invalid content type"
     }
   }
 

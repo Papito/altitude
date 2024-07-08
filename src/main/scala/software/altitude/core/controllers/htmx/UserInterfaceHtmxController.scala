@@ -171,4 +171,9 @@ class UserInterfaceHtmxController extends BaseHtmxController{
   get("/close-modal") {
     ssp("htmx/close_modal")
   }
+
+  post("/folder/move") {
+    request.parameters.foreach(println)
+    halt(200, "Folder moved")
+  }
 }

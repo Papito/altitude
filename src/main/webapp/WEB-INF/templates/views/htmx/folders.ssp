@@ -107,7 +107,7 @@
     </div>
 </div>
 
-<script lang="js" type="module">
+<script type="module">
     htmx.find("#rootFolderList").addEventListener('htmx:beforeRequest', function(evt) {
         /**
          * Context menu potential request
@@ -299,8 +299,17 @@
             draggableElement.classList.remove('can-drop')
 
             const parentFolderEl = draggableElement.closest(".folder")
-            parentFolderEl.remove()
 
+            const myEvent = new CustomEvent(
+                Const.events.folderMoved, {
+                detail: {
+                    folderId: 1,
+                    targetFolderId: 2
+                }});
+
+            document.body.dispatchEvent(myEvent)
+            // htmx.trigger(myEvent)
+            // parentFolderEl.remove()
         },
 
         ondropdeactivate: function (event) {
@@ -324,5 +333,17 @@
                 listeners: { move: dragMoveListener }
             })
 
+</script>
+
+<script type="module">
+    document.body.addEventListener(Const.events.folderMoved, (event) => {
+
+        htmx.ajax(
+            "POST",
+            "/htmx/folder/move", {
+                "swap": "none",
+                "values": {...event.detail}
+            })
+    })
 
 </script>

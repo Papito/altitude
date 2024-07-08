@@ -6,4 +6,5 @@
 <script src="/js/json-enc.js"></script>
 <script src="/js/ws.js"></script>
 <script src="/js/split.min.js"></script>
+<script src="/js/constants.js"></script>
 <script src="/js/utils.js"></script>
