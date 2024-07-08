@@ -173,7 +173,9 @@ class UserInterfaceHtmxController extends BaseHtmxController{
   }
 
   post("/folder/move") {
-    request.parameters.foreach(println)
+    val movedFolderId = request.getParameter(C.Api.Folder.MOVED_FOLDER_ID)
+    val newParentId = request.getParameter(C.Api.Folder.NEW_PARENT_ID)
+    println(s"Moving folder $movedFolderId to $newParentId")
     halt(200, "Folder moved")
   }
 }

@@ -226,6 +226,8 @@ object Const {
       val NAME = "name"
       val EXISTING_NAME = "existingName"
       val PARENT_ID = "parentId"
+      val MOVED_FOLDER_ID = "movedFolderId"
+      val NEW_PARENT_ID = "targetFolderId"
     }
 
     object Trash {
