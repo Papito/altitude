@@ -89,7 +89,10 @@
 
 <div id="rootFolderList" class="folder-list">
     <% val rootFolderId = RequestContext.getRepository.rootFolderId %>
-    <div class="folder root" id="folder-${rootFolderId}" folderId="${rootFolderId}">
+    <div class="folder root dropzone"
+         id="folder-${rootFolderId}"
+         folderId="${rootFolderId}">
+
         <div class="controls">
             <i class="fas fa-folder"></i>
             <div class="menu-ctrl">
@@ -100,8 +103,9 @@
                    hx-vals='{"folderId": "${rootFolderId}"}'
                    hx-trigger="click">&#10247;</a>
             </div>
-            <span id="folderName-${rootFolderId}" class="folder-name dropzone">/Root</span>
+            <span id="folderName-${rootFolderId}" class="folder-name">/Root</span>
         </div>
+
         <div class="menu" id="menu-${rootFolderId}"></div>
 
         <div class="children"
@@ -255,7 +259,7 @@
                 // keep the element within the area of it's parent
                 modifiers: [
                     interact.modifiers.restrictRect({
-                        restriction: '#rootFolderList',
+                        restriction: '#rootFolderList > div.children',
                         endOnly: true,
                         elementRect: {
                             top: 0,
