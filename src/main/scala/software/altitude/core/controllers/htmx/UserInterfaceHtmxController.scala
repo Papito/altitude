@@ -175,7 +175,16 @@ class UserInterfaceHtmxController extends BaseHtmxController{
   post("/folder/move") {
     val movedFolderId = request.getParameter(C.Api.Folder.MOVED_FOLDER_ID)
     val newParentId = request.getParameter(C.Api.Folder.NEW_PARENT_ID)
-    println(s"Moving folder $movedFolderId to $newParentId")
-    halt(200, "Folder moved")
+    val isTargetFolderExpanded = request.getParameter(C.Api.Folder.IS_TARGET_FOLDER_EXPANDED)
+
+    logger.info(s"Moving folder $movedFolderId to $newParentId. Target folder expanded: $isTargetFolderExpanded")
+
+    if (movedFolderId == newParentId) {
+      val msg = "Cannot move folder into itself"
+      logger.warn(msg)
+      halt(200, msg)
+    }
+
+    halt(200, "OK")
   }
 }

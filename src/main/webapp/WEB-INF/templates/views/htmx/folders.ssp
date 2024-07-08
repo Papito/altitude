@@ -116,6 +116,19 @@
 </div>
 
 <script type="module">
+    /**
+     * MODULE:
+     *
+     * Before/after HTMX request listeners
+     */
+
+    /**
+     * This handles multiple "before request" scenarios, short-circuiting the request
+     * if necessary.
+     *
+     * Some actions require a network call (show menu, expand folders)
+     * but other do not (close menu, collapse folders).
+     */
     htmx.find("#rootFolderList").addEventListener('htmx:beforeRequest', function(evt) {
         /**
          * Context menu potential request
@@ -211,6 +224,12 @@
 
 <script type="module">
     /**
+     * MODULE:
+     *
+     * DRAGON DROP for folders
+     */
+
+    /**
      * Maintain position of the dragged element in order to snap it back in cancel
      * https://github.com/taye/interact.js/issues/819#issuecomment-626599750
      */
@@ -301,6 +320,8 @@
             event.relatedTarget.classList.remove('can-drop')
         },
         ondrop: function (event) {
+            console.log(event.relatedTarget)
+            console.log(event.target)
             const draggableElement = event.relatedTarget
             const dropzoneElement = event.target
 
@@ -313,11 +334,22 @@
             const newParentFolderId = dropzoneElement.getAttribute("folder-id")
             console.log("Moving folder " + movedFolderId + " to " + newParentFolderId)
 
+            const movedName = htmx.find("#folderName-" + movedFolderId).innerText
+            console.log("Moved folder name: " + movedName)
+            const newParentName = htmx.find("#folderName-" + newParentFolderId).innerText
+            console.log("New parent folder name: " + newParentName)
+
+            const isTargetFolderExpanded = htmx.find("#folder-" + newParentFolderId)
+                    .getAttribute(Const.attributes.expanded) === "true"
+
+            console.log("Is target folder expanded: " + isTargetFolderExpanded)
+
             const myEvent = new CustomEvent(
                 Const.events.folderMoved, {
                 detail: {
                     ${Const.Api.Folder.MOVED_FOLDER_ID}: movedFolderId,
-                    ${Const.Api.Folder.NEW_PARENT_ID}: newParentFolderId
+                    ${Const.Api.Folder.NEW_PARENT_ID}: newParentFolderId,
+                    ${Const.Api.Folder.IS_TARGET_FOLDER_EXPANDED}: isTargetFolderExpanded,
                 }});
 
             document.body.dispatchEvent(myEvent)
@@ -349,8 +381,9 @@
 
 <script type="module">
     /**
-     * Custom event listeners to fire low-level HTMX requests when we are
-     * stretching the limits of what the library can do.
+     * MODULE:
+     *
+     * Custom event listeners to fire low-level HTMX requests.
      */
 
     /**
