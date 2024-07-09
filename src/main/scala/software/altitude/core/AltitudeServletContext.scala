@@ -5,8 +5,7 @@ import org.scalatra.servlet.ServletApiImplicits._
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.controllers.api._
-import software.altitude.core.controllers.htmx.SetupController
-import software.altitude.core.controllers.htmx.UserInterfaceHtmxController
+import software.altitude.core.controllers.htmx.{FolderActionController, SetupController, UserInterfaceHtmxController}
 import software.altitude.core.controllers.web.ImportController
 import software.altitude.core.controllers.web.IndexController
 import software.altitude.core.controllers.web.SecuredStaticFileController
@@ -20,7 +19,7 @@ object AltitudeServletContext {
   val app: Altitude = new Altitude
 
   val endpoints: Seq[(ScalatraServlet, String)] = List(
-    (new IndexController, "/*"),
+    (new IndexController, "/"),
     (new ImportController, "/import/*"),
 
     (new AssetController, "/api/v1/assets/*"),
@@ -32,6 +31,7 @@ object AltitudeServletContext {
     (new SessionController, "/sessions/*"),
     (new SecuredStaticFileController, "/content/*"),
     (new UserInterfaceHtmxController, "/htmx/*"),
+    (new FolderActionController, "/htmx/folder/*"),
 
     (new SetupController, "/htmx/admin/setup/*"),
 

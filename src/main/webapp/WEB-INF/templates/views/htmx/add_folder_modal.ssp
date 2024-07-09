@@ -15,7 +15,7 @@
 <form action="#"
       id="addFolder"
       hx-swap="innerHTML"
-      hx-post="/htmx/folder/add"
+      hx-post="${ url(htmxAddFolder) }"
       hx-target="#children-${parentId}"
       hx-trigger="submit"
       hx-ext="json-enc">

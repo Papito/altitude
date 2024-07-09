@@ -1,8 +1,7 @@
 package software.altitude.core.controllers
 
-import org.scalatra.ContentEncodingSupport
-import org.scalatra.InternalServerError
-import org.scalatra.ScalatraServlet
+import org.scalatra.scalate.ScalateUrlGeneratorSupport
+import org.scalatra.{ContentEncodingSupport, InternalServerError, ScalatraServlet, UrlGeneratorSupport}
 import org.slf4j.MDC
 import software.altitude.core.AltitudeServletContext
 import software.altitude.core.Const
@@ -14,8 +13,13 @@ import java.io.PrintWriter
 import java.io.StringWriter
 import java.lang.System.currentTimeMillis
 
-abstract class BaseController extends ScalatraServlet
-  with ContentEncodingSupport with AuthenticationSupport with AltitudeServletContext {
+abstract class BaseController
+  extends ScalatraServlet
+    with ContentEncodingSupport
+    with UrlGeneratorSupport
+    with ScalateUrlGeneratorSupport
+    with AuthenticationSupport
+    with AltitudeServletContext {
 
   final def user: User = request.getAttribute("user").asInstanceOf[User]
 

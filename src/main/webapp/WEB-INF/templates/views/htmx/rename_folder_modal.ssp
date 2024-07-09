@@ -17,7 +17,7 @@
 <form action="#"
       id="renameFolder"
       hx-swap="innerHTML"
-      hx-put="/htmx/folder/rename"
+      hx-put="${ url(htmxRenameFolder) }"
       hx-trigger="submit"
       hx-target="#folderName-${id}"
       hx-ext="json-enc">

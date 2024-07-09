@@ -97,7 +97,7 @@
             <i class="fas fa-folder"></i>
             <div class="menu-ctrl">
                 <a href="#"
-                   hx-get="/htmx/folder/context-menu"
+                   hx-get="${ url(showFolderContextMenu) }"
                    hx-swap="innerHTML"
                    hx-target="#menu-${rootFolderId}"
                    hx-vals='{"folderId": "${rootFolderId}"}'
@@ -111,7 +111,7 @@
         <div class="children"
              id="children-${rootFolderId}"
              hx-swap="innerHTML"
-             hx-get="/htmx/folder/children"
+             hx-get="${ url(htmxFolderChildren) }"
              hx-vals='{"parentId": "${rootFolderId}", "isRoot": true}'
              hx-trigger="load">
         </div>
@@ -137,7 +137,7 @@
         /**
          * Context menu potential request
          */
-        if (evt.detail.pathInfo.requestPath  === "/htmx/folder/context-menu") {
+        if (evt.detail.pathInfo.requestPath  === "${ url(showFolderContextMenu) }") {
             const isMenuExpanded = evt.detail.target.querySelector("span") !== null
 
             // Do not go to the server if the menu is already open, just kill it
@@ -160,7 +160,7 @@
         /**
          * Folder children potential request
          */
-        if (evt.detail.pathInfo.requestPath  === "/htmx/folder/children") {
+        if (evt.detail.pathInfo.requestPath  === "${ url(htmxFolderChildren) }") {
             const url = new URL("https://dummy.com" + evt.detail.pathInfo.finalRequestPath)
             const folderId = url.searchParams.get("parentId")
             const folderEl = htmx.find("#folder-" + folderId)
@@ -198,12 +198,12 @@
         }
 
         // on successful context menu request, show the menu
-        if (evt.detail.pathInfo.requestPath  === "/htmx/folder/context-menu") {
+        if (evt.detail.pathInfo.requestPath  === "${ url(showFolderContextMenu) }") {
             evt.detail.target.style.display = "flex"
         }
 
         // on successful folder children request, mark the parent as expanded
-        if (evt.detail.pathInfo.requestPath  === "/htmx/folder/children") {
+        if (evt.detail.pathInfo.requestPath  === "${ url(htmxFolderChildren) }") {
             const url = new URL("https://dummy.com" + evt.detail.pathInfo.finalRequestPath)
             const isRoot = url.searchParams.get("isRoot")
 
@@ -234,7 +234,7 @@
      */
 
     /**
-     * Maintain position of the dragged element in order to snap it back in cancel
+     * Maintain position of the dragged element in order to snap it back at cancel
      * https://github.com/taye/interact.js/issues/819#issuecomment-626599750
      */
     const dragState = {

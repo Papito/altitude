@@ -12,7 +12,7 @@
     <div class="controls draggable drag-drop"
          folderId="${folder.persistedId}">
         <a href="#" hx-swap="innerHTML"
-           hx-get="/htmx/folder/children"
+           hx-get="${ url(htmxFolderChildren) }"
            hx-target="#children-${folder.persistedId}"
            hx-vals='{"parentId": "${folder.persistedId}", "isRoot": false}'>
            <i class="fas fa-folder-plus"></i>
@@ -21,7 +21,7 @@
         <div class="menu-ctrl">
             <div>
                 <a href="#"
-                   hx-get="/htmx/folder/context-menu"
+                   hx-get="${ url(showFolderContextMenu) }"
                    hx-swap="innerHTML"
                    hx-target="#menu-${folder.persistedId}"
                    hx-vals='{"folderId": "${folder.persistedId}"}'
