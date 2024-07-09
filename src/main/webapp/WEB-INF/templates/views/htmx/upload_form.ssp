@@ -28,7 +28,7 @@
 
 </style>
 
-<form id="uploadForm" hx-post="/import/upload" hx-encoding="multipart/form-data">
+<form id="uploadForm" hx-post="${ url(uploadFilesForm) )}" hx-encoding="multipart/form-data">
     <div>
         <input type="file" name="files" id="files" multiple>
     </div>

@@ -396,7 +396,7 @@
     document.body.addEventListener(Const.events.folderMoved, (event) => {
         htmx.ajax(
             "POST",
-            "/htmx/folder/move", {
+            "${ url(htmxMoveFolder) }", {
                 "swap": "none",
                 "values": {...event.detail}
             })

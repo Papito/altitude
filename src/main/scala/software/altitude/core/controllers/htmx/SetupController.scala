@@ -1,4 +1,5 @@
 package software.altitude.core.controllers.htmx
+import org.scalatra.Route
 import play.api.libs.json.JsObject
 import software.altitude.core.DataScrubber
 import software.altitude.core.ValidationException
@@ -37,7 +38,7 @@ class SetupController extends BaseHtmxController  {
     ),
   )
 
-  post("/") {
+  val htmxAdminSetup: Route = post("/") {
     if (app.isInitialized) {
       val message = "Instance is already initialized."
       logger.warn(message)
