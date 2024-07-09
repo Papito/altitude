@@ -293,12 +293,8 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       val folderForUpdate = Folder(
         parentId = destFolderId,
         name = folderBeingMoved.name)
-      try {
-        updateById(folderBeingMovedId, folderForUpdate, List(C.Folder.PARENT_ID), Some(dupQuery))
-      } catch {
-        case _: DuplicateException => throw ValidationException(
-          s"Cannot move to '${destFolder.get.name}' as a folder by this name already exists")
-      }
+
+      updateById(folderBeingMovedId, folderForUpdate, List(C.Folder.PARENT_ID), Some(dupQuery))
 
       Tuple2(folderBeingMoved, destFolder.get)
     }

@@ -36,6 +36,14 @@ function closeFolderContextMenu(menuEl) {
     menuEl.style.display = "none"
 }
 
+function clearFolderChildNodes(folderId) {
+    const childEls = document.querySelectorAll("#children-" + folderId + " .folder")
+    childEls.forEach(child => {
+        clearInnerNodes(child)
+        child.innerHTML = ""
+        child.style.display = "none"
+    })
+}
 /**
  * Default action of the ESC key is to close the modal
  */

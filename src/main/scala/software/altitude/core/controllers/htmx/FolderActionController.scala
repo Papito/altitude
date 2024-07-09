@@ -167,25 +167,22 @@ class FolderActionController extends BaseHtmxController{
   val htmxMoveFolder: Route = post("/move") {
     val movedFolderId = request.getParameter(C.Api.Folder.MOVED_FOLDER_ID)
     val newParentId = request.getParameter(C.Api.Folder.NEW_PARENT_ID)
-    val isTargetFolderExpanded = request.getParameter(C.Api.Folder.IS_TARGET_FOLDER_EXPANDED)
 
-    logger.info(s"Moving folder $movedFolderId to $newParentId. Target folder expanded: $isTargetFolderExpanded")
+    logger.info(s"Moving folder $movedFolderId to $newParentId")
 
     // short-circuit if this is a noop
     if (movedFolderId == newParentId) {
-      halt(Ok("", headers = Map("HX-Reswap" -> "none")))
+      halt(400)
     }
 
     // Call the movers
-    app.service.folder.move(movedFolderId, newParentId)
-
-    // no need to return child folders - the parent is not expanded
-    if (isTargetFolderExpanded == "false") {
-      halt(Ok("", headers = Map("HX-Reswap" -> "none")))
+    try {
+      app.service.folder.move(movedFolderId, newParentId)
+    } catch {
+      case _: DuplicateException =>
+        halt(409)
     }
 
-    val childFolders: List[Folder] = app.service.folder.immediateChildren(newParentId)
-    ssp("htmx/folder_children",
-      "folders" -> childFolders)
+    halt(200)
   }
 }

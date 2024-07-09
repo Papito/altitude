@@ -228,7 +228,6 @@ object Const {
       val PARENT_ID = "parentId"
       val MOVED_FOLDER_ID = "movedFolderId"
       val NEW_PARENT_ID = "newParentId"
-      val IS_TARGET_FOLDER_EXPANDED = "isTargetFolderExpanded"
     }
 
     object Trash {

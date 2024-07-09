@@ -177,13 +177,7 @@
             if (isExpanded && !isRoot) {
                 evt.preventDefault()
 
-                const childrenEl = htmx.findAll("#children-" + folderId + " .folder")
-
-                childrenEl.forEach(child => {
-                    clearInnerNodes(child)
-                    child.innerHTML = ""
-                    child.style.display = "none"
-                })
+                clearFolderChildNodes(folderId)
 
                 folderIconEl.classList.remove("fa-folder-minus")
                 folderIconEl.classList.add("fa-folder-plus")
@@ -349,19 +343,14 @@
             const newParentName = htmx.find("#folderName-" + newParentFolderId).innerText
             console.log("New parent folder name: " + newParentName)
 
-            const isTargetFolderExpanded = htmx.find("#folder-" + newParentFolderId)
-                    .getAttribute(Const.attributes.expanded) === "true"
-
             const myEvent = new CustomEvent(
                 Const.events.folderMoved, {
                 detail: {
                     ${Const.Api.Folder.MOVED_FOLDER_ID}: movedFolderId,
                     ${Const.Api.Folder.NEW_PARENT_ID}: newParentFolderId,
-                    ${Const.Api.Folder.IS_TARGET_FOLDER_EXPANDED}: isTargetFolderExpanded,
                 }});
 
             document.body.dispatchEvent(myEvent)
-            // parentFolderEl.remove()
         },
 
         ondropdeactivate: function (event) {
@@ -406,14 +395,40 @@
             return
         }
 
-        htmx.find("#folder-" + movedFolderId).remove()
+        function handler(response)  {
+            const status = response['htmx-internal-data'].xhr.status
+            if (status === 200) {
+                const isTargetFolderExpanded = htmx.find(
+                    "#folder-" + newParentId).getAttribute(Const.attributes.expanded) === "true"
+
+                if (isTargetFolderExpanded) {
+                    // target folder is expanded, so append the moved folder to the children
+                    const newParentChildrenEl = htmx.find("#children-" + newParentId)
+                    console.log("Target folder expanded - appending the moved folder.")
+                    newParentChildrenEl.append(
+                        htmx.find("#folder-" + movedFolderId)
+                    )
+                } else {
+                    console.log("Target folder not expanded - removing the moved folder.")
+                    // target folder is not expanded, so just make the moved folder disappear
+                    htmx.find("#folder-" + movedFolderId).remove()
+                }
+
+                // IRREGARDLESS of the target folder state, we should clear the inner child nodes of the moved folder
+                clearFolderChildNodes(movedFolderId)
+            }
+
+            if (status === 409) {
+                // TODO: call the warning toast with name conflict error
+            }
+        }
 
         htmx.ajax(
             "POST",
             "${ url(htmxMoveFolder) }", {
-                "target": "#children-" + newParentId,
-                "swap": "innerHTML",
-                "values": {...event.detail}
+                "swap": "none",
+                "values": {...event.detail},
+                "handler": handler
             })
     })
 
