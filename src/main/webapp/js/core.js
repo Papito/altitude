@@ -19,13 +19,13 @@ function closeModal() {
 
 function clearInnerNodes(node) {
     while (node.hasChildNodes()) {
-        clearNode(node.firstChild);
+        _clearNode(node.firstChild);
     }
 }
 
-function clearNode(node) {
+function _clearNode(node) {
     while (node.hasChildNodes()) {
-        clearNode(node.firstChild);
+        _clearNode(node.firstChild);
     }
     node.parentNode.removeChild(node);
 }

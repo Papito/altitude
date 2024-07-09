@@ -336,12 +336,9 @@
 
             const movedFolderId = draggableElement.getAttribute("folder-id")
             const newParentFolderId = dropzoneElement.getAttribute("folder-id")
-            console.log("Moving folder " + movedFolderId + " to " + newParentFolderId)
 
             const movedName = htmx.find("#folderName-" + movedFolderId).innerText
-            console.log("Moved folder name: " + movedName)
             const newParentName = htmx.find("#folderName-" + newParentFolderId).innerText
-            console.log("New parent folder name: " + newParentName)
 
             const myEvent = new CustomEvent(
                 Const.events.folderMoved, {
