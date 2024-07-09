@@ -1,6 +1,6 @@
 package software.altitude.core.controllers.htmx
 
-import org.scalatra.Route
+import org.scalatra.{ActionResult, Ok, Route}
 import play.api.libs.json.JsObject
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.BaseHtmxController
@@ -171,12 +171,21 @@ class FolderActionController extends BaseHtmxController{
 
     logger.info(s"Moving folder $movedFolderId to $newParentId. Target folder expanded: $isTargetFolderExpanded")
 
+    // short-circuit if this is a noop
     if (movedFolderId == newParentId) {
-      val msg = "Cannot move folder into itself"
-      logger.warn(msg)
-      halt(200, msg)
+      halt(Ok("", headers = Map("HX-Reswap" -> "none")))
     }
 
-    halt(200, "OK")
+    // Call the movers
+    app.service.folder.move(movedFolderId, newParentId)
+
+    // no need to return child folders - the parent is not expanded
+    if (isTargetFolderExpanded == "false") {
+      halt(Ok("", headers = Map("HX-Reswap" -> "none")))
+    }
+
+    val childFolders: List[Folder] = app.service.folder.immediateChildren(newParentId)
+    ssp("htmx/folder_children",
+      "folders" -> childFolders)
   }
 }

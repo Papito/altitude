@@ -395,10 +395,21 @@
      * A folder is dragon dropped.
      */
     document.body.addEventListener(Const.events.folderMoved, (event) => {
+        const newParentId = event.detail["${Const.Api.Folder.NEW_PARENT_ID}"]
+        const movedFolderId = event.detail["${Const.Api.Folder.MOVED_FOLDER_ID}"]
+
+        // The server does check this, but since we remove the moved folder from the DOM, we must short-circuit
+        if (newParentId === movedFolderId) {
+            return
+        }
+
+        htmx.find("#folder-" + movedFolderId).remove()
+
         htmx.ajax(
             "POST",
             "${ url(htmxMoveFolder) }", {
-                "swap": "none",
+                "target": "#children-" + newParentId,
+                "swap": "innerHTML",
                 "values": {...event.detail}
             })
     })
