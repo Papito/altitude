@@ -91,7 +91,7 @@
     <% val rootFolderId = RequestContext.getRepository.rootFolderId %>
     <div class="folder root dropzone"
          id="folder-${rootFolderId}"
-         folderId="${rootFolderId}">
+         folder-id="${rootFolderId}">
 
         <div class="controls">
             <i class="fas fa-folder"></i>
@@ -164,7 +164,7 @@
             const url = new URL("https://dummy.com" + evt.detail.pathInfo.finalRequestPath)
             const folderId = url.searchParams.get("parentId")
             const folderEl = htmx.find("#folder-" + folderId)
-            const folderIconEl = htmx.find("#folder-" + folderId + " i")
+            const folderIconEl = htmx.find("#folder-icon-" + folderId)
 
             /**
              * IF the folder is currently expanded - abort the req and remove the child nodes
@@ -192,7 +192,7 @@
         }
     });
 
-    htmx.find("#rootFolderList").addEventListener('htmx:afterRequest', function(evt) {
+    document.addEventListener('htmx:afterRequest', function(evt) {
         if (evt.detail.successful === false) {
             return
         }
@@ -202,8 +202,14 @@
             evt.detail.target.style.display = "flex"
         }
 
-        // on successful folder children request, mark the parent as expanded
-        if (evt.detail.pathInfo.requestPath  === "${ url(htmxFolderChildren) }") {
+        // on successful children OR add folder request, mark the parent as expanded
+        const doesReqExpandChildren = [
+            "${ url(htmxFolderChildren) }",
+            "${ url(htmxAddFolder) }"].includes(evt.detail.pathInfo.requestPath)
+
+        if (doesReqExpandChildren) {
+            const parentFolderId = evt.target.getAttribute("folder-id")
+
             const url = new URL("https://dummy.com" + evt.detail.pathInfo.finalRequestPath)
             const isRoot = url.searchParams.get("isRoot")
 
@@ -214,11 +220,10 @@
             /**
              * Mark the parent folder as expanded.
              */
-            const folderId = url.searchParams.get("parentId")
-            const folderEl = htmx.find("#folder-" + folderId)
+            const folderEl = htmx.find("#folder-" + parentFolderId)
             folderEl.setAttribute(Const.attributes.expanded, "true")
 
-            const folderIconEl = htmx.find("#folder-" + folderId + " i.fa-folder-plus")
+            const folderIconEl = htmx.find("#folder-icon-" + parentFolderId)
             folderIconEl.classList.remove("fa-folder-plus")
             folderIconEl.classList.add("fa-folder-minus")
         }
@@ -324,8 +329,6 @@
             event.relatedTarget.classList.remove('can-drop')
         },
         ondrop: function (event) {
-            console.log(event.relatedTarget)
-            console.log(event.target)
             const draggableElement = event.relatedTarget
             const dropzoneElement = event.target
 
@@ -334,8 +337,8 @@
 
             draggableElement.classList.remove('can-drop')
 
-            const movedFolderId = draggableElement.getAttribute("folderId")
-            const newParentFolderId = dropzoneElement.getAttribute("folderId")
+            const movedFolderId = draggableElement.getAttribute("folder-id")
+            const newParentFolderId = dropzoneElement.getAttribute("folder-id")
             console.log("Moving folder " + movedFolderId + " to " + newParentFolderId)
 
             const movedName = htmx.find("#folderName-" + movedFolderId).innerText
@@ -345,8 +348,6 @@
 
             const isTargetFolderExpanded = htmx.find("#folder-" + newParentFolderId)
                     .getAttribute(Const.attributes.expanded) === "true"
-
-            console.log("Is target folder expanded: " + isTargetFolderExpanded)
 
             const myEvent = new CustomEvent(
                 Const.events.folderMoved, {
