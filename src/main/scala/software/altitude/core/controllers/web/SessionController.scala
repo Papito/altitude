@@ -19,6 +19,9 @@ class SessionController
     }
   }
 
+  /**
+   * WARNING: hard-coded in AuthenticationSupport
+   */
   val newSession: Route = get("/new") {
     if (isAuthenticated) redirect("/")
 
