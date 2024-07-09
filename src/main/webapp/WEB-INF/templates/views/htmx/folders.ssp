@@ -91,7 +91,9 @@
     <% val rootFolderId = RequestContext.getRepository.rootFolderId %>
     <div class="folder root dropzone"
          id="folder-${rootFolderId}"
-         folder-id="${rootFolderId}">
+         folder-id="${rootFolderId}"
+         is-root="true"
+         expanded="true">
 
         <div class="controls">
             <i class="fas fa-folder"></i>
@@ -170,8 +172,9 @@
              * IF the folder is currently expanded - abort the req and remove the child nodes
              */
             const isExpanded = folderEl.getAttribute(Const.attributes.expanded) === "true"
+            const isRoot = folderEl.getAttribute(Const.attributes.isRoot) === "true"
 
-            if (isExpanded) {
+            if (isExpanded && !isRoot) {
                 evt.preventDefault()
 
                 const childrenEl = htmx.findAll("#children-" + folderId + " .folder")
