@@ -23,6 +23,7 @@
         display: grid;
         grid-template-columns: max-content 25px 1fr;
         align-items: center;
+        touch-action: none;
     }
 
 
@@ -123,10 +124,11 @@
 
 <script type="module">
     /**
-     * MODULE:
-     *
      * Before/after HTMX request listeners
      */
+
+    import {Const} from "/js/constants.js";
+    import {closeFolderContextMenu, clearFolderChildNodes} from "/js/core.js";
 
     /**
      * This handles multiple "before request" scenarios, short-circuiting the request
@@ -230,10 +232,11 @@
 
 <script type="module">
     /**
-     * MODULE:
-     *
      * DRAGON DROP for folders
      */
+
+    import {Const} from "/js/constants.js"
+    import interact from "https://cdn.interactjs.io/v1.9.20/interactjs/index.js"
 
     /**
      * Maintain position of the dragged element in order to snap it back at cancel
@@ -375,11 +378,11 @@
 
 <script type="module">
     /**
-     * MODULE:
-     *
      * Custom event listeners to fire low-level HTMX requests.
      */
 
+    import {Const} from "/js/constants.js";
+    import {clearFolderChildNodes} from "/js/core.js";
     /**
      * A folder is dragon dropped.
      */

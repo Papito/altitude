@@ -1,9 +1,18 @@
-function highlightNav(elClass) {
+
+export const state = {
+    snackbar: {
+        type: "info",
+        message: "",
+        show: false,
+    }
+}
+
+export function highlightNav(elClass) {
     const fullClassName = `nav .menu.${elClass}`
     document.querySelector(fullClassName).classList.add("active");
 }
 
-function showModal({minWidthPx, title}) {
+export function showModal({minWidthPx, title}) {
     htmx.find("#modalTitle").innerText = title
 
     if (minWidthPx) {
@@ -13,11 +22,11 @@ function showModal({minWidthPx, title}) {
     htmx.find("#modalContainer").style.display = "block"
 }
 
-function closeModal() {
+export function closeModal() {
     htmx.find("#modalContainer").style.display = "none"
 }
 
-function clearInnerNodes(node) {
+export function clearInnerNodes(node) {
     while (node.hasChildNodes()) {
         _clearNode(node.firstChild);
     }
@@ -30,13 +39,13 @@ function _clearNode(node) {
     node.parentNode.removeChild(node);
 }
 
-function closeFolderContextMenu(menuEl) {
+export function closeFolderContextMenu(menuEl) {
     clearInnerNodes(menuEl)
     menuEl.innerHTML = ""
     menuEl.style.display = "none"
 }
 
-function clearFolderChildNodes(folderId) {
+export function clearFolderChildNodes(folderId) {
     const childEls = document.querySelectorAll("#children-" + folderId + " .folder")
     childEls.forEach(child => {
         clearInnerNodes(child)
@@ -44,6 +53,7 @@ function clearFolderChildNodes(folderId) {
         child.style.display = "none"
     })
 }
+
 /**
  * Default action of the ESC key is to close the modal
  */

@@ -49,7 +49,9 @@
     <%= RequestContext.account.value.getOrElse("None") %>
 </footer>
 
-<script lang="js">
+<script lang="js" type="module">
+    import {highlightNav} from "/js/core.js";
+
     highlightNav("import");
 </script>
 

@@ -11,8 +11,6 @@
 
     ${include("includes/header_common.ssp")}
 
-    <script src="/js/interact.min.js"></script>
-
     <style>
         body {
             display: grid;
