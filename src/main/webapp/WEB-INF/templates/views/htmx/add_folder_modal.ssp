@@ -46,8 +46,6 @@
 <%@ val minWidth: Int %>
 <%@ val title: String %>
 <script lang="js" type="module">
-    import {showModal, closeModal} from "/js/core.js";
-
     showModal({minWidthPx: "${minWidth}", title: "${title}"})
     htmx.find("#field${ Const.Api.Folder.NAME }").focus()
 

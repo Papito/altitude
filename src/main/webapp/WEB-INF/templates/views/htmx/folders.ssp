@@ -128,7 +128,7 @@
      */
 
     import {Const} from "/js/constants.js";
-    import {closeFolderContextMenu, clearFolderChildNodes} from "/js/core.js";
+    import {closeFolderContextMenu, clearFolderChildNodes} from "/js/utils.js";
 
     /**
      * This handles multiple "before request" scenarios, short-circuiting the request
@@ -382,13 +382,17 @@
      */
 
     import {Const} from "/js/constants.js";
-    import {clearFolderChildNodes} from "/js/core.js";
+    import {clearFolderChildNodes} from "/js/utils.js";
+
     /**
      * A folder is dragon dropped.
      */
     document.body.addEventListener(Const.events.folderMoved, (event) => {
         const newParentId = event.detail["${Const.Api.Folder.NEW_PARENT_ID}"]
         const movedFolderId = event.detail["${Const.Api.Folder.MOVED_FOLDER_ID}"]
+
+        const movedName = htmx.find("#folderName-" + movedFolderId).innerText
+        const newParentName = htmx.find("#folderName-" + newParentId).innerText
 
         // The server does check this, but since we remove the moved folder from the DOM, we must short-circuit
         if (newParentId === movedFolderId) {
@@ -416,10 +420,12 @@
 
                 // IRREGARDLESS of the target folder state, we should clear the inner child nodes of the moved folder
                 clearFolderChildNodes(movedFolderId)
+
+                showSuccessSnackBar("Folder \"" + movedName + "\" moved to \"" + newParentName + '"')
             }
 
             if (status === 409) {
-                // TODO: call the warning toast with name conflict error
+                showWarningSnackBar("Folder \"" + movedName + "\" already exists here")
             }
         }
 

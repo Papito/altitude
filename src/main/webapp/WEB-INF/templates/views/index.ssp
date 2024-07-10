@@ -103,6 +103,7 @@
             height: 220px;
             place-items: center;
         }
+
     </style>
 </head>
 
@@ -114,7 +115,7 @@
 </div>
 
 <main>
-    ${include("includes/modal_container.ssp")}
+    ${include("includes/html_common.ssp")}
 
     <div id="browser" class="split content split-horizontal">
         <div id="folders" class="split content">

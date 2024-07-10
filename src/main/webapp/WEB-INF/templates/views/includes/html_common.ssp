@@ -1,4 +1,5 @@
-#import(software.altitude.core.controllers.htmx.UserInterfaceHtmxController)
+<div id="snackbar"></div>
+
 <div id="modalContainer">
     <div id="modalBox">
         <div id="modalToolbar">
