@@ -111,12 +111,12 @@ form input.error, form input.error:focus {
     background: var(--success-background-color);
     font-weight: bold;
     color: white;
-    border: 0 none;
+    border: 2px solid #bdbbbb;
     border-radius: 4px;
     cursor: pointer;
     padding: 7px;
     text-decoration: none;
-    text-shadow: rgba(72, 70, 70, 0.45) 1px 1px 1px;
+    text-shadow: rgba(72, 70, 70, 0.55) 4px 4px 4px;
     font-size: 1em;
 }
 .action-button:hover, .action-button:focus {
@@ -261,6 +261,7 @@ form input.error, form input.error:focus {
     padding-left: .7em;
     font-size: 1.1em;
     font-weight: bold;
+    text-transform: capitalize;
 }
 
 #closeModal:hover,

@@ -8,7 +8,7 @@ import software.altitude.test.core.ControllerTestCore
 
 @DoNotDiscover class SetupControllerTests(override val testApp: Altitude) extends ControllerTestCore {
 
-  test("Should return validation errors", Focused) {
+  test("Should return validation errors") {
 
     post("/htmx/admin/setup", body = "{}") {
       val requiredCount = "required".r.findAllIn(response.body).toList.size

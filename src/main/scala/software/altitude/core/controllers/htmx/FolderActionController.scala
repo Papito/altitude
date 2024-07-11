@@ -1,6 +1,6 @@
 package software.altitude.core.controllers.htmx
 
-import org.scalatra.{ActionResult, Ok, Route}
+import org.scalatra.Route
 import play.api.libs.json.JsObject
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.BaseHtmxController
@@ -31,6 +31,17 @@ class FolderActionController extends BaseHtmxController{
       "title" -> C.UI.RENAME_FOLDER_MODAL_TITLE,
       C.Api.Folder.EXISTING_NAME -> Some(folder.name),
       C.Api.ID -> folderId)
+  }
+
+  val showDeleteFolderModal: Route = get("/modals/delete-folder") {
+    val folderId: String = params.get(C.Api.ID).get
+
+    val folder: Folder = app.service.folder.getById(folderId)
+
+    ssp("htmx/delete_folder_modal",
+      "minWidth" -> C.UI.DELETE_FOLDER_MODAL_MIN_WIDTH,
+      "title" -> C.UI.DELETE_FOLDER_MODAL_TITLE,
+      C.Api.Folder.FOLDER -> folder)
   }
 
   val showFolderContextMenu: Route = get("/context-menu") {
@@ -185,4 +196,11 @@ class FolderActionController extends BaseHtmxController{
 
     halt(200)
   }
+
+  val htmxDeleteFolder: Route = delete("/") {
+    val folderId = params.get(C.Api.ID).get
+    app.service.library.deleteFolderById(folderId)
+    halt(200)
+  }
+
 }

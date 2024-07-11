@@ -2,6 +2,9 @@
 #import(play.api.libs.json.Json)
 #import(play.api.libs.json.JsObject)
 
+<%@ val minWidth: Int %>
+<%@ val title: String %>
+
 <%@ val fieldErrors: Map[String, String] = Map.empty %>
 <%@ val formJson: JsObject = Json.obj() %>
 <%@ val id: String %>
@@ -51,8 +54,6 @@
     </div>
 </form>
 
-<%@ val minWidth: Int %>
-<%@ val title: String %>
 <script lang="js" type="module">
     import {closeFolderContextMenu} from "/js/utils.js";
 

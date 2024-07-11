@@ -197,7 +197,7 @@ import software.altitude.test.core.IntegrationTestCore
     }
   }
 
-  test("Deleting a non-exisiting folder should fail with a NOT FOUND") {
+  test("Deleting a non-existing folder should fail with a NOT FOUND") {
     intercept[NotFoundException] {
       testApp.service.library.deleteFolderById("bogus")
     }

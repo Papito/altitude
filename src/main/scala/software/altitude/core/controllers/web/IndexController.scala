@@ -29,8 +29,6 @@ class IndexController extends BaseWebController {
     val repo = RequestContext.getRepository
     val firstLevelFolders: List[Folder] = app.service.folder.immediateChildren(repo.rootFolderId)
 
-    println("=== Folders", firstLevelFolders.length)
-
     layoutTemplate(
       "/WEB-INF/templates/views/index.ssp",
         "results" -> results,

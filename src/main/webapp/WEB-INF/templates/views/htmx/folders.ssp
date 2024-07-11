@@ -53,8 +53,10 @@
 
     #rootFolderList .folder .menu {
         display: none;
-        padding: 6px 6px 10px 6px;
+        padding: 5px 5px 5px 5px;
+        margin: 0 6px 6px 6px;
         flex-wrap: wrap;
+        border-radius: 5px;
         gap: 5px;
         background-color: var(--form-background-color);
     }
@@ -199,6 +201,18 @@
         // on successful context menu request, show the menu
         if (evt.detail.pathInfo.requestPath  === "${ url(showFolderContextMenu) }") {
             evt.detail.target.style.display = "flex"
+
+            const parentFolderId = evt.target.getAttribute("folder-id")
+
+            const folderEl = htmx.find("#folder-" + parentFolderId)
+            const isExpanded = folderEl.getAttribute(Const.attributes.expanded) === "true"
+
+            if (!isExpanded) {
+                // Trigger "expand children action"
+                const expandFolderChildrenEl = htmx.find("#" + "expand-folder-children-" + parentFolderId)
+                htmx.trigger(expandFolderChildrenEl, "click")
+            }
+
         }
 
         // on successful children OR add folder request, mark the parent as expanded

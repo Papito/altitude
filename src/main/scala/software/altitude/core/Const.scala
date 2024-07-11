@@ -218,9 +218,9 @@ object Const {
     }
 
     object Folder {
+      val FOLDER = "folder"
       val HIERARCHY = "hierarchy"
       val FOLDERS = "folders"
-      val FOLDER = "folder"
       val ASSET_IDS = "assetIds"
       val PATH = "path"
       val NAME = "name"
@@ -271,10 +271,15 @@ object Const {
   }
 
   object UI {
+    private val DEFAULT_MODAL_WIDTH = 400
+
     val ADD_FOLDER_MODAL_TITLE = "Add a folder"
-    val ADD_FOLDER_MODAL_MIN_WIDTH = 400
+    val ADD_FOLDER_MODAL_MIN_WIDTH: Int = DEFAULT_MODAL_WIDTH
 
     val RENAME_FOLDER_MODAL_TITLE = "Rename folder"
-    val RENAME_FOLDER_MODAL_MIN_WIDTH: Int = ADD_FOLDER_MODAL_MIN_WIDTH
+    val RENAME_FOLDER_MODAL_MIN_WIDTH: Int = DEFAULT_MODAL_WIDTH
+
+    val DELETE_FOLDER_MODAL_TITLE = "Delete folder"
+    val DELETE_FOLDER_MODAL_MIN_WIDTH: Int = DEFAULT_MODAL_WIDTH
   }
 }

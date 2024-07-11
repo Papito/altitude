@@ -18,7 +18,10 @@
           hx-trigger="click">
         Rename
     </span>
-    <span>
+    <span hx-get="${ url(showDeleteFolderModal) }"
+      hx-target="#modalContent"
+      hx-vals='{"minWidth": ${Const.UI.DELETE_FOLDER_MODAL_MIN_WIDTH}, "id": "${folderId}"}'
+      hx-trigger="click">
         Delete
     </span>
 #end
