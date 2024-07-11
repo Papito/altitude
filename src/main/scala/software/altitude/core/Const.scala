@@ -90,6 +90,7 @@ object Const {
     val NAME_LC = "name_lc"
     val PARENT_ID = "parent_id"
     val NUM_OF_ASSETS = "num_of_assets"
+    val NUM_OF_CHILDREN = "num_of_children"
     val CHILDREN = "children"
     val IS_RECYCLED = "is_recycled"
 

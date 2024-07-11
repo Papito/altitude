@@ -31,62 +31,62 @@ import software.altitude.test.core.IntegrationTestCore
     val folder1_1: Folder = testApp.service.library.addFolder(
       name = "folder1_1", parentId = folder1.id)
 
-        folder1_1.parentId should not be None
+    folder1_1.parentId should not be None
 
-        val folder1_2: Folder = testApp.service.library.addFolder(
-          name = "folder1_2", parentId = folder1.id)
+    val folder1_2: Folder = testApp.service.library.addFolder(
+      name = "folder1_2", parentId = folder1.id)
 
-        folder1.id should contain(folder1_2.parentId)
+    folder1.id should contain(folder1_2.parentId)
 
-        /*
-          folder2
-            folder2_1
-              folder2_1_1
-            folder2_2
-          */
-        val folder2: Folder = testApp.service.library.addFolder(
-          name = "folder2")
+    /*
+      folder2
+        folder2_1
+          folder2_1_1
+        folder2_2
+      */
+    val folder2: Folder = testApp.service.library.addFolder(
+      name = "folder2")
 
-        folder2.parentId shouldEqual RequestContext.repository.value.get.rootFolderId
+    folder2.parentId shouldEqual RequestContext.repository.value.get.rootFolderId
 
-        val folder2_1: Folder = testApp.service.library.addFolder(
-          name = "folder2_1", parentId = folder2.id)
+    val folder2_1: Folder = testApp.service.library.addFolder(
+      name = "folder2_1", parentId = folder2.id)
 
-        folder2.id should contain(folder2_1.parentId)
+    folder2.id should contain(folder2_1.parentId)
 
-        val folder2_1_1: Folder = testApp.service.library.addFolder(
-          name = "folder2_1_1", parentId = folder2_1.id)
+    val folder2_1_1: Folder = testApp.service.library.addFolder(
+      name = "folder2_1_1", parentId = folder2_1.id)
 
-        folder2_1.id should contain(folder2_1_1.parentId)
+    folder2_1.id should contain(folder2_1_1.parentId)
 
-        val folder2_2: Folder = testApp.service.library.addFolder(
-          name = "folder2_2", parentId = folder2.id)
+    val folder2_2: Folder = testApp.service.library.addFolder(
+      name = "folder2_2", parentId = folder2.id)
 
-        folder2.id should contain(folder2_2.parentId)
+    folder2.id should contain(folder2_2.parentId)
 
-        val hierarchy = testApp.service.folder.hierarchy()
-        hierarchy.length shouldBe 2
-        hierarchy.head.children.length shouldBe 2
-        hierarchy(1).children.length shouldBe 2
-        hierarchy(1).children.head.children.length shouldBe 1
-        hierarchy(1).children(1).children.length shouldBe 0
+    val hierarchy = testApp.service.folder.hierarchy()
+    hierarchy.length shouldBe 2
+    hierarchy.head.children.length shouldBe 2
+    hierarchy(1).children.length shouldBe 2
+    hierarchy(1).children.head.children.length shouldBe 1
+    hierarchy(1).children(1).children.length shouldBe 0
 
-        // check immediate children of the second folder
-        val immediateChildren = testApp.app.service.folder.immediateChildren(rootId = folder2_1.persistedId)
-        immediateChildren.length shouldBe 1
+    // check immediate children of the second folder
+    val immediateChildren = testApp.app.service.folder.immediateChildren(rootId = folder2_1.persistedId)
+    immediateChildren.length shouldBe 1
 
-        // check breadcrumb
-        val path = testApp.app.service.folder.pathComponents(folderId = folder2_1_1.persistedId)
-        path.length shouldBe 4
-        path(1).id shouldBe folder2.id
-        path.last.id shouldBe folder2_1_1.id
+    // check breadcrumb
+    val path = testApp.app.service.folder.pathComponents(folderId = folder2_1_1.persistedId)
+    path.length shouldBe 4
+    path(1).id shouldBe folder2.id
+    path.last.id shouldBe folder2_1_1.id
 
-        // SECOND REPO
-        val repo2 = testContext.persistRepository()
-        switchContextRepo(repo2)
+    // SECOND REPO
+    val repo2 = testContext.persistRepository()
+    switchContextRepo(repo2)
 
-        val hierarchy2 = testApp.service.folder.hierarchy()
-        hierarchy2 shouldBe empty
+    val hierarchy2 = testApp.service.folder.hierarchy()
+    hierarchy2 shouldBe empty
   }
 
   test("Hierarchy for a bad root ID should fail") {
@@ -312,18 +312,18 @@ import software.altitude.test.core.IntegrationTestCore
     }
 
     // move into a parent with the same immediate child name
-    intercept[ValidationException] {
+    intercept[DuplicateException] {
       testApp.service.library.moveFolder(folder1_1_1.persistedId, folder2.persistedId)
     }
 
-    // move into a parent with the same immediate child name (different casing_
-    intercept[ValidationException] {
+    // move into a parent with the same immediate child name (different casing)
+    intercept[DuplicateException] {
       testApp.service.library.moveFolder(folder1_1_1.persistedId, folder3.persistedId)
     }
 
     // move into a folder that does not exist
     intercept[ValidationException] {
-    testApp.service.library.moveFolder(folder1.persistedId, "bogus")
+      testApp.service.library.moveFolder(folder1.persistedId, "bogus")
     }
   }
 
@@ -356,5 +356,31 @@ import software.altitude.test.core.IntegrationTestCore
     intercept[IllegalOperationException] {
       testApp.service.library.renameFolder(RequestContext.repository.value.get.rootFolderId, folder1.name)
     }
+  }
+
+  test("Folders child count should be correct") {
+    /*
+      folder1
+        folder1_1
+        folder1_2
+      */
+
+    var folder1: Folder = testApp.service.library.addFolder("folder1")
+    println("Parent", folder1.persistedId)
+
+    val folder1_1: Folder = testApp.service.library.addFolder(
+      name = "folder1_1", parentId = folder1.id)
+
+    val folder1_2: Folder = testApp.service.library.addFolder(
+      name = "folder1_2", parentId = folder1.id)
+
+    folder1 = testApp.service.folder.getById(folder1.persistedId)
+    folder1.numOfChildren shouldBe 2
+
+    testApp.service.library.deleteFolderById(folder1_1.persistedId)
+    testApp.service.library.deleteFolderById(folder1_2.persistedId)
+
+    folder1 = testApp.service.folder.getById(folder1.persistedId)
+    folder1.numOfChildren shouldBe 0
   }
 }

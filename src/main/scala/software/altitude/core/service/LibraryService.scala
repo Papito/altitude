@@ -359,11 +359,14 @@ class LibraryService(val app: Altitude) {
     * FOLDERS
     * *********************************************************************** */
 
-  def addFolder(name: String, parentId: Option[String] = None): JsObject = {
+  def addFolder(name: String, parentId: Option[String] = None): Folder = {
     txManager.withTransaction[JsObject] {
       val _parentId = if (parentId.isDefined) parentId.get else RequestContext.repository.value.get.rootFolderId
       val folder = Folder(name = name.trim, parentId = _parentId)
-      val addedFolder = app.service.folder.add(folder)
+      val addedFolder: Folder = app.service.folder.add(folder)
+
+      app.service.folder.incrChildCount(_parentId)
+
       addedFolder
     }
   }
@@ -434,6 +437,8 @@ class LibraryService(val app: Altitude) {
 
         treeAssetCount // accumulates total asset count for the next step in the fold
       }
+
+      app.service.folder.decrChildCount(folder.parentId)
     }
   }
 
@@ -511,7 +516,6 @@ class LibraryService(val app: Altitude) {
       }
     }
   }
-
 
   /** **************************************************************************
     * METADATA

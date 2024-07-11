@@ -27,15 +27,6 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     }
   }
 
-  /**
-   * Get root folder object for this repository.
-   */
-  def rootFolder: Folder = Folder(
-    id = Some(contextRepo.rootFolderId),
-    parentId = contextRepo.rootFolderId,
-    name = C.Folder.Name.ROOT,
-  )
-
   def isRootFolder(id: String): Boolean =
     id == contextRepo.rootFolderId
 
@@ -103,6 +94,12 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       }
 
       val parents = findParents(folderId = folderId, allRepoFolders = repoFolders)
+
+      val rootFolder = Folder(
+        id = Some(contextRepo.rootFolderId),
+        parentId = contextRepo.rootFolderId,
+        name = C.Folder.Name.ROOT,
+      )
 
       List(rootFolder) ::: (folder :: parents).reverse
     }
@@ -180,12 +177,6 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     else {
       List()
     }
-  }
-
-  override def getById(id: String): JsObject = {
-    txManager.asReadOnly[JsObject] {
-      if (isRootFolder(id)) rootFolder else super.getById(id)
-   }
   }
 
   /**
@@ -322,25 +313,35 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     }
   }
 
-  /**
-   * Increase a folder's asset count.
-   */
   def incrAssetCount(folderId: String, count: Int = 1): Unit = {
-    logger.debug(s"Incrementing folder $folderId count by $count")
+    logger.debug(s"Incrementing folder $folderId asset count by $count")
 
     txManager.withTransaction {
       dao.increment(folderId, C.Folder.NUM_OF_ASSETS, count)
     }
   }
 
-  /**
-   * Decrease a folder's asset count.
-   */
   def decrAssetCount(folderId: String, count: Int = 1): Unit = {
-    logger.debug(s"Decrementing folder $folderId count by $count")
+    logger.debug(s"Decrementing folder $folderId asset count by $count")
 
     txManager.withTransaction {
       dao.decrement(folderId, C.Folder.NUM_OF_ASSETS, count)
+    }
+  }
+
+  def incrChildCount(folderId: String, count: Int = 1): Unit = {
+    logger.debug(s"Incrementing folder $folderId child folder count by $count")
+
+    txManager.withTransaction {
+      dao.increment(folderId, C.Folder.NUM_OF_CHILDREN, count)
+    }
+  }
+
+  def decrChildCount(folderId: String, count: Int = 1): Unit = {
+    logger.debug(s"Decrementing folder $folderId child folder count by $count")
+
+    txManager.withTransaction {
+      dao.decrement(folderId, C.Folder.NUM_OF_CHILDREN, count)
     }
   }
 

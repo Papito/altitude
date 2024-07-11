@@ -108,7 +108,7 @@
                    hx-vals='{"folderId": "${rootFolderId}"}'
                    hx-trigger="click">&#10247;</a>
             </div>
-            <span id="folderName-${rootFolderId}" class="folder-name">/Root</span>
+            <span id="folderName-${rootFolderId}" class="folder-name">/ Root</span>
         </div>
 
         <div class="menu" id="menu-${rootFolderId}"></div>
