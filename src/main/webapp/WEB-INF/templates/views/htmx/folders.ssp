@@ -150,9 +150,10 @@
 
             // Do not go to the server if the menu is already open, just kill it
             if (isMenuExpanded) {
-                evt.preventDefault()
                 console.log("Context menu already open, closing it.")
                 closeFolderContextMenu(evt.detail.target)
+
+                evt.preventDefault()
             } else {
                 /**
                  * The request for the context meny will go out, so let's go full Marie Kondo
@@ -183,9 +184,9 @@
 
             if (isExpanded) {
                 // IF the folder is currently expanded - abort the req and update state
-                evt.preventDefault() // do not trip to the server
 
-                folderEl.setAttribute(Const.attributes.expanded, "false")
+                console.log("Setting folder to collapsed " + folderId)
+                folderEl.removeAttribute(Const.attributes.expanded)
 
                 const folderStateChanged = new CustomEvent(
                         Const.events.folderStateChanged, {
@@ -193,8 +194,10 @@
                         });
                 document.body.dispatchEvent(folderStateChanged)
 
+                evt.preventDefault() // do not trip to the server
             } else {
                 // ELSE proceed with request and update state
+                console.log("Setting folder to expanded " + folderId)
                 folderEl.setAttribute(Const.attributes.expanded, "true")
 
                 const folderStateChanged = new CustomEvent(
@@ -216,6 +219,15 @@
         // on successful context menu request, show the menu
         if (requestPath  === "${ url(showFolderContextMenu) }") {
             console.log("Context menu request successful")
+
+            const allFolderEls = htmx.findAll("#rootFolderList .folder")
+
+            allFolderEls.forEach(folderEl => {
+                const folderId = folderEl.getAttribute("folder-id")
+                const expanded = folderEl.getAttribute(Const.attributes.expanded) ? "true" : "false"
+                console.log(folderId + " expanded? " +  expanded)
+            })
+
             evt.detail.target.style.display = "flex"
 
             const parentFolderId = evt.target.getAttribute("folder-id")
@@ -224,9 +236,9 @@
             const isExpanded = folderEl.getAttribute(Const.attributes.expanded) === "true"
             const isRoot = folderEl.getAttribute(Const.attributes.isRoot) === "true"
 
-            if (!isExpanded || !isRoot) { // root folder is always expanded
-                console.log("Folder is not expanded, expanding it.")
+            if (!isExpanded && !isRoot) { // root folder is always expanded
                 // Trigger "expand children action"
+                console.log("Triggering expand children action")
                 const expandFolderChildrenEl = htmx.find("#" + "expand-folder-children-" + parentFolderId)
                 htmx.trigger(expandFolderChildrenEl, "click")
             }
@@ -238,6 +250,7 @@
             const folderId = evt.target.getAttribute("folder-id")
             const folderEl = htmx.find("#folder-" + folderId)
 
+            console.log("Setting folder to expanded " + folderId)
             folderEl.setAttribute(Const.attributes.expanded, "true")
 
             const folderStateChanged = new CustomEvent(
@@ -515,8 +528,18 @@
      * and if the folder is expanded or not.
      */
     document.body.addEventListener(Const.events.folderStateChanged, (event) => {
+        const allFolderEls = htmx.findAll("#rootFolderList .folder")
+        //
+        // allFolderEls.forEach(folderEl => {
+        //     const folderId = folderEl.getAttribute("folder-id")
+        //     const expanded = folderEl.getAttribute(Const.attributes.expanded) ? "true" : "false"
+        //     console.log(folderId + " expanded? " +  expanded)
+        // })
+
+
         const folderId = event.detail["${Const.Api.ID}"]
-        console.log("Folder state changed event received for folder " + folderId)
+        const folderName = htmx.find("#folderName-" + folderId).innerText
+        console.log("Folder state changed event received for folder " + folderId + " -- " + folderName)
 
         const folderEl = htmx.find("#folder-" + folderId)
 
@@ -526,7 +549,7 @@
         }
 
         const isExpanded = folderEl.getAttribute(Const.attributes.expanded) === "true"
-        console.log("Expanded? " + isExpanded)
+        // console.log(folderEl.getAttribute("folder-id") + " -- Expanded? " + isExpanded)
 
         // are there any children?
         const childrenEls = htmx.findAll("#" + "children-" + folderId + " > .folder")
@@ -566,5 +589,6 @@
             }
         }
 
+        // DEBUG
     })
 </script>
