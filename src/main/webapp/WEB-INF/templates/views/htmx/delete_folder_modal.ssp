@@ -14,12 +14,12 @@
 </style>
 
 <button class="action-button error"
-      id="deleteFolder"
-      hx-swap="none"
-      hx-delete="${ url(htmxDeleteFolder) }"
-      hx-trigger="click"
-      hx-vars="{'${Const.Api.ID}': '${folder.id}'}"
-      hx-ext="json-enc">
+        id="deleteFolder"
+        hx-swap="none"
+        hx-delete="${ url(htmxDeleteFolder) }"
+        hx-trigger="click"
+        hx-vars="{'${Const.Api.ID}': '${folder.id}'}"
+        hx-ext="json-enc">
     Delete <strong>${folder.name}</strong> and move assets into Recycle Bin
 </button>
 
@@ -27,13 +27,21 @@
 <%@ val title: String %>
 
 <script lang="js" type="module">
+    import {Const} from "/js/constants.js";
+
     showModal({minWidthPx: "${minWidth}", title: "${title}"})
 
     htmx.find("#deleteFolder").addEventListener('htmx:afterRequest', function(evt) {
-        const folderEl = htmx.find("#folder-${folder.id}")
-        const folderName = htmx.find("#folderName-${folder.id}").innerText
-        folderEl.remove()
-        closeModal()
-        showSuccessSnackBar("Folder \"" + folderName + "\" deleted")
+        if (evt.detail.successful === true) {
+            const deletedFolderEvent = new CustomEvent(
+                    Const.events.folderDeleted, {
+                        detail: {${Const.Api.ID}: "${folder.id}"}
+                    });
+
+            document.body.dispatchEvent(deletedFolderEvent)
+
+            closeModal()
+        }
+
     });
 </script>

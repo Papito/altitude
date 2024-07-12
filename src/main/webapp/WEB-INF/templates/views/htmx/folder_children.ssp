@@ -17,10 +17,14 @@
            folder-id="${folder.persistedId}"
            hx-get="${ url(htmxFolderChildren) }"
            hx-target="#children-${folder.persistedId}"
-           hx-vals='{"parentId": "${folder.persistedId}", "isRoot": false}'>
+           hx-vals='{"parentId": "${folder.persistedId}"}'>
 
             <i id="folder-icon-${folder.persistedId}"
-              class="fas fa-folder-plus"></i>
+              #if (folder.numOfChildren > 0)
+                class="fas fa-folder-plus"
+              #else
+              class="fas fa-folder"
+              #end></i>
         </a>
 
         <div class="menu-ctrl">
@@ -39,7 +43,9 @@
     </div>
 
     <div class="menu" id="menu-${folder.persistedId}"></div>
-    <div class="children" id="children-${folder.persistedId}"></div>
+    <div class="children"
+         id="children-${folder.persistedId}"
+         folder-id="${folder.persistedId}"></div>
 </div>
 
 #end

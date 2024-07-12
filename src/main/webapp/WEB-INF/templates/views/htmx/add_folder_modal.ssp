@@ -29,9 +29,9 @@
         <label for="${ Const.Api.Folder.NAME }"></label>
         <input type="text"
                id="field${ Const.Api.Folder.NAME }"
-               #if (fieldErrors.contains(Const.Api.Folder.NAME))
+            #if (fieldErrors.contains(Const.Api.Folder.NAME))
                class="error"
-               #end
+            #end
                name="${ Const.Api.Folder.NAME }"
                autocomplete="off"
                value='<%= (formJson \ Const.Api.Folder.NAME).asOpt[String].getOrElse("") %>'
@@ -46,13 +46,22 @@
 <%@ val minWidth: Int %>
 <%@ val title: String %>
 <script lang="js" type="module">
+    import {Const} from "/js/constants.js";
+
     showModal({minWidthPx: "${minWidth}", title: "${title}"})
+
     htmx.find("#field${ Const.Api.Folder.NAME }").focus()
 
     htmx.find("#addFolder").addEventListener('htmx:afterRequest', function(evt) {
         if (evt.detail.successful === true) {
+            const folderAddedEvent = new CustomEvent(
+                    Const.events.folderAdded, {
+                        detail: {${Const.Api.Folder.PARENT_ID}: "${parentId}"}
+                    });
+
+            document.body.dispatchEvent(folderAddedEvent)
+
             closeModal()
         }
     });
-
 </script>

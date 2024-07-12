@@ -43,7 +43,7 @@
         font-size: 1.2em;
     }
 
-    #rootFolderList .folder:not(.root) i.fa-folder-plus {
+    #rootFolderList .folder:not(.root) i {
         color: var(--success-font-color);
     }
 
@@ -98,10 +98,12 @@
          is-root="true"
          expanded="true">
 
-        <div class="controls">
+        <div class="controls"
+             folder-id="${rootFolderId}">
             <i class="fas fa-folder"></i>
             <div class="menu-ctrl">
                 <a href="#"
+                   folder-id="${rootFolderId}"
                    hx-get="${ url(showFolderContextMenu) }"
                    hx-swap="innerHTML"
                    hx-target="#menu-${rootFolderId}"
@@ -115,9 +117,10 @@
 
         <div class="children"
              id="children-${rootFolderId}"
+             folder-id="${rootFolderId}"
              hx-swap="innerHTML"
              hx-get="${ url(htmxFolderChildren) }"
-             hx-vals='{"parentId": "${rootFolderId}", "isRoot": true}'
+             hx-vals='{"parentId": "${rootFolderId}"}'
              hx-trigger="load">
         </div>
 
@@ -215,7 +218,7 @@
 
         }
 
-        // on successful children OR add folder request, mark the parent as expanded
+        // on successful
         const doesReqExpandChildren = [
             "${ url(htmxFolderChildren) }",
             "${ url(htmxAddFolder) }"].includes(evt.detail.pathInfo.requestPath)
@@ -223,22 +226,24 @@
         if (doesReqExpandChildren) {
             const parentFolderId = evt.target.getAttribute("folder-id")
 
-            const url = new URL("https://dummy.com" + evt.detail.pathInfo.finalRequestPath)
-            const isRoot = url.searchParams.get("isRoot")
-
-            if (isRoot === "true") {
-                return
-            }
-
             /**
              * Mark the parent folder as expanded.
              */
             const folderEl = htmx.find("#folder-" + parentFolderId)
-            folderEl.setAttribute(Const.attributes.expanded, "true")
 
-            const folderIconEl = htmx.find("#folder-icon-" + parentFolderId)
-            folderIconEl.classList.remove("fa-folder-plus")
-            folderIconEl.classList.add("fa-folder-minus")
+            if (folderEl.getAttribute(Const.attributes.isRoot) === "true") {
+                return
+            }
+
+            const childrenEls = htmx.findAll("#" + "children-" + parentFolderId + " > .folder")
+
+            if (childrenEls.length > 0) {
+                folderEl.setAttribute(Const.attributes.expanded, "true")
+
+                const folderIconEl = htmx.find("#folder-icon-" + parentFolderId)
+                folderIconEl.classList.remove("fa-folder-plus")
+                folderIconEl.classList.add("fa-folder-minus")
+            }
         }
     });
 
@@ -354,17 +359,14 @@
             const movedFolderId = draggableElement.getAttribute("folder-id")
             const newParentFolderId = dropzoneElement.getAttribute("folder-id")
 
-            const movedName = htmx.find("#folderName-" + movedFolderId).innerText
-            const newParentName = htmx.find("#folderName-" + newParentFolderId).innerText
-
-            const myEvent = new CustomEvent(
+            const movedFolderEvent = new CustomEvent(
                 Const.events.folderMoved, {
                 detail: {
                     ${Const.Api.Folder.MOVED_FOLDER_ID}: movedFolderId,
                     ${Const.Api.Folder.NEW_PARENT_ID}: newParentFolderId,
                 }});
 
-            document.body.dispatchEvent(myEvent)
+            document.body.dispatchEvent(movedFolderEvent)
         },
 
         ondropdeactivate: function (event) {
@@ -392,16 +394,18 @@
 
 <script type="module">
     /**
-     * Custom event listeners to fire low-level HTMX requests.
+     * Custom event listeners
      */
 
     import {Const} from "/js/constants.js";
     import {clearFolderChildNodes} from "/js/utils.js";
 
     /**
-     * A folder is dragon dropped.
+     * A folder is dragon dropped in UI BUT not yet removed on the server-side
      */
     document.body.addEventListener(Const.events.folderMoved, (event) => {
+        console.log("Folder dragon dropped event received")
+
         const newParentId = event.detail["${Const.Api.Folder.NEW_PARENT_ID}"]
         const movedFolderId = event.detail["${Const.Api.Folder.MOVED_FOLDER_ID}"]
 
@@ -450,6 +454,21 @@
                 "values": {...event.detail},
                 "handler": handler
             })
+    })
+
+    /**
+     * A folder is deleted on the server
+     */
+    document.body.addEventListener(Const.events.folderDeleted, (event) => {
+        console.log("Folder deleted event received")
+
+        const folderId = event.detail["${Const.Api.ID}"]
+        const folderName = htmx.find("#folderName-" + folderId).innerText
+        const folderEl = htmx.find("#folder-" + folderId)
+
+        folderEl.remove()
+
+        showSuccessSnackBar("Folder \"" + folderName + "\" deleted")
     })
 
 </script>
