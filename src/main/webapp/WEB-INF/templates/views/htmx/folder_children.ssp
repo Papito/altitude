@@ -7,6 +7,8 @@
 <% val folder: Folder = folders(idx) %>
 <div class="folder dropzone"
      id="folder-${folder.persistedId}"
+     num-of-children="${folder.numOfChildren}"
+     parent-folder-id="${folder.parentId}"
      folder-id="${folder.persistedId}">
 
     <div class="controls draggable drag-drop"
@@ -20,7 +22,6 @@
            hx-vals='{"parentId": "${folder.persistedId}"}'>
 
             <i id="folder-icon-${folder.persistedId}"
-               num-of-children="${folder.numOfChildren}"
               #if (folder.numOfChildren > 0)
                 class="fas fa-folder-plus"
               #else
