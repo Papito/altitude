@@ -104,6 +104,7 @@
             <div class="menu-ctrl">
                 <a href="#"
                    folder-id="${rootFolderId}"
+                   id="expand-folder-children-${rootFolderId}"
                    hx-get="${ url(showFolderContextMenu) }"
                    hx-swap="innerHTML"
                    hx-target="#menu-${rootFolderId}"
@@ -133,7 +134,7 @@
      */
 
     import {Const} from "/js/constants.js";
-    import {closeFolderContextMenu, clearFolderChildNodes} from "/js/utils.js";
+    import {closeFolderContextMenu} from "/js/utils.js";
 
     /**
      * This handles multiple "before request" scenarios, short-circuiting the request
@@ -173,25 +174,35 @@
             const url = new URL("https://dummy.com" + evt.detail.pathInfo.finalRequestPath)
             const folderId = url.searchParams.get("parentId")
             const folderEl = htmx.find("#folder-" + folderId)
-            const folderIconEl = htmx.find("#folder-icon-" + folderId)
 
-            /**
-             * IF the folder is currently expanded - abort the req and remove the child nodes
-             */
             const isExpanded = folderEl.getAttribute(Const.attributes.expanded) === "true"
             const isRoot = folderEl.getAttribute(Const.attributes.isRoot) === "true"
 
-            if (isExpanded && !isRoot) {
-                evt.preventDefault()
+            if (isRoot) {
+                return
+            }
 
-                clearFolderChildNodes(folderId)
+            if (isExpanded) {
+                // IF the folder is currently expanded - abort the req and update state
+                evt.preventDefault() // do not trip to the server
 
-                folderIconEl.classList.remove("fa-folder-minus")
-                folderIconEl.classList.add("fa-folder-plus")
                 folderEl.setAttribute(Const.attributes.expanded, "false")
 
-                // when we close the folder - probably expected that the menu will close as well
-                closeFolderContextMenu(htmx.find("#menu-" + folderId))
+                const folderStateChanged = new CustomEvent(
+                        Const.events.folderStateChanged, {
+                            detail: {${Const.Api.ID}: folderId}
+                        });
+                document.body.dispatchEvent(folderStateChanged)
+
+            } else {
+                // ELSE proceed with request and update state
+                folderEl.setAttribute(Const.attributes.expanded, "true")
+
+                const folderStateChanged = new CustomEvent(
+                        Const.events.folderStateChanged, {
+                            detail: {${Const.Api.ID}: folderId}
+                        });
+                document.body.dispatchEvent(folderStateChanged)
             }
         }
     });
@@ -209,8 +220,9 @@
 
             const folderEl = htmx.find("#folder-" + parentFolderId)
             const isExpanded = folderEl.getAttribute(Const.attributes.expanded) === "true"
+            const isRoot = folderEl.getAttribute(Const.attributes.isRoot) === "true"
 
-            if (!isExpanded) {
+            if (!isExpanded || !isRoot) { // root folder is always expanded
                 // Trigger "expand children action"
                 const expandFolderChildrenEl = htmx.find("#" + "expand-folder-children-" + parentFolderId)
                 htmx.trigger(expandFolderChildrenEl, "click")
@@ -218,32 +230,28 @@
 
         }
 
-        // on successful
-        const doesReqExpandChildren = [
-            "${ url(htmxFolderChildren) }",
-            "${ url(htmxAddFolder) }"].includes(evt.detail.pathInfo.requestPath)
+        console.log(evt.detail.pathInfo.requestPath)
 
-        if (doesReqExpandChildren) {
-            const parentFolderId = evt.target.getAttribute("folder-id")
+        // on successful folder children request, expand the folder
+        if (evt.detail.pathInfo.requestPath === "${ url(htmxFolderChildren) }") {
+            const folderId = evt.target.getAttribute("folder-id")
+            const folderStateChanged = new CustomEvent(
+                    Const.events.folderStateChanged, {
+                        detail: {${Const.Api.ID}: folderId}
+                    });
 
-            /**
-             * Mark the parent folder as expanded.
-             */
-            const folderEl = htmx.find("#folder-" + parentFolderId)
+            document.body.dispatchEvent(folderStateChanged)
+        }
 
-            if (folderEl.getAttribute(Const.attributes.isRoot) === "true") {
-                return
-            }
+        // if a folder is added, expand it automagically
+        if (evt.detail.pathInfo.requestPath === "${ url(htmxAddFolder) }") {
+            const folderId = evt.target.getAttribute("folder-id")
+            const folderStateChanged = new CustomEvent(
+                    Const.events.folderStateChanged, {
+                        detail: {${Const.Api.ID}: folderId}
+                    });
 
-            const childrenEls = htmx.findAll("#" + "children-" + parentFolderId + " > .folder")
-
-            if (childrenEls.length > 0) {
-                folderEl.setAttribute(Const.attributes.expanded, "true")
-
-                const folderIconEl = htmx.find("#folder-icon-" + parentFolderId)
-                folderIconEl.classList.remove("fa-folder-plus")
-                folderIconEl.classList.add("fa-folder-minus")
-            }
+            document.body.dispatchEvent(folderStateChanged)
         }
     });
 
@@ -398,7 +406,7 @@
      */
 
     import {Const} from "/js/constants.js";
-    import {clearFolderChildNodes} from "/js/utils.js";
+    import {clearFolderChildNodes, closeFolderContextMenu} from "/js/utils.js";
 
     /**
      * A folder is dragon dropped in UI BUT not yet removed on the server-side
@@ -469,6 +477,53 @@
         folderEl.remove()
 
         showSuccessSnackBar("Folder \"" + folderName + "\" deleted")
+    })
+
+    /**
+     * Folder state changed, update the UI based on whether or not there are children
+     */
+    document.body.addEventListener(Const.events.folderStateChanged, (event) => {
+        console.log("Folder state changed event received")
+
+        const folderId = event.detail["${Const.Api.ID}"]
+        console.log("Folder ID: " + folderId)
+        const folderEl = htmx.find("#folder-" + folderId)
+
+        // we always leave the root folder alone
+        if (folderEl.getAttribute(Const.attributes.isRoot) === "true") {
+            return
+        }
+
+        const isExpanded = folderEl.getAttribute(Const.attributes.expanded) === "true"
+        console.log("Expanded? " + isExpanded)
+
+
+        // are there any children?
+        const childrenEls = htmx.findAll("#" + "children-" + folderId + " > .folder")
+
+        if (isExpanded && childrenEls.length > 0) {
+            console.log("Folder is expanded and has children")
+            const folderIconEl = htmx.find("#folder-icon-" + folderId)
+            folderIconEl.classList.remove("fa-folder-plus")
+            folderIconEl.classList.add("fa-folder-minus")
+        }
+
+        if (!isExpanded || childrenEls.length === 0) {
+            console.log("Folder is collapsed or has no children")
+            clearFolderChildNodes(folderId)
+
+            const folderIconEl = htmx.find("#folder-icon-" + folderId)
+            folderIconEl.classList.remove("fa-folder-minus")
+            folderIconEl.classList.add("fa-folder-plus")
+
+            closeFolderContextMenu(htmx.find("#menu-" + folderId))
+        }
+    })
+
+    /**
+     * Folder children are collapsed
+     */
+    document.body.addEventListener(Const.events.folderCollapsed, (event) => {
     })
 
 </script>

@@ -20,6 +20,7 @@
            hx-vals='{"parentId": "${folder.persistedId}"}'>
 
             <i id="folder-icon-${folder.persistedId}"
+               num-of-children="${folder.numOfChildren}"
               #if (folder.numOfChildren > 0)
                 class="fas fa-folder-plus"
               #else
