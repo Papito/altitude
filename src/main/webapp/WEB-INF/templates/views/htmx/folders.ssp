@@ -549,13 +549,7 @@
         }
 
         const isExpanded = folderEl.getAttribute(Const.attributes.expanded) === "true"
-        // console.log(folderEl.getAttribute("folder-id") + " -- Expanded? " + isExpanded)
-
-        // are there any children?
-        const childrenEls = htmx.findAll("#" + "children-" + folderId + " > .folder")
-
-        // const numOfVisibleChildren = childrenEls.length
-        const numOfActualChildren = parseInt(folderEl.getAttribute(Const.attributes.numOfChildren))
+        const numOfChildren = parseInt(folderEl.getAttribute(Const.attributes.numOfChildren))
 
         const folderIconEl = htmx.find("#folder-icon-" + folderId)
 
@@ -564,7 +558,7 @@
             console.log("Closing folder context menu")
             closeFolderContextMenu(htmx.find("#menu-" + folderId))
 
-            if (numOfActualChildren) {
+            if (numOfChildren) {
                 console.log("Folder is collapsed and has actual children")
                 folderIconEl.classList.remove("fa-folder-minus")
                 folderIconEl.classList.add("fa-folder-plus")
@@ -577,7 +571,7 @@
         }
 
         if (isExpanded) {
-            if (numOfActualChildren) {
+            if (numOfChildren) {
                 console.log("Folder is expanded and has actual children")
                 folderIconEl.classList.remove("fa-folder-plus")
                 folderIconEl.classList.add("fa-folder-minus")
