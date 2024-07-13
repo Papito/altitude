@@ -55,14 +55,16 @@
 </form>
 
 <script lang="js" type="module">
-    import {closeFolderContextMenu} from "/js/utils.js";
+    import {Folder} from "/js/models.js";
 
     showModal({minWidthPx: "${minWidth}", title: "${title}"})
     htmx.find("#field-${ Const.Api.Folder.NAME }").focus()
 
     htmx.find("#renameFolder").addEventListener('htmx:afterRequest', function(evt) {
         if (evt.detail.successful === true) {
-            closeFolderContextMenu(htmx.find("#menu-${id}"))
+            const folder = new Folder("${id}")
+            folder.closeContextMenu()
+
             closeModal()
         }
     });

@@ -3,7 +3,6 @@ export const Const = {
         folderMoved: "FOLDER_MOVED_EVENT",
         folderDeleted: "FOLDER_DELETED_EVENT",
         folderAdded: "FOLDER_ADDED_EVENT",
-        folderStateChanged: "FOLDER_STATE_CHANGED_EVENT",
         folderCollapsed: "FOLDER_COLLAPSED_EVENT",
     },
 
@@ -18,5 +17,6 @@ export const Const = {
         isRoot: "is-root",
         numOfChildren: "num-of-children",
         parentFolderId: "parent-folder-id",
+        folderId: "folder-id",
     }
 }

@@ -44,7 +44,10 @@
               class="folder-name">${folder.name}</span>
     </div>
 
-    <div class="menu" id="menu-${folder.persistedId}"></div>
+    <div class="menu"
+         id="menu-${folder.persistedId}"
+         folder-id="${folder.persistedId}">
+    </div>
     <div class="children"
          id="children-${folder.persistedId}"
          folder-id="${folder.persistedId}"></div>

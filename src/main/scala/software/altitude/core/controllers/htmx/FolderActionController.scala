@@ -12,6 +12,10 @@ import software.altitude.core.{DataScrubber, DuplicateException, ValidationExcep
  */
 class FolderActionController extends BaseHtmxController{
 
+  before() {
+    requireLogin()
+  }
+
   val showAddFolderModal: Route = get("/modals/add-folder") {
     val parentId: String = params.get(C.Api.Folder.PARENT_ID).get
 
