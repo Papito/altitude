@@ -287,6 +287,10 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
 
       updateById(folderBeingMovedId, folderForUpdate, List(C.Folder.PARENT_ID), Some(dupQuery))
 
+      incrChildCount(destFolderId)
+      // this is still the old parent as the model is immutable
+      decrChildCount(folderBeingMoved.parentId)
+
       Tuple2(folderBeingMoved, destFolder.get)
     }
   }

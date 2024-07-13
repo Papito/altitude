@@ -209,14 +209,14 @@ import software.altitude.test.core.IntegrationTestCore
     }
   }
 
-  test("Moving a folder") {
+  test("Moving a folder to another folder should work") {
     /*
-  folder1
-    folder1_1
-      folder1_1_1
-    folder1_2
-  folder2
-  */
+    folder1
+      folder1_1
+        folder1_1_1
+      folder1_2
+    folder2
+    */
     val folder1: Folder = testApp.service.library.addFolder("folder1")
 
     val folder1_1: Folder = testApp.service.library.addFolder(
@@ -358,7 +358,7 @@ import software.altitude.test.core.IntegrationTestCore
     }
   }
 
-  test("Folders child count should be correct") {
+  test("Folders child count should be correct after addition") {
     /*
       folder1
         folder1_1
@@ -382,5 +382,65 @@ import software.altitude.test.core.IntegrationTestCore
 
     folder1 = testApp.service.folder.getById(folder1.persistedId)
     folder1.numOfChildren shouldBe 0
+  }
+
+  test("Folders child count should be correct after moving", Focused) {
+    /*
+    folder1
+      folder1_1
+        folder1_1_1
+      folder1_2
+    folder2
+    */
+    var folder1: Folder = testApp.service.library.addFolder("folder1")
+
+    var folder1_1: Folder = testApp.service.library.addFolder(
+      name = "folder1_1", parentId = folder1.id)
+
+    var folder1_1_1: Folder = testApp.service.library.addFolder(
+      name = "folder1_1_1", parentId = folder1_1.id)
+
+    testApp.service.library.addFolder(
+      name = "folder1_2", parentId = folder1.id)
+
+    var folder2: Folder = testApp.service.library.addFolder("folder2")
+
+    // before any actions, check the baseline
+    folder1 = testApp.service.folder.getById(folder1.persistedId)
+    folder1.numOfChildren shouldBe 2
+    var rootFolder: Folder = testApp.service.folder.getById(testContext.repository.rootFolderId)
+    rootFolder.numOfChildren shouldBe 2
+
+    folder1_1 = testApp.service.folder.getById(folder1_1.persistedId)
+    folder1_1.numOfChildren shouldBe 1
+
+    //
+    // move folder1_1_1 to folder1
+    //
+    testApp.service.library.moveFolder(folder1_1_1.persistedId, folder1.persistedId)
+
+    // target
+    folder1 = testApp.service.folder.getById(folder1.persistedId)
+    // source
+    folder1_1 = testApp.service.folder.getById(folder1_1.persistedId)
+
+    folder1.numOfChildren shouldBe 3
+    folder1_1.numOfChildren shouldBe 0
+
+    rootFolder = testApp.service.folder.getById(testContext.repository.rootFolderId)
+    rootFolder.numOfChildren shouldBe 2
+
+    //
+    // move folder1_1 to root
+    //
+    testApp.service.library.moveFolder(folder1_1.persistedId, testContext.repository.rootFolderId)
+
+    // target
+    rootFolder = testApp.service.folder.getById(testContext.repository.rootFolderId)
+    // source
+    folder1 = testApp.service.folder.getById(folder1.persistedId)
+
+    folder1.numOfChildren shouldBe 2
+    rootFolder.numOfChildren shouldBe 3
   }
 }
