@@ -262,8 +262,8 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     txManager.withTransaction {
       // cannot move into own child
       if (flatChildrenIdsWithDepths(folderBeingMovedId, repositoryFolders()).map(_._2).contains(destFolderId)) {
-        throw IllegalOperationException(
-          s"Cannot move a folder into own child. $destFolderId ID in $folderBeingMovedId path")
+        throw DuplicateException(
+          Some(s"Cannot move parent folder into a child node"))
       }
 
       var destFolder: Option[Folder] = None

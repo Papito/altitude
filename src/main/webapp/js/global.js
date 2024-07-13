@@ -16,19 +16,22 @@ function showModal({minWidthPx, title}) {
     htmx.find("#modalContainer").style.display = "block"
 }
 
-function _showSnackbar({type, message}) {
+function _showSnackbar({type="success", message}) {
     let elSnackbar = htmx.find("#snackbar");
 
     elSnackbar.classList.remove("success")
     elSnackbar.classList.remove("warning")
+    elSnackbar.classList.remove("error")
 
     elSnackbar.innerHTML = message
     elSnackbar.classList.add("show")
 
-    if (type === "success") {
-        elSnackbar.classList.add("success")
-    } else {
+    if (type === "error") {
+        elSnackbar.classList.add("error")
+    } else if (type === "warning") {
         elSnackbar.classList.add("warning")
+    } else {
+        elSnackbar.classList.add("success")
     }
 
     if (state.snackbarTimeout) {
@@ -42,11 +45,15 @@ function _showSnackbar({type, message}) {
 }
 
 function showSuccessSnackBar (message) {
-    _showSnackbar({type: "success", message: message})
+    _showSnackbar({message: message})
 }
 
 function showWarningSnackBar (message) {
     _showSnackbar({type: "warning", message: message})
+}
+
+function showErrorSnackBar (message) {
+    _showSnackbar({type: "error", message: message})
 }
 
 /**

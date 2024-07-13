@@ -5,7 +5,7 @@ import play.api.libs.json.JsObject
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.BaseHtmxController
 import software.altitude.core.models.Folder
-import software.altitude.core.{DataScrubber, DuplicateException, ValidationException, Const => C}
+import software.altitude.core.{DataScrubber, DuplicateException, RequestContext, ValidationException, Const => C}
 
 /**
   @ /htmx/folder/
@@ -14,6 +14,10 @@ class FolderActionController extends BaseHtmxController{
 
   before() {
     requireLogin()
+
+    if (RequestContext.repository.value.isEmpty){
+      throw new RuntimeException("Repository not set")
+    }
   }
 
   val showAddFolderModal: Route = get("/modals/add-folder") {
@@ -103,8 +107,9 @@ class FolderActionController extends BaseHtmxController{
     try {
       app.service.library.addFolder(folderName, parentId = Some(parentId))
     } catch {
-      case _: DuplicateException =>
-        haltWithValidationErrors(Map(C.Api.Folder.NAME -> "Folder name already exists at this level"), parentId = parentId)
+      case ex: DuplicateException =>
+        val message = ex.message.getOrElse("Folder name already exists at this level")
+        haltWithValidationErrors(Map(C.Api.Folder.NAME -> message), parentId = parentId)
     }
 
     val childFolders: List[Folder] = app.service.folder.immediateChildren(parentId)
@@ -163,9 +168,9 @@ class FolderActionController extends BaseHtmxController{
     try {
       app.service.library.renameFolder(folderId=folderId, newName=newName)
     } catch {
-      case _: DuplicateException =>
-        haltWithValidationErrors(
-          Map(C.Api.Folder.NAME -> "Folder name already exists at this level"), folderId = folderId)
+      case ex: DuplicateException =>
+        val message = ex.message.getOrElse("Folder name already exists at this level")
+        haltWithValidationErrors(Map(C.Api.Folder.NAME -> message), folderId = folderId)
     }
 
     halt(200, newName)
@@ -194,8 +199,8 @@ class FolderActionController extends BaseHtmxController{
     try {
       app.service.folder.move(movedFolderId, newParentId)
     } catch {
-      case _: DuplicateException =>
-        halt(409)
+      case ex: DuplicateException =>
+        halt(409, ex.message.getOrElse("Folder name already exists at this level"))
     }
 
     halt(200)

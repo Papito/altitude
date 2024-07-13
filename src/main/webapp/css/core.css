@@ -198,6 +198,10 @@ form input.error, form input.error:focus {
     background-color: var(--warning-background-color);
 }
 
+#snackbar.error {
+    background-color: var(--error-background-color);
+}
+
 @keyframes fadein {
     from {bottom: 0; opacity: 0;}
     to {bottom: 30px; opacity: 1;}

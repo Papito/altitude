@@ -18,7 +18,7 @@ case class ValidationException(message: String = "") extends Exception {
 }
 
 
-case class DuplicateException() extends Exception
+case class DuplicateException(message: Option[String] = None) extends Exception
 
 case class ConstraintException(msg: String) extends Exception(msg)
 

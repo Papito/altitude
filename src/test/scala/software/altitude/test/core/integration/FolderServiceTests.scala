@@ -307,7 +307,7 @@ import software.altitude.test.core.IntegrationTestCore
     }
 
     // move into a child
-    intercept[IllegalOperationException] {
+    intercept[DuplicateException] {
       testApp.service.library.moveFolder(folder1.persistedId, folder1_1_1.persistedId)
     }
 
@@ -366,7 +366,6 @@ import software.altitude.test.core.IntegrationTestCore
       */
 
     var folder1: Folder = testApp.service.library.addFolder("folder1")
-    println("Parent", folder1.persistedId)
 
     val folder1_1: Folder = testApp.service.library.addFolder(
       name = "folder1_1", parentId = folder1.id)

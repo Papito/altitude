@@ -66,14 +66,17 @@ export class Folder {
     }
 
     incrementNumOfChildren() {
-        console.log("Incrementing # of children for  " + this.name())
-
+        console.log("Incrementing # of children for  " + this.name() + ". New value: " + this.numOfChildren())
+        console.log("\tOld value: " + this.numOfChildren())
         this.element.setAttribute(Const.attributes.numOfChildren, this.numOfChildren() + 1)
+        console.log("\tNew value: " + this.numOfChildren())
     }
 
     decrementNumOfChildren() {
-        console.log("Decrementing # of children for  " + this.name())
+        console.log("Decrementing # of children for  " + this.name() + ". New value: " + this.numOfChildren())
+        console.log("\tOld value: " + this.numOfChildren())
         this.element.setAttribute(Const.attributes.numOfChildren, this.numOfChildren() - 1)
+        console.log("\tNew value: " + this.numOfChildren())
     }
 
     updateVisualState() {
