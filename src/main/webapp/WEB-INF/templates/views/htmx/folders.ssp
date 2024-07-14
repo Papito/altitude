@@ -45,6 +45,10 @@
         font-size: 1.2em;
     }
 
+    #rootFolderList .folder.root i {
+        color: #f8c98f;
+    }
+
     #rootFolderList .folder:not(.root) i {
         color: var(--success-font-color);
     }

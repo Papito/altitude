@@ -28,6 +28,7 @@
             border-right: 1px solid var(--panel-border-color);
             box-shadow: var(--box-shadow);
             text-shadow: rgba(0,0,0,0.75) 0 1px;
+            padding-top: var(--panel-padding);
         }
 
         #assets {
@@ -122,7 +123,7 @@
             <tab-container>
                 <div role="tablist">
                     <button type="button" id="folderTab" role="tab"
-                            data-tab-container-no-tabstop aria-selected="true">
+                            data-tab-container-no-tabstop aria-selected="True">
                         <a href="#">Folders</a>
                     </button>
                     <button type="button" id="activityLogsTab" role="tab"
