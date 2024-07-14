@@ -6,7 +6,7 @@ scalaVersion := "2.13.14"
 val json4sVersion = "4.0.7"
 val scalatraVersion = "2.8.4"
 val jettyVersion = "9.4.20.v20190813"
-// val AkkaVersion = "2.6.16"
+val opencvVersion = "1.5.10"
 
 scalacOptions := Seq(
   "-deprecation",
@@ -21,7 +21,6 @@ libraryDependencies ++= Seq(
 
   "org.scalatra"                %% "scalatra"                 % scalatraVersion,
   "org.scalatra"                %% "scalatra-atmosphere"      % scalatraVersion,
-  "org.scalatra"                %% "scalatra-scalatest"       % scalatraVersion % Test,
   "org.scalatra"                %% "scalatra-scalate"         % scalatraVersion,
   "org.scalatra"                %% "scalatra-auth"            % scalatraVersion,
   "org.scalatra"                %% "scalatra-atmosphere"      % scalatraVersion,
@@ -29,28 +28,31 @@ libraryDependencies ++= Seq(
   "org.scalatra.scalate"        %% "scalate-core"             % "1.10.1",
 
   "com.typesafe"                 % "config"                   % "1.4.3",
-
   "com.typesafe.play"           %% "play-json"                % "2.10.5",
-  "org.apache.tika"              % "tika-core"                % "2.9.2",
-  "org.apache.tika"              % "tika-parsers" % "2.9.2",
-  "org.apache.tika"              % "tika-parser-image-module" % "2.9.2",
 
   "commons-io"                   % "commons-io"               % "2.16.1",
   "commons-codec"                % "commons-codec"            % "1.17.0",
   "commons-dbutils"              % "commons-dbutils"          % "1.8.1",
-  "commons-logging"              % "commons-logging"           % "1.3.1",
+  "commons-logging"              % "commons-logging"           % "1.3.3",
+  "org.apache.commons"           % "commons-imaging"          % "1.0-alpha2",
 
   "org.mindrot"                  % "jbcrypt"                  % "0.4",
+
   "org.postgresql"               % "postgresql"               % "42.7.3",
   "org.xerial"                   % "sqlite-jdbc"              % "3.46.0.0",
 
-  "org.imgscalr"                 % "imgscalr-lib"             % "4.2",
-  "org.apache.commons"           % "commons-imaging"          % "1.0-alpha2",
   "com.drewnoakes"               % "metadata-extractor"       % "2.19.0",
+  "org.apache.tika"              % "tika-core"                % "2.9.2",
+  "org.apache.tika"              % "tika-parsers" % "2.9.2",
+  "org.apache.tika"              % "tika-parser-image-module" % "2.9.2",
+  "org.imgscalr"                 % "imgscalr-lib"             % "4.2",
+  "org.bytedeco"                 % "javacv-platform"          % opencvVersion,
+  "nu.pattern"                   % "opencv"                   % "2.4.9-7",
   "ch.qos.logback"               % "logback-classic"          % "1.5.6" % "runtime",
   "org.slf4j"                    % "slf4j-api"                % "2.0.12" % "runtime",
 
-  "org.mockito" % "mockito-core" % "5.11.0" % Test,
+  "org.scalatra"                %% "scalatra-scalatest"       % scalatraVersion % Test,
+  "org.mockito"                  % "mockito-core"             % "5.11.0" % Test,
 
   //
   // ATTN: The old versions are required - we don't need to update them until Scalatra 3.x/Scala 3.x upgrade
