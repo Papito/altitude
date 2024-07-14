@@ -24,7 +24,7 @@
             overflow: hidden;
         }
 
-        #browser {
+        #explorer {
             border-right: 1px solid var(--panel-border-color);
             box-shadow: var(--box-shadow);
             text-shadow: rgba(0,0,0,0.75) 0 1px;
@@ -37,12 +37,12 @@
             overflow-y: auto;
         }
 
-        #folders {
+        #explorerViews {
             box-shadow: var(--box-shadow);
             text-shadow: rgba(0,0,0,0.75) 0 1px;
         }
 
-        #albums {
+        #infoPanel {
             border-top: 1px solid var(--panel-border-color);
             box-shadow: var(--box-shadow);
             text-shadow: rgba(0,0,0,0.75) 0 1px;
@@ -117,11 +117,27 @@
 <main>
     ${include("includes/html_common.ssp")}
 
-    <div id="browser" class="split content split-horizontal">
-        <div id="folders" class="split content">
-            ${include("htmx/folders.ssp")}
+    <div id="explorer" class="split content split-horizontal">
+        <div id="explorerViews" class="split content">
+            <tab-container>
+                <div role="tablist">
+                    <button type="button" id="folderTab" role="tab"
+                            data-tab-container-no-tabstop aria-selected="true">
+                        <a href="#">Folders</a>
+                    </button>
+                    <button type="button" id="activityLogsTab" role="tab"
+                            data-tab-container-no-tabstop>
+                        <a href="#">Albums</a>
+                    </button>
+                </div>
+
+                <div role="tabpanel" class="tab-content">
+                    ${include("htmx/folders.ssp")}
+                </div>
+            </tab-container>
         </div>
-        <div id="albums" class="split content">
+
+        <div id="infoPanel" class="split content">
         </div>
     </div>
 
@@ -156,7 +172,7 @@
         horizontalSplitSizes = JSON.parse(savedHorizontalSplitSizes)
     }
 
-    Split(["#browser", "#assets"], {
+    Split(["#explorer", "#assets"], {
         sizes: horizontalSplitSizes,
         minSize: [100, 300],
         onDragEnd: function (horizontalSplitSizes) {
@@ -171,7 +187,7 @@
         verticalSplitSizes = JSON.parse(savedVerticalSplitSizes)
     }
 
-    Split(["#folders", "#albums"], {
+    Split(["#explorerViews", "#infoPanel"], {
         sizes: verticalSplitSizes,
         direction: 'vertical',
         onDragEnd: function (verticalSplitSizes) {
