@@ -41,13 +41,13 @@ libraryDependencies ++= Seq(
   "org.postgresql"               % "postgresql"               % "42.7.3",
   "org.xerial"                   % "sqlite-jdbc"              % "3.46.0.0",
 
+  // "org.bytedeco"                 % "javacv"                   % "1.5.10",
+  // "nu.pattern"                   % "opencv"                   % "2.4.9-7",
   "com.drewnoakes"               % "metadata-extractor"       % "2.19.0",
   "org.apache.tika"              % "tika-core"                % "2.9.2",
   "org.apache.tika"              % "tika-parsers" % "2.9.2",
   "org.apache.tika"              % "tika-parser-image-module" % "2.9.2",
   "org.imgscalr"                 % "imgscalr-lib"             % "4.2",
-  "org.bytedeco"                 % "javacv-platform"          % opencvVersion,
-  "nu.pattern"                   % "opencv"                   % "2.4.9-7",
   "ch.qos.logback"               % "logback-classic"          % "1.5.6" % "runtime",
   "org.slf4j"                    % "slf4j-api"                % "2.0.12" % "runtime",
 
@@ -69,9 +69,32 @@ inThisBuild(
   List(
     scalaVersion := scalaVersion.value,
     semanticdbEnabled := true,
-    semanticdbVersion := scalafixSemanticdb.revision
+    semanticdbVersion := scalafixSemanticdb.revision,
   )
 )
+
+val javacppVersion = "1.5"
+
+// From: https://github.com/duanebester/streaming-ocr
+
+// Platform classifier for native library dependencies
+val platform = org.bytedeco.javacpp.Loader.getPlatform
+// Libraries with native dependencies
+val bytedecoPresetLibs = Seq(
+  "opencv" -> s"4.0.1-$javacppVersion",
+  "ffmpeg" -> s"4.1.3-$javacppVersion").flatMap {
+  case (lib, ver) => Seq(
+    // Add both: dependency and its native binaries for the current `platform`
+    "org.bytedeco" % lib % ver withSources() withJavadoc(),
+    "org.bytedeco" % lib % ver classifier platform
+  )
+}
+
+libraryDependencies ++= bytedecoPresetLibs
+
+autoCompilerPlugins := true
+
+fork := true // prevent classloader issues caused by sbt and opencv
 
 ThisBuild / scalacOptions ++= Seq(
   "-deprecation",
@@ -88,6 +111,10 @@ parallelExecution in Test := false
 unmanagedResourceDirectories in Compile += {
   baseDirectory.value / "src/main/webapp"
 }
+
+//unmanagedClasspath in Compile += {
+//  baseDirectory.value / "lib"
+//}
 
 assemblyMergeStrategy in assembly := {
   case PathList("META-INF", xs @ _*) if xs.contains("MANIFEST.MF") => MergeStrategy.discard
