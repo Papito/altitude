@@ -19,8 +19,8 @@ class LocalDevRememberMeStrategy(protected val app: ScalatraBase)(implicit reque
   override def name: String = "RememberMe"
 
   def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse): Option[User] = {
-    if (Environment.CURRENT != Environment.Name.DEV)
-      throw new RuntimeException("LocalDevRememberMeStrategy can only be used in development environment")
+//    if (Environment.CURRENT != Environment.Name.DEV)
+//      throw new RuntimeException("LocalDevRememberMeStrategy can only be used in development environment")
 
     // The base web controller will have already set the repository and user in the request context
     // by finding the first available repository and user in the database

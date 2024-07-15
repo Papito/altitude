@@ -96,10 +96,6 @@ val bytedecoPresetLibs = Seq(
 
 libraryDependencies ++= bytedecoPresetLibs
 
-autoCompilerPlugins := true
-
-fork := true // prevent classloader issues caused by sbt and opencv
-
 ThisBuild / scalacOptions ++= Seq(
   "-deprecation",
   "-encoding", "UTF-8",
@@ -133,6 +129,8 @@ assembly / assemblyJarName := {
   val base = name.value
   s"$base-${version.value}.jar"
 }
+
+assembly / mainClass := Some("ScalatraLauncher")
 
 commands += Command.command("testFocused") { state =>
   "testOnly -- -n focused" :: state

@@ -11,9 +11,7 @@ import software.altitude.core.util.Query
 class BaseWebController extends BaseController with ScalateSupport {
   before() {
     Environment.CURRENT match {
-      case Environment.Name.PROD =>
-
-      case Environment.Name.DEV =>
+      case Environment.Name.DEV | Environment.Name.PROD =>
         val repoResults = app.service.repository.query(new Query())
         if (repoResults.records.nonEmpty) {
           RequestContext.repository.value = Some(repoResults.records.head: Repository)

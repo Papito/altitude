@@ -1,5 +1,6 @@
 package research
 
+/*
 import org.bytedeco.javacpp.Loader
 import org.opencv.face.LBPHFaceRecognizer
 import org.opencv.objdetect.CascadeClassifier
@@ -24,3 +25,4 @@ object FaceRecognition extends App {
   val allFiles = getAllFilesInDirectory(dirPath)
   allFiles.foreach(println)
 }
+*/

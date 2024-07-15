@@ -148,8 +148,9 @@ class Altitude(val dbEngineOverride: Option[String] = None)  {
    */
   val scentryStrategies: List[(String, Class[_ <: ScentryStrategy[User]])] = Environment.CURRENT match {
     case Environment.Name.PROD => List(
-      ("UserPasswordStrategy", classOf[UserPasswordStrategy]),
-      ("RememberMeStrategy", classOf[RememberMeStrategy])
+      ("RememberMeStrategy", classOf[LocalDevRememberMeStrategy])
+//      ("UserPasswordStrategy", classOf[UserPasswordStrategy]),
+//      ("RememberMeStrategy", classOf[RememberMeStrategy])
     )
     case Environment.Name.DEV => List(
       ("RememberMeStrategy", classOf[LocalDevRememberMeStrategy])

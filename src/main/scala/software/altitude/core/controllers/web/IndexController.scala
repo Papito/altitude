@@ -1,8 +1,6 @@
 package software.altitude.core.controllers.web
 
-import software.altitude.core.RequestContext
 import software.altitude.core.controllers.BaseWebController
-import software.altitude.core.models.Folder
 import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchResult
 import software.altitude.core.{Const => C}
