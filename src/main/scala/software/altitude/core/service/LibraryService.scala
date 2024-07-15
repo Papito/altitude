@@ -4,8 +4,6 @@ import com.drew.imaging.ImageMetadataReader
 import com.drew.metadata.exif.ExifDirectoryBase
 import com.drew.metadata.exif.ExifIFD0Directory
 import org.imgscalr.Scalr
-import org.opencv.core.MatOfRect
-import org.opencv.imgcodecs.Imgcodecs
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
@@ -76,18 +74,6 @@ class LibraryService(val app: Altitude) {
         data = assetIn.data,
         extractedMetadata = assetIn.extractedMetadata
       )
-
-      println("!!!!")
-      Imgcodecs.imread("/home/andrei/dropbox/media/_catalog/Tessa/DSC_0495.jpg")
-
-      println("!!!!")
-      val faceDetections = new MatOfRect()
-//
-//      println("!!!!")
-//      faceDetector.detectMultiScale(image, faceDetections)
-//
-//      println("!!!!")
-//      println(String.format("Detected %s faces", faceDetections.toList.size()))
 
       logger.info(s"Adding asset: $assetToAddModel")
 
