@@ -73,16 +73,20 @@ inThisBuild(
   )
 )
 
-val javacppVersion = "1.5"
+val javacppVersion = "1.5.7"
 
 // From: https://github.com/duanebester/streaming-ocr
 
 // Platform classifier for native library dependencies
 val platform = org.bytedeco.javacpp.Loader.getPlatform
+// Seq("windows-x86_64", "macosx-x86_64", "linux-x86_64")
+
 // Libraries with native dependencies
 val bytedecoPresetLibs = Seq(
-  "opencv" -> s"4.0.1-$javacppVersion",
-  "ffmpeg" -> s"4.1.3-$javacppVersion").flatMap {
+  "opencv" -> s"4.5.5-$javacppVersion",
+  "ffmpeg" -> s"5.0-$javacppVersion",
+  "openblas" -> s"0.3.19-$javacppVersion"
+).flatMap {
   case (lib, ver) => Seq(
     // Add both: dependency and its native binaries for the current `platform`
     "org.bytedeco" % lib % ver withSources() withJavadoc(),
