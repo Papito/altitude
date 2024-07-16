@@ -1,8 +1,8 @@
 package software.altitude.core.controllers.htmx
 
 import org.scalatra.Route
-import software.altitude.core.controllers.BaseHtmxController
 import software.altitude.core.RequestContext
+import software.altitude.core.controllers.BaseHtmxController
 
 /**
   * @ /htmx/album/

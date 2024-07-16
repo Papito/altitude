@@ -2,7 +2,9 @@ package software.altitude.core.controllers.web
 
 import org.json4s.DefaultFormats
 import org.json4s.Formats
-import org.scalatra.{RequestEntityTooLarge, Route, SessionSupport}
+import org.scalatra.RequestEntityTooLarge
+import org.scalatra.Route
+import org.scalatra.SessionSupport
 import org.scalatra.atmosphere.AtmoReceive
 import org.scalatra.atmosphere.AtmosphereClient
 import org.scalatra.atmosphere.AtmosphereSupport

@@ -263,7 +263,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
       // cannot move into own child
       if (flatChildrenIdsWithDepths(folderBeingMovedId, repositoryFolders()).map(_._2).contains(destFolderId)) {
         throw DuplicateException(
-          Some(s"Cannot move parent folder into a child node"))
+          Some("Cannot move parent folder into a child node"))
       }
 
       var destFolder: Option[Folder] = None

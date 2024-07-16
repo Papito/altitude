@@ -8,9 +8,7 @@ import org.scalatra.auth.ScentryStrategy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.auth.strategies.LocalDevRememberMeStrategy
-import software.altitude.core.auth.strategies.RememberMeStrategy
 import software.altitude.core.auth.strategies.TestRememberMeStrategy
-import software.altitude.core.auth.strategies.UserPasswordStrategy
 import software.altitude.core.dao._
 import software.altitude.core.models.User
 import software.altitude.core.service._
@@ -209,6 +207,12 @@ class Altitude(val dbEngineOverride: Option[String] = None)  {
       case C.DbEngineName.SQLITE => new sqlite.SearchDao(app.config)
       case _ => throw new IllegalArgumentException(s"Unknown datasource [$dataSourceType]")
     }
+
+    val face: FaceDao = dataSourceType match {
+      case C.DbEngineName.POSTGRES => new jdbc.FaceDao(app.config) with dao.postgres.PostgresOverrides
+      case C.DbEngineName.SQLITE => new jdbc.FaceDao(app.config) with dao.sqlite.SqliteOverrides
+      case _ => throw new IllegalArgumentException(s"Unknown datasource [$dataSourceType]")
+    }
   }
 
   object service {
@@ -234,6 +238,7 @@ class Altitude(val dbEngineOverride: Option[String] = None)  {
     val asset = new AssetService(app)
     val folder = new FolderService(app)
     val stats = new StatsService(app)
+    val face = new FaceService(app)
 
     val fileStore: FileStoreService = fileStoreType match {
       case C.StorageEngineName.FS => new FileSystemStoreService(app)

@@ -1,11 +1,15 @@
 package research
 
 import org.apache.commons.io.FileUtils
-import org.opencv.core.{Mat, MatOfByte, MatOfRect, Point, Scalar}
-import org.opencv.imgcodecs.Imgcodecs
-import org.opencv.objdetect.CascadeClassifier
 import org.bytedeco.javacpp.Loader
+import org.opencv.core.Mat
+import org.opencv.core.MatOfByte
+import org.opencv.core.MatOfRect
+import org.opencv.core.Point
+import org.opencv.core.Scalar
+import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
+import org.opencv.objdetect.CascadeClassifier
 
 import java.io.File
 

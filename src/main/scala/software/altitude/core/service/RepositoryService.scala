@@ -6,7 +6,10 @@ import software.altitude.core.Altitude
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.RepositoryDao
 import software.altitude.core.dao.jdbc.BaseDao
-import software.altitude.core.models.{Folder, Repository, Stats, User}
+import software.altitude.core.models.Folder
+import software.altitude.core.models.Repository
+import software.altitude.core.models.Stats
+import software.altitude.core.models.User
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.{Const => C}
 

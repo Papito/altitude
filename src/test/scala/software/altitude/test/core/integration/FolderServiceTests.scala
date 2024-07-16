@@ -383,7 +383,7 @@ import software.altitude.test.core.IntegrationTestCore
     folder1.numOfChildren shouldBe 0
   }
 
-  test("Folders child count should be correct after moving", Focused) {
+  test("Folders child count should be correct after moving") {
     /*
     folder1
       folder1_1

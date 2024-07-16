@@ -1,7 +1,10 @@
 package software.altitude.core.controllers
 
+import org.scalatra.ContentEncodingSupport
+import org.scalatra.InternalServerError
+import org.scalatra.ScalatraServlet
+import org.scalatra.UrlGeneratorSupport
 import org.scalatra.scalate.ScalateUrlGeneratorSupport
-import org.scalatra.{ContentEncodingSupport, InternalServerError, ScalatraServlet, UrlGeneratorSupport}
 import org.slf4j.MDC
 import software.altitude.core.AltitudeServletContext
 import software.altitude.core.Const

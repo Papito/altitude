@@ -1,8 +1,10 @@
 package research
 
 import org.opencv.core._
-import org.opencv.dnn.Dnn.{blobFromImage, readNetFromCaffe}
-import org.opencv.imgcodecs.Imgcodecs.{IMREAD_COLOR, imread}
+import org.opencv.dnn.Dnn.blobFromImage
+import org.opencv.dnn.Dnn.readNetFromCaffe
+import org.opencv.imgcodecs.Imgcodecs.IMREAD_COLOR
+import org.opencv.imgcodecs.Imgcodecs.imread
 import org.opencv.imgproc.Imgproc
 
 import java.io.File
@@ -55,8 +57,8 @@ object DeepNetFaceDetection extends SandboxApp {
       for (idx <- 0 until di.rows()) yield {
         val confidence = di.get(idx, 2)(0)
 
+        // println(confidence)
         if (confidence > confidenceThreshold) {
-//          println(confidence)
           val x1 = (di.get(idx, 3)(0) * image.size().width).toInt
           val y1 = (di.get(idx, 4)(0) * image.size().height).toInt
           val x2 = (di.get(idx, 5)(0) * image.size().width).toInt

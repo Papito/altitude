@@ -1,7 +1,10 @@
 package software.altitude.core.controllers.web
 
-import org.scalatra.{Route, ScalatraServlet, UrlGeneratorSupport}
-import org.scalatra.scalate.{ScalateSupport, ScalateUrlGeneratorSupport}
+import org.scalatra.Route
+import org.scalatra.ScalatraServlet
+import org.scalatra.UrlGeneratorSupport
+import org.scalatra.scalate.ScalateSupport
+import org.scalatra.scalate.ScalateUrlGeneratorSupport
 import software.altitude.core.auth.AuthenticationSupport
 
 class SessionController

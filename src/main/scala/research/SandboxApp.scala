@@ -47,5 +47,5 @@ abstract class SandboxApp extends App {
     new File(url.toURI)
   }
 
-  val allFilePaths = getAllFilesInDirectory(sourceDirPath)
+  val allFilePaths: List[String] = getAllFilesInDirectory(sourceDirPath)
 }
