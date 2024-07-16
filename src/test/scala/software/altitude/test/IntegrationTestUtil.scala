@@ -31,14 +31,14 @@ object IntegrationTestUtil {
   /**
    * Convert a file system resource to an import asset (this reads the actual binary content of the file).
    */
-  def fileToImportAsset(file: File): ImportAsset = new ImportAsset(
+  protected def fileToImportAsset(file: File): ImportAsset = new ImportAsset(
     fileName = file.getName,
     data = FileUtils.readFileToByteArray(file),
     metadata = Metadata())
 
-  def getImportAsset(path: String): ImportAsset = {
-    val _path = getClass.getResource(s"/import/$path").getPath
-    val fileImportAsset = fileToImportAsset(new File(_path))
+  def getImportAsset(relPath: String): ImportAsset = {
+    val path = getClass.getResource(s"/import/$relPath").getPath
+    val fileImportAsset = fileToImportAsset(new File(path))
     fileImportAsset
   }
 }

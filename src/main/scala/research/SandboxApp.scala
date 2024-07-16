@@ -28,7 +28,9 @@ abstract class SandboxApp extends App {
     val directory = new File(directoryPath)
     directory.listFiles.filter(_.isFile)
       .filter(file =>
-        file.getName.toLowerCase.endsWith(".jpg") || file.getName.toLowerCase.endsWith(".jpeg"))
+        file.getName.toLowerCase.endsWith(".jpg") ||
+          file.getName.toLowerCase.endsWith(".jpeg") ||
+          file.getName.toLowerCase.endsWith(".png"))
       .map(_.getAbsolutePath).toList
   }
 

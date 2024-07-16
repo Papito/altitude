@@ -68,6 +68,13 @@ object Const {
     val ACCOUNT_TYPE = "account_type"
   }
 
+  object Face extends Common {
+    val X1 = "x1"
+    val Y1 = "y1"
+    val X2 = "x2"
+    val Y2 = "y2"
+  }
+
   object Asset extends Common {
     val ASSET_TYPE = "asset_type"
     val FOLDER_ID = "folder_id"

@@ -1,32 +1,17 @@
 package research
 
+import org.apache.commons.io.FileUtils
 import org.opencv.core._
 import org.opencv.dnn.Dnn.blobFromImage
-import org.opencv.dnn.Dnn.readNetFromCaffe
-import org.opencv.imgcodecs.Imgcodecs.IMREAD_COLOR
-import org.opencv.imgcodecs.Imgcodecs.imread
+import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
+import software.altitude.core.service.FaceService
 
 import java.io.File
 
 object DeepNetFaceDetection extends SandboxApp {
-  private val confidenceThreshold = 0.35
-  private val modelConfiguration = loadResourceAsFile("/opencv/deploy.prototxt")
-  private val modelBinary = loadResourceAsFile("/opencv/res10_300x300_ssd_iter_140000.caffemodel")
-  private val inWidth = 300
-  private val inHeight = 300
-  private val inScaleFactor = 1.0
-  private val meanVal = new Scalar(104.0, 177.0, 123.0, 128)
+  private var totalFaceRegions = 0
   private val markerColor = new Scalar(0, 255, 255, 0)
-
-  if (!modelConfiguration.exists()) {
-    println(s"Cannot find model configuration: ${modelConfiguration.getCanonicalPath}")
-  }
-  if (!modelBinary.exists()) {
-    println(s"Cannot find model file: ${modelConfiguration.getCanonicalPath}")
-  }
-
-  private val net = readNetFromCaffe(modelConfiguration.getCanonicalPath, modelBinary.getCanonicalPath)
 
   override def process(path: String): Unit = {
     val file = new File(path)
@@ -34,7 +19,9 @@ object DeepNetFaceDetection extends SandboxApp {
     println("\n=========================================")
     println(s"Processing ${file.getAbsolutePath}")
 
-    val image = imread(file.getAbsolutePath, IMREAD_COLOR)
+    val fileByteArray: Array[Byte] = FileUtils.readFileToByteArray(file)
+    val image: Mat = Imgcodecs.imdecode(new MatOfByte(fileByteArray: _*), Imgcodecs.IMREAD_ANYCOLOR)
+
     if (image.empty) {
       println("!!! Couldn't load image: " + file.getAbsolutePath)
       return
@@ -42,13 +29,13 @@ object DeepNetFaceDetection extends SandboxApp {
 
     // Convert image to format suitable for using with the net
     val inputBlob = blobFromImage(
-      image, inScaleFactor, new Size(inWidth, inHeight), meanVal, false, false, CvType.CV_32F)
+      image, FaceService.inScaleFactor, new Size(FaceService.inWidth, FaceService.inHeight), FaceService.meanVal, false, false, CvType.CV_32F)
 
     // Set the network input
-    net.setInput(inputBlob)
+    FaceService.net.setInput(inputBlob)
 
     // Make forward pass, compute output
-    val detections = net.forward()
+    val detections = FaceService.net.forward()
 
     // Decode detected face locations
     val di = detections.reshape(1, detections.total().asInstanceOf[Int] / 7)
@@ -58,7 +45,7 @@ object DeepNetFaceDetection extends SandboxApp {
         val confidence = di.get(idx, 2)(0)
 
         // println(confidence)
-        if (confidence > confidenceThreshold) {
+        if (confidence > FaceService.confidenceThreshold) {
           val x1 = (di.get(idx, 3)(0) * image.size().width).toInt
           val y1 = (di.get(idx, 4)(0) * image.size().height).toInt
           val x2 = (di.get(idx, 5)(0) * image.size().width).toInt
@@ -75,10 +62,14 @@ object DeepNetFaceDetection extends SandboxApp {
 
     // Draw rectangles around detected faces
     for (rect <- faceRegions) {
+      totalFaceRegions += 1
       Imgproc.rectangle(image, rect.tl(), rect.br(), markerColor, 2)
     }
 
     writeResult(file, image)
   }
+
   allFilePaths.foreach(process)
+
+  println(s"\n=======\nTotal face regions detected: $totalFaceRegions")
 }
