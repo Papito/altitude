@@ -13,11 +13,16 @@ object HaarFaceDetection extends SandboxApp {
 
   override def process(path: String): Unit = {
     val file = new File(path)
+
+    println("\n=========================================")
+    println(s"Processing ${file.getAbsolutePath}")
+
     val fileByteArray: Array[Byte] = FileUtils.readFileToByteArray(file)
     val image: Mat = Imgcodecs.imdecode(new MatOfByte(fileByteArray: _*), Imgcodecs.IMREAD_GRAYSCALE)
 
-    val faceDetector: CascadeClassifier = new CascadeClassifier("haarcascade_frontalface_default.xml");
-    faceDetector.load(Loader.extractResource("haarcascade_frontalface_default.xml", null, "classifier", ".xml").getAbsolutePath)
+    val resourceFilePath = "opencv/haarcascade_frontalface_default.xml"
+    val faceDetector: CascadeClassifier = new CascadeClassifier(resourceFilePath);
+    faceDetector.load(Loader.extractResource(resourceFilePath, null, "classifier", ".xml").getAbsolutePath)
 
     val faceDetections: MatOfRect = new MatOfRect()
     faceDetector.detectMultiScale(image, faceDetections)

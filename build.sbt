@@ -86,6 +86,13 @@ val bytedecoPresetLibs = Seq(
   "opencv" -> s"4.5.5-$javacppVersion",
   "ffmpeg" -> s"5.0-$javacppVersion",
   "openblas" -> s"0.3.19-$javacppVersion"
+
+  // Fails RN with:
+  //    bytedeco/openblas/linux-x86_64/libjniopenblas_nolapack.so: /lib/x86_64-linux-gnu/libm.so.6: version `GLIBC_2.29' not found
+  //"opencv" -> s"4.9.0-$javacppVersion",
+  //"ffmpeg" -> s"6.1.1-$javacppVersion",
+  //"openblas" -> s"0.3.26-$javacppVersion"
+
 ).flatMap {
   case (lib, ver) => Seq(
     // Add both: dependency and its native binaries for the current `platform`

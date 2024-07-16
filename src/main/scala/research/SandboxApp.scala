@@ -33,12 +33,18 @@ abstract class SandboxApp extends App {
   }
 
   def writeResult(ogFile: File, image: Mat): Unit = {
-    println("\n=========================================")
-    println(s"Processing ${ogFile.getAbsolutePath}")
     val outputPath = FilenameUtils.concat(outputDirPath, ogFile.getName)
     println(String.format("Writing %s", outputPath))
     Imgcodecs.imwrite(outputPath, image)
 
+  }
+
+  def loadResourceAsFile(relativePath: String): File = {
+    val url = getClass.getResource(relativePath)
+    if (url == null) {
+      throw new IllegalArgumentException(s"Resource not found: $relativePath")
+    }
+    new File(url.toURI)
   }
 
   val allFilePaths = getAllFilesInDirectory(sourceDirPath)
