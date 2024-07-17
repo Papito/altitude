@@ -4,6 +4,7 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
+import software.altitude.core.service.FaceService.detectFaces
 import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.IntegrationTestCore
 
@@ -13,7 +14,7 @@ import software.altitude.test.core.IntegrationTestCore
     val importAsset = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     testApp.service.assetImport.importAsset(importAsset).get
 
-    val faces = testApp.service.face.detectFaces(importAsset.data)
+    val faces = detectFaces(importAsset.data)
 
     faces.length should be(1)
   }
@@ -22,7 +23,7 @@ import software.altitude.test.core.IntegrationTestCore
     val importAsset = IntegrationTestUtil.getImportAsset("people/speed.png")
     testApp.service.assetImport.importAsset(importAsset).get
 
-    val faces = testApp.service.face.detectFaces(importAsset.data)
+    val faces = detectFaces(importAsset.data)
 
     faces.length should be(2)
   }
@@ -31,7 +32,7 @@ import software.altitude.test.core.IntegrationTestCore
     val importAsset = IntegrationTestUtil.getImportAsset("people/meme-wednesday.png")
     testApp.service.assetImport.importAsset(importAsset).get
 
-    val faces = testApp.service.face.detectFaces(importAsset.data)
+    val faces = detectFaces(importAsset.data)
 
     faces.length should be(2)
   }

@@ -13,6 +13,7 @@ import org.opencv.dnn.Dnn.blobFromImage
 import org.opencv.dnn.Dnn.readNetFromCaffe
 import org.opencv.dnn.Net
 import org.opencv.imgcodecs.Imgcodecs
+import org.slf4j.{Logger, LoggerFactory}
 import research.DeepNetFaceDetection.loadResourceAsFile
 import software.altitude.core.Altitude
 import software.altitude.core.dao.FaceDao
@@ -30,14 +31,10 @@ object FaceService {
   val inScaleFactor = 1.0
   val meanVal = new Scalar(104.0, 177.0, 123.0, 128)
   val net: Net = readNetFromCaffe(modelConfiguration.getCanonicalPath, modelBinary.getCanonicalPath)
-}
-
-class FaceService(val app: Altitude) extends BaseService[Face] {
-  Loader.load(classOf[opencv_java])
-
-  override protected val dao: FaceDao = app.DAO.face
 
   def detectFaces(data: Array[Byte]): List[Face] = {
+    val logger: Logger = LoggerFactory.getLogger(getClass)
+
     val image: Mat = Imgcodecs.imdecode(new MatOfByte(data: _*), Imgcodecs.IMREAD_ANYCOLOR)
 
     if (image.empty) {
@@ -77,7 +74,7 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
             logger.warn("Face region too small")
             None
           } else {
-              Option(rect)
+            Option(rect)
           }
         } else {
           None
@@ -91,4 +88,11 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
       Face(x1 = region.x, y1 = region.y, x2 = region.x + region.width, y2 = region.y + region.height)
     }.toList
   }
+}
+
+class FaceService(val app: Altitude) extends BaseService[Face] {
+  Loader.load(classOf[opencv_java])
+
+  override protected val dao: FaceDao = app.DAO.face
+
 }
