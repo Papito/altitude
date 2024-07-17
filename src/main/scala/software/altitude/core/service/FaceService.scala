@@ -21,7 +21,8 @@ import software.altitude.core.models.Face
 import java.io.File
 
 object FaceService {
-  val confidenceThreshold = 0.38
+  val confidenceThreshold = 0.37
+  val minFaceSize = 40 // minimum acceptable size of face region in pixels
   private val modelConfiguration: File = loadResourceAsFile("/opencv/deploy.prototxt")
   private val modelBinary: File = loadResourceAsFile("/opencv/res10_300x300_ssd_iter_140000.caffemodel")
   val inWidth = 300
@@ -45,7 +46,10 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
     }
 
     val inputBlob = blobFromImage(
-      image, FaceService.inScaleFactor, new Size(FaceService.inWidth, FaceService.inHeight), FaceService.meanVal, false, false, CvType.CV_32F)
+      image,
+      FaceService.inScaleFactor,
+      new Size(FaceService.inWidth, FaceService.inHeight),
+      FaceService.meanVal, false, false, CvType.CV_32F)
 
     // Set the network input
     FaceService.net.setInput(inputBlob)
@@ -67,7 +71,14 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
           val x2 = (di.get(idx, 5)(0) * image.size().width).toInt
           val y2 = (di.get(idx, 6)(0) * image.size().height).toInt
 
-          Option(new Rect(new Point(x1, y1), new Point(x2, y2)))
+          val rect = new Rect(new Point(x1, y1), new Point(x2, y2))
+
+          if (rect.width < FaceService.minFaceSize || rect.height < FaceService.minFaceSize) {
+            logger.warn("Face region too small")
+            None
+          } else {
+              Option(rect)
+          }
         } else {
           None
         }

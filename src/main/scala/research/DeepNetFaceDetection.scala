@@ -44,16 +44,26 @@ object DeepNetFaceDetection extends SandboxApp {
       for (idx <- 0 until di.rows()) yield {
         val confidence = di.get(idx, 2)(0)
 
-        // println(confidence)
         if (confidence > FaceService.confidenceThreshold) {
+          println(s"@@@ Confidence: $confidence")
+
           val x1 = (di.get(idx, 3)(0) * image.size().width).toInt
           val y1 = (di.get(idx, 4)(0) * image.size().height).toInt
           val x2 = (di.get(idx, 5)(0) * image.size().width).toInt
           val y2 = (di.get(idx, 6)(0) * image.size().height).toInt
 
-          Option(new Rect(new Point(x1, y1), new Point(x2, y2)))
-          } else {
+          val rect = new Rect(new Point(x1, y1), new Point(x2, y2))
+
+          println(s"@@@ Size: ${rect.width}x${rect.height}\n")
+
+          if (rect.width < FaceService.minFaceSize || rect.height < FaceService.minFaceSize) {
+            println("!!! Face region is too small")
             None
+          } else {
+            Option(rect)
+          }
+        } else {
+          None
         }
       }
     }.flatten
