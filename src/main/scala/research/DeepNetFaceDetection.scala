@@ -22,11 +22,6 @@ object DeepNetFaceDetection extends SandboxApp {
     val fileByteArray: Array[Byte] = FileUtils.readFileToByteArray(file)
     val image: Mat = Imgcodecs.imdecode(new MatOfByte(fileByteArray: _*), Imgcodecs.IMREAD_ANYCOLOR)
 
-    if (image.empty) {
-      println("!!! Couldn't load image: " + file.getAbsolutePath)
-      return
-    }
-
     // Convert image to format suitable for using with the net
     val inputBlob = blobFromImage(
       image, FaceService.inScaleFactor, new Size(FaceService.inWidth, FaceService.inHeight), FaceService.meanVal, false, false, CvType.CV_32F)
