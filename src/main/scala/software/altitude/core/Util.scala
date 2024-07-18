@@ -3,8 +3,7 @@ import org.mindrot.jbcrypt.BCrypt
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-import java.io.PrintWriter
-import java.io.StringWriter
+import java.io.{File, PrintWriter, StringWriter}
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -28,6 +27,14 @@ object Util {
     } else {
       ""
     }
+  }
+
+  def loadResourceAsFile(relativePath: String): File = {
+    val url = getClass.getResource(relativePath)
+    if (url == null) {
+      throw new IllegalArgumentException(s"Resource not found: $relativePath")
+    }
+    new File(url.toURI)
   }
 
   def stringToLocalDateTime(str: String): Option[LocalDateTime] = {

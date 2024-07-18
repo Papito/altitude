@@ -41,13 +41,5 @@ abstract class SandboxApp extends App {
 
   }
 
-  def loadResourceAsFile(relativePath: String): File = {
-    val url = getClass.getResource(relativePath)
-    if (url == null) {
-      throw new IllegalArgumentException(s"Resource not found: $relativePath")
-    }
-    new File(url.toURI)
-  }
-
   val allFilePaths: List[String] = getAllFilesInDirectory(sourceDirPath)
 }

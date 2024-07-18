@@ -14,13 +14,14 @@ import org.opencv.dnn.Dnn.readNetFromCaffe
 import org.opencv.dnn.Net
 import org.opencv.imgcodecs.Imgcodecs
 import org.slf4j.{Logger, LoggerFactory}
-import research.DeepNetFaceDetection.loadResourceAsFile
 import software.altitude.core.Altitude
+import software.altitude.core.Util.loadResourceAsFile
 import software.altitude.core.dao.FaceDao
 import software.altitude.core.models.Face
 
 import java.io.File
 
+// YUNET version of this: https://gist.github.com/papito/769dd7e4b820bcacce2ac89d385e91ce
 object FaceService {
   private val confidenceThreshold = 0.37
   private val minFaceSize = 40 // minimum acceptable size of face region in pixels

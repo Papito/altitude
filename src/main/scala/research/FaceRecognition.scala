@@ -2,12 +2,12 @@ package research
 
 
 import org.apache.commons.io.FileUtils
-import org.opencv.core
-import org.opencv.core.{CvType, Mat, MatOfByte, MatOfFloat, MatOfInt, Point, Rect, Scalar, Size}
+import org.opencv.core.{CvType, Mat, MatOfByte, MatOfFloat, Point, Rect, Scalar, Size}
 import org.opencv.dnn.Dnn.{blobFromImage, readNetFromTorch}
 import org.opencv.face.FisherFaceRecognizer
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgcodecs.Imgcodecs.imdecode
+import software.altitude.core.Util.loadResourceAsFile
 import software.altitude.core.models.Face
 import software.altitude.core.service.FaceService
 
