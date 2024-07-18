@@ -38,18 +38,7 @@ object FaceRecognition extends SandboxApp {
       val rect: Rect = new Rect(new Point(face.x1, face.y1), new Point(face.x2, face.y2))
       val faceBlob = blobFromImage(new Mat(image, rect), 1.0 / 255, new Size(96, 96), new Scalar(0, 0), true, false, CvType.CV_32F)
       faceMats = faceMats :+ faceBlob
-//      embedder.setInput(faceBlob)
-//      val embeddingsMat = embedder.forward()
-//      val embeddings = new Array[Float](128)
-//      embeddingsMat.get(0, 0, embeddings)
-//      recognizer.update(List(embeddingsMat).asJava, 0)
-      //      val label = new Array[Int](1)
-      //      val confidence = new Array[Double](0)
-      //
-      //      faceRecognizer.predict(embeddingsMat, label, confidence)
-      //      println(embeddings.mkString(","))
     }
-
   }
 
   allFilePaths.foreach(process)
@@ -63,5 +52,6 @@ object FaceRecognition extends SandboxApp {
     labelsBuf.put(idx, idx)
   }
 
+  println("Training recognizer...")
   recognizer.train(faceBlobs, labels)
 }
