@@ -3,7 +3,7 @@ package research
 
 import org.apache.commons.io.FileUtils
 import org.opencv.core
-import org.opencv.core.{CvType, Mat, MatOfByte, MatOfInt, Point, Rect, Scalar, Size}
+import org.opencv.core.{CvType, Mat, MatOfByte, MatOfFloat, MatOfInt, Point, Rect, Scalar, Size}
 import org.opencv.dnn.Dnn.{blobFromImage, readNetFromTorch}
 import org.opencv.face.FisherFaceRecognizer
 import org.opencv.imgcodecs.Imgcodecs
@@ -32,6 +32,12 @@ object FaceRecognition extends SandboxApp {
       val faceBlob = blobFromImage(image.submat(rect), 1.0 / 255, new Size(96, 96), new Scalar(0, 0, 0), true, false)
 
       faceMats = faceMats :+ faceBlob
+      embedder.setInput(faceBlob)
+      // 128-dimensional embeddings
+      val embedderMat = embedder.forward()
+      val floatMat = new MatOfFloat()
+      embedderMat.assignTo(floatMat, CvType.CV_32F)
+      val faceSignature: Array[Float] = floatMat.toArray
     }
   }
 
