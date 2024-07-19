@@ -118,6 +118,26 @@ object FaceService {
     ret.toList
   }
 
+  def multiPassFaceDetect(image: Mat): List[Mat] = {
+    val faces = detectFacesWithDnnNet(image)
+
+    if (faces.nonEmpty) {
+      // extract face regions as Mats
+      val faceMats = faces.map { face =>
+        image.submat(face.y1, face.y2, face.x1, face.x2)
+      }
+
+      println("MULTI-PASS DNN")
+      faceMats.foldLeft(List[Mat]()) { (acc, faceMat) =>
+        acc ++ detectFacesWithYunet(faceMat)
+      }
+    } else {
+      println("YUNET ONLY")
+      // DNN failed - fallback to YUNET
+      detectFacesWithYunet(image)
+    }
+  }
+
   def isFaceSimilar(image1: Mat, image2: Mat, faceMat1: Mat, faceMat2: Mat): Boolean = {
     val alignedFace1 = new Mat
     val alignedFace2 = new Mat
