@@ -24,7 +24,7 @@ object FaceRecognition extends SandboxApp {
     val fileByteArray: Array[Byte] = FileUtils.readFileToByteArray(file)
     val image: Mat = imdecode(new MatOfByte(fileByteArray:_*), Imgcodecs.IMREAD_ANYCOLOR)
 
-    val faces: List[Face] = FaceService.detectFaces(fileByteArray)
+    val faces: List[Face] = FaceService.detectFacesWithDnnNet(fileByteArray)
 
     for (idx <- faces.indices) {
       val face = faces(idx)

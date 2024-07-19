@@ -38,7 +38,6 @@ abstract class SandboxApp extends App {
     val outputPath = FilenameUtils.concat(outputDirPath, ogFile.getName)
     println(String.format("Writing %s", outputPath))
     Imgcodecs.imwrite(outputPath, image)
-
   }
 
   val allFilePaths: List[String] = getAllFilesInDirectory(sourceDirPath)
