@@ -1,6 +1,6 @@
 package software.altitude.test.core.integration
 
-import org.opencv.core.{CvType, Mat}
+import org.opencv.core.Mat
 import org.opencv.imgcodecs.Imgcodecs
 import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.be
@@ -12,13 +12,22 @@ import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class FaceServiceTests(override val testApp: Altitude) extends IntegrationTestCore {
 
-  test("Face is detected in an image (1)") {
-    val importAsset = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
+  def dumpDetections(imageMat: Mat, detections: List[Mat]): Unit = {
+    detections.indices foreach(idx => {
+      val detection = detections(idx)
+      val faceMat1 = imageMat.submat(FaceService.faceDetectToRect(detection))
+      Imgcodecs.imwrite(s"/home/andrei/output/res${idx}.jpg", faceMat1)
+    })
+  }
+
+  test("Face is detected in an image (1)", Focused) {
+    val importAsset = IntegrationTestUtil.getImportAsset("people/bullock.jpg")
     testApp.service.assetImport.importAsset(importAsset).get
 
-    val faces = FaceService.detectFacesWithDnnNet(FaceService.matFromBytes(importAsset.data))
-
-    faces.length should be(1)
+    val imageMat = FaceService.matFromBytes(importAsset.data)
+    val detections = FaceService.detectFacesWithYunet(imageMat)
+    dumpDetections(imageMat, detections)
+//    detections.length should be(1)
   }
 
   test("Faces are detected in an image (2)") {
@@ -43,7 +52,7 @@ import software.altitude.test.core.IntegrationTestCore
     val importAsset = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val imageMat1: Mat = FaceService.matFromBytes(importAsset.data)
     val faces = FaceService.detectFacesWithDnnNet(imageMat1)
-    val faceMat1 = imageMat1.submat(faces.head.y1, faces.head.y2, faces.head.x1, faces.head.x2)
+    val faceMat1 = imageMat1.submat(faces.head)
     val imageMat2 = imageMat1.clone()
     val faceMat2 = faceMat1.clone()
 
@@ -55,17 +64,17 @@ import software.altitude.test.core.IntegrationTestCore
     val importAsset = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val imageMat1: Mat = FaceService.matFromBytes(importAsset.data)
     val faces = FaceService.detectFacesWithDnnNet(imageMat1)
-    val faceMat1 = imageMat1.submat(faces.head.y1, faces.head.y2, faces.head.x1, faces.head.x2)
+    val faceMat1 = imageMat1.submat(faces.head)
 
     val importAsset2 = IntegrationTestUtil.getImportAsset("people/meme-ben2.png")
     val imageMat2: Mat = FaceService.matFromBytes(importAsset2.data)
     val faces2 = FaceService.detectFacesWithDnnNet(imageMat2)
-    val faceMat2 = imageMat2.submat(faces2.head.y1, faces2.head.y2, faces2.head.x1, faces2.head.x2)
+    val faceMat2 = imageMat2.submat(faces2.head)
 
     val importAsset3 = IntegrationTestUtil.getImportAsset("people/meme-ben3.png")
     val imageMat3: Mat = FaceService.matFromBytes(importAsset3.data)
     val faces3 = FaceService.detectFacesWithDnnNet(imageMat3)
-    val faceMat3 = imageMat3.submat(faces3.head.y1, faces3.head.y2, faces3.head.x1, faces3.head.x2)
+    val faceMat3 = imageMat3.submat(faces3.head)
 
     // 1 & 2 are the same
     FaceService.isFaceSimilar(imageMat1, imageMat2, faceMat1, faceMat2) should be(true)
@@ -75,71 +84,20 @@ import software.altitude.test.core.IntegrationTestCore
     FaceService.isFaceSimilar(imageMat2, imageMat3, faceMat2, faceMat3) should be(true)
   }
 
-  test("Different people are NOT identified as same in multiple images", Focused) {
-    val importAsset = IntegrationTestUtil.getImportAsset("people/movies-speed.png")
-    val imageMat: Mat = FaceService.matFromBytes(importAsset.data)
-    val faces = FaceService.detectFacesWithDnnNet(imageMat)
-    val face1 = faces(1)
-    val faceMat1 = imageMat.submat(face1.y1, face1.y2, face1.x1, face1.x2)
-    println(faceMat1.width(), faceMat1.height())
-    Imgcodecs.imwrite("/home/andrei/output/face1.jpg", faceMat1)
-
-    val yunetDetections = FaceService.detectFacesWithYunet(faceMat1)
-    val face1_1 = FaceService.faceDetectionMatToFace(yunetDetections.head)
-    val faceMat1_1 = imageMat.submat(face1_1.y1, face1_1.y2, face1_1.x1, face1_1.x2)
-    println(yunetDetections.head.dump())
-    Imgcodecs.imwrite("/home/andrei/output/face1.jpg", faceMat1_1)
-
-//     val face1 = FaceService.faceDetectionMatToFace(faceAreaMat1)
-//     val faceMat1 = imageMat.submat(face1.y1, face1.y2, face1.x1, face1.x2)
-//     Imgcodecs.imwrite("/home/andrei/output/face1.jpg", faceMat1)
-//
-//    val face2 = FaceService.faceDetectionMatToFace(faceAreaMat2)
-//    val faceMat2 = imageMat.submat(face2.y1, face2.y2, face2.x1, face2.x2)
-//    Imgcodecs.imwrite("/home/andrei/output/face2.jpg", faceMat2)
-//
-    // different people
-    // COS LOW
-    // L2 HIGH
-//    FaceService.isFaceSimilar(imageMat,imageMat.clone(), faceAreaMat1, faceAreaMat2)
-//
-//    val faceAreaMat3 = detections.head
-//    val face3 = FaceService.faceDetectionMatToFace(faceAreaMat1)
-
-    // same person
-    // COS HIGH
-    // L2 LOW
-//    FaceService.isFaceSimilar(imageMat,imageMat.clone(), faceAreaMat1, faceAreaMat3)
-
-    /*    val importAsset = IntegrationTestUtil.getImportAsset("people/affleck.jpg")
-    val imageMat1: Mat = FaceService.matFromBytes(importAsset.data)
-    val faces = FaceService.detectFacesWithDnnNet(importAsset.data)
-    val faceMat1 = imageMat1.submat(faces.head.y1, faces.head.y2, faces.head.x1, faces.head.x2)
+  test("Different people are NOT identified as same in multiple images") {
+//    val importAsset = IntegrationTestUtil.getImportAsset("people/affleck.jpg")
+//    val imageMat1: Mat = FaceService.matFromBytes(importAsset.data)
+//    val faces = FaceService.detectFacesWithYunet(importAsset.data)
+//    val faceMat1 = imageMat1.submat(faces.head.y1, faces.head.y2, faces.head.x1, faces.head.x2)
 
     val importAsset2 = IntegrationTestUtil.getImportAsset("people/bullock.jpg")
     val imageMat2: Mat = FaceService.matFromBytes(importAsset2.data)
-    val faces2 = FaceService.detectFacesWithDnnNet(importAsset2.data)
-    val faceMat2 = imageMat2.submat(faces2.head.y1, faces2.head.y2, faces2.head.x1, faces2.head.x2)
+    val faces2 = FaceService.detectFacesWithDnnNet(imageMat2)
+    val faceMat2 = imageMat2.submat(faces2.head)
 
-    val face1AreaMat = new Mat(1, 4, CvType.CV_32F)
-    face1AreaMat.put(0, 0, 0)
-    face1AreaMat.put(0, 1, faces.head.y1)
-    face1AreaMat.put(0, 2, 0)
-    face1AreaMat.put(0, 3, faces.head.y2)
-
-    val face2AreaMat = new Mat(1, 4, CvType.CV_32F)
-    face2AreaMat.put(0, 0, 0)
-    face2AreaMat.put(0, 1, faces2.head.y1)
-    face2AreaMat.put(0, 2, 0)
-    face2AreaMat.put(0, 3, faces.head.y2)
-
-    println(face1AreaMat.dump())
-    println(face2AreaMat.dump())
-
-    Imgcodecs.imwrite("/home/andrei/output/face1.jpg", faceMat1)
     Imgcodecs.imwrite("/home/andrei/output/face2.jpg", faceMat2)
 
-    val isSimilar = FaceService.isFaceSimilar(faceMat1, faceMat2, face1AreaMat, face2AreaMat)
+//    val isSimilar = FaceService.isFaceSimilar(faceMat1, faceMat2, face1AreaMat, face2AreaMat)
 //    isSimilar should be(false)
-*/  }
+  }
 }

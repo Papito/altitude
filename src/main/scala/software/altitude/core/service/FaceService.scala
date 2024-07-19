@@ -26,25 +26,33 @@ import java.io.File
 
 // YUNET version of this: https://gist.github.com/papito/769dd7e4b820bcacce2ac89d385e91ce
 object FaceService {
-  private val confidenceThreshold = 0.37
-  private val minFaceSize = 40 // minimum acceptable size of face region in pixels
-  private val modelConfigurationFile: File = loadResourceAsFile("/opencv/deploy.prototxt")
-  private val modelFile: File = loadResourceAsFile("/opencv/res10_300x300_ssd_iter_140000.caffemodel")
-  private val sfaceModelFile = loadResourceAsFile("/opencv/face_recognition_sface_2021dec.onnx")
-  private val yunetModelFilePath = loadResourceAsFile("/opencv/face_detection_yunet_2022mar.onnx")
-  private val inWidth = 300
-  private val inHeight = 300
-  private val inScaleFactor = 1.0
-  private val meanVal = new Scalar(104.0, 177.0, 123.0, 128)
-  private val dnnNet: Net = readNetFromCaffe(modelConfigurationFile.getCanonicalPath, modelFile.getCanonicalPath)
-
-  private val sfaceRecognizer = FaceRecognizerSF.create(sfaceModelFile.getCanonicalPath, "")
-  private val yuNet = FaceDetectorYN.create(yunetModelFilePath.getCanonicalPath, "", new Size())
-  yuNet.setScoreThreshold(.9f)
-
   val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  def detectFacesWithDnnNet(image: Mat): List[Face] = {
+  private val dnnConfigurationFile: File = loadResourceAsFile("/opencv/deploy.prototxt")
+  private val dnnModelFile: File = loadResourceAsFile("/opencv/res10_300x300_ssd_iter_140000.caffemodel")
+  private val sfaceModelFile = loadResourceAsFile("/opencv/face_recognition_sface_2021dec.onnx")
+  private val yunetModelFile = loadResourceAsFile("/opencv/face_detection_yunet_2022mar.onnx")
+//  private val embedderModelFile = loadResourceAsFile("/opencv/openface_nn4.small2.v1.t7")
+
+  private val dnnConfidenceThreshold = 0.37
+  private val minFaceSize = 50 // minimum acceptable size of face region in pixels
+  private val dnnInWidth = 300
+  private val dnnInHeight = 300
+  private val dnnInScaleFactor = 1.0
+  private val dnnMeanVal = new Scalar(104.0, 177.0, 123.0, 128)
+  private val yunetConfidenceThreshold = 0.90f
+
+  private val dnnNet: Net = readNetFromCaffe(dnnConfigurationFile.getCanonicalPath, dnnModelFile.getCanonicalPath)
+
+//  private val embedderNet: Net = readNetFromTorch(embedderModelFile.getCanonicalPath)
+
+  private val sfaceRecognizer = FaceRecognizerSF.create(sfaceModelFile.getCanonicalPath, "")
+
+  private val yuNet = FaceDetectorYN.create(yunetModelFile.getCanonicalPath, "", new Size())
+  yuNet.setScoreThreshold(yunetConfidenceThreshold)
+  yuNet.setNMSThreshold(0.6f)
+
+  def detectFacesWithDnnNet(image: Mat): List[Rect] = {
     if (image.empty) {
       logger.warn("No data in image")
       return List()
@@ -52,9 +60,9 @@ object FaceService {
 
     val inputBlob = blobFromImage(
       image,
-      FaceService.inScaleFactor,
-      new Size(FaceService.inWidth, FaceService.inHeight),
-      FaceService.meanVal, false, false, CvType.CV_32F)
+      FaceService.dnnInScaleFactor,
+      new Size(FaceService.dnnInWidth, FaceService.dnnInHeight),
+      FaceService.dnnMeanVal, false, false, CvType.CV_32F)
 
     // Set the network input
     FaceService.dnnNet.setInput(inputBlob)
@@ -69,7 +77,7 @@ object FaceService {
       for (idx <- 0 until di.rows()) yield {
         val confidence = di.get(idx, 2)(0)
 
-        if (confidence > FaceService.confidenceThreshold) {
+        if (confidence > FaceService.dnnConfidenceThreshold) {
           logger.info("Found a face with confidence value of " + confidence)
           val x1 = (di.get(idx, 3)(0) * image.size().width).toInt
           val y1 = (di.get(idx, 4)(0) * image.size().height).toInt
@@ -88,13 +96,11 @@ object FaceService {
           None
         }
       }
-    }.flatten
+    }.flatten.toList
 
     logger.info(s"Number of face regions found: ${faceRegions.size}")
 
-    faceRegions.map { region =>
-      Face(x1 = region.x, y1 = region.y, x2 = region.x + region.width, y2 = region.y + region.height)
-    }.toList
+    faceRegions
   }
 
   def detectFacesWithYunet(image: Mat): List[Mat] = {
@@ -105,37 +111,70 @@ object FaceService {
 
     val detectionResults = new Mat()
     yuNet.setInputSize(new Size(image.width(), image.height()))
-    // Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2RGB)
     yuNet.detect(image, detectionResults)
     val numOfFaces = detectionResults.rows()
 
     logger.info(s"Number of face regions found: $numOfFaces")
 
-    val ret = for (idx <- 0 until numOfFaces) yield {
-      detectionResults.row(idx)
-    }
+    val ret: List[Option[Mat]] = (for (idx <- 0 until numOfFaces) yield {
+      val detection = detectionResults.row(idx)
+      val detectionRect = faceDetectToRect(detection)
+      if (detectionRect.height < minFaceSize || detectionRect.width < minFaceSize) {
+        logger.warn("Face region too small")
+        None
+      } else {
+        Option(detection)
+      }
+    }).toList
 
-    ret.toList
+    ret.flatten
   }
 
-  def multiPassFaceDetect(image: Mat): List[Mat] = {
-    val faces = detectFacesWithDnnNet(image)
+//  def multiPassFaceDetect(image: Mat): List[Mat] = {
+//    println("Detecting faces with Yunet")
+//    val yunetResults = detectFacesWithYunet(image)
+//
+//    println(s"Detected ${yunetResults.length} faces with Yunet")
+//
+//    if (yunetResults.isEmpty) {
+//      return List.empty
+//    }
+//
+//
+//    val verifiedMatches: List[Option[Mat]] = (for (idx <- yunetResults.indices) yield {
+//      println(s"Verifying face $idx")
+//      val ynetResult = yunetResults(idx)
+//
+//      val faceRect = FaceService.faceDetectToRect(ynetResult)
+//      println(faceRect)
+//      val faceMat = image.submat(faceRect)
+//      val verifiedFaceMatches = detectFacesWithDnnNet(faceMat)
+//
+//      var idx2 = 0
+//      verifiedFaceMatches.foreach(fa => {
+//        println(fa)
+//        val faceMat2 = faceMat.submat(fa)
+//        // Imgcodecs.imwrite(s"/home/andrei/output/face$idx.$idx2.jpg", faceMat2)
+//        idx2 += 1
+//      })
+//
+//      None
+//    }).toList
+//
+//    verifiedMatches.flatten
+//  }
 
-    if (faces.nonEmpty) {
-      // extract face regions as Mats
-      val faceMats = faces.map { face =>
-        image.submat(face.y1, face.y2, face.x1, face.x2)
-      }
+  def getFaceEmbedding(faceImageMat: Mat): Array[Float] = {
+    val faceBlob = blobFromImage(faceImageMat, 1.0 / 255, new Size(96, 96), new Scalar(0, 0, 0), true, false)
 
-      println("MULTI-PASS DNN")
-      faceMats.foldLeft(List[Mat]()) { (acc, faceMat) =>
-        acc ++ detectFacesWithYunet(faceMat)
-      }
-    } else {
-      println("YUNET ONLY")
-      // DNN failed - fallback to YUNET
-      detectFacesWithYunet(image)
-    }
+//    embedderNet.setInput(faceBlob)
+//    // 128-dimensional embeddings
+//    val embedderMat = embedderNet.forward()
+//    val floatMat = new MatOfFloat()
+//    embedderMat.assignTo(floatMat, CvType.CV_32F)
+//    floatMat.toArray
+
+  new Array[Float](128)
   }
 
   def isFaceSimilar(image1: Mat, image2: Mat, faceMat1: Mat, faceMat2: Mat): Boolean = {
@@ -168,17 +207,17 @@ object FaceService {
     Face(x1 = asRect.x, y1 = asRect.y, x2 = asRect.width, y2 = asRect.height)
   }
 
-  private def faceDetectToRect(detectedFace: Mat): Rect = {
+  def faceDetectToRect(detectedFace: Mat): Rect = {
     val x = detectedFace.get(0, 0)(0).asInstanceOf[Int]
     val y = detectedFace.get(0, 1)(0).asInstanceOf[Int]
     val w = detectedFace.get(0, 2)(0).asInstanceOf[Int]
     val h = detectedFace.get(0, 3)(0).asInstanceOf[Int]
-    new Rect(x, y, x + w, y + h)
+    new Rect(x, y, w, h)
   }
 
-//  def faceToRect(face: Face): Rect = {
-//    new Rect(face.x1, face.y1, face.x2, face.y2)
-//  }
+  def faceToRect(face: Face): Rect = {
+    new Rect(new Point(face.x1, face.y1), new Point(face.x2, face.y2))
+  }
 //
 //  def faceToMat(face: Face): Mat = {
 //    // Create a Mat with 1 row and 4 columns
@@ -193,7 +232,7 @@ object FaceService {
 //  }
 
   def matFromBytes(data: Array[Byte]): Mat = {
-    Imgcodecs.imdecode(new MatOfByte(data: _*), Imgcodecs.IMREAD_ANYCOLOR)
+    Imgcodecs.imdecode(new MatOfByte(data: _*), Imgcodecs.IMREAD_COLOR)
   }
 
 }
