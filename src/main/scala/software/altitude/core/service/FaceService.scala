@@ -97,7 +97,7 @@ object FaceService {
     }.toList
   }
 
-  def detectFacesWithYunet(image: Mat): List[Face] = {
+  def detectFacesWithYunet(image: Mat): List[Mat] = {
     if (image.empty) {
       logger.warn("No data in image")
       return List()
@@ -111,19 +111,11 @@ object FaceService {
 
     logger.info(s"Number of face regions found: $numOfFaces")
 
-    val faces = for (idx <- 0 until numOfFaces) yield {
-      val detectionResult = detectionResults.row(idx)
-      val asRect = faceDetectToRect(detectionResult)
-
-      val f = Face(
-        x1 = asRect.x,
-        y1 = asRect.y,
-        x2 = asRect.width,
-        y2 = asRect.height)
-      f
+    val ret = for (idx <- 0 until numOfFaces) yield {
+      detectionResults.row(idx)
     }
 
-    faces.toList
+    ret.toList
   }
 
   def isFaceSimilar(image1: Mat, image2: Mat, faceMat1: Mat, faceMat2: Mat): Boolean = {
@@ -131,8 +123,8 @@ object FaceService {
     val alignedFace2 = new Mat
     sfaceRecognizer.alignCrop(image1, faceMat1, alignedFace1)
     sfaceRecognizer.alignCrop(image2, faceMat2, alignedFace2)
-//    Imgcodecs.imwrite("/home/andrei/output/face1.jpg", alignedFace1)
-//    Imgcodecs.imwrite("/home/andrei/output/face2.jpg", alignedFace2)
+    Imgcodecs.imwrite("/home/andrei/output/face1-1.jpg", alignedFace1)
+    Imgcodecs.imwrite("/home/andrei/output/face2-1.jpg", alignedFace2)
 
     var feature1 = new Mat
     var feature2 = new Mat
@@ -145,13 +137,13 @@ object FaceService {
     val L2Score = sfaceRecognizer.`match`(feature1, feature2, FaceRecognizerSF.FR_NORM_L2)
     logger.info(s"Similarity cosine score: $cosScore")
     logger.info(s"Similarity L2 score: $L2Score")
-    println(cosScore)
-    println(L2Score)
+    println("COS: " + cosScore)
+    println("L2: " + L2Score)
     println()
     cosScore >= 0.363
   }
 
-  def faceDetectResultsToFace(detectedFace: Mat): Face = {
+  def faceDetectionMatToFace(detectedFace: Mat): Face = {
     val asRect = faceDetectToRect(detectedFace)
     Face(x1 = asRect.x, y1 = asRect.y, x2 = asRect.width, y2 = asRect.height)
   }

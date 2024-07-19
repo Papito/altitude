@@ -76,11 +76,33 @@ import software.altitude.test.core.IntegrationTestCore
   }
 
   test("Different people are NOT identified as same in multiple images", Focused) {
-    val importAsset = IntegrationTestUtil.getImportAsset("people/meme-ben2.png")
-    val imageMat1: Mat = FaceService.matFromBytes(importAsset.data)
-    val faces = FaceService.detectFacesWithYunet(imageMat1)
-    val faceMat1 = imageMat1.submat(faces.head.y1, faces.head.y2, faces.head.x1, faces.head.x2)
-    Imgcodecs.imwrite("/home/andrei/output/face1.jpg", faceMat1)
+    val importAsset = IntegrationTestUtil.getImportAsset("people/movies-speed.png")
+    val imageMat: Mat = FaceService.matFromBytes(importAsset.data)
+    val detections = FaceService.detectFacesWithYunet(imageMat)
+
+    val faceAreaMat1 = detections.head
+    val faceAreaMat2 = detections(1)
+
+     val face1 = FaceService.faceDetectionMatToFace(faceAreaMat1)
+     val faceMat1 = imageMat.submat(face1.y1, face1.y2, face1.x1, face1.x2)
+     Imgcodecs.imwrite("/home/andrei/output/face1.jpg", faceMat1)
+
+    val face2 = FaceService.faceDetectionMatToFace(faceAreaMat2)
+    val faceMat2 = imageMat.submat(face2.y1, face2.y2, face2.x1, face2.x2)
+    Imgcodecs.imwrite("/home/andrei/output/face2.jpg", faceMat2)
+
+    // different people
+    // COS LOW
+    // L2 HIGH
+    FaceService.isFaceSimilar(imageMat,imageMat.clone(), faceAreaMat1, faceAreaMat2)
+
+    val faceAreaMat3 = detections.head
+    val face3 = FaceService.faceDetectionMatToFace(faceAreaMat1)
+
+    // same person
+    // COS HIGH
+    // L2 LOW
+    FaceService.isFaceSimilar(imageMat,imageMat.clone(), faceAreaMat1, faceAreaMat3)
 
     /*    val importAsset = IntegrationTestUtil.getImportAsset("people/affleck.jpg")
     val imageMat1: Mat = FaceService.matFromBytes(importAsset.data)
