@@ -13,9 +13,10 @@ import org.opencv.dnn.Dnn.blobFromImage
 import org.opencv.dnn.Dnn.readNetFromCaffe
 import org.opencv.dnn.Net
 import org.opencv.imgcodecs.Imgcodecs
-import org.opencv.imgproc.Imgproc
-import org.opencv.objdetect.{FaceDetectorYN, FaceRecognizerSF}
-import org.slf4j.{Logger, LoggerFactory}
+import org.opencv.objdetect.FaceDetectorYN
+import org.opencv.objdetect.FaceRecognizerSF
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
 import software.altitude.core.Util.loadResourceAsFile
 import software.altitude.core.dao.FaceDao
@@ -43,9 +44,7 @@ object FaceService {
 
   val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  def detectFacesWithDnnNet(data: Array[Byte]): List[Face] = {
-    val image: Mat = matFromBytes(data)
-
+  def detectFacesWithDnnNet(image: Mat): List[Face] = {
     if (image.empty) {
       logger.warn("No data in image")
       return List()
@@ -98,17 +97,11 @@ object FaceService {
     }.toList
   }
 
-  def detectFacesWithYunet(data: Array[Byte]): List[Face] = {
-    val logger: Logger = LoggerFactory.getLogger(getClass)
-
-    val image: Mat = matFromBytes(data)
-
+  def detectFacesWithYunet(image: Mat): List[Face] = {
     if (image.empty) {
       logger.warn("No data in image")
       return List()
     }
-
-    // Set the network input
 
     val detectionResults = new Mat()
     yuNet.setInputSize(new Size(image.width(), image.height()))
@@ -158,6 +151,10 @@ object FaceService {
     cosScore >= 0.363
   }
 
+  def faceDetectResultsToFace(detectedFace: Mat): Face = {
+    val asRect = faceDetectToRect(detectedFace)
+    Face(x1 = asRect.x, y1 = asRect.y, x2 = asRect.width, y2 = asRect.height)
+  }
 
   private def faceDetectToRect(detectedFace: Mat): Rect = {
     val x = detectedFace.get(0, 0)(0).asInstanceOf[Int]
@@ -167,21 +164,21 @@ object FaceService {
     new Rect(x, y, x + w, y + h)
   }
 
-  def faceToRect(face: Face): Rect = {
-    new Rect(face.x1, face.y1, face.x2, face.y2)
-  }
-
-  def faceToMat(face: Face): Mat = {
-    // Create a Mat with 1 row and 4 columns
-    val mat = new Mat(1, 4, CvType.CV_32F)
-
-    mat.put(0, 0, face.x1.toDouble)
-    mat.put(0, 1, face.y1.toDouble)
-    mat.put(0, 2, face.x2.toDouble - face.x1.toDouble)
-    mat.put(0, 3, face.y2.toDouble - face.y1.toDouble)
-
-    mat
-  }
+//  def faceToRect(face: Face): Rect = {
+//    new Rect(face.x1, face.y1, face.x2, face.y2)
+//  }
+//
+//  def faceToMat(face: Face): Mat = {
+//    // Create a Mat with 1 row and 4 columns
+//    val mat = new Mat(1, 4, CvType.CV_32F)
+//
+//    mat.put(0, 0, face.x1.toDouble)
+//    mat.put(0, 1, face.y1.toDouble)
+//    mat.put(0, 2, face.x2.toDouble - face.x1.toDouble)
+//    mat.put(0, 3, face.y2.toDouble - face.y1.toDouble)
+//
+//    mat
+//  }
 
   def matFromBytes(data: Array[Byte]): Mat = {
     Imgcodecs.imdecode(new MatOfByte(data: _*), Imgcodecs.IMREAD_ANYCOLOR)

@@ -2,8 +2,16 @@ package research
 
 
 import org.apache.commons.io.FileUtils
-import org.opencv.core.{CvType, Mat, MatOfByte, MatOfFloat, Point, Rect, Scalar, Size}
-import org.opencv.dnn.Dnn.{blobFromImage, readNetFromTorch}
+import org.opencv.core.CvType
+import org.opencv.core.Mat
+import org.opencv.core.MatOfByte
+import org.opencv.core.MatOfFloat
+import org.opencv.core.Point
+import org.opencv.core.Rect
+import org.opencv.core.Scalar
+import org.opencv.core.Size
+import org.opencv.dnn.Dnn.blobFromImage
+import org.opencv.dnn.Dnn.readNetFromTorch
 import org.opencv.face.FisherFaceRecognizer
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgcodecs.Imgcodecs.imdecode
@@ -24,7 +32,7 @@ object FaceRecognition extends SandboxApp {
     val fileByteArray: Array[Byte] = FileUtils.readFileToByteArray(file)
     val image: Mat = imdecode(new MatOfByte(fileByteArray:_*), Imgcodecs.IMREAD_ANYCOLOR)
 
-    val faces: List[Face] = FaceService.detectFacesWithDnnNet(fileByteArray)
+    val faces: List[Face] = FaceService.detectFacesWithDnnNet(image)
 
     for (idx <- faces.indices) {
       val face = faces(idx)
