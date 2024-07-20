@@ -1,6 +1,8 @@
 package software.altitude.test
 
-import org.apache.commons.io.FileUtils
+import org.apache.commons.io.{FileUtils, FilenameUtils}
+import org.opencv.core.Mat
+import org.opencv.imgcodecs.Imgcodecs
 import software.altitude.core.Altitude
 import software.altitude.core.models.ImportAsset
 import software.altitude.core.models.Metadata
@@ -31,7 +33,7 @@ object IntegrationTestUtil {
   /**
    * Convert a file system resource to an import asset (this reads the actual binary content of the file).
    */
-  protected def fileToImportAsset(file: File): ImportAsset = new ImportAsset(
+  def fileToImportAsset(file: File): ImportAsset = new ImportAsset(
     fileName = file.getName,
     data = FileUtils.readFileToByteArray(file),
     metadata = Metadata())
