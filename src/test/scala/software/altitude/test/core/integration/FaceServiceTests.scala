@@ -11,6 +11,14 @@ import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class FaceServiceTests(override val testApp: Altitude) extends IntegrationTestCore {
 
+  def dumpDetections(imageMat: Mat, detections: List[Mat]): Unit = {
+    detections.indices foreach(idx => {
+      val detection = detections(idx)
+      val faceMat = imageMat.submat(FaceService.faceDetectToRect(detection))
+      FaceService.writeDebugOpenCvMat(faceMat, s"res${idx}.jpg")
+    })
+  }
+
   test("Face is detected in an image (1)", Focused) {
     val importAsset = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val detections = FaceService.detectFacesWithYunet(FaceService.matFromBytes(importAsset.data))
@@ -41,9 +49,11 @@ import software.altitude.test.core.IntegrationTestCore
     detections.length should be(1)
   }
 
-  test("Large portrait face image is detected (1), Focused") {
+  test("Large portrait face image is detected (1)", Focused) {
     val importAsset = IntegrationTestUtil.getImportAsset("people/affleck.jpg")
-    val detections = FaceService.detectFacesWithYunet(FaceService.matFromBytes(importAsset.data))
+    val imageMat = FaceService.matFromBytes(importAsset.data)
+    val detections = FaceService.detectFacesWithYunet(imageMat)
+    dumpDetections(imageMat, detections)
     detections.length should be(1)
   }
 

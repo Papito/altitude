@@ -43,7 +43,7 @@ object FaceService {
   private val minFaceSize = 50 // minimum acceptable size of face region in pixels
   private val dnnInScaleFactor = 1.0
   private val dnnMeanVal = new Scalar(104.0, 177.0, 123.0, 128)
-  private val yunetConfidenceThreshold = 0.74f
+  private val yunetConfidenceThreshold = 0.80f
 
   private val dnnNet: Net = readNetFromCaffe(dnnConfigurationFile.getCanonicalPath, dnnModelFile.getCanonicalPath)
 
@@ -106,7 +106,7 @@ object FaceService {
 
     val detectionResults = new Mat()
 
-    val boundingBoxSize = 650
+    val boundingBoxSize = 640
 
     val scaleFactor = determineImageScale(image.width(), image.height(), boundingBoxSize, boundingBoxSize) match {
         case scale if scale < 1.0 => scale
@@ -215,7 +215,7 @@ object FaceService {
     Math.min(scaleX, scaleY)
   }
 
-  private def writeDebugOpenCvMat(mat: Mat, fileName: String): Unit = {
+  def writeDebugOpenCvMat(mat: Mat, fileName: String): Unit = {
     val outputDir = System.getenv().get("OUTPUT")
 
     if (outputDir == null) {
