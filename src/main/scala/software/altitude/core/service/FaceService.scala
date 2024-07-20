@@ -41,7 +41,7 @@ object FaceService {
   private val dnnInHeight = 300
   private val dnnInScaleFactor = 1.0
   private val dnnMeanVal = new Scalar(104.0, 177.0, 123.0, 128)
-  private val yunetConfidenceThreshold = 0.8f
+  private val yunetConfidenceThreshold = 0.80f
 
   private val dnnNet: Net = readNetFromCaffe(dnnConfigurationFile.getCanonicalPath, dnnModelFile.getCanonicalPath)
 
@@ -110,8 +110,30 @@ object FaceService {
     }
 
     val detectionResults = new Mat()
-    yuNet.setInputSize(new Size(image.width(), image.height()))
-    yuNet.detect(image, detectionResults)
+
+    def determineImageScale(sourceWidth: Int, sourceHeight: Int, targetWidth: Int, targetHeight: Int) = {
+      val scaleX = targetWidth.toDouble / sourceWidth
+      val scaleY = targetHeight.toDouble / sourceHeight
+      Math.min(scaleX, scaleY)
+    }
+
+    val boundingBoxSize = 650
+
+    val scaleFactor = determineImageScale(image.width(), image.height(), boundingBoxSize, boundingBoxSize) match {
+        case scale if scale < 1.0 => scale
+        case _ => 1.0
+    }
+
+    val srcMat: Mat = if (scaleFactor < 1.0) {
+      val resized = new Mat()
+      Imgproc.resize(image, resized, new Size(), scaleFactor, scaleFactor, Imgproc.INTER_AREA)
+      resized
+    } else {
+        image.clone()
+    }
+
+    yuNet.setInputSize(srcMat.size())
+    yuNet.detect(srcMat, detectionResults)
     val numOfFaces = detectionResults.rows()
 
     logger.info(s"Number of face regions found: $numOfFaces")
@@ -119,6 +141,18 @@ object FaceService {
     val ret: List[Option[Mat]] = (for (idx <- 0 until numOfFaces) yield {
       val detection = detectionResults.row(idx)
       val detectionRect = faceDetectToRect(detection)
+
+      detectionRect.x = (detectionRect.x / scaleFactor).toInt
+      detectionRect.y = (detectionRect.y / scaleFactor).toInt
+      detectionRect.width = (detectionRect.width / scaleFactor).toInt
+      detectionRect.height = (detectionRect.height / scaleFactor).toInt
+
+      // update the original detection to account for the scaling factor
+      detection.put(0, 0, detectionRect.x)
+      detection.put(0, 1, detectionRect.y)
+      detection.put(0, 2, detectionRect.width)
+      detection.put(0, 3, detectionRect.height)
+
       if (detectionRect.height < minFaceSize || detectionRect.width < minFaceSize) {
         logger.warn("Face region too small")
         None
