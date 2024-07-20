@@ -21,11 +21,12 @@ import software.altitude.test.core.IntegrationTestCore
   }
 
   test("Face is detected in an image (1)", Focused) {
-    val importAsset = IntegrationTestUtil.getImportAsset("people/bullock.jpg")
+    val importAsset = IntegrationTestUtil.getImportAsset("people/movies-speed.png")
     testApp.service.assetImport.importAsset(importAsset).get
 
     val imageMat = FaceService.matFromBytes(importAsset.data)
     val detections = FaceService.detectFacesWithYunet(imageMat)
+    println("Found face: " + detections.length)
     dumpDetections(imageMat, detections)
 //    detections.length should be(1)
   }

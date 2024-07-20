@@ -13,6 +13,7 @@ import org.opencv.dnn.Dnn.blobFromImage
 import org.opencv.dnn.Dnn.readNetFromCaffe
 import org.opencv.dnn.Net
 import org.opencv.imgcodecs.Imgcodecs
+import org.opencv.imgproc.Imgproc
 import org.opencv.objdetect.FaceDetectorYN
 import org.opencv.objdetect.FaceRecognizerSF
 import org.slf4j.Logger
@@ -40,17 +41,16 @@ object FaceService {
   private val dnnInHeight = 300
   private val dnnInScaleFactor = 1.0
   private val dnnMeanVal = new Scalar(104.0, 177.0, 123.0, 128)
-  private val yunetConfidenceThreshold = 0.90f
+  private val yunetConfidenceThreshold = 0.8f
 
   private val dnnNet: Net = readNetFromCaffe(dnnConfigurationFile.getCanonicalPath, dnnModelFile.getCanonicalPath)
 
-//  private val embedderNet: Net = readNetFromTorch(embedderModelFile.getCanonicalPath)
+  //  private val embedderNet: Net = readNetFromTorch(embedderModelFile.getCanonicalPath)
 
   private val sfaceRecognizer = FaceRecognizerSF.create(sfaceModelFile.getCanonicalPath, "")
 
   private val yuNet = FaceDetectorYN.create(yunetModelFile.getCanonicalPath, "", new Size())
   yuNet.setScoreThreshold(yunetConfidenceThreshold)
-  yuNet.setNMSThreshold(0.6f)
 
   def detectFacesWithDnnNet(image: Mat): List[Rect] = {
     if (image.empty) {
@@ -130,51 +130,51 @@ object FaceService {
     ret.flatten
   }
 
-//  def multiPassFaceDetect(image: Mat): List[Mat] = {
-//    println("Detecting faces with Yunet")
-//    val yunetResults = detectFacesWithYunet(image)
-//
-//    println(s"Detected ${yunetResults.length} faces with Yunet")
-//
-//    if (yunetResults.isEmpty) {
-//      return List.empty
-//    }
-//
-//
-//    val verifiedMatches: List[Option[Mat]] = (for (idx <- yunetResults.indices) yield {
-//      println(s"Verifying face $idx")
-//      val ynetResult = yunetResults(idx)
-//
-//      val faceRect = FaceService.faceDetectToRect(ynetResult)
-//      println(faceRect)
-//      val faceMat = image.submat(faceRect)
-//      val verifiedFaceMatches = detectFacesWithDnnNet(faceMat)
-//
-//      var idx2 = 0
-//      verifiedFaceMatches.foreach(fa => {
-//        println(fa)
-//        val faceMat2 = faceMat.submat(fa)
-//        // Imgcodecs.imwrite(s"/home/andrei/output/face$idx.$idx2.jpg", faceMat2)
-//        idx2 += 1
-//      })
-//
-//      None
-//    }).toList
-//
-//    verifiedMatches.flatten
-//  }
+  //  def multiPassFaceDetect(image: Mat): List[Mat] = {
+  //    println("Detecting faces with Yunet")
+  //    val yunetResults = detectFacesWithYunet(image)
+  //
+  //    println(s"Detected ${yunetResults.length} faces with Yunet")
+  //
+  //    if (yunetResults.isEmpty) {
+  //      return List.empty
+  //    }
+  //
+  //
+  //    val verifiedMatches: List[Option[Mat]] = (for (idx <- yunetResults.indices) yield {
+  //      println(s"Verifying face $idx")
+  //      val ynetResult = yunetResults(idx)
+  //
+  //      val faceRect = FaceService.faceDetectToRect(ynetResult)
+  //      println(faceRect)
+  //      val faceMat = image.submat(faceRect)
+  //      val verifiedFaceMatches = detectFacesWithDnnNet(faceMat)
+  //
+  //      var idx2 = 0
+  //      verifiedFaceMatches.foreach(fa => {
+  //        println(fa)
+  //        val faceMat2 = faceMat.submat(fa)
+  //        // Imgcodecs.imwrite(s"/home/andrei/output/face$idx.$idx2.jpg", faceMat2)
+  //        idx2 += 1
+  //      })
+  //
+  //      None
+  //    }).toList
+  //
+  //    verifiedMatches.flatten
+  //  }
 
   def getFaceEmbedding(faceImageMat: Mat): Array[Float] = {
     val faceBlob = blobFromImage(faceImageMat, 1.0 / 255, new Size(96, 96), new Scalar(0, 0, 0), true, false)
 
-//    embedderNet.setInput(faceBlob)
-//    // 128-dimensional embeddings
-//    val embedderMat = embedderNet.forward()
-//    val floatMat = new MatOfFloat()
-//    embedderMat.assignTo(floatMat, CvType.CV_32F)
-//    floatMat.toArray
+    //    embedderNet.setInput(faceBlob)
+    //    // 128-dimensional embeddings
+    //    val embedderMat = embedderNet.forward()
+    //    val floatMat = new MatOfFloat()
+    //    embedderMat.assignTo(floatMat, CvType.CV_32F)
+    //    floatMat.toArray
 
-  new Array[Float](128)
+    new Array[Float](128)
   }
 
   def isFaceSimilar(image1: Mat, image2: Mat, faceMat1: Mat, faceMat2: Mat): Boolean = {
@@ -218,21 +218,21 @@ object FaceService {
   def faceToRect(face: Face): Rect = {
     new Rect(new Point(face.x1, face.y1), new Point(face.x2, face.y2))
   }
-//
-//  def faceToMat(face: Face): Mat = {
-//    // Create a Mat with 1 row and 4 columns
-//    val mat = new Mat(1, 4, CvType.CV_32F)
-//
-//    mat.put(0, 0, face.x1.toDouble)
-//    mat.put(0, 1, face.y1.toDouble)
-//    mat.put(0, 2, face.x2.toDouble - face.x1.toDouble)
-//    mat.put(0, 3, face.y2.toDouble - face.y1.toDouble)
-//
-//    mat
-//  }
+  //
+  //  def faceToMat(face: Face): Mat = {
+  //    // Create a Mat with 1 row and 4 columns
+  //    val mat = new Mat(1, 4, CvType.CV_32F)
+  //
+  //    mat.put(0, 0, face.x1.toDouble)
+  //    mat.put(0, 1, face.y1.toDouble)
+  //    mat.put(0, 2, face.x2.toDouble - face.x1.toDouble)
+  //    mat.put(0, 3, face.y2.toDouble - face.y1.toDouble)
+  //
+  //    mat
+  //  }
 
   def matFromBytes(data: Array[Byte]): Mat = {
-    Imgcodecs.imdecode(new MatOfByte(data: _*), Imgcodecs.IMREAD_COLOR)
+    Imgcodecs.imdecode(new MatOfByte(data: _*), Imgcodecs.IMREAD_GRAYSCALE)
   }
 
 }
