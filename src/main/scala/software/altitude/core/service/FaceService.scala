@@ -266,7 +266,7 @@ object FaceService {
   //  }
 
   def matFromBytes(data: Array[Byte]): Mat = {
-    Imgcodecs.imdecode(new MatOfByte(data: _*), Imgcodecs.IMREAD_GRAYSCALE)
+    Imgcodecs.imdecode(new MatOfByte(data: _*), Imgcodecs.IMREAD_ANYCOLOR)
   }
 
 }
