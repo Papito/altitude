@@ -16,7 +16,7 @@ abstract class SandboxApp extends App {
   private val IMAGE_FILE_FILTER: IOFileFilter = new SuffixFileFilter(".jpg", ".jpeg", ".png")
 
   protected val sourceDirPath: String =  System.getenv().get("SOURCE")
-  private val outputDirPath = System.getenv().get("OUTPUT")
+  protected val outputDirPath = System.getenv().get("OUTPUT")
 
   def process(path: String): Unit
 
@@ -35,6 +35,7 @@ abstract class SandboxApp extends App {
         println("Empty image !!!")
         return
     }
+
     Imgcodecs.imwrite(outputPath, image)
   }
 
