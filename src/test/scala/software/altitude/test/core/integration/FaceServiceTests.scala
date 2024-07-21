@@ -1,11 +1,17 @@
 package software.altitude.test.core.integration
+
+import org.opencv.core.Mat
 import org.scalatest.DoNotDiscover
+import org.scalatest.matchers.must.Matchers.be
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
+import software.altitude.core.service.FaceService
+import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class FaceServiceTests(override val testApp: Altitude) extends IntegrationTestCore {
 
-/*  def dumpDetections(imageMat: Mat, detections: List[Mat]): Unit = {
+  def dumpDetections(imageMat: Mat, detections: List[Mat]): Unit = {
     detections.indices foreach(idx => {
       val detection = detections(idx)
       val faceMat = imageMat.submat(FaceService.faceDetectToRect(detection))
@@ -134,4 +140,4 @@ import software.altitude.test.core.IntegrationTestCore
     // 2 & 3
     testApp.service.face.isFaceSimilar(imageMat2, imageMat3, detection2, detection3) should be(false)
   }
-*/}
+}
