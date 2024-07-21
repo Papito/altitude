@@ -76,48 +76,13 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
 
   override protected val dao: FaceDao = app.DAO.face
 
-//  val path: Path = Paths.get(getClass.getProtectionDomain.getCodeSource.getLocation.toURI)
-//  private val resourceDir = new File(path.toFile.getParentFile, "opencv")
-//
-//  private val sfaceModelFile = new File(resourceDir.getParentFile, "opencv/face_recognition_sface_2021dec.onnx").getAbsolutePath
-//  private val sfaceRecognizer = FaceRecognizerSF.create(sfaceModelFile, "")
-//
-//  private val dnnConfigurationFile  = new File(resourceDir.getParentFile, "opencv/deploy.prototxt").getAbsolutePath
-//
-//  private val dnnModelFile = new File(resourceDir.getParentFile, s"opencv/res10_${dnnInWidth}x${dnnInHeight}_ssd_iter_140000.caffemodel").getAbsolutePath
-//
-//  private val dnnNet: Net = readNetFromCaffe(dnnConfigurationFile, dnnModelFile)
-//
-//
-//  private val yunetModelFile = new File(resourceDir.getParentFile, "/opencv/face_detection_yunet_2022mar.onnx").getAbsolutePath
-//
-//  private val modelFile = new File(resourceDir.getParentFile, "/opencv/openface_nn4.small2.v1.t7").getAbsolutePath
-//  private val embedder = readNetFromTorch(modelFile)
-//
-//  private val yuNet = FaceDetectorYN.create(yunetModelFile, "", new Size())
-//  yuNet.setScoreThreshold(FaceService.yunetConfidenceThreshold)
-//  yuNet.setNMSThreshold(0.2f)
-
-//  private val modelFile = loadResourceAsFile("/opencv/openface_nn4.small2.v1.t7")
-//  private val embedder = readNetFromTorch(modelFile.getCanonicalPath)
-//  println(embedder.empty())
-
-//  private val sfaceModelFile = loadResourceAsFile("/opencv/face_recognition_sface_2021dec.onnx")
   private val sfaceRecognizer = FaceRecognizerSF.create("src/main/resources/opencv/face_recognition_sface_2021dec.onnx", "")
-
-  // private val dnnConfigurationFile: File = loadResourceAsFile("/opencv/deploy.prototxt")
-
-  // private val dnnModelFile: File = loadResourceAsFile(s"/opencv/res10_${FaceService.dnnInWidth}x${FaceService.dnnInHeight}_ssd_iter_140000.caffemodel")
-
-  // private val yunetModelFile = loadResourceAsFile("/opencv/face_detection_yunet_2022mar.onnx")
 
   private val dnnNet: Net = readNetFromCaffe(
     "src/main/resources/opencv/deploy.prototxt",
     s"src/main/resources/opencv/res10_${FaceService.dnnInWidth}x${FaceService.dnnInHeight}_ssd_iter_140000.caffemodel")
 
-
-  // private val modelFile = loadResourceAsFile("/opencv/openface_nn4.small2.v1.t7")
-//  private val embedder = readNetFromTorch("src/main/resources/opencv/openface_nn4.small2.v1.t7")
+  private val embedder = readNetFromTorch("/home/andrei/projects/altitude/src/main/resources/opencv/openface_nn4.small2.v1.t7", true)
 
   private val yuNet = FaceDetectorYN.create("src/main/resources/opencv/face_detection_yunet_2022mar.onnx", "", new Size())
   yuNet.setScoreThreshold(FaceService.yunetConfidenceThreshold)
@@ -186,7 +151,7 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
 
     val srcMat: Mat = if (scaleFactor < 1.0) {
       val resized = new Mat()
-      Imgproc.resize(image, resized, new Size(), scaleFactor, scaleFactor, Imgproc.INTER_LINEAR)
+      Imgproc.resize(image, resized, new Size(), scaleFactor, scaleFactor, Imgproc.INTER_LINEAR_EXACT)
       resized
     } else {
       image.clone()
@@ -247,12 +212,11 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
     Imgproc.cvtColor(resized, resized, Imgproc.COLOR_BGR2RGB)
     val faceBlob = blobFromImage(resized, 1.0 / 255, new Size(96, 96), new Scalar(0, 0, 0), true, false)
 
-//    embedder.setInput(faceBlob)
-//    val embeddingsMat = embedder.forward
-//    val embeddings = new Array[Float](128)
-//    embeddingsMat.get(0, 0, embeddings)
-//    embeddings
-    return new Array[Float](128)
+    embedder.setInput(faceBlob)
+    val embeddingsMat = embedder.forward
+    val embeddings = new Array[Float](128)
+    embeddingsMat.get(0, 0, embeddings)
+    embeddings
   }
 
   def isFaceSimilar(image1: Mat, image2: Mat, detectMat1: Mat, detectMat2: Mat): Boolean = {
