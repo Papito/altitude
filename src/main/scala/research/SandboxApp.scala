@@ -31,6 +31,10 @@ abstract class SandboxApp extends App {
   def writeResult(ogFile: File, image: Mat): Unit = {
     val outputPath = FilenameUtils.concat(outputDirPath, ogFile.getName)
     println(String.format("Writing %s", outputPath))
+    if (image.empty()) {
+        println("Empty image !!!")
+        return
+    }
     Imgcodecs.imwrite(outputPath, image)
   }
 
