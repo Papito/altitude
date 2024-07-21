@@ -4,7 +4,6 @@ import org.apache.commons.io.FileUtils
 import org.opencv.core._
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
-import software.altitude.core.service.FaceService
 
 import java.io.File
 
@@ -21,7 +20,7 @@ object DeepNetFaceDetection extends SandboxApp {
     val fileByteArray: Array[Byte] = FileUtils.readFileToByteArray(file)
     val image: Mat = Imgcodecs.imdecode(new MatOfByte(fileByteArray: _*), Imgcodecs.IMREAD_ANYCOLOR)
 
-    val faces: List[Rect] = FaceService.detectFacesWithDnnNet(image)
+    val faces: List[Rect] = altitude.service.face.detectFacesWithDnnNet(image)
 
     for (rect <- faces) {
       totalFaceRegions += 1

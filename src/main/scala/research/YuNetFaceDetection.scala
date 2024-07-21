@@ -21,7 +21,7 @@ object YuNetFaceDetection extends SandboxApp {
     val fileByteArray: Array[Byte] = FileUtils.readFileToByteArray(file)
     val image: Mat = matFromBytes(fileByteArray)
 
-    val results: List[Mat] = FaceService.detectFacesWithYunet(image)
+    val results: List[Mat] = altitude.service.face.detectFacesWithYunet(image)
 
     for (res <- results) {
       totalFaceRegions += 1

@@ -10,16 +10,12 @@ import org.opencv.core.Point
 import org.opencv.core.Rect
 import org.opencv.core.Scalar
 import org.opencv.core.Size
-import org.opencv.dnn.Dnn.blobFromImage
-import org.opencv.dnn.Dnn.readNetFromCaffe
-import org.opencv.dnn.Dnn.readNetFromTorch
+import org.opencv.dnn.Dnn.{blobFromImage, readNetFromCaffe, readNetFromTorch}
 import org.opencv.dnn.Net
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
 import org.opencv.objdetect.FaceDetectorYN
 import org.opencv.objdetect.FaceRecognizerSF
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
 import software.altitude.core.Util.loadResourceAsFile
 import software.altitude.core.dao.FaceDao
@@ -27,33 +23,106 @@ import software.altitude.core.models.Face
 
 import java.io.File
 
-// YUNET version of this: https://gist.github.com/papito/769dd7e4b820bcacce2ac89d385e91ce
 object FaceService {
-  val logger: Logger = LoggerFactory.getLogger(getClass)
-
-  private val dnnConfigurationFile: File = loadResourceAsFile("/opencv/deploy.prototxt")
   private val dnnInWidth = 300
   private val dnnInHeight = 300
-  private val dnnModelFile: File = loadResourceAsFile(s"/opencv/res10_${dnnInWidth}x${dnnInHeight}_ssd_iter_140000.caffemodel")
-
-  private val sfaceModelFile = loadResourceAsFile("/opencv/face_recognition_sface_2021dec.onnx")
-  private val yunetModelFile = loadResourceAsFile("/opencv/face_detection_yunet_2022mar.onnx")
-  private val embedderModelFile = loadResourceAsFile("/opencv/openface_nn4.small2.v1.t7")
 
   private val dnnConfidenceThreshold = 0.37
   private val minFaceSize = 50 // minimum acceptable size of face region in pixels
   private val dnnInScaleFactor = 1.0
   private val dnnMeanVal = new Scalar(104.0, 177.0, 123.0, 128)
-  private val yunetConfidenceThreshold = 0.80f
+  private val yunetConfidenceThreshold = 0.96f
+
+  def faceDetectToRect(detectedFace: Mat): Rect = {
+    val origX = detectedFace.get(0, 0)(0).asInstanceOf[Int]
+    val origY = detectedFace.get(0, 1)(0).asInstanceOf[Int]
+
+    val x = Math.max(0, origX)
+    val y = Math.max(0, origY)
+
+    val w = detectedFace.get(0, 2)(0).asInstanceOf[Int]
+    val h = detectedFace.get(0, 3)(0).asInstanceOf[Int]
+    new Rect(x, y, w, h)
+  }
+
+  def faceDetectToMat(image: Mat, detectedFace: Mat): Mat = {
+    val faceRect = faceDetectToRect(detectedFace)
+    image.submat(faceRect)
+  }
+
+  def matFromBytes(data: Array[Byte]): Mat = {
+    Imgcodecs.imdecode(new MatOfByte(data: _*), Imgcodecs.IMREAD_ANYCOLOR)
+  }
+
+  private def determineImageScale(sourceWidth: Int, sourceHeight: Int, targetWidth: Int, targetHeight: Int): Double = {
+    val scaleX = targetWidth.toDouble / sourceWidth
+    val scaleY = targetHeight.toDouble / sourceHeight
+    Math.min(scaleX, scaleY)
+  }
+
+  def writeDebugOpenCvMat(mat: Mat, fileName: String): Unit = {
+    val outputDir = System.getenv().get("OUTPUT")
+
+    if (outputDir == null) {
+      println("OUTPUT environment variable not set for debug image writing")
+      return
+    }
+
+    val outputPath = FilenameUtils.concat(outputDir, fileName)
+    println(String.format("Writing %s", outputPath))
+    Imgcodecs.imwrite(outputPath, mat)
+  }
+}
+
+class FaceService(val app: Altitude) extends BaseService[Face] {
+  Loader.load(classOf[opencv_java])
+
+  override protected val dao: FaceDao = app.DAO.face
+
+//  val path: Path = Paths.get(getClass.getProtectionDomain.getCodeSource.getLocation.toURI)
+//  private val resourceDir = new File(path.toFile.getParentFile, "opencv")
+//
+//  private val sfaceModelFile = new File(resourceDir.getParentFile, "opencv/face_recognition_sface_2021dec.onnx").getAbsolutePath
+//  private val sfaceRecognizer = FaceRecognizerSF.create(sfaceModelFile, "")
+//
+//  private val dnnConfigurationFile  = new File(resourceDir.getParentFile, "opencv/deploy.prototxt").getAbsolutePath
+//
+//  private val dnnModelFile = new File(resourceDir.getParentFile, s"opencv/res10_${dnnInWidth}x${dnnInHeight}_ssd_iter_140000.caffemodel").getAbsolutePath
+//
+//  private val dnnNet: Net = readNetFromCaffe(dnnConfigurationFile, dnnModelFile)
+//
+//
+//  private val yunetModelFile = new File(resourceDir.getParentFile, "/opencv/face_detection_yunet_2022mar.onnx").getAbsolutePath
+//
+//  private val modelFile = new File(resourceDir.getParentFile, "/opencv/openface_nn4.small2.v1.t7").getAbsolutePath
+//  private val embedder = readNetFromTorch(modelFile)
+//
+//  private val yuNet = FaceDetectorYN.create(yunetModelFile, "", new Size())
+//  yuNet.setScoreThreshold(FaceService.yunetConfidenceThreshold)
+//  yuNet.setNMSThreshold(0.2f)
+
+//  private val modelFile = loadResourceAsFile("/opencv/openface_nn4.small2.v1.t7")
+//  private val embedder = readNetFromTorch(modelFile.getCanonicalPath)
+//  println(embedder.empty())
+
+  private val sfaceModelFile = loadResourceAsFile("/opencv/face_recognition_sface_2021dec.onnx")
+  private val sfaceRecognizer = FaceRecognizerSF.create(sfaceModelFile.getCanonicalPath, "")
+
+  private val dnnConfigurationFile: File = loadResourceAsFile("/opencv/deploy.prototxt")
+
+  private val dnnModelFile: File = loadResourceAsFile(s"/opencv/res10_${FaceService.dnnInWidth}x${FaceService.dnnInHeight}_ssd_iter_140000.caffemodel")
+
+  private val yunetModelFile = loadResourceAsFile("/opencv/face_detection_yunet_2022mar.onnx")
 
   private val dnnNet: Net = readNetFromCaffe(dnnConfigurationFile.getCanonicalPath, dnnModelFile.getCanonicalPath)
 
 
-  private val sfaceRecognizer = FaceRecognizerSF.create(sfaceModelFile.getCanonicalPath, "")
-  private val embedder: Net = readNetFromTorch(embedderModelFile.getCanonicalPath)
+  private val modelFile = loadResourceAsFile("/opencv/openface_nn4.small2.v1.t7")
+  private val embedder = readNetFromTorch(modelFile.getCanonicalPath)
 
   private val yuNet = FaceDetectorYN.create(yunetModelFile.getCanonicalPath, "", new Size())
-  yuNet.setScoreThreshold(yunetConfidenceThreshold)
+  yuNet.setScoreThreshold(FaceService.yunetConfidenceThreshold)
+  yuNet.setNMSThreshold(0.2f)
 
   def detectFacesWithDnnNet(image: Mat): List[Rect] = {
     val inputBlob = blobFromImage(
@@ -62,9 +131,9 @@ object FaceService {
       new Size(FaceService.dnnInWidth, FaceService.dnnInHeight),
       FaceService.dnnMeanVal, false, false, CvType.CV_32F)
 
-    FaceService.dnnNet.setInput(inputBlob)
+    dnnNet.setInput(inputBlob)
 
-    val detections = FaceService.dnnNet.forward()
+    val detections = dnnNet.forward()
 
     // Decode detected face locations
     val di = detections.reshape(1, detections.total().asInstanceOf[Int] / 7)
@@ -109,18 +178,22 @@ object FaceService {
 
     val boundingBoxSize = 640
 
-    val scaleFactor = determineImageScale(image.width(), image.height(), boundingBoxSize, boundingBoxSize) match {
-        case scale if scale < 1.0 => scale
-        case _ => 1.0
+    // println("OG Image size: " + image.size())
+    val scaleFactor = FaceService.determineImageScale(image.width(), image.height(), boundingBoxSize, boundingBoxSize) match {
+      case scale if scale < 1.0 => scale
+      case _ => 1.0
     }
+    // println("Scale factor: " + scaleFactor)
 
     val srcMat: Mat = if (scaleFactor < 1.0) {
       val resized = new Mat()
       Imgproc.resize(image, resized, new Size(), scaleFactor, scaleFactor, Imgproc.INTER_LINEAR)
       resized
     } else {
-        image.clone()
+      image.clone()
     }
+
+    // println("Resized Image size: " + srcMat.size())
 
     yuNet.setInputSize(srcMat.size())
     yuNet.detect(srcMat, detectionResults)
@@ -131,6 +204,7 @@ object FaceService {
     val ret: List[Option[Mat]] = (for (idx <- 0 until numOfFaces) yield {
       val detection = detectionResults.row(idx)
 
+      // println("Detection: " + detection.dump())
       // update the original detection matrix to account for the scaling factor
       if (scaleFactor < 1.0) {
         for (col <- 0 until detection.cols()) {
@@ -138,10 +212,11 @@ object FaceService {
           detection.put(0, col, originalValue / scaleFactor)
         }
       }
+      // println("Scaled detection: " + detection.dump())
 
-      val detectionRect = faceDetectToRect(detection)
+      val detectionRect = FaceService.faceDetectToRect(detection)
 
-      if (detectionRect.height < minFaceSize || detectionRect.width < minFaceSize) {
+      if (detectionRect.height < FaceService.minFaceSize || detectionRect.width < FaceService.minFaceSize) {
         logger.warn("Face region too small")
         None
       } else {
@@ -155,38 +230,47 @@ object FaceService {
   def train(mat: Mat): Unit = {
   }
 
-  def getFaceEmbedding(faceImageMat: Mat): Array[Float] = {
-    val faceBlob = blobFromImage(faceImageMat, 1.0 / 255, new Size(96, 96), new Scalar(0, 0, 0), true, false)
+  def alignCropFace(image: Mat, detection: Mat): Mat = {
+    val alignedFace = new Mat
+    sfaceRecognizer.alignCrop(image, detection, alignedFace)
+    alignedFace
+  }
 
-    //    embedderNet.setInput(faceBlob)
-    //    // 128-dimensional embeddings
-    //    val embedderMat = embedderNet.forward()
-    //    val floatMat = new MatOfFloat()
-    //    embedderMat.assignTo(floatMat, CvType.CV_32F)
-    //    floatMat.toArray
+  def getFeatures(image: Mat): Mat = {
+    val feature = new Mat
+    sfaceRecognizer.feature(image, feature)
+    feature
+  }
 
-    new Array[Float](128)
+  def getEmbeddings(image: Mat): Array[Float] = {
+    val resized = new Mat
+    Imgproc.resize(image, resized, new Size(96, 96))
+    Imgproc.cvtColor(resized, resized, Imgproc.COLOR_BGR2RGB)
+    val faceBlob = blobFromImage(resized, 1.0 / 255, new Size(96, 96), new Scalar(0, 0, 0), true, false)
+
+//    embedder.setInput(faceBlob)
+//    val embeddingsMat = embedder.forward
+//    val embeddings = new Array[Float](128)
+//    embeddingsMat.get(0, 0, embeddings)
+//    embeddings
+    return new Array[Float](128)
   }
 
   def isFaceSimilar(image1: Mat, image2: Mat, detectMat1: Mat, detectMat2: Mat): Boolean = {
-    val face1Rect = faceDetectToRect(detectMat1)
-    val face2Rect = faceDetectToRect(detectMat2)
+    // val face1Rect = faceDetectToRect(detectMat1)
+    // val face2Rect = faceDetectToRect(detectMat2)
     // writeDebugOpenCvMat(image1.submat(face1Rect), "face1-1.jpg")
     // writeDebugOpenCvMat(image2.submat(face2Rect), "face2-1.jpg")
 
-    val alignedFace1 = new Mat
-    val alignedFace2 = new Mat
-    sfaceRecognizer.alignCrop(image1, detectMat1, alignedFace1)
-    sfaceRecognizer.alignCrop(image2, detectMat2, alignedFace2)
+    val alignedFace1 = alignCropFace(image1, detectMat1)
+    val alignedFace2 = alignCropFace(image2, detectMat2)
+
     // writeDebugOpenCvMat(alignedFace1, "face1-2.jpg")
     // writeDebugOpenCvMat(alignedFace2, "face2-2.jpg")
 
-    var feature1 = new Mat
-    var feature2 = new Mat
-    sfaceRecognizer.feature(alignedFace1, feature1)
-    feature1 = feature1.clone
-    sfaceRecognizer.feature(alignedFace2, feature2)
-    feature2 = feature2.clone
+    val feature1 = getFeatures(alignedFace1).clone()
+
+    val feature2 = getFeatures(alignedFace2).clone()
 
     val cosScore = sfaceRecognizer.`match`(feature1, feature2, FaceRecognizerSF.FR_COSINE)
     logger.info(s"Similarity cosine score: $cosScore")
@@ -195,47 +279,5 @@ object FaceService {
     //    println("L2: " + L2Score)
     cosScore >= 0.363
   }
-
-  def faceDetectToRect(detectedFace: Mat): Rect = {
-    val x = detectedFace.get(0, 0)(0).asInstanceOf[Int]
-    val y = detectedFace.get(0, 1)(0).asInstanceOf[Int]
-    val w = detectedFace.get(0, 2)(0).asInstanceOf[Int]
-    val h = detectedFace.get(0, 3)(0).asInstanceOf[Int]
-    new Rect(x, y, w, h)
-  }
-
-  def faceDetectToMat(image: Mat, detectedFace: Mat): Mat = {
-    val faceRect = faceDetectToRect(detectedFace)
-    image.submat(faceRect)
-  }
-
-  def matFromBytes(data: Array[Byte]): Mat = {
-    Imgcodecs.imdecode(new MatOfByte(data: _*), Imgcodecs.IMREAD_ANYCOLOR)
-  }
-
-  private def determineImageScale(sourceWidth: Int, sourceHeight: Int, targetWidth: Int, targetHeight: Int): Double = {
-    val scaleX = targetWidth.toDouble / sourceWidth
-    val scaleY = targetHeight.toDouble / sourceHeight
-    Math.min(scaleX, scaleY)
-  }
-
-  def writeDebugOpenCvMat(mat: Mat, fileName: String): Unit = {
-    val outputDir = System.getenv().get("OUTPUT")
-
-    if (outputDir == null) {
-      logger.warn("OUTPUT environment variable not set for debug image writing")
-      return
-    }
-
-    val outputPath = FilenameUtils.concat(outputDir, fileName)
-    println(String.format("Writing %s", outputPath))
-    Imgcodecs.imwrite(outputPath, mat)
-  }
-}
-
-class FaceService(val app: Altitude) extends BaseService[Face] {
-  Loader.load(classOf[opencv_java])
-
-  override protected val dao: FaceDao = app.DAO.face
 
 }

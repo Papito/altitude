@@ -2,21 +2,26 @@ package research
 
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
-import org.apache.commons.io.filefilter.{IOFileFilter, SuffixFileFilter, TrueFileFilter}
+import org.apache.commons.io.filefilter.IOFileFilter
+import org.apache.commons.io.filefilter.SuffixFileFilter
+import org.apache.commons.io.filefilter.TrueFileFilter
 import org.bytedeco.javacpp.Loader
 import org.bytedeco.opencv.opencv_java
 import org.opencv.core.Mat
 import org.opencv.imgcodecs.Imgcodecs
+import software.altitude.core.Altitude
 
 import java.io.File
 
 abstract class SandboxApp extends App {
   Loader.load(classOf[opencv_java])
 
+  val altitude = new Altitude()
+
   private val IMAGE_FILE_FILTER: IOFileFilter = new SuffixFileFilter(".jpg", ".jpeg", ".png")
 
   protected val sourceDirPath: String =  System.getenv().get("SOURCE")
-  protected val outputDirPath = System.getenv().get("OUTPUT")
+  protected val outputDirPath: String = System.getenv().get("OUTPUT")
 
   def process(path: String): Unit
 
