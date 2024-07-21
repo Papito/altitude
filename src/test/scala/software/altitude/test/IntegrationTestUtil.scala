@@ -1,8 +1,6 @@
 package software.altitude.test
 
-import org.apache.commons.io.{FileUtils, FilenameUtils}
-import org.opencv.core.Mat
-import org.opencv.imgcodecs.Imgcodecs
+import org.apache.commons.io.FileUtils
 import software.altitude.core.Altitude
 import software.altitude.core.models.ImportAsset
 import software.altitude.core.models.Metadata

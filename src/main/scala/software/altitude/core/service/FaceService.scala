@@ -12,6 +12,7 @@ import org.opencv.core.Scalar
 import org.opencv.core.Size
 import org.opencv.dnn.Dnn.blobFromImage
 import org.opencv.dnn.Dnn.readNetFromCaffe
+import org.opencv.dnn.Dnn.readNetFromTorch
 import org.opencv.dnn.Net
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
@@ -37,7 +38,7 @@ object FaceService {
 
   private val sfaceModelFile = loadResourceAsFile("/opencv/face_recognition_sface_2021dec.onnx")
   private val yunetModelFile = loadResourceAsFile("/opencv/face_detection_yunet_2022mar.onnx")
-//  private val embedderModelFile = loadResourceAsFile("/opencv/openface_nn4.small2.v1.t7")
+  private val embedderModelFile = loadResourceAsFile("/opencv/openface_nn4.small2.v1.t7")
 
   private val dnnConfidenceThreshold = 0.37
   private val minFaceSize = 50 // minimum acceptable size of face region in pixels
@@ -47,9 +48,9 @@ object FaceService {
 
   private val dnnNet: Net = readNetFromCaffe(dnnConfigurationFile.getCanonicalPath, dnnModelFile.getCanonicalPath)
 
-  //  private val embedderNet: Net = readNetFromTorch(embedderModelFile.getCanonicalPath)
 
   private val sfaceRecognizer = FaceRecognizerSF.create(sfaceModelFile.getCanonicalPath, "")
+  private val embedder: Net = readNetFromTorch(embedderModelFile.getCanonicalPath)
 
   private val yuNet = FaceDetectorYN.create(yunetModelFile.getCanonicalPath, "", new Size())
   yuNet.setScoreThreshold(yunetConfidenceThreshold)
@@ -151,6 +152,9 @@ object FaceService {
     ret.flatten
   }
 
+  def train(mat: Mat): Unit = {
+  }
+
   def getFaceEmbedding(faceImageMat: Mat): Array[Float] = {
     val faceBlob = blobFromImage(faceImageMat, 1.0 / 255, new Size(96, 96), new Scalar(0, 0, 0), true, false)
 
@@ -167,15 +171,15 @@ object FaceService {
   def isFaceSimilar(image1: Mat, image2: Mat, detectMat1: Mat, detectMat2: Mat): Boolean = {
     val face1Rect = faceDetectToRect(detectMat1)
     val face2Rect = faceDetectToRect(detectMat2)
-    writeDebugOpenCvMat(image1.submat(face1Rect), "face1-1.jpg")
-    writeDebugOpenCvMat(image2.submat(face2Rect), "face2-1.jpg")
+    // writeDebugOpenCvMat(image1.submat(face1Rect), "face1-1.jpg")
+    // writeDebugOpenCvMat(image2.submat(face2Rect), "face2-1.jpg")
 
     val alignedFace1 = new Mat
     val alignedFace2 = new Mat
     sfaceRecognizer.alignCrop(image1, detectMat1, alignedFace1)
     sfaceRecognizer.alignCrop(image2, detectMat2, alignedFace2)
-    writeDebugOpenCvMat(alignedFace1, "face1-2.jpg")
-    writeDebugOpenCvMat(alignedFace2, "face2-2.jpg")
+    // writeDebugOpenCvMat(alignedFace1, "face1-2.jpg")
+    // writeDebugOpenCvMat(alignedFace2, "face2-2.jpg")
 
     var feature1 = new Mat
     var feature2 = new Mat
@@ -227,7 +231,6 @@ object FaceService {
     println(String.format("Writing %s", outputPath))
     Imgcodecs.imwrite(outputPath, mat)
   }
-
 }
 
 class FaceService(val app: Altitude) extends BaseService[Face] {

@@ -3,13 +3,12 @@ package research
 import org.apache.commons.io.FileUtils
 import org.bytedeco.javacpp.Loader
 import org.opencv.core.Mat
-import org.opencv.core.MatOfByte
 import org.opencv.core.MatOfRect
 import org.opencv.core.Point
 import org.opencv.core.Scalar
-import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
 import org.opencv.objdetect.CascadeClassifier
+import software.altitude.core.service.FaceService.matFromBytes
 
 import java.io.File
 
@@ -22,7 +21,7 @@ object HaarFaceDetection extends SandboxApp {
     println(s"Processing ${file.getAbsolutePath}")
 
     val fileByteArray: Array[Byte] = FileUtils.readFileToByteArray(file)
-    val image: Mat = Imgcodecs.imdecode(new MatOfByte(fileByteArray: _*), Imgcodecs.IMREAD_GRAYSCALE)
+    val image: Mat = matFromBytes(fileByteArray)
 
     val resourceFilePath = "opencv/haarcascade_frontalface_default.xml"
     val faceDetector: CascadeClassifier = new CascadeClassifier(resourceFilePath);

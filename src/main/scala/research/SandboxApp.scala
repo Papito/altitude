@@ -1,6 +1,8 @@
 package research
 
+import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
+import org.apache.commons.io.filefilter.{IOFileFilter, SuffixFileFilter, TrueFileFilter}
 import org.bytedeco.javacpp.Loader
 import org.bytedeco.opencv.opencv_java
 import org.opencv.core.Mat
@@ -11,7 +13,9 @@ import java.io.File
 abstract class SandboxApp extends App {
   Loader.load(classOf[opencv_java])
 
-  private val sourceDirPath =  System.getenv().get("SOURCE")
+  private val IMAGE_FILE_FILTER: IOFileFilter = new SuffixFileFilter(".jpg", ".jpeg", ".png")
+
+  protected val sourceDirPath: String =  System.getenv().get("SOURCE")
   private val outputDirPath = System.getenv().get("OUTPUT")
 
   def process(path: String): Unit
@@ -24,21 +28,28 @@ abstract class SandboxApp extends App {
     println(s"Output directory [$outputDirPath] does not exist")
   }
 
-  def getAllFilesInDirectory(directoryPath: String): List[String] = {
-    val directory = new File(directoryPath)
-    directory.listFiles.filter(_.isFile)
-      .filter(file =>
-        file.getName.toLowerCase.endsWith(".jpg") ||
-          file.getName.toLowerCase.endsWith(".jpeg") ||
-          file.getName.toLowerCase.endsWith(".png"))
-      .map(_.getAbsolutePath).toList
-  }
-
   def writeResult(ogFile: File, image: Mat): Unit = {
     val outputPath = FilenameUtils.concat(outputDirPath, ogFile.getName)
     println(String.format("Writing %s", outputPath))
     Imgcodecs.imwrite(outputPath, image)
   }
 
-  val allFilePaths: List[String] = getAllFilesInDirectory(sourceDirPath)
+  private def allFilePathsInDir(directoryPath: String): List[String] = {
+    recursiveFilePathIterator(directoryPath).toList
+  }
+
+  def recursiveFilePathIterator(path: String): Iterator[String] = {
+    val files = FileUtils.iterateFiles(
+      new File(path), IMAGE_FILE_FILTER, TrueFileFilter.INSTANCE)
+
+    new Iterable[String] {
+      def iterator: Iterator[String] = new Iterator[String] {
+        def hasNext: Boolean = files.hasNext
+
+        def next(): String = files.next().getAbsolutePath
+      }
+    }.iterator
+  }
+
+  val allFilePaths: List[String] = allFilePathsInDir(sourceDirPath)
 }

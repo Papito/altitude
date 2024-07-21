@@ -2,9 +2,9 @@ package research
 
 import org.apache.commons.io.FileUtils
 import org.opencv.core._
-import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
 import software.altitude.core.service.FaceService
+import software.altitude.core.service.FaceService.matFromBytes
 
 import java.io.File
 
@@ -19,7 +19,7 @@ object YuNetFaceDetection extends SandboxApp {
     println(s"Processing ${file.getAbsolutePath}")
 
     val fileByteArray: Array[Byte] = FileUtils.readFileToByteArray(file)
-    val image: Mat = Imgcodecs.imdecode(new MatOfByte(fileByteArray: _*), Imgcodecs.IMREAD_ANYCOLOR)
+    val image: Mat = matFromBytes(fileByteArray)
 
     val results: List[Mat] = FaceService.detectFacesWithYunet(image)
 
