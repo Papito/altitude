@@ -28,7 +28,7 @@ object FaceService {
   private val minFaceSize = 50 // minimum acceptable size of face region in pixels
   private val dnnInScaleFactor = 1.0
   private val dnnMeanVal = new Scalar(104.0, 177.0, 123.0, 128)
-  private val yunetConfidenceThreshold = 0.85f
+  private val yunetConfidenceThreshold = 0.95f
 
   def faceDetectToRect(detectedFace: Mat): Rect = {
     val origX = detectedFace.get(0, 0)(0).asInstanceOf[Int]
@@ -206,17 +206,19 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
     feature
   }
 
-  def getEmbeddings(image: Mat): Array[Float] = {
-    val resized = new Mat
-    Imgproc.resize(image, resized, new Size(96, 96))
-    Imgproc.cvtColor(resized, resized, Imgproc.COLOR_BGR2RGB)
-    val faceBlob = blobFromImage(resized, 1.0 / 255, new Size(96, 96), new Scalar(0, 0, 0), true, false)
-
-    embedder.setInput(faceBlob)
+  def getEmbeddings(alignedFaceBlob: Mat): Array[Float] = {
+    embedder.setInput(alignedFaceBlob)
     val embeddingsMat = embedder.forward
     val embeddings = new Array[Float](128)
     embeddingsMat.get(0, 0, embeddings)
     embeddings
+  }
+
+  def getAlignedFaceBlob(image: Mat): Mat = {
+    val resized = new Mat
+    Imgproc.resize(image, resized, new Size(96, 96))
+    Imgproc.cvtColor(resized, resized, Imgproc.COLOR_BGR2RGB)
+    blobFromImage(resized, 1.0 / 255, new Size(96, 96), new Scalar(0, 0, 0), true, false)
   }
 
   def isFaceSimilar(image1: Mat, image2: Mat, detectMat1: Mat, detectMat2: Mat): Boolean = {

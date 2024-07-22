@@ -3,13 +3,16 @@ package research
 
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
-import org.opencv.core.Mat
+import org.opencv.core.{CvType, Mat}
+import org.opencv.face.{FisherFaceRecognizer, LBPHFaceRecognizer}
 import org.opencv.imgcodecs.Imgcodecs
+import org.opencv.imgproc.Imgproc
 import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.service.FaceService
 import software.altitude.core.service.FaceService.matFromBytes
 
 import java.io.File
+import java.util
 
 class Face(val id: String = BaseDao.genId,
            val image: Mat,
@@ -19,6 +22,10 @@ class Face(val id: String = BaseDao.genId,
 }
 
 object FaceRecognition extends SandboxApp {
+  private val recognizer  = FisherFaceRecognizer.create()
+  // private val recognizer  = LBPHFaceRecognizer.create()
+
+  val images = new util.ArrayList[Mat]()
 
   override def process(path: String): Unit = {
     val file = new File(path)
@@ -38,17 +45,22 @@ object FaceRecognition extends SandboxApp {
       val rect = FaceService.faceDetectToRect(res)
       val faceImage = image.submat(rect)
 
-
       val alignedImage = altitude.service.face.alignCropFace(image, res)
       writeResult(file, alignedImage, idx)
 
+      val alignedFaceBlob = altitude.service.face.getAlignedFaceBlob(alignedImage)
+
+      val greyAlignedImage = new Mat()
+      Imgproc.cvtColor(alignedImage, greyAlignedImage, Imgproc.COLOR_BGR2GRAY)
+      images.add(greyAlignedImage)
+
       val features = altitude.service.face.getFeatures(alignedImage)
-      val embedding = altitude.service.face.getEmbeddings(features)
-      println(s"Embedding size: ${embedding.mkString(", ")}")
+      val embedding = altitude.service.face.getEmbeddings(alignedFaceBlob)
 
       val face = new Face(image = faceImage, alignedImage = alignedImage, embedding = embedding, features = features)
       face
     }).toList
+
   }
 
   def writeResult(ogFile: File, image: Mat, idx: Int): Unit = {
@@ -71,4 +83,11 @@ object FaceRecognition extends SandboxApp {
     val path: String = itr.next()
     process(path)
   }
+
+  private val labels = new Mat(images.size(), 1, CvType.CV_32SC1)
+  for (idx <- 0 until images.size()) {
+    labels.put(idx, 0, idx)
+  }
+
+  recognizer.train(images, labels)
 }
