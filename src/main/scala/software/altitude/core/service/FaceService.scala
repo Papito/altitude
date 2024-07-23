@@ -16,6 +16,7 @@ import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
 import org.opencv.objdetect.FaceDetectorYN
 import org.opencv.objdetect.FaceRecognizerSF
+import research.FaceRecognition.{altitude, images}
 import software.altitude.core.Altitude
 import software.altitude.core.dao.FaceDao
 import software.altitude.core.models.Face
@@ -194,19 +195,20 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
   def train(mat: Mat): Unit = {
   }
 
-  def alignCropFace(image: Mat, detection: Mat): Mat = {
+  def alignCropFaceFromDetection(image: Mat, detection: Mat): Mat = {
     val alignedFace = new Mat
     sfaceRecognizer.alignCrop(image, detection, alignedFace)
     alignedFace
   }
 
-  def getFeatures(image: Mat): Mat = {
+  def getFacialFeatures(image: Mat): Mat = {
     val feature = new Mat
     sfaceRecognizer.feature(image, feature)
     feature
   }
 
-  def getEmbeddings(alignedFaceBlob: Mat): Array[Float] = {
+  def getEmbeddings(trainingImage: Mat): Array[Float] = {
+    val alignedFaceBlob = getAlignedFaceBlob(trainingImage)
     embedder.setInput(alignedFaceBlob)
     val embeddingsMat = embedder.forward
     val embeddings = new Array[Float](128)
@@ -214,7 +216,14 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
     embeddings
   }
 
-  def getAlignedFaceBlob(image: Mat): Mat = {
+//  def getTrainingFaceImage(cropAlignedFace: Mat): Mat = {
+//    val greyAlignedImage = new Mat()
+//    Imgproc.cvtColor(cropAlignedFace, greyAlignedImage, Imgproc.COLOR_BGR2GRAY)
+//    Imgproc.equalizeHist(greyAlignedImage, greyAlignedImage)
+//    greyAlignedImage
+//  }
+
+  private def getAlignedFaceBlob(image: Mat): Mat = {
     val resized = new Mat
     Imgproc.resize(image, resized, new Size(96, 96))
     Imgproc.cvtColor(resized, resized, Imgproc.COLOR_BGR2RGB)
@@ -227,15 +236,15 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
     // writeDebugOpenCvMat(image1.submat(face1Rect), "face1-1.jpg")
     // writeDebugOpenCvMat(image2.submat(face2Rect), "face2-1.jpg")
 
-    val alignedFace1 = alignCropFace(image1, detectMat1)
-    val alignedFace2 = alignCropFace(image2, detectMat2)
+    val alignedFace1 = alignCropFaceFromDetection(image1, detectMat1)
+    val alignedFace2 = alignCropFaceFromDetection(image2, detectMat2)
 
     // writeDebugOpenCvMat(alignedFace1, "face1-2.jpg")
     // writeDebugOpenCvMat(alignedFace2, "face2-2.jpg")
 
-    val feature1 = getFeatures(alignedFace1).clone()
+    val feature1 = getFacialFeatures(alignedFace1).clone()
 
-    val feature2 = getFeatures(alignedFace2).clone()
+    val feature2 = getFacialFeatures(alignedFace2).clone()
 
     val cosScore = sfaceRecognizer.`match`(feature1, feature2, FaceRecognizerSF.FR_COSINE)
     logger.info(s"Similarity cosine score: $cosScore")
