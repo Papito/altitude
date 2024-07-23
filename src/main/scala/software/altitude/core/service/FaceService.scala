@@ -16,7 +16,6 @@ import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
 import org.opencv.objdetect.FaceDetectorYN
 import org.opencv.objdetect.FaceRecognizerSF
-import research.FaceRecognition.{altitude, images}
 import software.altitude.core.Altitude
 import software.altitude.core.dao.FaceDao
 import software.altitude.core.models.Face
@@ -30,6 +29,8 @@ object FaceService {
   private val dnnInScaleFactor = 1.0
   private val dnnMeanVal = new Scalar(104.0, 177.0, 123.0, 128)
   private val yunetConfidenceThreshold = 0.95f
+
+  val cosineSimilarityThreshold = 0.363
 
   def faceDetectToRect(detectedFace: Mat): Rect = {
     val origX = detectedFace.get(0, 0)(0).asInstanceOf[Int]
@@ -164,7 +165,7 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
     yuNet.detect(srcMat, detectionResults)
     val numOfFaces = detectionResults.rows()
 
-    logger.info(s"Number of face regions found: $numOfFaces")
+    // logger.info(s"Number of face regions found: $numOfFaces")
 
     val ret: List[Option[Mat]] = (for (idx <- 0 until numOfFaces) yield {
       val detection = detectionResults.row(idx)
@@ -216,12 +217,12 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
     embeddings
   }
 
-//  def getTrainingFaceImage(cropAlignedFace: Mat): Mat = {
-//    val greyAlignedImage = new Mat()
-//    Imgproc.cvtColor(cropAlignedFace, greyAlignedImage, Imgproc.COLOR_BGR2GRAY)
-//    Imgproc.equalizeHist(greyAlignedImage, greyAlignedImage)
-//    greyAlignedImage
-//  }
+  def getHistEqualizedGrayScImage(cropAlignedFace: Mat): Mat = {
+    val greyAlignedImage = new Mat()
+    Imgproc.cvtColor(cropAlignedFace, greyAlignedImage, Imgproc.COLOR_BGR2GRAY)
+    Imgproc.equalizeHist(greyAlignedImage, greyAlignedImage)
+    greyAlignedImage
+  }
 
   private def getAlignedFaceBlob(image: Mat): Mat = {
     val resized = new Mat
@@ -243,15 +244,13 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
     // writeDebugOpenCvMat(alignedFace2, "face2-2.jpg")
 
     val feature1 = getFacialFeatures(alignedFace1).clone()
-
     val feature2 = getFacialFeatures(alignedFace2).clone()
 
-    val cosScore = sfaceRecognizer.`match`(feature1, feature2, FaceRecognizerSF.FR_COSINE)
-    logger.info(s"Similarity cosine score: $cosScore")
-    //    val L2Score = sfaceRecognizer.`match`(feature1, feature2, FaceRecognizerSF.FR_NORM_L2)
-    //    logger.info(s"Similarity L2 score: $L2Score")
-    //    println("L2: " + L2Score)
-    cosScore >= 0.363
+    getFeatureSimilarityScore(feature1, feature2) >= FaceService.cosineSimilarityThreshold
+  }
+
+  def getFeatureSimilarityScore(feature1: Mat, feature2: Mat): Double = {
+    sfaceRecognizer.`match`(feature1, feature2, FaceRecognizerSF.FR_COSINE)
   }
 
 }
