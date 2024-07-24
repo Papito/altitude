@@ -37,7 +37,15 @@ class DbFace(val face: Face, val personLabel: Int) {
 
 object Person {
   private val minViablePersonFaceNum = 5
-  val minFacesSimilarityThreshold = 2
+  /**
+   * Number of faces required to be similar to consider a person as known
+   * THIS DEPENDS ON minViablePersonFaceNum, and since we are doing
+   * minViablePersonFaceNum*2 comparisons between unknown person faces, this number should be
+   * around half that.
+   * 4 faces -> 16 comparisons -> 8 similar faces
+   * 5 faces -> 25 comparisons -> 12-ish similar faces
+   */
+  val minFacesSimilarityThreshold = 25
 }
 
 class Person(val label: Int, val isUnknown: Boolean = true) {
@@ -49,6 +57,7 @@ class Person(val label: Int, val isUnknown: Boolean = true) {
 
   def addFaceAndGetUpdatedPerson(face: Face): Person = {
     faces.addOne(new DbFace(face, label))
+    println("Adding face " + face.name + " to person " + label + ". Number of faces: " + faces.size)
 
     if (faces.size == Person.minViablePersonFaceNum) {
       val knownPerson = new Person(this.label, isUnknown = false)
@@ -142,7 +151,7 @@ object FaceRecognition extends SandboxApp {
     process(path)
   }
 
-  private val minKnownPersons = 10
+  private val minKnownPersons = 4
   private val cosineSimilarityThreshold = .48
 
   private var labelIdx = -1
@@ -174,15 +183,15 @@ object FaceRecognition extends SandboxApp {
       if (unknownPersonFaceMatch.isDefined) {
         println("Found match for " + thisFace.name + " -> " + unknownPersonFaceMatch.get.face.name)
 
-        val personMatch = DB.
-          db(unknownPersonFaceMatch.get.personLabel).
-          addFaceAndGetUpdatedPerson(thisFace)
+        val personMatch = DB.db(unknownPersonFaceMatch.get.personLabel).addFaceAndGetUpdatedPerson(thisFace)
 
         if (personMatch.isKnown) {
+          println("The matched person is known")
           // Edge case - if we keep seeing the same person, we need to discard the new instance and keep going
           // until we have 2 people required to start the training
           if (DB.allKnownPersons.size == 1) {
-            if (arePeopleSimilar(DB.allKnownPersons.head, personMatch)) {
+            val onlyPersonInDb = DB.allKnownPersons.head
+            if (arePeopleSimilar(onlyPersonInDb, personMatch)) {
               println("Removing " + personMatch.label)
               DB.db.remove(personMatch.label)
             } else {
@@ -237,15 +246,15 @@ object FaceRecognition extends SandboxApp {
   })
 
 
-  println("==>>>>>> RERUNNING WITH TRAINED DATA")
-  srcFaces.forEach(thisFace => {
-      println("\n--------------------\n" + thisFace.path + "\n")
-
-      val predLabel = new Array[Int](1)
-      val confidence = new Array[Double](1)
-      recognizer.predict(thisFace.alignedFaceImageGraySc, predLabel, confidence)
-      writeDnnHit(predLabel = predLabel(0), confidence = confidence(0), face = thisFace)
-  })
+//  println("==>>>>>> RERUNNING WITH TRAINED DATA")
+//  srcFaces.forEach(thisFace => {
+//      println("\n--------------------\n" + thisFace.path + "\n")
+//
+//      val predLabel = new Array[Int](1)
+//      val confidence = new Array[Double](1)
+//      recognizer.predict(thisFace.alignedFaceImageGraySc, predLabel, confidence)
+//      writeFrHit(predLabel = predLabel(0), confidence = confidence(0), face = thisFace)
+//  })
 
   private def getUnknownPersonFaceMatch(thisFace: Face): Option[DbFace] = {
     val unknownFaceSimilarityWeights: List[(Double, DbFace)] = DB.allUnknownPersonFaces().map { unknownPersonFace =>
@@ -270,17 +279,22 @@ object FaceRecognition extends SandboxApp {
     // assumes obviously that both people are "known" with same number of faces
 
     println("COMPARING PERSON1 " + person1.name + " with PERSON2 " + person2.name)
-    val facePairs = person1.allFaces().zip(person2.allFaces())
 
-    val areSimilar = for ((face1, face2) <- facePairs) yield {
-      val similarityScore = altitude.service.face.getFeatureSimilarityScore(face1.face.features, face2.face.features)
+    val cosDistancesTmp: List[List[Double]] = person1.allFaces().map { face =>
+      person2.allFaces().map { face2 =>
+        altitude.service.face.getFeatureSimilarityScore(face.face.features, face2.face.features)
+      }
+    }
+    val cosDistances = cosDistancesTmp.flatten
+
+    val similarityHits = cosDistances.filter { similarityScore =>
       similarityScore >= cosineSimilarityThreshold
     }
 
-    val hits = areSimilar.count(_ == true)
-    println("HITS: " + hits + " out of " + Person.minFacesSimilarityThreshold + " required")
+    println("!!! COSINE DISTANCES: " + cosDistances)
+    println("!!! HITS: " + similarityHits.length + " out of " + cosDistances.length)
 
-    if (hits >= Person.minFacesSimilarityThreshold) {
+    if (similarityHits.length >= Person.minFacesSimilarityThreshold) {
       println("People are similar")
       true
     } else {
@@ -314,7 +328,7 @@ object FaceRecognition extends SandboxApp {
     }
   }
 
-  private def writeDnnHit(predLabel: Int, confidence: Double, face: Face): Unit = {
+  private def writeFrHit(predLabel: Int, confidence: Double, face: Face): Unit = {
     println(s"Predicted label: ${predLabel} with confidence: ${confidence} for " + face.name)
     val ogFile = new File(face.path)
     val indexedFileName = "hit-" + "lbl_" + predLabel + "-conf_" + confidence.toInt + "-" + face.idx + "_" + ogFile.getName
