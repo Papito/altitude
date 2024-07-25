@@ -6,12 +6,15 @@ import org.apache.commons.io.FilenameUtils
 import org.opencv.core.{CvType, Mat}
 import org.opencv.face.LBPHFaceRecognizer
 import org.opencv.imgcodecs.Imgcodecs
+import software.altitude.core.AllDone
 import software.altitude.core.service.FaceService
 import software.altitude.core.service.FaceService.matFromBytes
 
 import java.io.File
 import java.util
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
+import scala.math.pow
 import scala.util.control.Breaks.{break, breakable}
 
 class Face(val path: String,
@@ -34,16 +37,24 @@ class DbFace(val face: Face, val personLabel: Int) {
 }
 
 object Person {
-  private val minViablePersonFaceNum = 4
+  private val minViablePersonFaceNum = 10
   /**
    * Number of faces required to be similar to consider a person as known
    * THIS DEPENDS ON minViablePersonFaceNum, and since we are doing expensive quadratic
    * minViablePersonFaceNum*2 comparisons between unknown person faces, this number should be
-   * around half that.
-   * 4 faces -> 16 comparisons -> 8 similar faces
-   * 5 faces -> 25 comparisons -> 12-ish similar faces
+   * a fraction of that. So, if it's a quarter:
+   *   5 faces -> 25 comparisons -> 5 similar faces
+   *   10 faces -> 100 comparisons -> 25 similar faces
    */
-  val minFacesSimilarityThreshold = 8
+  val minFacesSimilarityThreshold: Int = pow(minViablePersonFaceNum, 2).intValue / 4
+  println("minFacesSimilarityThreshold: " + minFacesSimilarityThreshold)
+
+  /**
+   * Threshold to short-circuit similarity comparisons between unknown person faces.
+   * If we keep getting negatives, we can stop early to save on computation.
+   */
+  val similarityShortCircuitThreshold: Int = (minFacesSimilarityThreshold / 2) + 1
+    println("similarityShortCircuitThreshold: " + similarityShortCircuitThreshold)
 }
 
 class Person(val label: Int, val isUnknown: Boolean = true) {
@@ -158,7 +169,7 @@ object FaceRecognition extends SandboxApp {
   }
 
   private val minKnownPersons = 6
-  private val cosineSimilarityThreshold = .43
+  private val cosineSimilarityThreshold = .48
 
   private var labelIdx = -1
 
@@ -281,22 +292,41 @@ object FaceRecognition extends SandboxApp {
   private def arePeopleSimilar(person1: Person, person2: Person): Boolean = {
     println("Comparing PERSON1 " + person1.name + " with PERSON2 " + person2.name)
 
-    val cosDistancesTmp: List[List[Double]] = person1.allFaces().map { face =>
-      person2.allFaces().map { face2 =>
-        comparisonOpCount += 1
-        altitude.service.face.getFeatureSimilarityScore(face.face.features, face2.face.features)
+    val histAccumulator = ListBuffer.empty[Boolean]
+    var comparisonHits = 0
+    try {
+      person1.allFaces().map { face =>
+        person2.allFaces().map { face2 =>
+          val score = altitude.service.face.getFeatureSimilarityScore(face.face.features, face2.face.features)
+          comparisonOpCount += 1 // for keeping global count
+
+          val isAMatch = score >= cosineSimilarityThreshold
+          comparisonHits +=  (if (isAMatch) 1 else 0)
+          histAccumulator.addOne(isAMatch)
+
+          // short-circuit if we have enough comparisons and no hits
+          if (histAccumulator.size == Person.similarityShortCircuitThreshold && comparisonHits == 0) {
+            throw AllDone(success = false)
+          }
+
+          // short-circuit if we have enough hits
+          if (comparisonHits == Person.minFacesSimilarityThreshold) {
+            throw AllDone(success = true)
+          }
+
+          isAMatch
+        }
       }
-    }
-    val cosDistances = cosDistancesTmp.flatten
-
-    val similarityHits = cosDistances.filter { similarityScore =>
-      similarityScore >= cosineSimilarityThreshold
+    } catch {
+        case AllDone(true) => println("Short-circuiting similarity comparisons with TRUE")
+        case AllDone(false) => println("Short-circuiting similarity comparisons with FALSE")
     }
 
-    println("!!! COSINE DISTANCES: " + cosDistances)
-    println("!!! HITS: " + similarityHits.length + " out of " + cosDistances.length)
+    val similarityHits = histAccumulator.count(_ == true)
 
-    if (similarityHits.length >= Person.minFacesSimilarityThreshold) {
+    println("!!! HITS: " + similarityHits + " out of " + histAccumulator.size)
+
+    if (similarityHits >= Person.minFacesSimilarityThreshold) {
       println("People are similar")
       true
     } else {
