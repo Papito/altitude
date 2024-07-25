@@ -84,7 +84,7 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
     "src/main/resources/opencv/deploy.prototxt",
     s"src/main/resources/opencv/res10_${FaceService.dnnInWidth}x${FaceService.dnnInHeight}_ssd_iter_140000.caffemodel")
 
-  private val embedder = readNetFromTorch("/home/andrei/projects/altitude/src/main/resources/opencv/openface_nn4.small2.v1.t7", true)
+  private val embedder = readNetFromTorch("src/main/resources/opencv/openface_nn4.small2.v1.t7", true)
 
   private val yuNet = FaceDetectorYN.create("src/main/resources/opencv/face_detection_yunet_2022mar.onnx", "", new Size())
   yuNet.setScoreThreshold(FaceService.yunetConfidenceThreshold)
