@@ -48,7 +48,7 @@ class PersonFace(val face: Face, val personLabel: Int) {
 }
 
 object Person {
-  private val minTrainablePersonFaceNum = 10
+  private val minTrainablePersonFaceNum = 12
   /**
    * Number of faces required to be similar to consider a person as known
    * THIS DEPENDS ON minViablePersonFaceNum, and since we are doing expensive quadratic
@@ -65,7 +65,7 @@ object Person {
    * If we keep getting negatives this many times in a row, we can stop early to save on computation.
    */
   val similarityShortCircuitThreshold: Int = (minFacesSimilarityThreshold / 2) + 1
-    println("similarityShortCircuitThreshold: " + similarityShortCircuitThreshold)
+  println("similarityShortCircuitThreshold: " + similarityShortCircuitThreshold)
 }
 
 /**
@@ -187,7 +187,7 @@ object FaceRecognition extends SandboxApp {
   }
 
   private val minKnownPersons = 6
-  private val cosineSimilarityThreshold = .47
+  private val cosineSimilarityThreshold = .5
 
   private var labelIdx = -1
 
