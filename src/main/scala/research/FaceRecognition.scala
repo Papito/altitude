@@ -37,7 +37,7 @@ class DbFace(val face: Face, val personLabel: Int) {
 }
 
 object Person {
-  private val minViablePersonFaceNum = 10
+  private val minIndexablePersonFaceNum = 10
   /**
    * Number of faces required to be similar to consider a person as known
    * THIS DEPENDS ON minViablePersonFaceNum, and since we are doing expensive quadratic
@@ -46,7 +46,7 @@ object Person {
    *   5 faces -> 25 comparisons -> 5 similar faces
    *   10 faces -> 100 comparisons -> 25 similar faces
    */
-  val minFacesSimilarityThreshold: Int = pow(minViablePersonFaceNum, 2).intValue / 4
+  val minFacesSimilarityThreshold: Int = pow(minIndexablePersonFaceNum, 2).intValue / 4
   println("minFacesSimilarityThreshold: " + minFacesSimilarityThreshold)
 
   /**
@@ -57,17 +57,15 @@ object Person {
     println("similarityShortCircuitThreshold: " + similarityShortCircuitThreshold)
 }
 
-class Person(val label: Int, val isUnknown: Boolean = true) {
+class Person(val label: Int, val isTrainable: Boolean = false) {
   private val faces: mutable.ListBuffer[DbFace] = mutable.ListBuffer[DbFace]()
-
-  def isKnown: Boolean = !isUnknown
 
   def addFaceAndGetUpdatedPerson(face: Face): Person = {
     faces.addOne(new DbFace(face, label))
     println("Adding face " + face.name + " to person " + label + ". Number of faces: " + faces.size)
 
-    if (isUnknown && faces.size >= Person.minViablePersonFaceNum) {
-      val knownPerson = new Person(this.label, isUnknown = false)
+    if (!isTrainable && faces.size >= Person.minIndexablePersonFaceNum) {
+      val knownPerson = new Person(this.label, isTrainable = true)
       knownPerson.faces.addAll(this.faces)
       return knownPerson
     }
@@ -92,26 +90,29 @@ class Person(val label: Int, val isUnknown: Boolean = true) {
   }
 
   override def toString: String =
-    s"PERSON $name. Label: $label. Faces: ${faces.size}. Known: $isKnown"
+    s"PERSON $name. Label: $label. Faces: ${faces.size}. Trainable: $isTrainable"
 }
 
 
 object DB {
   val db: mutable.Map[Int, Person] = mutable.Map[Int, Person]()
 
-  def allUnknownPersonFaces(): List[DbFace] = {
-    db.values.filter(_.isUnknown).flatMap(_.allFaces()).toList
+  def allUntrainablePersonFaces(): List[DbFace] = {
+    db.values.filter(!_.isTrainable).flatMap(_.allFaces()).toList
   }
 
-  def allKnownPersons: Iterable[Person] = {
-    db.values.filter(!_.isUnknown)
+  def allTrainablePersons: Iterable[Person] = {
+    db.values.filter(_.isTrainable)
+  }
+
+  def all(): Iterable[Person] = {
+    db.values
   }
 }
 
 object FaceRecognition extends SandboxApp {
   private val trainedModelPath = FilenameUtils.concat(outputDirPath, "trained_model.xml")
 
-  //     public static native @Ptr LBPHFaceRecognizer create(int radius/*=1*/, int neighbors/*=8*/, int grid_x/*=8*/, int grid_y/*=8*/, double threshold/*=DBL_MAX*/);
   private val recognizer = LBPHFaceRecognizer.create()
   recognizer.setGridX(12)
   recognizer.setGridY(12)
@@ -169,14 +170,14 @@ object FaceRecognition extends SandboxApp {
   }
 
   private val minKnownPersons = 6
-  private val cosineSimilarityThreshold = .48
+  private val cosineSimilarityThreshold = .47
 
   private var labelIdx = -1
 
   println("==>>>>>> INITIAL TRAINING RUN WITH MINIMAL DATA")
   srcFaces.forEach(thisFace => {
     breakable {
-      if (DB.allKnownPersons.size == minKnownPersons) {
+      if (DB.allTrainablePersons.size == minKnownPersons) {
         break()
       }
       println("\n--------------------\n" + thisFace.path + "\n")
@@ -184,7 +185,7 @@ object FaceRecognition extends SandboxApp {
 
       // No data in DB
       if (DB.db.isEmpty) {
-        val person = new Person(label = 0, isUnknown = true).addFaceAndGetUpdatedPerson(thisFace)
+        val person = new Person(label = 0, isTrainable = false).addFaceAndGetUpdatedPerson(thisFace)
         DB.db.put(0, person)
         println("First person added as UNKNOWN")
         break()
@@ -199,11 +200,11 @@ object FaceRecognition extends SandboxApp {
 
         val personMatch = DB.db(unknownPersonFaceMatch.get.personLabel).addFaceAndGetUpdatedPerson(thisFace)
 
-        if (personMatch.isKnown) {
+        if (personMatch.isTrainable) {
           // we have a complete person with enough faces to train, but are there similar people in DB?
           var similarPerson: Option[Person] = None
 
-          DB.allKnownPersons.foreach { person =>
+          DB.allTrainablePersons.foreach { person =>
             if (similarPerson.isEmpty && arePeopleSimilar(person, personMatch)) {
               similarPerson = Some(person)
             }
@@ -219,7 +220,7 @@ object FaceRecognition extends SandboxApp {
             println("No other known persons are similar to " + personMatch.name)
             // update the unknown person as known
             DB.db.put(personMatch.label, personMatch)
-            println("Known persons: " + DB.allKnownPersons.size)
+            println("Known persons: " + DB.allTrainablePersons.size)
           }
 
         } else {
@@ -230,7 +231,7 @@ object FaceRecognition extends SandboxApp {
       } else {
         // No match found for this face - create a new unknown person
         println("No match found for " + thisFace.name + " -> creating new unknown person with label " + labelIdx)
-        val person = new Person(label = labelIdx, isUnknown = true).
+        val person = new Person(label = labelIdx, isTrainable = false).
           addFaceAndGetUpdatedPerson(thisFace)
 
         DB.db.put(labelIdx, person)
@@ -238,7 +239,7 @@ object FaceRecognition extends SandboxApp {
     }
   })
 
-  DB.allKnownPersons.foreach { person =>
+  DB.all.foreach { person =>
     println(person.name + " faces: \n" +  person.allFaces())
     println()
     writePerson(person)
@@ -246,7 +247,7 @@ object FaceRecognition extends SandboxApp {
 
   println("Training with the minimal set of known persons")
 
-  private val allFaces = DB.allKnownPersons.flatMap(_.allFaces()).toList
+  private val allFaces = DB.allTrainablePersons.flatMap(_.allFaces()).toList
 
   private val labels = new Mat(allFaces.size, 1, CvType.CV_32SC1)
   private val images = new util.ArrayList[Mat]()
@@ -270,7 +271,7 @@ object FaceRecognition extends SandboxApp {
 //  })
 
   private def getUnknownPersonFaceMatch(thisFace: Face): Option[DbFace] = {
-    val unknownFaceSimilarityWeights: List[(Double, DbFace)] = DB.allUnknownPersonFaces().map { unknownPersonFace =>
+    val unknownFaceSimilarityWeights: List[(Double, DbFace)] = DB.allUntrainablePersonFaces().map { unknownPersonFace =>
       val similarityScore = altitude.service.face.getFeatureSimilarityScore(
         thisFace.features, unknownPersonFace.face.features)
 
