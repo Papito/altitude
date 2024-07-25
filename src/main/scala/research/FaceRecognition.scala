@@ -19,11 +19,13 @@ import scala.util.control.Breaks.{break, breakable}
 
 class Face(val path: String,
            val idx: Int,
+           val detectionScore: Float,
            val image: Mat,
            val alignedFaceImage: Mat,
            val alignedFaceImageGraySc: Mat,
            val embedding: Array[Float],
            val features: Mat) {
+
 
   def name: String = {
     val f = new File(path)
@@ -31,40 +33,54 @@ class Face(val path: String,
   }
 }
 
-class DbFace(val face: Face, val personLabel: Int) {
+object PersonFace {
+  /**
+   * Automatically sort a person's faces by detection score, best score on top,
+   * so when we compare people, we compare the "best" faces first, hopefully
+   * knowing one way or the other quickly.
+   */
+  implicit val faceOrdering: Ordering[PersonFace] = Ordering.by(-_.face.detectionScore)
+}
+
+class PersonFace(val face: Face, val personLabel: Int) {
   override def toString: String =
-    s"FACE ${face.name}. Label: $personLabel\n"
+    s"FACE ${face.name}. Label: $personLabel. Score: ${face.detectionScore}\n"
 }
 
 object Person {
-  private val minIndexablePersonFaceNum = 10
+  private val minTrainablePersonFaceNum = 10
   /**
    * Number of faces required to be similar to consider a person as known
    * THIS DEPENDS ON minViablePersonFaceNum, and since we are doing expensive quadratic
-   * minViablePersonFaceNum*2 comparisons between unknown person faces, this number should be
-   * a fraction of that. So, if it's a quarter:
-   *   5 faces -> 25 comparisons -> 5 similar faces
-   *   10 faces -> 100 comparisons -> 25 similar faces
+   * minViablePersonFaceNum * 2 comparisons between unknown person faces (only theoretical worst case),
+   * this number should be a fraction of that. So, if it's..
+   *   5 faces -> 25 comparisons -> 5 similar faces minimum
+   *   10 faces -> 100 comparisons -> 25 similar faces minimum
    */
-  val minFacesSimilarityThreshold: Int = pow(minIndexablePersonFaceNum, 2).intValue / 4
+  val minFacesSimilarityThreshold: Int = pow(minTrainablePersonFaceNum, 2).intValue / 4
   println("minFacesSimilarityThreshold: " + minFacesSimilarityThreshold)
 
   /**
-   * Threshold to short-circuit similarity comparisons between unknown person faces.
-   * If we keep getting negatives, we can stop early to save on computation.
+   * Face number threshold to short-circuit similarity comparisons between persons' faces.
+   * If we keep getting negatives this many times in a row, we can stop early to save on computation.
    */
   val similarityShortCircuitThreshold: Int = (minFacesSimilarityThreshold / 2) + 1
     println("similarityShortCircuitThreshold: " + similarityShortCircuitThreshold)
 }
 
+/**
+ * Note: A "trainable" person is a person with enough faces to train a model,
+ * set with minTrainablePersonFaceNum
+ */
 class Person(val label: Int, val isTrainable: Boolean = false) {
-  private val faces: mutable.ListBuffer[DbFace] = mutable.ListBuffer[DbFace]()
+  private val faces: mutable.TreeSet[PersonFace] = mutable.TreeSet[PersonFace]()
 
   def addFaceAndGetUpdatedPerson(face: Face): Person = {
-    faces.addOne(new DbFace(face, label))
+    faces.addOne(new PersonFace(face, label))
     println("Adding face " + face.name + " to person " + label + ". Number of faces: " + faces.size)
 
-    if (!isTrainable && faces.size >= Person.minIndexablePersonFaceNum) {
+    // if not trainable and we have enough faces, make it trainable and return
+    if (!isTrainable && faces.size >= Person.minTrainablePersonFaceNum) {
       val knownPerson = new Person(this.label, isTrainable = true)
       knownPerson.faces.addAll(this.faces)
       return knownPerson
@@ -80,7 +96,7 @@ class Person(val label: Int, val isTrainable: Boolean = false) {
     }
   }
 
-  def allFaces(): List[DbFace] = {
+  def allFaces(): List[PersonFace] = {
     faces.toList
   }
 
@@ -97,7 +113,7 @@ class Person(val label: Int, val isTrainable: Boolean = false) {
 object DB {
   val db: mutable.Map[Int, Person] = mutable.Map[Int, Person]()
 
-  def allUntrainablePersonFaces(): List[DbFace] = {
+  def allUntrainablePersonFaces(): List[PersonFace] = {
     db.values.filter(!_.isTrainable).flatMap(_.allFaces()).toList
   }
 
@@ -143,6 +159,7 @@ object FaceRecognition extends SandboxApp {
       val face = new Face(
         path = path,
         idx = idx,
+        detectionScore = res.get(0, 14)(0).asInstanceOf[Float],
         image = faceImage.clone(),
         alignedFaceImage = alignedFaceImage.clone(),
         alignedFaceImageGraySc = alignedFaceImageGr.clone(),
@@ -176,6 +193,7 @@ object FaceRecognition extends SandboxApp {
 
   println("==>>>>>> INITIAL TRAINING RUN WITH MINIMAL DATA")
   srcFaces.forEach(thisFace => {
+
     breakable {
       if (DB.allTrainablePersons.size == minKnownPersons) {
         break()
@@ -192,7 +210,7 @@ object FaceRecognition extends SandboxApp {
       }
 
       // Below the number of minimum trainable persons
-      val unknownPersonFaceMatch: Option[DbFace] = getUnknownPersonFaceMatch(thisFace)
+      val unknownPersonFaceMatch: Option[PersonFace] = getUnknownPersonFaceMatch(thisFace)
 
       // found a match for this face for an existing unknown person
       if (unknownPersonFaceMatch.isDefined) {
@@ -239,7 +257,7 @@ object FaceRecognition extends SandboxApp {
     }
   })
 
-  DB.all.foreach { person =>
+  DB.all().foreach { person =>
     println(person.name + " faces: \n" +  person.allFaces())
     println()
     writePerson(person)
@@ -253,10 +271,10 @@ object FaceRecognition extends SandboxApp {
   private val images = new util.ArrayList[Mat]()
 
   for (idx <- allFaces.indices) {
-    val face = allFaces(idx)
-    println("Training " + face.face.name + " with index " + idx + " and label " + face.personLabel)
-    labels.put(idx, 0, face.personLabel)
-    images.add(face.face.alignedFaceImageGraySc)
+    val personFace = allFaces(idx)
+    println("Training " + personFace.face.name + " with index " + idx + " and label " + personFace.personLabel)
+    labels.put(idx, 0, personFace.personLabel)
+    images.add(personFace.face.alignedFaceImageGraySc)
   }
   recognizer.train(images, labels)
 
@@ -270,8 +288,8 @@ object FaceRecognition extends SandboxApp {
 //      writeFrHit(predLabel = predLabel(0), confidence = confidence(0), face = thisFace)
 //  })
 
-  private def getUnknownPersonFaceMatch(thisFace: Face): Option[DbFace] = {
-    val unknownFaceSimilarityWeights: List[(Double, DbFace)] = DB.allUntrainablePersonFaces().map { unknownPersonFace =>
+  private def getUnknownPersonFaceMatch(thisFace: Face): Option[PersonFace] = {
+    val unknownFaceSimilarityWeights: List[(Double, PersonFace)] = DB.allUntrainablePersonFaces().map { unknownPersonFace =>
       val similarityScore = altitude.service.face.getFeatureSimilarityScore(
         thisFace.features, unknownPersonFace.face.features)
 
@@ -296,9 +314,9 @@ object FaceRecognition extends SandboxApp {
     val histAccumulator = ListBuffer.empty[Boolean]
     var comparisonHits = 0
     try {
-      person1.allFaces().map { face =>
+      person1.allFaces().map { personFace =>
         person2.allFaces().map { face2 =>
-          val score = altitude.service.face.getFeatureSimilarityScore(face.face.features, face2.face.features)
+          val score = altitude.service.face.getFeatureSimilarityScore(personFace.face.features, face2.face.features)
           comparisonOpCount += 1 // for keeping global count
 
           val isAMatch = score >= cosineSimilarityThreshold
@@ -354,7 +372,8 @@ object FaceRecognition extends SandboxApp {
     person.allFaces().indices.foreach { idx =>
       val dbFace = person.allFaces()(idx)
       val ogFile = new File(dbFace.face.path)
-      val indexedFileName = personPrefix + "-" + idx + 1 + "." + FilenameUtils.getExtension(ogFile.getName)
+      val isCompleteStr = if (person.isTrainable) "compl" else "incompl"
+      val indexedFileName = isCompleteStr + "-" + personPrefix + "-" + idx + 1 + "." + FilenameUtils.getExtension(ogFile.getName)
       val outputPath = FilenameUtils.concat(outputDirPath, indexedFileName)
       println("Writing " + outputPath)
       Imgcodecs.imwrite(outputPath, dbFace.face.alignedFaceImage)
