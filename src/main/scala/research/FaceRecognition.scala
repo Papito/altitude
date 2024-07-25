@@ -50,24 +50,7 @@ class PersonFace(val face: Face, val personLabel: Int) {
 }
 
 object Person {
-  private val minTrainablePersonFaceNum = 12
-  /**
-   * Number of faces required to be similar to consider a person as known
-   * THIS DEPENDS ON minViablePersonFaceNum, and since we are doing expensive quadratic
-   * minViablePersonFaceNum * 2 comparisons between unknown person faces (only theoretical worst case),
-   * this number should be a fraction of that. So, if it's..
-   *   5 faces -> 25 comparisons -> 5 similar faces minimum
-   *   10 faces -> 100 comparisons -> 25 similar faces minimum
-   */
-  val minFacesSimilarityThreshold: Int = pow(minTrainablePersonFaceNum, 2).intValue / 4
-  println("minFacesSimilarityThreshold: " + minFacesSimilarityThreshold)
-
-  /**
-   * Face number threshold to short-circuit similarity comparisons between persons' faces.
-   * If we keep getting negatives this many times in a row, we can stop early to save on computation.
-   */
-  val similarityShortCircuitThreshold: Int = (minFacesSimilarityThreshold / 2) + 1
-  println("similarityShortCircuitThreshold: " + similarityShortCircuitThreshold)
+  private val minTrainablePersonFaceNum = 10
 }
 
 /**
@@ -81,14 +64,7 @@ class Person(val label: Int, val isTrainable: Boolean = false) {
     faces.addOne(new PersonFace(face, label))
     println("Adding face " + face.name + " to person " + label + ". Number of faces: " + faces.size)
 
-    // if not trainable and we have enough faces, make it trainable and return
-    if (!isTrainable && faces.size >= Person.minTrainablePersonFaceNum) {
-      val knownPerson = new Person(this.label, isTrainable = true)
-      knownPerson.faces.addAll(this.faces)
-      return knownPerson
-    }
-
-    this
+    checkIfTrainableAndReturnNewPersonObj()
   }
 
   def name: String = {
@@ -102,9 +78,22 @@ class Person(val label: Int, val isTrainable: Boolean = false) {
     faces.toList
   }
 
-  def merge(person: Person): Unit = {
+  def merge(person: Person): Person = {
     println("Merging " + this.name + " with " + person.name)
     this.faces.addAll(person.allFaces())
+
+    checkIfTrainableAndReturnNewPersonObj()
+  }
+
+  private def checkIfTrainableAndReturnNewPersonObj(): Person = {
+    if (!isTrainable && faces.size >= Person.minTrainablePersonFaceNum) {
+      val trainablePerson = new Person(this.label, isTrainable = true)
+      trainablePerson.faces.addAll(this.faces)
+      return trainablePerson
+    }
+
+    // change nothing
+    this
   }
 
   override def toString: String =
@@ -121,6 +110,10 @@ object DB {
 
   def allTrainedPersons: Iterable[Person] = {
     db.values.filter(_.isTrainable)
+  }
+
+  def allUntrainedPersons: Iterable[Person] = {
+    db.values.filter(!_.isTrainable)
   }
 
   def all(): Iterable[Person] = {
@@ -205,7 +198,6 @@ object FaceRecognition extends SandboxApp {
     process(path)
   }
 
-  private val minKnownPersons = 6
   private val cosineSimilarityThreshold = .5
 
   private var labelIdx = 3
@@ -217,48 +209,15 @@ object FaceRecognition extends SandboxApp {
       println("\n--------------------\n" + thisFace.path + "\n")
       labelIdx += 1
 
-      val unknownPersonFaceMatch: Option[PersonFace] = getUntrainedPersonFaceMatch(thisFace)
+      val untrainedPersonFaceMatch: Option[PersonFace] = getUntrainedPersonFaceMatch(thisFace)
 
-      // found a match for this face for an existing unknown person
-      if (unknownPersonFaceMatch.isDefined) {
-        println("Found match for " + thisFace.name + " -> " + unknownPersonFaceMatch.get.face.name)
-
-        val personMatch = DB.db(unknownPersonFaceMatch.get.personLabel).addFaceAndGetUpdatedPerson(thisFace)
-
-        if (personMatch.isTrainable) {
-          // we have a complete person with enough faces to train, but are there similar people in DB?
-          var similarPerson: Option[Person] = None
-
-          DB.allTrainedPersons.foreach { person =>
-            if (similarPerson.isEmpty && arePeopleSimilar(person, personMatch)) {
-              similarPerson = Some(person)
-            }
-          }
-
-          if (similarPerson.isDefined) {
-            println(s"Found a similar person in DB: ${similarPerson.get.name} -> MERGING")
-            similarPerson.get.merge(personMatch)
-            DB.db.remove(personMatch.label)
-            println("Merged person: " + similarPerson)
-            DB.db.put(similarPerson.get.label, similarPerson.get)
-          } else {
-            println("No other known persons are similar to " + personMatch.name)
-            // update the unknown person as known
-            DB.db.put(personMatch.label, personMatch)
-            println("Known persons: " + DB.allTrainedPersons.size)
-          }
-
-        } else {
-          // update the unknown person with the new face
-          DB.db.put(personMatch.label, personMatch)
-        }
-
+      // found a match for this face for an existing person
+      if (untrainedPersonFaceMatch.isDefined) {
+        println("Found match for " + thisFace.name + " -> " + untrainedPersonFaceMatch.get.face.name)
+        val personMatch = DB.db(untrainedPersonFaceMatch.get.personLabel).addFaceAndGetUpdatedPerson(thisFace)
+        DB.db.put(personMatch.label, personMatch)
       } else {
-        // No match found for this face - create a new unknown person
-        println("No match found for " + thisFace.name + " -> creating new unknown person with label " + labelIdx)
-        val person = new Person(label = labelIdx, isTrainable = false).
-          addFaceAndGetUpdatedPerson(thisFace)
-
+        val person = new Person(label = labelIdx, isTrainable = false).addFaceAndGetUpdatedPerson(thisFace)
         DB.db.put(labelIdx, person)
       }
     }
@@ -297,6 +256,7 @@ object FaceRecognition extends SandboxApp {
 
   private def getUntrainedPersonFaceMatch(thisFace: Face): Option[PersonFace] = {
     val unknownFaceSimilarityWeights: List[(Double, PersonFace)] = DB.allUntrainedPersonFaces().map { unknownPersonFace =>
+      comparisonOpCount += 1
       val similarityScore = altitude.service.face.getFeatureSimilarityScore(
         thisFace.features, unknownPersonFace.face.features)
 
@@ -314,52 +274,6 @@ object FaceRecognition extends SandboxApp {
 
   println("PROCESSED FILES: " + fileCount)
   println("COMPARISON OPERATIONS: " + comparisonOpCount)
-
-  private def arePeopleSimilar(person1: Person, person2: Person): Boolean = {
-    println("Comparing PERSON1 " + person1.name + " with PERSON2 " + person2.name)
-
-    val histAccumulator = ListBuffer.empty[Boolean]
-    var comparisonHits = 0
-    try {
-      person1.allFaces().map { personFace =>
-        person2.allFaces().map { face2 =>
-          val score = altitude.service.face.getFeatureSimilarityScore(personFace.face.features, face2.face.features)
-          comparisonOpCount += 1 // for keeping global count
-
-          val isAMatch = score >= cosineSimilarityThreshold
-          comparisonHits +=  (if (isAMatch) 1 else 0)
-          histAccumulator.addOne(isAMatch)
-
-          // short-circuit if we have enough comparisons and no hits
-          if (histAccumulator.size == Person.similarityShortCircuitThreshold && comparisonHits == 0) {
-            throw AllDone(success = false)
-          }
-
-          // short-circuit if we have enough hits
-          if (comparisonHits == Person.minFacesSimilarityThreshold) {
-            throw AllDone(success = true)
-          }
-
-          isAMatch
-        }
-      }
-    } catch {
-        case AllDone(true) => println("Short-circuiting similarity comparisons with TRUE")
-        case AllDone(false) => println("Short-circuiting similarity comparisons with FALSE")
-    }
-
-    val similarityHits = histAccumulator.count(_ == true)
-
-    println("!!! HITS: " + similarityHits + " out of " + histAccumulator.size)
-
-    if (similarityHits >= Person.minFacesSimilarityThreshold) {
-      println("People are similar")
-      true
-    } else {
-      println("People are not similar")
-      false
-    }
-  }
 
   def writeResult(ogFile: File, image: Mat, idx: Int): Unit = {
     val indexedFileName = idx + "-" + ogFile.getName
