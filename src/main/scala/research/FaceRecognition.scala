@@ -14,7 +14,9 @@ import java.io.File
 import java.util
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+import scala.io.Source
 import scala.math.pow
+import scala.sys.exit
 import scala.util.control.Breaks.{break, breakable}
 
 class Face(val path: String,
@@ -174,6 +176,23 @@ object FaceRecognition extends SandboxApp {
     }
   }
 
+  println("==>>>>>> TRAINING WITH INITIAL DATA")
+  private val initialLabels = new Mat(2, 1, CvType.CV_32SC1)
+  private val InitialImages = new util.ArrayList[Mat]()
+
+  for (idx <- 1 to 2) {
+    val file = new File("src/main/resources/train/1.jpg")
+    val image: Mat = matFromBytes(FileUtils.readFileToByteArray(file))
+    val results: List[Mat] = altitude.service.face.detectFacesWithYunet(image)
+    val res = results.head
+    val alignedFaceImage = altitude.service.face.alignCropFaceFromDetection(image, res)
+    val alignedFaceImageGr = altitude.service.face.getHistEqualizedGrayScImage(alignedFaceImage)
+    initialLabels.put(idx, 0, idx)
+    InitialImages.add(alignedFaceImageGr)
+  }
+
+  recognizer.train(InitialImages, initialLabels)
+
   private val itr: Iterator[String] = recursiveFilePathIterator(sourceDirPath)
 
   private var fileCount = 0
@@ -189,27 +208,15 @@ object FaceRecognition extends SandboxApp {
   private val minKnownPersons = 6
   private val cosineSimilarityThreshold = .5
 
-  private var labelIdx = -1
+  private var labelIdx = 3
 
   println("==>>>>>> INITIAL TRAINING RUN WITH MINIMAL DATA")
   srcFaces.forEach(thisFace => {
 
     breakable {
-      if (DB.allTrainablePersons.size == minKnownPersons) {
-        break()
-      }
       println("\n--------------------\n" + thisFace.path + "\n")
       labelIdx += 1
 
-      // No data in DB
-      if (DB.db.isEmpty) {
-        val person = new Person(label = 0, isTrainable = false).addFaceAndGetUpdatedPerson(thisFace)
-        DB.db.put(0, person)
-        println("First person added as UNKNOWN")
-        break()
-      }
-
-      // Below the number of minimum trainable persons
       val unknownPersonFaceMatch: Option[PersonFace] = getUnknownPersonFaceMatch(thisFace)
 
       // found a match for this face for an existing unknown person
@@ -229,7 +236,7 @@ object FaceRecognition extends SandboxApp {
           }
 
           if (similarPerson.isDefined) {
-            println(s"Found ONE similar person in DB: ${similarPerson.get.name} -> MERGING")
+            println(s"Found a similar person in DB: ${similarPerson.get.name} -> MERGING")
             similarPerson.get.merge(personMatch)
             DB.db.remove(personMatch.label)
             println("Merged person: " + similarPerson)
