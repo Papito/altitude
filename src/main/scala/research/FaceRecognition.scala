@@ -13,10 +13,6 @@ import software.altitude.core.service.FaceService.matFromBytes
 import java.io.File
 import java.util
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
-import scala.io.Source
-import scala.math.pow
-import scala.sys.exit
 import scala.util.control.Breaks.{break, breakable}
 
 class Face(val path: String,
@@ -172,6 +168,7 @@ object FaceRecognition extends SandboxApp {
 
   private var fileCount = 0
   private var comparisonOpCount = 0
+  private var modelHitCount = 0
 
   println("==>>>>>> CACHING IMAGE DATA")
   while (itr.hasNext) {
@@ -180,7 +177,7 @@ object FaceRecognition extends SandboxApp {
     process(path)
   }
 
-  private val cosineSimilarityThreshold = .45
+  private val cosineSimilarityThreshold = .46
 
   srcFaces.forEach(thisFace => {
     breakable {
@@ -228,6 +225,7 @@ object FaceRecognition extends SandboxApp {
         addNewPerson(thisFace)
       } else {
         // WE GOT THEM
+        modelHitCount += 1
         val matchedPerson = DB.db(bestPersonFaceMatch.get.personLabel)
         val newPersonFace = matchedPerson.addFace(thisFace)
         updateModelWithFace(newPersonFace)
@@ -290,6 +288,7 @@ object FaceRecognition extends SandboxApp {
 
   println("PROCESSED FILES: " + fileCount)
   println("COMPARISON OPERATIONS: " + comparisonOpCount)
+  println("MODEL HITS: " + modelHitCount)
 
   def writeResult(ogFile: File, image: Mat, idx: Int): Unit = {
     val indexedFileName = idx + "-" + ogFile.getName

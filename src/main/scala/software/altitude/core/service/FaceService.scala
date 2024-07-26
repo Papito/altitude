@@ -28,7 +28,7 @@ object FaceService {
   private val minFaceSize = 50 // minimum acceptable size of face region in pixels
   private val dnnInScaleFactor = 1.0
   private val dnnMeanVal = new Scalar(104.0, 177.0, 123.0, 128)
-  private val yunetConfidenceThreshold = 0.95f
+  private val yunetConfidenceThreshold = 0.855f
 
   val cosineSimilarityThreshold = 0.363
 
