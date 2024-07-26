@@ -45,10 +45,6 @@ class PersonFace(val face: Face, val personLabel: Int) {
     s"FACE ${face.name}. Label: $personLabel. Score: ${face.detectionScore}\n"
 }
 
-object Person {
-  private val minTrainablePersonFaceNum = 10
-}
-
 /**
  * Note: A "trainable" person is a person with enough faces to train a model,
  * set with minTrainablePersonFaceNum
@@ -263,15 +259,19 @@ object FaceRecognition extends SandboxApp {
   }
 
   private def getPersonFaceMatches(thisFace: Face): Option[PersonFace] = {
-    val faceSimilarityScores: List[(Double, PersonFace)] = DB.allPersons().map { person =>
-      val bestFace = person.allFaces().head
-      println(s"Comparing ${thisFace.name} Q:${thisFace.detectionScore} with ${bestFace.face.name} Q:${bestFace.face.detectionScore}")
-      comparisonOpCount += 1
-      val similarityScore = altitude.service.face.getFeatureSimilarityScore(
-        thisFace.features, bestFace.face.features)
-      println(" -> " + similarityScore)
+    val faceSimilarityScores: List[(Double, PersonFace)] = DB.allPersons().flatMap { person =>
+      val bestFaces = person.allFaces().take(1)
 
-      (similarityScore, bestFace)
+      val faceScores: List[(Double, PersonFace)] = bestFaces.map { bestFace =>
+        comparisonOpCount += 1
+        println(s"Comparing ${thisFace.name} Q:${thisFace.detectionScore} with ${bestFace.face.name} Q:${bestFace.face.detectionScore}")
+        val similarityScore = altitude.service.face.getFeatureSimilarityScore(
+          thisFace.features, bestFace.face.features)
+        println(" -> " + similarityScore)
+        (similarityScore, bestFace)
+      }
+
+      faceScores
     }
 
     // get the top one
