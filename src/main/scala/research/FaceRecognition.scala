@@ -109,6 +109,7 @@ object FaceRecognition extends SandboxApp {
   private val recognizer = LBPHFaceRecognizer.create()
   recognizer.setGridX(12)
   recognizer.setGridY(12)
+  recognizer.setRadius(2)
   private val srcFaces = new util.ArrayList[Face]()
 
   override def process(path: String): Unit = {
@@ -190,6 +191,7 @@ object FaceRecognition extends SandboxApp {
       val predLabelArr = new Array[Int](1)
       val confidenceArr = new Array[Double](1)
       recognizer.predict(thisFace.alignedFaceImageGraySc, predLabelArr, confidenceArr)
+
       val predLabel = predLabelArr.head
       val confidence = confidenceArr.head
       println("Predicted label: " + predLabel + " with confidence: " + confidence + " for " + thisFace.name)
@@ -200,7 +202,7 @@ object FaceRecognition extends SandboxApp {
         break()
       }
 
-      // get the DB match and do a similarity check
+      // get the match from DB and do a similarity check
       val personMatch: Person = DB.db(predLabel)
       println(s"Running similarity check for this face and the Recognizer match -> ${personMatch.name}")
 
