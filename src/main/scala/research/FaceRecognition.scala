@@ -173,8 +173,8 @@ object FaceRecognition extends SandboxApp {
   private val initialLabels = new Mat(2, 1, CvType.CV_32SC1)
   private val InitialImages = new util.ArrayList[Mat]()
 
-  for (idx <- 1 to 2) {
-    val file = new File("src/main/resources/train/1.jpg")
+  for (idx <- 0 to 1) {
+    val file = new File(s"src/main/resources/train/1.jpg")
     val image: Mat = matFromBytes(FileUtils.readFileToByteArray(file))
     val results: List[Mat] = altitude.service.face.detectFacesWithYunet(image)
     val res = results.head
@@ -200,7 +200,7 @@ object FaceRecognition extends SandboxApp {
 
   private val cosineSimilarityThreshold = .5
 
-  private var labelIdx = 3
+  private var labelIdx = 2
 
   println("==>>>>>> INITIAL TRAINING RUN WITH MINIMAL DATA")
   srcFaces.forEach(thisFace => {
@@ -209,17 +209,39 @@ object FaceRecognition extends SandboxApp {
       println("\n--------------------\n" + thisFace.path + "\n")
       labelIdx += 1
 
+      val predLabel = new Array[Int](1)
+      val confidence = new Array[Double](1)
+      recognizer.predict(thisFace.alignedFaceImageGraySc, predLabel, confidence)
+      println("Predicted label: " + predLabel(0) + " with confidence: " + confidence(0) + " for " + thisFace.name)
+      writeFrHit(predLabel = predLabel(0), confidence = confidence(0), face = thisFace)
+
       val untrainedPersonFaceMatch: Option[PersonFace] = getUntrainedPersonFaceMatch(thisFace)
 
       // found a match for this face for an existing person
       if (untrainedPersonFaceMatch.isDefined) {
         println("Found match for " + thisFace.name + " -> " + untrainedPersonFaceMatch.get.face.name)
-        val personMatch = DB.db(untrainedPersonFaceMatch.get.personLabel).addFaceAndGetUpdatedPerson(thisFace)
-        DB.db.put(personMatch.label, personMatch)
+        val updatedPerson = DB.db(untrainedPersonFaceMatch.get.personLabel).addFaceAndGetUpdatedPerson(thisFace)
+        DB.db.put(updatedPerson.label, updatedPerson)
+        if (updatedPerson.isTrainable) {
+          val labels = new Mat(1, updatedPerson.allFaces().size, CvType.CV_32SC1)
+          val images = new util.ArrayList[Mat]()
+
+          println("Training person " + updatedPerson.name + " with " + updatedPerson.allFaces().size + " faces")
+          updatedPerson.allFaces().indices.foreach { idx =>
+            val personFace = updatedPerson.allFaces()(idx)
+            labels.put(idx, 0, personFace.personLabel)
+            images.add(personFace.face.alignedFaceImageGraySc)
+          }
+          recognizer.update(images, labels)
+        }
+
       } else {
         val person = new Person(label = labelIdx, isTrainable = false).addFaceAndGetUpdatedPerson(thisFace)
         DB.db.put(labelIdx, person)
       }
+
+      println("Untrained persons " + DB.allUntrainedPersons.size)
+      println("Trained persons " + DB.allTrainedPersons.size)
     }
   })
 
@@ -229,30 +251,15 @@ object FaceRecognition extends SandboxApp {
     writePerson(person)
   }
 
-  println("Training with the minimal set of known persons")
-
-  private val allFaces = DB.allTrainedPersons.flatMap(_.allFaces()).toList
-
-  private val labels = new Mat(allFaces.size, 1, CvType.CV_32SC1)
-  private val images = new util.ArrayList[Mat]()
-
-  for (idx <- allFaces.indices) {
-    val personFace = allFaces(idx)
-    println("Training " + personFace.face.name + " with index " + idx + " and label " + personFace.personLabel)
-    labels.put(idx, 0, personFace.personLabel)
-    images.add(personFace.face.alignedFaceImageGraySc)
-  }
-  recognizer.train(images, labels)
-
-//  println("==>>>>>> RERUNNING WITH TRAINED DATA")
-//  srcFaces.forEach(thisFace => {
-//      println("\n--------------------\n" + thisFace.path + "\n")
-//
-//      val predLabel = new Array[Int](1)
-//      val confidence = new Array[Double](1)
-//      recognizer.predict(thisFace.alignedFaceImageGraySc, predLabel, confidence)
-//      writeFrHit(predLabel = predLabel(0), confidence = confidence(0), face = thisFace)
-//  })
+  //  println("==>>>>>> RERUNNING WITH TRAINED DATA")
+  //  srcFaces.forEach(thisFace => {
+  //      println("\n--------------------\n" + thisFace.path + "\n")
+  //
+  //      val predLabel = new Array[Int](1)
+  //      val confidence = new Array[Double](1)
+  //      recognizer.predict(thisFace.alignedFaceImageGraySc, predLabel, confidence)
+  //      writeFrHit(predLabel = predLabel(0), confidence = confidence(0), face = thisFace)
+  //  })
 
   private def getUntrainedPersonFaceMatch(thisFace: Face): Option[PersonFace] = {
     val unknownFaceSimilarityWeights: List[(Double, PersonFace)] = DB.allUntrainedPersonFaces().map { unknownPersonFace =>
