@@ -37,8 +37,8 @@ import software.altitude.test.core.IntegrationTestCore
     asset.sizeBytes should not be 0
   }
 
-  test("Imported image WITH metadata should should successfully import") {
-    val importAsset = IntegrationTestUtil.getImportAsset("images/cactus.jpg")
+  test("Imported image WITH metadata should successfully import", Focused) {
+    val importAsset = IntegrationTestUtil.getImportAsset("people/bullock.jpg")
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
 
     importedAsset.assetType should equal(importedAsset.assetType)

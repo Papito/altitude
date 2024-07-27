@@ -19,7 +19,7 @@ import software.altitude.test.core.IntegrationTestCore
     })
   }
 
-  test("Face is detected in an image (1)", Focused) {
+  test("Face is detected in an image (1)") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
 
 
@@ -27,51 +27,51 @@ import software.altitude.test.core.IntegrationTestCore
     detections.length should be(1)
   }
 
-  test("Faces are detected in an image (1)", Focused) {
+  test("Faces are detected in an image (1)") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/movies-speed.png")
     val detections = testApp.service.face.detectFacesWithDnnNet(FaceService.matFromBytes(importAsset.data))
     detections.length should be(2)
   }
 
-  test("Faces are detected in an image (2)", Focused) {
+  test("Faces are detected in an image (2)") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/meme-wednesday.png")
     val detections = testApp.service.face.detectFacesWithDnnNet(FaceService.matFromBytes(importAsset.data))
     detections.length should be(2)
   }
 
-  test("Small face image is detected (1)", Focused) {
+  test("Small face image is detected (1)") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/small-face1.jpg")
     val detections = testApp.service.face.detectFacesWithYunet(FaceService.matFromBytes(importAsset.data))
     detections.length should be(1)
   }
 
-  test("Small face image is detected (2)", Focused) {
+  test("Small face image is detected (2)") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/small-face2.jpg")
     val detections = testApp.service.face.detectFacesWithYunet(FaceService.matFromBytes(importAsset.data))
     detections.length should be(1)
   }
 
-  test("Large portrait face image is detected (1)", Focused) {
+  test("Large portrait face image is detected (1)") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/affleck.jpg")
     val imageMat = FaceService.matFromBytes(importAsset.data)
     val detections = testApp.service.face.detectFacesWithYunet(imageMat)
-    dumpDetections(imageMat, detections)
+    // dumpDetections(imageMat, detections)
     detections.length should be(1)
   }
 
-  test("Large portrait face image is detected (2)", Focused) {
+  test("Large portrait face image is detected (2)") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/bullock.jpg")
     val detections = testApp.service.face.detectFacesWithYunet(FaceService.matFromBytes(importAsset.data))
     detections.length should be(1)
   }
 
-  test("Large portrait face image is detected (3)", Focused) {
+  test("Large portrait face image is detected (3)") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/damon.jpg")
     val detections = testApp.service.face.detectFacesWithYunet(FaceService.matFromBytes(importAsset.data))
     detections.length should be(1)
   }
 
-  test("Faces from the same image are identical", Focused) {
+  test("Faces from the same image are identical") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val imageMat1: Mat = FaceService.matFromBytes(importAsset.data)
     val imageMat2 = imageMat1.clone()
@@ -84,7 +84,7 @@ import software.altitude.test.core.IntegrationTestCore
     isSimilar should be(true)
   }
 
-  test("Same person is identified as same in multiple images (1)", Focused) {
+  test("Same person is identified as same in multiple images (1)") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val imageMat1: Mat = FaceService.matFromBytes(importAsset.data)
     val detections = testApp.service.face.detectFacesWithYunet(imageMat1)
@@ -108,7 +108,7 @@ import software.altitude.test.core.IntegrationTestCore
     testApp.service.face.isFaceSimilar(imageMat2, imageMat3, detection2, detection3) should be(true)
   }
 
-  test("Different people are NOT identified as same in the same image (1)", Focused) {
+  test("Different people are NOT identified as same in the same image (1)") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/movies-speed.png")
     val imageMat1: Mat = FaceService.matFromBytes(importAsset.data)
     val detections = testApp.service.face.detectFacesWithYunet(imageMat1)
@@ -117,7 +117,7 @@ import software.altitude.test.core.IntegrationTestCore
     testApp.service.face.isFaceSimilar(imageMat1, imageMat1, detection1, detection2) should be(false)
   }
 
-  test("Different people are NOT identified as same in multiple images (1)", Focused) {
+  test("Different people are NOT identified as same in multiple images (1)") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/affleck.jpg")
     val imageMat1: Mat = FaceService.matFromBytes(importAsset.data)
     val detections = testApp.service.face.detectFacesWithYunet(imageMat1)

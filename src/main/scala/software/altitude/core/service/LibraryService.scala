@@ -4,6 +4,7 @@ import com.drew.imaging.ImageMetadataReader
 import com.drew.metadata.exif.ExifDirectoryBase
 import com.drew.metadata.exif.ExifIFD0Directory
 import org.imgscalr.Scalr
+import org.opencv.core.Mat
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
@@ -12,6 +13,7 @@ import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.Folder
 import software.altitude.core.models._
+import software.altitude.core.service.FaceService.matFromBytes
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
@@ -76,6 +78,17 @@ class LibraryService(val app: Altitude) {
       )
 
       logger.info(s"Adding asset: $assetToAddModel")
+
+      // FIXME: this is temporary, to work under tests
+      if (assetIn.data.nonEmpty) {
+        val image: Mat = matFromBytes(assetIn.data)
+        val results: List[Mat] = app.service.face.detectFacesWithYunet(image)
+        results.indices.foreach { idx =>
+          val res = results(idx)
+          val rect = FaceService.faceDetectToRect(res)
+          logger.info("Face detected: " + rect)
+        }
+      }
 
       app.service.asset.add(assetToAddModel)
 

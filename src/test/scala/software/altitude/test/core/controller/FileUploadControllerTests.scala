@@ -12,8 +12,8 @@ import java.io.File
   test("Upload with multiple files") {
     testContext.persistRepository()
 
-    val file1 = new File(getClass.getResource("/import/images/1.jpg").getPath)
-    val file2 = new File(getClass.getResource("/import/images/cactus.jpg").getPath)
+    val file1 = new File(getClass.getResource("/import/people/bullock.jpg").getPath)
+    val file2 = new File(getClass.getResource("/import/people/meme-ben.jpg").getPath)
 
     post("/import/upload",
       Map(),

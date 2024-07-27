@@ -76,7 +76,7 @@ abstract class MigrationService(val app: Altitude)  {
     /**
      * We load the entire schema as the one and only migration in the following cases:
      * 1. In test and dev environments
-     * 2. When migrating to version 1 in prod
+     * 2. When initiating version 1 in prod
      */
     val path = Environment.CURRENT match {
       case Environment.Name.TEST | Environment.Name.DEV => entireSchemaPath
@@ -86,8 +86,8 @@ abstract class MigrationService(val app: Altitude)  {
     }
 
     log.info(s"Migration path: $path")
-    val r = getClass.getResource(path)
-    val source = Source.fromURL(r)
+    val resourceUrl = getClass.getResource(path)
+    val source = Source.fromURL(resourceUrl)
     val commands = source.mkString
     source.close()
 

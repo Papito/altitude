@@ -3,17 +3,18 @@ package research
 
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
-import org.opencv.core.{CvType, Mat}
+import org.opencv.core.CvType
+import org.opencv.core.Mat
 import org.opencv.face.LBPHFaceRecognizer
 import org.opencv.imgcodecs.Imgcodecs
-import software.altitude.core.AllDone
 import software.altitude.core.service.FaceService
 import software.altitude.core.service.FaceService.matFromBytes
 
 import java.io.File
 import java.util
 import scala.collection.mutable
-import scala.util.control.Breaks.{break, breakable}
+import scala.util.control.Breaks.break
+import scala.util.control.Breaks.breakable
 
 class Face(val path: String,
            val idx: Int,
@@ -149,7 +150,7 @@ object FaceRecognition extends SandboxApp {
   private val InitialImages = new util.ArrayList[Mat]()
 
   for (idx <- 0 to 1) {
-    val file = new File(s"src/main/resources/train/1.jpg")
+    val file = new File("src/main/resources/train/1.jpg")
     val image: Mat = matFromBytes(FileUtils.readFileToByteArray(file))
     val results: List[Mat] = altitude.service.face.detectFacesWithYunet(image)
     val res = results.head
@@ -291,7 +292,7 @@ object FaceRecognition extends SandboxApp {
   println("MODEL HITS: " + modelHitCount)
 
   def writeResult(ogFile: File, image: Mat, idx: Int): Unit = {
-    val indexedFileName = idx + "-" + ogFile.getName
+    val indexedFileName = s"$idx-${ogFile.getName}"
     val outputPath = FilenameUtils.concat(outputDirPath, indexedFileName)
 
     if (image.empty()) {
