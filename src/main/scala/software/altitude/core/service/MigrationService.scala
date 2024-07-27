@@ -1,4 +1,5 @@
 package software.altitude.core.service
+import org.apache.commons.io.FileUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
@@ -10,7 +11,7 @@ import java.io.File
 import scala.io.Source
 
 abstract class MigrationService(val app: Altitude)  {
-  protected val log: Logger = LoggerFactory.getLogger(getClass)
+  protected val logger: Logger = LoggerFactory.getLogger(getClass)
 
   protected val txManager: TransactionManager = app.txManager
   protected val CURRENT_VERSION: Int
@@ -51,25 +52,25 @@ abstract class MigrationService(val app: Altitude)  {
   }
 
   def migrationRequired: Boolean = {
-    log.info("Checking if migration is required")
+    logger.info("Checking if migration is required")
     val version = app.service.system.version
-    log.info(s"Current database version is @ $version")
+    logger.info(s"Current database version is @ $version")
     val isRequired = version < CURRENT_VERSION
-    log.info(s"Migration required? : $isRequired")
+    logger.info(s"Migration required? : $isRequired")
     isRequired
   }
 
   def migrate(): Unit = {
     val oldVersion = app.service.system.version
-    log.warn("!!!! MIGRATING !!!!")
-    log.info(s"From version $oldVersion to $CURRENT_VERSION")
+    logger.warn("!!!! MIGRATING !!!!")
+    logger.info(s"From version $oldVersion to $CURRENT_VERSION")
     for (version <- oldVersion + 1 to CURRENT_VERSION) {
       runMigration(version)
     }
   }
 
   private def parseMigrationCommands(version: Int): String = {
-    log.info(s"RUNNING MIGRATION TO VERSION ^^$version^^")
+    logger.info(s"RUNNING MIGRATION TO VERSION ^^$version^^")
 
     val entireSchemaPath = new File(MIGRATIONS_DIR, "all.sql").toString
 
@@ -85,7 +86,7 @@ abstract class MigrationService(val app: Altitude)  {
         new File(MIGRATIONS_DIR, s"$version$FILE_EXTENSION").toString
     }
 
-    log.info(s"Migration path: $path")
+    logger.info(s"Migration path: $path")
     val resourceUrl = getClass.getResource(path)
     val source = Source.fromURL(resourceUrl)
     val commands = source.mkString

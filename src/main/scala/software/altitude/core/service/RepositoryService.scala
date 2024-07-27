@@ -2,8 +2,7 @@ package software.altitude.core.service
 
 import org.apache.commons.io.FilenameUtils
 import play.api.libs.json.JsObject
-import software.altitude.core.Altitude
-import software.altitude.core.RequestContext
+import software.altitude.core.{Altitude, Environment, RequestContext, Const => C}
 import software.altitude.core.dao.RepositoryDao
 import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.Folder
@@ -11,7 +10,6 @@ import software.altitude.core.models.Repository
 import software.altitude.core.models.Stats
 import software.altitude.core.models.User
 import software.altitude.core.transactions.TransactionManager
-import software.altitude.core.{Const => C}
 
 class RepositoryService(val app: Altitude) extends BaseService[Repository] {
   protected val dao: RepositoryDao = app.DAO.repository
@@ -23,16 +21,7 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
 
     val id = BaseDao.genId
 
-    // FIXME: storage service function
-    val workPath = System.getProperty("user.dir")
-    logger.info(s"Repository [$name] work path: [$workPath]")
-    val dataDir = app.config.getString(C.Conf.FS_DATA_DIR)
-    logger.info(s"Repository [$name] data path: [$dataDir]")
-    val dataPath = FilenameUtils.concat(workPath, dataDir)
-    logger.info(s"Repository [$name] work path")
-    logger.info(s"Data path: [$dataPath]")
-
-    val reposDataPath = FilenameUtils.concat(dataPath, C.DataStore.REPOSITORIES)
+    val reposDataPath = FilenameUtils.concat(app.dataPath, C.DataStore.REPOSITORIES)
     val repoDataPath = FilenameUtils.concat(reposDataPath, id.substring(0, 8))
 
     val repoToSave = Repository(

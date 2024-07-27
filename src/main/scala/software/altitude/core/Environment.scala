@@ -23,14 +23,14 @@ object Environment extends Enumeration {
     case _ => Name.DEV
   }
 
-  private val ROOT_PATH: String = CURRENT match {
+  val ROOT_PATH: String = CURRENT match {
     case Name.PROD =>
       val url = Environment.getClass.getProtectionDomain.getCodeSource.getLocation
       new File(url.toURI).getParentFile.getAbsolutePath
-    case _ => ""
+    case _ => System.getProperty("user.dir")
   }
 
-  val RESOURCES_PATH: String = CURRENT match {
+  private val RESOURCES_PATH: String = CURRENT match {
     case Name.PROD => new File(ROOT_PATH, "resources").getAbsolutePath
     case _ => "src/main/resources"
   }

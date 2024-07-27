@@ -4,14 +4,10 @@ import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import software.altitude.core.Altitude
-import software.altitude.core.NotFoundException
-import software.altitude.core.RequestContext
-import software.altitude.core.StorageException
+import software.altitude.core.{Altitude, Environment, NotFoundException, RequestContext, StorageException, Const => C}
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Data
 import software.altitude.core.models.Preview
-import software.altitude.core.{Const => C}
 
 import java.io._
 
@@ -110,8 +106,9 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   }
 
   private def filePath(assetId: String): String = {
-    val repositoryRoot = RequestContext.repository.value.get.fileStoreConfig(C.Repository.Config.PATH)
-    val absoluteFilesPath = FilenameUtils.concat(repositoryRoot, C.DataStore.FILES)
+    val repositoryRootDir = RequestContext.repository.value.get.fileStoreConfig(C.Repository.Config.PATH)
+    val repositoryRootPath = new File(Environment.ROOT_PATH, repositoryRootDir).getAbsolutePath
+    val absoluteFilesPath = FilenameUtils.concat(repositoryRootPath, C.DataStore.FILES)
     val absoluteFilePartitionPath = FilenameUtils.concat(absoluteFilesPath, assetId.substring(0, 2))
     FilenameUtils.concat(absoluteFilePartitionPath, assetId)
   }

@@ -3,7 +3,7 @@ package software.altitude.core
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
-import org.apache.commons.io.FilenameUtils
+import org.apache.commons.io.{FileUtils, FilenameUtils}
 import org.scalatra.auth.ScentryStrategy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -86,6 +86,11 @@ class Altitude(val dbEngineOverride: Option[String] = None)  {
     case _ =>
       throw new RuntimeException("Unknown environment")
 
+  }
+
+  final def dataPath: String = {
+    val dataDir: String = app.config.getString(C.Conf.FS_DATA_DIR)
+    FilenameUtils.concat(Environment.ROOT_PATH, dataDir)
   }
 
   /**
@@ -244,6 +249,14 @@ class Altitude(val dbEngineOverride: Option[String] = None)  {
       case C.StorageEngineName.FS => new FileSystemStoreService(app)
       // S3-based file store bigly wants to be here
       case _ => throw new NotImplementedError
+    }
+
+    if (dataSourceType == C.DbEngineName.SQLITE) {
+      val dbFolder = new File(dataPath, "db")
+      if (!dbFolder.exists()) {
+        logger.info("Creating the DB folder for SQLite: " + dbFolder)
+        FileUtils.forceMkdir(dbFolder)
+      }
     }
   }
 
