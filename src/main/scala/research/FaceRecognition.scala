@@ -174,6 +174,7 @@ object FaceRecognition extends SandboxApp {
   }
 
   private val cosineSimilarityThreshold = .46
+  private val maxPersonCompareCycles = 12
 
   srcFaces.forEach(thisFace => {
     breakable {
@@ -261,7 +262,7 @@ object FaceRecognition extends SandboxApp {
   private def getPersonFaceMatches(thisFace: Face): Option[PersonFace] = {
     val faceSimilarityScores: List[(Double, PersonFace)] = DB.allPersons().flatMap { person =>
       // these are already sorted by detection score, best first
-      val bestFaces = person.allFaces().take(1)
+      val bestFaces = person.allFaces().take(maxPersonCompareCycles)
 
       val faceScores: List[(Double, PersonFace)] = bestFaces.map { bestFace =>
         comparisonOpCount += 1
