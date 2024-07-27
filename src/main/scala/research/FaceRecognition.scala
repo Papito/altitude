@@ -99,8 +99,8 @@ object FaceRecognition extends SandboxApp {
   private val trainedModelPath = FilenameUtils.concat(outputDirPath, "trained_model.xml")
 
   private val recognizer = LBPHFaceRecognizer.create()
-  recognizer.setGridX(12)
-  recognizer.setGridY(12)
+  recognizer.setGridX(10)
+  recognizer.setGridY(10)
   recognizer.setRadius(2)
   private val srcFaces = new util.ArrayList[Face]()
 
