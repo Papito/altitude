@@ -142,7 +142,7 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
 
     val detectionResults = new Mat()
 
-    val boundingBoxSize = 640
+    val boundingBoxSize = 600
 
     // println("OG Image size: " + image.size())
     val scaleFactor = FaceService.determineImageScale(image.width(), image.height(), boundingBoxSize, boundingBoxSize) match {
@@ -153,7 +153,7 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
 
     val srcMat: Mat = if (scaleFactor < 1.0) {
       val resized = new Mat()
-      Imgproc.resize(image, resized, new Size(), scaleFactor, scaleFactor, Imgproc.INTER_LINEAR_EXACT)
+      Imgproc.resize(image, resized, new Size(), scaleFactor, scaleFactor, Imgproc.INTER_LINEAR)
       resized
     } else {
       image.clone()

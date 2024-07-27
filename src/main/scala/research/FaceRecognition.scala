@@ -260,6 +260,7 @@ object FaceRecognition extends SandboxApp {
 
   private def getPersonFaceMatches(thisFace: Face): Option[PersonFace] = {
     val faceSimilarityScores: List[(Double, PersonFace)] = DB.allPersons().flatMap { person =>
+      // these are already sorted by detection score, best first
       val bestFaces = person.allFaces().take(1)
 
       val faceScores: List[(Double, PersonFace)] = bestFaces.map { bestFace =>
@@ -276,8 +277,6 @@ object FaceRecognition extends SandboxApp {
 
     // get the top one
     val sortedMatchingSimilarityWeights = faceSimilarityScores.sortBy(_._1)
-//    println("WEIGHTS")
-//    println(sortedMatchingSimilarityWeights.mkString("\n"))
     val highestSimilarityWeights = sortedMatchingSimilarityWeights.filter(_._1 >= cosineSimilarityThreshold)
 
     highestSimilarityWeights.headOption match {
