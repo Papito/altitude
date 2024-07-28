@@ -58,7 +58,7 @@ object Const {
     val FILES_STORE_CONFIG = "file_store_config"
 
     object Config {
-      val PATH = "path"
+      val DIR = "dir"
     }
   }
 

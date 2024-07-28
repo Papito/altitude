@@ -29,12 +29,12 @@ object Environment extends Enumeration {
       new File(url.toURI).getParentFile.getAbsolutePath
     case _ => System.getProperty("user.dir")
   }
+  logger.info(s"Root path: $ROOT_PATH")
 
   private val RESOURCES_PATH: String = CURRENT match {
     case Name.PROD => new File(ROOT_PATH, "resources").getAbsolutePath
     case _ => "src/main/resources"
   }
-
   logger.info(s"Resources path: $RESOURCES_PATH")
 
   val OPENCV_RESOURCE_PATH: String = new File(RESOURCES_PATH, "opencv").getAbsolutePath

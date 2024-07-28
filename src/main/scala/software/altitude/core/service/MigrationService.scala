@@ -1,5 +1,5 @@
 package software.altitude.core.service
-import org.apache.commons.io.FileUtils
+
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
@@ -7,7 +7,6 @@ import software.altitude.core.Environment
 import software.altitude.core.RequestContext
 import software.altitude.core.transactions.TransactionManager
 
-import java.io.File
 import scala.io.Source
 
 abstract class MigrationService(val app: Altitude)  {
@@ -17,16 +16,15 @@ abstract class MigrationService(val app: Altitude)  {
   protected val CURRENT_VERSION: Int
 
   private def migrateVersion(version: Int): Unit = {
-      version match {
-        case 1 => v1()
-      }
+    version match {
+      case 1 => v1()
+    }
   }
 
   private def v1(): Unit = {
   }
 
   protected val MIGRATIONS_DIR: String
-  private val FILE_EXTENSION = ".sql"
 
   /**
    * Execute an arbitrary command
@@ -72,7 +70,7 @@ abstract class MigrationService(val app: Altitude)  {
   private def parseMigrationCommands(version: Int): String = {
     logger.info(s"RUNNING MIGRATION TO VERSION ^^$version^^")
 
-    val entireSchemaPath = new File(MIGRATIONS_DIR, "all.sql").toString
+    val entireSchemaPath = s"$MIGRATIONS_DIR/all.sql"
 
     /**
      * We load the entire schema as the one and only migration in the following cases:
@@ -83,7 +81,7 @@ abstract class MigrationService(val app: Altitude)  {
       case Environment.Name.TEST | Environment.Name.DEV => entireSchemaPath
       case Environment.Name.PROD => if (version == 1) entireSchemaPath
       else
-        new File(MIGRATIONS_DIR, s"$version$FILE_EXTENSION").toString
+        s"$MIGRATIONS_DIR/$version.sql"
     }
 
     logger.info(s"Migration path: $path")

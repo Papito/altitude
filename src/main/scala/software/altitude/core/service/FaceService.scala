@@ -116,6 +116,9 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
   yuNet.setNMSThreshold(0.2f)
 
 
+  /**
+   * Create the required OPENCV resource files if they do not exist outside of the JAR itself.
+   */
   private def checkAndCreateResourceFiles(): Unit = {
     val openCvResourcesDir = new File(Environment.OPENCV_RESOURCE_PATH)
 
@@ -129,9 +132,11 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
 
       if (!filePath.exists() || !filePath.isFile) {
         logger.info(s"Resource file $fileName not found, creating it from source")
-        val resourcePath = new File("/opencv/", fileName).toString
-        logger.info("Resource path: " + resourcePath)
-        val resourceUrl = getClass.getResource(resourcePath)
+
+        val resourceFilePath = s"/opencv/$fileName"
+
+        logger.info("Resource path: " + resourceFilePath)
+        val resourceUrl = getClass.getResource(resourceFilePath)
         logger.info("Copying resource file from " + resourceUrl + " to " + filePath)
         FileUtils.copyURLToFile(resourceUrl, filePath)
       }

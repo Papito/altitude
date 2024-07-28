@@ -18,11 +18,11 @@ import software.altitude.test.core.IntegrationTestCore
       fileStoreType = C.StorageEngineName.FS,
       owner = testContext.user)
 
-    repo.fileStoreConfig.keys should contain(C.Repository.Config.PATH)
+    repo.fileStoreConfig.keys should contain(C.Repository.Config.DIR)
 
     val storedRepo: Repository = testApp.service.repository.getById(repo.persistedId)
     storedRepo.name shouldEqual repo.name
-    storedRepo.fileStoreConfig.keys should contain(C.Repository.Config.PATH)
+    storedRepo.fileStoreConfig.keys should contain(C.Repository.Config.DIR)
     storedRepo.createdAt should not be None
   }
 }

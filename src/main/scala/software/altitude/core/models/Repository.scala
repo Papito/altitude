@@ -1,5 +1,4 @@
 package software.altitude.core.models
-
 import play.api.libs.json._
 import software.altitude.core.{Const => C}
 

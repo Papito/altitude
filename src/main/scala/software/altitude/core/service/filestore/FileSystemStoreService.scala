@@ -4,10 +4,14 @@ import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import software.altitude.core.{Altitude, Environment, NotFoundException, RequestContext, StorageException, Const => C}
+import software.altitude.core.Altitude
+import software.altitude.core.NotFoundException
+import software.altitude.core.RequestContext
+import software.altitude.core.StorageException
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Data
 import software.altitude.core.models.Preview
+import software.altitude.core.{Const => C}
 
 import java.io._
 
@@ -88,28 +92,21 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
 
   private def previewFilePath(assetId: String): String = {
     val dirName = assetId.substring(0, 2)
-    new File(new File(previewDirPath, dirName).getPath, assetId + Preview.FILE_EXTENSION).getPath
+    new File(new File(previewDataPath, dirName).getPath, s"$assetId.${Preview.FILE_EXTENSION}").getPath
   }
 
-  private def previewDirPath: String =
-    new File(
-      RequestContext.getRepository.fileStoreConfig(C.Repository.Config.PATH),
-      C.DataStore.PREVIEW).getPath
-
-  /**
-   * Get the absolute path to the asset on file system,
-   * given path relative to repository root
-   */
-  private def fileFromRelPath(relativePath: String): File = {
-    val repositoryRoot = RequestContext.repository.value.get.fileStoreConfig(C.Repository.Config.PATH)
-    new File(repositoryRoot, relativePath)
+  private def repositoryDataPath: String = {
+    val reposDataPath = FilenameUtils.concat(app.dataPath, C.DataStore.REPOSITORIES)
+    val repositoryDir = RequestContext.repository.value.get.fileStoreConfig(C.Repository.Config.DIR)
+    FilenameUtils.concat(reposDataPath, repositoryDir)
   }
+
+  private def previewDataPath: String =
+    new File(repositoryDataPath, C.DataStore.PREVIEW).getPath
 
   private def filePath(assetId: String): String = {
-    val repositoryRootDir = RequestContext.repository.value.get.fileStoreConfig(C.Repository.Config.PATH)
-    val repositoryRootPath = new File(Environment.ROOT_PATH, repositoryRootDir).getAbsolutePath
-    val absoluteFilesPath = FilenameUtils.concat(repositoryRootPath, C.DataStore.FILES)
-    val absoluteFilePartitionPath = FilenameUtils.concat(absoluteFilesPath, assetId.substring(0, 2))
-    FilenameUtils.concat(absoluteFilePartitionPath, assetId)
+    val filesPath = FilenameUtils.concat(repositoryDataPath, C.DataStore.FILES)
+    val partitionedFilesPath = FilenameUtils.concat(filesPath, assetId.substring(0, 2))
+    FilenameUtils.concat(partitionedFilesPath, assetId)
   }
 }

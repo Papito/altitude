@@ -3,7 +3,8 @@ package software.altitude.core
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
-import org.apache.commons.io.{FileUtils, FilenameUtils}
+import org.apache.commons.io.FileUtils
+import org.apache.commons.io.FilenameUtils
 import org.scalatra.auth.ScentryStrategy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
