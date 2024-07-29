@@ -21,16 +21,12 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
 
     val id = BaseDao.genId
 
-    val repoDataDir = id.substring(0, 8)
-
     val repoToSave = Repository(
       id = Some(id),
       name = name,
       ownerAccountId = owner.persistedId,
       rootFolderId = BaseDao.genId,
-      fileStoreType = fileStoreType,
-      fileStoreConfig = Map(
-        C.Repository.Config.DIR -> repoDataDir)
+      fileStoreType = fileStoreType
     )
 
     txManager.withTransaction[JsObject] {

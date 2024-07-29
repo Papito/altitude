@@ -23,7 +23,7 @@ case class Repository(id: Option[String] = None,
                       ownerAccountId: String,
                       rootFolderId: String,
                       fileStoreType: String,
-                      fileStoreConfig: Map[String, String]) extends BaseModel {
+                      fileStoreConfig: Map[String, String] = Map()) extends BaseModel {
 
   def toJson: JsObject = {
     Json.obj(
