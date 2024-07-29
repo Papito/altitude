@@ -5,22 +5,27 @@ import org.scalatra.Ok
 import play.api.libs.json.JsNull
 import play.api.libs.json.Json
 import software.altitude.core.controllers.BaseApiController
-import software.altitude.core.models.Asset
+import software.altitude.core.models.{Asset, Repository, User}
 import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchSort
-import software.altitude.core.{Const => C}
+import software.altitude.core.{RequestContext, Const => C}
 
 class SearchController extends BaseApiController {
 
   get("/") {
+    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
+    val repo: Repository = RequestContext.getRepository
     val foldersQuery = params.getOrElse(C.Api.Search.FOLDERS, "")
 
-    val folderId = if (foldersQuery.isEmpty) repository.rootFolderId else foldersQuery
+    val folderId = if (foldersQuery.isEmpty) repo.rootFolderId else foldersQuery
 
     defaultQuery(folderId)
   }
 
   get(s"/p/:${C.Api.Search.PAGE}/rpp/:${C.Api.Search.RESULTS_PER_PAGE}/?") {
+    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
+    val repo: Repository = RequestContext.getRepository
+
     val rpp = params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, C.Api.Search.DEFAULT_RPP.toString).toInt
     val page = params.getOrElse(C.Api.Search.PAGE, "1").toInt
     val queryText = params.get(C.Api.Search.QUERY_TEXT)
@@ -39,7 +44,7 @@ class SearchController extends BaseApiController {
 
     // TODO: if there is query text, do not specify folder ids. Search everything
     val foldersQuery = params.getOrElse(C.Api.Search.FOLDERS, "")
-    val folderIdsArg = if (foldersQuery.isEmpty) repository.rootFolderId else foldersQuery
+    val folderIdsArg = if (foldersQuery.isEmpty) repo.rootFolderId else foldersQuery
 
     val q = new SearchQuery(
       text = queryText,

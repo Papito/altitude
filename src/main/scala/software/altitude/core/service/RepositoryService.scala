@@ -60,4 +60,10 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
   def switchContextToRepository(repo: Repository): Unit = {
     RequestContext.repository.value = Some(repo)
   }
+
+  def setContextFromUserActiveRepo(user: User): Unit = {
+    require(user.activeRepoId.isDefined, "User has no active repo")
+    val activeRepo: Repository = getById(user.activeRepoId.get)
+    RequestContext.repository.value = Some(activeRepo)
+  }
 }

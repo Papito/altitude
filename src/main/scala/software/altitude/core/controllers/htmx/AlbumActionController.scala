@@ -11,13 +11,11 @@ class AlbumActionController extends BaseHtmxController{
 
   before() {
     requireLogin()
-
-    if (RequestContext.repository.value.isEmpty){
-      throw new RuntimeException("Repository not set")
-    }
   }
 
   val showAlbumsTab: Route = get("/tab") {
+    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
+
     ssp("htmx/albums", "albums" -> List())
   }
 

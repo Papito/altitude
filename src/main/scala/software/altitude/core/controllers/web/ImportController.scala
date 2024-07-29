@@ -94,6 +94,7 @@ class ImportController
   val uploadFilesForm: Route = post("/upload") {
     contentType = "text/html"
 
+    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
     val repoId = RequestContext.getRepository.persistedId
 
     val processedAndTotal = importAssetCountPerRepo.computeIfAbsent(repoId, _ =>

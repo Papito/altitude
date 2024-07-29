@@ -23,10 +23,6 @@ abstract class BaseController
     with AuthenticationSupport
     with AltitudeServletContext {
 
-  final def user: User = request.getAttribute("user").asInstanceOf[User]
-
-  final def repository: Repository = request.getAttribute("repository").asInstanceOf[Repository]
-
   before() {
     val requestId = software.altitude.core.Util.randomStr(size = 6)
     request.setAttribute("request_id", requestId)
@@ -38,6 +34,7 @@ abstract class BaseController
   after() {
     logRequestEnd()
     MDC.clear()
+    RequestContext.clear()
   }
 
   protected def logRequestStart(): Unit = {
@@ -50,7 +47,7 @@ abstract class BaseController
     if (isAssetRequest) return
 
     val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
-    logger.info(s"Request END: ${request.getRequestURI} in ${currentTimeMillis - startTime}ms")
+    logger.info(s"Request END (${response.status}): ${request.getRequestURI} in ${currentTimeMillis - startTime}ms")
     logger.info(s"Request READ queries: ${RequestContext.readQueryCount.value}")
     logger.info(s"Request WRITE queries: ${RequestContext.writeQueryCount.value}")
   }
@@ -58,8 +55,8 @@ abstract class BaseController
   private def isAssetRequest =  request.pathInfo.startsWith("/css") ||
     request.pathInfo.startsWith("/js") ||
     request.pathInfo.startsWith("/webfonts") ||
-    request.pathInfo.startsWith("/images") ||
-    request.pathInfo.startsWith(s"/${Const.DataStore.PREVIEW}")
+    request.pathInfo.startsWith("/images")
+//    request.pathInfo.startsWith(s"/${Const.DataStore.PREVIEW}")
 
   error {
     case ex: Exception =>

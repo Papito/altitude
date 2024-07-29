@@ -3,7 +3,7 @@ package software.altitude.core.controllers.web
 import org.scalatra.NotFound
 import software.altitude.core.controllers.BaseWebController
 import software.altitude.core.models.Preview
-import software.altitude.core.{Const => C}
+import software.altitude.core.{RequestContext, Const => C}
 
 
 class SecuredStaticFileController extends BaseWebController {
@@ -13,6 +13,7 @@ class SecuredStaticFileController extends BaseWebController {
   }
 
   notFound {
+    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
     val pathSegments = request.pathInfo.split("/").toList
 
     if (pathSegments(1) == C.DataStore.PREVIEW) {

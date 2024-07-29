@@ -27,7 +27,7 @@ class BaseHtmxController extends BaseController with ScalateSupport {
 
   override def logRequestEnd(): Unit = {
     val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
-    logger.info(s"HTMX request END: ${request.getRequestURI} in ${currentTimeMillis - startTime}ms")
+    logger.info(s"HTMX request END (${response.status}): ${request.getRequestURI} in ${currentTimeMillis - startTime}ms")
     logger.info(s"HTMX request READ queries: ${RequestContext.readQueryCount.value}")
     logger.info(s"HTMX request WRITE queries: ${RequestContext.writeQueryCount.value}")
   }

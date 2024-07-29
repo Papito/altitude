@@ -8,7 +8,7 @@ import software.altitude.core.RequestContext
 import software.altitude.core.ValidationException
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.BaseHtmxController
-import software.altitude.core.models.Folder
+import software.altitude.core.models.{Folder, Repository, User}
 import software.altitude.core.{Const => C}
 
 /**
@@ -18,10 +18,6 @@ class FolderActionController extends BaseHtmxController{
 
   before() {
     requireLogin()
-
-    if (RequestContext.repository.value.isEmpty){
-      throw new RuntimeException("Repository not set")
-    }
   }
 
   val showAddFolderModal: Route = get("/modals/add-folder") {
@@ -64,7 +60,8 @@ class FolderActionController extends BaseHtmxController{
   }
 
   val showFoldersTab: Route = get("/tab") {
-    val repo = RequestContext.getRepository
+    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
+    val repo: Repository = RequestContext.getRepository
     val rootFolder: Folder = app.service.folder.getById(repo.rootFolderId)
 
     ssp("htmx/folders",
@@ -72,6 +69,8 @@ class FolderActionController extends BaseHtmxController{
   }
 
   val htmxAddFolder: Route = post("/add") {
+    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
+
     val dataScrubber = DataScrubber(
       trim = List(C.Api.Folder.NAME),
     )
@@ -133,6 +132,8 @@ class FolderActionController extends BaseHtmxController{
   }
 
   val htmxRenameFolder: Route = put("/rename") {
+    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
+
     val dataScrubber = DataScrubber(
       trim = List(C.Api.Folder.NAME),
     )
@@ -189,6 +190,8 @@ class FolderActionController extends BaseHtmxController{
   }
 
   val htmxFolderChildren: Route = get("/children") {
+    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
+
     val parentId: String = params.get(C.Api.Folder.PARENT_ID).get
     val childFolders: List[Folder] = app.service.folder.immediateChildren(parentId)
 
@@ -197,6 +200,8 @@ class FolderActionController extends BaseHtmxController{
   }
 
   val htmxMoveFolder: Route = post("/move") {
+    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
+
     val movedFolderId = request.getParameter(C.Api.Folder.MOVED_FOLDER_ID)
     val newParentId = request.getParameter(C.Api.Folder.NEW_PARENT_ID)
 
@@ -219,6 +224,8 @@ class FolderActionController extends BaseHtmxController{
   }
 
   val htmxDeleteFolder: Route = delete("/") {
+    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
+
     val folderId = params.get(C.Api.ID).get
     app.service.library.deleteFolderById(folderId)
     halt(200)
