@@ -52,7 +52,7 @@ abstract class BaseDao {
     Json.parse(jsonStr).as[JsObject]
   }
 
-  private def getOneByQuery(q: Query): JsObject = {
+  def getOneByQuery(q: Query): JsObject = {
     val sqlQuery = sqlQueryBuilder.buildSelectSql(q)
     getOneBySql(sqlQuery.sqlAsString, sqlQuery.bindValues)
   }

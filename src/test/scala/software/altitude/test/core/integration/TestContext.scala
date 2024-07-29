@@ -18,11 +18,13 @@ class TestContext(val testApp: Altitude) {
 
   def makeUser(): User = User(
     email = Util.randomStr(),
+    name = Util.randomStr(),
     accountType = AccountType.User,
   )
 
   def makeAdminUser(): User = User(
     email = Util.randomStr(),
+    name = Util.randomStr(),
     accountType = AccountType.Admin,
   )
 

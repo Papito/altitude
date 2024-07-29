@@ -63,8 +63,10 @@ object Const {
 
   object User extends Common {
     val EMAIL = "email"
+    val NAME = "name"
     val PASSWORD_HASH = "password_hash"
     val ACCOUNT_TYPE = "account_type"
+    val ACTIVE_REPO_ID = "active_repo_id"
   }
 
   object Face extends Common {
@@ -257,6 +259,7 @@ object Const {
 
     object Setup {
       val ADMIN_EMAIL = "adminEmail"
+      val ADMIN_NAME = "adminName"
       val REPOSITORY_NAME = "repositoryName"
       val PASSWORD = "password"
       val PASSWORD2 = "password2"
@@ -265,6 +268,9 @@ object Const {
     object Constraints {
       val MAX_EMAIL_LENGTH = 80
       val MIN_EMAIL_LENGTH = 3
+
+      val MAX_NAME_LENGTH = 80
+      val MIN_NAME_LENGTH = 2
 
       val MAX_PASSWORD_LENGTH = 50
       val MIN_PASSWORD_LENGTH = 8

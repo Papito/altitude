@@ -47,4 +47,12 @@ class UserService(val app: Altitude) extends BaseService[User] {
     dao.add(objIn.toJson ++ Json.obj(Const.User.PASSWORD_HASH -> passwordHash))
   }
 
+  def setActiveRepoId(user: User, repoId: String): Unit = {
+    val updatedUserCopy = user.copy(
+      activeRepoId = Some(repoId)
+    )
+    txManager.withTransaction {
+      dao.updateById(user.persistedId, data=updatedUserCopy, List(Const.User.ACTIVE_REPO_ID))
+    }
+  }
 }

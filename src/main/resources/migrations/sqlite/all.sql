@@ -10,9 +10,11 @@ INSERT INTO system(version, is_initialized) VALUES(0, 0);
 CREATE TABLE account(
   id CHAR(36) PRIMARY KEY,
   email TEXT NOT NULL,
+  name TEXT NOT NULL,
   account_type TEXT NOT NULL
                CHECK(account_type IN ('ADMIN','USER','GUEST')),
   password_hash TEXT NOT NULL,
+  active_repo_id CHAR(36),
   created_at DATETIME DEFAULT (datetime('now', 'utc')),
   updated_at DATETIME DEFAULT NULL
 );

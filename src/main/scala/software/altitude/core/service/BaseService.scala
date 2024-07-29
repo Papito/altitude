@@ -130,6 +130,15 @@ abstract class BaseService[Model <: BaseModel] {
   }
 
   /**
+   * Get a single document using a Query
+   */
+  def getOneByQuery(query: Query): JsObject = {
+    txManager.asReadOnly[JsObject] {
+      dao.getOneByQuery(query)
+    }
+  }
+
+  /**
    * Get multiple documents using a Query
    */
   def query(query: Query): QueryResult = {

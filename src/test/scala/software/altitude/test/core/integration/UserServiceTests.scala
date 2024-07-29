@@ -22,11 +22,17 @@ import software.altitude.test.core.IntegrationTestCore
     user.id shouldEqual storedUser.id
   }
 
+  test("Can set user active repository") {
+    val user: User = testContext.persistUser()
+    testApp.service.user.setActiveRepoId(user, testContext.repository.persistedId)
+  }
+
   test("Check valid user password") {
     val password = "MyPassword123"
 
     val userModel = User(
       email = Util.randomStr(),
+      name = Util.randomStr(),
       accountType = AccountType.User
     )
 

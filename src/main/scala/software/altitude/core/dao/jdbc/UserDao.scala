@@ -14,7 +14,9 @@ abstract class UserDao(override val config: Config) extends BaseDao with softwar
     val model = User(
       id = Some(rec(C.Base.ID).asInstanceOf[String]),
       email = rec(C.User.EMAIL).asInstanceOf[String],
+      name = rec(C.User.NAME).asInstanceOf[String],
       accountType = rec(C.User.ACCOUNT_TYPE).asInstanceOf[AccountType],
+      activeRepoId = Some(rec(C.User.ACTIVE_REPO_ID).asInstanceOf[String])
     )
 
     addCoreAttrs(model, rec)
@@ -22,8 +24,10 @@ abstract class UserDao(override val config: Config) extends BaseDao with softwar
 
   override def add(jsonIn: JsObject): JsObject = {
     val sql = s"""
-        INSERT INTO $tableName (${C.User.ID}, ${C.User.EMAIL}, ${C.User.ACCOUNT_TYPE}, ${C.User.PASSWORD_HASH})
-             VALUES (?, ?, ?, ?)
+        INSERT INTO $tableName (${C.User.ID}, ${C.User.EMAIL}, ${C.User.NAME},
+                                ${C.User.ACCOUNT_TYPE}, ${C.User.PASSWORD_HASH},
+                                ${C.User.ACTIVE_REPO_ID})
+             VALUES (?, ?, ?, ?, ?, ?)
     """
 
     val user: User = jsonIn: User
@@ -34,8 +38,11 @@ abstract class UserDao(override val config: Config) extends BaseDao with softwar
     val sqlVals: List[Any] = List(
       id,
       user.email,
+      user.name,
       user.accountType,
-      passwordHash)
+      passwordHash,
+      user.activeRepoId.orNull
+    )
 
     addRecord(jsonIn, sql, sqlVals)
     jsonIn ++ Json.obj(C.Base.ID -> id)
