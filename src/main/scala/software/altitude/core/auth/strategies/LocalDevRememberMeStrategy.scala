@@ -4,8 +4,9 @@ import org.scalatra.ScalatraBase
 import org.scalatra.auth.ScentryStrategy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import software.altitude.core.RequestContext
+import software.altitude.core.{AltitudeServletContext, RequestContext}
 import software.altitude.core.models.User
+import software.altitude.core.util.Query
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -21,8 +22,12 @@ class LocalDevRememberMeStrategy(protected val app: ScalatraBase)(implicit reque
 //    if (Environment.CURRENT != Environment.Name.DEV)
 //      throw new RuntimeException("LocalDevRememberMeStrategy can only be used in development environment")
 
-    // The base web controller will have already set the repository and user in the request context
-    // by finding the first available repository and user in the database
+    val userResults = AltitudeServletContext.app.service.user.query(new Query())
+
+    if (userResults.records.nonEmpty) {
+      RequestContext.account.value = Some(userResults.records.head: User)
+    }
+
     RequestContext.account.value match {
       case Some(user) => Some(user)
       case None => None

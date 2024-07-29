@@ -34,7 +34,7 @@ import software.altitude.test.core.ControllerTestCore
     }
   }
 
-  test("Get file") {
+  test("Get file", Focused) {
     testContext.persistRepository() // and user
 
     val importAsset = IntegrationTestUtil.getImportAsset("images/1.jpg")

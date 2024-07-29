@@ -1,22 +1,20 @@
 package software.altitude.core.controllers.web
 
+import org.scalatra.Route
 import software.altitude.core.controllers.BaseWebController
+import software.altitude.core.models.{Repository, User}
 import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchResult
-import software.altitude.core.{Const => C}
+import software.altitude.core.{RequestContext, Const => C}
 
 class IndexController extends BaseWebController {
 
-  get("/") {
-    // Kick to setup if this is a new install
-    if (!app.isInitialized) {
-      logger.warn("App is not initialized, redirecting to setup")
-      redirect("/setup")
-    }
-
+  val indexViewRepo: Route = get("/r/:repoId") {
     requireLogin()
-
     contentType = "text/html"
+
+    val repo: Repository = app.service.repository.getById(params("repoId"))
+    RequestContext.repository.value = Some(repo)
 
     val q = new SearchQuery(
       rpp = C.Api.Search.DEFAULT_RPP,
@@ -26,9 +24,26 @@ class IndexController extends BaseWebController {
 
     layoutTemplate(
       "/WEB-INF/templates/views/index.ssp",
-        "results" -> results,
+      "results" -> results,
     )
   }
+
+  get("/") {
+    // Kick to setup if this is a new install
+    if (!app.isInitialized) {
+      logger.warn("App is not initialized, redirecting to setup")
+      redirect("/setup")
+    }
+
+    // else, go to the default repo view
+    requireLogin()
+
+    val user: User = RequestContext.account.value.get
+    require(user.activeRepoId.isDefined, "User has no active repo")
+
+    redirect(url(indexViewRepo, "repoId" -> user.activeRepoId.get))
+  }
+
 
   get("/setup") {
     contentType = "text/html"
