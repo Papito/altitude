@@ -112,8 +112,8 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
     jsonIn ++ Json.obj(C.Base.ID -> id)
   }
 
-  override def setMetadata(assetId: String, metadata: Metadata)
-                          : Unit = {
+  override def setMetadata(assetId: String, metadata: Metadata): Unit = {
+    BaseDao.incrWriteQueryCount()
 
     val metadataWithIds = Metadata.withIds(metadata)
 

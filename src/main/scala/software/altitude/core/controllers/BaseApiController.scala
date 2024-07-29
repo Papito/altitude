@@ -4,11 +4,8 @@ import org.scalatra._
 import play.api.libs.json.JsNull
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import software.altitude.core.DataScrubber
-import software.altitude.core.NotFoundException
-import software.altitude.core.ValidationException
+import software.altitude.core.{DataScrubber, NotFoundException, RequestContext, ValidationException, Const => C}
 import software.altitude.core.Validators.ApiRequestValidator
-import software.altitude.core.{Const => C}
 
 import java.lang.System.currentTimeMillis
 
@@ -35,6 +32,8 @@ class BaseApiController extends BaseController {
   override def logRequestEnd(): Unit = {
     val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
     logger.info(s"API request END: ${request.getRequestURI} in ${currentTimeMillis - startTime}ms")
+    logger.info(s"API request READ queries: ${RequestContext.readQueryCount.value}")
+    logger.info(s"API request WRITE queries: ${RequestContext.writeQueryCount.value}")
   }
 
   // override to disable this check in controllers that do not require a JSON payload for post and put
@@ -70,11 +69,5 @@ class BaseApiController extends BaseController {
       InternalServerError(Json.obj(
         C.Api.ERROR -> (if (ex.getMessage!= null) ex.getMessage else ex.getClass.getName),
         C.Api.STACKTRACE -> strStacktrace))
-  }
-
-  override def setUser(): Unit = {
-  }
-
-  override def setRepository(): Unit = {
   }
 }

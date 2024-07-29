@@ -6,8 +6,7 @@ import org.scalatra.ScalatraServlet
 import org.scalatra.UrlGeneratorSupport
 import org.scalatra.scalate.ScalateUrlGeneratorSupport
 import org.slf4j.MDC
-import software.altitude.core.AltitudeServletContext
-import software.altitude.core.Const
+import software.altitude.core.{AltitudeServletContext, Const, RequestContext}
 import software.altitude.core.auth.AuthenticationSupport
 import software.altitude.core.models.Repository
 import software.altitude.core.models.User
@@ -34,8 +33,6 @@ abstract class BaseController
     MDC.put("REQUEST_ID", s"[$requestId]")
     request.setAttribute("startTime", currentTimeMillis)
     logRequestStart()
-    setUser()
-    setRepository()
   }
 
   after() {
@@ -54,6 +51,8 @@ abstract class BaseController
 
     val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
     logger.info(s"Request END: ${request.getRequestURI} in ${currentTimeMillis - startTime}ms")
+    logger.info(s"Request READ queries: ${RequestContext.readQueryCount.value}")
+    logger.info(s"Request WRITE queries: ${RequestContext.writeQueryCount.value}")
   }
 
   private def isAssetRequest =  request.pathInfo.startsWith("/css") ||
@@ -61,36 +60,6 @@ abstract class BaseController
     request.pathInfo.startsWith("/webfonts") ||
     request.pathInfo.startsWith("/images") ||
     request.pathInfo.startsWith(s"/${Const.DataStore.PREVIEW}")
-
-  protected def setUser(): Unit = {
-/*    val userId =
-      Option(request.getAttribute("user_id").asInstanceOf[String]) orElse params.get("user_id")
-
-    if (userId.isEmpty) {
-      throw new IllegalStateException("Request contains no USER ID as either attribute or a parameter")
-    }
-
-    log.debug(s"Request user id [${userId.get}]")
-
-    val user: User = app.service.user.getUserById(userId.get)
-    MDC.put("USER", s"[$user]")
-    request.setAttribute("user", user)
-*/  }
-
-  protected def setRepository(): Unit = {
-  /*  val repositoryId =
-      Option(request.getAttribute("repository_id").asInstanceOf[String]) orElse params.get("repository_id")
-
-    if (repositoryId.isEmpty) {
-      throw new IllegalStateException("Request contains no REPOSITORY ID as either attribute or a parameter")
-    }
-
-    log.debug(s"Request repo id [${repositoryId.get}]")
-
-    val repository: Repository = app.service.repository.getRepositoryById(repositoryId.get)
-    MDC.put("REPO", s"[$repository]")
-    request.setAttribute("repository", repository)
-  */}
 
   error {
     case ex: Exception =>

@@ -4,8 +4,7 @@ import org.scalatra._
 import org.scalatra.scalate.ScalateSupport
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import software.altitude.core.ValidationException
-import software.altitude.core.{Const => C}
+import software.altitude.core.{RequestContext, ValidationException, Const => C}
 
 import java.lang.System.currentTimeMillis
 
@@ -28,12 +27,8 @@ class BaseHtmxController extends BaseController with ScalateSupport {
 
   override def logRequestEnd(): Unit = {
     val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
-    logger.info(s"API request END: ${request.getRequestURI} in ${currentTimeMillis - startTime}ms")
-  }
-
-  override def setUser(): Unit = {
-  }
-
-  override def setRepository(): Unit = {
+    logger.info(s"HTMX request END: ${request.getRequestURI} in ${currentTimeMillis - startTime}ms")
+    logger.info(s"HTMX request READ queries: ${RequestContext.readQueryCount.value}")
+    logger.info(s"HTMX request WRITE queries: ${RequestContext.writeQueryCount.value}")
   }
 }

@@ -23,6 +23,14 @@ import scala.jdk.CollectionConverters._
 object BaseDao {
   final def genId: String = UUID.randomUUID.toString
   val totalRecsWindowFunction: String = "count(*) OVER() AS total"
+
+  private def incrReadQueryCount(): Unit = {
+    RequestContext.readQueryCount.value = RequestContext.readQueryCount.value + 1
+  }
+
+  def incrWriteQueryCount(): Unit = {
+    RequestContext.writeQueryCount.value = RequestContext.writeQueryCount.value + 1
+  }
 }
 
 abstract class BaseDao {
@@ -103,6 +111,9 @@ abstract class BaseDao {
 
   def deleteByQuery(q: Query): Int = {
     logger.debug(s"Deleting record by query: $q")
+
+    BaseDao.incrWriteQueryCount()
+
     val fieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
 
     val sql = s"""
@@ -137,11 +148,15 @@ abstract class BaseDao {
   }
 
   protected def addRecord(jsonIn: JsObject, sql: String, values: List[Any]): Unit = {
-   val runner = queryRunner
+    BaseDao.incrWriteQueryCount()
+
+    val runner = queryRunner
     runner.update(RequestContext.getConn, sql, values.map(_.asInstanceOf[Object]): _*)
   }
 
   private def getResults(sql: String, values: List[Any]): List[Map[String, AnyRef]] = {
+    BaseDao.incrReadQueryCount()
+
     val res = queryRunner.query(
       RequestContext.getConn,
       sql, new MapListHandler(),
@@ -158,6 +173,8 @@ abstract class BaseDao {
     if (ids.isEmpty) {
       return List()
     }
+
+    BaseDao.incrReadQueryCount()
 
     val query = new Query().add(C.Base.ID -> Query.IN(ids.asInstanceOf[Set[Any]]))
     val sqlQuery = sqlQueryBuilder.buildSelectSql(query)
@@ -179,6 +196,8 @@ abstract class BaseDao {
 
   def updateByQuery(q: Query, json: JsObject, fields: List[String]): Int = {
     logger.debug(s"Updating record by query $q with data $json for fields: $fields")
+
+    BaseDao.incrWriteQueryCount()
 
     val queryFieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
     val updateFieldPlaceholders: List[String] = json.fields.filter {
@@ -216,6 +235,8 @@ abstract class BaseDao {
   }
 
   def increment(id: String, field: String, count: Int = 1): Unit = {
+    BaseDao.incrWriteQueryCount()
+
     val sql = s"""
       UPDATE $tableName
          SET $field = $field + $count
