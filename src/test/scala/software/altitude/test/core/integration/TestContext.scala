@@ -61,7 +61,7 @@ class TestContext(val testApp: Altitude) {
       owner = persistedUser)
     repositories = repositories ::: persistedRepo :: Nil
 
-    testApp.service.user.setActiveRepoId(persistedUser, persistedRepo.persistedId)
+    testApp.service.user.setLastActiveRepoId(persistedUser, persistedRepo.persistedId)
 
     // if this is the only (or the first repo), set current request context
     if (repositories.length == 1) {

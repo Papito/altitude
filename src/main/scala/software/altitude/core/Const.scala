@@ -70,7 +70,7 @@ object Const {
     val NAME = "name"
     val PASSWORD_HASH = "password_hash"
     val ACCOUNT_TYPE = "account_type"
-    val ACTIVE_REPO_ID = "active_repo_id"
+    val LAST_ACTIVE_REPO_ID = "last_active_repo_id"
   }
 
   object UserToken {

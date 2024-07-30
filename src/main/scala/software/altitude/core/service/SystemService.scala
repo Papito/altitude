@@ -65,7 +65,7 @@ class SystemService(val app: Altitude) {
         fileStoreType = C.StorageEngineName.FS, // hard default for now
         owner = admin)
 
-      app.service.user.setActiveRepoId(admin, repo.persistedId)
+      app.service.user.setLastActiveRepoId(admin, repo.persistedId)
 
       systemMetadataDao.setInitialized()
 

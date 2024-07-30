@@ -21,7 +21,7 @@ CREATE TABLE account(
   account_type TEXT NOT NULL
                CHECK(account_type IN ('ADMIN','USER','GUEST')),
   password_hash TEXT NOT NULL,
-  active_repo_id CHAR(36)
+  last_active_repo_id CHAR(36)
 ) INHERITS (_core);
 
 CREATE TABLE user_token (

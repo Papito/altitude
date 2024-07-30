@@ -115,12 +115,12 @@ class UserService(val app: Altitude) extends BaseService[User] {
     user
   }
 
-  def setActiveRepoId(user: User, repoId: String): Unit = {
+  def setLastActiveRepoId(user: User, repoId: String): Unit = {
     val updatedUserCopy = user.copy(
-      activeRepoId = Some(repoId)
+      lastActiveRepoId = Some(repoId)
     )
     txManager.withTransaction {
-      dao.updateById(user.persistedId, data=updatedUserCopy, List(Const.User.ACTIVE_REPO_ID))
+      dao.updateById(user.persistedId, data=updatedUserCopy, List(Const.User.LAST_ACTIVE_REPO_ID))
     }
   }
 

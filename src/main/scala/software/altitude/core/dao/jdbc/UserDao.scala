@@ -16,7 +16,7 @@ abstract class UserDao(override val config: Config) extends BaseDao with softwar
       email = rec(C.User.EMAIL).asInstanceOf[String],
       name = rec(C.User.NAME).asInstanceOf[String],
       accountType = rec(C.User.ACCOUNT_TYPE).asInstanceOf[AccountType],
-      activeRepoId = Some(rec(C.User.ACTIVE_REPO_ID).asInstanceOf[String])
+      lastActiveRepoId = Some(rec(C.User.LAST_ACTIVE_REPO_ID).asInstanceOf[String])
     )
 
     addCoreAttrs(model, rec)
@@ -26,7 +26,7 @@ abstract class UserDao(override val config: Config) extends BaseDao with softwar
     val sql = s"""
         INSERT INTO $tableName (${C.User.ID}, ${C.User.EMAIL}, ${C.User.NAME},
                                 ${C.User.ACCOUNT_TYPE}, ${C.User.PASSWORD_HASH},
-                                ${C.User.ACTIVE_REPO_ID})
+                                ${C.User.LAST_ACTIVE_REPO_ID})
              VALUES (?, ?, ?, ?, ?, ?)
     """
 
@@ -41,7 +41,7 @@ abstract class UserDao(override val config: Config) extends BaseDao with softwar
       user.name,
       user.accountType,
       passwordHash,
-      user.activeRepoId.orNull
+      user.lastActiveRepoId.orNull
     )
 
     addRecord(jsonIn, sql, sqlVals)

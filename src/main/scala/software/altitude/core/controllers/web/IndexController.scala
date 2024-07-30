@@ -36,10 +36,11 @@ class IndexController extends BaseWebController {
     // else, go to the default repo view
     requireLogin()
 
+    // if we the user is not going to a specific repo, redirect to the last active repo
     val user: User = RequestContext.getAccount
-    require(user.activeRepoId.isDefined, "User has no active repo")
+    require(user.lastActiveRepoId.isDefined, "User has no last active repo")
 
-    redirect(url(indexViewRepo, "repoId" -> user.activeRepoId.get))
+    redirect(url(indexViewRepo, "repoId" -> user.lastActiveRepoId.get))
   }
 
 

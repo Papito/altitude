@@ -48,7 +48,7 @@ import software.altitude.test.core.ControllerTestCore
 
       val query = new Query(params = Map(Const.User.EMAIL -> email))
       val user: User = testApp.service.user.getOneByQuery(query)
-      user.activeRepoId should not be None
+      user.lastActiveRepoId should not be None
 
       // Sends HTMX redirect to the root path
       response.getHeader("HX-Redirect") should be("/")
