@@ -69,7 +69,7 @@
         <a href="/">Altitude</a>
     </div>
     <div class="menu">
-        <a href=""><i class="fas fa-database"></i><span>Default</span></a>
+        <a href=""><i class="fas fa-database"></i><span>${software.altitude.core.RequestContext.getRepository.name}</span></a>
     </div>
     <div class="menu import">
         <a href='${ url(importView, "repoId" -> RequestContext.getRepository.persistedId) }'><i class="fas fa-download"></i><span>Import</span></a></span>
