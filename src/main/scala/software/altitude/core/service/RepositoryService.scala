@@ -1,4 +1,5 @@
 package software.altitude.core.service
+import org.scalatra.Params
 import play.api.libs.json.JsObject
 import software.altitude.core.Altitude
 import software.altitude.core.AltitudeServletContext
@@ -11,6 +12,8 @@ import software.altitude.core.models.Stats
 import software.altitude.core.models.User
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.{Const => C}
+
+import javax.servlet.http.HttpServletRequest
 
 class RepositoryService(val app: Altitude) extends BaseService[Repository] {
   protected val dao: RepositoryDao = app.DAO.repository
@@ -76,5 +79,16 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
     require(user.activeRepoId.isDefined, "User has no active repo")
     val activeRepo: Repository = getById(user.activeRepoId.get)
     RequestContext.repository.value = Some(activeRepo)
+  }
+
+  def setContextFromRequest(params: Params): Unit = {
+    val repoId = params.get("repoId")
+    repoId match {
+      case None => throw new IllegalArgumentException("Request has no repository")
+      case repoId => {
+        val repo: Repository = getById(repoId.get)
+        RequestContext.repository.value = Some(repo)
+      }
+    }
   }
 }

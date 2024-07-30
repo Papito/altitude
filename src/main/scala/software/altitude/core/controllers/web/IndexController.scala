@@ -15,8 +15,8 @@ class IndexController extends BaseWebController {
     requireLogin()
     contentType = "text/html"
 
-    val repo: Repository = app.service.repository.getById(params("repoId"))
-    RequestContext.repository.value = Some(repo)
+    params
+    app.service.repository.setContextFromRequest(params)
 
     val q = new SearchQuery(
       rpp = C.Api.Search.DEFAULT_RPP,
