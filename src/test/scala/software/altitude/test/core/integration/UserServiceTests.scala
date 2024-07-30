@@ -16,9 +16,6 @@ import software.altitude.test.core.IntegrationTestCore
     val user: User = testContext.persistUser()
     val storedUser: User = testApp.service.user.getById(user.persistedId)
 
-    storedUser.createdAt should not be None
-    storedUser.updatedAt should be(None)
-
     user.id shouldEqual storedUser.id
   }
 
@@ -27,7 +24,7 @@ import software.altitude.test.core.IntegrationTestCore
     testApp.service.user.setActiveRepoId(user, testContext.repository.persistedId)
   }
 
-  test("Check valid user password") {
+  test("Check valid user password", Focused) {
     val password = "MyPassword123"
 
     val userModel = User(

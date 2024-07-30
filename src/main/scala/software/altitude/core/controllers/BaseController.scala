@@ -48,15 +48,20 @@ abstract class BaseController
 
     val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
     logger.info(s"Request END (${response.status}): ${request.getRequestURI} in ${currentTimeMillis - startTime}ms")
-    logger.info(s"Request READ queries: ${RequestContext.readQueryCount.value}")
-    logger.info(s"Request WRITE queries: ${RequestContext.writeQueryCount.value}")
+
+    if (RequestContext.readQueryCount.value > 0) {
+      logger.info(s"Request READ queries: ${RequestContext.readQueryCount.value}")
+    }
+    if (RequestContext.writeQueryCount.value > 0) {
+      logger.info(s"Request WRITE queries: ${RequestContext.writeQueryCount.value}")
+    }
   }
 
   private def isAssetRequest =  request.pathInfo.startsWith("/css") ||
     request.pathInfo.startsWith("/js") ||
     request.pathInfo.startsWith("/webfonts") ||
-    request.pathInfo.startsWith("/images")
-//    request.pathInfo.startsWith(s"/${Const.DataStore.PREVIEW}")
+    request.pathInfo.startsWith("/images") ||
+    request.pathInfo.startsWith(s"/${Const.DataStore.PREVIEW}")
 
   error {
     case ex: Exception =>

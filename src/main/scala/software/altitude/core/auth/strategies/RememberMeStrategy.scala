@@ -53,8 +53,7 @@ class RememberMeStrategy(protected val app: ScalatraBase)(implicit request: Http
   }
 
   /**
-   * * After successfully authenticating with either the RememberMeStrategy, or the UserPasswordStrategy with the "remember me" tickbox
-   * checked, we set a rememberMe cookie for later use.
+   * * After successfully authenticating with either the RememberMeStrategy, we set a rememberMe cookie for later use.
    *
    * NB make sure you set a cookie path, or you risk getting weird problems because you've accidentally set more than 1 cookie.
    */
@@ -73,16 +72,5 @@ class RememberMeStrategy(protected val app: ScalatraBase)(implicit request: Http
       user.forgetMe()
     }
     app.cookies.delete(COOKIE_KEY)(CookieOptions(path = "/"))
-  }
-
-  /** Used to easily match a checkbox value */
-  private def checkbox2boolean(s: String): Boolean = {
-    s match {
-      case "yes" => true
-      case "y" => true
-      case "1" => true
-      case "true" => true
-      case _ => false
-    }
   }
 }

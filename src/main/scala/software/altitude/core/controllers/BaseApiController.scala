@@ -32,8 +32,13 @@ class BaseApiController extends BaseController {
   override def logRequestEnd(): Unit = {
     val startTime: Long = request.getAttribute("startTime").asInstanceOf[Long]
     logger.info(s"API request END (${response.status}): ${request.getRequestURI} in ${currentTimeMillis - startTime}ms")
-    logger.info(s"API request READ queries: ${RequestContext.readQueryCount.value}")
-    logger.info(s"API request WRITE queries: ${RequestContext.writeQueryCount.value}")
+
+    if (RequestContext.readQueryCount.value > 0) {
+      logger.info(s"API request READ queries: ${RequestContext.readQueryCount.value}")
+    }
+    if (RequestContext.writeQueryCount.value > 0) {
+      logger.info(s"API request WRITE queries: ${RequestContext.writeQueryCount.value}")
+    }
   }
 
   // override to disable this check in controllers that do not require a JSON payload for post and put
