@@ -6,10 +6,10 @@ import org.scalatra.ScalatraServlet
 import org.scalatra.UrlGeneratorSupport
 import org.scalatra.scalate.ScalateUrlGeneratorSupport
 import org.slf4j.MDC
-import software.altitude.core.{AltitudeServletContext, Const, RequestContext}
+import software.altitude.core.AltitudeServletContext
+import software.altitude.core.Const
+import software.altitude.core.RequestContext
 import software.altitude.core.auth.AuthenticationSupport
-import software.altitude.core.models.Repository
-import software.altitude.core.models.User
 
 import java.io.PrintWriter
 import java.io.StringWriter

@@ -24,6 +24,7 @@ abstract class IntegrationTestCore
   var testContext: TestContext = new TestContext(testApp)
 
   override def beforeEach(): Unit = {
+    AltitudeServletContext.clearState()
     AltitudeServletContext.app.isInitialized = false
     testContext = new TestContext(testApp)
 

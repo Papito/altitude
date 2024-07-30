@@ -5,7 +5,9 @@ import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.SystemMetadataDao
-import software.altitude.core.models.{Repository, SystemMetadata, User}
+import software.altitude.core.models.Repository
+import software.altitude.core.models.SystemMetadata
+import software.altitude.core.models.User
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.{Const => C}
 

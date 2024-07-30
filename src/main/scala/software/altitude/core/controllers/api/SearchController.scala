@@ -4,11 +4,13 @@ import org.scalatra.ActionResult
 import org.scalatra.Ok
 import play.api.libs.json.JsNull
 import play.api.libs.json.Json
+import software.altitude.core.RequestContext
 import software.altitude.core.controllers.BaseApiController
-import software.altitude.core.models.{Asset, Repository, User}
+import software.altitude.core.models.Asset
+import software.altitude.core.models.Repository
 import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchSort
-import software.altitude.core.{RequestContext, Const => C}
+import software.altitude.core.{Const => C}
 
 class SearchController extends BaseApiController {
 

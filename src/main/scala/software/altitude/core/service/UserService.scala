@@ -1,33 +1,47 @@
 package software.altitude.core.service
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
+import software.altitude.core.AltitudeServletContext
 import software.altitude.core._
 import software.altitude.core.dao.UserDao
-import software.altitude.core.models.User
+import software.altitude.core.dao.UserTokenDao
+import software.altitude.core.models.{User, UserToken}
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.Query
-import software.altitude.core.AltitudeServletContext
+
+import java.time.LocalDateTime
 
 class UserService(val app: Altitude) extends BaseService[User] {
   protected val dao: UserDao = app.DAO.user
+  private val tokenDao: UserTokenDao = app.DAO.userToken
 
   override protected val txManager: TransactionManager = app.txManager
 
-  def switchContextToUser(repo: User): Unit = {
-    RequestContext.account.value = Some(repo)
+  def switchContextToUser(user: User): Unit = {
+    RequestContext.account.value = Some(user)
   }
 
   def loginAndGetUser(email: String, password: String): Option[User] = {
-    txManager.asReadOnly {
+    txManager.withTransaction {
       val passwordHash = getPasswordHashByEmail(email)
 
-      if (Util.checkPassword(password, passwordHash)) {
-        val user: User = getByEmail(email)
-        switchContextToUser(user)
-        Some(user)
-      } else {
-        None
+      if (!Util.checkPassword(password, passwordHash)) {
+        return None
       }
+
+      val user: User = getByEmail(email)
+
+      // save the token
+      val userToken = UserToken(
+        userId = user.persistedId,
+        token = Util.randomStr(64),
+        expiresAt = LocalDateTime.now.plusDays(Const.Security.MEMBER_ME_COOKIE_EXPIRATION_DAYS))
+
+      tokenDao.add(userToken.toJson)
+      AltitudeServletContext.usersByToken += (userToken.token -> user)
+
+      switchContextToUser(user)
+      Some(user)
     }
   }
 
@@ -57,6 +71,20 @@ class UserService(val app: Altitude) extends BaseService[User] {
 
     AltitudeServletContext.usersPasswordHashByEmail += (email -> passwordHash)
     passwordHash
+  }
+
+  def getByToken(token: String): Option[User] = {
+    if (AltitudeServletContext.usersByToken.contains(token)) {
+      return Some(AltitudeServletContext.usersByToken(token))
+    }
+
+    None
+  }
+
+  def deleteToken(token: String): Unit = {
+    logger.info("Deleting token: " + token)
+    tokenDao.deleteByQuery(new Query(params = Map(Const.UserToken.TOKEN -> token)))
+    AltitudeServletContext.usersByToken -= token
   }
 
   private def getByEmail(email: String): JsObject = {
@@ -94,4 +122,5 @@ class UserService(val app: Altitude) extends BaseService[User] {
       dao.updateById(user.persistedId, data=updatedUserCopy, List(Const.User.ACTIVE_REPO_ID))
     }
   }
+
 }

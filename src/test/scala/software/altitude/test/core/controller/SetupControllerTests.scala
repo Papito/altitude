@@ -2,9 +2,12 @@ package software.altitude.test.core.controller
 
 import org.scalatest.DoNotDiscover
 import play.api.libs.json.Json
+import software.altitude.core.Altitude
+import software.altitude.core.Const
+import software.altitude.core.Util
 import software.altitude.core.models.User
 import software.altitude.core.util.Query
-import software.altitude.core.{Altitude, Const, Util, Const => C}
+import software.altitude.core.{Const => C}
 import software.altitude.test.core.ControllerTestCore
 
 @DoNotDiscover class SetupControllerTests(override val testApp: Altitude) extends ControllerTestCore {

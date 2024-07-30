@@ -1,6 +1,8 @@
 package software.altitude.core.service
 import play.api.libs.json.JsObject
-import software.altitude.core.{Altitude, AltitudeServletContext, RequestContext, Const => C}
+import software.altitude.core.Altitude
+import software.altitude.core.AltitudeServletContext
+import software.altitude.core.RequestContext
 import software.altitude.core.dao.RepositoryDao
 import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.Folder
@@ -8,6 +10,7 @@ import software.altitude.core.models.Repository
 import software.altitude.core.models.Stats
 import software.altitude.core.models.User
 import software.altitude.core.transactions.TransactionManager
+import software.altitude.core.{Const => C}
 
 class RepositoryService(val app: Altitude) extends BaseService[Repository] {
   protected val dao: RepositoryDao = app.DAO.repository

@@ -3,7 +3,6 @@ import org.mindrot.jbcrypt.BCrypt
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.time.LocalDateTime
@@ -31,14 +30,6 @@ object Util {
     }
   }
 
-  def loadResourceAsFile(relativePath: String): File = {
-    val url = getClass.getResource(relativePath)
-    if (url == null) {
-      throw new IllegalArgumentException(s"Resource not found: $relativePath")
-    }
-    new File(url.toURI)
-  }
-
   def stringToLocalDateTime(str: String): Option[LocalDateTime] = {
     if (str.isEmpty) {
       None
@@ -49,8 +40,6 @@ object Util {
   }
 
   def randomStr(size: Int = 10): String = scala.util.Random.alphanumeric.take(size).mkString
-
-  def randomLongInt(): Long = scala.util.Random.nextLong(1000000000L)
 
   def hashPassword(password: String): String = {
     BCrypt.hashpw(password, BCrypt.gensalt())

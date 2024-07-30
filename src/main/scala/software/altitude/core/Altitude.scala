@@ -9,7 +9,9 @@ import org.scalatra.auth.ScentryStrategy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.auth.strategies.LocalDevRememberMeStrategy
+import software.altitude.core.auth.strategies.RememberMeStrategy
 import software.altitude.core.auth.strategies.TestRememberMeStrategy
+import software.altitude.core.auth.strategies.UserPasswordStrategy
 import software.altitude.core.dao._
 import software.altitude.core.models.User
 import software.altitude.core.service._
@@ -152,9 +154,9 @@ class Altitude(val dbEngineOverride: Option[String] = None)  {
    */
   val scentryStrategies: List[(String, Class[_ <: ScentryStrategy[User]])] = Environment.CURRENT match {
     case Environment.Name.PROD => List(
-      ("RememberMeStrategy", classOf[LocalDevRememberMeStrategy])
-//      ("UserPasswordStrategy", classOf[UserPasswordStrategy]),
-//      ("RememberMeStrategy", classOf[RememberMeStrategy])
+//      ("RememberMeStrategy", classOf[LocalDevRememberMeStrategy])
+      ("UserPasswordStrategy", classOf[UserPasswordStrategy]),
+      ("RememberMeStrategy", classOf[RememberMeStrategy])
     )
     case Environment.Name.DEV => List(
       ("RememberMeStrategy", classOf[LocalDevRememberMeStrategy])
@@ -175,6 +177,12 @@ class Altitude(val dbEngineOverride: Option[String] = None)  {
     val user: UserDao = dataSourceType match {
       case C.DbEngineName.POSTGRES => new jdbc.UserDao(app.config) with dao.postgres.PostgresOverrides
       case C.DbEngineName.SQLITE => new jdbc.UserDao(app.config) with dao.sqlite.SqliteOverrides
+      case _ => throw new IllegalArgumentException(s"Unknown datasource [$dataSourceType]")
+    }
+
+    val userToken: UserTokenDao = dataSourceType match {
+      case C.DbEngineName.POSTGRES => new jdbc.UserTokenDao(app.config) with dao.postgres.PostgresOverrides
+      case C.DbEngineName.SQLITE => new jdbc.UserTokenDao(app.config) with dao.sqlite.SqliteOverrides
       case _ => throw new IllegalArgumentException(s"Unknown datasource [$dataSourceType]")
     }
 

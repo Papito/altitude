@@ -24,9 +24,15 @@ CREATE TABLE account(
   active_repo_id CHAR(36)
 ) INHERITS (_core);
 
+CREATE TABLE user_token (
+  account_id CHAR(36) REFERENCES account(id) ON DELETE CASCADE,
+  token TEXT NOT NULL,
+  expires_at TIMESTAMP WITH TIME ZONE
+);
+
 CREATE TABLE repository(
   id CHAR(36) PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
+  name TEXT NOT NULL,
   description TEXT,
   owner_account_id CHAR(36) REFERENCES account(id) ON DELETE CASCADE,
   root_folder_id CHAR(36) NOT NULL,

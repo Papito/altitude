@@ -32,7 +32,7 @@ class SessionController
     layoutTemplate("/WEB-INF/templates/views/login.ssp")
   }
 
-  val sessions: Route = post("/") {
+  val doLogin: Route = post("/login") {
     scentry.authenticate()
 
     if (isAuthenticated) {
@@ -42,8 +42,7 @@ class SessionController
     }
   }
 
-  //FIXME: use POST
-  val logout: Route = get("/logout") {
+  val logout: Route = post("/logout") {
     scentry.logout()
     redirect("/")
   }

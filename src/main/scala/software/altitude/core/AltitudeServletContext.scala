@@ -13,10 +13,10 @@ import software.altitude.core.controllers.web.ImportController
 import software.altitude.core.controllers.web.IndexController
 import software.altitude.core.controllers.web.SecuredStaticFileController
 import software.altitude.core.controllers.web.SessionController
-import software.altitude.core.models.{Repository, User}
+import software.altitude.core.models.Repository
+import software.altitude.core.models.User
 
 import javax.servlet.ServletContext
-import scala.collection.mutable
 
 object AltitudeServletContext {
   protected final val logger: Logger = LoggerFactory.getLogger(getClass)
@@ -26,9 +26,22 @@ object AltitudeServletContext {
 
   // id -> user
   var usersById: Map[String, User] = Map[String, User]()
+  // email -> user
   var usersByEmail: Map[String, User] = Map[String, User]()
+  // email -> password hash
   var usersPasswordHashByEmail: Map[String, String] = Map[String, String]()
+    // token -> user
+  var usersByToken: Map[String, User] = Map[String, User]()
+  // id -> repository
   var repositoriesById: Map[String, Repository] = Map[String, Repository]()
+
+  def clearState(): Unit = {
+    usersById = Map.empty
+    usersByEmail = Map.empty
+    usersByToken = Map.empty
+    usersPasswordHashByEmail = Map.empty
+    repositoriesById = Map.empty
+  }
 
   val endpoints: Seq[(ScalatraServlet, String)] = List(
     (new IndexController, "/"),
@@ -64,6 +77,7 @@ trait AltitudeServletContext {
   val app: Altitude = AltitudeServletContext.app
   var usersById: Map[String, User] = AltitudeServletContext.usersById
   var usersByEmail: Map[String, User] = AltitudeServletContext.usersByEmail
+  var usersByToken: Map[String, User] = AltitudeServletContext.usersByToken
   var usersPasswordHashByEmail: Map[String, String] = AltitudeServletContext.usersPasswordHashByEmail
   var repositoriesById: Map[String, Repository] = AltitudeServletContext.repositoriesById
 }

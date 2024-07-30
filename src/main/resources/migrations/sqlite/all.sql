@@ -19,9 +19,15 @@ CREATE TABLE account(
   updated_at DATETIME DEFAULT NULL
 );
 
+CREATE TABLE user_token (
+  account_id CHAR(36) REFERENCES account(id) ON DELETE CASCADE,
+  token TEXT NOT NULL,
+  expires_at DATETIME
+);
+
 CREATE TABLE repository(
   id CHAR(36) PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
+  name TEXT NOT NULL,
   owner_account_id CHAR(36) REFERENCES account(id) ON DELETE CASCADE,
   description TEXT,
   root_folder_id CHAR(36) NOT NULL,

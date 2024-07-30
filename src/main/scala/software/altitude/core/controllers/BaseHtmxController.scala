@@ -4,7 +4,9 @@ import org.scalatra._
 import org.scalatra.scalate.ScalateSupport
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import software.altitude.core.{RequestContext, ValidationException, Const => C}
+import software.altitude.core.RequestContext
+import software.altitude.core.ValidationException
+import software.altitude.core.{Const => C}
 
 import java.lang.System.currentTimeMillis
 

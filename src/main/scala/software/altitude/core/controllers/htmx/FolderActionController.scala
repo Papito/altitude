@@ -8,7 +8,8 @@ import software.altitude.core.RequestContext
 import software.altitude.core.ValidationException
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.BaseHtmxController
-import software.altitude.core.models.{Folder, Repository, User}
+import software.altitude.core.models.Folder
+import software.altitude.core.models.Repository
 import software.altitude.core.{Const => C}
 
 /**

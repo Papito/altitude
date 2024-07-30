@@ -5,6 +5,9 @@ import org.scalatra.ScalatraBase
 import org.scalatra.auth.ScentryStrategy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import software.altitude.core.AltitudeServletContext
+import software.altitude.core.Const
+import software.altitude.core.Util
 import software.altitude.core.models.User
 
 import javax.servlet.http.HttpServletRequest
@@ -17,8 +20,9 @@ class RememberMeStrategy(protected val app: ScalatraBase)(implicit request: Http
 
   override def name: String = "RememberMe"
 
-  private val COOKIE_KEY = "rememberMe"
-  private val ONE_WEEK = 7 * 24 * 3600
+  // This obviously means that after a restart, all rememberMe cookies will be invalid.
+  private val COOKIE_KEY = Util.randomStr(40)
+  private val ONE_WEEK = Const.Security.MEMBER_ME_COOKIE_EXPIRATION_DAYS * 24 * 3600
 
   /**
    * * Grab the value of the rememberMe cookie token.
@@ -39,13 +43,19 @@ class RememberMeStrategy(protected val app: ScalatraBase)(implicit request: Http
   }
 
   /**
-   * * In a real application, we'd check the cookie's token value against a known hash, probably saved in a datastore, to see if we should
-   * accept the cookie's token. Here, we'll just see if it's the one we set earlier ("foobar") and accept it if so.
+   * The member me strategy authenticates by means of an existing valid token.
    */
   def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse): Option[User] = {
-    logger.info("RememberMeStrategy: attempting authentication")
-    throw new NotImplementedError("Production REMEMBER me is not implemented yet")
-  }
+    AltitudeServletContext.app.service.user.getByToken(tokenVal) match {
+      case Some(user) =>
+        logger.info("RememberMeStrategy: authenticate: user found")
+        Some(user)
+
+      case None =>
+        logger.warn("RememberMeStrategy: authenticate: user not found")
+        None
+    }
+   }
 
   /** What should happen if the user is currently not authenticated? */
   override def unauthenticated()(implicit request: HttpServletRequest, response: HttpServletResponse): Unit = {
@@ -54,8 +64,6 @@ class RememberMeStrategy(protected val app: ScalatraBase)(implicit request: Http
 
   /**
    * * After successfully authenticating with either the RememberMeStrategy, we set a rememberMe cookie for later use.
-   *
-   * NB make sure you set a cookie path, or you risk getting weird problems because you've accidentally set more than 1 cookie.
    */
   override def afterAuthenticate(winningStrategy: String, user: User)(implicit
       request: HttpServletRequest,
@@ -68,6 +76,9 @@ class RememberMeStrategy(protected val app: ScalatraBase)(implicit request: Http
   /** Run this code before logout, to clean up any leftover database state and delete the rememberMe token cookie. */
   override def beforeLogout(user: User)(implicit request: HttpServletRequest, response: HttpServletResponse): Unit = {
     logger.info("rememberMe: beforeLogout")
+
+    AltitudeServletContext.app.service.user.deleteToken(tokenVal)
+
     if (user != null) {
       user.forgetMe()
     }

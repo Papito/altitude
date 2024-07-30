@@ -4,8 +4,12 @@ import org.scalatra._
 import play.api.libs.json.JsNull
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import software.altitude.core.{DataScrubber, NotFoundException, RequestContext, ValidationException, Const => C}
+import software.altitude.core.DataScrubber
+import software.altitude.core.NotFoundException
+import software.altitude.core.RequestContext
+import software.altitude.core.ValidationException
 import software.altitude.core.Validators.ApiRequestValidator
+import software.altitude.core.{Const => C}
 
 import java.lang.System.currentTimeMillis
 

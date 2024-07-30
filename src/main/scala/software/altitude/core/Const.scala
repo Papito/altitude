@@ -28,6 +28,10 @@ object Const {
     val FS = "fs"
   }
 
+  object Security {
+    val MEMBER_ME_COOKIE_EXPIRATION_DAYS = 7
+  }
+
   /**
    * MODELS
    */
@@ -67,6 +71,12 @@ object Const {
     val PASSWORD_HASH = "password_hash"
     val ACCOUNT_TYPE = "account_type"
     val ACTIVE_REPO_ID = "active_repo_id"
+  }
+
+  object UserToken {
+    val ACCOUNT_ID = "account_id"
+    val TOKEN = "token"
+    val EXPIRES_AT = "expires_at"
   }
 
   object Face extends Common {
