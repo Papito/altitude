@@ -1,7 +1,6 @@
 package software.altitude.core.controllers.htmx
 
 import org.scalatra.Route
-import software.altitude.core.RequestContext
 import software.altitude.core.controllers.BaseHtmxController
 
 /**
@@ -13,9 +12,7 @@ class AlbumActionController extends BaseHtmxController{
     requireLogin()
   }
 
-  val showAlbumsTab: Route = get("/tab") {
-    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
-
+  val showAlbumsTab: Route = get("/r/:repoId/tab") {
     ssp("htmx/albums", "albums" -> List())
   }
 

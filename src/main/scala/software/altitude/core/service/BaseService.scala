@@ -29,7 +29,7 @@ abstract class BaseService[Model <: BaseModel] {
 
   protected def contextRepo: Repository = {
     // get the connection associated with this request
-    RequestContext.repository.value.get
+    RequestContext.getRepository
   }
 
   /**

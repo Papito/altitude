@@ -55,7 +55,7 @@ class ImportController
     requireLogin()
   }
 
-  get("/") {
+  val importView: Route = get("/r/:repoId") {
     contentType = "text/html"
     layoutTemplate("/WEB-INF/templates/views/import.ssp")
   }
@@ -91,10 +91,9 @@ class ImportController
     client
   }
 
-  val uploadFilesForm: Route = post("/upload") {
+  val uploadFilesForm: Route = post("/r/:repoId/upload") {
     contentType = "text/html"
 
-    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
     val repoId = RequestContext.getRepository.persistedId
 
     val processedAndTotal = importAssetCountPerRepo.computeIfAbsent(repoId, _ =>

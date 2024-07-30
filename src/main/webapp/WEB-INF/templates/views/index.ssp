@@ -128,7 +128,7 @@
                            hx-target="#explorerPanelContent"
                            hx-swap="innerHTML"
                            hx-trigger="load, click"
-                           hx-get="${ url(showFoldersTab) }">Folders</a>
+                           hx-get='${ url(showFoldersTab, "repoId" -> RequestContext.getRepository.persistedId) }'>Folders</a>
                     </button>
 
                     <button type="button" id="albumsTab" role="tab"
@@ -138,7 +138,7 @@
                            hx-trigger="click"
                            hx-swap="innerHTML"
                            hx-replace-url="/albums"
-                           hx-get="${ url(showAlbumsTab) }">Albums</a>
+                           hx-get='${ url(showAlbumsTab, "repoId" -> RequestContext.getRepository.persistedId) }'>Albums</a>
                     </button>
                 </div>
 
@@ -157,7 +157,7 @@
             #for (idx <- 0 to results.records.length - 1)
                 <div class="cell">
                     <% val asset: Asset = results.records(idx) %>
-                    <img src="/${ Const.DataStore.CONTENT }/${ Const.DataStore.PREVIEW }/${ asset.persistedId }"
+                    <img src="/${ Const.DataStore.CONTENT }/r/${software.altitude.core.RequestContext.getRepository.persistedId}/${ Const.DataStore.PREVIEW }/${ asset.persistedId }"
                          alt = "${ asset.fileName }"
                          class="responsive-image"/>
                 </div>

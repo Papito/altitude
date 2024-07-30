@@ -3,7 +3,6 @@ package software.altitude.core.controllers.web
 import org.scalatra.Route
 import software.altitude.core.RequestContext
 import software.altitude.core.controllers.BaseWebController
-import software.altitude.core.models.Repository
 import software.altitude.core.models.User
 import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchResult
@@ -14,9 +13,6 @@ class IndexController extends BaseWebController {
   val indexViewRepo: Route = get("/r/:repoId") {
     requireLogin()
     contentType = "text/html"
-
-    params
-    app.service.repository.setContextFromRequest(params)
 
     val q = new SearchQuery(
       rpp = C.Api.Search.DEFAULT_RPP,

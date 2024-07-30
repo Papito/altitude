@@ -5,7 +5,8 @@ import software.altitude.core.AltitudeServletContext
 import software.altitude.core._
 import software.altitude.core.dao.UserDao
 import software.altitude.core.dao.UserTokenDao
-import software.altitude.core.models.{User, UserToken}
+import software.altitude.core.models.User
+import software.altitude.core.models.UserToken
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.Query
 

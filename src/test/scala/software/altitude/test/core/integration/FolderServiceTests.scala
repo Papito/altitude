@@ -26,7 +26,7 @@ import software.altitude.test.core.IntegrationTestCore
 
     val folder1: Folder = testApp.service.library.addFolder("folder1")
 
-    folder1.parentId shouldEqual RequestContext.repository.value.get.rootFolderId
+    folder1.parentId shouldEqual RequestContext.getRepository.rootFolderId
 
     val folder1_1: Folder = testApp.service.library.addFolder(
       name = "folder1_1", parentId = folder1.id)
@@ -47,7 +47,7 @@ import software.altitude.test.core.IntegrationTestCore
     val folder2: Folder = testApp.service.library.addFolder(
       name = "folder2")
 
-    folder2.parentId shouldEqual RequestContext.repository.value.get.rootFolderId
+    folder2.parentId shouldEqual RequestContext.getRepository.rootFolderId
 
     val folder2_1: Folder = testApp.service.library.addFolder(
       name = "folder2_1", parentId = folder2.id)
@@ -96,7 +96,7 @@ import software.altitude.test.core.IntegrationTestCore
   }
 
   test("Root folder path should be empty") {
-    val path: List[Folder] = testApp.app.service.folder.pathComponents(folderId = RequestContext.repository.value.get.rootFolderId)
+    val path: List[Folder] = testApp.app.service.folder.pathComponents(folderId = RequestContext.getRepository.rootFolderId)
     path.length should equal(0)
   }
 
@@ -205,7 +205,7 @@ import software.altitude.test.core.IntegrationTestCore
 
   test("Deleting the root folder should fail") {
     intercept[IllegalOperationException] {
-      testApp.service.library.deleteFolderById(RequestContext.repository.value.get.rootFolderId)
+      testApp.service.library.deleteFolderById(RequestContext.getRepository.rootFolderId)
     }
   }
 
@@ -262,13 +262,13 @@ import software.altitude.test.core.IntegrationTestCore
     testApp.service.library.addFolder("folder2")
 
     // assert initial state
-    testApp.app.service.folder.immediateChildren(rootId = RequestContext.repository.value.get.rootFolderId).length shouldBe 2
+    testApp.app.service.folder.immediateChildren(rootId = RequestContext.getRepository.rootFolderId).length shouldBe 2
 
-    testApp.service.library.moveFolder(folder1_1_1.persistedId, RequestContext.repository.value.get.rootFolderId)
-    testApp.app.service.folder.immediateChildren(rootId = RequestContext.repository.value.get.rootFolderId).length shouldBe 3
+    testApp.service.library.moveFolder(folder1_1_1.persistedId, RequestContext.getRepository.rootFolderId)
+    testApp.app.service.folder.immediateChildren(rootId = RequestContext.getRepository.rootFolderId).length shouldBe 3
 
-    testApp.service.library.moveFolder(folder1_1.persistedId, RequestContext.repository.value.get.rootFolderId)
-    testApp.app.service.folder.immediateChildren(rootId = RequestContext.repository.value.get.rootFolderId).length shouldBe 4
+    testApp.service.library.moveFolder(folder1_1.persistedId, RequestContext.getRepository.rootFolderId)
+    testApp.app.service.folder.immediateChildren(rootId = RequestContext.getRepository.rootFolderId).length shouldBe 4
   }
 
   test("Illegal folder move actions should throw") {
@@ -354,7 +354,7 @@ import software.altitude.test.core.IntegrationTestCore
 
     // rename a system folder
     intercept[IllegalOperationException] {
-      testApp.service.library.renameFolder(RequestContext.repository.value.get.rootFolderId, folder1.name)
+      testApp.service.library.renameFolder(RequestContext.getRepository.rootFolderId, folder1.name)
     }
   }
 

@@ -1,6 +1,5 @@
 package software.altitude.core.service
-import org.scalatra.Params
-import play.api.libs.json.JsObject
+
 import software.altitude.core.Altitude
 import software.altitude.core.AltitudeServletContext
 import software.altitude.core.RequestContext
@@ -12,8 +11,7 @@ import software.altitude.core.models.Stats
 import software.altitude.core.models.User
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.{Const => C}
-
-import javax.servlet.http.HttpServletRequest
+import play.api.libs.json.JsObject
 
 class RepositoryService(val app: Altitude) extends BaseService[Repository] {
   protected val dao: RepositoryDao = app.DAO.repository
@@ -49,7 +47,7 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
 
       app.service.folder.add(rootFolder)
 
-      logger.info(s"Setting up repository [${RequestContext.repository.value.get.name}] statistics")
+      logger.info(s"Setting up repository [${RequestContext.getRepository.name}] statistics")
       app.service.stats.createStat(Stats.SORTED_ASSETS)
       app.service.stats.createStat(Stats.SORTED_BYTES)
       app.service.stats.createStat(Stats.TRIAGE_ASSETS)
@@ -75,20 +73,10 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
     RequestContext.repository.value = Some(repo)
   }
 
-  def setContextFromUserActiveRepo(user: User): Unit = {
-    require(user.activeRepoId.isDefined, "User has no active repo")
-    val activeRepo: Repository = getById(user.activeRepoId.get)
-    RequestContext.repository.value = Some(activeRepo)
-  }
-
-  def setContextFromRequest(params: Params): Unit = {
-    val repoId = params.get("repoId")
-    repoId match {
-      case None => throw new IllegalArgumentException("Request has no repository")
-      case repoId => {
-        val repo: Repository = getById(repoId.get)
-        RequestContext.repository.value = Some(repo)
-      }
+  def setContextFromRequest(repoId: Option[String]): Unit = {
+    if (repoId.nonEmpty) {
+      val repo: Repository = getById(repoId.get)
+      RequestContext.repository.value = Some(repo)
     }
   }
 }

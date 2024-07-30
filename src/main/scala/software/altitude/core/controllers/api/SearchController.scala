@@ -14,8 +14,7 @@ import software.altitude.core.{Const => C}
 
 class SearchController extends BaseApiController {
 
-  get("/") {
-    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
+  get("/r/:repoId/") {
     val repo: Repository = RequestContext.getRepository
     val foldersQuery = params.getOrElse(C.Api.Search.FOLDERS, "")
 
@@ -24,8 +23,7 @@ class SearchController extends BaseApiController {
     defaultQuery(folderId)
   }
 
-  get(s"/p/:${C.Api.Search.PAGE}/rpp/:${C.Api.Search.RESULTS_PER_PAGE}/?") {
-    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
+  get(s"/r/:repoId/p/:${C.Api.Search.PAGE}/rpp/:${C.Api.Search.RESULTS_PER_PAGE}/?") {
     val repo: Repository = RequestContext.getRepository
 
     val rpp = params.getOrElse(C.Api.Search.RESULTS_PER_PAGE, C.Api.Search.DEFAULT_RPP.toString).toInt
@@ -58,10 +56,10 @@ class SearchController extends BaseApiController {
     query(q)
   }
 
-  get("/triage") {
+  get("/r/:repoId/triage") {
   }
 
-  get(s"/triage/p/:${C.Api.Search.PAGE}/rpp/:${C.Api.Search.RESULTS_PER_PAGE}") {
+  get(s"/r/:repoId/triage/p/:${C.Api.Search.PAGE}/rpp/:${C.Api.Search.RESULTS_PER_PAGE}") {
   }
 
   private def defaultQuery(folderId: String): ActionResult = {

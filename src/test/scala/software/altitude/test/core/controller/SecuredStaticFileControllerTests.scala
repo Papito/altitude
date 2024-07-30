@@ -22,13 +22,14 @@ import software.altitude.test.core.ControllerTestCore
     }
   }
 */
-  test("Get preview file") {
+  test("Get preview file", Focused) {
     testContext.persistRepository() // and user
+    val repoId = testContext.repository.persistedId
 
     val importAsset = IntegrationTestUtil.getImportAsset("images/1.jpg")
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
 
-    get(s"/content/preview/${importedAsset.persistedId}", headers=testAuthHeaders()) {
+    get(s"/content/r/$repoId/preview/${importedAsset.persistedId}", headers=testAuthHeaders()) {
       status should equal(200)
       response.getContentType() should be(s"${Preview.MIME_TYPE};charset=utf-8")
     }
@@ -36,11 +37,12 @@ import software.altitude.test.core.ControllerTestCore
 
   test("Get file") {
     testContext.persistRepository() // and user
+    val repoId = testContext.repository.persistedId
 
     val importAsset = IntegrationTestUtil.getImportAsset("images/1.jpg")
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
 
-    get(s"/content/file/${importedAsset.persistedId}", headers=testAuthHeaders()) {
+    get(s"/content/r/$repoId/file/${importedAsset.persistedId}", headers=testAuthHeaders()) {
       status should equal(200)
     }
   }

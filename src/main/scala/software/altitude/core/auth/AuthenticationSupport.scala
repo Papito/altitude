@@ -6,7 +6,6 @@ import org.scalatra.auth.ScentrySupport
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.AltitudeServletContext
-import software.altitude.core.RequestContext
 import software.altitude.core.models.User
 
 import javax.servlet.http.HttpServletRequest

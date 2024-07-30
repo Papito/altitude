@@ -2,6 +2,7 @@ package software.altitude.core.controllers
 
 import org.scalatra.ContentEncodingSupport
 import org.scalatra.InternalServerError
+import org.scalatra.MatchedRoute
 import org.scalatra.ScalatraServlet
 import org.scalatra.UrlGeneratorSupport
 import org.scalatra.scalate.ScalateUrlGeneratorSupport
@@ -23,12 +24,27 @@ abstract class BaseController
     with AuthenticationSupport
     with AltitudeServletContext {
 
+  /**
+   * The "before()" block does not have HTTP params set yet, so this is the workaround
+   * for us to set repo context for each request
+   *
+   * https://stackoverflow.com/a/19671423/53687
+   */
+  override def invoke(matchedRoute: MatchedRoute): Option[Any] = {
+    withRouteMultiParams(Some(matchedRoute)){
+      val repoId: Option[String] = params.get("repoId")
+      app.service.repository.setContextFromRequest(repoId)
+      BaseController.super.invoke(matchedRoute)
+    }
+  }
+
   before() {
     val requestId = software.altitude.core.Util.randomStr(size = 6)
     request.setAttribute("request_id", requestId)
     MDC.put("REQUEST_ID", s"[$requestId]")
     request.setAttribute("startTime", currentTimeMillis)
     logRequestStart()
+
   }
 
   after() {
@@ -61,7 +77,9 @@ abstract class BaseController
     request.pathInfo.startsWith("/js") ||
     request.pathInfo.startsWith("/webfonts") ||
     request.pathInfo.startsWith("/images") ||
-    request.pathInfo.startsWith(s"/${Const.DataStore.PREVIEW}")
+    request.pathInfo.contains(s"/${Const.DataStore.PREVIEW}/") ||
+    request.pathInfo.contains(s"/${Const.DataStore.CONTENT}/")
+
 
   error {
     case ex: Exception =>

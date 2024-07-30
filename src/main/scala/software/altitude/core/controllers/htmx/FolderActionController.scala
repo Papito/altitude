@@ -21,7 +21,7 @@ class FolderActionController extends BaseHtmxController{
     requireLogin()
   }
 
-  val showAddFolderModal: Route = get("/modals/add-folder") {
+  val showAddFolderModal: Route = get("/r/:repoId/modals/add-folder") {
     val parentId: String = params.get(C.Api.Folder.PARENT_ID).get
 
     ssp("htmx/add_folder_modal",
@@ -30,7 +30,7 @@ class FolderActionController extends BaseHtmxController{
       C.Api.Folder.PARENT_ID -> parentId)
   }
 
-  val showRenameFolderModal: Route = get("/modals/rename-folder") {
+  val showRenameFolderModal: Route = get("/r/:repoId/modals/rename-folder") {
     val folderId: String = params.get(C.Api.ID).get
 
     val folder: Folder = app.service.folder.getById(folderId)
@@ -42,7 +42,7 @@ class FolderActionController extends BaseHtmxController{
       C.Api.ID -> folderId)
   }
 
-  val showDeleteFolderModal: Route = get("/modals/delete-folder") {
+  val showDeleteFolderModal: Route = get("/r/:repoId/modals/delete-folder") {
     val folderId: String = params.get(C.Api.ID).get
 
     val folder: Folder = app.service.folder.getById(folderId)
@@ -53,15 +53,14 @@ class FolderActionController extends BaseHtmxController{
       C.Api.Folder.FOLDER -> folder)
   }
 
-  val showFolderContextMenu: Route = get("/context-menu") {
+  val showFolderContextMenu: Route = get("/r/:repoId/context-menu") {
     val folderId: String = params.get("folderId").get
 
     ssp("htmx/folder_context_menu",
       "folderId" -> folderId)
   }
 
-  val showFoldersTab: Route = get("/tab") {
-    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
+  val showFoldersTab: Route = get("/r/:repoId/tab") {
     val repo: Repository = RequestContext.getRepository
     val rootFolder: Folder = app.service.folder.getById(repo.rootFolderId)
 
@@ -69,9 +68,7 @@ class FolderActionController extends BaseHtmxController{
       "rootFolder" -> rootFolder)
   }
 
-  val htmxAddFolder: Route = post("/add") {
-    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
-
+  val htmxAddFolder: Route = post("/r/:repoId/add") {
     val dataScrubber = DataScrubber(
       trim = List(C.Api.Folder.NAME),
     )
@@ -132,9 +129,7 @@ class FolderActionController extends BaseHtmxController{
     )
   }
 
-  val htmxRenameFolder: Route = put("/rename") {
-    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
-
+  val htmxRenameFolder: Route = put("/r/:repoId/rename") {
     val dataScrubber = DataScrubber(
       trim = List(C.Api.Folder.NAME),
     )
@@ -146,7 +141,7 @@ class FolderActionController extends BaseHtmxController{
         C.Api.Folder.NAME -> C.Api.Constraints.MAX_FOLDER_NAME_LENGTH,
       ),
       minLengths = Map(
-        C.Api.Folder.NAME -> C.Api.Constraints.MIN_REPOSITORY_NAME_LENGTH,
+        C.Api.Folder.NAME -> C.Api.Constraints.MIN_FOLDER_NAME_LENGTH,
       ),
     )
 
@@ -190,9 +185,7 @@ class FolderActionController extends BaseHtmxController{
     halt(200, newName)
   }
 
-  val htmxFolderChildren: Route = get("/children") {
-    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
-
+  val htmxFolderChildren: Route = get("/r/:repoId/children") {
     val parentId: String = params.get(C.Api.Folder.PARENT_ID).get
     val childFolders: List[Folder] = app.service.folder.immediateChildren(parentId)
 
@@ -200,9 +193,7 @@ class FolderActionController extends BaseHtmxController{
       "folders" -> childFolders)
   }
 
-  val htmxMoveFolder: Route = post("/move") {
-    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
-
+  val htmxMoveFolder: Route = post("/r/:repoId/move") {
     val movedFolderId = request.getParameter(C.Api.Folder.MOVED_FOLDER_ID)
     val newParentId = request.getParameter(C.Api.Folder.NEW_PARENT_ID)
 
@@ -224,9 +215,7 @@ class FolderActionController extends BaseHtmxController{
     halt(200)
   }
 
-  val htmxDeleteFolder: Route = delete("/") {
-    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
-
+  val htmxDeleteFolder: Route = delete("/r/:repoId/") {
     val folderId = params.get(C.Api.ID).get
     app.service.library.deleteFolderById(folderId)
     halt(200)

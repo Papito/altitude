@@ -64,11 +64,11 @@ import software.altitude.test.core.IntegrationTestCore
     (testApp.service.folder.getByIdWithChildAssetCounts(folder2.persistedId, all): Folder).numOfAssets shouldBe 10
 
     // test counts for immediate children
-    val rootChildren = testApp.service.folder.immediateChildren(RequestContext.repository.value.get.rootFolderId, all)
+    val rootChildren = testApp.service.folder.immediateChildren(RequestContext.getRepository.rootFolderId, all)
     rootChildren.head.numOfAssets shouldBe 2
     rootChildren.last.numOfAssets shouldBe 10
 
-    val rootChildren2 = testApp.service.folder.immediateChildren(RequestContext.repository.value.get.rootFolderId)
+    val rootChildren2 = testApp.service.folder.immediateChildren(RequestContext.getRepository.rootFolderId)
     rootChildren2.head.numOfAssets shouldBe 2
     rootChildren2.last.numOfAssets shouldBe 10
 

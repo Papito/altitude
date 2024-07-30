@@ -1,7 +1,6 @@
 package software.altitude.core.controllers.web
 
 import org.scalatra.NotFound
-import software.altitude.core.RequestContext
 import software.altitude.core.controllers.BaseWebController
 import software.altitude.core.models.Preview
 import software.altitude.core.{Const => C}
@@ -14,11 +13,15 @@ class SecuredStaticFileController extends BaseWebController {
   }
 
   notFound {
-    app.service.repository.setContextFromUserActiveRepo(RequestContext.getAccount)
     val pathSegments = request.pathInfo.split("/").toList
+    // the first elements (we are not interested in are "", "r")
+    require(pathSegments.length == 5, "Content path must include repoId, dataType, and assetId")
+    val repoId = pathSegments(2)
+    val dataType = pathSegments(3)
+    val assetId = pathSegments(4)
 
-    if (pathSegments(1) == C.DataStore.PREVIEW) {
-      val assetId = pathSegments.last
+    app.service.repository.setContextFromRequest(Some(repoId))
+    if (dataType == C.DataStore.PREVIEW) {
 
       val preview = app.service.fileStore.getPreviewById(assetId)
       contentType = Preview.MIME_TYPE
@@ -26,9 +29,7 @@ class SecuredStaticFileController extends BaseWebController {
       halt(200)
     }
 
-    if (pathSegments(1) == C.DataStore.FILE) {
-      val assetId = pathSegments.last
-
+    if (dataType == C.DataStore.FILE) {
       val data = app.service.fileStore.getById(assetId)
       contentType = data.mimeType
       response.getOutputStream.write(data.data)

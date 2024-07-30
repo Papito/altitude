@@ -4,7 +4,8 @@ import org.scalatra.ScalatraBase
 import org.scalatra.auth.ScentryStrategy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import software.altitude.core.{AltitudeServletContext, Environment, RequestContext}
+import software.altitude.core.AltitudeServletContext
+import software.altitude.core.Environment
 import software.altitude.core.models.User
 import software.altitude.core.util.Query
 

@@ -1,3 +1,5 @@
+#import(software.altitude.core.RequestContext)
+
 <style>
     nav {
         display: grid;
@@ -70,7 +72,7 @@
         <a href=""><i class="fas fa-database"></i><span>Default</span></a>
     </div>
     <div class="menu import">
-        <a href="/import"><i class="fas fa-download"></i><span>Import</span></a></span>
+        <a href='${ url(importView, "repoId" -> RequestContext.getRepository.persistedId) }'><i class="fas fa-download"></i><span>Import</span></a></span>
     </div>
     <div class="menu">
         <a href=""><i class="fas fa-adjust"></i><span>Settings</span></a>

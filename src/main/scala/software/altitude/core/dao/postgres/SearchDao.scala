@@ -26,7 +26,7 @@ class SearchDao(override val config: Config) extends software.altitude.core.dao.
     }
 
     val sqlVals: List[Any] = List(
-      RequestContext.repository.value.get.persistedId,
+      RequestContext.getRepository.persistedId,
       asset.persistedId,
       metadataValues.mkString(" "),
       "" /* body */)

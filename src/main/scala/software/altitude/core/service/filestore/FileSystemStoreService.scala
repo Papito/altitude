@@ -97,7 +97,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
 
   private def repositoryDataPath: String = {
     val reposDataPath = FilenameUtils.concat(app.dataPath, C.DataStore.REPOSITORIES)
-    val repositoryDir = RequestContext.repository.value.get.persistedId
+    val repositoryDir = RequestContext.getRepository.persistedId
     FilenameUtils.concat(reposDataPath, repositoryDir)
   }
 

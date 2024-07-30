@@ -3,7 +3,9 @@ package software.altitude.test.core.integration
 import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import software.altitude.core.{Altitude, AltitudeServletContext, Util}
+import software.altitude.core.Altitude
+import software.altitude.core.AltitudeServletContext
+import software.altitude.core.Util
 import software.altitude.core.models.AccountType
 import software.altitude.core.models.User
 import software.altitude.test.core.IntegrationTestCore
