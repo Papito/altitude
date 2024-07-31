@@ -11,6 +11,7 @@ import software.altitude.core.AltitudeServletContext
 import software.altitude.core.Const
 import software.altitude.core.RequestContext
 import software.altitude.core.auth.AuthenticationSupport
+import software.altitude.core.util.Util
 
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -39,7 +40,7 @@ abstract class BaseController
   }
 
   before() {
-    val requestId = software.altitude.core.Util.randomStr(size = 6)
+    val requestId = Util.randomStr(size = 6)
     request.setAttribute("request_id", requestId)
     MDC.put("REQUEST_ID", s"[$requestId]")
     request.setAttribute("startTime", currentTimeMillis)

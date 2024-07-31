@@ -9,6 +9,7 @@ import software.altitude.core.NotFoundException
 import software.altitude.core.RequestContext
 import software.altitude.core.ValidationException
 import software.altitude.core.Validators.ApiRequestValidator
+import software.altitude.core.util.Util
 import software.altitude.core.{Const => C}
 
 import java.lang.System.currentTimeMillis
@@ -73,7 +74,7 @@ class BaseApiController extends BaseController {
     case _: NotFoundException =>
       NotFound(Json.obj())
     case ex: Exception =>
-      val strStacktrace = software.altitude.core.Util.logStacktrace(ex)
+      val strStacktrace = Util.logStacktrace(ex)
 
       InternalServerError(Json.obj(
         C.Api.ERROR -> (if (ex.getMessage!= null) ex.getMessage else ex.getClass.getName),

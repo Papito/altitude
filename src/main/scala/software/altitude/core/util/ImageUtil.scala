@@ -113,7 +113,7 @@ object ImageUtil {
 
     } catch {
       case ex: Exception =>
-        software.altitude.core.Util.logStacktrace(ex)
+        Util.logStacktrace(ex)
         throw FormatException(asset)
     }
   }

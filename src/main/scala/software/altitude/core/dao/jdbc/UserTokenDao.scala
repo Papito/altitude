@@ -2,8 +2,8 @@ package software.altitude.core.dao.jdbc
 
 import com.typesafe.config.Config
 import play.api.libs.json.JsObject
-import software.altitude.core.Util
 import software.altitude.core.models.UserToken
+import software.altitude.core.util.Util
 import software.altitude.core.{Const => C}
 
 abstract class UserTokenDao(override val config: Config) extends BaseDao with software.altitude.core.dao.UserTokenDao {

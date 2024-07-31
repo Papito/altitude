@@ -8,7 +8,7 @@ import software.altitude.core.dao.UserTokenDao
 import software.altitude.core.models.User
 import software.altitude.core.models.UserToken
 import software.altitude.core.transactions.TransactionManager
-import software.altitude.core.util.Query
+import software.altitude.core.util.{Query, Util}
 
 import java.time.LocalDateTime
 

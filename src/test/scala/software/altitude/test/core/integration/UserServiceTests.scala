@@ -5,9 +5,9 @@ import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
 import software.altitude.core.AltitudeServletContext
-import software.altitude.core.Util
 import software.altitude.core.models.AccountType
 import software.altitude.core.models.User
+import software.altitude.core.util.Util
 import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class UserServiceTests(override val testApp: Altitude) extends IntegrationTestCore {

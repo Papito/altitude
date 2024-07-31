@@ -1,10 +1,9 @@
-package software.altitude.core
-import org.mindrot.jbcrypt.BCrypt
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+package software.altitude.core.util
 
-import java.io.PrintWriter
-import java.io.StringWriter
+import org.mindrot.jbcrypt.BCrypt
+import org.slf4j.{Logger, LoggerFactory}
+
+import java.io.{PrintWriter, StringWriter}
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 

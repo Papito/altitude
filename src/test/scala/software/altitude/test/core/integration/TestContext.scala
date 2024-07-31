@@ -1,7 +1,6 @@
 package software.altitude.test.core.integration
 
 import software.altitude.core.Altitude
-import software.altitude.core.Util
 import software.altitude.core.models.AccountType
 import software.altitude.core.models.Asset
 import software.altitude.core.models.AssetType
@@ -9,6 +8,7 @@ import software.altitude.core.models.Folder
 import software.altitude.core.models.Metadata
 import software.altitude.core.models.Repository
 import software.altitude.core.models.User
+import software.altitude.core.util.Util
 import software.altitude.core.{Const => C}
 
 class TestContext(val testApp: Altitude) {

@@ -4,8 +4,8 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
-import software.altitude.core.Util
 import software.altitude.core.models.Repository
+import software.altitude.core.util.Util
 import software.altitude.core.{Const => C}
 import software.altitude.test.core.IntegrationTestCore
 

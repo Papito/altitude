@@ -3,7 +3,7 @@ package software.altitude.core.models
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import software.altitude.core.Util
+import software.altitude.core.util.Util
 import software.altitude.core.{Const => C}
 
 import java.time.LocalDateTime
