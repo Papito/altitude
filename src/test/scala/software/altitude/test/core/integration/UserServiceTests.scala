@@ -40,7 +40,7 @@ import software.altitude.test.core.IntegrationTestCore
     user should not be None
   }
 
-  test("Logging in a user create a token in cache", Focused) {
+  test("Logging in a user create a token in cache") {
     val password = "MyPassword123"
 
     val userModel = User(

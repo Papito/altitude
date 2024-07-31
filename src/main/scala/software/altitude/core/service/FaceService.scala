@@ -23,6 +23,7 @@ import software.altitude.core.Altitude
 import software.altitude.core.Environment
 import software.altitude.core.dao.FaceDao
 import software.altitude.core.models.Face
+import software.altitude.core.util.ImageUtil.determineImageScale
 
 import java.io.File
 import java.nio.file.Paths
@@ -58,12 +59,6 @@ object FaceService {
 
   def matFromBytes(data: Array[Byte]): Mat = {
     Imgcodecs.imdecode(new MatOfByte(data: _*), Imgcodecs.IMREAD_ANYCOLOR)
-  }
-
-  private def determineImageScale(sourceWidth: Int, sourceHeight: Int, targetWidth: Int, targetHeight: Int): Double = {
-    val scaleX = targetWidth.toDouble / sourceWidth
-    val scaleY = targetHeight.toDouble / sourceHeight
-    Math.min(scaleX, scaleY)
   }
 
   def writeDebugOpenCvMat(mat: Mat, fileName: String): Unit = {
@@ -198,7 +193,7 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
     val boundingBoxSize = 600
 
     // println("OG Image size: " + image.size())
-    val scaleFactor = FaceService.determineImageScale(image.width(), image.height(), boundingBoxSize, boundingBoxSize) match {
+    val scaleFactor = determineImageScale(image.width(), image.height(), boundingBoxSize, boundingBoxSize) match {
       case scale if scale < 1.0 => scale
       case _ => 1.0
     }

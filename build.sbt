@@ -41,13 +41,10 @@ libraryDependencies ++= Seq(
   "org.postgresql"               % "postgresql"               % "42.7.3",
   "org.xerial"                   % "sqlite-jdbc"              % "3.46.0.0",
 
-  // "org.bytedeco"                 % "javacv"                   % "1.5.10",
-  // "nu.pattern"                   % "opencv"                   % "2.4.9-7",
   "com.drewnoakes"               % "metadata-extractor"       % "2.19.0",
   "org.apache.tika"              % "tika-core"                % "2.9.2",
   "org.apache.tika"              % "tika-parsers" % "2.9.2",
   "org.apache.tika"              % "tika-parser-image-module" % "2.9.2",
-  "org.imgscalr"                 % "imgscalr-lib"             % "4.2",
   "ch.qos.logback"               % "logback-classic"          % "1.5.6" % "runtime",
   "org.slf4j"                    % "slf4j-api"                % "2.0.12" % "runtime",
 
