@@ -46,10 +46,6 @@ class PersonFace(val face: Face, val personLabel: Int) {
     s"FACE ${face.name}. Label: $personLabel. Score: ${face.detectionScore}\n"
 }
 
-/**
- * Note: A "trainable" person is a person with enough faces to train a model,
- * set with minTrainablePersonFaceNum
- */
 class Person(val label: Int) {
   private val faces: mutable.TreeSet[PersonFace] = mutable.TreeSet[PersonFace]()
 
@@ -69,11 +65,6 @@ class Person(val label: Int) {
 
   def allFaces(): List[PersonFace] = {
     faces.toList
-  }
-
-  def merge(person: Person): Unit = {
-    println("Merging " + this.name + " with " + person.name)
-    this.faces.addAll(person.allFaces())
   }
 
   override def toString: String =

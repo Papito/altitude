@@ -82,8 +82,24 @@ object Const {
   object Face extends Common {
     val X1 = "x1"
     val Y1 = "y1"
-    val X2 = "x2"
-    val Y2 = "y2"
+    val WIDTH = "width"
+    val HEIGHT = "height"
+    val ASSET_ID = "asset_id"
+    val PERSON_ID = "person_id"
+    val DETECTION_SCORE = "detection_score"
+    val EMBEDDINGS = "embeddings"
+    val FEATURES = "features"
+    val IMAGE = "image"
+    val ALIGNED_IMAGE = "aligned_image"
+    val ALIGNED_IMAGE_GS = "aligned_image_gs"
+  }
+
+  object Person extends Common {
+    val LABEL = "label"
+    val NAME = "name"
+    val MERGED_WITH_IDS = "merged_with_ids"
+    val NUM_OF_FACES = "num_of_faces"
+    val MERGED_INTO_ID = "merged_into_id"
   }
 
   object Asset extends Common {

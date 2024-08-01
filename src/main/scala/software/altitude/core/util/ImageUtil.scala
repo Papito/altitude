@@ -1,17 +1,24 @@
 package software.altitude.core.util
 
 import com.drew.imaging.ImageMetadataReader
-import com.drew.metadata.exif.{ExifDirectoryBase, ExifIFD0Directory}
-import org.opencv.core.{Mat, MatOfByte, Size}
+import com.drew.metadata.exif.ExifDirectoryBase
+import com.drew.metadata.exif.ExifIFD0Directory
+import org.opencv.core.Mat
+import org.opencv.core.MatOfByte
+import org.opencv.core.Size
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
 import software.altitude.core.FormatException
 import software.altitude.core.models.Asset
 
-import java.awt.{AlphaComposite, Color, Graphics2D}
+import java.awt.AlphaComposite
+import java.awt.Color
+import java.awt.Graphics2D
 import java.awt.geom.AffineTransform
-import java.awt.image.{AffineTransformOp, BufferedImage}
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+import java.awt.image.AffineTransformOp
+import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
 
 object ImageUtil {

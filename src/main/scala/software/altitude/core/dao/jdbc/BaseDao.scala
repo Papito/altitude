@@ -65,8 +65,8 @@ abstract class BaseDao {
     getOneBySql(sqlQuery.sqlAsString, sqlQuery.bindValues)
   }
 
-  def getOneRawRecordBySql(sql: String, values: List[Any] = List()): Map[String, AnyRef] = {
-    val res = getResults(sql, values)
+  def executeAndGetOne(sql: String, values: List[Any] = List()): Map[String, AnyRef] = {
+    val res = executeAndGetMany(sql, values)
 
     if (res.isEmpty) {
       throw NotFoundException(s"Cannot find record with SQL: $sql and values: $values")
@@ -80,7 +80,7 @@ abstract class BaseDao {
   }
 
   def getOneBySql(sql: String, values: List[Any] = List()): JsObject = {
-    val rec = getOneRawRecordBySql(sql, values)
+    val rec = executeAndGetOne(sql, values)
     makeModel(rec)
   }
 
@@ -154,7 +154,7 @@ abstract class BaseDao {
     runner.update(RequestContext.getConn, sql, values.map(_.asInstanceOf[Object]): _*)
   }
 
-  private def getResults(sql: String, values: List[Any]): List[Map[String, AnyRef]] = {
+  private def executeAndGetMany(sql: String, values: List[Any]): List[Map[String, AnyRef]] = {
     BaseDao.incrReadQueryCount()
 
     val res = queryRunner.query(
@@ -166,7 +166,7 @@ abstract class BaseDao {
   }
 
   protected def manyBySqlQuery(sql: String, values: List[Any] = List()): List[Map[String, AnyRef]] = {
-    getResults(sql, values)
+    executeAndGetMany(sql, values)
   }
 
   def getByIds(ids: Set[String]): List[JsObject] = {

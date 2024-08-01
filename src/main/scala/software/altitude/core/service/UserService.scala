@@ -8,7 +8,8 @@ import software.altitude.core.dao.UserTokenDao
 import software.altitude.core.models.User
 import software.altitude.core.models.UserToken
 import software.altitude.core.transactions.TransactionManager
-import software.altitude.core.util.{Query, Util}
+import software.altitude.core.util.Query
+import software.altitude.core.util.Util
 
 import java.time.LocalDateTime
 
@@ -66,7 +67,7 @@ class UserService(val app: Altitude) extends BaseService[User] {
 
     /* Since the user model does not explicitly store the hashed password,
        we need to do a low-level query to get the password hash */
-    val userRec: Map[String, AnyRef] = dao.getOneRawRecordBySql(sqlQuery.sqlAsString, sqlQuery.bindValues)
+    val userRec: Map[String, AnyRef] = dao.executeAndGetOne(sqlQuery.sqlAsString, sqlQuery.bindValues)
 
     val passwordHash = userRec(Const.User.PASSWORD_HASH).asInstanceOf[String]
 

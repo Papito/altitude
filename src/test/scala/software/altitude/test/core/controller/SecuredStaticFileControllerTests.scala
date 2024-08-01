@@ -22,7 +22,7 @@ import software.altitude.test.core.ControllerTestCore
     }
   }
 */
-  test("Get preview file", Focused) {
+  test("Get preview file") {
     testContext.persistRepository() // and user
     val repoId = testContext.repository.persistedId
 

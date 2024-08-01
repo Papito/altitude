@@ -63,11 +63,51 @@ CREATE TABLE asset  (
   is_recycled TINYINT NOT NULL DEFAULT 0,
   is_triaged TINYINT NOT NULL DEFAULT 0,
   created_at DATETIME DEFAULT (datetime('now', 'utc')),
-  updated_at DATETIME DEFAULT NULL,
-  FOREIGN KEY(repository_id) REFERENCES repository(id) ON DELETE CASCADE,
-  FOREIGN KEY(user_id) REFERENCES account(id) ON DELETE CASCADE
+  updated_at DATETIME DEFAULT NULL
 );
 CREATE UNIQUE INDEX asset_01 ON asset(repository_id, checksum, is_recycled);
+
+CREATE TABLE person_label (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  created_at DATETIME DEFAULT (datetime('now', 'utc'))
+);
+
+CREATE TABLE person (
+  id CHAR(36) PRIMARY KEY,
+  repository_id CHAR(36) NOT NULL,
+  -- this is taken from the person_label table, where its primary key is a sequence
+  label INT NOT NULL,
+  name TEXT NOT NULL,
+  merged_with_ids TEXT DEFAULT NULL,
+  num_of_faces INT NOT NULL DEFAULT 0,
+  merged_into_id CHAR(36) DEFAULT NULL,
+  created_at DATETIME DEFAULT (datetime('now', 'utc')),
+  updated_at DATETIME DEFAULT NULL,
+  FOREIGN KEY(merged_into_id) REFERENCES person(id) ON DELETE CASCADE
+);
+CREATE UNIQUE INDEX person_01 ON person(name);
+
+CREATE TABLE face (
+  id CHAR(36) PRIMARY KEY,
+  asset_id CHAR(36) NOT NULL,
+  x INT NOT NULL,
+  y INT NOT NULL,
+  repository_id CHAR(36) NOT NULL,
+  person_id CHAR(36) NOT NULL,
+  width INT NOT NULL,
+  height INT NOT NULL,
+  detection_score FLOAT NOT NULL,
+  embeddings TEXT NOT NULL,
+  features TEXT NOT NULL,
+  created_at DATETIME DEFAULT (datetime('now', 'utc')),
+  updated_at DATETIME DEFAULT NULL,
+  image BLOB NOT NULL,
+  aligned_image_face BLOB NOT NULL,
+  aligned_image_face_gs BLOB NOT NULL,
+  FOREIGN KEY(person_id) REFERENCES person(id) ON DELETE CASCADE,
+  FOREIGN KEY(asset_id) REFERENCES asset(id) ON DELETE CASCADE
+);
+CREATE UNIQUE INDEX face_01 ON face(person_id, asset_id);
 
 CREATE TABLE metadata_field (
   id CHAR(36) PRIMARY KEY,

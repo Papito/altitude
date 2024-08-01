@@ -10,20 +10,20 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
   override final val tableName = "face"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
-    val model = Face(
-      id = Some(rec(C.Base.ID).asInstanceOf[String]),
-      x1 = rec(C.Face.X1).asInstanceOf[Int],
-      y1 = rec(C.Face.Y1).asInstanceOf[Int],
-      x2 = rec(C.Face.X2).asInstanceOf[Int],
-      y2 = rec(C.Face.Y2).asInstanceOf[Int]
-    )
+//    val model = Face(
+//      id = Some(rec(C.Base.ID).asInstanceOf[String]),
+//      x1 = rec(C.Face.X1).asInstanceOf[Int],
+//      y1 = rec(C.Face.Y1).asInstanceOf[Int],
+//      width = rec(C.Face.WIDTH).asInstanceOf[Int],
+//      height = rec(C.Face.HEIGHT).asInstanceOf[Int]
+//    )
 
-    addCoreAttrs(model, rec)
+    Json.obj()
   }
 
   override def add(jsonIn: JsObject): JsObject = {
     val sql = s"""
-        INSERT INTO $tableName (${C.Face.ID}, ${C.Face.X1}, ${C.Face.Y1}, ${C.Face.X2}, ${C.Face.Y2})
+        INSERT INTO $tableName (${C.Face.ID}, ${C.Face.X1}, ${C.Face.Y1}, ${C.Face.WIDTH}, ${C.Face.HEIGHT})
              VALUES (?, ?, ?, ?, ?)
     """
 
@@ -35,8 +35,8 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
       id,
       face.x1,
       face.y1,
-      face.x2,
-      face.y2
+      face.width,
+      face.height
     )
 
     addRecord(jsonIn, sql, sqlVals)

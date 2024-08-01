@@ -1,6 +1,6 @@
 package software.altitude.core.service
 
-import org.opencv.core.{Mat, MatOfByte, Size}
+import org.opencv.core.Mat
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
@@ -12,7 +12,10 @@ import software.altitude.core.models._
 import software.altitude.core.service.FaceService.matFromBytes
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.ImageUtil.makeImageThumbnail
-import software.altitude.core.util.{Query, QueryResult, SearchQuery, SearchResult}
+import software.altitude.core.util.Query
+import software.altitude.core.util.QueryResult
+import software.altitude.core.util.SearchQuery
+import software.altitude.core.util.SearchResult
 import software.altitude.core.{Const => C, _}
 
 /**

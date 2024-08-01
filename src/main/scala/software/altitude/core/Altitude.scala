@@ -222,6 +222,12 @@ class Altitude(val dbEngineOverride: Option[String] = None)  {
       case _ => throw new IllegalArgumentException(s"Unknown datasource [$dataSourceType]")
     }
 
+    val person: PersonDao = dataSourceType match {
+      case C.DbEngineName.POSTGRES => new jdbc.PersonDao(app.config) with dao.postgres.PostgresOverrides
+      case C.DbEngineName.SQLITE => new jdbc.PersonDao(app.config) with dao.sqlite.SqliteOverrides
+      case _ => throw new IllegalArgumentException(s"Unknown datasource [$dataSourceType]")
+    }
+
     val face: FaceDao = dataSourceType match {
       case C.DbEngineName.POSTGRES => new jdbc.FaceDao(app.config) with dao.postgres.PostgresOverrides
       case C.DbEngineName.SQLITE => new jdbc.FaceDao(app.config) with dao.sqlite.SqliteOverrides
@@ -252,6 +258,7 @@ class Altitude(val dbEngineOverride: Option[String] = None)  {
     val asset = new AssetService(app)
     val folder = new FolderService(app)
     val stats = new StatsService(app)
+    val person = new PersonService(app)
     val face = new FaceService(app)
 
     val fileStore: FileStoreService = fileStoreType match {

@@ -9,7 +9,8 @@ import software.altitude.core.IllegalOperationException
 import software.altitude.core.NotFoundException
 import software.altitude.core.RequestContext
 import software.altitude.core.models._
-import software.altitude.core.util.{Query, Util}
+import software.altitude.core.util.Query
+import software.altitude.core.util.Util
 import software.altitude.core.{Const => C}
 import software.altitude.test.core.IntegrationTestCore
 

@@ -8,9 +8,10 @@ import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models.Repository
-import software.altitude.core.util.{Query, Util}
+import software.altitude.core.util.Query
 import software.altitude.core.util.Sort
 import software.altitude.core.util.SortDirection
+import software.altitude.core.util.Util
 import software.altitude.test.core.TestFocus
 
 @DoNotDiscover class SqlQueryTests extends funsuite.AnyFunSuite with TestFocus {
