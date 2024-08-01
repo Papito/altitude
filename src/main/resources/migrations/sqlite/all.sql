@@ -63,13 +63,13 @@ CREATE TABLE asset  (
   is_recycled TINYINT NOT NULL DEFAULT 0,
   is_triaged TINYINT NOT NULL DEFAULT 0,
   created_at DATETIME DEFAULT (datetime('now', 'utc')),
-  updated_at DATETIME DEFAULT NULL
+  updated_at DATETIME DEFAULT NULL,
+  FOREIGN KEY(repository_id) REFERENCES repository(id) ON DELETE CASCADE
 );
 CREATE UNIQUE INDEX asset_01 ON asset(repository_id, checksum, is_recycled);
 
 CREATE TABLE person_label (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  created_at DATETIME DEFAULT (datetime('now', 'utc'))
+  id INTEGER PRIMARY KEY AUTOINCREMENT
 );
 
 CREATE TABLE person (
@@ -78,12 +78,14 @@ CREATE TABLE person (
   -- this is taken from the person_label table, where its primary key is a sequence
   label INT NOT NULL,
   name TEXT NOT NULL,
-  merged_with_ids TEXT DEFAULT NULL,
+  merged_with_ids TEXT NOT NULL DEFAULT '{}',
   num_of_faces INT NOT NULL DEFAULT 0,
   merged_into_id CHAR(36) DEFAULT NULL,
+  is_hidden TINYINT NOT NULL DEFAULT 0,
   created_at DATETIME DEFAULT (datetime('now', 'utc')),
   updated_at DATETIME DEFAULT NULL,
-  FOREIGN KEY(merged_into_id) REFERENCES person(id) ON DELETE CASCADE
+  FOREIGN KEY(merged_into_id) REFERENCES person(id) ON DELETE CASCADE,
+  FOREIGN KEY(repository_id) REFERENCES repository(id) ON DELETE CASCADE
 );
 CREATE UNIQUE INDEX person_01 ON person(name);
 
@@ -105,7 +107,8 @@ CREATE TABLE face (
   aligned_image_face BLOB NOT NULL,
   aligned_image_face_gs BLOB NOT NULL,
   FOREIGN KEY(person_id) REFERENCES person(id) ON DELETE CASCADE,
-  FOREIGN KEY(asset_id) REFERENCES asset(id) ON DELETE CASCADE
+  FOREIGN KEY(asset_id) REFERENCES asset(id) ON DELETE CASCADE,
+  FOREIGN KEY(repository_id) REFERENCES repository(id) ON DELETE CASCADE
 );
 CREATE UNIQUE INDEX face_01 ON face(person_id, asset_id);
 

@@ -223,8 +223,8 @@ class Altitude(val dbEngineOverride: Option[String] = None)  {
     }
 
     val person: PersonDao = dataSourceType match {
-      case C.DbEngineName.POSTGRES => new jdbc.PersonDao(app.config) with dao.postgres.PostgresOverrides
-      case C.DbEngineName.SQLITE => new jdbc.PersonDao(app.config) with dao.sqlite.SqliteOverrides
+      case C.DbEngineName.POSTGRES => new postgres.PersonDao(app.config)
+      case C.DbEngineName.SQLITE => new sqlite.PersonDao(app.config)
       case _ => throw new IllegalArgumentException(s"Unknown datasource [$dataSourceType]")
     }
 

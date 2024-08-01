@@ -1,25 +1,31 @@
-package software.altitude.core.dao.jdbc
+package software.altitude.core.dao.postgres
 
 import com.typesafe.config.Config
-import play.api.libs.json.JsObject
-import play.api.libs.json.Json
+import org.postgresql.jdbc.PgArray
+import play.api.libs.json.{JsObject, Json}
+import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.Person
 import software.altitude.core.{RequestContext, Const => C}
 
-abstract class PersonDao(override val config: Config) extends BaseDao with software.altitude.core.dao.PersonDao {
+class PersonDao(override val config: Config)
+  extends BaseDao
+    with software.altitude.core.dao.PersonDao
+    with PostgresOverrides {
+
   override final val tableName = "person"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
-    val mergedWithIdsJson = rec(C.Person.MERGED_WITH_IDS).asInstanceOf[String]
+    val mergedWithIds = rec(C.Person.MERGED_WITH_IDS).asInstanceOf[PgArray].getArray.asInstanceOf[Array[String]]
     println("!!!")
-    println(mergedWithIdsJson)
+    println(mergedWithIds.mkString("Array(", ", ", ")"))
     val model = Person(
       id = Some(rec(C.Base.ID).asInstanceOf[String]),
-      label = rec(C.Person.LABEL).asInstanceOf[Int],
+      label = rec(C.Person.LABEL).asInstanceOf[Long],
       name = rec(C.Person.NAME).asInstanceOf[String],
       mergedWithIds = List(),
       mergedIntoId = Some(rec(C.Person.MERGED_INTO_ID).asInstanceOf[String]),
-      numOfFaces = rec(C.Person.NUM_OF_FACES).asInstanceOf[Int]
+      numOfFaces = rec(C.Person.NUM_OF_FACES).asInstanceOf[Int],
+      isHidden = getBooleanField(rec(C.Person.IS_HIDDEN))
     )
 
     addCoreAttrs(model, rec)
@@ -29,11 +35,12 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
     /**
      * Get the next person label using the person_label sequence table
      */
-    val labelSql = "INSERT INTO person_label DEFAULT VALUES RETURNING id"
+    val labelSql = "SELECT nextval('person_label')"
     val labelRes = executeAndGetOne(labelSql, List())
-    val label = labelRes("id").asInstanceOf[Int]
+    val label = labelRes("nextval").asInstanceOf[Long]
 
-    val sql = s"""
+    val sql =
+      s"""
         INSERT INTO $tableName (${C.Person.ID}, ${C.Asset.REPO_ID}, ${C.Person.LABEL}, ${C.Person.NAME})
               VALUES (?, ?, ?, ?)
     """

@@ -66,6 +66,41 @@ CREATE TABLE asset (
 ) INHERITS (_core);
 CREATE UNIQUE INDEX asset_01 ON asset(repository_id, checksum, is_recycled);
 
+CREATE SEQUENCE person_label;
+
+CREATE TABLE person (
+  id CHAR(36) PRIMARY KEY,
+  repository_id CHAR(36) REFERENCES repository(id) ON DELETE CASCADE,
+  -- this is taken from the person_label table, where its primary key is a sequence
+  label BIGINT NOT NULL,
+  name TEXT NOT NULL,
+  merged_with_ids TEXT[] DEFAULT ARRAY[]::TEXT[],
+  num_of_faces INT NOT NULL DEFAULT 0,
+  merged_into_id CHAR(36) DEFAULT NULL REFERENCES person(id) ON DELETE CASCADE,
+  is_hidden BOOLEAN NOT NULL DEFAULT FALSE
+) INHERITS (_core);
+
+CREATE UNIQUE INDEX person_01 ON person(name);
+
+CREATE TABLE face (
+  id CHAR(36) PRIMARY KEY,
+  repository_id CHAR(36) REFERENCES repository(id) ON DELETE CASCADE,
+  asset_id CHAR(36) REFERENCES asset(id) ON DELETE CASCADE,
+  person_id CHAR(36) REFERENCES person(id) ON DELETE CASCADE,
+  x INT NOT NULL,
+  y INT NOT NULL,
+  width INT NOT NULL,
+  height INT NOT NULL,
+  detection_score FLOAT NOT NULL,
+  embeddings TEXT NOT NULL,
+  features TEXT NOT NULL,
+  image bytea NOT NULL,
+  aligned_image_face bytea NOT NULL,
+  aligned_image_face_gs bytea NOT NULL
+) INHERITS (_core);
+CREATE UNIQUE INDEX face_01 ON face(person_id, asset_id);
+
+
 CREATE TABLE metadata_field (
   id CHAR(36) PRIMARY KEY,
   repository_id CHAR(36) REFERENCES repository(id) ON DELETE CASCADE,

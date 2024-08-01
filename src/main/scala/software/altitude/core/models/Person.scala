@@ -11,10 +11,11 @@ object Person {
     Person(
       id = (json \ C.Base.ID).asOpt[String],
       name = (json \ C.Person.NAME).as[String],
-      label = (json \ C.Person.LABEL).as[Int],
+      label = (json \ C.Person.LABEL).as[Long],
       mergedWithIds = (json \ C.Person.MERGED_WITH_IDS).as[Seq[String]],
       numOfFaces = (json \ C.Person.NUM_OF_FACES).as[Int],
-      mergedIntoId = (json \ C.Person.MERGED_INTO_ID).asOpt[String]
+      mergedIntoId = (json \ C.Person.MERGED_INTO_ID).asOpt[String],
+      isHidden = (json \ C.Person.IS_HIDDEN).as[Boolean]
     ).withCoreAttr(json)
   }
 }
@@ -22,9 +23,10 @@ object Person {
 case class Person(id: Option[String] = None,
                   name: String,
                   mergedWithIds: Seq[String] = List(),
-                  label: Int = -1,
+                  label: Long = -1,
                   numOfFaces: Int = 0,
-                  mergedIntoId: Option[String] = None) extends BaseModel {
+                  mergedIntoId: Option[String] = None,
+                  isHidden: Boolean = false) extends BaseModel {
 
   override def toJson: JsObject = {
     Json.obj(
@@ -33,7 +35,7 @@ case class Person(id: Option[String] = None,
       C.Person.NUM_OF_FACES -> numOfFaces,
       C.Person.MERGED_WITH_IDS -> mergedWithIds,
       C.Person.MERGED_INTO_ID -> numOfFaces,
-
+      C.Person.IS_HIDDEN -> isHidden,
     ) ++ coreJsonAttrs
   }
 

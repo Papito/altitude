@@ -11,16 +11,19 @@ import software.altitude.test.core.IntegrationTestCore
 
   test("Can add and retrieve a person", Focused) {
     val person = Person(
-      name = "Holden McGroin 1",
+      name = "Holden McGroin",
     )
     val savedPerson1: Person = testApp.service.person.add(person)
+    val retrievedPerson1: Person = testApp.service.person.getById(savedPerson1.persistedId)
+    retrievedPerson1.isHidden should be(false)
+    retrievedPerson1.name should be(person.name)
 
     val person2 = Person(
-      name = "Holden McGroin 2",
+      name = "Justin Case",
     )
     val savedPerson2: Person = testApp.service.person.add(person2)
 
-    savedPerson1.label should be(1)
-    savedPerson2.label should be(2)
+    savedPerson2.label - savedPerson1.label should be(1)
+
   }
 }
