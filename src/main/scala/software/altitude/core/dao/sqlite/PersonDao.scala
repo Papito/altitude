@@ -14,15 +14,18 @@ class PersonDao(override val config: Config)
   override final val tableName = "person"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
-    val mergedWithIdsJson = rec(C.Person.MERGED_WITH_IDS).asInstanceOf[String]
-    println("!!!")
-    println(mergedWithIdsJson)
+    val newMergedWithIdsList = if (rec(C.Person.MERGED_WITH_IDS) != null) {
+      val newMergedWithIdsJson = rec(C.Person.MERGED_WITH_IDS).asInstanceOf[String]
+      getListFromJsonStr(newMergedWithIdsJson, C.Person.MERGED_WITH_IDS)
+    } else {
+      List()
+    }
 
     val model = Person(
       id = Some(rec(C.Base.ID).asInstanceOf[String]),
       label = rec(C.Person.LABEL).asInstanceOf[Int],
-      name = rec(C.Person.NAME).asInstanceOf[String],
-      mergedWithIds = List(),
+      name = Some(rec(C.Person.NAME).asInstanceOf[String]),
+      mergedWithIds = newMergedWithIdsList,
       mergedIntoId = Some(rec(C.Person.MERGED_INTO_ID).asInstanceOf[String]),
       numOfFaces = rec(C.Person.NUM_OF_FACES).asInstanceOf[Int],
       isHidden = getBooleanField(rec(C.Person.IS_HIDDEN))
@@ -44,19 +47,51 @@ class PersonDao(override val config: Config)
     """
 
     val person: Person = jsonIn: Person
+    // WARNING: name logic is duplicated for DAOs
+    val personName = person.name.getOrElse(s"${Person.UNKNOWN_NAME_PREFIX} $label")
     val id = BaseDao.genId
 
     val sqlVals: List[Any] = List(
       id,
       RequestContext.getRepository.persistedId,
       label,
-      person.name,
+      personName
     )
 
     addRecord(jsonIn, sql, sqlVals)
 
     jsonIn ++ Json.obj(
       C.Base.ID -> id,
-      C.Person.LABEL -> label)
+      C.Person.LABEL -> label,
+      C.Person.NAME -> Some(personName))
+  }
+
+  /**
+   * For SQLITE, we keep this list as a JSON array as the DB does not natively support array types
+   */
+  override def updateMergedWithIds(person: Person, newId: String): Person = {
+    val sql =
+      s"""
+            UPDATE $tableName
+               SET ${C.Person.MERGED_WITH_IDS} = ?
+             WHERE ${C.Base.ID} = ?
+         RETURNING ${C.Person.MERGED_WITH_IDS}
+      """
+
+    val updatedIdList = person.mergedWithIds :+ newId
+
+    val mergedWithIdsJson = Json.obj(
+      C.Person.MERGED_WITH_IDS -> Json.toJson(updatedIdList),
+    )
+
+    val sqlVals: List[Any] = List(
+      mergedWithIdsJson.toString(),
+      person.persistedId
+    )
+
+    val res = executeAndGetOne(sql, sqlVals)
+    val newMergedWithIdsJson = res(C.Person.MERGED_WITH_IDS).asInstanceOf[String]
+    val newMergedWithIdsList = getListFromJsonStr(newMergedWithIdsJson, C.Person.MERGED_WITH_IDS)
+    person.copy(mergedWithIds= newMergedWithIdsList)
   }
 }

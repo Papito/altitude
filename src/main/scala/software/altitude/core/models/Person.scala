@@ -6,23 +6,25 @@ import software.altitude.core.{Const => C}
 import scala.language.implicitConversions
 
 object Person {
+  val UNKNOWN_NAME_PREFIX = "Unknown"
+
   implicit def fromJson(json: JsValue): Person = {
 
     Person(
       id = (json \ C.Base.ID).asOpt[String],
-      name = (json \ C.Person.NAME).as[String],
+      name = (json \ C.Person.NAME).asOpt[String],
       label = (json \ C.Person.LABEL).as[Long],
-      mergedWithIds = (json \ C.Person.MERGED_WITH_IDS).as[Seq[String]],
-      numOfFaces = (json \ C.Person.NUM_OF_FACES).as[Int],
+      mergedWithIds = (json \ C.Person.MERGED_WITH_IDS).as[List[String]],
       mergedIntoId = (json \ C.Person.MERGED_INTO_ID).asOpt[String],
+      numOfFaces = (json \ C.Person.NUM_OF_FACES).as[Int],
       isHidden = (json \ C.Person.IS_HIDDEN).as[Boolean]
     ).withCoreAttr(json)
   }
 }
 
 case class Person(id: Option[String] = None,
-                  name: String,
-                  mergedWithIds: Seq[String] = List(),
+                  name: Option[String] = None,
+                  mergedWithIds: List[String] = List(),
                   label: Long = -1,
                   numOfFaces: Int = 0,
                   mergedIntoId: Option[String] = None,
@@ -34,7 +36,7 @@ case class Person(id: Option[String] = None,
       C.Person.NAME -> name,
       C.Person.NUM_OF_FACES -> numOfFaces,
       C.Person.MERGED_WITH_IDS -> mergedWithIds,
-      C.Person.MERGED_INTO_ID -> numOfFaces,
+      C.Person.MERGED_INTO_ID -> mergedIntoId,
       C.Person.IS_HIDDEN -> isHidden,
     ) ++ coreJsonAttrs
   }

@@ -234,6 +234,11 @@ abstract class BaseDao {
     numUpdated
   }
 
+  def getListFromJsonStr(jsonStr: String, key: String): List[String] = {
+    val json = Json.parse(jsonStr)
+    (json \ key).as[List[String]]
+  }
+
   def increment(id: String, field: String, count: Int = 1): Unit = {
     BaseDao.incrWriteQueryCount()
 

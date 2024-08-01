@@ -7,6 +7,8 @@ import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.Person
 import software.altitude.core.{RequestContext, Const => C}
 
+import java.sql.PreparedStatement
+
 class PersonDao(override val config: Config)
   extends BaseDao
     with software.altitude.core.dao.PersonDao
@@ -15,14 +17,19 @@ class PersonDao(override val config: Config)
   override final val tableName = "person"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
-    val mergedWithIds = rec(C.Person.MERGED_WITH_IDS).asInstanceOf[PgArray].getArray.asInstanceOf[Array[String]]
-    println("!!!")
-    println(mergedWithIds.mkString("Array(", ", ", ")"))
+    val mergedWithIdsRecVal = rec(C.Person.MERGED_WITH_IDS)
+
+    val mergedWIthIdsList = if (mergedWithIdsRecVal != null) {
+      rec(C.Person.MERGED_WITH_IDS).asInstanceOf[PgArray].getArray.asInstanceOf[Array[String]].toList
+    } else {
+        List()
+    }
+
     val model = Person(
       id = Some(rec(C.Base.ID).asInstanceOf[String]),
       label = rec(C.Person.LABEL).asInstanceOf[Long],
-      name = rec(C.Person.NAME).asInstanceOf[String],
-      mergedWithIds = List(),
+      name = Some(rec(C.Person.NAME).asInstanceOf[String]),
+      mergedWithIds = mergedWIthIdsList,
       mergedIntoId = Some(rec(C.Person.MERGED_INTO_ID).asInstanceOf[String]),
       numOfFaces = rec(C.Person.NUM_OF_FACES).asInstanceOf[Int],
       isHidden = getBooleanField(rec(C.Person.IS_HIDDEN))
@@ -46,19 +53,42 @@ class PersonDao(override val config: Config)
     """
 
     val person: Person = jsonIn: Person
+    // WARNING: name logic is duplicated for DAOs
+    val personName = person.name.getOrElse(s"${Person.UNKNOWN_NAME_PREFIX} $label")
     val id = BaseDao.genId
 
     val sqlVals: List[Any] = List(
       id,
       RequestContext.getRepository.persistedId,
       label,
-      person.name,
+      personName,
     )
 
     addRecord(jsonIn, sql, sqlVals)
 
     jsonIn ++ Json.obj(
       C.Base.ID -> id,
-      C.Person.LABEL -> label)
+      C.Person.LABEL -> label,
+      C.Person.NAME -> Some(personName))
+  }
+
+  override def updateMergedWithIds(person: Person, newId: String): Person = {
+    val updatedIdList = person.mergedWithIds :+ newId
+
+    val sql =
+      s"""
+        UPDATE $tableName
+           SET ${C.Person.MERGED_WITH_IDS} = ?
+         WHERE ${C.Base.ID} = ?
+      """
+    val conn = RequestContext.getConn
+
+    val updatedIdListAsSqlArray = conn.createArrayOf("text", updatedIdList.toArray)
+    val preparedStatement: PreparedStatement = conn.prepareStatement(sql)
+    preparedStatement.setObject(1, updatedIdListAsSqlArray)
+    preparedStatement.setString(2, person.persistedId)
+    preparedStatement.execute()
+
+    person.copy(mergedWithIds = updatedIdList)
   }
 }

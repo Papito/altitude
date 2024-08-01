@@ -78,7 +78,7 @@ CREATE TABLE person (
   -- this is taken from the person_label table, where its primary key is a sequence
   label INT NOT NULL,
   name TEXT NOT NULL,
-  merged_with_ids TEXT NOT NULL DEFAULT '{}',
+  merged_with_ids TEXT,
   num_of_faces INT NOT NULL DEFAULT 0,
   merged_into_id CHAR(36) DEFAULT NULL,
   is_hidden TINYINT NOT NULL DEFAULT 0,
