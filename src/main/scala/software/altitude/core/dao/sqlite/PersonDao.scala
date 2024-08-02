@@ -16,6 +16,7 @@ class PersonDao(override val config: Config)
   override final val tableName = "person"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
+    // get a list persons this record has been merged with
     val newMergedWithIdsList = if (rec(C.Person.MERGED_WITH_IDS) != null) {
       val newMergedWithIdsJson = rec(C.Person.MERGED_WITH_IDS).asInstanceOf[String]
       getStringListFromJsonStr(newMergedWithIdsJson, C.Person.MERGED_WITH_IDS)
@@ -27,6 +28,7 @@ class PersonDao(override val config: Config)
       id = Some(rec(C.Base.ID).asInstanceOf[String]),
       label = rec(C.Person.LABEL).asInstanceOf[Int],
       name = Some(rec(C.Person.NAME).asInstanceOf[String]),
+      coverFaceId = Some(rec(C.Person.COVER_FACE_ID).asInstanceOf[String]),
       mergedWithIds = newMergedWithIdsList,
       mergedIntoId = Some(rec(C.Person.MERGED_INTO_ID).asInstanceOf[String]),
       numOfFaces = rec(C.Person.NUM_OF_FACES).asInstanceOf[Int],

@@ -13,6 +13,7 @@ object Person {
     Person(
       id = (json \ C.Base.ID).asOpt[String],
       name = (json \ C.Person.NAME).asOpt[String],
+      coverFaceId = (json \ C.Person.COVER_FACE_ID).asOpt[String],
       label = (json \ C.Person.LABEL).as[Long],
       mergedWithIds = (json \ C.Person.MERGED_WITH_IDS).as[List[String]],
       mergedIntoId = (json \ C.Person.MERGED_INTO_ID).asOpt[String],
@@ -24,6 +25,7 @@ object Person {
 
 case class Person(id: Option[String] = None,
                   name: Option[String] = None,
+                  coverFaceId: Option[String] = None,
                   mergedWithIds: List[String] = List(),
                   label: Long = -1,
                   numOfFaces: Int = 0,
@@ -34,6 +36,7 @@ case class Person(id: Option[String] = None,
     Json.obj(
       C.Person.LABEL -> label,
       C.Person.NAME -> name,
+      C.Person.COVER_FACE_ID -> coverFaceId,
       C.Person.NUM_OF_FACES -> numOfFaces,
       C.Person.MERGED_WITH_IDS -> mergedWithIds,
       C.Person.MERGED_INTO_ID -> mergedIntoId,

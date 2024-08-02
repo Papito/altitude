@@ -78,6 +78,7 @@ CREATE TABLE person (
   -- this is taken from the person_label table, where its primary key is a sequence
   label INT NOT NULL,
   name TEXT NOT NULL,
+  cover_face_id CHAR(36),
   merged_with_ids TEXT,
   num_of_faces INT NOT NULL DEFAULT 0,
   merged_into_id CHAR(36) DEFAULT NULL,
@@ -88,6 +89,7 @@ CREATE TABLE person (
   FOREIGN KEY(repository_id) REFERENCES repository(id) ON DELETE CASCADE
 );
 CREATE UNIQUE INDEX person_01 ON person(name);
+CREATE UNIQUE INDEX person_02 ON person(cover_face_id);
 
 CREATE TABLE face (
   id CHAR(36) PRIMARY KEY,

@@ -66,6 +66,7 @@ CREATE TABLE asset (
 ) INHERITS (_core);
 CREATE UNIQUE INDEX asset_01 ON asset(repository_id, checksum, is_recycled);
 
+
 CREATE SEQUENCE person_label;
 
 CREATE TABLE person (
@@ -74,13 +75,15 @@ CREATE TABLE person (
   -- this is taken from the person_label table, where its primary key is a sequence
   label BIGINT NOT NULL,
   name TEXT NOT NULL,
+  cover_face_id CHAR(36),
   merged_with_ids TEXT[] DEFAULT ARRAY[]::TEXT[],
   num_of_faces INT NOT NULL DEFAULT 0,
   merged_into_id CHAR(36) DEFAULT NULL REFERENCES person(id) ON DELETE CASCADE,
   is_hidden BOOLEAN NOT NULL DEFAULT FALSE
 ) INHERITS (_core);
-
 CREATE UNIQUE INDEX person_01 ON person(name);
+CREATE UNIQUE INDEX person_02 ON person(cover_face_id);
+
 
 CREATE TABLE face (
   id CHAR(36) PRIMARY KEY,

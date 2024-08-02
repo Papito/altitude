@@ -12,7 +12,7 @@ import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class FaceServiceTests(override val testApp: Altitude) extends IntegrationTestCore {
 
-  test("Can save and retrieve a face object", Focused) {
+  test("Can save and retrieve a face object") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/movies-speed.png")
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
 
@@ -35,5 +35,9 @@ import software.altitude.test.core.IntegrationTestCore
       retrievedFace.aligned_image.length shouldBe savedFace.aligned_image.length
       retrievedFace.aligned_image_gs.length shouldBe savedFace.aligned_image_gs.length
     })
+  }
+
+  test("First face is added to a person", Focused) {
+
   }
 }
