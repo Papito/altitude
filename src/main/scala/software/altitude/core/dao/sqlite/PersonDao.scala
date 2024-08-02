@@ -18,7 +18,7 @@ class PersonDao(override val config: Config)
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val newMergedWithIdsList = if (rec(C.Person.MERGED_WITH_IDS) != null) {
       val newMergedWithIdsJson = rec(C.Person.MERGED_WITH_IDS).asInstanceOf[String]
-      getListFromJsonStr(newMergedWithIdsJson, C.Person.MERGED_WITH_IDS)
+      getStringListFromJsonStr(newMergedWithIdsJson, C.Person.MERGED_WITH_IDS)
     } else {
       List()
     }
@@ -93,7 +93,7 @@ class PersonDao(override val config: Config)
 
     val res = executeAndGetOne(sql, sqlVals)
     val newMergedWithIdsJson = res(C.Person.MERGED_WITH_IDS).asInstanceOf[String]
-    val newMergedWithIdsList = getListFromJsonStr(newMergedWithIdsJson, C.Person.MERGED_WITH_IDS)
-    person.copy(mergedWithIds= newMergedWithIdsList)
+    val newMergedWithIdsList = getStringListFromJsonStr(newMergedWithIdsJson, C.Person.MERGED_WITH_IDS)
+    person.copy(mergedWithIds = newMergedWithIdsList)
   }
 }

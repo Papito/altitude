@@ -1,16 +1,22 @@
-package software.altitude.core.dao.jdbc
+package software.altitude.core.dao.postgres
 
 import com.typesafe.config.Config
 import org.postgresql.jdbc.PgArray
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
 import software.altitude.core.RequestContext
-import software.altitude.core.models.{Asset, Face, Person}
+import software.altitude.core.dao.jdbc.BaseDao
+import software.altitude.core.models.Asset
+import software.altitude.core.models.Face
+import software.altitude.core.models.Person
 import software.altitude.core.{Const => C}
 
 import java.sql.PreparedStatement
 
-abstract class FaceDao(override val config: Config) extends BaseDao with software.altitude.core.dao.FaceDao {
+class FaceDao(override val config: Config)
+  extends BaseDao
+    with software.altitude.core.dao.FaceDao
+    with PostgresOverrides {
   override final val tableName = "face"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
@@ -43,10 +49,10 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
     val id = BaseDao.genId
 
     val sql = s"""
-        INSERT INTO $tableName (${C.Face.ID}, ${C.Face.X1}, ${C.Face.Y1}, ${C.Face.WIDTH}, ${C.Face.HEIGHT},
+        INSERT INTO $tableName (${C.Face.ID}, ${C.Base.REPO_ID}, ${C.Face.X1}, ${C.Face.Y1}, ${C.Face.WIDTH}, ${C.Face.HEIGHT},
                                 ${C.Face.ASSET_ID}, ${C.Face.PERSON_ID}, ${C.Face.DETECTION_SCORE}, ${C.Face.EMBEDDINGS},
                                 ${C.Face.FEATURES}, ${C.Face.IMAGE}, ${C.Face.ALIGNED_IMAGE}, ${C.Face.ALIGNED_IMAGE_GS})
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
 
     val conn = RequestContext.getConn
@@ -56,18 +62,19 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
 
     val preparedStatement: PreparedStatement = conn.prepareStatement(sql)
     preparedStatement.setString(1, id)
-    preparedStatement.setInt(2, face.x1)
-    preparedStatement.setInt(3, face.y1)
-    preparedStatement.setInt(4, face.width)
-    preparedStatement.setInt(5, face.height)
-    preparedStatement.setString(6, asset.persistedId)
-    preparedStatement.setString(7, person.persistedId)
-    preparedStatement.setDouble(8, face.detectionScore)
-    preparedStatement.setObject(9, embeddingsArray)
-    preparedStatement.setObject(10, featuresArray)
-    preparedStatement.setBytes(11, face.image)
-    preparedStatement.setBytes(12, face.aligned_image)
-    preparedStatement.setBytes(13, face.aligned_image_gs)
+    preparedStatement.setString(2, RequestContext.getRepository.persistedId)
+    preparedStatement.setInt(3, face.x1)
+    preparedStatement.setInt(4, face.y1)
+    preparedStatement.setInt(5, face.width)
+    preparedStatement.setInt(6, face.height)
+    preparedStatement.setString(7, asset.persistedId)
+    preparedStatement.setString(8, person.persistedId)
+    preparedStatement.setDouble(9, face.detectionScore)
+    preparedStatement.setObject(10, embeddingsArray)
+    preparedStatement.setObject(11, featuresArray)
+    preparedStatement.setBytes(12, face.image)
+    preparedStatement.setBytes(13, face.aligned_image)
+    preparedStatement.setBytes(14, face.aligned_image_gs)
     preparedStatement.execute()
 
     jsonIn ++ Json.obj(

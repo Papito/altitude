@@ -22,7 +22,9 @@ import org.opencv.objdetect.FaceRecognizerSF
 import software.altitude.core.Altitude
 import software.altitude.core.Environment
 import software.altitude.core.dao.FaceDao
-import software.altitude.core.models.{Asset, Face, Person}
+import software.altitude.core.models.Asset
+import software.altitude.core.models.Face
+import software.altitude.core.models.Person
 import software.altitude.core.util.ImageUtil.determineImageScale
 
 import java.io.File
@@ -338,5 +340,6 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
 
   def add(face: Face, asset: Asset, personId: Person): Face = {
     dao.add(face, asset, personId)
+
   }
 }

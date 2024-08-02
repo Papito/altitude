@@ -234,9 +234,14 @@ abstract class BaseDao {
     numUpdated
   }
 
-  def getListFromJsonStr(jsonStr: String, key: String): List[String] = {
+  def getStringListFromJsonStr(jsonStr: String, key: String): List[String] = {
     val json = Json.parse(jsonStr)
     (json \ key).as[List[String]]
+  }
+
+  def getFloatListFromJsonStr(jsonStr: String, key: String): List[Float] = {
+    val json = Json.parse(jsonStr)
+    (json \ key).as[List[Float]]
   }
 
   def increment(id: String, field: String, count: Int = 1): Unit = {

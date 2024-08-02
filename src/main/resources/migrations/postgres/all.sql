@@ -84,9 +84,9 @@ CREATE UNIQUE INDEX person_01 ON person(name);
 
 CREATE TABLE face (
   id CHAR(36) PRIMARY KEY,
-  repository_id CHAR(36) REFERENCES repository(id) ON DELETE CASCADE,
-  asset_id CHAR(36) REFERENCES asset(id) ON DELETE CASCADE,
-  person_id CHAR(36) REFERENCES person(id) ON DELETE CASCADE,
+  repository_id CHAR(36) NOT NULL REFERENCES repository(id) ON DELETE CASCADE,
+  asset_id CHAR(36) NOT NULL REFERENCES asset(id) ON DELETE CASCADE,
+  person_id CHAR(36) NOT NULL REFERENCES person(id) ON DELETE CASCADE,
   x1 INT NOT NULL,
   y1 INT NOT NULL,
   width INT NOT NULL,

@@ -229,8 +229,8 @@ class Altitude(val dbEngineOverride: Option[String] = None)  {
     }
 
     val face: FaceDao = dataSourceType match {
-      case C.DbEngineName.POSTGRES => new jdbc.FaceDao(app.config) with dao.postgres.PostgresOverrides
-      case C.DbEngineName.SQLITE => new jdbc.FaceDao(app.config) with dao.sqlite.SqliteOverrides
+      case C.DbEngineName.POSTGRES => new postgres.FaceDao(app.config)
+      case C.DbEngineName.SQLITE => new sqlite.FaceDao(app.config)
       case _ => throw new IllegalArgumentException(s"Unknown datasource [$dataSourceType]")
     }
   }
