@@ -22,7 +22,7 @@ import org.opencv.objdetect.FaceRecognizerSF
 import software.altitude.core.Altitude
 import software.altitude.core.Environment
 import software.altitude.core.dao.FaceDao
-import software.altitude.core.models.Face
+import software.altitude.core.models.{Asset, Face, Person}
 import software.altitude.core.util.ImageUtil.determineImageScale
 
 import java.io.File
@@ -192,12 +192,10 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
 
     val boundingBoxSize = 600
 
-    // println("OG Image size: " + image.size())
     val scaleFactor = determineImageScale(image.width(), image.height(), boundingBoxSize, boundingBoxSize) match {
       case scale if scale < 1.0 => scale
       case _ => 1.0
     }
-    // println("Scale factor: " + scaleFactor)
 
     val srcMat: Mat = if (scaleFactor < 1.0) {
       val resized = new Mat()
@@ -207,18 +205,13 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
       image.clone()
     }
 
-    // println("Resized Image size: " + srcMat.size())
-
     yuNet.setInputSize(srcMat.size())
     yuNet.detect(srcMat, detectionResults)
     val numOfFaces = detectionResults.rows()
 
-    // logger.info(s"Number of face regions found: $numOfFaces")
-
     val ret: List[Option[Mat]] = (for (idx <- 0 until numOfFaces) yield {
       val detection = detectionResults.row(idx)
 
-      // println("Detection: " + detection.dump())
       // update the original detection matrix to account for the scaling factor
       if (scaleFactor < 1.0) {
         for (col <- 0 until detection.cols()) {
@@ -226,7 +219,6 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
           detection.put(0, col, originalValue / scaleFactor)
         }
       }
-      // println("Scaled detection: " + detection.dump())
 
       val detectionRect = FaceService.faceDetectToRect(detection)
 
@@ -239,6 +231,49 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
     }).toList
 
     ret.flatten
+  }
+
+  def extractFaces(data: Array[Byte]): List[Face] = {
+    val imageMat: Mat = FaceService.matFromBytes(data)
+    val results: List[Mat] = detectFacesWithYunet(imageMat)
+
+    val faces: List[Face] = results.map { res =>
+      val alignedFaceImage = alignCropFaceFromDetection(imageMat, res)
+      // LBPHFaceRecognizer requires grayscale images
+      val alignedFaceImageGs = getHistEqualizedGrayScImage(alignedFaceImage)
+      val features = getFacialFeatures(alignedFaceImage)
+
+      val featuresArray = (0 to 127).map(col => features.get(0, col)(0).asInstanceOf[Float]).toArray
+      // val featureArray = new Array[Float](features.total().asInstanceOf[Float])
+      val embedding = getEmbeddings(alignedFaceImage)
+
+      val rect = FaceService.faceDetectToRect(res)
+      val faceImage: Mat = imageMat.submat(rect)
+
+      val imageBytes = new MatOfByte
+      Imgcodecs.imencode(".png", faceImage, imageBytes)
+
+      val alignedImageBytes = new MatOfByte
+      Imgcodecs.imencode(".png", alignedFaceImage, alignedImageBytes)
+
+      val alignedFaceImageGsBytes = new MatOfByte
+      Imgcodecs.imencode(".png", alignedFaceImageGs, alignedFaceImageGsBytes)
+
+      Face(
+        x1 = rect.x,
+        y1 = rect.y,
+        width = rect.width,
+        height = rect.height,
+        detectionScore = res.get(0, 14)(0).asInstanceOf[Float],
+        embeddings = embedding,
+        features = featuresArray,
+        image = imageBytes.toArray,
+        aligned_image = alignedImageBytes.toArray,
+        aligned_image_gs = alignedFaceImageGsBytes.toArray
+      )
+    }
+
+    faces
   }
 
   def train(mat: Mat): Unit = {
@@ -301,4 +336,7 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
     sfaceRecognizer.`match`(feature1, feature2, FaceRecognizerSF.FR_COSINE)
   }
 
+  def add(face: Face, asset: Asset, personId: Person): Face = {
+    dao.add(face, asset, personId)
+  }
 }

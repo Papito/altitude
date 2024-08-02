@@ -14,14 +14,14 @@ object Face {
       y1 = (json \ C.Face.Y1).as[Int],
       width = (json \ C.Face.WIDTH).as[Int],
       height = (json \ C.Face.HEIGHT).as[Int],
-      assetId = (json \ C.Face.ASSET_ID).as[String],
-      personId = (json \ C.Face.PERSON_ID).as[String],
+      assetId = (json \ C.Face.ASSET_ID).asOpt[String],
+      personId = (json \ C.Face.PERSON_ID).asOpt[String],
       detectionScore = (json \ C.Face.DETECTION_SCORE).as[Double],
-      embeddings = (json \ C.Face.EMBEDDINGS).as[Seq[Double]],
-      features = (json \ C.Face.FEATURES).as[Seq[Double]],
+      embeddings = (json \ C.Face.EMBEDDINGS).as[Array[Float]],
+      features = (json \ C.Face.FEATURES).as[Array[Float]],
       image = (json \ C.Face.IMAGE).as[Array[Byte]],
-      aligned_image = (json \ C.Face.IMAGE).as[Array[Byte]],
-      aligned_image_gs = (json \ C.Face.IMAGE).as[Array[Byte]]
+      aligned_image = (json \ C.Face.ALIGNED_IMAGE).as[Array[Byte]],
+      aligned_image_gs = (json \ C.Face.ALIGNED_IMAGE_GS).as[Array[Byte]]
     ).withCoreAttr(json)
   }
 }
@@ -31,11 +31,11 @@ case class Face(id: Option[String] = None,
                 y1: Int,
                 width: Int,
                 height: Int,
-                assetId: String,
-                personId: String,
+                assetId: Option[String] = None,
+                personId: Option[String] = None,
                 detectionScore: Double,
-                embeddings: Seq[Double],
-                features: Seq[Double],
+                embeddings: Array[Float],
+                features: Array[Float],
                 image: Array[Byte],
                 aligned_image: Array[Byte],
                 aligned_image_gs: Array[Byte]) extends BaseModel {

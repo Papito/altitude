@@ -2,10 +2,12 @@ package software.altitude.core.dao.postgres
 
 import com.typesafe.config.Config
 import org.postgresql.jdbc.PgArray
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.JsObject
+import play.api.libs.json.Json
+import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.Person
-import software.altitude.core.{RequestContext, Const => C}
+import software.altitude.core.{Const => C}
 
 import java.sql.PreparedStatement
 
@@ -84,6 +86,7 @@ class PersonDao(override val config: Config)
     val conn = RequestContext.getConn
 
     val updatedIdListAsSqlArray = conn.createArrayOf("text", updatedIdList.toArray)
+
     val preparedStatement: PreparedStatement = conn.prepareStatement(sql)
     preparedStatement.setObject(1, updatedIdListAsSqlArray)
     preparedStatement.setString(2, person.persistedId)

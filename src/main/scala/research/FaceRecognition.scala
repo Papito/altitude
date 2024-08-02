@@ -225,11 +225,11 @@ object FaceRecognition extends SandboxApp {
     }
   })
 
-    DB.allPersons().foreach { person =>
-      println(person.name + " faces: \n" +  person.allFaces())
-      println()
-      writePerson(person)
-    }
+  DB.allPersons().foreach { person =>
+    println(person.name + " faces: \n" +  person.allFaces())
+    println()
+    writePerson(person)
+  }
 
   private def addNewPerson(face: Face): Unit = {
     println("Adding new person with face " + face.name)

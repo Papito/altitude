@@ -22,7 +22,6 @@ import software.altitude.test.core.IntegrationTestCore
   test("Face is detected in an image (1)") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
 
-
     val detections = testApp.service.face.detectFacesWithYunet(FaceService.matFromBytes(importAsset.data))
     detections.length should be(1)
   }

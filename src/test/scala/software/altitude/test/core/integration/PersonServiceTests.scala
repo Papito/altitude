@@ -24,7 +24,7 @@ import software.altitude.test.core.IntegrationTestCore
     person2.label - person1.label should be(1)
   }
 
-  test("Can merge two people into one", Focused) {
+  test("Can merge three people into one") {
     val person1Model = Person()
     val person1: Person = testApp.service.person.add(person1Model)
 

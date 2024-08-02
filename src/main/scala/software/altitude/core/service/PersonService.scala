@@ -1,9 +1,10 @@
 package software.altitude.core.service
 
-import software.altitude.core.{Altitude, Const => C}
+import software.altitude.core.Altitude
 import software.altitude.core.dao.PersonDao
 import software.altitude.core.models.Person
 import software.altitude.core.transactions.TransactionManager
+import software.altitude.core.{Const => C}
 
 class PersonService (val app: Altitude) extends BaseService[Person] {
   protected val dao: PersonDao = app.DAO.person

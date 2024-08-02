@@ -87,16 +87,16 @@ CREATE TABLE face (
   repository_id CHAR(36) REFERENCES repository(id) ON DELETE CASCADE,
   asset_id CHAR(36) REFERENCES asset(id) ON DELETE CASCADE,
   person_id CHAR(36) REFERENCES person(id) ON DELETE CASCADE,
-  x INT NOT NULL,
-  y INT NOT NULL,
+  x1 INT NOT NULL,
+  y1 INT NOT NULL,
   width INT NOT NULL,
   height INT NOT NULL,
   detection_score FLOAT NOT NULL,
-  embeddings TEXT NOT NULL,
-  features TEXT NOT NULL,
-  image bytea NOT NULL,
-  aligned_image_face bytea NOT NULL,
-  aligned_image_face_gs bytea NOT NULL
+  embeddings FLOAT[9],
+  features FLOAT[9],
+  image BYTEA NOT NULL,
+  aligned_image BYTEA NOT NULL,
+  aligned_image_gs BYTEA NOT NULL
 ) INHERITS (_core);
 CREATE UNIQUE INDEX face_01 ON face(person_id, asset_id);
 

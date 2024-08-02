@@ -92,8 +92,8 @@ CREATE UNIQUE INDEX person_01 ON person(name);
 CREATE TABLE face (
   id CHAR(36) PRIMARY KEY,
   asset_id CHAR(36) NOT NULL,
-  x INT NOT NULL,
-  y INT NOT NULL,
+  x1 INT NOT NULL,
+  y1 INT NOT NULL,
   repository_id CHAR(36) NOT NULL,
   person_id CHAR(36) NOT NULL,
   width INT NOT NULL,
@@ -104,8 +104,8 @@ CREATE TABLE face (
   created_at DATETIME DEFAULT (datetime('now', 'utc')),
   updated_at DATETIME DEFAULT NULL,
   image BLOB NOT NULL,
-  aligned_image_face BLOB NOT NULL,
-  aligned_image_face_gs BLOB NOT NULL,
+  aligned_image BLOB NOT NULL,
+  aligned_image_gs BLOB NOT NULL,
   FOREIGN KEY(person_id) REFERENCES person(id) ON DELETE CASCADE,
   FOREIGN KEY(asset_id) REFERENCES asset(id) ON DELETE CASCADE,
   FOREIGN KEY(repository_id) REFERENCES repository(id) ON DELETE CASCADE
