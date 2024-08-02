@@ -173,4 +173,12 @@ abstract class BaseService[Model <: BaseModel] {
       dao.deleteByQuery(query)
     }
   }
+
+  def increment(id: String, field: String, count: Int = 1): Unit = {
+    dao.increment(id, field, count)
+  }
+
+  def decrement(id: String, field: String, count: Int = 1): Unit = {
+    dao.decrement(id, field, count)
+  }
 }

@@ -19,8 +19,7 @@ import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
 import org.opencv.objdetect.FaceDetectorYN
 import org.opencv.objdetect.FaceRecognizerSF
-import software.altitude.core.Altitude
-import software.altitude.core.Environment
+import software.altitude.core.{Altitude, Const => C, Environment}
 import software.altitude.core.dao.FaceDao
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Face
@@ -338,8 +337,16 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
     sfaceRecognizer.`match`(feature1, feature2, FaceRecognizerSF.FR_COSINE)
   }
 
-  def add(face: Face, asset: Asset, personId: Person): Face = {
-    dao.add(face, asset, personId)
+  def add(face: Face, asset: Asset, person: Person): Face = {
+    val newFace: Face = dao.add(face, asset, person)
 
+    if (person.numOfFaces == 0) {
+      val personForUpdate = person.copy(coverFaceId = Some(newFace.persistedId))
+      app.service.person.updateById(person.persistedId, personForUpdate, List(C.Person.COVER_FACE_ID))
+    }
+
+    app.service.person.increment(person.persistedId, C.Person.NUM_OF_FACES)
+
+    newFace
   }
 }

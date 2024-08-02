@@ -12,7 +12,7 @@ import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class FaceServiceTests(override val testApp: Altitude) extends IntegrationTestCore {
 
-  test("Can save and retrieve a face object", Focused) {
+  test("Can save and retrieve a face object") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/movies-speed.png")
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
 
@@ -21,7 +21,7 @@ import software.altitude.test.core.IntegrationTestCore
     faces.foreach(face => {
       val person = testApp.service.person.add(Person())
       // no pun intended
-      val savedFace: Face = testApp.service.face.add(face=face, asset=importedAsset, person: Person)
+      val savedFace: Face = testApp.service.face.add(face=face, asset=importedAsset, person = person)
 
       savedFace.image.length should be > 1000
       savedFace.aligned_image.length should be > 1000
@@ -38,6 +38,31 @@ import software.altitude.test.core.IntegrationTestCore
   }
 
   test("First face is added to a person", Focused) {
+    val importAsset1 = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
+    val importedAsset1: Asset = testApp.service.assetImport.importAsset(importAsset1).get
+    val faces1 = testApp.service.face.extractFaces(importAsset1.data)
+    val person: Person = testApp.service.person.add(Person())
 
+    person.numOfFaces should be (0)
+
+    val face1: Face = faces1.head
+    val savedFace1: Face = testApp.service.face.add(face=face1, asset=importedAsset1, person = person)
+
+    val updatedPerson: Person = testApp.service.person.getById(person.persistedId)
+    updatedPerson.numOfFaces should be (1)
+    updatedPerson.coverFaceId should be (Some(savedFace1.persistedId))
+
+    // Add another face to the same person
+    val importAsset2 = IntegrationTestUtil.getImportAsset("people/meme-ben2.png")
+    val importedAsset2: Asset = testApp.service.assetImport.importAsset(importAsset2).get
+
+    val faces2 = testApp.service.face.extractFaces(importAsset2.data)
+    val face2 = faces2.head
+    testApp.service.face.add(face=face2, asset=importedAsset2, person = updatedPerson)
+
+    val updatedPersonAgain: Person = testApp.service.person.getById(person.persistedId)
+    updatedPersonAgain.numOfFaces should be (2)
+    // cover face should not change
+    updatedPersonAgain.coverFaceId should be (Some(savedFace1.persistedId))
   }
 }
