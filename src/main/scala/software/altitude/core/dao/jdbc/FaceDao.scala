@@ -3,6 +3,7 @@ package software.altitude.core.dao.jdbc
 import com.typesafe.config.Config
 import play.api.libs.json.{JsObject, Json}
 import software.altitude.core.models.{Asset, Face, Person}
+import software.altitude.core.util.MurmurHash
 import software.altitude.core.{RequestContext, Const => C}
 
 import java.sql.PreparedStatement
@@ -43,8 +44,9 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
       s"""
         INSERT INTO $tableName (${C.Face.ID}, ${C.Base.REPO_ID}, ${C.Face.X1}, ${C.Face.Y1}, ${C.Face.WIDTH}, ${C.Face.HEIGHT},
                                 ${C.Face.ASSET_ID}, ${C.Face.PERSON_ID}, ${C.Face.DETECTION_SCORE}, ${C.Face.EMBEDDINGS},
-                                ${C.Face.FEATURES}, ${C.Face.IMAGE}, ${C.Face.ALIGNED_IMAGE}, ${C.Face.ALIGNED_IMAGE_GS})
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                ${C.Face.FEATURES}, ${C.Face.IMAGE}, ${C.Face.ALIGNED_IMAGE}, ${C.Face.ALIGNED_IMAGE_GS},
+                                ${C.Face.CHECKSUM})
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
 
     val conn = RequestContext.getConn
@@ -62,6 +64,8 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
       C.Face.FEATURES -> Json.toJson(face.features),
     )
 
+    val checksum = MurmurHash.hash32(face.image)
+
     val preparedStatement: PreparedStatement = conn.prepareStatement(sql)
     preparedStatement.setString(1, id)
     preparedStatement.setString(2, RequestContext.getRepository.persistedId)
@@ -77,6 +81,7 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
     preparedStatement.setBytes(12, face.image)
     preparedStatement.setBytes(13, face.aligned_image)
     preparedStatement.setBytes(14, face.aligned_image_gs)
+    preparedStatement.setInt(15, checksum)
     preparedStatement.execute()
 
     jsonIn ++ Json.obj(

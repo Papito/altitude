@@ -108,11 +108,13 @@ CREATE TABLE face (
   image BLOB NOT NULL,
   aligned_image BLOB NOT NULL,
   aligned_image_gs BLOB NOT NULL,
+  checksum INT NOT NULL,
   FOREIGN KEY(person_id) REFERENCES person(id) ON DELETE CASCADE,
   FOREIGN KEY(asset_id) REFERENCES asset(id) ON DELETE CASCADE,
   FOREIGN KEY(repository_id) REFERENCES repository(id) ON DELETE CASCADE
 );
 CREATE UNIQUE INDEX face_01 ON face(person_id, asset_id);
+CREATE UNIQUE INDEX face_02 ON face(repository_id, checksum);
 
 CREATE TABLE metadata_field (
   id CHAR(36) PRIMARY KEY,

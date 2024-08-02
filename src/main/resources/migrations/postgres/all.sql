@@ -99,9 +99,11 @@ CREATE TABLE face (
   features TEXT NOT NULL,
   image BYTEA NOT NULL,
   aligned_image BYTEA NOT NULL,
-  aligned_image_gs BYTEA NOT NULL
+  aligned_image_gs BYTEA NOT NULL,
+  checksum INT NOT NULL
 ) INHERITS (_core);
 CREATE UNIQUE INDEX face_01 ON face(person_id, asset_id);
+CREATE UNIQUE INDEX face_02 ON face(repository_id, checksum);
 
 
 CREATE TABLE metadata_field (
