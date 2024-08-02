@@ -95,8 +95,8 @@ CREATE TABLE face (
   width INT NOT NULL,
   height INT NOT NULL,
   detection_score FLOAT NOT NULL,
-  embeddings FLOAT[9],
-  features FLOAT[9],
+  embeddings TEXT NOT NULL,
+  features TEXT NOT NULL,
   image BYTEA NOT NULL,
   aligned_image BYTEA NOT NULL,
   aligned_image_gs BYTEA NOT NULL
