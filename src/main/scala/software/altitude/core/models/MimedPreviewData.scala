@@ -8,14 +8,14 @@ import software.altitude.core.{Const => C}
 
 import scala.language.implicitConversions
 
-object Preview {
+object MimedPreviewData {
   final val MIME_TYPE = "image/png"
   final val FILE_EXTENSION = "png"
 
-  implicit def fromJson(json: JsValue): Preview = {
+  implicit def fromJson(json: JsValue): MimedPreviewData = {
     val data: String = (json \ C.Preview.DATA).as[String]
 
-    Preview(
+    MimedPreviewData(
       assetId = (json \ C.Preview.ASSET_ID).as[String],
       mimeType = (json \ C.Preview.MIME_TYPE).as[String],
       data = Base64.decodeBase64(data)
@@ -23,9 +23,9 @@ object Preview {
   }
 }
 
-case class Preview(assetId: String,
-                   mimeType: String,
-                   data: Array[Byte]) extends BaseModel with NoId {
+case class MimedPreviewData(assetId: String,
+                            mimeType: String,
+                            data: Array[Byte]) extends BaseModel with NoId {
 
   override def toJson: JsObject = {
     Json.obj(

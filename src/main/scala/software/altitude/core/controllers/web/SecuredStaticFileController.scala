@@ -2,7 +2,7 @@ package software.altitude.core.controllers.web
 
 import org.scalatra.NotFound
 import software.altitude.core.controllers.BaseWebController
-import software.altitude.core.models.Preview
+import software.altitude.core.models.MimedPreviewData
 import software.altitude.core.{Const => C}
 
 
@@ -24,13 +24,13 @@ class SecuredStaticFileController extends BaseWebController {
     if (dataType == C.DataStore.PREVIEW) {
 
       val preview = app.service.fileStore.getPreviewById(assetId)
-      contentType = Preview.MIME_TYPE
+      contentType = MimedPreviewData.MIME_TYPE
       response.getOutputStream.write(preview.data)
       halt(200)
     }
 
     if (dataType == C.DataStore.FILE) {
-      val data = app.service.fileStore.getById(assetId)
+      val data = app.service.fileStore.getAssetById(assetId)
       contentType = data.mimeType
       response.getOutputStream.write(data.data)
       halt(200)

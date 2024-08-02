@@ -187,13 +187,13 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  private def addPreview(asset: Asset): Option[Preview] = {
+  private def addPreview(asset: Asset): Option[MimedPreviewData] = {
     val previewData: Array[Byte] = genPreviewData(asset)
 
     previewData.length match {
       case size if size > 0 =>
 
-        val preview: Preview = Preview(
+        val preview: MimedPreviewData = MimedPreviewData(
           assetId = asset.persistedId,
           mimeType = asset.assetType.mime,
           data = previewData)
@@ -205,7 +205,7 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def getPreview(assetId: String): Preview = {
+  def getPreview(assetId: String): MimedPreviewData = {
     app.service.fileStore.getPreviewById(assetId)
   }
 

@@ -9,7 +9,7 @@ import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
 import software.altitude.core.DuplicateException
 import software.altitude.core.models.Asset
-import software.altitude.core.models.Preview
+import software.altitude.core.models.MimedPreviewData
 import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.IntegrationTestCore
 
@@ -54,7 +54,7 @@ import software.altitude.test.core.IntegrationTestCore
     val importAsset = IntegrationTestUtil.getImportAsset("images/1.jpg")
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
     val asset = testApp.service.library.getById(importedAsset.persistedId): Asset
-    val preview: Preview = testApp.service.library.getPreview(asset.persistedId)
+    val preview: MimedPreviewData = testApp.service.library.getPreview(asset.persistedId)
 
     preview.mimeType should equal("application/octet-stream")
     preview.data.length should not be 0

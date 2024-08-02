@@ -9,8 +9,8 @@ import software.altitude.core.NotFoundException
 import software.altitude.core.RequestContext
 import software.altitude.core.StorageException
 import software.altitude.core.models.Asset
-import software.altitude.core.models.Data
-import software.altitude.core.models.Preview
+import software.altitude.core.models.MimedAssetData
+import software.altitude.core.models.MimedPreviewData
 import software.altitude.core.{Const => C}
 
 import java.io._
@@ -18,7 +18,7 @@ import java.io._
 class FileSystemStoreService(app: Altitude) extends FileStoreService {
   protected final val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  override def getById(id: String): Data = {
+  override def getAssetById(id: String): MimedAssetData = {
     val path = filePath(id)
     val srcFile: File = new File(path)
 
@@ -32,7 +32,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
         throw StorageException(s"Error reading file [${srcFile.getPath}: $ex]")
     }
 
-    Data(
+    MimedAssetData(
       assetId = id,
       data = byteArray.get,
       mimeType = "application/octet-stream")
@@ -51,7 +51,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     }
   }
 
-  override def addPreview(preview: Preview): Unit = {
+  override def addPreview(preview: MimedPreviewData): Unit = {
     logger.info(s"Adding preview for asset ${preview.assetId}")
 
     // get the full path to our preview file
@@ -69,7 +69,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     }
   }
 
-  override def getPreviewById(assetId: String): Preview = {
+  override def getPreviewById(assetId: String): MimedPreviewData = {
     val f: File = new File(previewFilePath(assetId))
 
     if (!f.isFile) {
@@ -80,7 +80,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     val is: InputStream = new ByteArrayInputStream(byteArray)
 
     try {
-      Preview(
+      MimedPreviewData(
         assetId = assetId,
         data = byteArray,
         mimeType = "application/octet-stream")
@@ -92,7 +92,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
 
   private def previewFilePath(assetId: String): String = {
     val dirName = assetId.substring(0, 2)
-    new File(new File(previewDataPath, dirName).getPath, s"$assetId.${Preview.FILE_EXTENSION}").getPath
+    new File(new File(previewDataPath, dirName).getPath, s"$assetId.${MimedPreviewData.FILE_EXTENSION}").getPath
   }
 
   private def repositoryDataPath: String = {
