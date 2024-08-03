@@ -12,12 +12,11 @@ object Person {
   val RESERVED_LABEL_COUNT = 10
 
   implicit def fromJson(json: JsValue): Person = {
-
     Person(
       id = (json \ C.Base.ID).asOpt[String],
       name = (json \ C.Person.NAME).asOpt[String],
       coverFaceId = (json \ C.Person.COVER_FACE_ID).asOpt[String],
-      label = (json \ C.Person.LABEL).as[Long],
+      label = (json \ C.Person.LABEL).as[Int],
       mergedWithIds = (json \ C.Person.MERGED_WITH_IDS).as[List[String]],
       mergedIntoId = (json \ C.Person.MERGED_INTO_ID).asOpt[String],
       numOfFaces = (json \ C.Person.NUM_OF_FACES).as[Int],
@@ -30,7 +29,7 @@ case class Person(id: Option[String] = None,
                   name: Option[String] = None,
                   coverFaceId: Option[String] = None,
                   mergedWithIds: List[String] = List(),
-                  label: Long = -1,
+                  label: Int = -1,
                   numOfFaces: Int = 0,
                   mergedIntoId: Option[String] = None,
                   isHidden: Boolean = false) extends BaseModel {

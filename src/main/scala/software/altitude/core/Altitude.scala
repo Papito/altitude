@@ -127,7 +127,7 @@ class Altitude(val dbEngineOverride: Option[String] = None)  {
 
   private final val schemaVersion = 1
 
-  private final val dataSourceType = config.getString(C.Conf.DB_ENGINE)
+  final val dataSourceType = config.getString(C.Conf.DB_ENGINE)
   logger.info(s"Datasource type: $dataSourceType")
 
   final val fileStoreType: String =  config.getString(C.Conf.DEFAULT_STORAGE_ENGINE)

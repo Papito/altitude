@@ -19,6 +19,7 @@ import software.altitude.core.{Const => C}
 
 import java.util.UUID
 import scala.jdk.CollectionConverters._
+import scala.reflect.ClassTag
 
 object BaseDao {
   final def genId: String = UUID.randomUUID.toString
@@ -234,6 +235,13 @@ abstract class BaseDao {
     numUpdated
   }
 
+  protected def updateByBySql(sql: String, values: List[Any]): Int = {
+    BaseDao.incrWriteQueryCount()
+
+    val runner = queryRunner
+    runner.update(RequestContext.getConn, sql, values.map(_.asInstanceOf[Object]): _*)
+  }
+
   def getStringListFromJsonStr(jsonStr: String, key: String): List[String] = {
     val json = Json.parse(jsonStr)
     (json \ key).as[List[String]]
@@ -242,6 +250,17 @@ abstract class BaseDao {
   def getFloatListFromJsonStr(jsonStr: String, key: String): List[Float] = {
     val json = Json.parse(jsonStr)
     (json \ key).as[List[Float]]
+  }
+
+  def makeCsv[T](values: List[T]): String = {
+    values.map(_.toString).mkString(",")
+  }
+
+  def loadCsv[T:ClassTag](csv: String): List[T] = {
+    if (csv == null || csv.isEmpty) {
+      return List()
+    }
+    csv.split(",").map(_.asInstanceOf[T]).toList
   }
 
   def increment(id: String, field: String, count: Int = 1): Unit = {

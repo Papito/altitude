@@ -2,9 +2,7 @@ package software.altitude.core.service
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import software.altitude.core.Altitude
-import software.altitude.core.Environment
-import software.altitude.core.RequestContext
+import software.altitude.core.{Altitude, Const, Environment, RequestContext}
 import software.altitude.core.transactions.TransactionManager
 
 import scala.io.Source
@@ -26,12 +24,21 @@ abstract class MigrationService(val app: Altitude)  {
 
   protected val MIGRATIONS_DIR: String
 
-  /**
-   * Execute an arbitrary command
-   */
   private def executeCommand(command: String): Unit = {
     val stmt = RequestContext.getConn.createStatement()
-    stmt.execute(command)
+
+    /**
+     * Postgres next_val returns values, confusing `executeUpdate`.
+     * Yet, using `execute` for both blows up Sqlite dev server ¯\_(ツ)_/¯
+     * I don't got time for this.
+     */
+    app.dataSourceType match {
+      case Const.DbEngineName.SQLITE =>
+        stmt.executeUpdate(command)
+      case Const.DbEngineName.POSTGRES =>
+        stmt.execute(command)
+    }
+
     stmt.close()
   }
 

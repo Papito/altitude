@@ -89,7 +89,7 @@ CREATE TABLE person (
   label BIGINT NOT NULL,
   name TEXT NOT NULL,
   cover_face_id CHAR(36),
-  merged_with_ids TEXT[] DEFAULT ARRAY[]::TEXT[],
+  merged_with_ids TEXT,
   num_of_faces INT NOT NULL DEFAULT 0,
   merged_into_id CHAR(36) DEFAULT NULL REFERENCES person(id) ON DELETE CASCADE,
   is_hidden BOOLEAN NOT NULL DEFAULT FALSE
