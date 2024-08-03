@@ -17,15 +17,15 @@ object MimedPreviewData {
 
     MimedPreviewData(
       assetId = (json \ C.Preview.ASSET_ID).as[String],
-      mimeType = (json \ C.Preview.MIME_TYPE).as[String],
       data = Base64.decodeBase64(data)
     )
   }
 }
 
 case class MimedPreviewData(assetId: String,
-                            mimeType: String,
                             data: Array[Byte]) extends BaseModel with NoId {
+
+  val mimeType: String = MimedPreviewData.MIME_TYPE
 
   override def toJson: JsObject = {
     Json.obj(

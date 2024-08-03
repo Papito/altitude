@@ -195,7 +195,6 @@ class LibraryService(val app: Altitude) {
 
         val preview: MimedPreviewData = MimedPreviewData(
           assetId = asset.persistedId,
-          mimeType = asset.assetType.mime,
           data = previewData)
 
         app.service.fileStore.addPreview(preview)

@@ -56,7 +56,7 @@ import software.altitude.test.core.IntegrationTestCore
     val asset = testApp.service.library.getById(importedAsset.persistedId): Asset
     val preview: MimedPreviewData = testApp.service.library.getPreview(asset.persistedId)
 
-    preview.mimeType should equal("application/octet-stream")
+    preview.mimeType should equal(MimedPreviewData.MIME_TYPE)
     preview.data.length should not be 0
   }
 

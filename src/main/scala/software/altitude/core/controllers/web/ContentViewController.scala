@@ -2,11 +2,11 @@ package software.altitude.core.controllers.web
 
 import org.scalatra.NotFound
 import software.altitude.core.controllers.BaseWebController
-import software.altitude.core.models.MimedPreviewData
+import software.altitude.core.models.{Face, MimedPreviewData}
 import software.altitude.core.{Const => C}
 
 
-class SecuredStaticFileController extends BaseWebController {
+class ContentViewController extends BaseWebController {
 
   before() {
     requireLogin()
@@ -18,21 +18,29 @@ class SecuredStaticFileController extends BaseWebController {
     require(pathSegments.length == 5, "Content path must include repoId, dataType, and assetId")
     val repoId = pathSegments(2)
     val dataType = pathSegments(3)
-    val assetId = pathSegments(4)
+    val itemId = pathSegments(4)
 
     app.service.repository.setContextFromRequest(Some(repoId))
     if (dataType == C.DataStore.PREVIEW) {
 
-      val preview = app.service.fileStore.getPreviewById(assetId)
-      contentType = MimedPreviewData.MIME_TYPE
+      val preview: MimedPreviewData = app.service.fileStore.getPreviewById(itemId)
+      contentType =preview.mimeType
       response.getOutputStream.write(preview.data)
       halt(200)
     }
 
     if (dataType == C.DataStore.FILE) {
-      val data = app.service.fileStore.getAssetById(assetId)
+      val data = app.service.fileStore.getAssetById(itemId)
       contentType = data.mimeType
       response.getOutputStream.write(data.data)
+      halt(200)
+    }
+
+    // face data we get straight from the DB
+    if (dataType == C.DataStore.FACE) {
+      val face: Face = app.service.face.getById(itemId)
+      contentType = "image/png"
+      response.getOutputStream.write(face.image)
       halt(200)
     }
 

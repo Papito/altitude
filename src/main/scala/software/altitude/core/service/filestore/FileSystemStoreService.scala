@@ -8,9 +8,7 @@ import software.altitude.core.Altitude
 import software.altitude.core.NotFoundException
 import software.altitude.core.RequestContext
 import software.altitude.core.StorageException
-import software.altitude.core.models.Asset
-import software.altitude.core.models.MimedAssetData
-import software.altitude.core.models.MimedPreviewData
+import software.altitude.core.models.{Asset, Face, MimedAssetData, MimedPreviewData, Person}
 import software.altitude.core.{Const => C}
 
 import java.io._
@@ -40,7 +38,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
 
   override def addAsset(asset: Asset): Unit = {
     val destFile = new File(filePath(asset.persistedId))
-    logger.debug(s"Creating asset [$asset] on file system at [$destFile]")
+    logger.info(s"Creating asset [$asset] on file system at [$destFile]")
 
     try {
       FileUtils.writeByteArrayToFile(destFile, asset.data)
@@ -59,7 +57,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     // parse out the dir path
     val dirPath = FilenameUtils.getFullPath(destFilePath)
 
-    FileUtils.forceMkdir(new File(dirPath))
+//    FileUtils.forceMkdir(new File(dirPath))
 
     try {
       FileUtils.writeByteArrayToFile(new File(destFilePath), preview.data)
@@ -82,8 +80,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     try {
       MimedPreviewData(
         assetId = assetId,
-        data = byteArray,
-        mimeType = "application/octet-stream")
+        data = byteArray)
     }
     finally {
       if (is != null) is.close()
@@ -108,5 +105,24 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     val filesPath = FilenameUtils.concat(repositoryDataPath, C.DataStore.FILES)
     val partitionedFilesPath = FilenameUtils.concat(filesPath, assetId.substring(0, 2))
     FilenameUtils.concat(partitionedFilesPath, assetId)
+  }
+
+  private def facePath(faceId: String): String = {
+    val facesPath = FilenameUtils.concat(repositoryDataPath, C.DataStore.FACES)
+    val partitionedFacesPath = FilenameUtils.concat(facesPath, faceId.substring(0, 2))
+    FilenameUtils.concat(partitionedFacesPath, faceId)
+  }
+
+  override def addFace(face: Face): Unit = {
+    val destFile = new File(facePath(face.persistedId))
+    logger.debug(s"Creating face [$face] on file system at [$destFile]")
+
+    try {
+      FileUtils.writeByteArrayToFile(destFile, face.image)
+    }
+    catch {
+      case ex: IOException =>
+        throw StorageException(s"Error creating [$face] @ [$destFile]: $ex]")
+    }
   }
 }

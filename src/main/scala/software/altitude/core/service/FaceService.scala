@@ -338,15 +338,19 @@ class FaceService(val app: Altitude) extends BaseService[Face] {
   }
 
   def add(face: Face, asset: Asset, person: Person): Face = {
-    val newFace: Face = dao.add(face, asset, person)
+    val persistedFace: Face = dao.add(face, asset, person)
 
+    app.service.fileStore.addFace(persistedFace)
+
+    // First time? Add the face to the person as the cover
     if (person.numOfFaces == 0) {
-      val personForUpdate = person.copy(coverFaceId = Some(newFace.persistedId))
+      val personForUpdate = person.copy(coverFaceId = Some(persistedFace.persistedId))
       app.service.person.updateById(person.persistedId, personForUpdate, List(C.Person.COVER_FACE_ID))
     }
 
+    // face number + 1
     app.service.person.increment(person.persistedId, C.Person.NUM_OF_FACES)
 
-    newFace
+    persistedFace
   }
 }

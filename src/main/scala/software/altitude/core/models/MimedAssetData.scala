@@ -9,10 +9,10 @@ import software.altitude.core.{Const => C}
 import scala.language.implicitConversions
 
 object MimedAssetData {
-  implicit def fromJson(json: JsValue): MimedPreviewData = {
+  implicit def fromJson(json: JsValue): MimedAssetData = {
     val data: String = (json \ C.Data.DATA).as[String]
 
-    MimedPreviewData(
+    MimedAssetData(
       assetId = (json \ C.Data.ASSET_ID).as[String],
       mimeType = (json \ C.Data.MIME_TYPE).as[String],
       data = Base64.decodeBase64(data)

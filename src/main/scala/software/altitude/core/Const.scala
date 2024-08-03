@@ -175,6 +175,8 @@ object Const {
     val PREVIEW = "preview"
     val FILE = "file"
     val FILES = "files"
+    val FACE = "face"
+    val FACES = "faces"
     val REPOSITORIES = "repositories"
   }
 

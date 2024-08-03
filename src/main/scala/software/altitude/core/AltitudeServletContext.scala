@@ -11,7 +11,7 @@ import software.altitude.core.controllers.htmx.SetupController
 import software.altitude.core.controllers.htmx.UserInterfaceHtmxController
 import software.altitude.core.controllers.web.ImportController
 import software.altitude.core.controllers.web.IndexController
-import software.altitude.core.controllers.web.SecuredStaticFileController
+import software.altitude.core.controllers.web.ContentViewController
 import software.altitude.core.controllers.web.SessionController
 import software.altitude.core.models.Repository
 import software.altitude.core.models.User
@@ -54,7 +54,7 @@ object AltitudeServletContext {
     (new StatsController, "/api/v1/stats/*"),
     (new MetadataController, "/api/v1/metadata/*"),
     (new SessionController, "/sessions/*"),
-    (new SecuredStaticFileController, "/content/*"),
+    (new ContentViewController, "/content/*"),
     (new UserInterfaceHtmxController, "/htmx/*"),
     (new FolderActionController, "/htmx/folder/*"),
     (new AlbumActionController, "/htmx/album/*"),

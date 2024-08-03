@@ -37,7 +37,7 @@ import software.altitude.test.core.IntegrationTestCore
     })
   }
 
-  test("First face is added to a person", Focused) {
+  test("Faces are added to a person", Focused) {
     val importAsset1 = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val importedAsset1: Asset = testApp.service.assetImport.importAsset(importAsset1).get
     val faces1 = testApp.service.face.extractFaces(importAsset1.data)
@@ -62,7 +62,7 @@ import software.altitude.test.core.IntegrationTestCore
 
     val updatedPersonAgain: Person = testApp.service.person.getById(person.persistedId)
     updatedPersonAgain.numOfFaces should be (2)
-    // cover face should not change
+    // cover face should not have changed
     updatedPersonAgain.coverFaceId should be (Some(savedFace1.persistedId))
   }
 }
