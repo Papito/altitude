@@ -279,9 +279,6 @@ class FaceDetectionService {
     faces
   }
 
-  def train(mat: Mat): Unit = {
-  }
-
   def alignCropFaceFromDetection(image: Mat, detection: Mat): Mat = {
     val alignedFace = new Mat
     sfaceRecognizer.alignCrop(image, detection, alignedFace)

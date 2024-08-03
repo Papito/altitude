@@ -1,5 +1,7 @@
 package software.altitude.test.core.integration
 
+import org.mockito.Mockito
+import org.mockito.invocation.InvocationOnMock
 import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
@@ -7,12 +9,13 @@ import software.altitude.core.Altitude
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Face
 import software.altitude.core.models.Person
+import software.altitude.core.service.FaceRecognitionService
 import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class FaceServiceTests(override val testApp: Altitude) extends IntegrationTestCore {
 
-  test("Can save and retrieve a face object") {
+  test("Can save and retrieve a face object", Focused) {
     val importAsset = IntegrationTestUtil.getImportAsset("people/movies-speed.png")
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
 
@@ -37,7 +40,7 @@ import software.altitude.test.core.IntegrationTestCore
     })
   }
 
-  test("Faces are added to a person", Focused) {
+  test("Faces are added to a person") {
     val importAsset1 = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val importedAsset1: Asset = testApp.service.assetImport.importAsset(importAsset1).get
     val faces1 = testApp.service.faceDetection.extractFaces(importAsset1.data)

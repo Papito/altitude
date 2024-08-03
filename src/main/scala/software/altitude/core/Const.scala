@@ -178,6 +178,7 @@ object Const {
     val FACE = "face"
     val FACES = "faces"
     val REPOSITORIES = "repositories"
+    val MODELS = "models"
   }
 
   /**

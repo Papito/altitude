@@ -141,7 +141,7 @@ object FaceRecognition extends SandboxApp {
   private val InitialImages = new util.ArrayList[Mat]()
 
   for (idx <- 0 to 1) {
-    val file = new File("src/main/resources/train/1.jpg")
+    val file = new File(s"src/main/resources/train/$idx.png")
     val image: Mat = matFromBytes(FileUtils.readFileToByteArray(file))
     val results: List[Mat] = altitude.service.faceDetection.detectFacesWithYunet(image)
     val res = results.head

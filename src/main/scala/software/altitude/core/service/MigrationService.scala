@@ -87,6 +87,7 @@ abstract class MigrationService(val app: Altitude)  {
     logger.info(s"Migration path: $path")
     val resourceUrl = getClass.getResource(path)
     val source = Source.fromURL(resourceUrl)
+
     val commands = source.mkString
     source.close()
 
