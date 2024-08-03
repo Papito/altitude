@@ -50,8 +50,12 @@ class FaceRecognitionService(app: Altitude) {
   initialize()
 
   private def saveModel(): Unit = {
-    // Unorthodox, but this whole file-writing thing is messy and we can't really mock this method
-    // as it can be invoked during deep app init, before we can use Mockito
+    /**
+     * Unorthodox, but this whole file-writing thing is messy and we can't really mock this method
+     * as it can be invoked during deep app init, before we can use Mockito.
+     *
+     * In test, the model is ephemeral.
+     */
     if (Environment.CURRENT == Environment.Name.TEST) {
       return
     }

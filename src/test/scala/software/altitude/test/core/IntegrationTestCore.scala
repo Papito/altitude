@@ -29,15 +29,15 @@ abstract class IntegrationTestCore
     AltitudeServletContext.app.isInitialized = false
     testContext = new TestContext(testApp)
 
-    /*
-     Every integration test has at least one repository to start with - you can't do anything otherwise.
-     This also creates the first user (owner of the repository).
-
-     Tests then can create additional repos and users to test the boundaries of repository and user separation.
-     */
+    // Every integration test has at least one repository and its admin to start with - you can't test anything otherwise.
+    // Tests then can create additional repos and users to test the boundaries of repository and user separation.
     testContext.persistRepository()
 
+    // nuke the data dir tree
     IntegrationTestUtil.createFileStoreDir(testApp)
+
+    // Clear the face recognition model before each test
+    testApp.service.faceRecognition.recognizer.clear()
   }
 
   override def afterEach(): Unit = {
