@@ -69,6 +69,19 @@ CREATE UNIQUE INDEX asset_01 ON asset(repository_id, checksum, is_recycled);
 
 CREATE SEQUENCE person_label;
 
+-- The first 10 machine learning labels are reserved for the system:
+--   1-2: Initial dummy image data because the minimal training set it 2
+SELECT nextval('person_label');
+SELECT nextval('person_label');
+SELECT nextval('person_label');
+SELECT nextval('person_label');
+SELECT nextval('person_label');
+SELECT nextval('person_label');
+SELECT nextval('person_label');
+SELECT nextval('person_label');
+SELECT nextval('person_label');
+SELECT nextval('person_label');
+
 CREATE TABLE person (
   id CHAR(36) PRIMARY KEY,
   repository_id CHAR(36) REFERENCES repository(id) ON DELETE CASCADE,

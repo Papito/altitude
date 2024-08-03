@@ -7,6 +7,9 @@ import scala.language.implicitConversions
 
 object Person {
   val UNKNOWN_NAME_PREFIX = "Unknown"
+  // Number of labels reserved for special cases, and not used for actual people instances
+  // Labels start at this number + 1 but Unknown people start at 1 (so reserved label count must be known)
+  val RESERVED_LABEL_COUNT = 10
 
   implicit def fromJson(json: JsValue): Person = {
 

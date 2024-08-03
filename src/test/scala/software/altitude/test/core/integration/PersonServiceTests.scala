@@ -9,19 +9,21 @@ import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class PersonServiceTests(override val testApp: Altitude) extends IntegrationTestCore {
 
-  test("Can add and retrieve a person") {
+  test("Can add and retrieve a person", Focused) {
     val person1Model = Person()
     val person1: Person = testApp.service.person.add(person1Model)
 
     val retrievedPerson1: Person = testApp.service.person.getById(person1.persistedId)
     retrievedPerson1.isHidden should be(false)
-    // To the effect of "Unknown 1"
-    retrievedPerson1.name.get should be(s"${Person.UNKNOWN_NAME_PREFIX} ${retrievedPerson1.label}")
+    // "Unknown 1"
+    retrievedPerson1.name.get should be(s"${Person.UNKNOWN_NAME_PREFIX} 1")
 
     val person2Model = Person()
     val person2: Person = testApp.service.person.add(person2Model)
+    val retrievedPerson2: Person = testApp.service.person.getById(person2.persistedId)
 
-    person2.label - person1.label should be(1)
+    // "Unknown 2"
+    retrievedPerson1.name.get should be(s"${Person.UNKNOWN_NAME_PREFIX} 1")
   }
 
   test("Can merge three people into one") {

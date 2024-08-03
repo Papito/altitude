@@ -42,7 +42,7 @@ class PersonDao(override val config: Config)
     // Get the next person label using the person_label sequence table
     val labelSql = "INSERT INTO person_label DEFAULT VALUES RETURNING id"
     val labelRes = executeAndGetOne(labelSql, List())
-    val label = labelRes("id").asInstanceOf[Int]
+    val label = labelRes("id").asInstanceOf[Int] - Person.RESERVED_LABEL_COUNT
 
     val sql =
       s"""

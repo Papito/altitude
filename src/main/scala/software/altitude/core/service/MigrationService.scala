@@ -31,7 +31,7 @@ abstract class MigrationService(val app: Altitude)  {
    */
   private def executeCommand(command: String): Unit = {
     val stmt = RequestContext.getConn.createStatement()
-    stmt.executeUpdate(command)
+    stmt.execute(command)
     stmt.close()
   }
 

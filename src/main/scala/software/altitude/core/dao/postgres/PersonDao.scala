@@ -47,7 +47,7 @@ class PersonDao(override val config: Config)
      */
     val labelSql = "SELECT nextval('person_label')"
     val labelRes = executeAndGetOne(labelSql, List())
-    val label = labelRes("nextval").asInstanceOf[Long]
+    val label = labelRes("nextval").asInstanceOf[Long] - Person.RESERVED_LABEL_COUNT
 
     val sql =
       s"""

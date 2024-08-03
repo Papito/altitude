@@ -72,6 +72,18 @@ CREATE TABLE person_label (
   id INTEGER PRIMARY KEY AUTOINCREMENT
 );
 
+-- See the postgres version for the explanation of the following 10 inserts
+INSERT INTO person_label DEFAULT VALUES;
+INSERT INTO person_label DEFAULT VALUES;
+INSERT INTO person_label DEFAULT VALUES;
+INSERT INTO person_label DEFAULT VALUES;
+INSERT INTO person_label DEFAULT VALUES;
+INSERT INTO person_label DEFAULT VALUES;
+INSERT INTO person_label DEFAULT VALUES;
+INSERT INTO person_label DEFAULT VALUES;
+INSERT INTO person_label DEFAULT VALUES;
+INSERT INTO person_label DEFAULT VALUES;
+
 CREATE TABLE person (
   id CHAR(36) PRIMARY KEY,
   repository_id CHAR(36) NOT NULL,
