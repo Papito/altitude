@@ -20,7 +20,7 @@ object DeepNetFaceDetection extends SandboxApp {
     val fileByteArray: Array[Byte] = FileUtils.readFileToByteArray(file)
     val image: Mat = Imgcodecs.imdecode(new MatOfByte(fileByteArray: _*), Imgcodecs.IMREAD_ANYCOLOR)
 
-    val faces: List[Rect] = altitude.service.face.detectFacesWithDnnNet(image)
+    val faces: List[Rect] = altitude.service.faceDetection.detectFacesWithDnnNet(image)
 
     for (rect <- faces) {
       totalFaceRegions += 1

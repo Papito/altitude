@@ -9,9 +9,9 @@ import software.altitude.core.controllers.htmx.AlbumActionController
 import software.altitude.core.controllers.htmx.FolderActionController
 import software.altitude.core.controllers.htmx.SetupController
 import software.altitude.core.controllers.htmx.UserInterfaceHtmxController
+import software.altitude.core.controllers.web.ContentViewController
 import software.altitude.core.controllers.web.ImportController
 import software.altitude.core.controllers.web.IndexController
-import software.altitude.core.controllers.web.ContentViewController
 import software.altitude.core.controllers.web.SessionController
 import software.altitude.core.models.Repository
 import software.altitude.core.models.User

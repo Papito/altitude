@@ -1,8 +1,12 @@
 package software.altitude.test.core.controller
 
 import org.scalatest.DoNotDiscover
-import software.altitude.core.{Altitude, Const => C}
-import software.altitude.core.models.{Asset, Face, MimedPreviewData, Person}
+import software.altitude.core.Altitude
+import software.altitude.core.models.Asset
+import software.altitude.core.models.Face
+import software.altitude.core.models.MimedPreviewData
+import software.altitude.core.models.Person
+import software.altitude.core.{Const => C}
 import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.ControllerTestCore
 
@@ -48,7 +52,7 @@ import software.altitude.test.core.ControllerTestCore
 
     val importAsset = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
-    val faces1 = testApp.service.face.extractFaces(importAsset.data)
+    val faces1 = testApp.service.faceDetection.extractFaces(importAsset.data)
     val person: Person = testApp.service.person.add(Person())
 
     val face: Face = faces1.head

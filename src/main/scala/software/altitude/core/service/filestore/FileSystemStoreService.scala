@@ -8,7 +8,10 @@ import software.altitude.core.Altitude
 import software.altitude.core.NotFoundException
 import software.altitude.core.RequestContext
 import software.altitude.core.StorageException
-import software.altitude.core.models.{Asset, Face, MimedAssetData, MimedPreviewData, Person}
+import software.altitude.core.models.Asset
+import software.altitude.core.models.Face
+import software.altitude.core.models.MimedAssetData
+import software.altitude.core.models.MimedPreviewData
 import software.altitude.core.{Const => C}
 
 import java.io._

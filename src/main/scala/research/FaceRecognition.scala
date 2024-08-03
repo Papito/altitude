@@ -7,8 +7,8 @@ import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.face.LBPHFaceRecognizer
 import org.opencv.imgcodecs.Imgcodecs
-import software.altitude.core.service.FaceService
-import software.altitude.core.service.FaceService.matFromBytes
+import software.altitude.core.service.FaceDetectionService
+import software.altitude.core.service.FaceDetectionService.matFromBytes
 
 import java.io.File
 import java.util
@@ -102,20 +102,20 @@ object FaceRecognition extends SandboxApp {
     val fileByteArray: Array[Byte] = FileUtils.readFileToByteArray(file)
     val image: Mat = matFromBytes(fileByteArray)
 
-    val results: List[Mat] = altitude.service.face.detectFacesWithYunet(image)
+    val results: List[Mat] = altitude.service.faceDetection.detectFacesWithYunet(image)
 
     results.indices.foreach { idx =>
       val res = results(idx)
-      val rect = FaceService.faceDetectToRect(res)
+      val rect = FaceDetectionService.faceDetectToRect(res)
 
-      val alignedFaceImage = altitude.service.face.alignCropFaceFromDetection(image, res)
+      val alignedFaceImage = altitude.service.faceDetection.alignCropFaceFromDetection(image, res)
 
       // LBPHFaceRecognizer requires grayscale images
-      val alignedFaceImageGr = altitude.service.face.getHistEqualizedGrayScImage(alignedFaceImage)
+      val alignedFaceImageGr = altitude.service.faceDetection.getHistEqualizedGrayScImage(alignedFaceImage)
       // writeResult(file, alignedFaceImage, idx)
 
-      val features = altitude.service.face.getFacialFeatures(alignedFaceImage)
-      val embedding = altitude.service.face.getEmbeddings(alignedFaceImage)
+      val features = altitude.service.faceDetection.getFacialFeatures(alignedFaceImage)
+      val embedding = altitude.service.faceDetection.getEmbeddings(alignedFaceImage)
 
       val faceImage = image.submat(rect)
       val face = new Face(
@@ -143,10 +143,10 @@ object FaceRecognition extends SandboxApp {
   for (idx <- 0 to 1) {
     val file = new File("src/main/resources/train/1.jpg")
     val image: Mat = matFromBytes(FileUtils.readFileToByteArray(file))
-    val results: List[Mat] = altitude.service.face.detectFacesWithYunet(image)
+    val results: List[Mat] = altitude.service.faceDetection.detectFacesWithYunet(image)
     val res = results.head
-    val alignedFaceImage = altitude.service.face.alignCropFaceFromDetection(image, res)
-    val alignedFaceImageGr = altitude.service.face.getHistEqualizedGrayScImage(alignedFaceImage)
+    val alignedFaceImage = altitude.service.faceDetection.alignCropFaceFromDetection(image, res)
+    val alignedFaceImageGr = altitude.service.faceDetection.getHistEqualizedGrayScImage(alignedFaceImage)
     initialLabels.put(idx, 0, idx)
     InitialImages.add(alignedFaceImageGr)
   }
@@ -193,7 +193,7 @@ object FaceRecognition extends SandboxApp {
       println(s"Running similarity check for this face and the Recognizer match -> ${personMatch.name}")
 
       comparisonOpCount += 1
-      val simScore = altitude.service.face.getFeatureSimilarityScore(
+      val simScore = altitude.service.faceDetection.getFeatureSimilarityScore(
         thisFace.features, personMatch.allFaces().head.face.features)
       println("Similarity score: " + simScore)
 
@@ -259,7 +259,7 @@ object FaceRecognition extends SandboxApp {
       val faceScores: List[(Double, PersonFace)] = bestFaces.map { bestFace =>
         comparisonOpCount += 1
         println(s"Comparing ${thisFace.name} Q:${thisFace.detectionScore} with ${bestFace.face.name} Q:${bestFace.face.detectionScore}")
-        val similarityScore = altitude.service.face.getFeatureSimilarityScore(
+        val similarityScore = altitude.service.faceDetection.getFeatureSimilarityScore(
           thisFace.features, bestFace.face.features)
         println(" -> " + similarityScore)
         (similarityScore, bestFace)

@@ -3,8 +3,8 @@ package research
 import org.apache.commons.io.FileUtils
 import org.opencv.core._
 import org.opencv.imgproc.Imgproc
-import software.altitude.core.service.FaceService
-import software.altitude.core.service.FaceService.matFromBytes
+import software.altitude.core.service.FaceDetectionService
+import software.altitude.core.service.FaceDetectionService.matFromBytes
 
 import java.io.File
 
@@ -21,11 +21,11 @@ object YuNetFaceDetection extends SandboxApp {
     val fileByteArray: Array[Byte] = FileUtils.readFileToByteArray(file)
     val image: Mat = matFromBytes(fileByteArray)
 
-    val results: List[Mat] = altitude.service.face.detectFacesWithYunet(image)
+    val results: List[Mat] = altitude.service.faceDetection.detectFacesWithYunet(image)
 
     for (res <- results) {
       totalFaceRegions += 1
-      val rect = FaceService.faceDetectToRect(res)
+      val rect = FaceDetectionService.faceDetectToRect(res)
       Imgproc.rectangle(image, rect.tl(), rect.br(), markerColor, 2)
     }
 

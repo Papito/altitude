@@ -9,7 +9,7 @@ import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.Folder
 import software.altitude.core.models._
-import software.altitude.core.service.FaceService.matFromBytes
+import software.altitude.core.service.FaceDetectionService.matFromBytes
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.ImageUtil.makeImageThumbnail
 import software.altitude.core.util.Query
@@ -68,10 +68,10 @@ class LibraryService(val app: Altitude) {
       // FIXME: this is temporary, to work under tests
       if (assetIn.data.nonEmpty) {
         val image: Mat = matFromBytes(assetIn.data)
-        val results: List[Mat] = app.service.face.detectFacesWithYunet(image)
+        val results: List[Mat] = app.service.faceDetection.detectFacesWithYunet(image)
         results.indices.foreach { idx =>
           val res = results(idx)
-          val rect = FaceService.faceDetectToRect(res)
+          val rect = FaceDetectionService.faceDetectToRect(res)
           logger.info("Face detected: " + rect)
         }
       }

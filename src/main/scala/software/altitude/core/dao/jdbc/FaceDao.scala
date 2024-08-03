@@ -1,10 +1,14 @@
 package software.altitude.core.dao.jdbc
 
 import com.typesafe.config.Config
-import play.api.libs.json.{JsObject, Json}
-import software.altitude.core.models.{Asset, Face, Person}
+import play.api.libs.json.JsObject
+import play.api.libs.json.Json
+import software.altitude.core.RequestContext
+import software.altitude.core.models.Asset
+import software.altitude.core.models.Face
+import software.altitude.core.models.Person
 import software.altitude.core.util.MurmurHash
-import software.altitude.core.{RequestContext, Const => C}
+import software.altitude.core.{Const => C}
 
 import java.sql.PreparedStatement
 
