@@ -77,7 +77,15 @@ object FaceDetectionService {
 
 class FaceDetectionService {
   /**
-   * Add bytedeco comment here
+   * As if the fact that OpenCV for Java has two competing APIs wasn't confusing enough (org.opencv, org.bytedeco), e
+   * very example under the sun directs to do this in order to have native lib linking errors go away:
+   * System.loadLibrary(Core.NATIVE_LIBRARY_NAME)
+   *
+   * But it doesn't work. While we use the org.opencv API, the native lib is loaded by the org.bytedeco API.
+   *
+   * If it works, it works. I give up.
+   *
+   * https://stackoverflow.com/a/58064096/53687
    */
   Loader.load(classOf[opencv_java])
 
