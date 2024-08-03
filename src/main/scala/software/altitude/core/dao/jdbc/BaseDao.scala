@@ -242,12 +242,7 @@ abstract class BaseDao {
     runner.update(RequestContext.getConn, sql, values.map(_.asInstanceOf[Object]): _*)
   }
 
-  def getStringListFromJsonStr(jsonStr: String, key: String): List[String] = {
-    val json = Json.parse(jsonStr)
-    (json \ key).as[List[String]]
-  }
-
-  def getFloatListFromJsonStr(jsonStr: String, key: String): List[Float] = {
+  def getFloatListByJsonKey(jsonStr: String, key: String): List[Float] = {
     val json = Json.parse(jsonStr)
     (json \ key).as[List[Float]]
   }

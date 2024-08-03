@@ -17,8 +17,8 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
   override final val tableName = "face"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
-    val embeddingsArray = getFloatListFromJsonStr(rec(C.Face.EMBEDDINGS).asInstanceOf[String], C.Face.EMBEDDINGS)
-    val featuresArray = getFloatListFromJsonStr(rec(C.Face.FEATURES).asInstanceOf[String], C.Face.FEATURES)
+    val embeddingsArray = getFloatListByJsonKey(rec(C.Face.EMBEDDINGS).asInstanceOf[String], C.Face.EMBEDDINGS)
+    val featuresArray = getFloatListByJsonKey(rec(C.Face.FEATURES).asInstanceOf[String], C.Face.FEATURES)
 
     val model = Face(
       id = Some(rec(C.Base.ID).asInstanceOf[String]),
@@ -59,6 +59,9 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
      * Embeddings and Features are an array of floats, and even though Postgres supports float array natively,
      * there is really no value in creating a separate or a more confusing DAO hierarchy just for that.
      * Both DBs store this data as JSON in a TEXT field - faces are preloaded into memory anyway.
+     *
+     * Why not as a CSV? Casting Floats into Strings and back is a pain, and JSON is more pliable for this, without
+     * worrying about messing with precision.
      */
     val embeddingsArrayJson = Json.obj(
       C.Face.EMBEDDINGS -> Json.toJson(face.embeddings),
