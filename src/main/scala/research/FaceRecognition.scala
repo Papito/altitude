@@ -8,7 +8,7 @@ import org.opencv.core.Mat
 import org.opencv.face.LBPHFaceRecognizer
 import org.opencv.imgcodecs.Imgcodecs
 import software.altitude.core.service.FaceDetectionService
-import software.altitude.core.service.FaceDetectionService.matFromBytes
+import software.altitude.core.util.ImageUtil.matFromBytes
 
 import java.io.File
 import java.util
@@ -142,13 +142,9 @@ object FaceRecognition extends SandboxApp {
 
   for (idx <- 0 to 1) {
     val file = new File(s"src/main/resources/train/$idx.png")
-    val image: Mat = matFromBytes(FileUtils.readFileToByteArray(file))
-    val results: List[Mat] = altitude.service.faceDetection.detectFacesWithYunet(image)
-    val res = results.head
-    val alignedFaceImage = altitude.service.faceDetection.alignCropFaceFromDetection(image, res)
-    val alignedFaceImageGr = altitude.service.faceDetection.getHistEqualizedGrayScImage(alignedFaceImage)
+    val faceImage: Mat = matFromBytes(FileUtils.readFileToByteArray(file))
     initialLabels.put(idx, 0, idx)
-    InitialImages.add(alignedFaceImageGr)
+    InitialImages.add(faceImage)
   }
   recognizer.train(InitialImages, initialLabels)
 

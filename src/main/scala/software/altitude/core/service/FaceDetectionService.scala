@@ -23,7 +23,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.Environment
 import software.altitude.core.models.Face
-import software.altitude.core.util.ImageUtil.determineImageScale
+import software.altitude.core.util.ImageUtil.{determineImageScale, matFromBytes}
 
 import java.io.File
 import java.nio.file.Paths
@@ -55,10 +55,6 @@ object FaceDetectionService {
   def faceDetectToMat(image: Mat, detectedFace: Mat): Mat = {
     val faceRect = faceDetectToRect(detectedFace)
     image.submat(faceRect)
-  }
-
-  def matFromBytes(data: Array[Byte]): Mat = {
-    Imgcodecs.imdecode(new MatOfByte(data: _*), Imgcodecs.IMREAD_ANYCOLOR)
   }
 
   def writeDebugOpenCvMat(mat: Mat, fileName: String): Unit = {
@@ -245,7 +241,7 @@ class FaceDetectionService {
   }
 
   def extractFaces(data: Array[Byte]): List[Face] = {
-    val imageMat: Mat = FaceDetectionService.matFromBytes(data)
+    val imageMat: Mat = matFromBytes(data)
     val results: List[Mat] = detectFacesWithYunet(imageMat)
 
     val faces: List[Face] = results.map { res =>
@@ -279,8 +275,8 @@ class FaceDetectionService {
         embeddings = embedding,
         features = featuresArray,
         image = imageBytes.toArray,
-        aligned_image = alignedImageBytes.toArray,
-        aligned_image_gs = alignedFaceImageGsBytes.toArray
+        alignedImage = alignedImageBytes.toArray,
+        alignedImageGs = alignedFaceImageGsBytes.toArray
       )
     }
 

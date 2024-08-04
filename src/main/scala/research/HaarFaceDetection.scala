@@ -8,7 +8,7 @@ import org.opencv.core.Point
 import org.opencv.core.Scalar
 import org.opencv.imgproc.Imgproc
 import org.opencv.objdetect.CascadeClassifier
-import software.altitude.core.service.FaceDetectionService.matFromBytes
+import software.altitude.core.util.ImageUtil.matFromBytes
 
 import java.io.File
 

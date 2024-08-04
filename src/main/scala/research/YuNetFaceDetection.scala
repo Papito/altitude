@@ -4,7 +4,7 @@ import org.apache.commons.io.FileUtils
 import org.opencv.core._
 import org.opencv.imgproc.Imgproc
 import software.altitude.core.service.FaceDetectionService
-import software.altitude.core.service.FaceDetectionService.matFromBytes
+import software.altitude.core.util.ImageUtil.matFromBytes
 
 import java.io.File
 

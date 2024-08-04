@@ -1,6 +1,8 @@
 package software.altitude.core.models
 
+import org.opencv.core.Mat
 import play.api.libs.json._
+import software.altitude.core.util.ImageUtil.matFromBytes
 import software.altitude.core.{Const => C}
 
 import scala.language.implicitConversions
@@ -20,8 +22,8 @@ object Face {
       embeddings = (json \ C.Face.EMBEDDINGS).as[Array[Float]],
       features = (json \ C.Face.FEATURES).as[Array[Float]],
       image = (json \ C.Face.IMAGE).as[Array[Byte]],
-      aligned_image = (json \ C.Face.ALIGNED_IMAGE).as[Array[Byte]],
-      aligned_image_gs = (json \ C.Face.ALIGNED_IMAGE_GS).as[Array[Byte]]
+      alignedImage = (json \ C.Face.ALIGNED_IMAGE).as[Array[Byte]],
+      alignedImageGs = (json \ C.Face.ALIGNED_IMAGE_GS).as[Array[Byte]]
     ).withCoreAttr(json)
   }
 }
@@ -37,8 +39,10 @@ case class Face(id: Option[String] = None,
                 embeddings: Array[Float],
                 features: Array[Float],
                 image: Array[Byte],
-                aligned_image: Array[Byte],
-                aligned_image_gs: Array[Byte]) extends BaseModel {
+                alignedImage: Array[Byte],
+                alignedImageGs: Array[Byte]) extends BaseModel {
+
+  val alignedImageGsMat: Mat = matFromBytes(alignedImageGs)
 
   override def toJson: JsObject = {
     Json.obj(
@@ -52,8 +56,8 @@ case class Face(id: Option[String] = None,
       C.Face.EMBEDDINGS -> embeddings,
       C.Face.FEATURES -> features,
       C.Face.IMAGE -> image,
-      C.Face.ALIGNED_IMAGE -> aligned_image,
-      C.Face.ALIGNED_IMAGE_GS -> aligned_image_gs
+      C.Face.ALIGNED_IMAGE -> alignedImage,
+      C.Face.ALIGNED_IMAGE_GS -> alignedImageGs
     ) ++ coreJsonAttrs
   }
 

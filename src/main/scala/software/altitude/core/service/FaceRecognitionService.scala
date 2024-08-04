@@ -4,7 +4,8 @@ import org.apache.commons.io.{FileUtils, FilenameUtils}
 import org.opencv.core.{CvType, Mat}
 import org.opencv.face.LBPHFaceRecognizer
 import org.slf4j.{Logger, LoggerFactory}
-import software.altitude.core.service.FaceDetectionService.matFromBytes
+import software.altitude.core.models.{Asset, Face, Person}
+import software.altitude.core.util.ImageUtil.matFromBytes
 import software.altitude.core.{Altitude, Const, Environment}
 
 import java.io.File
@@ -31,12 +32,16 @@ class FaceRecognitionService(app: Altitude) {
       return
     }
 
-  logger.warn("No facial recognition model found, training with initial data...")
+    logger.warn("No facial recognition model found, training with initial data...")
 
+    /**
+     * Initial data is two random images, as we need the minimum of two.
+     * Can't just add the first user image without an error.
+     */
     val initialLabels = new Mat(2, 1, CvType.CV_32SC1)
     val InitialImages = new java.util.ArrayList[Mat]()
 
-    for (idx <- 1 to 2) {
+    for (idx <- 0 to 1) {
       val bytes = getClass.getResourceAsStream(s"/train/${idx}.png").readAllBytes()
       val image: Mat = matFromBytes(bytes)
       initialLabels.put(idx, 0, idx)
@@ -63,6 +68,31 @@ class FaceRecognitionService(app: Altitude) {
     logger.info("Saving initial model")
     FileUtils.forceMkdirParent(modelFile)
     recognizer.save(FACE_RECOGNITION_MODEL_PATH)
+  }
+
+  /**
+   * Returns an existing OR a new person, already persisted in the database.
+   *
+   * The person/faces are also added to the cache for this repository, as we may need to
+   * brute-force search for the person's face in the future.
+   */
+  def detectPerson(face: Face, asset: Asset): Person = {
+    val predLabelArr = new Array[Int](1)
+    val confidenceArr = new Array[Double](1)
+    recognizer.predict(face.alignedImageGsMat, predLabelArr, confidenceArr)
+
+    val predLabel = predLabelArr.head
+    val confidence = confidenceArr.head
+    println("Predicted label: " + predLabel + " with confidence: " + confidence + " for " + face.persistedId)
+
+    // if system label, ignore, we are probably at the start, just add the face and the NEW person
+    if (predLabel <= Person.RESERVED_LABEL_COUNT) {
+      val newPerson = app.service.person.add(Person())
+      val persistedFace = app.service.face.add(face, asset, newPerson)
+      return newPerson
+    }
+
+    null
   }
 
   def train(mat: Mat): Unit = {

@@ -9,9 +9,8 @@ import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.Folder
 import software.altitude.core.models._
-import software.altitude.core.service.FaceDetectionService.matFromBytes
 import software.altitude.core.transactions.TransactionManager
-import software.altitude.core.util.ImageUtil.makeImageThumbnail
+import software.altitude.core.util.ImageUtil.{makeImageThumbnail, matFromBytes}
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 import software.altitude.core.util.SearchQuery

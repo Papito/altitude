@@ -26,16 +26,16 @@ import software.altitude.test.core.IntegrationTestCore
       val savedFace: Face = testApp.service.face.add(face=face, asset=importedAsset, person = person)
 
       savedFace.image.length should be > 1000
-      savedFace.aligned_image.length should be > 1000
-      savedFace.aligned_image_gs.length should be > 1000
+      savedFace.alignedImage.length should be > 1000
+      savedFace.alignedImageGs.length should be > 1000
 
       val retrievedFace: Face = testApp.service.face.getById(savedFace.id.get)
       retrievedFace.features should be (savedFace.features)
       retrievedFace.embeddings should be (savedFace.embeddings)
 
       retrievedFace.image.length shouldBe savedFace.image.length
-      retrievedFace.aligned_image.length shouldBe savedFace.aligned_image.length
-      retrievedFace.aligned_image_gs.length shouldBe savedFace.aligned_image_gs.length
+      retrievedFace.alignedImage.length shouldBe savedFace.alignedImage.length
+      retrievedFace.alignedImageGs.length shouldBe savedFace.alignedImageGs.length
     })
   }
 

@@ -32,8 +32,8 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
       embeddings = embeddingsArray.toArray,
       features = featuresArray.toArray,
       image = rec(C.Face.IMAGE).asInstanceOf[Array[Byte]],
-      aligned_image = rec(C.Face.ALIGNED_IMAGE).asInstanceOf[Array[Byte]],
-      aligned_image_gs = rec(C.Face.ALIGNED_IMAGE_GS).asInstanceOf[Array[Byte]]
+      alignedImage = rec(C.Face.ALIGNED_IMAGE).asInstanceOf[Array[Byte]],
+      alignedImageGs = rec(C.Face.ALIGNED_IMAGE_GS).asInstanceOf[Array[Byte]]
     )
 
     model
@@ -86,8 +86,8 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
     preparedStatement.setString(10, embeddingsArrayJson.toString())
     preparedStatement.setString(11, featuresArrayJson.toString())
     preparedStatement.setBytes(12, face.image)
-    preparedStatement.setBytes(13, face.aligned_image)
-    preparedStatement.setBytes(14, face.aligned_image_gs)
+    preparedStatement.setBytes(13, face.alignedImage)
+    preparedStatement.setBytes(14, face.alignedImageGs)
     preparedStatement.setInt(15, checksum)
     preparedStatement.execute()
 
