@@ -76,7 +76,7 @@ class FaceRecognitionService(app: Altitude) {
    * The person/faces are also added to the cache for this repository, as we may need to
    * brute-force search for the person's face in the future.
    */
-  def detectPerson(face: Face, asset: Asset): Person = {
+  def recognizePerson(face: Face, asset: Asset): Person = {
     val predLabelArr = new Array[Int](1)
     val confidenceArr = new Array[Double](1)
     recognizer.predict(face.alignedImageGsMat, predLabelArr, confidenceArr)
