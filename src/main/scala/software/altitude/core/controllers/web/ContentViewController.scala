@@ -39,7 +39,7 @@ class ContentViewController extends BaseWebController {
 
     // face data we get straight from the DB
     if (dataType == C.DataStore.FACE) {
-      val face: Face = app.service.face.getById(itemId)
+      val face: Face = app.service.person.getFaceById(itemId)
       contentType = "image/png"
       response.getOutputStream.write(face.image)
       halt(200)

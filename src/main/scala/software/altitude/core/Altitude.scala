@@ -259,7 +259,6 @@ class Altitude(val dbEngineOverride: Option[String] = None)  {
     val folder = new FolderService(app)
     val stats = new StatsService(app)
     val person = new PersonService(app)
-    val face = new FaceService(app)
     val faceDetection = new FaceDetectionService()
     val faceRecognition = new FaceRecognitionService(app)
 

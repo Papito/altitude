@@ -56,7 +56,7 @@ import software.altitude.test.core.ControllerTestCore
     val person: Person = testApp.service.person.add(Person())
 
     val face: Face = faces1.head
-    val savedFace: Face = testApp.service.face.add(face=face, asset=importedAsset, person = person)
+    val savedFace: Face = testApp.service.person.addFace(face=face, asset=importedAsset, person = person)
 
     get(s"/content/r/$repoId/${C.DataStore.FACE}/${savedFace.persistedId}", headers=testAuthHeaders()) {
       response.getContentType() should startWith("image/png")

@@ -88,7 +88,7 @@ class FaceRecognitionService(app: Altitude) {
     // if system label, ignore, we are probably at the start, just add the face and the NEW person
     if (predLabel <= Person.RESERVED_LABEL_COUNT) {
       val newPerson = app.service.person.add(Person())
-      val persistedFace = app.service.face.add(face, asset, newPerson)
+      val persistedFace = app.service.person.addFace(face, asset, newPerson)
       return newPerson
     }
 
