@@ -23,7 +23,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.Environment
 import software.altitude.core.models.Face
-import software.altitude.core.util.ImageUtil.{determineImageScale, matFromBytes}
+import software.altitude.core.util.ImageUtil.determineImageScale
+import software.altitude.core.util.ImageUtil.matFromBytes
 
 import java.io.File
 import java.nio.file.Paths

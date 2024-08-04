@@ -26,6 +26,9 @@ object Face {
       alignedImageGs = (json \ C.Face.ALIGNED_IMAGE_GS).as[Array[Byte]]
     ).withCoreAttr(json)
   }
+
+  // For sorting faces by detection score automatically, highest score first
+  implicit val faceOrdering: Ordering[Face] = Ordering.by(-_.detectionScore)
 }
 
 case class Face(id: Option[String] = None,

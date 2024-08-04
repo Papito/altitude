@@ -1,6 +1,4 @@
 package software.altitude.test.core
-
-import org.mockito.Mockito
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest._

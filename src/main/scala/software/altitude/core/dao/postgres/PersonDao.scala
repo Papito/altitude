@@ -6,6 +6,8 @@ import play.api.libs.json.Json
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.Person
+import software.altitude.core.service.FaceRecognitionService
+import software.altitude.core.service.PersonService
 import software.altitude.core.{Const => C}
 
 class PersonDao(override val config: Config)
@@ -18,7 +20,7 @@ class PersonDao(override val config: Config)
      */
     val labelSql = "SELECT nextval('person_label')"
     val labelRes = executeAndGetOne(labelSql, List())
-    val label = labelRes("nextval").asInstanceOf[Long] - Person.RESERVED_LABEL_COUNT
+    val label = labelRes("nextval").asInstanceOf[Long] - FaceRecognitionService.RESERVED_LABEL_COUNT
 
     val sql =
       s"""
@@ -27,7 +29,7 @@ class PersonDao(override val config: Config)
     """
 
     val person: Person = jsonIn: Person
-    val personName = person.name.getOrElse(s"${Person.UNKNOWN_NAME_PREFIX} $label")
+    val personName = person.name.getOrElse(s"${PersonService.UNKNOWN_NAME_PREFIX} $label")
     val id = BaseDao.genId
 
     val sqlVals: List[Any] = List(

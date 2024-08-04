@@ -3,14 +3,10 @@ package software.altitude.core.models
 import play.api.libs.json._
 import software.altitude.core.{Const => C}
 
+import scala.collection.mutable
 import scala.language.implicitConversions
 
 object Person {
-  val UNKNOWN_NAME_PREFIX = "Unknown"
-  // Number of labels reserved for special cases, and not used for actual people instances
-  // Labels start at this number + 1 but Unknown people start at 1 (so reserved label count must be known)
-  val RESERVED_LABEL_COUNT = 10
-
   implicit def fromJson(json: JsValue): Person = {
     Person(
       id = (json \ C.Base.ID).asOpt[String],
@@ -44,6 +40,12 @@ case class Person(id: Option[String] = None,
       C.Person.MERGED_INTO_ID -> mergedIntoId,
       C.Person.IS_HIDDEN -> isHidden,
     ) ++ coreJsonAttrs
+  }
+
+  private val faces: mutable.TreeSet[Face] = mutable.TreeSet[Face]()
+
+  def addFace(face: Face): Unit = {
+    faces.addOne(face)
   }
 
   override def canEqual(other: Any): Boolean = other.isInstanceOf[Face]

@@ -1,10 +1,17 @@
 package software.altitude.core.service
 
 import software.altitude.core.Altitude
-import software.altitude.core.dao.{FaceDao, PersonDao}
-import software.altitude.core.models.{Asset, Face, Person}
+import software.altitude.core.dao.FaceDao
+import software.altitude.core.dao.PersonDao
+import software.altitude.core.models.Asset
+import software.altitude.core.models.Face
+import software.altitude.core.models.Person
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.{Const => C}
+
+object PersonService {
+  val UNKNOWN_NAME_PREFIX = "Unknown"
+}
 
 class PersonService (val app: Altitude) extends BaseService[Person] {
   protected val dao: PersonDao = app.DAO.person

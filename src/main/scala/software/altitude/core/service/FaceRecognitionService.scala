@@ -1,14 +1,43 @@
 package software.altitude.core.service
 
-import org.apache.commons.io.{FileUtils, FilenameUtils}
-import org.opencv.core.{CvType, Mat}
+import org.apache.commons.io.FileUtils
+import org.apache.commons.io.FilenameUtils
+import org.opencv.core.CvType
+import org.opencv.core.Mat
 import org.opencv.face.LBPHFaceRecognizer
-import org.slf4j.{Logger, LoggerFactory}
-import software.altitude.core.models.{Asset, Face, Person}
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import software.altitude.core.Altitude
+import software.altitude.core.Const
+import software.altitude.core.Environment
+import software.altitude.core.models.Asset
+import software.altitude.core.models.Face
+import software.altitude.core.models.Person
 import software.altitude.core.util.ImageUtil.matFromBytes
-import software.altitude.core.{Altitude, Const, Environment}
 
 import java.io.File
+
+object FaceRecognitionService {
+  // Number of labels reserved for special cases, and not used for actual people instances
+  // Labels start at this number + 1 but Unknown people start at 1 (so reserved label count must be known)
+  val RESERVED_LABEL_COUNT = 10
+
+  /**
+   * If there is no machine learning model verified hit, we cycle through all people in the database,
+   * but only doing the matching on THIS many best face detections that we have (1 to X)
+   *
+   * Higher number means more matches will be found, at the cost of performance.
+   *
+   * Lower number means faster matching but the same person may be detected as new.
+   * Technically, just 1 "top" face will work, and the accuracy benefits get diminished the higher we go
+   */
+  private val MAX_BRUTE_FORCE_COMPARISONS_PER_PERSON = 8
+
+  /**
+   * If the cosine distance between the face embeddings is below this threshold, we consider the face a match.
+   */
+  private val PESSIMISTIC_COSINE_DISTANCE_THRESHOLD = .46
+}
 
 class FaceRecognitionService(app: Altitude) {
   final val logger: Logger = LoggerFactory.getLogger(getClass)
@@ -17,8 +46,6 @@ class FaceRecognitionService(app: Altitude) {
   private val FACE_RECOGNITION_MODEL_PATH = FilenameUtils.concat(MODELS_PATH, "lbphf_face_rec_model.xml")
 
   private val modelFile = new File(FACE_RECOGNITION_MODEL_PATH)
-  private val pessimisticCosineSimilarityThreshold = .46
-  private val maxFaceComparesPerPerson = 8
 
   val recognizer: LBPHFaceRecognizer = LBPHFaceRecognizer.create()
   recognizer.setGridX(10)
@@ -86,7 +113,7 @@ class FaceRecognitionService(app: Altitude) {
     println("Predicted label: " + predLabel + " with confidence: " + confidence + " for " + face.persistedId)
 
     // if system label, ignore, we are probably at the start, just add the face and the NEW person
-    if (predLabel <= Person.RESERVED_LABEL_COUNT) {
+    if (predLabel <= FaceRecognitionService.RESERVED_LABEL_COUNT) {
       val newPerson = app.service.person.add(Person())
       val persistedFace = app.service.person.addFace(face, asset, newPerson)
       return newPerson

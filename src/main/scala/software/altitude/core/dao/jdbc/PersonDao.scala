@@ -1,7 +1,7 @@
 package software.altitude.core.dao.jdbc
 
 import com.typesafe.config.Config
-import play.api.libs.json.{JsObject}
+import play.api.libs.json.JsObject
 import software.altitude.core.models.Person
 import software.altitude.core.{Const => C}
 
