@@ -1,7 +1,7 @@
 package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
-import org.scalatest.matchers.must.Matchers.be
+import org.scalatest.matchers.must.Matchers.{be}
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
 import software.altitude.core.models.Asset
@@ -64,6 +64,21 @@ import software.altitude.test.core.IntegrationTestCore
     updatedPersonAgain.numOfFaces should be (2)
     // cover face should not have changed
     updatedPersonAgain.coverFaceId should be (Some(savedFace1.persistedId))
+  }
+
+  test("Can add and retrieve a new person with a face", Focused) {
+    val importAsset1 = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
+    val importedAsset1: Asset = testApp.service.assetImport.importAsset(importAsset1).get
+    val faces1 = testApp.service.faceDetection.extractFaces(importAsset1.data)
+    val face1: Face = faces1.head
+
+    val personModel = Person()
+    personModel.addFace(face1)
+    val person: Person = testApp.service.person.addPerson(personModel, Some(importedAsset1))
+    person.numOfFaces should be(1)
+    person.getFaces.size should be(1)
+
+//    val personCoverFace = testApp.service.person.getFaceById()
   }
 
   test("Can add and retrieve a person") {

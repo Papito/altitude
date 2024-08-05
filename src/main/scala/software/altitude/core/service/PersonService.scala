@@ -1,5 +1,6 @@
 package software.altitude.core.service
 
+import play.api.libs.json.Json
 import software.altitude.core.Altitude
 import software.altitude.core.dao.FaceDao
 import software.altitude.core.dao.PersonDao
@@ -33,14 +34,46 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
 
       // First time? Add the face to the person as the cover
       if (person.numOfFaces == 0) {
-        val personForUpdate = person.copy(coverFaceId = Some(persistedFace.persistedId))
-        updateById(person.persistedId, personForUpdate, List(C.Person.COVER_FACE_ID))
+        setFaceAsCover(person, persistedFace)
       }
 
       // face number + 1
       increment(person.persistedId, C.Person.NUM_OF_FACES)
 
       persistedFace
+    }
+  }
+
+  def addPerson(person: Person, asset: Option[Asset] = None): Person = {
+    txManager.withTransaction[Person] {
+      require(person.getFaces.size < 2, "Adding a new person with more than one face is currently not supported")
+
+      // Without a face given, numOfFaces is 0, with a face given, it's 1
+      val personForUpdate = person.copy(
+        numOfFaces = person.getFaces.size,
+      )
+
+      val persistedPerson: Person = dao.add(personForUpdate)
+
+      // if we are adding a person and have a face to show for it
+      if (person.getFaces.size == 1) {
+        val face = person.getFaces.head
+
+        val persistedFace: Face = faceDao.add(
+          face,
+          asset.getOrElse(throw new IllegalArgumentException("Asset ID is required")),
+          persistedPerson)
+
+        app.service.fileStore.addFace(persistedFace)
+
+        // This face is the default cover
+        setFaceAsCover(persistedPerson, persistedFace)
+
+        persistedPerson.addFace(persistedFace)
+        persistedPerson ++ Json.obj(C.Person.COVER_FACE_ID -> persistedFace.persistedId)
+      }
+
+      persistedPerson
     }
   }
 
@@ -57,6 +90,14 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
       updateById(updatedSource.persistedId, updatedSource, List(C.Person.MERGED_INTO_ID))
 
       mergedPerson
+    }
+  }
+
+  def setFaceAsCover(person: Person, face: Face): Person = {
+    txManager.withTransaction[Person] {
+      val personForUpdate = person.copy(coverFaceId = Some(face.persistedId))
+      updateById(person.persistedId, personForUpdate, List(C.Person.COVER_FACE_ID))
+      personForUpdate
     }
   }
 }

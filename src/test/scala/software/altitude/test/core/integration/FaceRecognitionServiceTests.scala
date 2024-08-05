@@ -2,21 +2,22 @@ package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
 import software.altitude.core.Altitude
-import software.altitude.core.models.Asset
-import software.altitude.core.models.Face
+import software.altitude.core.models.{Asset, Face, Person}
 import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class FaceRecognitionServiceTests(override val testApp: Altitude) extends IntegrationTestCore {
 
-  test("Recognize one new person", Focused) {
+  test("Recognize one new person") {
     val importAsset1 = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val importedAsset1: Asset = testApp.service.assetImport.importAsset(importAsset1).get
     val faces1 = testApp.service.faceDetection.extractFaces(importAsset1.data)
     val face1: Face = faces1.head
 
+    val person: Person = testApp.service.faceRecognition.recognizePerson(face1, importedAsset1)
+    println(person)
 
-
+    println(testApp.service.faceRecognition.recognizer.getLabels.dump())
 //    val importAsset2 = IntegrationTestUtil.getImportAsset("people/meme-ben2.png")
 //    val importedAsset2: Asset = testApp.service.assetImport.importAsset(importAsset2).get
 //

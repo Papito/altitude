@@ -48,6 +48,10 @@ case class Person(id: Option[String] = None,
     faces.addOne(face)
   }
 
+  def clearFaces(): Unit = faces.clear()
+
+  def getFaces: mutable.TreeSet[Face] = faces
+
   override def canEqual(other: Any): Boolean = other.isInstanceOf[Face]
 
   override def equals(that: Any): Boolean = that match {

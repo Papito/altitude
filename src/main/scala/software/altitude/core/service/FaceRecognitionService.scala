@@ -103,19 +103,23 @@ class FaceRecognitionService(app: Altitude) {
    * The person/faces are also added to the cache for this repository, as we may need to
    * brute-force search for the person's face in the future.
    */
-  def recognizePerson(face: Face, asset: Asset): Person = {
+  def recognizePerson(detectedFace: Face, asset: Asset): Person = {
+    require(detectedFace.id.isEmpty, "Face object must not be persisted yet")
+    require(detectedFace.personId.isEmpty, "Face object must not be associated with a person yet")
+
     val predLabelArr = new Array[Int](1)
     val confidenceArr = new Array[Double](1)
-    recognizer.predict(face.alignedImageGsMat, predLabelArr, confidenceArr)
+    recognizer.predict(detectedFace.alignedImageGsMat, predLabelArr, confidenceArr)
 
     val predLabel = predLabelArr.head
     val confidence = confidenceArr.head
-    println("Predicted label: " + predLabel + " with confidence: " + confidence + " for " + face.persistedId)
+
+    println("Predicted label: " + predLabel + " with confidence: " + confidence)
 
     // if system label, ignore, we are probably at the start, just add the face and the NEW person
     if (predLabel <= FaceRecognitionService.RESERVED_LABEL_COUNT) {
       val newPerson = app.service.person.add(Person())
-      val persistedFace = app.service.person.addFace(face, asset, newPerson)
+      val persistedFace = app.service.person.addFace(detectedFace, asset, newPerson)
       return newPerson
     }
 
