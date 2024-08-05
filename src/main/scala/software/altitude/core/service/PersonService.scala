@@ -70,7 +70,9 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
         setFaceAsCover(persistedPerson, persistedFace)
 
         persistedPerson.addFace(persistedFace)
-        persistedPerson ++ Json.obj(C.Person.COVER_FACE_ID -> persistedFace.persistedId)
+
+        return persistedPerson ++ Json.obj(
+          C.Person.COVER_FACE_ID -> persistedFace.persistedId)
       }
 
       persistedPerson

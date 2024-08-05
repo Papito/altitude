@@ -102,6 +102,7 @@ object Const {
     val NUM_OF_FACES = "num_of_faces"
     val MERGED_INTO_ID = "merged_into_id"
     val IS_HIDDEN = "is_hidden"
+    val FACES = "faces"
   }
 
   object Asset extends Common {

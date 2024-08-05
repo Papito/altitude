@@ -8,7 +8,7 @@ import scala.language.implicitConversions
 
 object Person {
   implicit def fromJson(json: JsValue): Person = {
-    Person(
+    val person = Person(
       id = (json \ C.Base.ID).asOpt[String],
       name = (json \ C.Person.NAME).asOpt[String],
       coverFaceId = (json \ C.Person.COVER_FACE_ID).asOpt[String],
@@ -18,6 +18,10 @@ object Person {
       numOfFaces = (json \ C.Person.NUM_OF_FACES).as[Int],
       isHidden = (json \ C.Person.IS_HIDDEN).as[Boolean]
     ).withCoreAttr(json)
+
+    val faces: List[Face] = (json \ C.Person.FACES).asOpt[List[JsValue]].getOrElse(List()).map(Face.fromJson)
+    person.setFaces(faces)
+    person
   }
 }
 
@@ -39,18 +43,22 @@ case class Person(id: Option[String] = None,
       C.Person.MERGED_WITH_IDS -> mergedWithIds,
       C.Person.MERGED_INTO_ID -> mergedIntoId,
       C.Person.IS_HIDDEN -> isHidden,
+      C.Person.FACES -> _faces.toList.map(_.toJson)
     ) ++ coreJsonAttrs
   }
 
-  private val faces: mutable.TreeSet[Face] = mutable.TreeSet[Face]()
+  private val _faces: mutable.TreeSet[Face] = mutable.TreeSet[Face]()
 
   def addFace(face: Face): Unit = {
-    faces.addOne(face)
+    _faces.addOne(face)
   }
 
-  def clearFaces(): Unit = faces.clear()
+  def setFaces(faces: Seq[Face]): Unit = {
+    _faces.clear()
+    _faces.addAll(faces)
+  }
 
-  def getFaces: mutable.TreeSet[Face] = faces
+  def getFaces: mutable.TreeSet[Face] = _faces
 
   override def canEqual(other: Any): Boolean = other.isInstanceOf[Face]
 

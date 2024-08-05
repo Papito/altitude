@@ -1,7 +1,7 @@
 package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
-import org.scalatest.matchers.must.Matchers.{be}
+import org.scalatest.matchers.must.Matchers.{be, not}
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
 import software.altitude.core.models.Asset
@@ -77,8 +77,8 @@ import software.altitude.test.core.IntegrationTestCore
     val person: Person = testApp.service.person.addPerson(personModel, Some(importedAsset1))
     person.numOfFaces should be(1)
     person.getFaces.size should be(1)
-
-//    val personCoverFace = testApp.service.person.getFaceById()
+    person.coverFaceId should not be None
+    testApp.service.person.getFaceById(person.coverFaceId.get)
   }
 
   test("Can add and retrieve a person") {
