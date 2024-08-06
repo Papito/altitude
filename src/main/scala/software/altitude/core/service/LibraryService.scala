@@ -66,7 +66,6 @@ class LibraryService(val app: Altitude) {
       logger.info(s"Adding asset: $assetToAddModel")
 
       app.service.faceRecognition.processAsset(assetIn)
-
       app.service.asset.add(assetToAddModel)
 
       app.service.search.indexAsset(assetToAddModel)
@@ -91,7 +90,7 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def getByChecksum(checksum: String): Option[Asset] = {
+  private def getByChecksum(checksum: Int): Option[Asset] = {
     txManager.asReadOnly[Option[Asset]] {
       val query = new Query(params = Map(C.Asset.CHECKSUM -> checksum)).withRepository()
       val existing = app.service.asset.query(query)

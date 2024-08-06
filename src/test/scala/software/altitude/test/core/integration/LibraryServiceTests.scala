@@ -135,29 +135,9 @@ import software.altitude.test.core.IntegrationTestCore
 
     val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
 
-    testApp.service.asset.add(new Asset(
-      folderId = folder1_1.persistedId,
-      userId = testContext.user.persistedId,
-      assetType = mediaType,
-      fileName = "filename.ext",
-      checksum = Util.randomStr(32),
-      sizeBytes = 1L))
-
-    testApp.service.asset.add(new Asset(
-      folderId = folder1_2.persistedId,
-      userId = testContext.user.persistedId,
-      assetType = mediaType,
-      fileName = "filename.ext",
-      checksum = Util.randomStr(32),
-      sizeBytes = 1L))
-
-    testApp.service.asset.add(new Asset(
-      folderId = folder1.persistedId,
-      userId = testContext.user.persistedId,
-      assetType = mediaType,
-      fileName = "filename.ext",
-      checksum = Util.randomStr(32),
-      sizeBytes = 1L))
+    testContext.persistAsset(folder = Some(folder1_1))
+    testContext.persistAsset(folder = Some(folder1_2))
+    testContext.persistAsset(folder = Some(folder1))
 
     testApp.service.library.query(
       new Query(Map(C.Asset.FOLDER_ID -> folder1_2.persistedId))

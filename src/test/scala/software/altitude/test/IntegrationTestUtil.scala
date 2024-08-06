@@ -7,6 +7,7 @@ import software.altitude.core.models.Metadata
 import software.altitude.core.{Const => C}
 
 import java.io.File
+import scala.util.Random
 
 object IntegrationTestUtil {
   def createTestDir(testApp: Altitude): Unit = {
@@ -35,6 +36,14 @@ object IntegrationTestUtil {
     fileName = file.getName,
     data = FileUtils.readFileToByteArray(file),
     metadata = Metadata())
+
+
+  def generateRandomBytes(size: Int): Array[Byte] = {
+    val random = new Random()
+    val byteArray = new Array[Byte](size)
+    random.nextBytes(byteArray)
+    byteArray
+  }
 
   def getImportAsset(relPath: String): ImportAsset = {
     val path = getClass.getResource(s"/import/$relPath").getPath

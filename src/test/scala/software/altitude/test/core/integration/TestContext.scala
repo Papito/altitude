@@ -11,9 +11,10 @@ import software.altitude.core.models.Repository
 import software.altitude.core.models.User
 import software.altitude.core.util.Util
 import software.altitude.core.{Const => C}
-import software.altitude.test.IntegrationTestUtil.getClass
+import software.altitude.test.IntegrationTestUtil.{generateRandomBytes, getClass}
 
 import java.io.File
+import scala.util.Random
 
 class TestContext(val testApp: Altitude) {
   var users: List[User] = List()
@@ -103,13 +104,13 @@ class TestContext(val testApp: Altitude) {
     Asset(
       userId = currentUser.persistedId,
       folderId = folderId,
-      data = data,
+      data = generateRandomBytes(80),
       assetType = new AssetType(
         mediaType = "mediaType",
         mediaSubtype = "mediaSubtype",
         mime = "mime"),
       fileName = filename,
-      checksum = Util.randomStr(32),
+      checksum = Random.nextInt(500000),
       metadata = metadata,
       sizeBytes = data.length)
   }

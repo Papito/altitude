@@ -33,7 +33,7 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
       id = Some(rec(C.Base.ID).asInstanceOf[String]),
       userId = rec(C.Base.USER_ID).asInstanceOf[String],
       fileName = rec(C.Asset.FILENAME).asInstanceOf[String],
-      checksum = rec(C.Asset.CHECKSUM).asInstanceOf[String],
+      checksum = rec(C.Asset.CHECKSUM).asInstanceOf[Int],
       assetType = assetType,
       sizeBytes = rec(C.Asset.SIZE_BYTES).asInstanceOf[Int],
       metadata = metadataJson: Metadata,

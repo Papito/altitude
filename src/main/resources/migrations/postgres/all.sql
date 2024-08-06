@@ -51,7 +51,7 @@ CREATE TABLE asset (
   id CHAR(36) PRIMARY KEY,
   repository_id CHAR(36) REFERENCES repository(id) ON DELETE CASCADE,
   user_id CHAR(36) REFERENCES account(id) ON DELETE CASCADE,
-  checksum VARCHAR(64) NOT NULL,
+  checksum INT NOT NULL,
   media_type VARCHAR(64) NOT NULL,
   media_subtype VARCHAR(64) NOT NULL,
   mime_type VARCHAR(64) NOT NULL,

@@ -11,6 +11,7 @@ import software.altitude.core.FormatException
 import software.altitude.core.MetadataExtractorException
 import software.altitude.core.RequestContext
 import software.altitude.core.models._
+import software.altitude.core.util.MurmurHash
 
 import java.io.InputStream
 
@@ -59,7 +60,7 @@ class AssetImportService(app: Altitude) {
       userId = RequestContext.account.value.get.persistedId,
       data = importAsset.data,
       fileName = importAsset.fileName,
-      checksum = getChecksum(importAsset),
+      checksum = MurmurHash.hash32(importAsset.data),
       assetType = assetType,
       sizeBytes = importAsset.data.length,
       isTriaged = true,
@@ -81,7 +82,4 @@ class AssetImportService(app: Altitude) {
 
     storedAsset
   }
-
-  private def getChecksum(importAsset: ImportAsset): String =
-    DigestUtils.sha1Hex(importAsset.data)
 }
