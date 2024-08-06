@@ -100,7 +100,24 @@ import software.altitude.test.core.IntegrationTestCore
     retrievedPerson2.label - retrievedPerson1.label should be(1)
   }
 
-  test("Can merge three people into one") {
+  test("Person merge A -> B") {
+    val person1Model = Person()
+    val person1: Person = testApp.service.person.addPerson(person1Model)
+
+    val person2Model = Person()
+    val person2: Person = testApp.service.person.addPerson(person2Model)
+
+    val mergedIntoPerson: Person = testApp.service.person.merge(dest=person1, source=person2)
+    val savedMergedIntoPerson: Person = testApp.service.person.getById(person1.persistedId)
+
+    mergedIntoPerson.mergedWithIds.size should be(1)
+    mergedIntoPerson.mergedWithIds should be(savedMergedIntoPerson.mergedWithIds)
+
+    val savedMergedPerson: Person = testApp.service.person.getById(person2.persistedId)
+    savedMergedPerson.mergedIntoId should be(Some(mergedIntoPerson.persistedId))
+  }
+
+  test("Person merge B -> A, C -> A") {
     val person1Model = Person()
     val person1: Person = testApp.service.person.addPerson(person1Model)
 
@@ -116,15 +133,15 @@ import software.altitude.test.core.IntegrationTestCore
     val savedMergedPerson: Person = testApp.service.person.getById(person2.persistedId)
     savedMergedPerson.mergedIntoId should be(Some(mergedIntoPerson.persistedId))
 
-    val person3Model = Person()
-    val person3: Person = testApp.service.person.addPerson(person3Model)
-
     /**
      * To completely make sure this works, merge a second person into the OG destination (person1)
      *
      * The returned person from the merge() operation should identical to the persisted version, when we
      * get that object by ID directly.
      */
+    val person3Model = Person()
+    val person3: Person = testApp.service.person.addPerson(person3Model)
+
     val mergedIntoPersonAgain: Person = testApp.service.person.merge(dest=mergedIntoPerson, source=person3)
     mergedIntoPersonAgain.mergedWithIds.size should be(2)
 

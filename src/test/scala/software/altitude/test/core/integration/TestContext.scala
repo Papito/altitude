@@ -1,5 +1,6 @@
 package software.altitude.test.core.integration
 
+import org.apache.commons.io.FileUtils
 import software.altitude.core.Altitude
 import software.altitude.core.models.AccountType
 import software.altitude.core.models.Asset
@@ -10,6 +11,9 @@ import software.altitude.core.models.Repository
 import software.altitude.core.models.User
 import software.altitude.core.util.Util
 import software.altitude.core.{Const => C}
+import software.altitude.test.IntegrationTestUtil.getClass
+
+import java.io.File
 
 class TestContext(val testApp: Altitude) {
   var users: List[User] = List()
@@ -74,6 +78,7 @@ class TestContext(val testApp: Altitude) {
 
   def makeAsset(repository: Option[Repository] = None,
                 filename: String = Util.randomStr(50),
+                resourcePath: Option[String] = None,
                 user: Option[User] = None,
                 folder: Option[Folder] = None,
                 metadata: Metadata = Metadata()): Asset ={
@@ -91,9 +96,14 @@ class TestContext(val testApp: Altitude) {
 
     val currentUser = user.getOrElse(this.user)
 
+    val path = getClass.getResource(resourcePath.getOrElse("/import/images/test_asset.png")).getPath
+    val file  = new File(path)
+    val data = FileUtils.readFileToByteArray(file)
+
     Asset(
       userId = currentUser.persistedId,
       folderId = folderId,
+      data = data,
       assetType = new AssetType(
         mediaType = "mediaType",
         mediaSubtype = "mediaSubtype",
@@ -101,11 +111,12 @@ class TestContext(val testApp: Altitude) {
       fileName = filename,
       checksum = Util.randomStr(32),
       metadata = metadata,
-      sizeBytes = 1000L)
+      sizeBytes = data.length)
   }
 
   def persistAsset(asset: Option[Asset] = None,
                    repository: Option[Repository] = None,
+                   resourcePath: Option[String] = None,
                    user: Option[User] = None,
                    folder: Option[Folder] = None,
                    metadata: Metadata = Metadata()): Asset = {
@@ -121,7 +132,10 @@ class TestContext(val testApp: Altitude) {
 
     val assetModel = asset.getOrElse(
       makeAsset(
-        repository=Some(persistedRepository), folder=folder, metadata=metadata, user=user))
+        repository=Some(persistedRepository),
+        folder=folder,
+        resourcePath=resourcePath,
+        metadata=metadata, user=user))
 
     val persistedAsset: Asset = testApp.service.library.add(assetModel)
 

@@ -53,7 +53,7 @@ import software.altitude.test.core.IntegrationTestCore
     persistedPerson.numOfFaces should be(3)
   }
 
-  test("Recognize two new people", Focused) {
+  test("Recognize two new people") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/movies-speed.png")
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
 

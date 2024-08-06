@@ -65,16 +65,7 @@ class LibraryService(val app: Altitude) {
 
       logger.info(s"Adding asset: $assetToAddModel")
 
-      // FIXME: this is temporary, to work under tests
-      if (assetIn.data.nonEmpty) {
-        val image: Mat = matFromBytes(assetIn.data)
-        val results: List[Mat] = app.service.faceDetection.detectFacesWithYunet(image)
-        results.indices.foreach { idx =>
-          val res = results(idx)
-          val rect = FaceDetectionService.faceDetectToRect(res)
-          logger.info("Face detected: " + rect)
-        }
-      }
+      app.service.faceRecognition.processAsset(assetIn)
 
       app.service.asset.add(assetToAddModel)
 
@@ -450,5 +441,4 @@ class LibraryService(val app: Altitude) {
       app.service.search.reindexAsset(asset)
     }
   }
-
 }

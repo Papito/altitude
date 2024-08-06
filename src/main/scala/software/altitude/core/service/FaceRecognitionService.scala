@@ -98,6 +98,17 @@ class FaceRecognitionService(app: Altitude) {
     recognizer.save(FACE_RECOGNITION_MODEL_PATH)
   }
 
+  def processAsset(asset: Asset): Unit = {
+    val image: Mat = matFromBytes(asset.data)
+    val results: List[Mat] = app.service.faceDetection.detectFacesWithYunet(image)
+
+    results.indices.foreach { idx =>
+      val res = results(idx)
+      val rect = FaceDetectionService.faceDetectToRect(res)
+      logger.info("Face detected: " + rect)
+    }
+  }
+
   /**
    * Returns an existing OR a new person, already persisted in the database.
    *
