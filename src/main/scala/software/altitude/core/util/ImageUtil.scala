@@ -9,7 +9,7 @@ import org.opencv.core.Size
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
 import software.altitude.core.FormatException
-import software.altitude.core.models.Asset
+import software.altitude.core.models.AssetWithData
 
 import java.awt.AlphaComposite
 import java.awt.Color
@@ -33,9 +33,9 @@ object ImageUtil {
     Math.min(scaleX, scaleY)
   }
 
-  def makeImageThumbnail(asset: Asset, previewBoxSize: Int): Array[Byte] = {
+  def makeImageThumbnail(dataAsset: AssetWithData, previewBoxSize: Int): Array[Byte] = {
     try {
-      val mt: com.drew.metadata.Metadata = ImageMetadataReader.readMetadata(new ByteArrayInputStream(asset.data))
+      val mt: com.drew.metadata.Metadata = ImageMetadataReader.readMetadata(new ByteArrayInputStream(dataAsset.data))
       val exifDirectory = mt.getFirstDirectoryOfType(classOf[ExifIFD0Directory])
       // val jpegDirectory = mt.getFirstDirectoryOfType(classOf[JpegDirectory])
 
@@ -51,7 +51,7 @@ object ImageUtil {
        * https://sirv.com/help/articles/rotate-photos-to-be-upright/
        * https://stackoverflow.com/questions/5905868/how-to-rotate-jpeg-images-based-on-the-orientation-metadata
        */
-      val imageMat = Imgcodecs.imdecode(new MatOfByte(asset.data: _*), Imgcodecs.IMREAD_UNCHANGED | Imgcodecs.IMREAD_IGNORE_ORIENTATION)
+      val imageMat = Imgcodecs.imdecode(new MatOfByte(dataAsset.data: _*), Imgcodecs.IMREAD_UNCHANGED | Imgcodecs.IMREAD_IGNORE_ORIENTATION)
       val scaleFactor = determineImageScale(imageMat.width(), imageMat.height(), previewBoxSize, previewBoxSize)
 
       val resizedMat = new Mat()
@@ -126,7 +126,7 @@ object ImageUtil {
     } catch {
       case ex: Exception =>
         Util.logStacktrace(ex)
-        throw FormatException(asset)
+        throw FormatException(dataAsset.asset)
     }
   }
 }

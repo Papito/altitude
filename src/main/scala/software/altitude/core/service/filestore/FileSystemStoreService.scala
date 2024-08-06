@@ -8,7 +8,7 @@ import software.altitude.core.Altitude
 import software.altitude.core.NotFoundException
 import software.altitude.core.RequestContext
 import software.altitude.core.StorageException
-import software.altitude.core.models.Asset
+import software.altitude.core.models.AssetWithData
 import software.altitude.core.models.Face
 import software.altitude.core.models.MimedAssetData
 import software.altitude.core.models.MimedPreviewData
@@ -39,16 +39,16 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
       mimeType = "application/octet-stream")
   }
 
-  override def addAsset(asset: Asset): Unit = {
-    val destFile = new File(filePath(asset.persistedId))
-    logger.info(s"Creating asset [$asset] on file system at [$destFile]")
+  override def addAsset(dataAsset: AssetWithData): Unit = {
+    val destFile = new File(filePath(dataAsset.asset.persistedId))
+    logger.info(s"Creating asset [$dataAsset.asset] on file system at [$destFile]")
 
     try {
-      FileUtils.writeByteArrayToFile(destFile, asset.data)
+      FileUtils.writeByteArrayToFile(destFile, dataAsset.data)
     }
     catch {
       case ex: IOException =>
-        throw StorageException(s"Error creating [$asset] @ [$destFile]: $ex]")
+        throw StorageException(s"Error creating [$dataAsset.asset] @ [$destFile]: $ex]")
     }
   }
 

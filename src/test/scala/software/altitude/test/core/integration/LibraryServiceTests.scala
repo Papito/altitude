@@ -10,7 +10,6 @@ import software.altitude.core.NotFoundException
 import software.altitude.core.RequestContext
 import software.altitude.core.models._
 import software.altitude.core.util.Query
-import software.altitude.core.util.Util
 import software.altitude.core.{Const => C}
 import software.altitude.test.core.IntegrationTestCore
 
@@ -320,14 +319,14 @@ import software.altitude.test.core.IntegrationTestCore
   test("Restore an asset that was imported again") {
     val folder1: Folder = testApp.service.library.addFolder("folder1")
 
-    val assetModel: Asset = testContext.makeAsset(folder=Some(folder1))
-    val persistedAsset: Asset = testApp.service.library.add(assetModel)
+    val dataAsset = testContext.makeAssetWithData(folder=Some(folder1))
+    val persistedAsset: Asset = testApp.service.library.add(dataAsset)
 
     // recycle the asset
     testApp.service.library.recycleAsset(persistedAsset.persistedId)
 
     // import a new copy of it (should be allowed)
-    testApp.service.library.add(assetModel)
+    testApp.service.library.add(dataAsset)
 
     // now restore the previously deleted copy into itself
     intercept[DuplicateException] {

@@ -5,13 +5,14 @@ import software.altitude.core.Altitude
 import software.altitude.core.models.AccountType
 import software.altitude.core.models.Asset
 import software.altitude.core.models.AssetType
+import software.altitude.core.models.AssetWithData
 import software.altitude.core.models.Folder
 import software.altitude.core.models.Metadata
 import software.altitude.core.models.Repository
 import software.altitude.core.models.User
 import software.altitude.core.util.Util
 import software.altitude.core.{Const => C}
-import software.altitude.test.IntegrationTestUtil.{generateRandomBytes, getClass}
+import software.altitude.test.IntegrationTestUtil.generateRandomBytes
 
 import java.io.File
 import scala.util.Random
@@ -104,7 +105,6 @@ class TestContext(val testApp: Altitude) {
     Asset(
       userId = currentUser.persistedId,
       folderId = folderId,
-      data = generateRandomBytes(80),
       assetType = new AssetType(
         mediaType = "mediaType",
         mediaSubtype = "mediaSubtype",
@@ -113,6 +113,18 @@ class TestContext(val testApp: Altitude) {
       checksum = Random.nextInt(500000),
       metadata = metadata,
       sizeBytes = data.length)
+  }
+
+  def makeAssetWithData(repository: Option[Repository] = None,
+                        filename: String = Util.randomStr(50),
+                        resourcePath: Option[String] = None,
+                        user: Option[User] = None,
+                        folder: Option[Folder] = None,
+                        metadata: Metadata = Metadata()): AssetWithData = {
+
+    val asset = makeAsset(repository, filename, resourcePath, user, folder, metadata)
+    val data = generateRandomBytes(80)
+    AssetWithData(asset, data)
   }
 
   def persistAsset(asset: Option[Asset] = None,
@@ -138,7 +150,11 @@ class TestContext(val testApp: Altitude) {
         resourcePath=resourcePath,
         metadata=metadata, user=user))
 
-    val persistedAsset: Asset = testApp.service.library.add(assetModel)
+    val dataAsset = AssetWithData(
+      asset = assetModel,
+      data = generateRandomBytes(80))
+
+    val persistedAsset: Asset = testApp.service.library.add(dataAsset)
 
     assets = assets ::: persistedAsset :: Nil
 

@@ -1,6 +1,4 @@
 package software.altitude.core.service
-
-import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.slf4j.Logger
@@ -58,7 +56,6 @@ class AssetImportService(app: Altitude) {
 
     val asset: Asset = Asset(
       userId = RequestContext.account.value.get.persistedId,
-      data = importAsset.data,
       fileName = importAsset.fileName,
       checksum = MurmurHash.hash32(importAsset.data),
       assetType = assetType,
@@ -67,8 +64,10 @@ class AssetImportService(app: Altitude) {
       folderId = RequestContext.getRepository.rootFolderId,
       extractedMetadata = extractedMetadata)
 
+    val assetWithData = AssetWithData(asset, importAsset.data)
+
     val storedAsset: Option[Asset] = try {
-      Some(app.service.library.add(asset))
+      Some(app.service.library.add(assetWithData))
     }
     catch {
       case _: FormatException =>

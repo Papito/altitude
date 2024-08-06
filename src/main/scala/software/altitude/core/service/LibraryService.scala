@@ -1,6 +1,4 @@
 package software.altitude.core.service
-
-import org.opencv.core.Mat
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
@@ -11,7 +9,6 @@ import software.altitude.core.models.Folder
 import software.altitude.core.models._
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.ImageUtil.makeImageThumbnail
-import software.altitude.core.util.ImageUtil.matFromBytes
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 import software.altitude.core.util.SearchQuery
@@ -38,45 +35,47 @@ class LibraryService(val app: Altitude) {
     * ASSETS
     * *********************************************************************** */
 
-  def add(assetIn: Asset): JsObject = {
-    logger.info(s"Preparing to add asset [$assetIn]")
+  def add(dataAssetIn: AssetWithData): JsObject = {
+    logger.info(s"Preparing to add asset [$dataAssetIn]")
 
     txManager.withTransaction[JsObject] {
-      val existing: Option[Asset] = getByChecksum(assetIn.checksum)
+      val existing: Option[Asset] = getByChecksum(dataAssetIn.asset.checksum)
 
       if (existing.nonEmpty) {
-        logger.debug(s"Duplicate found for [$assetIn] and checksum: ${assetIn.checksum}")
+        logger.debug(s"Duplicate found for [$dataAssetIn] and checksum: ${dataAssetIn.asset.checksum}")
         throw DuplicateException()
       }
 
       /**
-        * Process metadata and append it to the asset
+        * Create the version of the asset with ID and metadata (we don't have that yet)
         */
-      val metadata = app.service.metadata.cleanAndValidate(assetIn.metadata)
-
+      val metadata = app.service.metadata.cleanAndValidate(dataAssetIn.asset.metadata)
       val assetId = BaseDao.genId
 
-      val assetToAddModel: Asset = assetIn.copy(
+      val asset: Asset = dataAssetIn.asset.copy(
         id = Some(assetId),
         metadata = metadata,
-        data = assetIn.data,
-        extractedMetadata = assetIn.extractedMetadata
+        extractedMetadata = dataAssetIn.asset.extractedMetadata
       )
 
-      logger.info(s"Adding asset: $assetToAddModel")
+      /**
+       * This data asset has:
+       *    - Asset with ID
+       *    - Asset with metadata
+       *    - The data, obviously
+       */
+      val dataAsset = AssetWithData(asset, dataAssetIn.data)
 
-      app.service.faceRecognition.processAsset(assetIn)
-      app.service.asset.add(assetToAddModel)
+      logger.info(s"Adding asset: $dataAsset")
 
-      app.service.search.indexAsset(assetToAddModel)
+      app.service.faceRecognition.processAsset(dataAsset)
+      app.service.asset.add(asset)
+      app.service.search.indexAsset(asset)
+      app.service.stats.addAsset(asset)
+      app.service.fileStore.addAsset(dataAsset)
+      addPreview(dataAsset)
 
-      app.service.stats.addAsset(assetToAddModel)
-
-      addPreview(assetToAddModel)
-
-      app.service.fileStore.addAsset(assetToAddModel)
-
-      assetToAddModel
+      asset
     }
   }
 
@@ -169,22 +168,22 @@ class LibraryService(val app: Altitude) {
     * DATA/PREVIEW
     * *********************************************************************** */
 
-  private def genPreviewData(asset: Asset): Array[Byte] = {
-    asset.assetType.mediaType match {
+  private def genPreviewData(dataAsset: AssetWithData): Array[Byte] = {
+    dataAsset.asset.assetType.mediaType match {
       case "image" =>
-        makeImageThumbnail(asset, previewBoxSize)
+        makeImageThumbnail(dataAsset, previewBoxSize)
       case _ => new Array[Byte](0)
     }
   }
 
-  private def addPreview(asset: Asset): Option[MimedPreviewData] = {
-    val previewData: Array[Byte] = genPreviewData(asset)
+  private def addPreview(dataAsset: AssetWithData): Option[MimedPreviewData] = {
+    val previewData: Array[Byte] = genPreviewData(dataAsset)
 
     previewData.length match {
       case size if size > 0 =>
 
         val preview: MimedPreviewData = MimedPreviewData(
-          assetId = asset.persistedId,
+          assetId = dataAsset.asset.persistedId,
           data = previewData)
 
         app.service.fileStore.addPreview(preview)

@@ -11,6 +11,7 @@ import software.altitude.core.Altitude
 import software.altitude.core.Const
 import software.altitude.core.Environment
 import software.altitude.core.models.Asset
+import software.altitude.core.models.AssetWithData
 import software.altitude.core.models.Face
 import software.altitude.core.models.Person
 import software.altitude.core.util.ImageUtil.matFromBytes
@@ -98,8 +99,8 @@ class FaceRecognitionService(app: Altitude) {
     recognizer.save(FACE_RECOGNITION_MODEL_PATH)
   }
 
-  def processAsset(asset: Asset): Unit = {
-    val image: Mat = matFromBytes(asset.data)
+  def processAsset(dataAsset: AssetWithData): Unit = {
+    val image: Mat = matFromBytes(dataAsset.data)
     val results: List[Mat] = app.service.faceDetection.detectFacesWithYunet(image)
 
     results.indices.foreach { idx =>
