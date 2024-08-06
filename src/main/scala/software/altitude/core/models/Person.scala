@@ -58,7 +58,14 @@ case class Person(id: Option[String] = None,
     _faces.addAll(faces)
   }
 
-  def getFaces: mutable.TreeSet[Face] = _faces
+  def getFaces: mutable.TreeSet[Face] = {
+    // we do not get faces for a person automatically, but "numOfFaces" reflects the actual number in DB
+    if (numOfFaces > 0 && _faces.isEmpty) {
+      throw new IllegalStateException("Faces have not been loaded for this person.")
+    }
+
+    _faces
+  }
 
   override def canEqual(other: Any): Boolean = other.isInstanceOf[Face]
 

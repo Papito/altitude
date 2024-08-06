@@ -1,7 +1,8 @@
 package software.altitude.core.service
 
-import research.Person
 import software.altitude.core.Altitude
+import software.altitude.core.RequestContext
+import software.altitude.core.models.Person
 
 import scala.collection.mutable
 
@@ -11,27 +12,41 @@ class FaceCacheService(app: Altitude) {
   private type PersonCache = mutable.Map[Label, Person]
   private type RepositoryPersonCache = mutable.Map[String, PersonCache]
 
-  private def newPersonCache(): PersonCache = mutable.Map[Label, Person]()
-
   // Model label (int) -> Person
-  private val repoPersonCache: PersonCache = newPersonCache()
+  private def newPersonCache(): PersonCache = mutable.Map[Label, Person]()
 
   // Repo ID -> Person Cache
   private val cache: RepositoryPersonCache = mutable.Map[String, PersonCache]()
 
-  private def getRepositoryPersonCache(repository: String): PersonCache = {
-    cache.getOrElseUpdate(repository, newPersonCache())
+  private def getRepositoryPersonCache: PersonCache = {
+    cache.getOrElseUpdate(RequestContext.getRepository.persistedId, newPersonCache())
   }
 
-  def getPerson(repositoryId: String, id: Label): Option[Person] = {
-    getRepositoryPersonCache(repositoryId).get(id)
+  def getPersonByLabel(label: Label): Option[Person] = {
+
+    val personOpt = getRepositoryPersonCache.get(label)
+
+    personOpt
   }
 
-  def putPerson(repositoryId: String, id: Label, person: Person): Unit = {
-    getRepositoryPersonCache(repositoryId).put(id, person)
+  def putPerson(person: Person): Unit = {
+    getRepositoryPersonCache.put(person.label, person)
   }
 
-  def removePerson(repositoryId: String, id: Label): Unit = {
-    getRepositoryPersonCache(repositoryId).remove(id)
+  def removePerson(label: Label): Unit = {
+    getRepositoryPersonCache.remove(label)
+  }
+
+  def size(): Int = getRepositoryPersonCache.keys.size
+
+  def getAll: List[Person] = getRepositoryPersonCache.values.toList
+
+  def dump(): Unit = {
+    cache.foreach { case (repoId, personCache) =>
+      println(s"Repository $repoId")
+      personCache.foreach { case (label, person) =>
+        println(s"  Label $label -> ${person.name}")
+      }
+    }
   }
 }

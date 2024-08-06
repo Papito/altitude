@@ -103,6 +103,7 @@ CREATE TABLE face (
   repository_id CHAR(36) NOT NULL REFERENCES repository(id) ON DELETE CASCADE,
   asset_id CHAR(36) NOT NULL REFERENCES asset(id) ON DELETE CASCADE,
   person_id CHAR(36) NOT NULL REFERENCES person(id) ON DELETE CASCADE,
+  person_label BIGINT NOT NULL,
   x1 INT NOT NULL,
   y1 INT NOT NULL,
   width INT NOT NULL,

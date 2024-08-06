@@ -86,6 +86,7 @@ object Const {
     val HEIGHT = "height"
     val ASSET_ID = "asset_id"
     val PERSON_ID = "person_id"
+    val PERSON_LABEL = "person_label"
     val DETECTION_SCORE = "detection_score"
     val EMBEDDINGS = "embeddings"
     val FEATURES = "features"

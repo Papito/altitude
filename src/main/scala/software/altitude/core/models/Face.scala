@@ -1,6 +1,7 @@
 package software.altitude.core.models
 
 import org.opencv.core.Mat
+import org.opencv.core.MatOfFloat
 import play.api.libs.json._
 import software.altitude.core.util.ImageUtil.matFromBytes
 import software.altitude.core.{Const => C}
@@ -18,6 +19,7 @@ object Face {
       height = (json \ C.Face.HEIGHT).as[Int],
       assetId = (json \ C.Face.ASSET_ID).asOpt[String],
       personId = (json \ C.Face.PERSON_ID).asOpt[String],
+      personLabel = (json \ C.Face.PERSON_LABEL).asOpt[Int],
       detectionScore = (json \ C.Face.DETECTION_SCORE).as[Double],
       embeddings = (json \ C.Face.EMBEDDINGS).as[Array[Float]],
       features = (json \ C.Face.FEATURES).as[Array[Float]],
@@ -38,6 +40,7 @@ case class Face(id: Option[String] = None,
                 height: Int,
                 assetId: Option[String] = None,
                 personId: Option[String] = None,
+                personLabel: Option[Int] = None,
                 detectionScore: Double,
                 embeddings: Array[Float],
                 features: Array[Float],
@@ -47,6 +50,12 @@ case class Face(id: Option[String] = None,
 
   val alignedImageGsMat: Mat = matFromBytes(alignedImageGs)
 
+  val featuresMat: Mat = {
+    val floatMat = new MatOfFloat()
+    floatMat.fromArray(features: _*)
+    floatMat
+  }
+
   override def toJson: JsObject = {
     Json.obj(
       C.Face.X1 -> x1,
@@ -55,6 +64,7 @@ case class Face(id: Option[String] = None,
       C.Face.HEIGHT -> height,
       C.Face.ASSET_ID -> assetId,
       C.Face.PERSON_ID -> personId,
+      C.Face.PERSON_LABEL -> personLabel,
       C.Face.DETECTION_SCORE -> detectionScore,
       C.Face.EMBEDDINGS -> embeddings,
       C.Face.FEATURES -> features,
@@ -63,6 +73,9 @@ case class Face(id: Option[String] = None,
       C.Face.ALIGNED_IMAGE_GS -> alignedImageGs
     ) ++ coreJsonAttrs
   }
+
+  override def toString: String =
+    s"FACE $id. Label: ${personLabel}. Score: $detectionScore, ${width}x${height} at ($x1, $y1)"
 
   override def canEqual(other: Any): Boolean = other.isInstanceOf[Face]
 

@@ -118,7 +118,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
 
   override def addFace(face: Face): Unit = {
     val destFile = new File(facePath(face.persistedId))
-    logger.debug(s"Creating face [$face] on file system at [$destFile]")
+    logger.debug(s"Creating face [${face.persistedId}] on file system at [$destFile]")
 
     try {
       FileUtils.writeByteArrayToFile(destFile, face.image)

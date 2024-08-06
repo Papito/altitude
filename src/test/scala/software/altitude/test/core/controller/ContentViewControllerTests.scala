@@ -53,7 +53,7 @@ import software.altitude.test.core.ControllerTestCore
     val importAsset = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
     val faces1 = testApp.service.faceDetection.extractFaces(importAsset.data)
-    val person: Person = testApp.service.person.add(Person())
+    val person: Person = testApp.service.person.addPerson(Person())
 
     val face: Face = faces1.head
     val savedFace: Face = testApp.service.person.addFace(face=face, asset=importedAsset, person = person)

@@ -1,7 +1,8 @@
 package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
-import org.scalatest.matchers.must.Matchers.{be, not}
+import org.scalatest.matchers.must.Matchers.be
+import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
 import software.altitude.core.models.Asset
@@ -19,13 +20,15 @@ import software.altitude.test.core.IntegrationTestCore
     val faces = testApp.service.faceDetection.extractFaces(importAsset.data)
 
     faces.foreach(face => {
-      val person = testApp.service.person.add(Person())
+      val person = testApp.service.person.addPerson(Person())
       // no pun intended
       val savedFace: Face = testApp.service.person.addFace(face=face, asset=importedAsset, person = person)
 
       savedFace.image.length should be > 1000
       savedFace.alignedImage.length should be > 1000
       savedFace.alignedImageGs.length should be > 1000
+      savedFace.personId should be (Some(person.persistedId))
+      savedFace.personLabel should be (Some(person.label))
 
       val retrievedFace: Face = testApp.service.person.getFaceById(savedFace.id.get)
       retrievedFace.features should be (savedFace.features)
@@ -34,6 +37,8 @@ import software.altitude.test.core.IntegrationTestCore
       retrievedFace.image.length shouldBe savedFace.image.length
       retrievedFace.alignedImage.length shouldBe savedFace.alignedImage.length
       retrievedFace.alignedImageGs.length shouldBe savedFace.alignedImageGs.length
+      retrievedFace.personId shouldBe savedFace.personId
+      retrievedFace.personLabel shouldBe savedFace.personLabel
     })
   }
 
@@ -41,7 +46,7 @@ import software.altitude.test.core.IntegrationTestCore
     val importAsset1 = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val importedAsset1: Asset = testApp.service.assetImport.importAsset(importAsset1).get
     val faces1 = testApp.service.faceDetection.extractFaces(importAsset1.data)
-    val person: Person = testApp.service.person.add(Person())
+    val person: Person = testApp.service.person.addPerson(Person())
 
     person.numOfFaces should be (0)
 
@@ -66,7 +71,7 @@ import software.altitude.test.core.IntegrationTestCore
     updatedPersonAgain.coverFaceId should be (Some(savedFace1.persistedId))
   }
 
-  test("Can add and retrieve a new person with a face", Focused) {
+  test("Can add and retrieve a new person with a face") {
     val importAsset1 = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val importedAsset1: Asset = testApp.service.assetImport.importAsset(importAsset1).get
     val faces1 = testApp.service.faceDetection.extractFaces(importAsset1.data)
@@ -83,13 +88,13 @@ import software.altitude.test.core.IntegrationTestCore
 
   test("Can add and retrieve a person") {
     val person1Model = Person()
-    val person1: Person = testApp.service.person.add(person1Model)
+    val person1: Person = testApp.service.person.addPerson(person1Model)
 
     val retrievedPerson1: Person = testApp.service.person.getById(person1.persistedId)
     retrievedPerson1.isHidden should be(false)
 
     val person2Model = Person()
-    val person2: Person = testApp.service.person.add(person2Model)
+    val person2: Person = testApp.service.person.addPerson(person2Model)
     val retrievedPerson2: Person = testApp.service.person.getById(person2.persistedId)
 
     retrievedPerson2.label - retrievedPerson1.label should be(1)
@@ -97,10 +102,10 @@ import software.altitude.test.core.IntegrationTestCore
 
   test("Can merge three people into one") {
     val person1Model = Person()
-    val person1: Person = testApp.service.person.add(person1Model)
+    val person1: Person = testApp.service.person.addPerson(person1Model)
 
     val person2Model = Person()
-    val person2: Person = testApp.service.person.add(person2Model)
+    val person2: Person = testApp.service.person.addPerson(person2Model)
 
     val mergedIntoPerson: Person = testApp.service.person.merge(dest=person1, source=person2)
     val savedMergedIntoPerson: Person = testApp.service.person.getById(person1.persistedId)
@@ -112,7 +117,7 @@ import software.altitude.test.core.IntegrationTestCore
     savedMergedPerson.mergedIntoId should be(Some(mergedIntoPerson.persistedId))
 
     val person3Model = Person()
-    val person3: Person = testApp.service.person.add(person3Model)
+    val person3: Person = testApp.service.person.addPerson(person3Model)
 
     /**
      * To completely make sure this works, merge a second person into the OG destination (person1)

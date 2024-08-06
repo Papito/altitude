@@ -110,6 +110,7 @@ CREATE TABLE face (
   y1 INT NOT NULL,
   repository_id CHAR(36) NOT NULL,
   person_id CHAR(36) NOT NULL,
+  person_label INT NOT NULL,
   width INT NOT NULL,
   height INT NOT NULL,
   detection_score FLOAT NOT NULL,

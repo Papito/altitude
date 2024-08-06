@@ -1,5 +1,6 @@
 package software.altitude.core.service
 
+import play.api.libs.json.JsObject
 import play.api.libs.json.Json
 import software.altitude.core.Altitude
 import software.altitude.core.dao.FaceDao
@@ -8,6 +9,7 @@ import software.altitude.core.models.Asset
 import software.altitude.core.models.Face
 import software.altitude.core.models.Person
 import software.altitude.core.transactions.TransactionManager
+import software.altitude.core.util.Query
 import software.altitude.core.{Const => C}
 
 object PersonService {
@@ -19,6 +21,16 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
   private val faceDao: FaceDao = app.DAO.face
 
   override protected val txManager: TransactionManager = app.txManager
+
+  override def add(objIn: Person, queryForDup: Option[Query] = None): JsObject = {
+    throw new NotImplementedError("Use the alternate addPerson() method2")
+  }
+
+  def getPersonById(personId: String): Person = {
+    txManager.asReadOnly[Person] {
+      dao.getById(personId)
+    }
+  }
 
   def getFaceById(faceId: String): Face = {
     txManager.asReadOnly[Face] {

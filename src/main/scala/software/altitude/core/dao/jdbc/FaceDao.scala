@@ -28,6 +28,10 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
       height = rec(C.Face.HEIGHT).asInstanceOf[Int],
       assetId = Some(rec(C.Face.ASSET_ID).asInstanceOf[String]),
       personId = Some(rec(C.Face.PERSON_ID).asInstanceOf[String]),
+      personLabel = Some(rec(C.Face.PERSON_LABEL).getClass match {
+        case c if c == classOf[java.lang.Integer] => rec(C.Face.PERSON_LABEL).asInstanceOf[Int]
+        case c if c == classOf[java.lang.Long] => rec(C.Face.PERSON_LABEL).asInstanceOf[Long].toInt
+      }),
       detectionScore = rec(C.Face.DETECTION_SCORE).asInstanceOf[Double],
       embeddings = embeddingsArray.toArray,
       features = featuresArray.toArray,
@@ -47,10 +51,10 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
     val sql =
       s"""
         INSERT INTO $tableName (${C.Face.ID}, ${C.Base.REPO_ID}, ${C.Face.X1}, ${C.Face.Y1}, ${C.Face.WIDTH}, ${C.Face.HEIGHT},
-                                ${C.Face.ASSET_ID}, ${C.Face.PERSON_ID}, ${C.Face.DETECTION_SCORE}, ${C.Face.EMBEDDINGS},
-                                ${C.Face.FEATURES}, ${C.Face.IMAGE}, ${C.Face.ALIGNED_IMAGE}, ${C.Face.ALIGNED_IMAGE_GS},
-                                ${C.Face.CHECKSUM})
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                ${C.Face.ASSET_ID}, ${C.Face.PERSON_ID}, ${C.Face.PERSON_LABEL}, ${C.Face.DETECTION_SCORE},
+                                ${C.Face.EMBEDDINGS}, ${C.Face.FEATURES}, ${C.Face.IMAGE}, ${C.Face.ALIGNED_IMAGE},
+                                ${C.Face.ALIGNED_IMAGE_GS}, ${C.Face.CHECKSUM})
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
 
     val conn = RequestContext.getConn
@@ -82,19 +86,21 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
     preparedStatement.setInt(6, face.height)
     preparedStatement.setString(7, asset.persistedId)
     preparedStatement.setString(8, person.persistedId)
-    preparedStatement.setDouble(9, face.detectionScore)
-    preparedStatement.setString(10, embeddingsArrayJson.toString())
-    preparedStatement.setString(11, featuresArrayJson.toString())
-    preparedStatement.setBytes(12, face.image)
-    preparedStatement.setBytes(13, face.alignedImage)
-    preparedStatement.setBytes(14, face.alignedImageGs)
-    preparedStatement.setInt(15, checksum)
+    preparedStatement.setInt(9, person.label)
+    preparedStatement.setDouble(10, face.detectionScore)
+    preparedStatement.setString(11, embeddingsArrayJson.toString())
+    preparedStatement.setString(12, featuresArrayJson.toString())
+    preparedStatement.setBytes(13, face.image)
+    preparedStatement.setBytes(14, face.alignedImage)
+    preparedStatement.setBytes(15, face.alignedImageGs)
+    preparedStatement.setInt(16, checksum)
     preparedStatement.execute()
 
     jsonIn ++ Json.obj(
       C.Base.ID -> id,
       C.Face.ASSET_ID -> asset.id.get,
-      C.Face.PERSON_ID -> person.id.get
+      C.Face.PERSON_ID -> person.id.get,
+      C.Face.PERSON_LABEL -> person.label,
     )
   }
 }

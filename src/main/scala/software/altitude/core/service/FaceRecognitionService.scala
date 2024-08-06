@@ -16,6 +16,7 @@ import software.altitude.core.models.Person
 import software.altitude.core.util.ImageUtil.matFromBytes
 
 import java.io.File
+import java.util
 
 object FaceRecognitionService {
   // Number of labels reserved for special cases, and not used for actual people instances
@@ -31,10 +32,10 @@ object FaceRecognitionService {
    * Lower number means faster matching but the same person may be detected as new.
    * Technically, just 1 "top" face will work, and the accuracy benefits get diminished the higher we go
    */
-  private val MAX_BRUTE_FORCE_COMPARISONS_PER_PERSON = 8
+  private val MAX_COMPARISONS_PER_PERSON = 8
 
   /**
-   * If the cosine distance between the face embeddings is below this threshold, we consider the face a match.
+   * If the cosine distance between the facial features is below this threshold, we consider the face a match.
    */
   private val PESSIMISTIC_COSINE_DISTANCE_THRESHOLD = .46
 }
@@ -103,7 +104,7 @@ class FaceRecognitionService(app: Altitude) {
    * The person/faces are also added to the cache for this repository, as we may need to
    * brute-force search for the person's face in the future.
    */
-  def recognizePerson(detectedFace: Face, asset: Asset): Person = {
+  def recognizeFace(detectedFace: Face, asset: Asset): Person = {
     require(detectedFace.id.isEmpty, "Face object must not be persisted yet")
     require(detectedFace.personId.isEmpty, "Face object must not be associated with a person yet")
 
@@ -114,18 +115,96 @@ class FaceRecognitionService(app: Altitude) {
     val predLabel = predLabelArr.head
     val confidence = confidenceArr.head
 
-    println("Predicted label: " + predLabel + " with confidence: " + confidence)
+    logger.debug("Predicted label: " + predLabel + " with confidence: " + confidence)
+    val personMlMatch: Option[Person] = app.service.faceCache.getPersonByLabel(predLabel)
 
-    // if system label, ignore, we are probably at the start, just add the face and the NEW person
-    if (predLabel <= FaceRecognitionService.RESERVED_LABEL_COUNT) {
-      val newPerson = app.service.person.add(Person())
-      val persistedFace = app.service.person.addFace(detectedFace, asset, newPerson)
-      return newPerson
+    /**
+     * If we have a match that is not a system label (low numbers), we compare the match to
+     * the person's "best" face - the faces are sorted by detection score.
+     *
+     * This is called a "verified" match.
+     *
+     * We do NOT trust the ML model confidence score, as its meaning is relative
+     */
+    if (personMlMatch.isDefined) {
+      logger.debug(f"Comparing ML match ${personMlMatch.get.persistedId})")
+      val simScore = app.service.faceDetection.getFeatureSimilarityScore(
+        detectedFace.featuresMat, personMlMatch.get.getFaces.head.featuresMat)
+      logger.debug("Similarity score: " + simScore)
+
+      if (simScore >= FaceRecognitionService.PESSIMISTIC_COSINE_DISTANCE_THRESHOLD) {
+        logger.debug("MATCHED. Persisting face")
+        updatePersonWithFace(personMlMatch.get, detectedFace, asset)
+        return personMlMatch.get
+      }
     }
 
-    null
+    // No verified match, try brute-force comparisons on cached faces
+    val bestPersonFaceMatch: Option[Face] = matchFaceBruteForce(detectedFace)
+
+    if (bestPersonFaceMatch.isDefined) {
+      val personBruteForceMatch = app.service.faceCache.getPersonByLabel(bestPersonFaceMatch.get.personLabel.get)
+      updatePersonWithFace(personBruteForceMatch.get, detectedFace, asset)
+      personBruteForceMatch.get
+    } else {
+      logger.info("Mo match. Adding new person")
+      val personModel = Person()
+      val newPerson: Person = app.service.person.addPerson(personModel, Some(asset))
+      updatePersonWithFace(newPerson, detectedFace, asset)
+      app.service.faceCache.putPerson(newPerson)
+      newPerson
+    }
   }
 
-  def train(mat: Mat): Unit = {
+  private def matchFaceBruteForce(face: Face): Option[Face] = {
+    logger.debug("Brute-force matching face")
+    val bestFaceMatch: Option[Face] = getBestFaceMatch(face)
+    logger.debug("Best match: " + bestFaceMatch)
+
+    bestFaceMatch match {
+      case None => None
+      case Some(matchedFace) => Some(matchedFace)
+    }
+  }
+
+  private def getBestFaceMatch(thisFace: Face): Option[Face] = {
+    logger.debug(s"Comparing $thisFace: ")
+    val faceSimilarityScores: List[(Double, Face)] = app.service.faceCache.getAll.flatMap { person =>
+      logger.debug(s"Comparing faces for person ${person.name.get}")
+      // these are already sorted by detection score, best first
+      val bestFaces = person.getFaces.toList.take(FaceRecognitionService.MAX_COMPARISONS_PER_PERSON)
+      val faceScores: List[(Double, Face)] = bestFaces.map { personFace =>
+        val similarityScore = app.service.faceDetection.getFeatureSimilarityScore(
+          thisFace.featuresMat, personFace.featuresMat)
+        logger.debug(s"Comparing with $personFace -> " + similarityScore)
+        (similarityScore, personFace)
+      }
+
+      faceScores
+    }
+
+    // get the top one
+    val sortedMatchingSimilarityWeights = faceSimilarityScores.sortBy(_._1)
+    val highestSimilarityWeights = sortedMatchingSimilarityWeights.filter(_._1 >= FaceRecognitionService.PESSIMISTIC_COSINE_DISTANCE_THRESHOLD)
+
+    highestSimilarityWeights.headOption match {
+      case None => None
+      case Some(res) => Some(res._2)
+    }
+  }
+
+
+  private def updatePersonWithFace(person: Person, face: Face, asset: Asset): Unit = {
+    val persistedFace = app.service.person.addFace(face, asset, person)
+    logger.info(s"Saving face ${persistedFace.persistedId} for person ${person.name.get}")
+    person.addFace(persistedFace)
+
+
+    logger.info(s"Updating model for person ${person.name.get}")
+    val labels = new Mat(1, 1, CvType.CV_32SC1)
+    val images = new util.ArrayList[Mat]()
+    labels.put(0, 0, person.label)
+    images.add(face.alignedImageGsMat)
+    recognizer.update(images, labels)
   }
 }
