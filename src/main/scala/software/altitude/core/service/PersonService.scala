@@ -88,6 +88,7 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
           C.Person.COVER_FACE_ID -> persistedFace.persistedId)
       }
 
+      app.service.faceCache.putPerson(persistedPerson)
       persistedPerson
     }
   }

@@ -163,7 +163,6 @@ class FaceRecognitionService(app: Altitude) {
       val personModel = Person()
       val newPerson: Person = app.service.person.addPerson(personModel, Some(asset))
       updatePersonWithFace(newPerson, detectedFace, asset)
-      app.service.faceCache.putPerson(newPerson)
       newPerson
     }
   }
