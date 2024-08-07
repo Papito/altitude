@@ -10,6 +10,7 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
   override final val tableName = "person"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
+    val mergedIntoLabel = rec(C.Person.MERGED_INTO_LABEL)
 
     val model = Person(
       id = Some(rec(C.Base.ID).asInstanceOf[String]),
@@ -22,6 +23,15 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
       coverFaceId = Some(rec(C.Person.COVER_FACE_ID).asInstanceOf[String]),
       mergedWithIds = loadCsv[String](rec(C.Person.MERGED_WITH_IDS).asInstanceOf[String]),
       mergedIntoId = Some(rec(C.Person.MERGED_INTO_ID).asInstanceOf[String]),
+      // If mergedIntoLabel is there, it's an Int or a Long, depending on DB
+      mergedIntoLabel = if (mergedIntoLabel != null) {
+        Some(mergedIntoLabel.getClass match {
+        case c if c == classOf[java.lang.Integer] => rec(C.Person.MERGED_INTO_LABEL).asInstanceOf[Int]
+        case c if c == classOf[java.lang.Long] => rec(C.Person.MERGED_INTO_LABEL).asInstanceOf[Long].toInt
+      })
+      } else {
+        None
+      },
       numOfFaces = rec(C.Person.NUM_OF_FACES).asInstanceOf[Int],
       isHidden = getBooleanField(rec(C.Person.IS_HIDDEN))
     )

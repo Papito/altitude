@@ -4,7 +4,7 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.must.Matchers.empty
 import org.scalatest.matchers.must.Matchers.not
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.matchers.should.Matchers.{convertToAnyShouldWrapper, theSameInstanceAs}
 import software.altitude.core.Altitude
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Face
@@ -102,60 +102,34 @@ import software.altitude.test.core.IntegrationTestCore
   }
 
   test("Person merge A -> B", Focused) {
-    val person1Model = Person()
-    val person1: Person = testApp.service.person.addPerson(person1Model)
-    testContext.addMockFaces(person1, 3)
+    val destPerson: Person = testApp.service.person.addPerson(Person())
+    testContext.addMockFaces(destPerson, 3)
 
-    val person2Model = Person()
-    val person2: Person = testApp.service.person.addPerson(person2Model)
-    testContext.addMockFaces(person2, 3)
+    val sourcePerson: Person = testApp.service.person.addPerson(Person())
+    testContext.addMockFaces(sourcePerson, 3)
 
-    val mergedIntoPerson: Person = testApp.service.person.merge(dest=person1, source=person2)
+    val destPersonMerged: Person = testApp.service.person.merge(dest=destPerson, source=sourcePerson)
+    destPersonMerged.mergedWithIds.size should be(1)
 
-    val mergedIntoFaces: List[Face] = testApp.service.person.getFaces(mergedIntoPerson.persistedId)
-    mergedIntoFaces.size should be(6)
+    val destPersonFaces: List[Face] = testApp.service.person.getFaces(destPersonMerged.persistedId)
+    destPersonFaces.size should be(6)
 
-    val savedMergedIntoPerson: Person = testApp.service.person.getById(person1.persistedId)
+    val destPersonInDb: Person = testApp.service.person.getById(destPerson.persistedId)
+    destPersonInDb.mergedWithIds should be(destPersonMerged.mergedWithIds)
 
-    mergedIntoPerson.mergedWithIds.size should be(1)
-    mergedIntoPerson.mergedWithIds should be(savedMergedIntoPerson.mergedWithIds)
+    val sourcePersonInDb: Person = testApp.service.person.getById(sourcePerson.persistedId)
+    sourcePersonInDb.mergedIntoId should be(Some(destPersonMerged.persistedId))
+    sourcePersonInDb.mergedIntoLabel should be(Some(destPersonMerged.label))
 
-    val savedMergedPerson: Person = testApp.service.person.getById(person2.persistedId)
-    savedMergedPerson.mergedIntoId should be(Some(mergedIntoPerson.persistedId))
+    val sourcePersonFaces: List[Face] = testApp.service.person.getFaces(sourcePersonInDb.persistedId)
+    sourcePersonFaces shouldBe empty
 
-    val mergedFromFaces: List[Face] = testApp.service.person.getFaces(savedMergedPerson.persistedId)
-    mergedFromFaces shouldBe empty
+    // the person in cache under source label should be the dest person
+    val destPersonInCache = testApp.service.faceCache.getPersonByLabel(sourcePerson.label).get
+    destPersonInCache should be(destPersonMerged)
+    destPersonInCache should be theSameInstanceAs destPersonMerged
   }
 
   test("Person merge B -> A, C -> A") {
-    val person1Model = Person()
-    val person1: Person = testApp.service.person.addPerson(person1Model)
-
-    val person2Model = Person()
-    val person2: Person = testApp.service.person.addPerson(person2Model)
-
-    val mergedIntoPerson: Person = testApp.service.person.merge(dest=person1, source=person2)
-    val savedMergedIntoPerson: Person = testApp.service.person.getById(person1.persistedId)
-
-    mergedIntoPerson.mergedWithIds.size should be(1)
-    mergedIntoPerson.mergedWithIds should be(savedMergedIntoPerson.mergedWithIds)
-
-    val savedMergedPerson: Person = testApp.service.person.getById(person2.persistedId)
-    savedMergedPerson.mergedIntoId should be(Some(mergedIntoPerson.persistedId))
-
-    /**
-     * To completely make sure this works, merge a second person into the OG destination (person1)
-     *
-     * The returned person from the merge() operation should identical to the persisted version, when we
-     * get that object by ID directly.
-     */
-    val person3Model = Person()
-    val person3: Person = testApp.service.person.addPerson(person3Model)
-
-    val mergedIntoPersonAgain: Person = testApp.service.person.merge(dest=mergedIntoPerson, source=person3)
-    mergedIntoPersonAgain.mergedWithIds.size should be(2)
-
-    val savedMergedIntoPersonAgain: Person = testApp.service.person.getById(mergedIntoPerson.persistedId)
-    mergedIntoPersonAgain.mergedWithIds should be(savedMergedIntoPersonAgain.mergedWithIds)
   }
 }

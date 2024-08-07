@@ -102,6 +102,7 @@ object Const {
     val MERGED_WITH_IDS = "merged_with_ids"
     val NUM_OF_FACES = "num_of_faces"
     val MERGED_INTO_ID = "merged_into_id"
+    val MERGED_INTO_LABEL = "merged_into_label"
     val IS_HIDDEN = "is_hidden"
     val FACES = "faces"
   }

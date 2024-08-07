@@ -96,22 +96,27 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
   def merge(dest: Person, source: Person): Person = {
     txManager.withTransaction[Person] {
       // update the destination with the source person's id (it's a list of ids at the destination)
-      val mergedPerson: Person = dao.updateMergedWithIds(dest, source.persistedId)
-
-      // update the source person with the destination person's id
-      updateById(
-        source.persistedId,
-        Map(C.Person.MERGED_INTO_ID -> mergedPerson.persistedId))
+      val mergedDest: Person = dao.updateMergedWithIds(dest, source.persistedId)
 
       // move all faces from source to destination
       val q = new Query().add(C.Face.PERSON_ID -> source.persistedId)
 
-      val updateData: Map[String, Any] = Map(
-        C.Face.PERSON_ID -> dest.persistedId,
-        C.Face.PERSON_LABEL -> dest.label)
+      faceDao.updateByQuery(q, Map(C.Face.PERSON_ID -> dest.persistedId))
 
-      faceDao.updateByQuery(q, updateData)
-      mergedPerson
+      // specify ID/label of where the source person was merged into
+      val updatedSource: Person = source.copy(
+        mergedIntoId = Some(dest.persistedId),
+        mergedIntoLabel = Some(dest.label))
+
+      updateById(
+        updatedSource.persistedId,
+        Map(
+          C.Person.MERGED_INTO_ID -> updatedSource.mergedIntoId.get,
+          C.Person.MERGED_INTO_LABEL -> updatedSource.mergedIntoLabel.get))
+
+      app.service.faceCache.replace(updatedSource)
+      app.service.faceCache.replace(mergedDest)
+      mergedDest
     }
   }
 
