@@ -106,10 +106,12 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
 
       // move all faces from source to destination
       val q = new Query().add(C.Face.PERSON_ID -> source.persistedId)
-      val updateObj = Json.obj(
+
+      val updateData: Map[String, Any] = Map(
         C.Face.PERSON_ID -> dest.persistedId,
         C.Face.PERSON_LABEL -> dest.label)
-      faceDao.updateByQuery(q, updateObj, List(C.Face.PERSON_ID, C.Face.PERSON_LABEL))
+
+      faceDao.updateByQuery(q, updateData)
       mergedPerson
     }
   }
