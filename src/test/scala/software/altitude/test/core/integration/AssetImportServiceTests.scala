@@ -7,7 +7,8 @@ import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
 import software.altitude.core.DuplicateException
-import software.altitude.core.models.{Asset, MimedPreviewData}
+import software.altitude.core.models.Asset
+import software.altitude.core.models.MimedPreviewData
 import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.IntegrationTestCore
 

@@ -2,6 +2,7 @@ package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.be
+import org.scalatest.matchers.must.Matchers.empty
 import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
@@ -100,14 +101,20 @@ import software.altitude.test.core.IntegrationTestCore
     retrievedPerson2.label - retrievedPerson1.label should be(1)
   }
 
-  test("Person merge A -> B") {
+  test("Person merge A -> B", Focused) {
     val person1Model = Person()
     val person1: Person = testApp.service.person.addPerson(person1Model)
+    testContext.addMockFaces(person1, 3)
 
     val person2Model = Person()
     val person2: Person = testApp.service.person.addPerson(person2Model)
+    testContext.addMockFaces(person2, 3)
 
     val mergedIntoPerson: Person = testApp.service.person.merge(dest=person1, source=person2)
+
+    val mergedIntoFaces: List[Face] = testApp.service.person.getFaces(mergedIntoPerson.persistedId)
+    mergedIntoFaces.size should be(6)
+
     val savedMergedIntoPerson: Person = testApp.service.person.getById(person1.persistedId)
 
     mergedIntoPerson.mergedWithIds.size should be(1)
@@ -115,6 +122,9 @@ import software.altitude.test.core.IntegrationTestCore
 
     val savedMergedPerson: Person = testApp.service.person.getById(person2.persistedId)
     savedMergedPerson.mergedIntoId should be(Some(mergedIntoPerson.persistedId))
+
+    val mergedFromFaces: List[Face] = testApp.service.person.getFaces(savedMergedPerson.persistedId)
+    mergedFromFaces shouldBe empty
   }
 
   test("Person merge B -> A, C -> A") {

@@ -10,6 +10,7 @@ import software.altitude.core.models.Face
 import software.altitude.core.models.Person
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.Query
+import software.altitude.core.util.QueryResult
 import software.altitude.core.{Const => C}
 
 object PersonService {
@@ -103,7 +104,21 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
 
       updateById(updatedSource.persistedId, updatedSource, List(C.Person.MERGED_INTO_ID))
 
+      // move all faces from source to destination
+      val q = new Query().add(C.Face.PERSON_ID -> source.persistedId)
+      val updateObj = Json.obj(
+        C.Face.PERSON_ID -> dest.persistedId,
+        C.Face.PERSON_LABEL -> dest.label)
+      faceDao.updateByQuery(q, updateObj, List(C.Face.PERSON_ID, C.Face.PERSON_LABEL))
       mergedPerson
+    }
+  }
+
+  def getFaces(personId: String, limit: Int = 50): List[Face] = {
+    txManager.asReadOnly[List[Face]] {
+      val q = new Query().add(C.Face.PERSON_ID -> personId)
+      val qRes: QueryResult = faceDao.query(q)
+      qRes.records.take(limit).map(Face.fromJson(_))
     }
   }
 

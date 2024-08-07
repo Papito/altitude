@@ -6,13 +6,14 @@ import software.altitude.core.models.AccountType
 import software.altitude.core.models.Asset
 import software.altitude.core.models.AssetType
 import software.altitude.core.models.AssetWithData
+import software.altitude.core.models.Face
 import software.altitude.core.models.Folder
 import software.altitude.core.models.Metadata
+import software.altitude.core.models.Person
 import software.altitude.core.models.Repository
 import software.altitude.core.models.User
 import software.altitude.core.util.Util
 import software.altitude.core.{Const => C}
-import software.altitude.test.IntegrationTestUtil.generateRandomBytes
 
 import java.io.File
 import scala.util.Random
@@ -123,7 +124,7 @@ class TestContext(val testApp: Altitude) {
                         metadata: Metadata = Metadata()): AssetWithData = {
 
     val asset = makeAsset(repository, filename, resourcePath, user, folder, metadata)
-    val data = generateRandomBytes(80)
+    val data = Random.nextBytes(100)
     AssetWithData(asset, data)
   }
 
@@ -152,13 +153,37 @@ class TestContext(val testApp: Altitude) {
 
     val dataAsset = AssetWithData(
       asset = assetModel,
-      data = generateRandomBytes(80))
+      data = Random.nextBytes(100))
 
     val persistedAsset: Asset = testApp.service.library.add(dataAsset)
 
     assets = assets ::: persistedAsset :: Nil
 
     persistedAsset
+  }
+
+  def addMockFaces(person: Person, count: Int = 1): Unit = {
+    require(person.id.nonEmpty, "Person must have an ID for a mock face to be added")
+
+    for (idx <- 1 to count) {
+      val asset: Asset = persistAsset()
+      val face = Face(id=Some(Util.randomStr(32)),
+        x1 = Random.nextInt(100) + 1,
+        y1 = Random.nextInt(100) + 1,
+        width =Random.nextInt(100) + 1,
+        height = Random.nextInt(100) + 1,
+        assetId = Some(asset.persistedId),
+        personId = Some(person.persistedId),
+        personLabel=Some(idx),
+        detectionScore = Random.nextDouble(),
+        embeddings = Array.fill(128) { Random.nextFloat() },
+        features = Array.fill(128) { Random.nextFloat() },
+        image = Random.nextBytes(100),
+        alignedImage = Random.nextBytes(100),
+        alignedImageGs = Random.nextBytes(100))
+
+      testApp.service.person.addFace(face, asset, person)
+    }
   }
 
   def user: User = {

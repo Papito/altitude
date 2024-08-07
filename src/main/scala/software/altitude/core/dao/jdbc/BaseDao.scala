@@ -5,6 +5,7 @@ import org.apache.commons.dbutils.QueryRunner
 import org.apache.commons.dbutils.handlers.MapListHandler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import play.api.libs.json.JsValue.jsValueToJsLookup
 import play.api.libs.json._
 import software.altitude.core.ConstraintException
 import software.altitude.core.NotFoundException
@@ -142,9 +143,9 @@ abstract class BaseDao {
 
     logger.debug(s"Found [$total] records. Retrieved [${recs.length}] records")
 
-    if (recs.nonEmpty) {
-      logger.debug(recs.map(_.toString()).mkString("\n"))
-    }
+//    if (recs.nonEmpty) {
+//      logger.debug(recs.map(_.toString()).mkString("\n"))
+//    }
     QueryResult(records = recs.map{makeModel}, total = total, rpp = query.rpp, sort = query.sort.toList)
   }
 
@@ -196,8 +197,6 @@ abstract class BaseDao {
   }
 
   def updateByQuery(q: Query, json: JsObject, fields: List[String]): Int = {
-    logger.debug(s"Updating record by query $q with data $json for fields: $fields")
-
     BaseDao.incrWriteQueryCount()
 
     val queryFieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
@@ -212,6 +211,8 @@ abstract class BaseDao {
          SET ${updateFieldPlaceholders.mkString(", ")}
        WHERE ${queryFieldPlaceholders.mkString(",")}
       """
+    logger.debug(s"Updating record by query [$sql] with data $json for fields: $fields")
+
 
     val dataUpdateValues: List[Any] = json.fields.filter {
       // extract only the json elements we want to update
@@ -221,14 +222,36 @@ abstract class BaseDao {
         val jsVal: JsValue = v._2
 
         jsVal match {
+          case JsString(_) => jsVal.as[String]
+          case JsNumber(_) => jsVal.as[Int]
           case JsTrue => true
           case JsFalse => false
-          case _ => jsVal.as[String]
+          case _ => jsVal.as[Int]
         }
       }
     }.toList
 
     val valuesForAllPlaceholders = dataUpdateValues ::: q.params.values.toList
+
+    val runner = queryRunner
+    val numUpdated = runner.update(RequestContext.getConn, sql, valuesForAllPlaceholders.map(_.asInstanceOf[Object]): _*)
+    numUpdated
+  }
+
+  def updateByQuery(q: Query, withValues: List[Any], fields: List[String]): Int = {
+    BaseDao.incrWriteQueryCount()
+
+    val queryFieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
+    val updateFieldPlaceholders: List[String] = List.fill(withValues.size)("?")
+
+    val sql = s"""
+      UPDATE $tableName
+         SET ${updateFieldPlaceholders.mkString(", ")}
+       WHERE ${queryFieldPlaceholders.mkString(",")}
+      """
+    logger.debug(s"Updating record by query [$sql] with data $withValues for fields: $fields")
+
+    val valuesForAllPlaceholders = withValues ::: q.params.values.toList
 
     val runner = queryRunner
     val numUpdated = runner.update(RequestContext.getConn, sql, valuesForAllPlaceholders.map(_.asInstanceOf[Object]): _*)
