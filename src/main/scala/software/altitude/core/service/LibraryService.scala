@@ -120,14 +120,13 @@ class LibraryService(val app: Altitude) {
          It may or may not be recycled or triaged, so we update it as neither unconditionally
          (saves us a separate update query)
       */
-      val updatedAsset: Asset = asset.copy(
-        folderId = destFolderId,
-        isRecycled = false,
-        isTriaged = false)
+      val data = Map(
+        C.Asset.FOLDER_ID -> destFolderId,
+        C.Asset.IS_RECYCLED -> false,
+        C.Asset.IS_TRIAGED -> false
+      )
 
-      app.service.asset.updateById(
-        asset.persistedId, updatedAsset,
-        fields = List(C.Asset.FOLDER_ID, C.Asset.IS_RECYCLED, C.Asset.IS_TRIAGED))
+      app.service.asset.updateById(asset.persistedId, data)
 
     }
 
@@ -152,15 +151,12 @@ class LibraryService(val app: Altitude) {
         throw IllegalOperationException(s"Cannot rename a recycled asset: [$asset]")
       }
 
-      val updatedAsset: Asset = asset.copy(fileName = newFilename)
+      val data = Map(
+        C.Asset.FILENAME -> newFilename
+      )
+      app.service.asset.updateById(asset.persistedId, data)
 
-      // Note that we are not updating the PATH because it does not exist as a property
-      app.service.asset.updateById(
-        asset.persistedId,
-        updatedAsset,
-        fields = List(C.Asset.FILENAME))
-
-      updatedAsset
+      asset.copy(fileName = newFilename)
     }
   }
 

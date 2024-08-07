@@ -281,11 +281,11 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
         C.Folder.PARENT_ID -> destFolderId,
         C.Folder.NAME_LC -> folderBeingMoved.nameLowercase))
 
-      val folderForUpdate = Folder(
-        parentId = destFolderId,
-        name = folderBeingMoved.name)
-
-      updateById(folderBeingMovedId, folderForUpdate, List(C.Folder.PARENT_ID), Some(dupQuery))
+      val data = Map(
+        C.Folder.PARENT_ID -> destFolderId,
+        C.Folder.NAME -> folderBeingMoved.name,
+      )
+      updateById(folderBeingMovedId, data, Some(dupQuery))
 
       incrChildCount(destFolderId)
       // this is still the old parent as the model is immutable
@@ -312,7 +312,11 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
         name = newName
       )
 
-      updateById(folderId, folderForUpdate, List(C.Folder.NAME, C.Folder.NAME_LC), Some(dupQuery))
+      val data = Map(
+        C.Folder.NAME -> newName,
+        C.Folder.NAME_LC -> newName.toLowerCase)
+
+      updateById(folderId, data, Some(dupQuery))
       folderForUpdate
     }
   }
@@ -357,8 +361,10 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
 
     txManager.withTransaction {
       logger.info(s"Setting folder [${folder.persistedId}] recycled flag to [$isRecycled]")
-      val updatedFolder = folder.copy(isRecycled = isRecycled)
-      dao.updateById(folder.persistedId, data = updatedFolder, fields = List(C.Folder.IS_RECYCLED))
+
+      dao.updateById(
+        folder.persistedId,
+        Map(C.Folder.IS_RECYCLED -> isRecycled))
     }
   }
 

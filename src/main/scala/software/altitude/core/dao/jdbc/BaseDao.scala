@@ -97,18 +97,9 @@ abstract class BaseDao {
     deleteByQuery(q)
   }
 
-  /**
-   * Update a document by ID with select field values (does not overwrite the document)
-   *
-   * @param id id of the document to be updated
-   * @param data JSON data for the update document, which is NOT used to overwrite the existing one
-   * @param fields fields to be updated with new values, taken from <code>data</code>
-   *
-   * @return number of documents updated - 0 or 1
-   */
-  def updateById(id: String, data: JsObject, fields: List[String]): Int = {
+  def updateById(id: String, data: Map[String, Any]): Int = {
     val q: Query = new Query().add(C.Base.ID -> id)
-    updateByQuery(q, data, fields)
+    updateByQuery(q, data)
   }
 
   def deleteByQuery(q: Query): Int = {
@@ -194,48 +185,6 @@ abstract class BaseDao {
     logger.debug(s"Found ${res.length} records")
     val recs = res.map{_.asScala.toMap[String, AnyRef]}
     recs.map{makeModel}
-  }
-
-  def updateByQuery(q: Query, json: JsObject, fields: List[String]): Int = {
-    BaseDao.incrWriteQueryCount()
-
-    val queryFieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
-    val updateFieldPlaceholders: List[String] = json.fields.filter {
-      // extract only the json elements we want to update
-      v: (String, JsValue) => fields.contains(v._1)}.map {
-      v: (String, JsValue) => s"${v._1} = ?"
-    }.toList
-
-    val sql = s"""
-      UPDATE $tableName
-         SET ${updateFieldPlaceholders.mkString(", ")}
-       WHERE ${queryFieldPlaceholders.mkString(",")}
-      """
-    logger.debug(s"Updating record by query [$sql] with data $json for fields: $fields")
-
-
-    val dataUpdateValues: List[Any] = json.fields.filter {
-      // extract only the json elements we want to update
-      v: (String, JsValue) => fields.contains(v._1)}.map {
-      // convert the values to string
-      v: (String, JsValue) => {
-        val jsVal: JsValue = v._2
-
-        jsVal match {
-          case JsString(_) => jsVal.as[String]
-          case JsNumber(_) => jsVal.as[Int]
-          case JsTrue => true
-          case JsFalse => false
-          case _ => jsVal.as[Int]
-        }
-      }
-    }.toList
-
-    val valuesForAllPlaceholders = dataUpdateValues ::: q.params.values.toList
-
-    val runner = queryRunner
-    val numUpdated = runner.update(RequestContext.getConn, sql, valuesForAllPlaceholders.map(_.asInstanceOf[Object]): _*)
-    numUpdated
   }
 
   def updateByQuery(q: Query, data: Map[String, Any]): Int = {

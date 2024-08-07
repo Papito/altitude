@@ -79,7 +79,7 @@ abstract class BaseService[Model <: BaseModel] {
    *
    * @return number of documents updated - 0 or 1
    */
-  def updateById(id: String, data: Model, fields: List[String], queryForDup: Option[Query] = None)
+  def updateById(id: String, data: Map[String, Any], queryForDup: Option[Query] = None)
                 : Int = {
 
     val existing = if (queryForDup.isDefined) query(queryForDup.get) else QueryResult.EMPTY
@@ -90,7 +90,7 @@ abstract class BaseService[Model <: BaseModel] {
     }
 
     txManager.withTransaction[Int] {
-      dao.updateById(id, data, fields)
+      dao.updateById(id, data)
     }
   }
 
@@ -105,14 +105,14 @@ abstract class BaseService[Model <: BaseModel] {
    *
    * @return number of documents updated
    */
-  def updateByQuery(query: Query, data: JsObject, fields: List[String])
+  def updateByQuery(query: Query, data: Map[String, Any], fields: List[String])
                    : Int = {
     if (query.params.isEmpty) {
       throw new RuntimeException("Cannot update [ALL] document with an empty Query")
     }
 
     txManager.withTransaction[Int] {
-      dao.updateByQuery(query, data, fields)
+      dao.updateByQuery(query, data)
     }
   }
 

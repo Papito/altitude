@@ -98,11 +98,9 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
       val mergedPerson: Person = dao.updateMergedWithIds(dest, source.persistedId)
 
       // update the source person with the destination person's id
-      val updatedSource = source.copy(
-        mergedIntoId = Some(mergedPerson.persistedId),
-      )
-
-      updateById(updatedSource.persistedId, updatedSource, List(C.Person.MERGED_INTO_ID))
+      updateById(
+        source.persistedId,
+        Map(C.Person.MERGED_INTO_ID -> mergedPerson.persistedId))
 
       // move all faces from source to destination
       val q = new Query().add(C.Face.PERSON_ID -> source.persistedId)
@@ -127,7 +125,11 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
   def setFaceAsCover(person: Person, face: Face): Person = {
     txManager.withTransaction[Person] {
       val personForUpdate = person.copy(coverFaceId = Some(face.persistedId))
-      updateById(person.persistedId, personForUpdate, List(C.Person.COVER_FACE_ID))
+
+      updateById(
+        person.persistedId,
+        Map(C.Person.COVER_FACE_ID -> face.persistedId))
+
       personForUpdate
     }
   }
