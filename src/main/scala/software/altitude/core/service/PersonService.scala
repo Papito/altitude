@@ -53,6 +53,8 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
       // face number + 1
       increment(person.persistedId, C.Person.NUM_OF_FACES)
 
+      app.service.faceCache.addFace(persistedFace)
+
       persistedFace
     }
   }
@@ -108,14 +110,20 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
         mergedIntoId = Some(dest.persistedId),
         mergedIntoLabel = Some(dest.label))
 
+      updatedSource.clearFaces()
+
       updateById(
         updatedSource.persistedId,
         Map(
           C.Person.MERGED_INTO_ID -> updatedSource.mergedIntoId.get,
           C.Person.MERGED_INTO_LABEL -> updatedSource.mergedIntoLabel.get))
 
-      app.service.faceCache.replace(updatedSource)
-      app.service.faceCache.replace(mergedDest)
+      val destFaces = getFaces(dest.persistedId, FaceRecognitionService.MAX_COMPARISONS_PER_PERSON)
+      mergedDest.setFaces(destFaces)
+
+      app.service.faceCache.putPerson(updatedSource)
+      app.service.faceCache.putPerson(mergedDest)
+
       mergedDest
     }
   }

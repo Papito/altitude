@@ -3,7 +3,7 @@ package software.altitude.core.service
 import org.slf4j.{Logger, LoggerFactory}
 import software.altitude.core.Altitude
 import software.altitude.core.RequestContext
-import software.altitude.core.models.Person
+import software.altitude.core.models.{Face, Person}
 
 import scala.collection.mutable
 
@@ -48,8 +48,13 @@ class FaceCacheService(app: Altitude) {
     getRepositoryPersonCache.put(person.label, person)
   }
 
-  def replace(person: Person): Unit = {
-    getRepositoryPersonCache.put(person.label, person)
+  def addFace(face: Face): Unit = {
+    val person = getRepositoryPersonCache(face.personLabel.get)
+
+    // add the face and trim the number to top X faces - we don't need all
+    val faces = person.getFaces
+    faces.add(face)
+    person.setFaces(faces.take(FaceRecognitionService.MAX_COMPARISONS_PER_PERSON).toSeq)
   }
 
   def removePerson(label: Label): Unit = {

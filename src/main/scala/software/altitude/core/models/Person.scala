@@ -61,6 +61,10 @@ case class Person(id: Option[String] = None,
     _faces.addAll(faces)
   }
 
+  def clearFaces(): Unit = {
+    _faces.clear()
+  }
+
   def getFaces: mutable.TreeSet[Face] = {
     // we do not get faces for a person automatically, but "numOfFaces" reflects the actual number in DB
     if (numOfFaces > 0 && _faces.isEmpty) {

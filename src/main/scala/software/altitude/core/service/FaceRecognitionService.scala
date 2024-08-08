@@ -33,7 +33,7 @@ object FaceRecognitionService {
    * Lower number means faster matching but the same person may be detected as new.
    * Technically, just 1 "top" face will work, and the accuracy benefits get diminished the higher we go
    */
-  private val MAX_COMPARISONS_PER_PERSON = 8
+  val MAX_COMPARISONS_PER_PERSON = 8
 
   /**
    * If the cosine distance between the facial features is below this threshold, we consider the face a match.

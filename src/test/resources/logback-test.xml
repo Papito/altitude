@@ -11,7 +11,7 @@
     <appender-ref ref="STDOUT" />
   </root>
 
-  <logger name="software.altitude" level="OFF" />
+  <logger name="software.altitude" level="INFO" />
   <logger name="software.altitude.core.transactions" level="OFF" />
   <logger name="software.altitude.core.dao" level="OFF" />
   <logger name="org.eclipse.jetty" level="OFF" />
