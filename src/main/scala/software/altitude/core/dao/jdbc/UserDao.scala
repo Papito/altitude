@@ -12,11 +12,11 @@ abstract class UserDao(override val config: Config) extends BaseDao with softwar
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val model = User(
-      id = Some(rec(C.Base.ID).asInstanceOf[String]),
+      id = Option(rec(C.Base.ID).asInstanceOf[String]),
       email = rec(C.User.EMAIL).asInstanceOf[String],
       name = rec(C.User.NAME).asInstanceOf[String],
       accountType = rec(C.User.ACCOUNT_TYPE).asInstanceOf[AccountType],
-      lastActiveRepoId = Some(rec(C.User.LAST_ACTIVE_REPO_ID).asInstanceOf[String])
+      lastActiveRepoId = Option(rec(C.User.LAST_ACTIVE_REPO_ID).asInstanceOf[String])
     )
 
     addCoreAttrs(model, rec)

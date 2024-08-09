@@ -21,14 +21,14 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
     val featuresArray = getFloatListByJsonKey(rec(C.Face.FEATURES).asInstanceOf[String], C.Face.FEATURES)
 
     val model = Face(
-      id = Some(rec(C.Base.ID).asInstanceOf[String]),
+      id = Option(rec(C.Base.ID).asInstanceOf[String]),
       x1 = rec(C.Face.X1).asInstanceOf[Int],
       y1 = rec(C.Face.Y1).asInstanceOf[Int],
       width = rec(C.Face.WIDTH).asInstanceOf[Int],
       height = rec(C.Face.HEIGHT).asInstanceOf[Int],
-      assetId = Some(rec(C.Face.ASSET_ID).asInstanceOf[String]),
-      personId = Some(rec(C.Face.PERSON_ID).asInstanceOf[String]),
-      personLabel = Some(rec(C.Face.PERSON_LABEL).getClass match {
+      assetId = Option(rec(C.Face.ASSET_ID).asInstanceOf[String]),
+      personId = Option(rec(C.Face.PERSON_ID).asInstanceOf[String]),
+      personLabel = Option(rec(C.Face.PERSON_LABEL).getClass match {
         case c if c == classOf[java.lang.Integer] => rec(C.Face.PERSON_LABEL).asInstanceOf[Int]
         case c if c == classOf[java.lang.Long] => rec(C.Face.PERSON_LABEL).asInstanceOf[Long].toInt
       }),

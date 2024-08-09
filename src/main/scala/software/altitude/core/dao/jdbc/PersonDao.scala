@@ -19,7 +19,7 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
         case c if c == classOf[java.lang.Integer] => rec(C.Person.LABEL).asInstanceOf[Int]
         case c if c == classOf[java.lang.Long] => rec(C.Person.LABEL).asInstanceOf[Long].toInt
       },
-      name = Some(rec(C.Person.NAME).asInstanceOf[String]),
+      name = Option(rec(C.Person.NAME).asInstanceOf[String]),
       coverFaceId = Option(rec(C.Person.COVER_FACE_ID).asInstanceOf[String]),
       mergedWithIds = loadCsv[String](rec(C.Person.MERGED_WITH_IDS).asInstanceOf[String]),
       mergedIntoId = Option(rec(C.Person.MERGED_INTO_ID).asInstanceOf[String]),

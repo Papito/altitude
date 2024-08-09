@@ -30,7 +30,7 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
     val extractedMetadataJson = Json.parse(extractedMetadataJsonStr).as[JsObject]
 
     val model = new Asset(
-      id = Some(rec(C.Base.ID).asInstanceOf[String]),
+      id = Option(rec(C.Base.ID).asInstanceOf[String]),
       userId = rec(C.Base.USER_ID).asInstanceOf[String],
       fileName = rec(C.Asset.FILENAME).asInstanceOf[String],
       checksum = rec(C.Asset.CHECKSUM).asInstanceOf[Int],
