@@ -9,7 +9,6 @@ import software.altitude.core.util.Query.QueryParam
 protected object SqlQueryBuilder {
   val SELECT = "select"
   val UPDATE = "update"
-  val SET = "set"
   val FROM = "from"
   val WHERE = "where"
   val GROUP_BY = "group_by"
@@ -57,24 +56,27 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
     SqlQuery(sql, bindVals)
   }
 
-
   def buildUpdateSql(query: QueryT, data: Map[String, Any]): SqlQuery = {
     val allClauses = compileClauses(query)
 
-    val updateFieldPlaceholders: List[String] = data.keys.map(field => s"$field = ?").toList
-    val sql = s"""
-      UPDATE ${tableNames.head}
-         SET ${updateFieldPlaceholders.mkString(", ")}
-      ${whereStr(allClauses(SqlQueryBuilder.WHERE))}
-      """
+    val sql = updateStr(allClauses(SqlQueryBuilder.UPDATE)) +
+      setStr(data) +
+      whereStr(allClauses(SqlQueryBuilder.WHERE))
 
-    val bindValClauses = List(allClauses(SqlQueryBuilder.WHERE))
-
-    val bindVals = data.values.toList ::: bindValClauses.foldLeft(List[Any]()) { (res, clause) =>
+    // SET binds, then WHERE binds
+    val whereBindClauses = List(allClauses(SqlQueryBuilder.WHERE))
+    val bindVals = data.values.toList ::: whereBindClauses.foldLeft(List[Any]()) { (res, clause) =>
       res ++ clause.bindVals
     }
 
     SqlQuery(sql, bindVals)
+  }
+
+
+  private def setStr(data: Map[String, Any]): String = {
+    val updateFieldPlaceholders: List[String] = data.keys.map(field => s"$field = ?").toList
+    val setString = updateFieldPlaceholders.mkString(", ")
+    s" SET $setString"
   }
 
   protected def compileClauses(query: QueryT): Map[String, ClauseComponents] = {
@@ -100,9 +102,9 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
     s" FROM ${tableNames.mkString(", ")}"
   }
 
-  protected def update(query: QueryT): ClauseComponents = ClauseComponents(elements = tableNames.toList)
-  protected def updateStr(clauseComponents: ClauseComponents): String = {
-    val tableName = clauseComponents.elements.head
+  protected def update(query: QueryT): ClauseComponents = ClauseComponents()
+  private def updateStr(clauseComponents: ClauseComponents): String = {
+    val tableName = tableNames.head
     s"UPDATE $tableName"
   }
 
