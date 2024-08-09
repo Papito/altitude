@@ -47,4 +47,5 @@ object IntegrationTestUtil {
     val fileImportAsset = fileToImportAsset(file)
     fileImportAsset
   }
+
 }

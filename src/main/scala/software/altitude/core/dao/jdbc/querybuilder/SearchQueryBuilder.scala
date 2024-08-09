@@ -29,6 +29,10 @@ abstract class SearchQueryBuilder(selColumnNames: List[String])
   override protected def from(searchQuery: SearchQuery): ClauseComponents = {
     ClauseComponents(elements = allTableNames(searchQuery))
   }
+  override protected def fromStr(clauseComponents: ClauseComponents): String = {
+    val tableNames = clauseComponents.elements
+    s"FROM ${tableNames.mkString(", ")}"
+  }
 
   /**
     * If we are joining a table - this will also include its name(s)
@@ -52,11 +56,13 @@ abstract class SearchQueryBuilder(selColumnNames: List[String])
   private def buildSelectSqlAsSubquery(query: SearchQuery): SqlQuery = {
     val allClauses = compileClauses(query)
 
-    val subquerySql: String = s"SELECT ${SearchQueryBuilder.ASSET_TABLE_NAME}.*" +
-      fromStr(allClauses(SqlQueryBuilder.FROM)) +
-      whereStr(allClauses(SqlQueryBuilder.WHERE)) +
-      groupByStr(allClauses(SqlQueryBuilder.GROUP_BY)) +
-      havingStr(allClauses(SqlQueryBuilder.HAVING))
+    val subquerySql: String = s"""
+        SELECT ${SearchQueryBuilder.ASSET_TABLE_NAME}.*
+          ${fromStr(allClauses(SqlQueryBuilder.FROM))}
+        ${whereStr(allClauses(SqlQueryBuilder.WHERE))}
+      ${groupByStr(allClauses(SqlQueryBuilder.GROUP_BY))}
+        ${havingStr(allClauses(SqlQueryBuilder.HAVING))}
+      """
 
     val sql =
       selectStr(allClauses(SqlQueryBuilder.SELECT)) +

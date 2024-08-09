@@ -34,15 +34,25 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableName: 
   def buildSelectSql(query: QueryT): SqlQuery = {
     val allClauses = compileClauses(query)
 
+    /**
+     *  --SELECT
+     *  ----FROM
+     *  ---WHERE
+     *  GROUP BY
+     *  --HAVING
+     *  ORDER BY
+     *  ---LIMIT
+     *  --OFFSET
+     */
     val sql = s"""
-      ${selectStr(allClauses(SqlQueryBuilder.SELECT))}
-      ${fromStr(allClauses(SqlQueryBuilder.FROM)) }
-      ${whereStr(allClauses(SqlQueryBuilder.WHERE))}
+        ${selectStr(allClauses(SqlQueryBuilder.SELECT))}
+          ${fromStr(allClauses(SqlQueryBuilder.FROM)) }
+         ${whereStr(allClauses(SqlQueryBuilder.WHERE))}
       ${groupByStr(allClauses(SqlQueryBuilder.GROUP_BY))}
-      ${havingStr(allClauses(SqlQueryBuilder.HAVING))}
+        ${havingStr(allClauses(SqlQueryBuilder.HAVING))}
       ${orderByStr(allClauses(SqlQueryBuilder.ORDER_BY))}
-      ${limitStr(query)}
-      ${offsetStr(query)}
+         ${limitStr(query)}
+        ${offsetStr(query)}
       """
 
     val bindValClauses = List(allClauses(SqlQueryBuilder.WHERE))
@@ -56,10 +66,15 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableName: 
   def buildUpdateSql(query: QueryT, data: Map[String, Any]): SqlQuery = {
     val allClauses = compileClauses(query)
 
+    /**
+     * UPDATE
+     * ---SET
+     * -WHERE
+     */
     val sql = s"""
       ${updateStr(allClauses(SqlQueryBuilder.UPDATE))}
-      ${setStr(data)}
-      ${whereStr(allClauses(SqlQueryBuilder.WHERE))}
+         ${setStr(data)}
+       ${whereStr(allClauses(SqlQueryBuilder.WHERE))}
       """
 
     // SET binds, then WHERE binds
