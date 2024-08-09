@@ -96,13 +96,46 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
   }
 
   def merge(dest: Person, source: Person): Person = {
+    if (source == dest) {
+        throw new IllegalArgumentException("Cannot merge a person with itself. That's perverse!")
+    }
+
+    if (source.mergedIntoId.nonEmpty) {
+      throw new IllegalArgumentException("Cannot merge a person that has already been merged")
+    }
+
+    if (dest.mergedWithIds.contains(source.persistedId)) {
+      throw new IllegalArgumentException("Cannot merge a person that has already been merged with the destination")
+    }
+
+    logger.info(s"Merging person ${source.name} into ${dest.name}")
+
     txManager.withTransaction[Person] {
+
+      // If the source was merged with something else before, follow that relation and update THAT source with current
+      // destination info.
+      // This way, when of of the old merge sources is pulled by label from cache, it will point directly to this new
+      // composite person.
+
+      if (source.mergedWithIds.nonEmpty) {
+        logger.info(s"Source person ${source.name} was merged with other people before. IDs: ${source.mergedWithIds}")
+        logger.info("Updating the old merge sources with the new destination info")
+        val oldMergeSourcesQ = new Query().add(
+          C.Person.ID -> Query.IN(source.mergedWithIds.toSet))
+
+        updateByQuery(
+          oldMergeSourcesQ,
+          Map(
+            C.Person.MERGED_INTO_ID -> dest.persistedId,
+            C.Person.MERGED_INTO_LABEL -> dest.label))
+      }
+
       // update the destination with the source person's id (it's a list of ids at the destination)
       val mergedDest: Person = dao.updateMergedWithIds(dest, source.persistedId)
 
       // move all faces from source to destination
+      logger.debug(s"Moving faces from ${source.name.get} to ${dest.name.get}")
       val q = new Query().add(C.Face.PERSON_ID -> source.persistedId)
-
       faceDao.updateByQuery(q, Map(C.Face.PERSON_ID -> dest.persistedId))
 
       // specify ID/label of where the source person was merged into

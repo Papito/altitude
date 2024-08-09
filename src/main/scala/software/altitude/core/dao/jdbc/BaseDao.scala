@@ -190,20 +190,13 @@ abstract class BaseDao {
   def updateByQuery(q: Query, data: Map[String, Any]): Int = {
     BaseDao.incrWriteQueryCount()
 
-    val queryFieldPlaceholders: List[String] = q.params.keys.map(_ + " = ?").toList
-    val updateFieldPlaceholders: List[String] = data.keys.map(field => s"$field = ?").toList
-
-    val sql = s"""
-      UPDATE $tableName
-         SET ${updateFieldPlaceholders.mkString(", ")}
-       WHERE ${queryFieldPlaceholders.mkString(",")}
-      """
-    logger.debug(s"Updating record by query [$sql] with data $data")
-
-    val valuesForAllPlaceholders = data.values.toList ::: q.params.values.toList
+    val sqlQuery = sqlQueryBuilder.buildUpdateSql(q, data)
+    logger.debug(s"UPDATE SQL: ${sqlQuery.sqlAsString} with bind values ${sqlQuery.bindValues}")
 
     val runner = queryRunner
-    val numUpdated = runner.update(RequestContext.getConn, sql, valuesForAllPlaceholders.map(_.asInstanceOf[Object]): _*)
+
+    val numUpdated = runner.update(RequestContext.getConn, sqlQuery.sqlAsString, sqlQuery.bindValues:_*)
+    logger.debug("Updated records: " + numUpdated)
     numUpdated
   }
 

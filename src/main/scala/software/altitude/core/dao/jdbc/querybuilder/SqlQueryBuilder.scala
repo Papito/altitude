@@ -8,6 +8,8 @@ import software.altitude.core.util.Query.QueryParam
 
 protected object SqlQueryBuilder {
   val SELECT = "select"
+  val UPDATE = "update"
+  val SET = "set"
   val FROM = "from"
   val WHERE = "where"
   val GROUP_BY = "group_by"
@@ -26,6 +28,7 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
   private type ClauseGeneratorType = QueryT => ClauseComponents
 
   private val chainMethods: List[(String, ClauseGeneratorType)] = List(
+    (SqlQueryBuilder.UPDATE, this.update),
     (SqlQueryBuilder.SELECT, this.select),
     (SqlQueryBuilder.FROM, this.from),
     (SqlQueryBuilder.WHERE, this.where),
@@ -51,8 +54,26 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
       res ++ clause.bindVals
     }
 
-    logger.debug(s"Select SQL: $sql with $bindVals")
-    // println("SELECT", sql, bindVals)
+    SqlQuery(sql, bindVals)
+  }
+
+
+  def buildUpdateSql(query: QueryT, data: Map[String, Any]): SqlQuery = {
+    val allClauses = compileClauses(query)
+
+    val updateFieldPlaceholders: List[String] = data.keys.map(field => s"$field = ?").toList
+    val sql = s"""
+      UPDATE ${tableNames.head}
+         SET ${updateFieldPlaceholders.mkString(", ")}
+      ${whereStr(allClauses(SqlQueryBuilder.WHERE))}
+      """
+
+    val bindValClauses = List(allClauses(SqlQueryBuilder.WHERE))
+
+    val bindVals = data.values.toList ::: bindValClauses.foldLeft(List[Any]()) { (res, clause) =>
+      res ++ clause.bindVals
+    }
+
     SqlQuery(sql, bindVals)
   }
 
@@ -77,6 +98,12 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
   protected def fromStr(clauseComponents: ClauseComponents): String = {
     val tableNames = clauseComponents.elements
     s" FROM ${tableNames.mkString(", ")}"
+  }
+
+  protected def update(query: QueryT): ClauseComponents = ClauseComponents(elements = tableNames.toList)
+  protected def updateStr(clauseComponents: ClauseComponents): String = {
+    val tableName = clauseComponents.elements.head
+    s"UPDATE $tableName"
   }
 
   protected def where(query: QueryT): ClauseComponents = {
@@ -116,7 +143,7 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
   }
 
   protected def whereStr(clauseComponents: ClauseComponents): String = {
-      clauseComponents.elements.length match {
+    clauseComponents.elements.length match {
       case 0 => ""
       case _ => s" WHERE ${clauseComponents.elements.mkString(" AND ")}"
     }
@@ -131,8 +158,8 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
   protected def orderBy(query: QueryT): ClauseComponents = {
     if (!query.isSorted) return ClauseComponents()
 
-   val sort = query.sort.head
-   ClauseComponents(elements = List(s"${sort.param} ${sort.direction}"))
+    val sort = query.sort.head
+    ClauseComponents(elements = List(s"${sort.param} ${sort.direction}"))
   }
 
   protected def orderByStr(clauseComponents: ClauseComponents): String = {

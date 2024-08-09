@@ -51,7 +51,7 @@ class FaceCacheService(app: Altitude) {
   def addFace(face: Face): Unit = {
     val person = getRepositoryPersonCache(face.personLabel.get)
 
-    // add the face and trim the number to top X faces - we don't need all
+    // add the face and trim the number to top X faces - we don't need all of them
     val faces = person.getFaces
     faces.add(face)
     person.setFaces(faces.take(FaceRecognitionService.MAX_COMPARISONS_PER_PERSON).toSeq)

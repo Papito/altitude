@@ -13,16 +13,16 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
     val mergedIntoLabel = rec(C.Person.MERGED_INTO_LABEL)
 
     val model = Person(
-      id = Some(rec(C.Base.ID).asInstanceOf[String]),
+      id = Option(rec(C.Base.ID).asInstanceOf[String]),
       // To placate Postgres Sequences, which return Longs
       label = rec(C.Person.LABEL).getClass match {
         case c if c == classOf[java.lang.Integer] => rec(C.Person.LABEL).asInstanceOf[Int]
         case c if c == classOf[java.lang.Long] => rec(C.Person.LABEL).asInstanceOf[Long].toInt
       },
       name = Some(rec(C.Person.NAME).asInstanceOf[String]),
-      coverFaceId = Some(rec(C.Person.COVER_FACE_ID).asInstanceOf[String]),
+      coverFaceId = Option(rec(C.Person.COVER_FACE_ID).asInstanceOf[String]),
       mergedWithIds = loadCsv[String](rec(C.Person.MERGED_WITH_IDS).asInstanceOf[String]),
-      mergedIntoId = Some(rec(C.Person.MERGED_INTO_ID).asInstanceOf[String]),
+      mergedIntoId = Option(rec(C.Person.MERGED_INTO_ID).asInstanceOf[String]),
       // If mergedIntoLabel is there, it's an Int or a Long, depending on DB
       mergedIntoLabel = if (mergedIntoLabel != null) {
         Some(mergedIntoLabel.getClass match {

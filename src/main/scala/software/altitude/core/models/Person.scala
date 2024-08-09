@@ -77,8 +77,8 @@ case class Person(id: Option[String] = None,
   override def canEqual(other: Any): Boolean = other.isInstanceOf[Face]
 
   override def equals(that: Any): Boolean = that match {
-    case that: Person if !that.canEqual( this) => false
-    case that: Person => that.id == this.id
+    case that: Person if !that.canEqual(this) => false
+    case that: Person => that.persistedId == this.persistedId
     case _ => false
   }
 

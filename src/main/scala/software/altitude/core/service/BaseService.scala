@@ -94,18 +94,7 @@ abstract class BaseService[Model <: BaseModel] {
     }
   }
 
-  /**
-   * Update multiple documents by query with select field values (does not overwrite the document).
-   * Faster but less safe - constraint violations are handled by the store directly.
-   *
-   * @param query the query
-   * @param data JSON data for the update documents, which is NOT used to overwrite the existing one
-   * @param fields fields to be updated with new values, taken from <code>data</code>
-   * @throws RuntimeException if attempting to update all documents with an empty query
-   *
-   * @return number of documents updated
-   */
-  def updateByQuery(query: Query, data: Map[String, Any], fields: List[String])
+  def updateByQuery(query: Query, data: Map[String, Any])
                    : Int = {
     if (query.params.isEmpty) {
       throw new RuntimeException("Cannot update [ALL] document with an empty Query")
