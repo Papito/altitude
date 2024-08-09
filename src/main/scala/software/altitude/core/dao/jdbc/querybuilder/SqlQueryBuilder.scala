@@ -16,13 +16,8 @@ protected object SqlQueryBuilder {
   val HAVING = "having"
 }
 
-class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames: Set[String]) {
+class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableName: String) {
   protected final val logger: Logger = LoggerFactory.getLogger(getClass)
-
-  // convenience constructor for the common case of just one table
-  def this(sqlColsForSelect: List[String], tableName: String) = {
-    this(sqlColsForSelect, Set(tableName))
-  }
 
   private type ClauseGeneratorType = QueryT => ClauseComponents
 
@@ -39,14 +34,16 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
   def buildSelectSql(query: QueryT): SqlQuery = {
     val allClauses = compileClauses(query)
 
-    val sql: String = selectStr(allClauses(SqlQueryBuilder.SELECT)) +
-      fromStr(allClauses(SqlQueryBuilder.FROM)) +
-      whereStr(allClauses(SqlQueryBuilder.WHERE)) +
-      groupByStr(allClauses(SqlQueryBuilder.GROUP_BY)) +
-      havingStr(allClauses(SqlQueryBuilder.HAVING)) +
-      orderByStr(allClauses(SqlQueryBuilder.ORDER_BY)) +
-      limitStr(query) +
-      offsetStr(query)
+    val sql = s"""
+      ${selectStr(allClauses(SqlQueryBuilder.SELECT))}
+      ${fromStr(allClauses(SqlQueryBuilder.FROM)) }
+      ${whereStr(allClauses(SqlQueryBuilder.WHERE))}
+      ${groupByStr(allClauses(SqlQueryBuilder.GROUP_BY))}
+      ${havingStr(allClauses(SqlQueryBuilder.HAVING))}
+      ${orderByStr(allClauses(SqlQueryBuilder.ORDER_BY))}
+      ${limitStr(query)}
+      ${offsetStr(query)}
+      """
 
     val bindValClauses = List(allClauses(SqlQueryBuilder.WHERE))
     val bindVals = bindValClauses.foldLeft(List[Any]()) { (res, clause) =>
@@ -59,9 +56,11 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
   def buildUpdateSql(query: QueryT, data: Map[String, Any]): SqlQuery = {
     val allClauses = compileClauses(query)
 
-    val sql = updateStr(allClauses(SqlQueryBuilder.UPDATE)) +
-      setStr(data) +
-      whereStr(allClauses(SqlQueryBuilder.WHERE))
+    val sql = s"""
+      ${updateStr(allClauses(SqlQueryBuilder.UPDATE))}
+      ${setStr(data)}
+      ${whereStr(allClauses(SqlQueryBuilder.WHERE))}
+      """
 
     // SET binds, then WHERE binds
     val whereBindClauses = List(allClauses(SqlQueryBuilder.WHERE))
@@ -76,7 +75,7 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
   private def setStr(data: Map[String, Any]): String = {
     val updateFieldPlaceholders: List[String] = data.keys.map(field => s"$field = ?").toList
     val setString = updateFieldPlaceholders.mkString(", ")
-    s" SET $setString"
+    s"SET $setString"
   }
 
   protected def compileClauses(query: QueryT): Map[String, ClauseComponents] = {
@@ -96,15 +95,13 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
     s"SELECT ${columnsWithTotalWinFunc.mkString(", ")}"
   }
 
-  protected def from(query: QueryT): ClauseComponents = ClauseComponents(elements = tableNames.toList)
+  protected def from(query: QueryT): ClauseComponents = ClauseComponents()
   protected def fromStr(clauseComponents: ClauseComponents): String = {
-    val tableNames = clauseComponents.elements
-    s" FROM ${tableNames.mkString(", ")}"
+    s"FROM $tableName"
   }
 
   protected def update(query: QueryT): ClauseComponents = ClauseComponents()
   private def updateStr(clauseComponents: ClauseComponents): String = {
-    val tableName = tableNames.head
     s"UPDATE $tableName"
   }
 
@@ -147,14 +144,14 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
   protected def whereStr(clauseComponents: ClauseComponents): String = {
     clauseComponents.elements.length match {
       case 0 => ""
-      case _ => s" WHERE ${clauseComponents.elements.mkString(" AND ")}"
+      case _ => s"WHERE ${clauseComponents.elements.mkString(" AND ")}"
     }
   }
 
   protected def groupBy(query: QueryT): ClauseComponents = ClauseComponents()
   protected def groupByStr(clauseComponents: ClauseComponents): String = {
     if (clauseComponents.isEmpty) return ""
-    s" GROUP BY ${clauseComponents.elements.mkString(", ")}"
+    s"GROUP BY ${clauseComponents.elements.mkString(", ")}"
   }
 
   protected def orderBy(query: QueryT): ClauseComponents = {
@@ -166,13 +163,13 @@ class SqlQueryBuilder[QueryT <: Query](selColumnNames: List[String], tableNames:
 
   protected def orderByStr(clauseComponents: ClauseComponents): String = {
     if (clauseComponents.isEmpty) return ""
-    s" ORDER BY ${clauseComponents.elements.mkString(", ")}"
+    s"ORDER BY ${clauseComponents.elements.mkString(", ")}"
   }
 
   protected def having(query: QueryT): ClauseComponents = ClauseComponents()
   protected def havingStr(clauseComponents: ClauseComponents): String = {
     if (clauseComponents.isEmpty) return ""
-    s" HAVING ${clauseComponents.elements.mkString(", ")}"
+    s"HAVING ${clauseComponents.elements.mkString(", ")}"
   }
 
   protected def limitStr(query: QueryT): String = if (query.rpp > 0) s" LIMIT ${query.rpp}" else ""

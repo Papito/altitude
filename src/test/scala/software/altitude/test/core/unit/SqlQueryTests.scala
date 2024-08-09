@@ -27,7 +27,7 @@ import software.altitude.test.core.TestFocus
   RequestContext.account.value = None
 
   test("WHERE SQL query with pagination is built correctly") {
-    val builder = new SqlQueryBuilder[Query](List("*"), Set("table1"))
+    val builder = new SqlQueryBuilder[Query](List("*"), "table1")
     val q = new Query(params = Map("searchValue" -> 3), rpp = 10, page = 2)
     val sqlQuery = builder.buildSelectSql(q.withRepository())
     sqlQuery.sqlAsString shouldBe s"SELECT *, ${BaseDao.totalRecsWindowFunction} FROM table1 WHERE searchValue = ? AND repository_id = ? LIMIT 10 OFFSET 10"
@@ -35,7 +35,7 @@ import software.altitude.test.core.TestFocus
   }
 
   test("Query with sorting is built correctly") {
-    val builder = new SqlQueryBuilder[Query](List("*"), Set("table1"))
+    val builder = new SqlQueryBuilder[Query](List("*"), "table1")
     val q = new Query(
       rpp = 10,
       page = 2,
