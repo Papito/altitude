@@ -150,6 +150,8 @@ abstract class BaseDao {
   private def executeAndGetMany(sql: String, values: List[Any]): List[Map[String, AnyRef]] = {
     BaseDao.incrReadQueryCount()
 
+    logger.debug(s"SELECT SQL: ${sql} with values: ${values}")
+
     val res = queryRunner.query(
       RequestContext.getConn,
       sql, new MapListHandler(),
@@ -172,7 +174,7 @@ abstract class BaseDao {
     val query = new Query().add(C.Base.ID -> Query.IN(ids.asInstanceOf[Set[Any]]))
     val sqlQuery = sqlQueryBuilder.buildSelectSql(query)
 
-    logger.debug(s"SQL: ${sqlQuery.sqlAsString} with values: ${ids.toList}")
+    logger.debug(s"SELECT SQL: ${sqlQuery.sqlAsString} with values: ${ids.toList}")
 
     val runner: QueryRunner = new QueryRunner()
 

@@ -4,7 +4,7 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.must.Matchers.empty
 import org.scalatest.matchers.must.Matchers.not
-import org.scalatest.matchers.should.Matchers.{convertToAnyShouldWrapper, theSameInstanceAs}
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Face
@@ -113,7 +113,7 @@ import software.altitude.test.core.IntegrationTestCore
     // *** Person in cache should have only the required top faces, sorted by detection score
     //
     var cachedA = testApp.service.faceCache.getPersonByLabel(personA.label).get
-
+    cachedA.numOfFaces should be(NUM_OF_FACES)
     cachedA.getFaces.size should be(FaceRecognitionService.MAX_COMPARISONS_PER_PERSON)
 
     // save the destination scores to compare with later
@@ -123,7 +123,10 @@ import software.altitude.test.core.IntegrationTestCore
       faces.head.detectionScore >= faces.last.detectionScore) should be(true)
 
     val personB: Person = testApp.service.person.addPerson(Person())
+    testContext.addTestFaces(personB, NUM_OF_FACES)
+
     var cachedB = testApp.service.faceCache.getPersonByLabel(personB.label).get
+    cachedB.getFaces.size should be(FaceRecognitionService.MAX_COMPARISONS_PER_PERSON)
 
     val mergedA: Person = testApp.service.person.merge(dest=personA, source=personB)
 
@@ -131,6 +134,7 @@ import software.altitude.test.core.IntegrationTestCore
     // *** Merged destination should have the merged with ID (one)
     //
     mergedA.mergedWithIds.size should be(1)
+    mergedA.mergedWithIds.head should be(personB.persistedId)
 
     //
     // *** Merged cached person should have top faces, sorted by detection score, and not identical by score to where we started
@@ -152,31 +156,38 @@ import software.altitude.test.core.IntegrationTestCore
     //
     // *** Sanity checks for persisted instances of source and destination2
     //
+    val aFacesInDb: List[Face] = testApp.service.person.getFaces(mergedA.persistedId)
+    aFacesInDb.size should be(NUM_OF_FACES * 2)
+
     val persistedA: Person = testApp.service.person.getById(personA.persistedId)
     persistedA.mergedWithIds should be(mergedA.mergedWithIds)
+    persistedA.numOfFaces should be(NUM_OF_FACES * 2)
 
     val persistedB: Person = testApp.service.person.getById(personB.persistedId)
     persistedB.mergedIntoId should be(Some(mergedA.persistedId))
     persistedB.mergedIntoLabel should be(Some(mergedA.label))
+    persistedB.numOfFaces should be(0)
 
     val bFacesInDb: List[Face] = testApp.service.person.getFaces(persistedB.persistedId)
     bFacesInDb shouldBe empty
   }
 
-  test("Person merge C -> B, B -> A", Focused) {
+  test("Person merge C -> B, B -> A") {
     val personC: Person = testApp.service.person.addPerson(Person(name=Some("C")))
     testContext.addTestFaces(personC, NUM_OF_FACES)
 
     val personB: Person = testApp.service.person.addPerson(Person(name=Some("B")))
     testContext.addTestFaces(personB, NUM_OF_FACES)
 
-    val personA: Person = testApp.service.person.addPerson(Person(name=Some("A")))
     // no faces, to keep it simple
+    val personA: Person = testApp.service.person.addPerson(Person(name=Some("A")))
 
     //
     // *** C -> B
     //
     val mergedB: Person = testApp.service.person.merge(dest=personB, source=personC)
+
+    val bOrigFaceScores = mergedB.getFaces.map(_.detectionScore)
 
     var bFacesInDb: List[Face] = testApp.service.person.getFaces(mergedB.persistedId)
     bFacesInDb.size should be(NUM_OF_FACES * 2)
@@ -187,15 +198,26 @@ import software.altitude.test.core.IntegrationTestCore
     var cachedC = testApp.service.faceCache.getPersonByLabel(personC.label).get
     var cachedB = testApp.service.faceCache.getPersonByLabel(personB.label).get
 
+    intercept[NoSuchElementException] {
+      testApp.service.faceCache.getPersonByLabel(personA.label).get
+    }
+
     cachedB should be theSameInstanceAs cachedC
 
-    val persistedA: Person = testApp.service.person.getById(personA.persistedId)
     val persistedB: Person = testApp.service.person.getById(personB.persistedId)
+    persistedB.numOfFaces should be(NUM_OF_FACES * 2)
+
+    val persistedC: Person = testApp.service.person.getById(personC.persistedId)
+    persistedC.numOfFaces should be(0)
+
+//    testApp.service.faceCache.dump()
 
     //
     // *** B -> A
     //
-    val mergedA: Person = testApp.service.person.merge(dest=persistedA, source=persistedB)
+    val persistedA: Person = testApp.service.person.getById(personA.persistedId)
+
+    val mergedA: Person = testApp.service.person.merge(dest=persistedA, source=cachedB)
 
     val aFacesInDb: List[Face] = testApp.service.person.getFaces(mergedA.persistedId)
     aFacesInDb.size should be(NUM_OF_FACES * 2)
@@ -205,6 +227,21 @@ import software.altitude.test.core.IntegrationTestCore
 
     cFacesInDb = testApp.service.person.getFaces(personC.persistedId)
     cFacesInDb.size should be(0)
+
+    val cachedA = testApp.service.faceCache.getPersonByLabel(personA.label).get
+
+    // B was merged, A was empty, so after merge A should have the same faces as B
+    cachedA.getFaces.map(_.detectionScore) shouldBe bOrigFaceScores
+
+    // C should be pointing to A now
+    cachedC = testApp.service.faceCache.getPersonByLabel(personC.label).get
+    cachedC should be theSameInstanceAs cachedA
+
+    // B should be pointing to A now
+    cachedB = testApp.service.faceCache.getPersonByLabel(personB.label).get
+    cachedB should be theSameInstanceAs cachedA
+
+//    testApp.service.faceCache.dump()
   }
 
   def isSortedDescending(seq: Seq[Double]): Boolean = {

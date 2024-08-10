@@ -11,6 +11,8 @@ import software.altitude.core.models.Person
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
+import software.altitude.core.util.Sort
+import software.altitude.core.util.SortDirection
 import software.altitude.core.{Const => C}
 
 object PersonService {
@@ -40,6 +42,8 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
   }
 
   def addFace(face: Face, asset: Asset, person: Person): Face = {
+    require(person.persistedId.nonEmpty, "Cannot add a face to an unsaved person object")
+
     txManager.withTransaction[Face] {
       val persistedFace: Face = faceDao.add(face, asset, person)
 
@@ -53,7 +57,15 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
       // face number + 1
       increment(person.persistedId, C.Person.NUM_OF_FACES)
 
-      app.service.faceCache.addFace(persistedFace)
+      val cachedPerson = app.service.faceCache.getPersonByLabel(persistedFace.personLabel.get)
+
+      if (cachedPerson.isEmpty) {
+        val personWithFace = person.copy(numOfFaces = 1)
+        personWithFace.addFace(persistedFace)
+        app.service.faceCache.putPerson(personWithFace)
+      } else {
+        app.service.faceCache.addFace(persistedFace)
+      }
 
       persistedFace
     }
@@ -70,7 +82,7 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
 
       val persistedPerson: Person = dao.add(personForUpdate)
 
-      // if we are adding a person and have a face to show for it
+      // if we are adding a person and it's the first face
       if (person.getFaces.size == 1) {
         val face = person.getFaces.head
 
@@ -86,11 +98,12 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
 
         persistedPerson.addFace(persistedFace)
 
+        app.service.faceCache.putPerson(persistedPerson)
+
         return persistedPerson ++ Json.obj(
           C.Person.COVER_FACE_ID -> persistedFace.persistedId)
       }
 
-      app.service.faceCache.putPerson(persistedPerson)
       persistedPerson
     }
   }
@@ -112,12 +125,13 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
 
     txManager.withTransaction[Person] {
 
-      // If the source was merged with something else before, follow that relation and update THAT source with current
-      // destination info.
-      // This way, when of of the old merge sources is pulled by label from cache, it will point directly to this new
-      // composite person.
-
       if (source.mergedWithIds.nonEmpty) {
+        /**
+         * If the source person was merged with other people before, follow that relation and update THAT source with
+         * current destination info.
+         * This way, when of of the old merge sources is pulled by label from cache, it will point directly to this new
+         * composite person.
+         */
         logger.info(s"Source person ${source.name} was merged with other people before. IDs: ${source.mergedWithIds}")
         logger.info("Updating the old merge sources with the new destination info")
         val oldMergeSourcesQ = new Query().add(
@@ -128,10 +142,25 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
           Map(
             C.Person.MERGED_INTO_ID -> dest.persistedId,
             C.Person.MERGED_INTO_LABEL -> dest.label))
+
+        // update the cache with the new destination info
+        source.mergedWithIds.foreach { oldMergeSourceId =>
+          val oldMergeSource = getPersonById(oldMergeSourceId)
+          app.service.faceCache.putPerson(oldMergeSource)
+        }
       }
 
       // update the destination with the source person's id (it's a list of ids at the destination)
+      val persistedDest: Person = dao.getById(dest.persistedId)
+      val persistedSource: Person = dao.getById(source.persistedId)
+
       val mergedDest: Person = dao.updateMergedWithIds(dest, source.persistedId)
+      val updatedDest = mergedDest.copy(numOfFaces = persistedDest.numOfFaces + persistedSource.numOfFaces)
+
+      // update new destination count
+      updateById(
+        dest.persistedId,
+        Map(C.Person.NUM_OF_FACES -> updatedDest.numOfFaces))
 
       // move all faces from source to destination
       logger.debug(s"Moving faces from ${source.name.get} to ${dest.name.get}")
@@ -139,7 +168,7 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
       faceDao.updateByQuery(q, Map(C.Face.PERSON_ID -> dest.persistedId))
 
       // specify ID/label of where the source person was merged into
-      val updatedSource: Person = source.copy(
+      val updatedSource: Person = persistedSource.copy(
         mergedIntoId = Some(dest.persistedId),
         mergedIntoLabel = Some(dest.label))
 
@@ -149,21 +178,29 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
         updatedSource.persistedId,
         Map(
           C.Person.MERGED_INTO_ID -> updatedSource.mergedIntoId.get,
-          C.Person.MERGED_INTO_LABEL -> updatedSource.mergedIntoLabel.get))
+          C.Person.MERGED_INTO_LABEL -> updatedSource.mergedIntoLabel.get,
+          C.Person.NUM_OF_FACES -> 0
+        ))
 
+      // get the top face after merge
       val destFaces = getFaces(dest.persistedId, FaceRecognitionService.MAX_COMPARISONS_PER_PERSON)
-      mergedDest.setFaces(destFaces)
+      updatedDest.setFaces(destFaces)
 
       app.service.faceCache.putPerson(updatedSource)
-      app.service.faceCache.putPerson(mergedDest)
+      app.service.faceCache.putPerson(updatedDest)
 
-      mergedDest
+      updatedDest
     }
   }
 
   def getFaces(personId: String, limit: Int = 50): List[Face] = {
     txManager.asReadOnly[List[Face]] {
-      val q = new Query().add(C.Face.PERSON_ID -> personId)
+      val sort: Sort = Sort(C.Face.DETECTION_SCORE, SortDirection.DESC)
+
+      val q = new Query(
+        params=Map(C.Face.PERSON_ID -> personId),
+        sort=List(sort))
+
       val qRes: QueryResult = faceDao.query(q)
       qRes.records.take(limit).map(Face.fromJson(_))
     }

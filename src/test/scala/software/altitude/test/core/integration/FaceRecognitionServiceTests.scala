@@ -14,7 +14,7 @@ import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class FaceRecognitionServiceTests(override val testApp: Altitude) extends IntegrationTestCore {
 
-  test("Recognize a person twice") {
+  test("Recognize a person twice", Focused) {
     val importAsset1 = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val importedAsset1: Asset = testApp.service.assetImport.importAsset(importAsset1).get
     val faces1 = testApp.service.faceDetection.extractFaces(importAsset1.data)
@@ -25,7 +25,7 @@ import software.altitude.test.core.IntegrationTestCore
     testApp.service.faceRecognition.recognizer.getLabels.size().height.toInt should be(3)
 
     // the person should be in the cache
-    val cachedPerson = testApp.service.faceCache.getPersonByLabel(recognizedPerson.label)
+    var cachedPerson = testApp.service.faceCache.getPersonByLabel(recognizedPerson.label)
     cachedPerson should not be empty
     cachedPerson.get.getFaces.size should be(1)
 
@@ -36,7 +36,7 @@ import software.altitude.test.core.IntegrationTestCore
     val face2: Face = faces2.head
 
     val samePerson: Person = testApp.service.faceRecognition.recognizeFace(face2, importedAsset2)
-    samePerson should be theSameInstanceAs recognizedPerson
+    samePerson.persistedId shouldBe recognizedPerson.persistedId
     cachedPerson.get.getFaces.size should be(2)
 
     // Recognize a second time
@@ -46,7 +46,9 @@ import software.altitude.test.core.IntegrationTestCore
     val face3: Face = faces3.head
 
     val samePersonAgain: Person = testApp.service.faceRecognition.recognizeFace(face3, importedAsset3)
-    samePersonAgain should be theSameInstanceAs recognizedPerson
+    samePersonAgain.persistedId shouldBe recognizedPerson.persistedId
+
+    cachedPerson = testApp.service.faceCache.getPersonByLabel(recognizedPerson.label)
     cachedPerson.get.getFaces.size should be(3)
 
     val persistedPerson = testApp.service.person.getPersonById(recognizedPerson.persistedId)

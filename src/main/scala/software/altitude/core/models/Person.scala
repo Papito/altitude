@@ -74,6 +74,10 @@ case class Person(id: Option[String] = None,
     _faces
   }
 
+  def hasFaces: Boolean = _faces.nonEmpty
+
+  def wasMergedFrom: Boolean = mergedIntoId.nonEmpty
+
   override def canEqual(other: Any): Boolean = other.isInstanceOf[Face]
 
   override def equals(that: Any): Boolean = that match {
@@ -83,4 +87,7 @@ case class Person(id: Option[String] = None,
   }
 
   override def hashCode: Int = super.hashCode
+
+  override def toString: String =
+    s"PERSON $id. Label: $label. Name: ${name.getOrElse("N/A")}. Faces: $numOfFaces"
 }
