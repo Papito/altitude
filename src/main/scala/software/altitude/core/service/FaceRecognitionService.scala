@@ -54,7 +54,7 @@ class FaceRecognitionService(val app: Altitude) {
   recognizer.setGridY(10)
   recognizer.setRadius(2)
 
-  private def initialize(): Unit = {
+  def initialize(): Unit = {
     if (modelFile.exists()) {
       logger.info("Found facial recognition model, loading...")
       recognizer.read(FACE_RECOGNITION_MODEL_PATH)
@@ -77,13 +77,14 @@ class FaceRecognitionService(val app: Altitude) {
       InitialImages.add(image)
     }
 
+    recognizer.clear()
     recognizer.train(InitialImages, initialLabels)
     saveModel()
   }
 
   initialize()
 
-  private def saveModel(): Unit = {
+  def saveModel(): Unit = {
     /**
      * Unorthodox, but this whole file-writing thing is messy and we can't really mock this method
      * as it can be invoked during deep app init, before we can use Mockito.
@@ -94,7 +95,7 @@ class FaceRecognitionService(val app: Altitude) {
       return
     }
 
-    logger.info("Saving initial model")
+    logger.info("--> Saving model")
     FileUtils.forceMkdirParent(modelFile)
     recognizer.save(FACE_RECOGNITION_MODEL_PATH)
   }
@@ -104,7 +105,10 @@ class FaceRecognitionService(val app: Altitude) {
     logger.info(s"Detected ${detectedFaces.size} faces")
 
     detectedFaces.foreach(face => {
-//      val person = recognizeFace(face, dataAsset.asset)
+      val existingOrNewPerson = recognizeFace(face, dataAsset.asset)
+      val persistedFace = app.service.person.addFace(face, dataAsset.asset, existingOrNewPerson)
+      logger.info(s"Saving face ${persistedFace.persistedId} for person ${existingOrNewPerson.name.get}")
+      indexFace(face, existingOrNewPerson)
     })
   }
 
@@ -144,7 +148,7 @@ class FaceRecognitionService(val app: Altitude) {
 
       if (simScore >= FaceRecognitionService.PESSIMISTIC_COSINE_DISTANCE_THRESHOLD) {
         logger.debug("MATCHED. Persisting face")
-        updatePersonWithFace(personMlMatch.get, detectedFace, asset)
+        personMlMatch.get.addFace(detectedFace)
         return personMlMatch.get
       }
     }
@@ -154,13 +158,13 @@ class FaceRecognitionService(val app: Altitude) {
 
     if (bestPersonFaceMatch.isDefined) {
       val personBruteForceMatch = app.service.faceCache.getPersonByLabel(bestPersonFaceMatch.get.personLabel.get)
-      updatePersonWithFace(personBruteForceMatch.get, detectedFace, asset)
+      personBruteForceMatch.get.addFace(detectedFace)
       personBruteForceMatch.get
     } else {
       logger.info("Mo match. Adding new person")
       val personModel = Person()
       val newPerson: Person = app.service.person.addPerson(personModel, Some(asset))
-      updatePersonWithFace(newPerson, detectedFace, asset)
+      newPerson.addFace(detectedFace)
       newPerson
     }
   }
@@ -202,20 +206,19 @@ class FaceRecognitionService(val app: Altitude) {
     }
   }
 
-
-  private def updatePersonWithFace(person: Person, face: Face, asset: Asset): Unit = {
-    // this will call the "indexFace" method in return, there is a circular action here
-    val persistedFace = app.service.person.addFace(face, asset, person)
-    person.addFace(persistedFace)
-    logger.info(s"Saving face ${persistedFace.persistedId} for person ${person.name.get}")
-  }
-
-  def indexFace(face: Face, person: Person): Unit = {
+  private def indexFace(face: Face, person: Person): Unit = {
     logger.info(s"Updating model for person ${person.label}")
     val labels = new Mat(1, 1, CvType.CV_32SC1)
     val images = new util.ArrayList[Mat]()
     labels.put(0, 0, person.label)
     images.add(face.alignedImageGsMat)
     recognizer.update(images, labels)
+  }
+
+  def addFacesToPerson(faces: List[Face], person: Person): Unit = {
+    faces.foreach(face => {
+      person.addFace(face)
+      indexFace(face, person)
+    })
   }
 }

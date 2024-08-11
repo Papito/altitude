@@ -142,6 +142,9 @@ class ImportController
                 processedAndTotal._1.set(0)
                 processedAndTotal._2.set(0)
 
+                // save the model after all files have been processed
+                app.service.faceRecognition.saveModel()
+
                 sendWsStatusToUserClients(
                   successStatusTickerTemplate.format("All files processed"))
               }

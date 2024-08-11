@@ -35,7 +35,7 @@ abstract class IntegrationTestCore
     IntegrationTestUtil.createFileStoreDir(testApp)
 
     // Clear the face recognition model before each test
-    testApp.service.faceRecognition.recognizer.clear()
+    testApp.service.faceRecognition.initialize()
   }
 
   override def afterEach(): Unit = {
@@ -95,4 +95,9 @@ abstract class IntegrationTestCore
    * That is, this reflects purely our trained labels for easier reasoning about the counts.
    */
   def getNumberOfModelLabels: Int = testApp.service.faceRecognition.recognizer.getLabels.size().height.toInt - 2
+
+  def getLabels: Seq[Int] = {
+    val labels = testApp.service.faceRecognition.recognizer.getLabels
+    (0 until labels.height()).map(labels.get(_, 0)(0).toInt)
+  }
 }

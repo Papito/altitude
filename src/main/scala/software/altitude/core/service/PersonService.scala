@@ -43,6 +43,7 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
 
   def addFace(face: Face, asset: Asset, person: Person): Face = {
     require(person.persistedId.nonEmpty, "Cannot add a face to an unsaved person object")
+    require(asset.persistedId.nonEmpty, "Cannot add a face to an unsaved asset object")
 
     txManager.withTransaction[Face] {
       val persistedFace: Face = faceDao.add(face, asset, person)
@@ -66,8 +67,6 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
       } else {
         app.service.faceCache.addFace(persistedFace)
       }
-
-      app.service.faceRecognition.indexFace(persistedFace, person)
 
       persistedFace
     }
@@ -170,10 +169,9 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
 
       val allSourceFaces: List[Face] = faceDao.query(q).records.map(Face.fromJson(_))
       logger.info(s"Training the ${allSourceFaces.size} faces on the destination label ${dest.label}")
+
       // train the faces on the destination label
-      allSourceFaces.foreach { face =>
-          app.service.faceRecognition.indexFace(face, persistedDest)
-      }
+      app.service.faceRecognition.addFacesToPerson(allSourceFaces, persistedDest)
 
       faceDao.updateByQuery(q, Map(C.Face.PERSON_ID -> dest.persistedId))
 
@@ -193,7 +191,7 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
         ))
 
       // get the top face after merge
-      val destFaces = getFaces(dest.persistedId, FaceRecognitionService.MAX_COMPARISONS_PER_PERSON)
+      val destFaces = getPersonFaces(dest.persistedId, FaceRecognitionService.MAX_COMPARISONS_PER_PERSON)
       updatedDest.setFaces(destFaces)
 
       app.service.faceCache.putPerson(updatedSource)
@@ -203,7 +201,7 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
     }
   }
 
-  def getFaces(personId: String, limit: Int = 50): List[Face] = {
+  def getPersonFaces(personId: String, limit: Int = 50): List[Face] = {
     txManager.asReadOnly[List[Face]] {
       val sort: Sort = Sort(C.Face.DETECTION_SCORE, SortDirection.DESC)
 
@@ -214,6 +212,30 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
       val qRes: QueryResult = faceDao.query(q)
       qRes.records.take(limit).map(Face.fromJson(_))
     }
+  }
+
+  def getAssetFaces(assetId: String): List[Face] = {
+    txManager.asReadOnly[List[Face]] {
+      val q = new Query(
+        params=Map(C.Face.ASSET_ID -> assetId))
+
+      val qRes: QueryResult = faceDao.query(q)
+      qRes.records.map(Face.fromJson(_))
+    }
+  }
+
+  def getPeople(assetId: String): List[Person] = {
+    txManager.asReadOnly[List[Person]] {
+      val faces = getAssetFaces(assetId)
+      val personIds = faces.map(_.personId.get)
+
+      val q = new Query(
+        params=Map(C.Person.ID -> Query.IN(personIds.toSet)))
+
+      val qRes: QueryResult = dao.query(q)
+      qRes.records.map(Person.fromJson(_))
+    }
+
   }
 
   def setFaceAsCover(person: Person, face: Face): Person = {

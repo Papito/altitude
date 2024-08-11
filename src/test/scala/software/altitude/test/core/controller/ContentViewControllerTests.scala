@@ -1,6 +1,7 @@
 package software.altitude.test.core.controller
 
 import org.scalatest.DoNotDiscover
+import org.scalatest.matchers.must.Matchers.be
 import software.altitude.core.Altitude
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Face
@@ -52,13 +53,11 @@ import software.altitude.test.core.ControllerTestCore
 
     val importAsset = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
-    val faces1 = testApp.service.faceDetection.extractFaces(importAsset.data)
-    val person: Person = testApp.service.person.addPerson(Person())
 
-    val face: Face = faces1.head
-    val savedFace: Face = testApp.service.person.addFace(face=face, asset=importedAsset, person = person)
+    val faces = testApp.service.person.getAssetFaces(importedAsset.persistedId)
+    val face: Face = faces.head
 
-    get(s"/content/r/$repoId/${C.DataStore.FACE}/${savedFace.persistedId}", headers=testAuthHeaders()) {
+    get(s"/content/r/$repoId/${C.DataStore.FACE}/${face.persistedId}", headers=testAuthHeaders()) {
       response.getContentType() should startWith("image/png")
       status should equal(200)
     }

@@ -28,7 +28,15 @@ class FaceCacheService(app: Altitude) {
   }
 
   def getPersonByLabel(label: Label): Option[Person] = {
-    val personOpt = getRepositoryPersonCache.get(label)
+    val personOpt =
+      try {
+        getRepositoryPersonCache.get(label)
+      } catch {
+        case e: NoSuchElementException =>
+          logger.error(s"Error getting person by label $label", e)
+          dump()
+          throw e
+      }
 
     // if this person had been merged - return the merge destination instead
     if (personOpt.nonEmpty && personOpt.get.mergedIntoLabel.nonEmpty) {

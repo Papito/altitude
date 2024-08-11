@@ -14,18 +14,22 @@ import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class FaceRecognitionServiceTests(override val testApp: Altitude) extends IntegrationTestCore {
 
-  test("Recognize a person twice", Focused) {
+  test("Recognize a person twice") {
     val importAsset1 = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val importedAsset1: Asset = testApp.service.assetImport.importAsset(importAsset1).get
     val faces1 = testApp.service.faceDetection.extractFaces(importAsset1.data)
     val face1: Face = faces1.head
-
     val recognizedPerson: Person = testApp.service.faceRecognition.recognizeFace(face1, importedAsset1)
 
     // the person should be in the cache
     var cachedPerson = testApp.service.faceCache.getPersonByLabel(recognizedPerson.label)
     cachedPerson should not be empty
     cachedPerson.get.getFaces.size should be(1)
+
+    // person is trained on one face (model has one label reference)
+    val people = testApp.service.person.getPeople(importedAsset1.persistedId)
+    val person = people.head
+    getLabels.count(_ == person.label) should be(1)
 
     // Recognize again
     val importAsset2 = IntegrationTestUtil.getImportAsset("people/meme-ben2.png")
@@ -36,6 +40,9 @@ import software.altitude.test.core.IntegrationTestCore
     val samePerson: Person = testApp.service.faceRecognition.recognizeFace(face2, importedAsset2)
     samePerson.persistedId shouldBe recognizedPerson.persistedId
     cachedPerson.get.getFaces.size should be(2)
+
+    // second face was used to train the same person
+    getLabels.count(_ == person.label) should be(2)
 
     // Recognize a second time
     val importAsset3 = IntegrationTestUtil.getImportAsset("people/meme-ben3.png")
@@ -51,20 +58,25 @@ import software.altitude.test.core.IntegrationTestCore
 
     val persistedPerson = testApp.service.person.getPersonById(recognizedPerson.persistedId)
     persistedPerson.numOfFaces should be(3)
+
+    // third face was used to train the same person
+    getLabels.count(_ == person.label) should be(3)
   }
 
   test("Recognize two new people") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/movies-speed.png")
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
 
-    val faces = testApp.service.faceDetection.extractFaces(importAsset.data)
+    val people = testApp.service.person.getPeople(importedAsset.persistedId)
+    people.size should be(2)
 
-    faces.foreach(face => {
-      testApp.service.faceRecognition.recognizeFace(face, importedAsset)
-    })
+    // model has two label references, one for each person
+    getLabels.count(_ == people.head.label) should be(1)
+    getLabels.count(_ == people.last.label) should be(1)
 
     // There should be two new people in the cache
     testApp.service.faceCache.size() should be(2)
+
   }
 
 }

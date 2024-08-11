@@ -68,8 +68,8 @@ class LibraryService(val app: Altitude) {
 
       logger.info(s"Adding asset: $dataAsset")
 
-      app.service.faceRecognition.processAsset(dataAsset)
       app.service.asset.add(asset)
+      app.service.faceRecognition.processAsset(dataAsset)
       app.service.search.indexAsset(asset)
       app.service.stats.addAsset(asset)
       app.service.fileStore.addAsset(dataAsset)
