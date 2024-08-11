@@ -252,7 +252,6 @@ class FaceDetectionService {
       val features = getFacialFeatures(alignedFaceImage)
 
       val featuresArray = (0 to 127).map(col => features.get(0, col)(0).asInstanceOf[Float]).toArray
-      // val featureArray = new Array[Float](features.total().asInstanceOf[Float])
       val embedding = getEmbeddings(alignedFaceImage)
 
       val rect = FaceDetectionService.faceDetectToRect(res)

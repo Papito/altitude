@@ -2,14 +2,14 @@ package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.be
-import org.scalatest.matchers.must.Matchers.empty
 import org.scalatest.matchers.must.Matchers.not
+import org.scalatest.matchers.must.Matchers.empty
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Face
 import software.altitude.core.models.Person
-import software.altitude.core.service.FaceRecognitionService
+import software.altitude.core.service.{FaceDetectionService, FaceRecognitionService}
 import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.IntegrationTestCore
 
@@ -105,9 +105,10 @@ import software.altitude.test.core.IntegrationTestCore
     retrievedPerson2.label - retrievedPerson1.label should be(1)
   }
 
-  test("Person merge B -> A") {
+  test("Person merge B -> A", Focused) {
     val personA: Person = testApp.service.person.addPerson(Person())
     testContext.addTestFaces(personA, NUM_OF_FACES)
+
 
     //
     // *** Person in cache should have only the required top faces, sorted by detection score
@@ -128,6 +129,9 @@ import software.altitude.test.core.IntegrationTestCore
     var cachedB = testApp.service.faceCache.getPersonByLabel(personB.label).get
     cachedB.getFaces.size should be(FaceRecognitionService.MAX_COMPARISONS_PER_PERSON)
 
+    //
+    // *** Merge B -> A
+    //
     val mergedA: Person = testApp.service.person.merge(dest=personA, source=personB)
 
     //

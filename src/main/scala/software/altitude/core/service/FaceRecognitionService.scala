@@ -41,7 +41,7 @@ object FaceRecognitionService {
   private val PESSIMISTIC_COSINE_DISTANCE_THRESHOLD = .46
 }
 
-class FaceRecognitionService(app: Altitude) {
+class FaceRecognitionService(val app: Altitude) {
   final val logger: Logger = LoggerFactory.getLogger(getClass)
 
   private val MODELS_PATH = FilenameUtils.concat(app.dataPath, Const.DataStore.MODELS)
@@ -100,14 +100,12 @@ class FaceRecognitionService(app: Altitude) {
   }
 
   def processAsset(dataAsset: AssetWithData): Unit = {
-    val image: Mat = matFromBytes(dataAsset.data)
-    val results: List[Mat] = app.service.faceDetection.detectFacesWithYunet(image)
+    val detectedFaces = app.service.faceDetection.extractFaces(dataAsset.data)
+    logger.info(s"Detected ${detectedFaces.size} faces")
 
-    results.indices.foreach { idx =>
-      val res = results(idx)
-      val rect = FaceDetectionService.faceDetectToRect(res)
-      logger.info("Face detected: " + rect)
-    }
+    detectedFaces.foreach(face => {
+//      val person = recognizeFace(face, dataAsset.asset)
+    })
   }
 
   /**
@@ -206,12 +204,14 @@ class FaceRecognitionService(app: Altitude) {
 
 
   private def updatePersonWithFace(person: Person, face: Face, asset: Asset): Unit = {
+    // this will call the "indexFace" method in return, there is a circular action here
     val persistedFace = app.service.person.addFace(face, asset, person)
-    logger.info(s"Saving face ${persistedFace.persistedId} for person ${person.name.get}")
     person.addFace(persistedFace)
+    logger.info(s"Saving face ${persistedFace.persistedId} for person ${person.name.get}")
+  }
 
-
-    logger.info(s"Updating model for person ${person.name.get}")
+  def indexFace(face: Face, person: Person): Unit = {
+    logger.info(s"Updating model for person ${person.label}")
     val labels = new Mat(1, 1, CvType.CV_32SC1)
     val images = new util.ArrayList[Mat]()
     labels.put(0, 0, person.label)

@@ -14,6 +14,8 @@ import software.altitude.core.models.Repository
 import software.altitude.core.models.User
 import software.altitude.core.util.Util
 import software.altitude.core.{Const => C}
+import software.altitude.test.IntegrationTestUtil.generateRandomImagBytesBgr
+import software.altitude.test.IntegrationTestUtil.generateRandomImagBytesGray
 
 import java.io.File
 import scala.util.Random
@@ -178,9 +180,9 @@ class TestContext(val testApp: Altitude) {
         detectionScore = Random.nextDouble(),
         embeddings = Array.fill(128) { Random.nextFloat() },
         features = Array.fill(128) { Random.nextFloat() },
-        image = Random.nextBytes(100),
-        alignedImage = Random.nextBytes(100),
-        alignedImageGs = Random.nextBytes(100))
+        image = generateRandomImagBytesBgr(),
+        alignedImage = generateRandomImagBytesBgr(),
+        alignedImageGs = generateRandomImagBytesGray())
 
       testApp.service.person.addFace(face, asset, person)
     }

@@ -67,6 +67,8 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
         app.service.faceCache.addFace(persistedFace)
       }
 
+      app.service.faceRecognition.indexFace(persistedFace, person)
+
       persistedFace
     }
   }
@@ -86,7 +88,7 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
       if (person.getFaces.size == 1) {
         val face = person.getFaces.head
 
-        val persistedFace: Face = faceDao.add(
+        val persistedFace: Face = addFace(
           face,
           asset.getOrElse(throw new IllegalArgumentException("Asset ID is required")),
           persistedPerson)
@@ -165,6 +167,14 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
       // move all faces from source to destination
       logger.debug(s"Moving faces from ${source.name.get} to ${dest.name.get}")
       val q = new Query().add(C.Face.PERSON_ID -> source.persistedId)
+
+      val allSourceFaces: List[Face] = faceDao.query(q).records.map(Face.fromJson(_))
+      logger.info(s"Training the ${allSourceFaces.size} faces on the destination label ${dest.label}")
+      // train the faces on the destination label
+      allSourceFaces.foreach { face =>
+          app.service.faceRecognition.indexFace(face, persistedDest)
+      }
+
       faceDao.updateByQuery(q, Map(C.Face.PERSON_ID -> dest.persistedId))
 
       // specify ID/label of where the source person was merged into

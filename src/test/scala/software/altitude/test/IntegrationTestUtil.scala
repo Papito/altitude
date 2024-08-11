@@ -6,7 +6,10 @@ import software.altitude.core.models.ImportAsset
 import software.altitude.core.models.Metadata
 import software.altitude.core.{Const => C}
 
+import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
 import java.io.File
+import javax.imageio.ImageIO
 
 object IntegrationTestUtil {
   def createTestDir(testApp: Altitude): Unit = {
@@ -46,6 +49,56 @@ object IntegrationTestUtil {
 
     val fileImportAsset = fileToImportAsset(file)
     fileImportAsset
+  }
+
+  def generateRandomImagBytesBgr(): Array[Byte] = {
+    val w = 50
+    val h = 50
+    val bufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR)
+
+    var y = 0
+    while (y < h) {
+      var x = 0
+      while (x < w) {
+        val a = (Math.random * 256).toInt //alpha
+        val r = (Math.random * 256).toInt //red
+        val g = (Math.random * 256).toInt //green
+        val b = (Math.random * 256).toInt //blue
+        val p = (a << 24) | (r << 16) | (g << 8) | b //pixel
+        bufferedImage.setRGB(x, y, p)
+        x += 1
+      }
+      y += 1
+    }
+
+    val byteArrayOutputStream = new ByteArrayOutputStream();
+    ImageIO.write(bufferedImage, "png", byteArrayOutputStream)
+    byteArrayOutputStream.toByteArray
+  }
+
+  def generateRandomImagBytesGray(): Array[Byte] = {
+    val w = 50
+    val h = 50
+    val bufferedImage = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_GRAY)
+
+    var y = 0
+    while (y < h) {
+      var x = 0
+      while (x < w) {
+        val a = (Math.random * 256).toInt //alpha
+        val r = (Math.random * 256).toInt //red
+        val g = (Math.random * 256).toInt //green
+        val b = (Math.random * 256).toInt //blue
+        val p = (a << 24) | (r << 16) | (g << 8) | b //pixel
+        bufferedImage.setRGB(x, y, p)
+        x += 1
+      }
+      y += 1
+    }
+
+    val byteArrayOutputStream = new ByteArrayOutputStream();
+    ImageIO.write(bufferedImage, "png", byteArrayOutputStream)
+    byteArrayOutputStream.toByteArray
   }
 
 }

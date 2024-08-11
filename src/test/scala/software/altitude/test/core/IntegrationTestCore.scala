@@ -89,4 +89,10 @@ abstract class IntegrationTestCore
   implicit def toAnswerWithArguments[T](f: InvocationOnMock => T): Answer[T] = new Answer[T] {
     override def answer(invocation: InvocationOnMock): T = f(invocation)
   }
+
+  /**
+   * The number of labels in the model, minus the reserved labels.
+   * That is, this reflects purely our trained labels for easier reasoning about the counts.
+   */
+  def getNumberOfModelLabels: Int = testApp.service.faceRecognition.recognizer.getLabels.size().height.toInt - 2
 }

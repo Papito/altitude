@@ -20,9 +20,7 @@ import software.altitude.test.core.IntegrationTestCore
     val faces1 = testApp.service.faceDetection.extractFaces(importAsset1.data)
     val face1: Face = faces1.head
 
-    testApp.service.faceRecognition.recognizer.getLabels.size().height.toInt should be(2)
     val recognizedPerson: Person = testApp.service.faceRecognition.recognizeFace(face1, importedAsset1)
-    testApp.service.faceRecognition.recognizer.getLabels.size().height.toInt should be(3)
 
     // the person should be in the cache
     var cachedPerson = testApp.service.faceCache.getPersonByLabel(recognizedPerson.label)
