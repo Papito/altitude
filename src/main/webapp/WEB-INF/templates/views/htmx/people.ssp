@@ -1,0 +1,23 @@
+#import(software.altitude.core.RequestContext)
+#import(software.altitude.core.Const)
+#import(software.altitude.core.models.Person)
+
+<%@ val people: List[Person] %>
+
+<style>
+</style>
+
+<div id="peopleList">
+    #for (person <- people)
+    <div>
+       <img src="/content/r/${RequestContext.getRepository.persistedId}/${Const.DataStore.FACE}/${person.coverFaceId}">
+    </div>
+    #end
+</div>
+
+<!-- On load -->
+<script type="module">
+    import {selectTab} from "/js/utils.js";
+
+    selectTab("explorer", "peopleTab")
+</script>

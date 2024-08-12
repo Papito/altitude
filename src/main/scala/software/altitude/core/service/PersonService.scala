@@ -235,11 +235,10 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
       val qRes: QueryResult = dao.query(q)
       qRes.records.map(Person.fromJson(_))
     }
-
   }
 
   def setFaceAsCover(person: Person, face: Face): Person = {
-    txManager.withTransaction[Person] {
+    txManager.withTransaction {
       val personForUpdate = person.copy(coverFaceId = Some(face.persistedId))
 
       updateById(
@@ -247,6 +246,12 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
         Map(C.Person.COVER_FACE_ID -> face.persistedId))
 
       personForUpdate
+    }
+  }
+
+  def getAll: List[Person] = {
+    txManager.asReadOnly {
+      dao.getAll.values.toList
     }
   }
 }
