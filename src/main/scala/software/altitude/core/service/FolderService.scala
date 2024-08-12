@@ -20,7 +20,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
 
   def getAll: List[JsObject] = {
     txManager.asReadOnly[List[JsObject]] {
-      val q: Query = new Query().withRepository()
+     val q: Query = new Query().withRepository()
      val wCounts = addAssetCount(dao.query(q).records)
      val wPaths = wCounts
      wPaths

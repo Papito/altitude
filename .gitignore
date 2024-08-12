@@ -11,8 +11,6 @@ project/project
 project/target
 test-data
 data
-# used to quickly copy over to data/ with admin user already set up
-data.clean
 target
 release
 dist

@@ -2,16 +2,20 @@ package software.altitude.core.service
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import software.altitude.core.Altitude
-import software.altitude.core.RequestContext
-import software.altitude.core.models.Face
-import software.altitude.core.models.Person
+import software.altitude.core.{Altitude, Environment, RequestContext}
+import software.altitude.core.dao.{FaceDao, PersonDao}
+import software.altitude.core.models.{Face, Person, Repository}
+import software.altitude.core.transactions.TransactionManager
 
 import scala.collection.mutable
 
 
 class FaceCacheService(app: Altitude) {
   protected final val logger: Logger = LoggerFactory.getLogger(getClass)
+
+  private val personDao: PersonDao = app.DAO.person
+  private val faceDao: FaceDao = app.DAO.face
+  protected val txManager: TransactionManager = app.txManager
 
   private type Label = Int
   private type PersonCache = mutable.Map[Label, Person]
@@ -25,6 +29,12 @@ class FaceCacheService(app: Altitude) {
 
   private def getRepositoryPersonCache: PersonCache = {
     cache.getOrElseUpdate(RequestContext.getRepository.persistedId, newPersonCache())
+  }
+
+  // This gets gnarly in tests fast, so let's just, like, NOT EVEN TRY
+  // We do test this, but pre-caching in test env has no point at all
+  if (Environment.CURRENT != Environment.Name.TEST) {
+    loadCacheForAll()
   }
 
   def getPersonByLabel(label: Label): Option[Person] = {
@@ -90,6 +100,37 @@ class FaceCacheService(app: Altitude) {
   def size(): Int = getRepositoryPersonCache.keys.size
 
   def getAll: List[Person] = getRepositoryPersonCache.values.toList
+
+  def clear(): Unit = getRepositoryPersonCache.clear()
+
+  def loadCache(repository: Repository): Unit = {
+    logger.info(s"Loading faces for repository ${repository.name}")
+
+    RequestContext.repository.value = Some(repository)
+
+    val allTopFaces: List[Face] = faceDao.getAllForCache
+    val allPeople: Map[String, Person] = personDao.getAll
+
+    allTopFaces.foreach { face =>
+      val person: Person = allPeople(face.personId.get)
+      person.addFace(face)
+    }
+
+    // faces added, now cache the peeps whole
+    allPeople.foreach { case (_, person) =>
+      putPerson(person)
+    }
+
+    RequestContext.repository.value = None
+  }
+
+  private def loadCacheForAll(): Unit = {
+    txManager.asReadOnly {
+      logger.info("Loading face cache from the database")
+      val repositories = app.DAO.repository.getAll
+      repositories.foreach(loadCache)
+    }
+  }
 
   def dump(): Unit = {
     cache.foreach { case (repoId, personCache) =>

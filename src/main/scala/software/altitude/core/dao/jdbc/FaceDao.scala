@@ -7,6 +7,7 @@ import software.altitude.core.RequestContext
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Face
 import software.altitude.core.models.Person
+import software.altitude.core.service.FaceRecognitionService
 import software.altitude.core.util.MurmurHash
 import software.altitude.core.{Const => C}
 
@@ -102,5 +103,31 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
       C.Face.PERSON_ID -> person.id.get,
       C.Face.PERSON_LABEL -> person.label,
     )
+  }
+
+  /**
+   * Get faces for all people in this repo, but only the top X faces per person.
+   * We use those to brute-force compare a new face, if there is no machine-learned hit
+   */
+  def getAllForCache: List[Face] = {
+    val sql = """
+       SELECT *
+         FROM (
+               SELECT ROW_NUMBER()
+                 OVER (PARTITION BY person_label ORDER BY detection_score DESC)
+                   AS r_num, sub_face.*
+                 FROM face AS sub_face
+                 WHERE repository_id = ?) face
+         WHERE repository_id =?
+           AND face.r_num <= ?
+        """
+
+    val recs: List[Map[String, AnyRef]] = manyBySqlQuery(
+      sql, List(
+        RequestContext.getRepository.persistedId,
+        RequestContext.getRepository.persistedId,
+        FaceRecognitionService.MAX_COMPARISONS_PER_PERSON))
+
+    recs.map(makeModel)
   }
 }

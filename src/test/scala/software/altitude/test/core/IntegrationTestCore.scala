@@ -31,11 +31,14 @@ abstract class IntegrationTestCore
     // Tests then can create additional repos and users to test the boundaries of repository and user separation.
     testContext.persistRepository()
 
-    // nuke the data dir tree
-    IntegrationTestUtil.createFileStoreDir(testApp)
-
     // Clear the face recognition model before each test
     testApp.service.faceRecognition.initialize()
+
+    // Clear face recognition cache
+    testApp.service.faceCache.clear()
+
+    // nuke the data dir tree
+    IntegrationTestUtil.createFileStoreDir(testApp)
   }
 
   override def afterEach(): Unit = {

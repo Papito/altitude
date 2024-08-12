@@ -5,10 +5,12 @@ import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.must.Matchers.empty
 import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import software.altitude.core.Altitude
+import software.altitude.core.{Altitude, RequestContext}
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Face
 import software.altitude.core.models.Person
+import software.altitude.core.service.FaceRecognitionService
+import software.altitude.core.util.Util
 import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.IntegrationTestCore
 
@@ -79,4 +81,32 @@ import software.altitude.test.core.IntegrationTestCore
 
   }
 
+  test("Load face cache", Focused) {
+    val personA: Person = testApp.service.person.addPerson(Person(name=Some(Util.randomStr(size = 6))))
+    testContext.addTestFaces(personA, 15)
+
+    val personB: Person = testApp.service.person.addPerson(Person(name=Some(Util.randomStr(size = 6))))
+    testContext.addTestFaces(personB, 15)
+
+    val personC: Person = testApp.service.person.addPerson(Person(name=Some(Util.randomStr(size = 6))))
+    testContext.addTestFaces(personC, 15)
+
+    testApp.service.faceCache.clear()
+
+    testApp.service.faceCache.loadCache(testContext.repository)
+
+    // load() method is a cross-repo operation, messing with the context
+    // so we need to set it back to the test repo
+    RequestContext.repository.value = Some(testContext.repository)
+
+    testApp.service.faceCache.size() should be(3)
+
+    // none should have more faces that the top ones we need
+    List(personA, personB, personC).foreach { person =>
+      val cachedPerson = testApp.service.faceCache.getPersonByLabel(person.label).get
+      cachedPerson.getFaces.size should be(FaceRecognitionService.MAX_COMPARISONS_PER_PERSON)
+    }
+
+    // should also pull ALL person A faces and make sure the top X ones are in the cache
+  }
 }

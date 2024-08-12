@@ -58,4 +58,10 @@ abstract class RepositoryDao(override val config: Config) extends BaseDao
 
     jsonIn ++ Json.obj(C.Base.ID -> id)
   }
+
+  def getAll: List[Repository] = {
+    val sql = s"SELECT ${columnsForSelect.mkString(", ")} FROM $tableName"
+    val recs = manyBySqlQuery(sql)
+    recs.map(makeModel)
+  }
 }

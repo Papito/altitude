@@ -102,6 +102,7 @@ abstract class BaseDao {
     updateByQuery(q, data)
   }
 
+  // FIXME: this should be part of query builder, a hack for now
   def deleteByQuery(q: Query): Int = {
     logger.debug(s"Deleting record by query: $q")
 
