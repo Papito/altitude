@@ -82,8 +82,6 @@ class FaceRecognitionService(val app: Altitude) {
     saveModel()
   }
 
-  initialize()
-
   def saveModel(): Unit = {
     /**
      * Unorthodox, but this whole file-writing thing is messy and we can't really mock this method

@@ -2,7 +2,7 @@ package software.altitude.core.service
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import software.altitude.core.{Altitude, Environment, RequestContext}
+import software.altitude.core.{Altitude, RequestContext}
 import software.altitude.core.dao.{FaceDao, PersonDao}
 import software.altitude.core.models.{Face, Person, Repository}
 import software.altitude.core.transactions.TransactionManager
@@ -29,12 +29,6 @@ class FaceCacheService(app: Altitude) {
 
   private def getRepositoryPersonCache: PersonCache = {
     cache.getOrElseUpdate(RequestContext.getRepository.persistedId, newPersonCache())
-  }
-
-  // This gets gnarly in tests fast, so let's just, like, NOT EVEN TRY
-  // We do test this, but pre-caching in test env has no point at all
-  if (Environment.CURRENT != Environment.Name.TEST) {
-    loadCacheForAll()
   }
 
   def getPersonByLabel(label: Label): Option[Person] = {
@@ -124,7 +118,7 @@ class FaceCacheService(app: Altitude) {
     RequestContext.repository.value = None
   }
 
-  private def loadCacheForAll(): Unit = {
+  def loadCacheForAll(): Unit = {
     txManager.asReadOnly {
       logger.info("Loading face cache from the database")
       val repositories = app.DAO.repository.getAll
