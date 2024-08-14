@@ -97,9 +97,11 @@ class FaceCacheService(app: Altitude) {
     val allTopFaces: List[Face] = faceDao.getAllForCache
     val allPeople: Map[String, Person] = personDao.getAll
 
+    var faceCount = 0
     allTopFaces.foreach { face =>
       val person: Person = allPeople(face.personId.get)
       person.addFace(face)
+      faceCount += 1
     }
 
     // faces added, now cache the peeps whole
@@ -107,7 +109,7 @@ class FaceCacheService(app: Altitude) {
       putPerson(person)
     }
 
-    logger.info(s"Loaded ${allPeople.size} people into the cache")
+    logger.info(s"Loaded ${allPeople.size} people into the cache, ${faceCount} faces.")
 
     RequestContext.repository.value = None
   }

@@ -107,27 +107,44 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     FilenameUtils.concat(partitionedFilesPath, assetId)
   }
 
-  private def facePath(faceId: String): String = {
+  private def displayFacePath(faceId: String): String = {
     val facesPath = FilenameUtils.concat(repositoryDataPath, C.DataStore.FACES)
     val partitionedFacesPath = FilenameUtils.concat(facesPath, faceId.substring(0, 2))
-    FilenameUtils.concat(partitionedFacesPath, faceId)
+    FilenameUtils.concat(partitionedFacesPath, s"$faceId-display.png")
+  }
+
+  private def detectedFacePath(faceId: String): String = {
+    val facesPath = FilenameUtils.concat(repositoryDataPath, C.DataStore.FACES)
+    val partitionedFacesPath = FilenameUtils.concat(facesPath, faceId.substring(0, 2))
+    FilenameUtils.concat(partitionedFacesPath, s"$faceId-detected.png")
+  }
+
+  private def alignedGreyscaleFacePath(faceId: String): String = {
+    val facesPath = FilenameUtils.concat(repositoryDataPath, C.DataStore.FACES)
+    val partitionedFacesPath = FilenameUtils.concat(facesPath, faceId.substring(0, 2))
+    FilenameUtils.concat(partitionedFacesPath, s"$faceId-aligned-gs.png")
   }
 
   override def addFace(face: Face): Unit = {
-    val destFile = new File(facePath(face.persistedId))
-    logger.debug(s"Creating face [${face.persistedId}] on file system at [$destFile]")
+    logger.debug(s"Creating face [${face.persistedId}] on file system")
+
+    val destDisplayFile = new File(displayFacePath(face.persistedId))
+    val detectedFaceFile = new File(detectedFacePath(face.persistedId))
+    val alignedGreyscaleFile = new File(alignedGreyscaleFacePath(face.persistedId))
 
     try {
-      FileUtils.writeByteArrayToFile(destFile, face.displayImage)
+      FileUtils.writeByteArrayToFile(destDisplayFile, face.displayImage)
+      FileUtils.writeByteArrayToFile(detectedFaceFile, face.image)
+      FileUtils.writeByteArrayToFile(alignedGreyscaleFile, face.alignedImageGs)
     }
     catch {
       case ex: IOException =>
-        throw StorageException(s"Error creating [$face] @ [$destFile]: $ex]")
+        throw StorageException(s"Error creating [$face] @ [$destDisplayFile]: $ex]")
     }
   }
 
-  override def getFaceById(faceId: String): MimedFaceData = {
-    val path = facePath(faceId)
+  override def getDisplayFaceById(faceId: String): MimedFaceData = {
+    val path = displayFacePath(faceId)
     val srcFile: File = new File(path)
 
     var byteArray: Option[Array[Byte]] = None

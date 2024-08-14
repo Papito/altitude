@@ -10,5 +10,5 @@ trait FileStoreService {
   def getPreviewById(assetId: String): MimedPreviewData
 
   def addFace(face: Face): Unit
-  def getFaceById(faceId: String): MimedFaceData
+  def getDisplayFaceById(faceId: String): MimedFaceData
 }
