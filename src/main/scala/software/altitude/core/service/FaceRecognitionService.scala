@@ -33,12 +33,12 @@ object FaceRecognitionService {
    * Lower number means faster matching but the same person may be detected as new.
    * Technically, just 1 "top" face will work, and the accuracy benefits get diminished the higher we go
    */
-  val MAX_COMPARISONS_PER_PERSON = 8
+  val MAX_COMPARISONS_PER_PERSON = 12
 
   /**
    * If the cosine distance between the facial features is below this threshold, we consider the face a match.
    */
-  private val PESSIMISTIC_COSINE_DISTANCE_THRESHOLD = .46
+  val PESSIMISTIC_COSINE_DISTANCE_THRESHOLD = .46
 }
 
 class FaceRecognitionService(val app: Altitude) {
@@ -102,11 +102,11 @@ class FaceRecognitionService(val app: Altitude) {
     val detectedFaces = app.service.faceDetection.extractFaces(dataAsset.data)
     logger.info(s"Detected ${detectedFaces.size} faces")
 
-    detectedFaces.foreach(face => {
-      val existingOrNewPerson = recognizeFace(face, dataAsset.asset)
-      val persistedFace = app.service.person.addFace(face, dataAsset.asset, existingOrNewPerson)
+    detectedFaces.foreach(detectedFace => {
+      val existingOrNewPerson = recognizeFace(detectedFace, dataAsset.asset)
+      val persistedFace = app.service.person.addFace(detectedFace, dataAsset.asset, existingOrNewPerson)
       logger.info(s"Saving face ${persistedFace.persistedId} for person ${existingOrNewPerson.name.get}")
-      indexFace(face, existingOrNewPerson)
+      indexFace(persistedFace, existingOrNewPerson)
     })
   }
 
@@ -131,7 +131,7 @@ class FaceRecognitionService(val app: Altitude) {
     val personMlMatch: Option[Person] = app.service.faceCache.getPersonByLabel(predLabel)
 
     /**
-     * If we have a match that is not a system label (low numbers), we compare the match to
+     * If we have a match, we compare the match to
      * the person's "best" face - the faces are sorted by detection score.
      *
      * This is called a "verified" match.
@@ -146,7 +146,6 @@ class FaceRecognitionService(val app: Altitude) {
 
       if (simScore >= FaceRecognitionService.PESSIMISTIC_COSINE_DISTANCE_THRESHOLD) {
         logger.debug("MATCHED. Persisting face")
-        personMlMatch.get.addFace(detectedFace)
         return personMlMatch.get
       }
     }
@@ -155,14 +154,14 @@ class FaceRecognitionService(val app: Altitude) {
     val bestPersonFaceMatch: Option[Face] = matchFaceBruteForce(detectedFace)
 
     if (bestPersonFaceMatch.isDefined) {
+      require(bestPersonFaceMatch.get.personLabel.isDefined, "Face must have a person label")
+
       val personBruteForceMatch = app.service.faceCache.getPersonByLabel(bestPersonFaceMatch.get.personLabel.get)
-      personBruteForceMatch.get.addFace(detectedFace)
       personBruteForceMatch.get
     } else {
       logger.info("Mo match. Adding new person")
       val personModel = Person()
       val newPerson: Person = app.service.person.addPerson(personModel, Some(asset))
-      newPerson.addFace(detectedFace)
       newPerson
     }
   }

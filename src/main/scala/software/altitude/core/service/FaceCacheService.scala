@@ -7,7 +7,7 @@ import software.altitude.core.dao.{FaceDao, PersonDao}
 import software.altitude.core.models.{Face, Person, Repository}
 import software.altitude.core.transactions.TransactionManager
 
-import scala.collection.mutable
+import scala.collection.concurrent.TrieMap
 
 
 class FaceCacheService(app: Altitude) {
@@ -18,14 +18,14 @@ class FaceCacheService(app: Altitude) {
   protected val txManager: TransactionManager = app.txManager
 
   private type Label = Int
-  private type PersonCache = mutable.Map[Label, Person]
-  private type RepositoryPersonCache = mutable.Map[String, PersonCache]
+  private type PersonCache = TrieMap[Label, Person]
+  private type RepositoryPersonCache = TrieMap[String, PersonCache]
 
   // Model label (int) -> Person
-  private def newPersonCache(): PersonCache = mutable.Map[Label, Person]()
+  private def newPersonCache(): PersonCache = TrieMap[Label, Person]()
 
   // Repo ID -> Person Cache
-  private val cache: RepositoryPersonCache = mutable.Map[String, PersonCache]()
+  private val cache: RepositoryPersonCache = TrieMap[String, PersonCache]()
 
   private def getRepositoryPersonCache: PersonCache = {
     cache.getOrElseUpdate(RequestContext.getRepository.persistedId, newPersonCache())
@@ -36,8 +36,9 @@ class FaceCacheService(app: Altitude) {
       try {
         getRepositoryPersonCache.get(label)
       } catch {
-        case e: NoSuchElementException =>
+        case e: Exception =>
           logger.error(s"Error getting person by label $label", e)
+          println("Size " + size)
           dump()
           throw e
       }
@@ -137,7 +138,7 @@ class FaceCacheService(app: Altitude) {
 
         if (person.hasFaces) {
           person.getFaces.foreach { face =>
-            println(s"    Face ${face.id} -> ${face.detectionScore}")
+            println(s"    Face $face")
           }
         } else {
           println("    Person has no faces stored in cache")

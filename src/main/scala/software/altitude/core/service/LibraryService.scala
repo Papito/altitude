@@ -167,7 +167,7 @@ class LibraryService(val app: Altitude) {
   private def genPreviewData(dataAsset: AssetWithData): Array[Byte] = {
     dataAsset.asset.assetType.mediaType match {
       case "image" =>
-        makeImageThumbnail(dataAsset, previewBoxSize)
+        makeImageThumbnail(dataAsset.data, previewBoxSize)
       case _ => new Array[Byte](0)
     }
   }

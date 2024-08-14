@@ -16,7 +16,7 @@ import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class FaceRecognitionServiceTests(override val testApp: Altitude) extends IntegrationTestCore {
 
-  test("Recognize a person twice") {
+  test("Recognize a person twice", Focused) {
     val importAsset1 = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val importedAsset1: Asset = testApp.service.assetImport.importAsset(importAsset1).get
     val faces1 = testApp.service.faceDetection.extractFaces(importAsset1.data)
@@ -63,6 +63,8 @@ import software.altitude.test.core.IntegrationTestCore
 
     // third face was used to train the same person
     getLabels.count(_ == person.label) should be(3)
+
+    // testApp.service.faceCache.dump()
   }
 
   test("Recognize two new people") {
@@ -81,7 +83,7 @@ import software.altitude.test.core.IntegrationTestCore
 
   }
 
-  test("Load face cache", Focused) {
+  test("Load face cache") {
     val personA: Person = testApp.service.person.addPerson(Person(name=Some(Util.randomStr(size = 6))))
     testContext.addTestFaces(personA, 15)
 

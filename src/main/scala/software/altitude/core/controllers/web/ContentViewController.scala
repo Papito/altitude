@@ -41,7 +41,7 @@ class ContentViewController extends BaseWebController {
     if (dataType == C.DataStore.FACE) {
       val face: Face = app.service.person.getFaceById(itemId)
       contentType = "image/png"
-      response.getOutputStream.write(face.image)
+      response.getOutputStream.write(face.displayImage)
       halt(200)
     }
 

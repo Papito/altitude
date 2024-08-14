@@ -7,7 +7,7 @@ import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.face.LBPHFaceRecognizer
 import org.opencv.imgcodecs.Imgcodecs
-import software.altitude.core.service.FaceDetectionService
+import software.altitude.core.service.{FaceDetectionService, FaceRecognitionService}
 import software.altitude.core.util.ImageUtil.matFromBytes
 
 import java.io.File
@@ -161,9 +161,6 @@ object FaceRecognition extends SandboxApp {
     process(path)
   }
 
-  private val cosineSimilarityThreshold = .46
-  private val maxPersonCompareCycles = 12
-
   srcFaces.forEach(thisFace => {
     breakable {
 
@@ -178,39 +175,30 @@ object FaceRecognition extends SandboxApp {
       val confidence = confidenceArr.head
       println("Predicted label: " + predLabel + " with confidence: " + confidence + " for " + thisFace.name)
 
-      // if system label, ignore, we are probably at the start, just add the face and the NEW person
-      if (predLabel < 2) {
-        addNewPerson(thisFace)
-        break()
+      val personMlMatch: Option[Person] = DB.db.get(predLabel)
+
+      if (personMlMatch.isDefined) {
+        val simScore = altitude.service.faceDetection.getFeatureSimilarityScore(
+          thisFace.features, personMlMatch.get.allFaces().head.face.features)
+        println("Similarity score: " + simScore)
+
+        if (simScore >= FaceRecognitionService.PESSIMISTIC_COSINE_DISTANCE_THRESHOLD) {
+          println("MATCHED. Persisting face")
+          personMlMatch.get.addFace(thisFace)
+          modelHitCount += 1
+          break()
+        }
       }
 
-      // get the match from DB and do a similarity check
-      val personMatch: Person = DB.db(predLabel)
-      println(s"Running similarity check for this face and the Recognizer match -> ${personMatch.name}")
-
-      comparisonOpCount += 1
-      val simScore = altitude.service.faceDetection.getFeatureSimilarityScore(
-        thisFace.features, personMatch.allFaces().head.face.features)
-      println("Similarity score: " + simScore)
-
-      if (simScore >= cosineSimilarityThreshold) {
-        println("MATCHED")
-        // Add the face and update the model
-        val personFace = personMatch.addFace(thisFace)
-        updateModelWithFace(personFace)
-        println("Faces in DB: " + DB.allFaces().size)
-        break()
-      }
+      println("BRUTE FORCE")
 
       // No match, brute force through all people (matching with only the top-ranking face)
       val bestPersonFaceMatch: Option[PersonFace] = getPersonFaceMatches(thisFace)
 
-      // this is most likely a new person
+      // this is a new person
       if (bestPersonFaceMatch.isEmpty) {
         addNewPerson(thisFace)
       } else {
-        // WE GOT THEM
-        modelHitCount += 1
         val matchedPerson = DB.db(bestPersonFaceMatch.get.personLabel)
         val newPersonFace = matchedPerson.addFace(thisFace)
         updateModelWithFace(newPersonFace)
@@ -250,7 +238,7 @@ object FaceRecognition extends SandboxApp {
   private def getPersonFaceMatches(thisFace: Face): Option[PersonFace] = {
     val faceSimilarityScores: List[(Double, PersonFace)] = DB.allPersons().flatMap { person =>
       // these are already sorted by detection score, best first
-      val bestFaces = person.allFaces().take(maxPersonCompareCycles)
+      val bestFaces = person.allFaces().take(FaceRecognitionService.MAX_COMPARISONS_PER_PERSON)
 
       val faceScores: List[(Double, PersonFace)] = bestFaces.map { bestFace =>
         comparisonOpCount += 1
@@ -266,7 +254,7 @@ object FaceRecognition extends SandboxApp {
 
     // get the top one
     val sortedMatchingSimilarityWeights = faceSimilarityScores.sortBy(_._1)
-    val highestSimilarityWeights = sortedMatchingSimilarityWeights.filter(_._1 >= cosineSimilarityThreshold)
+    val highestSimilarityWeights = sortedMatchingSimilarityWeights.filter(_._1 >= FaceRecognitionService.PESSIMISTIC_COSINE_DISTANCE_THRESHOLD)
 
     highestSimilarityWeights.headOption match {
       case None => None

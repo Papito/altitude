@@ -181,6 +181,7 @@ class TestContext(val testApp: Altitude) {
         embeddings = Array.fill(128) { Random.nextFloat() },
         features = Array.fill(128) { Random.nextFloat() },
         image = generateRandomImagBytesBgr(),
+        displayImage = generateRandomImagBytesBgr(),
         alignedImage = generateRandomImagBytesBgr(),
         alignedImageGs = generateRandomImagBytesGray())
 

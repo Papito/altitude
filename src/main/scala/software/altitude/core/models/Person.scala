@@ -53,6 +53,9 @@ case class Person(id: Option[String] = None,
   private val _faces: mutable.TreeSet[Face] = mutable.TreeSet[Face]()
 
   def addFace(face: Face): Unit = {
+    require(face.id.isDefined, "Face must have a persisted ID")
+    require(face.personLabel.isDefined, "Face must have a person label")
+    require(face.personId.isDefined, "Face must have a person ID")
     _faces.addOne(face)
   }
 

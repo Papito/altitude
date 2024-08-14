@@ -120,6 +120,7 @@ CREATE TABLE face (
   created_at DATETIME DEFAULT (datetime('now', 'utc')),
   updated_at DATETIME DEFAULT NULL,
   image BLOB NOT NULL,
+  display_image BLOB NOT NULL,
   aligned_image BLOB NOT NULL,
   aligned_image_gs BLOB NOT NULL,
   checksum INT NOT NULL,

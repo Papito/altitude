@@ -91,6 +91,7 @@ object Const {
     val EMBEDDINGS = "embeddings"
     val FEATURES = "features"
     val IMAGE = "image"
+    val DISPLAY_IMAGE = "display_image"
     val ALIGNED_IMAGE = "aligned_image"
     val ALIGNED_IMAGE_GS = "aligned_image_gs"
   }

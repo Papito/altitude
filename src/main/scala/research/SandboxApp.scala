@@ -18,7 +18,7 @@ abstract class SandboxApp extends App {
 
   val altitude = new Altitude()
 
-  private val IMAGE_FILE_FILTER: IOFileFilter = new SuffixFileFilter(".jpg", ".jpeg", ".png")
+  private val IMAGE_FILE_FILTER: IOFileFilter = new SuffixFileFilter(".JPG", ".jpg", ".jpeg", ".png")
 
   protected val sourceDirPath: String =  System.getenv().get("SOURCE")
   protected val outputDirPath: String = System.getenv().get("OUTPUT")

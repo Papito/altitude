@@ -81,31 +81,7 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
         numOfFaces = person.getFaces.size,
       )
 
-      val persistedPerson: Person = dao.add(personForUpdate)
-
-      // if we are adding a person and it's the first face
-      if (person.getFaces.size == 1) {
-        val face = person.getFaces.head
-
-        val persistedFace: Face = addFace(
-          face,
-          asset.getOrElse(throw new IllegalArgumentException("Asset ID is required")),
-          persistedPerson)
-
-        app.service.fileStore.addFace(persistedFace)
-
-        // This face is the default cover
-        setFaceAsCover(persistedPerson, persistedFace)
-
-        persistedPerson.addFace(persistedFace)
-
-        app.service.faceCache.putPerson(persistedPerson)
-
-        return persistedPerson ++ Json.obj(
-          C.Person.COVER_FACE_ID -> persistedFace.persistedId)
-      }
-
-      persistedPerson
+      dao.add(personForUpdate): Person
     }
   }
 

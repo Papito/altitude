@@ -37,6 +37,7 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
       embeddings = embeddingsArray.toArray,
       features = featuresArray.toArray,
       image = rec(C.Face.IMAGE).asInstanceOf[Array[Byte]],
+      displayImage = rec(C.Face.DISPLAY_IMAGE).asInstanceOf[Array[Byte]],
       alignedImage = rec(C.Face.ALIGNED_IMAGE).asInstanceOf[Array[Byte]],
       alignedImageGs = rec(C.Face.ALIGNED_IMAGE_GS).asInstanceOf[Array[Byte]]
     )
@@ -53,20 +54,20 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
       s"""
         INSERT INTO $tableName (${C.Face.ID}, ${C.Base.REPO_ID}, ${C.Face.X1}, ${C.Face.Y1}, ${C.Face.WIDTH}, ${C.Face.HEIGHT},
                                 ${C.Face.ASSET_ID}, ${C.Face.PERSON_ID}, ${C.Face.PERSON_LABEL}, ${C.Face.DETECTION_SCORE},
-                                ${C.Face.EMBEDDINGS}, ${C.Face.FEATURES}, ${C.Face.IMAGE}, ${C.Face.ALIGNED_IMAGE},
-                                ${C.Face.ALIGNED_IMAGE_GS}, ${C.Face.CHECKSUM})
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                ${C.Face.EMBEDDINGS}, ${C.Face.FEATURES}, ${C.Face.IMAGE}, ${C.Face.DISPLAY_IMAGE},
+                                ${C.Face.ALIGNED_IMAGE}, ${C.Face.ALIGNED_IMAGE_GS}, ${C.Face.CHECKSUM})
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
 
     val conn = RequestContext.getConn
 
     /**
      * Embeddings and Features are an array of floats, and even though Postgres supports float array natively,
-     * there is really no value in creating a separate or a more confusing DAO hierarchy just for that.
+     * there is really no value in creating a separate DAO hierarchy just for that.
      * Both DBs store this data as JSON in a TEXT field - faces are preloaded into memory anyway.
      *
-     * Why not as a CSV? Casting Floats into Strings and back is a pain, and JSON is more pliable for this, without
-     * worrying about messing with precision.
+     * Why not as a CSV? Casting floats into Strings and back is a pain, and JSON is more pliable for this, without
+     * worrying about messing with precision. This just works.
      */
     val embeddingsArrayJson = Json.obj(
       C.Face.EMBEDDINGS -> Json.toJson(face.embeddings),
@@ -92,9 +93,10 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
     preparedStatement.setString(11, embeddingsArrayJson.toString())
     preparedStatement.setString(12, featuresArrayJson.toString())
     preparedStatement.setBytes(13, face.image)
-    preparedStatement.setBytes(14, face.alignedImage)
-    preparedStatement.setBytes(15, face.alignedImageGs)
-    preparedStatement.setInt(16, checksum)
+    preparedStatement.setBytes(14, face.displayImage)
+    preparedStatement.setBytes(15, face.alignedImage)
+    preparedStatement.setBytes(16, face.alignedImageGs)
+    preparedStatement.setInt(17, checksum)
     preparedStatement.execute()
 
     jsonIn ++ Json.obj(
@@ -107,7 +109,8 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
 
   /**
    * Get faces for all people in this repo, but only the top X faces per person.
-   * We use those to brute-force compare a new face, if there is no machine-learned hit
+   * We use those to brute-force compare a new face, if there is no machine-learned hit,
+   * and to verify hits as well.
    */
   def getAllForCache: List[Face] = {
     val sql = """

@@ -219,7 +219,7 @@ import software.altitude.test.core.IntegrationTestCore
     cachedB = testApp.service.faceCache.getPersonByLabel(personB.label).get
     cachedB should be theSameInstanceAs cachedA
 
-//    testApp.service.faceCache.dump()
+    // testApp.service.faceCache.dump()
   }
 
   def isSortedDescending(seq: Seq[Double]): Boolean = {

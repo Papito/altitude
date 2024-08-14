@@ -24,6 +24,7 @@ object Face {
       embeddings = (json \ C.Face.EMBEDDINGS).as[Array[Float]],
       features = (json \ C.Face.FEATURES).as[Array[Float]],
       image = (json \ C.Face.IMAGE).as[Array[Byte]],
+      displayImage = (json \ C.Face.DISPLAY_IMAGE).as[Array[Byte]],
       alignedImage = (json \ C.Face.ALIGNED_IMAGE).as[Array[Byte]],
       alignedImageGs = (json \ C.Face.ALIGNED_IMAGE_GS).as[Array[Byte]]
     ).withCoreAttr(json)
@@ -45,6 +46,7 @@ case class Face(id: Option[String] = None,
                 embeddings: Array[Float],
                 features: Array[Float],
                 image: Array[Byte],
+                displayImage: Array[Byte],
                 alignedImage: Array[Byte],
                 alignedImageGs: Array[Byte]) extends BaseModel {
 
@@ -69,6 +71,7 @@ case class Face(id: Option[String] = None,
       C.Face.EMBEDDINGS -> embeddings,
       C.Face.FEATURES -> features,
       C.Face.IMAGE -> image,
+      C.Face.DISPLAY_IMAGE -> displayImage,
       C.Face.ALIGNED_IMAGE -> alignedImage,
       C.Face.ALIGNED_IMAGE_GS -> alignedImageGs
     ) ++ coreJsonAttrs

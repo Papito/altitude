@@ -23,8 +23,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.Environment
 import software.altitude.core.models.Face
-import software.altitude.core.util.ImageUtil.determineImageScale
-import software.altitude.core.util.ImageUtil.matFromBytes
+import software.altitude.core.util.ImageUtil.{determineImageScale, makeImageThumbnail, matFromBytes}
 
 import java.io.File
 import java.nio.file.Paths
@@ -266,6 +265,8 @@ class FaceDetectionService {
       val alignedFaceImageGsBytes = new MatOfByte
       Imgcodecs.imencode(".png", alignedFaceImageGs, alignedFaceImageGsBytes)
 
+      val displayImage = makeImageThumbnail(imageBytes.toArray, 50)
+
       Face(
         x1 = rect.x,
         y1 = rect.y,
@@ -274,6 +275,7 @@ class FaceDetectionService {
         detectionScore = res.get(0, 14)(0).asInstanceOf[Float],
         embeddings = embedding,
         features = featuresArray,
+        displayImage = displayImage,
         image = imageBytes.toArray,
         alignedImage = alignedImageBytes.toArray,
         alignedImageGs = alignedFaceImageGsBytes.toArray
