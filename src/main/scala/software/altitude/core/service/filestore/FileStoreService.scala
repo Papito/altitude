@@ -1,9 +1,6 @@
 package software.altitude.core.service.filestore
 
-import software.altitude.core.models.AssetWithData
-import software.altitude.core.models.Face
-import software.altitude.core.models.MimedAssetData
-import software.altitude.core.models.MimedPreviewData
+import software.altitude.core.models.{AssetWithData, Face, MimedAssetData, MimedFaceData, MimedPreviewData}
 
 trait FileStoreService {
   def addAsset(assetWithData: AssetWithData): Unit
@@ -13,4 +10,5 @@ trait FileStoreService {
   def getPreviewById(assetId: String): MimedPreviewData
 
   def addFace(face: Face): Unit
+  def getFaceById(faceId: String): MimedFaceData
 }

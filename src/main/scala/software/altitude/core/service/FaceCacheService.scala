@@ -32,16 +32,7 @@ class FaceCacheService(app: Altitude) {
   }
 
   def getPersonByLabel(label: Label): Option[Person] = {
-    val personOpt =
-      try {
-        getRepositoryPersonCache.get(label)
-      } catch {
-        case e: Exception =>
-          logger.error(s"Error getting person by label $label", e)
-          println("Size " + size)
-          dump()
-          throw e
-      }
+    val personOpt = getRepositoryPersonCache.get(label)
 
     // if this person had been merged - return the merge destination instead
     if (personOpt.nonEmpty && personOpt.get.mergedIntoLabel.nonEmpty) {
@@ -115,6 +106,8 @@ class FaceCacheService(app: Altitude) {
     allPeople.foreach { case (_, person) =>
       putPerson(person)
     }
+
+    logger.info(s"Loaded ${allPeople.size} people into the cache")
 
     RequestContext.repository.value = None
   }

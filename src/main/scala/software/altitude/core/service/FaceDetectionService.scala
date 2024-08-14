@@ -32,13 +32,15 @@ object FaceDetectionService {
   private val dnnInWidth = 300
   private val dnnInHeight = 300
 
+  val faceDetectionBoxPx = 80
+
   private val dnnConfidenceThreshold = 0.37
   private val minFaceSize = 50 // minimum acceptable size of face region in pixels
   private val dnnInScaleFactor = 1.0
   private val dnnMeanVal = new Scalar(104.0, 177.0, 123.0, 128)
   private val yunetConfidenceThreshold = 0.855f
 
-  val cosineSimilarityThreshold = 0.363
+  private val cosineSimilarityThreshold = 0.363
 
   def faceDetectToRect(detectedFace: Mat): Rect = {
     val origX = detectedFace.get(0, 0)(0).asInstanceOf[Int]
@@ -73,8 +75,8 @@ object FaceDetectionService {
 
 class FaceDetectionService {
   /**
-   * As if the fact that OpenCV for Java has two competing APIs wasn't confusing enough (org.opencv, org.bytedeco), e
-   * very example under the sun directs to do this in order to have native lib linking errors go away:
+   * As if the fact that OpenCV for Java has two competing APIs wasn't confusing enough (org.opencv, org.bytedeco),
+   * every example under the sun directs to do this in order to have native lib linking errors go away:
    * System.loadLibrary(Core.NATIVE_LIBRARY_NAME)
    *
    * But it doesn't work. While we use the org.opencv API, the native lib is loaded by the org.bytedeco API.
@@ -265,7 +267,7 @@ class FaceDetectionService {
       val alignedFaceImageGsBytes = new MatOfByte
       Imgcodecs.imencode(".png", alignedFaceImageGs, alignedFaceImageGsBytes)
 
-      val displayImage = makeImageThumbnail(imageBytes.toArray, 50)
+      val displayImage = makeImageThumbnail(imageBytes.toArray, FaceDetectionService.faceDetectionBoxPx)
 
       Face(
         x1 = rect.x,

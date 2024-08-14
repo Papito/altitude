@@ -5,14 +5,43 @@
 <%@ val people: List[Person] %>
 
 <style>
+    #people .cell {
+        margin: 3px;
+        border: 1px solid #837c7c;
+        border-radius: 5px;
+    }
+
+    #people .cell img {
+        display: block;
+    }
+
+    #people .grid {
+        margin: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    #people .cell {
+        display: grid;
+        width:<%= software.altitude.core.service.FaceDetectionService.faceDetectionBoxPx + 10 %>px;
+        height: <%= software.altitude.core.service.FaceDetectionService.faceDetectionBoxPx + 10 %>px;
+        place-items: center;
+    }
 </style>
 
 <div id="peopleList">
-    #for (person <- people)
-    <div>
-       <img src="/content/r/${RequestContext.getRepository.persistedId}/${Const.DataStore.FACE}/${person.coverFaceId}">
+    <div id="people">
+        <div class="grid">
+            #for (person <- people)
+            <div class="cell">
+                <img src="/content/r/${RequestContext.getRepository.persistedId}/${Const.DataStore.FACE}/${person.coverFaceId}">
+                ${person.name.get}
+            </div>
+            #end
+        </div>
     </div>
-    #end
 </div>
 
 <!-- On load -->

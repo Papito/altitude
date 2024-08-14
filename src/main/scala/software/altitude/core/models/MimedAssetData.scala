@@ -10,11 +10,11 @@ import scala.language.implicitConversions
 
 object MimedAssetData {
   implicit def fromJson(json: JsValue): MimedAssetData = {
-    val data: String = (json \ C.Data.DATA).as[String]
+    val data: String = (json \ C.MimedData.DATA).as[String]
 
     MimedAssetData(
-      assetId = (json \ C.Data.ASSET_ID).as[String],
-      mimeType = (json \ C.Data.MIME_TYPE).as[String],
+      assetId = (json \ C.MimedData.ASSET_ID).as[String],
+      mimeType = (json \ C.MimedData.MIME_TYPE).as[String],
       data = Base64.decodeBase64(data)
     )
   }
@@ -26,9 +26,9 @@ case class MimedAssetData(assetId: String,
 
   override def toJson: JsObject = {
     Json.obj(
-      C.Data.ASSET_ID -> assetId,
-      C.Data.MIME_TYPE -> mimeType,
-      C.Data.DATA -> Base64.encodeBase64String(data)
+      C.MimedData.ASSET_ID -> assetId,
+      C.MimedData.MIME_TYPE -> mimeType,
+      C.MimedData.DATA -> Base64.encodeBase64String(data)
     )
   }
 }

@@ -142,16 +142,10 @@ object Const {
     }
   }
 
-  object Preview {
-    val ASSET_ID = "asset_id"
+  object MimedData {
     val MIME_TYPE = "mime_type"
     val DATA = "data"
-  }
-
-  object Data {
     val ASSET_ID = "asset_id"
-    val MIME_TYPE = "mime_type"
-    val DATA = "data"
   }
 
   object Stat extends Common {

@@ -8,10 +8,7 @@ import software.altitude.core.Altitude
 import software.altitude.core.NotFoundException
 import software.altitude.core.RequestContext
 import software.altitude.core.StorageException
-import software.altitude.core.models.AssetWithData
-import software.altitude.core.models.Face
-import software.altitude.core.models.MimedAssetData
-import software.altitude.core.models.MimedPreviewData
+import software.altitude.core.models.{AssetWithData, Face, MimedAssetData, MimedFaceData, MimedPreviewData}
 import software.altitude.core.{Const => C}
 
 import java.io._
@@ -121,11 +118,30 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     logger.debug(s"Creating face [${face.persistedId}] on file system at [$destFile]")
 
     try {
-      FileUtils.writeByteArrayToFile(destFile, face.image)
+      FileUtils.writeByteArrayToFile(destFile, face.displayImage)
     }
     catch {
       case ex: IOException =>
         throw StorageException(s"Error creating [$face] @ [$destFile]: $ex]")
     }
   }
+
+  override def getFaceById(faceId: String): MimedFaceData = {
+    val path = facePath(faceId)
+    val srcFile: File = new File(path)
+
+    var byteArray: Option[Array[Byte]] = None
+
+    try {
+      byteArray = Some(FileUtils.readFileToByteArray(srcFile))
+    }
+    catch {
+      case ex: IOException =>
+        throw StorageException(s"Error reading file [${srcFile.getPath}: $ex]")
+    }
+
+    MimedFaceData(
+      data = byteArray.get)
+  }
+
 }

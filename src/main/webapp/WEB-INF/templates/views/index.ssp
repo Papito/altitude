@@ -78,19 +78,20 @@
             overflow-x: hidden;
         }
 
-        .responsive-image {
+        #assets .responsive-image {
             max-width: 100%;
         }
 
-        .cell {
+        #assets .cell {
             margin: 3px;
             border: 1px solid #837c7c;
         }
-        .cell img {
+
+        #assets .cell img {
             display: block;
         }
 
-        .grid {
+        #assets .grid {
             margin: 10px;
             display: flex;
             flex-wrap: wrap;
@@ -98,10 +99,10 @@
             justify-content: center;
         }
 
-        .cell {
+        #assets .cell {
             display: grid;
             width:<%= software.altitude.core.AltitudeServletContext.app.config.getInt(Const.Conf.PREVIEW_BOX_PIXELS).toInt + 20 %>px;
-            height: 220px;
+            height:<%= software.altitude.core.AltitudeServletContext.app.config.getInt(Const.Conf.PREVIEW_BOX_PIXELS).toInt + 20 %>px;
             place-items: center;
         }
 
