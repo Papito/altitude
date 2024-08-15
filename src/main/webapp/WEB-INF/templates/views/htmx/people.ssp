@@ -13,6 +13,7 @@
 
     #people .cell img {
         display: block;
+        border-radius: 4px;
     }
 
     #people .grid {
@@ -25,8 +26,8 @@
 
     #people .cell {
         display: grid;
-        width:<%= software.altitude.core.service.FaceDetectionService.faceDetectionBoxPx + 10 %>px;
-        height: <%= software.altitude.core.service.FaceDetectionService.faceDetectionBoxPx + 10 %>px;
+        width:<%= software.altitude.core.service.FaceDetectionService.faceDetectionBoxPx + 60 %>px;
+        height: <%= software.altitude.core.service.FaceDetectionService.faceDetectionBoxPx + 30 %>px;
         place-items: center;
     }
 </style>
