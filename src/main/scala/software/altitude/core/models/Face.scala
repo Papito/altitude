@@ -50,7 +50,7 @@ case class Face(id: Option[String] = None,
                 alignedImage: Array[Byte],
                 alignedImageGs: Array[Byte]) extends BaseModel {
 
-  val alignedImageGsMat: Mat = matFromBytes(alignedImageGs)
+  val alignedImageGsMat: Mat = if (alignedImageGs.length > 0) matFromBytes(alignedImageGs) else new Mat()
 
   val featuresMat: Mat = {
     val floatMat = new MatOfFloat()

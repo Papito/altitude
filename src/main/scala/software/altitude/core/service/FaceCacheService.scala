@@ -69,7 +69,14 @@ class FaceCacheService(app: Altitude) {
      * the list is sorted by detection score, so it must be pruned AFTER the sort settles.
      */
     val faces = person.getFaces
-    faces.add(face)
+
+    // Strip the binary data we don't need. We are just interested in the aligned greyscale image
+    val liteFace = face.copy(
+      image = Array[Byte](0),
+      alignedImage = Array[Byte](0),
+      displayImage = Array[Byte](0))
+
+    faces.add(liteFace)
     person.setFaces(faces.take(FaceRecognitionService.MAX_COMPARISONS_PER_PERSON).toSeq)
 
     // keep true to the actual number of faces
@@ -98,9 +105,12 @@ class FaceCacheService(app: Altitude) {
     val allPeople: Map[String, Person] = personDao.getAll
 
     var faceCount = 0
-    allTopFaces.foreach { face =>
+    allTopFaces.foreach { face: Face =>
       val person: Person = allPeople(face.personId.get)
-      person.addFace(face)
+
+      val alignedGreyscaleData = app.service.fileStore.getAlignedGreyscaleFaceById(face.persistedId)
+      val faceWithImageData = face.copy(alignedImageGs = alignedGreyscaleData.data)
+      person.addFace(faceWithImageData)
       faceCount += 1
     }
 

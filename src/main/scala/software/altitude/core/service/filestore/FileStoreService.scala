@@ -11,4 +11,5 @@ trait FileStoreService {
 
   def addFace(face: Face): Unit
   def getDisplayFaceById(faceId: String): MimedFaceData
+  def getAlignedGreyscaleFaceById(faceId: String): MimedFaceData
 }

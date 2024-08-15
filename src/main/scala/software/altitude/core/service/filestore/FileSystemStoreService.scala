@@ -161,4 +161,21 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
       data = byteArray.get)
   }
 
+  override def getAlignedGreyscaleFaceById(faceId: String): MimedFaceData = {
+    val path = alignedGreyscaleFacePath(faceId)
+    val srcFile: File = new File(path)
+
+    var byteArray: Option[Array[Byte]] = None
+
+    try {
+      byteArray = Some(FileUtils.readFileToByteArray(srcFile))
+    }
+    catch {
+      case ex: IOException =>
+        throw StorageException(s"Error reading file [${srcFile.getPath}: $ex]")
+    }
+
+    MimedFaceData(
+      data = byteArray.get)
+  }
 }

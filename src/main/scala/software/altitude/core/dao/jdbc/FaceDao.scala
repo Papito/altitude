@@ -18,34 +18,20 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
   override final val tableName = "face"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
-    val embeddingsArray = getFloatListByJsonKey(rec(C.Face.EMBEDDINGS).asInstanceOf[String], C.Face.EMBEDDINGS)
-    val featuresArray = getFloatListByJsonKey(rec(C.Face.FEATURES).asInstanceOf[String], C.Face.FEATURES)
+    val liteModel = makeLiteModel(rec)
 
-    val model = Face(
-      id = Option(rec(C.Base.ID).asInstanceOf[String]),
-      x1 = rec(C.Face.X1).asInstanceOf[Int],
-      y1 = rec(C.Face.Y1).asInstanceOf[Int],
-      width = rec(C.Face.WIDTH).asInstanceOf[Int],
-      height = rec(C.Face.HEIGHT).asInstanceOf[Int],
-      assetId = Option(rec(C.Face.ASSET_ID).asInstanceOf[String]),
-      personId = Option(rec(C.Face.PERSON_ID).asInstanceOf[String]),
-      personLabel = Option(rec(C.Face.PERSON_LABEL).getClass match {
-        case c if c == classOf[java.lang.Integer] => rec(C.Face.PERSON_LABEL).asInstanceOf[Int]
-        case c if c == classOf[java.lang.Long] => rec(C.Face.PERSON_LABEL).asInstanceOf[Long].toInt
-      }),
-      detectionScore = rec(C.Face.DETECTION_SCORE).asInstanceOf[Double],
-      embeddings = embeddingsArray.toArray,
-      features = featuresArray.toArray,
-      image = rec(C.Face.IMAGE).asInstanceOf[Array[Byte]],
-      displayImage = rec(C.Face.DISPLAY_IMAGE).asInstanceOf[Array[Byte]],
-      alignedImage = rec(C.Face.ALIGNED_IMAGE).asInstanceOf[Array[Byte]],
-      alignedImageGs = rec(C.Face.ALIGNED_IMAGE_GS).asInstanceOf[Array[Byte]]
+    // the lite model, used for caching in memory, does not have image data by default
+    val model = liteModel ++ Json.obj(
+      C.Face.IMAGE -> rec(C.Face.IMAGE).asInstanceOf[Array[Byte]],
+      C.Face.DISPLAY_IMAGE -> rec(C.Face.DISPLAY_IMAGE).asInstanceOf[Array[Byte]],
+      C.Face.ALIGNED_IMAGE -> rec(C.Face.ALIGNED_IMAGE).asInstanceOf[Array[Byte]],
+      C.Face.ALIGNED_IMAGE_GS -> rec(C.Face.ALIGNED_IMAGE_GS).asInstanceOf[Array[Byte]]
     )
 
     model
   }
 
-  protected def makeLiteModel(rec: Map[String, AnyRef]): JsObject = {
+  private def makeLiteModel(rec: Map[String, AnyRef]): JsObject = {
     val embeddingsArray = getFloatListByJsonKey(rec(C.Face.EMBEDDINGS).asInstanceOf[String], C.Face.EMBEDDINGS)
     val featuresArray = getFloatListByJsonKey(rec(C.Face.FEATURES).asInstanceOf[String], C.Face.FEATURES)
 
@@ -67,7 +53,7 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
       image = new Array[Byte](0),
       displayImage = new Array[Byte](0),
       alignedImage = new Array[Byte](0),
-      alignedImageGs = rec(C.Face.ALIGNED_IMAGE_GS).asInstanceOf[Array[Byte]]
+      alignedImageGs = new Array[Byte](0)
     )
 
     model
@@ -138,15 +124,19 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
   /**
    * Get faces for all people in this repo, but only the top X faces per person.
    * We use those to brute-force compare a new face, if there is no machine-learned hit,
-   * and to verify hits as well.
+   * and to verify ML hits as well.
    */
   def getAllForCache: List[Face] = {
-    val sql = """
-       SELECT *
+    val selectColumns = List(C.Face.ID, C.Base.REPO_ID, C.Face.X1, C.Face.Y1, C.Face.WIDTH, C.Face.HEIGHT,
+      C.Face.ASSET_ID, C.Face.PERSON_ID, C.Face.PERSON_LABEL, C.Face.DETECTION_SCORE, C.Face.EMBEDDINGS,
+      C.Face.FEATURES)
+
+    val sql = s"""
+       SELECT ${selectColumns.mkString(", ")}
          FROM (
                SELECT ROW_NUMBER()
                  OVER (PARTITION BY person_label ORDER BY detection_score DESC)
-                   AS r_num, sub_face.*
+                   AS r_num, ${selectColumns.map("sub_face." + _).mkString(", ")}
                  FROM face AS sub_face
                  WHERE repository_id = ?) face
          WHERE repository_id =?
