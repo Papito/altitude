@@ -225,6 +225,17 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
     }
   }
 
+  def updateName(person: Person, newName: String): Person = {
+    txManager.withTransaction {
+
+      updateById(
+        person.persistedId,
+        Map(C.Person.NAME -> newName))
+
+      person.copy(name = Some(newName))
+    }
+  }
+
   def getAll: List[Person] = {
     txManager.asReadOnly {
       dao.getAll.values.toList

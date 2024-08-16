@@ -268,6 +268,10 @@ object Const {
       val NEW_PARENT_ID = "newParentId"
     }
 
+    object Person {
+      val NAME = "name"
+    }
+
     object Trash {
       val ASSET_IDS = "asset_ids"
     }

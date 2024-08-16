@@ -1,0 +1,45 @@
+#import(software.altitude.core.Const)
+#import(software.altitude.core.RequestContext)
+#import(software.altitude.core.models.Person)
+<%@ val person: Person %>
+
+<style>
+    #person {
+        display: grid;
+        margin: 5px;
+        padding: 5px;
+        border-bottom: var(--result-border);
+        grid-template-columns: 100px 300px auto;
+    }
+
+    #person img {
+        border-radius: 50%;
+    }
+
+    #person .cover {
+        display: grid;
+        place-items: center;
+    }
+
+    #person .name {
+        display: grid;
+        align-items: center;
+    }
+
+    #person .name span  {
+        cursor: pointer;
+    }
+
+    #person .name span i {
+        padding-left: 10px;
+    }
+</style>
+
+<div id="person">
+    <div class="cover">
+        <img src="/content/r/${RequestContext.getRepository.persistedId}/${Const.DataStore.FACE}/${person.coverFaceId}">
+    </div>
+    <div class="name">
+        ${ include("view_person_name.ssp") }
+    </div>
+</div>

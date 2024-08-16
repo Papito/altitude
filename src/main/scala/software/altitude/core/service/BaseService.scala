@@ -53,6 +53,7 @@ abstract class BaseService[Model <: BaseModel] {
       try {
         dao.add(objIn)
       } catch {
+        // NOTE: duplicate logic in add() and updateById()
         case e: SQLException =>
           if (e.getErrorCode == /* SQLITE */ 19 || e.getSQLState == /* POSTGRES */ "23505") {
             throw DuplicateException()
@@ -79,8 +80,7 @@ abstract class BaseService[Model <: BaseModel] {
    *
    * @return number of documents updated - 0 or 1
    */
-  def updateById(id: String, data: Map[String, Any], queryForDup: Option[Query] = None)
-                : Int = {
+  def updateById(id: String, data: Map[String, Any], queryForDup: Option[Query] = None): Int = {
 
     val existing = if (queryForDup.isDefined) query(queryForDup.get) else QueryResult.EMPTY
 
@@ -90,7 +90,19 @@ abstract class BaseService[Model <: BaseModel] {
     }
 
     txManager.withTransaction[Int] {
-      dao.updateById(id, data)
+      try {
+        dao.updateById(id, data)
+      } catch {
+        case e: SQLException =>
+          // NOTE: duplicate logic in add() and updateById()
+          if (e.getErrorCode == /* SQLITE */ 19 || e.getSQLState == /* POSTGRES */ "23505") {
+            throw DuplicateException()
+          } else {
+            throw e
+          }
+        case ex: Exception =>
+          throw ex
+      }
     }
   }
 

@@ -7,7 +7,7 @@
 <style>
     #people .cell {
         margin: 3px;
-        border: 1px solid #837c7c;
+        border: var(--result-border);
         border-radius: 5px;
     }
 
@@ -30,6 +30,12 @@
         height: <%= software.altitude.core.service.FaceDetectionService.faceDetectionBoxPx + 30 %>px;
         place-items: center;
     }
+
+    #people .cell a {
+        color: #FFFFFF;
+        text-decoration: none;
+
+    }
 </style>
 
 <div id="peopleList">
@@ -37,8 +43,14 @@
         <div class="grid">
             #for (person <- people)
             <div class="cell">
+                <a href="#"
+                   hx-target="#content"
+                   hx-trigger="click"
+                   hx-swap="innerHTML"
+                   hx-get='${ url(searchPerson, "repoId" -> RequestContext.getRepository.persistedId, "personId" -> person.persistedId) }'>
                 <img src="/content/r/${RequestContext.getRepository.persistedId}/${Const.DataStore.FACE}/${person.coverFaceId}">
                 ${person.name.get}
+                </a>
             </div>
             #end
         </div>

@@ -95,7 +95,7 @@ CREATE TABLE person (
   num_of_faces INT NOT NULL DEFAULT 0,
   is_hidden BOOLEAN NOT NULL DEFAULT FALSE
 ) INHERITS (_core);
-CREATE UNIQUE INDEX person_01 ON person(name);
+CREATE UNIQUE INDEX person_01 ON person(repository_id, name);
 CREATE UNIQUE INDEX person_02 ON person(cover_face_id);
 
 
