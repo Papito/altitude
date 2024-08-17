@@ -1,4 +1,6 @@
 :root {
+    color-scheme: dark;
+
     --background-color: #363636;
     --form-background-color: #363535;
     --background-secondary-color: rgb(56, 56, 65);

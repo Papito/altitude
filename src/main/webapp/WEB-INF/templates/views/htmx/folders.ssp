@@ -359,7 +359,7 @@
         dragState.y = 0;
         e.target.style.transform = 'translate(0px, 0px)';
 
-        // reset the position attributes for draggablses (on failed drag, it will resume from the last position)
+        // reset the position attributes for draggables (on failed drag, it will resume from the last position)
         e.target.removeAttribute("data-x")
         e.target.removeAttribute("data-y")
     }
