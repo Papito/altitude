@@ -147,6 +147,7 @@ CREATE TABLE folder (
 CREATE INDEX folder_01 ON folder(repository_id, parent_id);
 CREATE UNIQUE INDEX folder_02 ON folder(repository_id, parent_id, name_lc);
 
+
 CREATE TABLE search_parameter (
   repository_id CHAR(36) REFERENCES repository(id),
   asset_id CHAR(36) REFERENCES asset(id) ON DELETE CASCADE,

@@ -315,15 +315,36 @@ import software.altitude.test.core.IntegrationTestCore
     intercept[DuplicateException] {
       testApp.service.library.moveFolder(folder1_1_1.persistedId, folder2.persistedId)
     }
+  }
+
+  test("Duplicate folder name moves should throw", Focused) {
+    /*
+    folder1
+      child
+    folder2
+        CHILD
+    */
+    val folder1: Folder = testApp.service.library.addFolder("folder1")
+
+    val folder1_1: Folder = testApp.service.library.addFolder(
+      name = "child", parentId = folder1.id)
+
+    val folder2: Folder = testApp.service.library.addFolder("folder2")
+
+    testApp.service.library.addFolder(name = "CHILD", parentId = folder2.id)
 
     // move into a parent with the same immediate child name (different casing)
     intercept[DuplicateException] {
-      testApp.service.library.moveFolder(folder1_1_1.persistedId, folder3.persistedId)
+      testApp.service.library.moveFolder(folder1_1.persistedId, folder2.persistedId)
     }
+  }
+
+  test("Moving into a folder that doe not exist should throw") {
+    val folder1: Folder = testApp.service.library.addFolder("folder1")
 
     // move into a folder that does not exist
     intercept[ValidationException] {
-      testApp.service.library.moveFolder(folder1.persistedId, "bogus")
+      testApp.service.library.moveFolder(folder1.persistedId, "bogus-id")
     }
   }
 
@@ -345,12 +366,17 @@ import software.altitude.test.core.IntegrationTestCore
     renamedFolder.name shouldEqual "Folder"
   }
 
-  test("Illegal folder rename actions should throw") {
-    val folder1: Folder = testApp.service.library.addFolder("folder")
+  test("Duplicate folder rename actions should thrown") {
+    val folder1: Folder = testApp.service.library.addFolder("folder1")
+    val folder2: Folder = testApp.service.library.addFolder("folder2")
 
     intercept[DuplicateException] {
-      testApp.service.library.renameFolder(folder1.persistedId, folder1.name)
+      testApp.service.library.renameFolder(folder1.persistedId, folder2.name)
     }
+  }
+
+  test("Illegal folder rename actions should throw") {
+    val folder1: Folder = testApp.service.library.addFolder("folder")
 
     // rename a system folder
     intercept[IllegalOperationException] {

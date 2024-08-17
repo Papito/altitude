@@ -336,8 +336,7 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def moveFolder(folderBeingMovedId: String, destFolderId: String)
-                : Folder = {
+  def moveFolder(folderBeingMovedId: String, destFolderId: String): Folder = {
     txManager.withTransaction[Folder] {
       val (movedFolder, _) = app.service.folder.move(folderBeingMovedId, destFolderId)
       movedFolder

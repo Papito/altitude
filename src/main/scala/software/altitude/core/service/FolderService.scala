@@ -276,16 +276,16 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
 
       val folderBeingMoved: Folder = getById(folderBeingMovedId)
 
-      // destination parent cannot have folder by the same name
-      val dupQuery = new Query(params = Map(
-        C.Folder.PARENT_ID -> destFolderId,
-        C.Folder.NAME_LC -> folderBeingMoved.nameLowercase))
-
       val data = Map(
         C.Folder.PARENT_ID -> destFolderId,
         C.Folder.NAME -> folderBeingMoved.name,
       )
-      updateById(folderBeingMovedId, data, Some(dupQuery))
+      try {
+        updateById(folderBeingMovedId, data)
+      } catch {
+        case e: Exception =>
+          throw e
+      }
 
       incrChildCount(destFolderId)
       // this is still the old parent as the model is immutable
@@ -303,11 +303,6 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     txManager.withTransaction {
       val folder: Folder = getById(folderId)
 
-      // new folder name cannot match existing one
-      val dupQuery = new Query(params = Map(
-        C.Folder.PARENT_ID -> folder.parentId,
-        C.Folder.NAME -> newName))
-
       val folderForUpdate: Folder = folder.copy(
         name = newName
       )
@@ -316,7 +311,7 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
         C.Folder.NAME -> newName,
         C.Folder.NAME_LC -> newName.toLowerCase)
 
-      updateById(folderId, data, Some(dupQuery))
+      updateById(folderId, data)
       folderForUpdate
     }
   }

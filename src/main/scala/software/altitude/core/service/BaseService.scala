@@ -32,13 +32,6 @@ abstract class BaseService[Model <: BaseModel] {
     RequestContext.getRepository
   }
 
-  /**
-   * Add a single document
-   * @param objIn the document to be added
-   * @param queryForDup query to find duplicate documents
-   *
-   * @return the document, complete with its ID in the database
-   */
   def add(objIn: Model, queryForDup: Option[Query] = None): JsObject = {
 
     val existing = if (queryForDup.isDefined) query(queryForDup.get) else QueryResult.EMPTY
@@ -66,28 +59,7 @@ abstract class BaseService[Model <: BaseModel] {
     }
   }
 
-  /**
-   * Update a document by ID with select field values (does not overwrite the document)
-   *
-   * @param id id of the document to be updated
-   * @param data JSON data for the update document, which is NOT used to overwrite the existing one
-   * @param fields fields to be updated with new values, taken from <code>data</code>
-   * @param queryForDup query to find a document that will violate a constraint after updating
-   *                    this document with this particular data set. For example, prevent
-   *                    updating a record with a certain email if that email already exists somewhere
-   *                    else. The DAO layer will relegate this to the storage engine to deal with,
-   *                    if this is missed.
-   *
-   * @return number of documents updated - 0 or 1
-   */
-  def updateById(id: String, data: Map[String, Any], queryForDup: Option[Query] = None): Int = {
-
-    val existing = if (queryForDup.isDefined) query(queryForDup.get) else QueryResult.EMPTY
-
-    if (existing.nonEmpty) {
-      logger.debug(s"Duplicate found for [$data] and query: ${queryForDup.get.params}")
-      throw DuplicateException()
-    }
+  def updateById(id: String, data: Map[String, Any]): Int = {
 
     txManager.withTransaction[Int] {
       try {
@@ -101,6 +73,7 @@ abstract class BaseService[Model <: BaseModel] {
             throw e
           }
         case ex: Exception =>
+          println(ex.toString)
           throw ex
       }
     }
@@ -117,13 +90,6 @@ abstract class BaseService[Model <: BaseModel] {
     }
   }
 
-  /**
-   * Gert a single record by ID
-   *
-   * @param id record id as string
-   *
-   * @return the document
-   */
   def getById(id: String): JsObject = {
     txManager.asReadOnly[JsObject] {
       dao.getById(id)
@@ -148,23 +114,12 @@ abstract class BaseService[Model <: BaseModel] {
     }
   }
 
-  /**
-   * Delete a document by its ID
-   *
-   * @return number of documents deleted - 0 or 1
-   */
   def deleteById(id: String): Int = {
     txManager.withTransaction[Int] {
       dao.deleteById(id)
     }
   }
 
-  /**
-   * Delete one or more document by query.
-   *
-   * @throws RuntimeException if attempting to delete all documents with an empty query
-   * @return number of documents deleted
-   */
   def deleteByQuery(query: Query): Int = {
     if (query.params.isEmpty) {
       throw new RuntimeException("Cannot delete [ALL] document with an empty Query")

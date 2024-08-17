@@ -47,7 +47,7 @@ import software.altitude.test.core.ControllerTestCore
     }
   }
 
-  test("View a person's cover image", Focused) {
+  test("View a person's cover image") {
     testContext.persistRepository()
     testApp.service.faceRecognition.initialize()
     val repoId = testContext.repository.persistedId
