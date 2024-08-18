@@ -10,20 +10,46 @@
         padding: 5px;
         border-bottom: 2px solid var(--background-tertiary-color);
         grid-template-columns: 100px 300px auto;
+        column-gap: var(--control-horizontal-space);
     }
 
     #person img {
         border-radius: 50%;
     }
 
-    #person .cover {
+    #person .visual {
+        display: grid;
+        grid-auto-rows: auto;
+        row-gap: var(--control-vertical-space);
+    }
+
+    #person .meta {
+        display: grid;
+        grid-template-rows: auto 20px;
+        row-gap: var(--control-vertical-space);
+        align-self: center;
+    }
+
+    #person .meta .name {
+        font-size: 1.1em;
+    }
+
+    #person .cover, #person .edit-cover {
         display: grid;
         place-items: center;
     }
 
-    #person .name {
+    #person .edit-cover a {
+        font-size: .9em;
+    }
+
+    #person .name, #person .num-of-instances{
         display: grid;
         align-items: center;
+    }
+
+    #person .num-of-instances {
+        color: var(--font-color-dim);
     }
 
     #person .name span  {
@@ -36,10 +62,20 @@
 </style>
 
 <div id="person">
-    <div class="cover" >
-        <img src="/content/r/${RequestContext.getRepository.persistedId}/${Const.DataStore.FACE}/${person.coverFaceId}">
+    <div class="visual">
+        <div class="cover">
+            <img src="/content/r/${RequestContext.getRepository.persistedId}/${Const.DataStore.FACE}/${person.coverFaceId}">
+        </div>
+        <div class="edit-cover">
+            <a href="#">Choose cover</a>
+        </div>
     </div>
-    <div class="name">
-        ${ include("view_person_name.ssp") }
+    <div class="meta">
+        <div class="name">
+            ${ include("view_person_name.ssp") }
+        </div>
+        <div class="num-of-instances">
+            (${person.numOfFaces} occurrences)
+        </div>
     </div>
 </div>

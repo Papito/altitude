@@ -64,7 +64,7 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
   }
 
   def getAll: Map[String, Person] = {
-    val sql = s"SELECT * from $tableName WHERE repository_id = ?"
+    val sql = s"SELECT * from $tableName WHERE repository_id = ? AND num_of_faces > 0"
     val recs: List[Map[String, AnyRef]] = manyBySqlQuery(sql, List(RequestContext.getRepository.persistedId))
 
     val lookup: mutable.Map[String, Person] = mutable.Map()

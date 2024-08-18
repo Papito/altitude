@@ -25,9 +25,7 @@ class PeopleActionController extends BaseHtmxController{
 
   val searchPerson: Route = get("/r/:repoId/p/:personId/search") {
     val personId: String = params.get("personId").get
-    val person: Person = app.service.person.getById(personId)
-
-    ssp("htmx/person", "person" -> person)
+    searchPerson(personId = personId)
   }
 
   val showEditPersonName: Route = get("/r/:repoId/p/:personId/name/edit") {
@@ -89,5 +87,44 @@ class PeopleActionController extends BaseHtmxController{
 
     val updatedPerson: Person = app.service.person.getById(personId)
     ssp("htmx/view_person_name", "person" -> updatedPerson)
+  }
+
+  val showMergePeopleModal: Route = get("/r/:repoId/modals/merge") {
+    val srcPersonId = request.getParameter(C.Api.Person.MERGE_SOURCE_ID)
+    val destPersonId = request.getParameter(C.Api.Person.MERGE_DEST_ID)
+
+    val requestedSourcePerson: Person = app.service.person.getById(srcPersonId)
+    val requestedDestPerson: Person = app.service.person.getById(destPersonId)
+
+    // if the merge is requested into a person with fewer faces, swap the source and dest
+    val (sourcePerson, destPerson) = if (requestedSourcePerson.numOfFaces < requestedDestPerson.numOfFaces) {
+      (requestedSourcePerson, requestedDestPerson)
+    } else {
+      (requestedDestPerson, requestedSourcePerson)
+    }
+
+    ssp("htmx/merge_people_modal",
+      "minWidth" -> C.UI.MERGE_PEOPLE_MODAL_MIN_WIDTH,
+      "title" -> C.UI.MERGE_PEOPLE_MODAL_TITLE,
+      C.Api.Person.MERGE_SOURCE_PERSON -> sourcePerson,
+      C.Api.Person.MERGE_DEST_PERSON -> destPerson)
+  }
+
+  val mergePeople: Route = put("/r/:repoId/src/:srcPersonId/dest/:destPersonId") {
+    val srcPersonId: String = params.get("srcPersonId").get
+    val destPersonId: String = params.get("destPersonId").get
+
+    val srcPerson: Person = app.service.person.getById(srcPersonId)
+    val destPerson: Person = app.service.person.getById(destPersonId)
+    logger.info(s"MERGING: {${srcPerson.name} into ${destPerson.name}")
+
+    app.service.person.merge(dest = destPerson, source = srcPerson)
+    searchPerson(personId = destPersonId)
+  }
+
+  private def searchPerson(personId: String): String = {
+    val person: Person = app.service.person.getById(personId)
+
+    ssp("htmx/person", "person" -> person)
   }
 }

@@ -270,6 +270,10 @@ object Const {
 
     object Person {
       val NAME = "name"
+      val MERGE_SOURCE_ID = "mergeSourceId"
+      val MERGE_DEST_ID = "mergeDestId"
+      val MERGE_SOURCE_PERSON = "mergeSourcePerson"
+      val MERGE_DEST_PERSON = "mergeDestPerson"
     }
 
     object Trash {
@@ -327,5 +331,8 @@ object Const {
 
     val DELETE_FOLDER_MODAL_TITLE = "Delete folder"
     val DELETE_FOLDER_MODAL_MIN_WIDTH: Int = DEFAULT_MODAL_WIDTH
+
+    val MERGE_PEOPLE_MODAL_TITLE = "Merge people"
+    val MERGE_PEOPLE_MODAL_MIN_WIDTH: Int = DEFAULT_MODAL_WIDTH
   }
 }

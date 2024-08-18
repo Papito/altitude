@@ -27,8 +27,10 @@
     #people .cell {
         display: grid;
         width:<%= software.altitude.core.service.FaceDetectionService.faceDetectionBoxPx + 60 %>px;
-        height: <%= software.altitude.core.service.FaceDetectionService.faceDetectionBoxPx + 30 %>px;
+        height: <%= software.altitude.core.service.FaceDetectionService.faceDetectionBoxPx + 40 %>px;
         place-items: center;
+        touch-action: none;
+        row-gap: var(--control-vertical-space);
     }
 
     #people .cell a {
@@ -58,15 +60,27 @@
     <div id="people">
         <div class="grid">
             #for (person <- people)
-            <div class="cell draggable drag-drop dropzone" person-id="${person.persistedId}">
-                <a href="#"
-                   hx-target="#content"
-                   hx-trigger="click"
-                   hx-swap="innerHTML"
-                   hx-get='${ url(searchPerson, "repoId" -> RequestContext.getRepository.persistedId, "personId" -> person.persistedId) }'>
-                <img src="/content/r/${RequestContext.getRepository.persistedId}/${Const.DataStore.FACE}/${person.coverFaceId}">
-                ${person.name.get}
-                </a>
+            <div id="person-${person.persistedId}"
+                 class="cell draggable drag-drop dropzone"
+                 person-id="${person.persistedId}">
+                <div>
+                    <a href="#"
+                       hx-target="#content"
+                       hx-trigger="click"
+                       hx-swap="innerHTML"
+                       hx-get='${ url(searchPerson, "repoId" -> RequestContext.getRepository.persistedId, "personId" -> person.persistedId) }'>
+                    <img src="/content/r/${RequestContext.getRepository.persistedId}/${Const.DataStore.FACE}/${person.coverFaceId}">
+                    </a>
+                </div>
+                <div>
+                    <a href="#"
+                       hx-target="#content"
+                       hx-trigger="click"
+                       hx-swap="innerHTML"
+                       hx-get='${ url(searchPerson, "repoId" -> RequestContext.getRepository.persistedId, "personId" -> person.persistedId) }'>
+                        ${person.name.get}
+                    </a>
+                </div>
             </div>
             #end
         </div>
@@ -79,6 +93,48 @@
 
     selectTab("explorer", "peopleTab")
 </script>
+
+<!-- Custom event listeners -->
+<script type="module">
+    import {Const} from "/js/constants.js";
+    import {Folder} from "/js/models.js";
+
+    /**
+     * A folder is dragon dropped in UI BUT not yet removed on the server-side
+     */
+    document.body.addEventListener(Const.events.confirmPersonMerge, (event) => {
+        const mergeSourceId = event.detail["${Const.Api.Person.MERGE_SOURCE_ID}"]
+        const mergeDestId = event.detail["${Const.Api.Person.MERGE_DEST_ID}"]
+
+        console.log("Person " + mergeSourceId + " dragon dropped into " + mergeDestId)
+
+        if (mergeSourceId === mergeDestId) {
+            return
+        }
+
+        htmx.ajax(
+                "GET",
+                '${ url(showMergePeopleModal, "repoId" -> RequestContext.getRepository.persistedId) }', {
+                    "swap": "innerHTML",
+                    "target": "#modalContent",
+                    "values": {...event.detail},
+                })
+    })
+
+    document.body.addEventListener(Const.events.personMerged, (event) => {
+        const mergeSourceId = event.detail["${Const.Api.Person.MERGE_SOURCE_ID}"]
+        const mergeDestId = event.detail["${Const.Api.Person.MERGE_DEST_ID}"]
+
+        console.log("Person " + mergeSourceId + " MERGED into " + mergeDestId)
+
+        // remove the source person from the DOM
+        htmx.find("#person-" + mergeSourceId).remove()
+
+        showSuccessSnackBar("Person merged successfully")
+
+    })
+</script>
+
 
 <!-- DRAGON DROP -->
 <script type="module">
@@ -121,9 +177,7 @@
                         }
                     })
                 ],
-                // enable autoScroll
-                autoScroll: true,
-
+                autoScroll: {container: document.getElementById('explorerViews')},
                 listeners: {
                     move: dragMoveListener,
                     end: dragged,
@@ -184,9 +238,17 @@
 
             draggableElement.classList.remove('can-drop')
 
-            const mergeSrc = draggableElement.getAttribute("person-id")
-            const mergeDest = dropzoneElement.getAttribute("person-id")
-            console.log('Dropped ' + mergeSrc + ' into ' + mergeDest)
+            const mergeSrcId = draggableElement.getAttribute("person-id")
+            const mergeDestId = dropzoneElement.getAttribute("person-id")
+
+            const confirmPersonMergeEvent = new CustomEvent(
+                    Const.events.confirmPersonMerge, {
+                        detail: {
+                                ${Const.Api.Person.MERGE_SOURCE_ID}: mergeSrcId,
+                                ${Const.Api.Person.MERGE_DEST_ID}: mergeDestId,
+                        }});
+
+            document.body.dispatchEvent(confirmPersonMergeEvent)
         },
 
         ondropdeactivate: function (event) {
