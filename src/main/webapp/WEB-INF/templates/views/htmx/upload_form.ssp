@@ -1,4 +1,6 @@
+#import(software.altitude.core.Const)
 #import(software.altitude.core.RequestContext)
+#import(software.altitude.core.util.Util)
 
 <style>
     #uploadForm {
@@ -30,7 +32,9 @@
 
 </style>
 
-<form id="uploadForm" hx-post='${ url(uploadFilesForm, "repoId" -> RequestContext.getRepository.persistedId) }' hx-encoding="multipart/form-data">
+<%@ val uploadId: String = Util.randomStr() %>
+
+<form id="uploadForm" hx-post='${ url(uploadFilesForm, Const.Api.REPO_ID -> RequestContext.getRepository.persistedId, Const.Api.Upload.UPLOAD_ID -> uploadId) }' hx-encoding="multipart/form-data">
     <div>
         <input type="file" name="files" id="files" multiple>
     </div>
@@ -42,27 +46,28 @@
     <div id="progressTextControl" hidden>
     </div>
 
-    <div id="doItButtonControl">
+    <div id="startUploadButtonControl">
         <button class="action-button">Upload from computer</button>
-    </div>
-
-    <div id="abortUploadButtonControl">
-        <button id="abortButton" onclick="htmx.trigger('#uploadForm', 'htmx:abort')"
-                class="action-button error">Cancel
-        </button>
     </div>
 
     <script>
         htmx.on('#uploadForm', 'htmx:xhr:progress', function(evt) {
             htmx.find("#progressBarControl").removeAttribute("hidden")
             htmx.find('#progressBar').setAttribute('value', evt.detail.loaded/evt.detail.total * 100)
-            htmx.find('#doItButtonControl').setAttribute('hidden', true)
+            htmx.find('#startUploadButtonControl').setAttribute('hidden', true)
             htmx.find('#files').setAttribute('disabled', true)
-            htmx.find('#abortUploadButtonControl').style.display = "block"
 
             htmx.find("#progressTextControl").removeAttribute("hidden")
             const percentLoaded = parseInt((evt.detail.loaded / evt.detail.total) * 100)
             htmx.find("#progressTextControl").innerText = percentLoaded+ "%"
+
+            if (percentLoaded === 100) {
+                htmx.find("#progressBarControl").setAttribute('hidden', true)
+                htmx.find('#startUploadButtonControl').setAttribute('hidden', false)
+                htmx.find('#files').setAttribute('disabled', false)
+            }
         });
+
+
     </script>
 </form>
