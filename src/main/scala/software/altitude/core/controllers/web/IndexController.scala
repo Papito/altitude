@@ -1,8 +1,7 @@
 package software.altitude.core.controllers.web
 
 import org.scalatra.Route
-import software.altitude.core.Api
-import software.altitude.core.RequestContext
+import software.altitude.core.{Api, Const, RequestContext}
 import software.altitude.core.controllers.BaseWebController
 import software.altitude.core.models.User
 import software.altitude.core.util.SearchQuery
@@ -15,7 +14,7 @@ class IndexController extends BaseWebController {
     contentType = "text/html"
 
     val q = new SearchQuery(
-      rpp = Api.Field.Search.DEFAULT_RPP,
+      rpp = Const.Search.DEFAULT_RPP,
     )
 
     val results: SearchResult = app.service.library.search(q)
