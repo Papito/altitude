@@ -57,12 +57,6 @@ class SearchController extends BaseApiController {
     query(q)
   }
 
-  get("/r/:repoId/triage") {
-  }
-
-  get(s"/r/:repoId/triage/p/:${Api.Field.Search.PAGE}/rpp/:${Api.Field.Search.RESULTS_PER_PAGE}") {
-  }
-
   private def defaultQuery(folderId: String): ActionResult = {
     val q = new SearchQuery(
       rpp = Const.Search.DEFAULT_RPP,
