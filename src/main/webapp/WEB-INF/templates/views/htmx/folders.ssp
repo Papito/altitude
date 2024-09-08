@@ -207,7 +207,7 @@
 
     });
 
-    document.addEventListener('htmx:afterRequest', function(evt) {
+    htmx.find("#rootFolderList").addEventListener('htmx:afterRequest', function(evt) {
         console.log("===========")
         const requestPath = evt.detail.pathInfo.requestPath
         const status = evt.detail.xhr.status
