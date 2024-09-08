@@ -29,18 +29,27 @@
         height:<%= software.altitude.core.AltitudeServletContext.app.config.getInt(Const.Conf.PREVIEW_BOX_PIXELS).toInt + 20 %>px;
         place-items: center;
     }
-
 </style>
 
 <div id="assets">
     <div class="grid">
-        #for (idx <- 0 to results.records.length - 1)
-        <div class="cell">
-            <% val asset: Asset = results.records(idx) %>
-            <img src="/${ Const.DataStore.CONTENT }/r/${software.altitude.core.RequestContext.getRepository.persistedId}/${ Const.DataStore.PREVIEW }/${ asset.persistedId }"
-                 alt = "${ asset.fileName }"
-                 class="responsive-image"/>
-        </div>
-    #end
+        ${include("results_grid.ssp")}
     </div>
 </div>
+
+<script type="module">
+    const assetsElement = document.getElementById('assets');
+
+    htmx.find('#assets').addEventListener('htmx:beforeRequest', function(evt) {
+        if (evt.detail.target.getAttribute("data-hx-revealed")) {
+            evt.preventDefault()
+        } else {
+            console.info("Loading more: %s", evt.detail.pathInfo.requestPath)
+        }
+    })
+
+    htmx.find('#assets').addEventListener('htmx:afterRequest', function(evt) {
+        evt.detail.target.setAttribute("data-hx-revealed", "true");
+    })
+
+</script>

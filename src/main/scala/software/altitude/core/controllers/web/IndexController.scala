@@ -1,7 +1,9 @@
 package software.altitude.core.controllers.web
 
 import org.scalatra.Route
-import software.altitude.core.{Api, Const, RequestContext}
+import software.altitude.core.Api
+import software.altitude.core.Const
+import software.altitude.core.RequestContext
 import software.altitude.core.controllers.BaseWebController
 import software.altitude.core.models.User
 import software.altitude.core.util.SearchQuery

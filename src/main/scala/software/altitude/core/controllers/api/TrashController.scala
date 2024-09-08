@@ -2,7 +2,8 @@ package software.altitude.core.controllers.api
 
 import org.scalatra.Ok
 import play.api.libs.json.Json
-import software.altitude.core.{Api, Const}
+import software.altitude.core.Api
+import software.altitude.core.Const
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.BaseApiController
 import software.altitude.core.models.Asset

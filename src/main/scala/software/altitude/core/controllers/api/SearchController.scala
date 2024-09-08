@@ -43,7 +43,6 @@ class SearchController extends BaseApiController {
       List()
     }
 
-    // TODO: if there is query text, do not specify folder ids. Search everything
     val foldersQuery = params.getOrElse(Api.Field.Search.FOLDERS, "")
     val folderIdsArg = if (foldersQuery.isEmpty) repo.rootFolderId else foldersQuery
 

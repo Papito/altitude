@@ -1,0 +1,30 @@
+#import(software.altitude.core.Const)
+#import(software.altitude.core.AltitudeServletContext)
+#import(software.altitude.core.RequestContext)
+#import(software.altitude.core.models.Asset)
+#import(software.altitude.core.util.SearchResult)
+#import(software.altitude.core.Api)
+
+
+<%@ val page: Int = 1 %>
+<%@ val nextPage: Int = page + 1 %>
+<%@ val results: SearchResult %>
+
+#for (idx <- 0 to results.records.length - 1)
+#if (idx == results.records.length - 1 && results.hasMoreResults)
+<div class="cell last-cell"
+     hx-trigger="intersect"
+     hx-get='${ url(htmxSearchResults, Api.Field.REPO_ID -> RequestContext.getRepository.persistedId) }?${Api.Field.Search.PAGE}=${nextPage}'
+     hx-swap="afterend">
+#else
+<div class="cell">
+#end
+
+<% val asset: Asset = results.records(idx) %>
+<img src="/${ Const.DataStore.CONTENT }/r/${software.altitude.core.RequestContext.getRepository.persistedId}/${ Const.DataStore.PREVIEW }/${ asset.persistedId }"
+     alt = "${ asset.fileName }"
+     class="responsive-image">
+
+</div>
+
+#end

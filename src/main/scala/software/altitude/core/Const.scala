@@ -29,7 +29,7 @@ object Const {
   }
 
   object Search {
-    val DEFAULT_RPP = 30
+    val DEFAULT_RPP = 21
   }
 
   object Security {
