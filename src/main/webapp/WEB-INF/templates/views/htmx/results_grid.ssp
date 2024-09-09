@@ -9,8 +9,10 @@
 <%@ val page: Int = 1 %>
 <%@ val nextPage: Int = page + 1 %>
 <%@ val results: SearchResult %>
+<%@ val isServerSideLoad: Boolean = false %>
 
 #for (idx <- 0 to results.records.length - 1)
+<% val asset: Asset = results.records(idx) %>
 #if (idx == results.records.length - 1 && results.hasMoreResults)
 <div class="cell last-cell"
      hx-trigger="intersect"
@@ -20,9 +22,14 @@
 <div class="cell">
 #end
 
-<% val asset: Asset = results.records(idx) %>
-<img src="/${ Const.DataStore.CONTENT }/r/${software.altitude.core.RequestContext.getRepository.persistedId}/${ Const.DataStore.PREVIEW }/${ asset.persistedId }"
-     alt = "${ asset.fileName }"
+<% var imgUrl = s"/${ Const.DataStore.CONTENT }/r/${software.altitude.core.RequestContext.getRepository.persistedId}/${ Const.DataStore.PREVIEW }/${ asset.persistedId }" %>
+<img id="asset-${asset.persistedId}"
+     #if (isServerSideLoad)
+     src="${imgUrl}"
+     #else
+     data-src="${imgUrl}"
+     #end
+     alt="${ asset.fileName }"
      class="responsive-image">
 
 </div>

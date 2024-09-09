@@ -24,6 +24,7 @@ class IndexController extends BaseWebController {
     layoutTemplate(
       "/WEB-INF/templates/views/index.ssp",
       "results" -> results,
+      "isServerSideLoad" -> true
     )
   }
 

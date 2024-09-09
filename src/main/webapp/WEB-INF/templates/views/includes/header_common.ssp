@@ -4,8 +4,7 @@
 <link rel="stylesheet" href="/css/core.css">
 <link rel="stylesheet" href="/css/font-awesome.min.css">
 <link rel="stylesheet" href="/css/tabs.css">
-<script src="https://unpkg.com/htmx.org@2.0.2"></script>
-<!--script src="/js/htmx.min.js"></script -->
+<script src="/js/htmx.min.js"></script>
 <script src="/js/json-enc.js"></script>
 <script src="/js/ws.js"></script>
 <script src="/js/split.min.js"></script>

@@ -287,9 +287,7 @@
 
                 newParent.updateVisualState()
                 oldParent.updateVisualState()
-                console.debug("4")
             } else if (status === 409) {
-                console.debug("5")
                 const message = response['htmx-internal-data'].xhr.responseText
                 showWarningSnackBar(message)
             } else {
