@@ -80,6 +80,7 @@
          */
         const observerOptions = {
             root: null, // intersection with Viewport
+            rootMargin: "0px 100% 0px 100%",
             threshold: [0, 1], // when goes fully invisible OR visible
         };
 
@@ -112,6 +113,9 @@
     </div>
 
     <script lang="javascript">
+        /**
+         * Observe every new cell element in the grid for lazy loading/unloading
+         */
         htmx.find('#assets .grid').addEventListener('htmx:load', function(evt) {
             const imgEl = evt.target.querySelector("img")
             if (imgEl !== null) {
