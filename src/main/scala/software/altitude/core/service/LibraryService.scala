@@ -62,13 +62,14 @@ class LibraryService(val app: Altitude) {
        * This data asset has:
        *    - Asset with ID
        *    - Asset with metadata
-       *    - The data, obviously
+       *    - The actual data (which we normally do not pass around for performance reasons)
        */
       val dataAsset = AssetWithData(asset, dataAssetIn.data)
 
       logger.info(s"Adding asset: $dataAsset")
 
       app.service.asset.add(asset)
+      extractAndSaveMetadata(dataAsset)
       app.service.faceRecognition.processAsset(dataAsset)
       app.service.search.indexAsset(asset)
       app.service.stats.addAsset(asset)
@@ -77,6 +78,10 @@ class LibraryService(val app: Altitude) {
 
       asset
     }
+  }
+
+  private def extractAndSaveMetadata(dataAsset: AssetWithData): Unit = {
+      app.service.metadataExtractor.extract(dataAsset.data)
   }
 
   def deleteById(id: String): Unit = {
