@@ -1,106 +1,36 @@
 package software.altitude.core.service
 
+import com.drew.imaging.ImageMetadataReader
+import com.drew.metadata.Directory
 import org.apache.tika.detect.DefaultDetector
 import org.apache.tika.detect.Detector
 import org.apache.tika.io.TikaInputStream
 import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
-import org.apache.tika.parser.AutoDetectParser
-import org.apache.tika.sax.BodyContentHandler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
 import software.altitude.core.models.AssetType
 import software.altitude.core.models.Metadata
-import software.altitude.core.models.MetadataValue
+import scala.jdk.CollectionConverters._
 
-import java.io.InputStream
+import java.io.{ByteArrayInputStream, InputStream}
 
 class MetadataExtractionService(app: Altitude) {
   protected final val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  /**
-   * This structure defines how we construct the final metadata object.
-   * Metadata can have a lot of fields that are related or identical
-   */
-  private val FIELD_REFERENCE: Map[String, List[String]] = Map(
-    /*
-        FINAL_FIELD_1 -> [
-          POSSIBLE_FIELD_1_PRIORITY_1,
-          POSSIBLE_FIELD_1_PRIORITY_2]
-        FINAL_FIELD_2 -> [
-          POSSIBLE_FIELD_2_PRIORITY_1,
-          POSSIBLE_FIELD_2_PRIORITY_2,
-          POSSIBLE_FIELD_2_PRIORITY_3]
-     */
-    "Image Width" -> List(
-      "tiff:ImageWidth",
-      "exif:ImageWidth",
-      "Image Width"
-    ),
-
-    "Image Height" -> List(
-      "tiff:ImageLength",
-      "exif:Image Height",
-      "Image Height"
-    ),
-
-    "Make" -> List(
-      "tiff:Make",
-      "exif:Make",
-      "Make"
-    ),
-
-    "Model" -> List(
-      "tiff:Model",
-      "exif:Model",
-      "Model"
-    ),
-
-    "Software" -> List(),
-
-    "Lens" -> List(
-      "Lens Information",
-      "Lens",
-      "Lens Model"
-    ),
-
-    "Iso Speed" -> List(
-      "exif:IsoSpeedRatings",
-      "ISO Speed Ratings"),
-
-    "Focal Length" -> List(
-      "exif:FocalLength",
-      "Focal Length",
-      "Aperture Value"
-    ),
-
-    "F-Number" -> List(
-      "exif:FNumber",
-      "F-Number"),
-
-    "Exposure Time" -> List(
-      "exif:ExposureTime",
-      "Exposure Time"
-    ),
-
-    "Flash" -> List(
-      "exif:Flash",
-      "Flash"
-    ),
-
-    "User Comment" -> List(
-      "User Comment",
-      "w:comments",
-      "JPEG Comment",
-      "Comments",
-      "Comment")
-  )
-
   def extract(data: Array[Byte]): Metadata = {
-    val raw: Option[TikaMetadata] = extractMetadata(data)
+    val rawMetadata: com.drew.metadata.Metadata = ImageMetadataReader.readMetadata(new ByteArrayInputStream(data))
+    println(rawMetadata)
 
-    rawToMetadata(raw)
+    for (directory: Directory <- rawMetadata.getDirectories.asScala) {
+      for (tag <- directory.getTags.asScala) {
+        println(tag.getTagName + " = " + tag.getDescription)
+      }
+    }
+
+    Metadata()
+    // rawToMetadata(raw)
   }
 
   private def rawToMetadata(raw: Option[TikaMetadata]): Metadata = {
@@ -115,47 +45,6 @@ class MetadataExtractionService(app: Altitude) {
     }
 
     Metadata(data.toMap)
-  }
-
-  private def extractMetadata(data: Array[Byte]): Option[TikaMetadata] = {
-    logger.info("Extracting metadata")
-    try {
-      val metadata = new TikaMetadata()
-      val inputStream = TikaInputStream.get(data, metadata)
-      val parser = new AutoDetectParser()
-      val handler = new BodyContentHandler()
-
-      parser.parse(inputStream, handler, metadata)
-      inputStream.close()
-      Some(metadata)
-    }
-    catch {
-      case ex: Exception =>
-        ex.printStackTrace()
-        logger.error(s"Error extracting metadata: ${ex.toString}")
-        None
-      }
-  }
-
-  private def normalize(metadata: Metadata): Metadata = {
-    val normalizedData = scala.collection.mutable.Map[String, Set[MetadataValue]]()
-
-    FIELD_REFERENCE.foreach { case (destField, srcFields) =>
-      if (srcFields.isEmpty && metadata.contains(destField)) {
-        normalizedData(destField) = metadata.data(destField)
-      }
-      else {
-        // find all the fields that exist in metadata
-        val existingSrcFields = srcFields.filter(metadata.contains)
-        // the field on TOP is it
-        if (existingSrcFields.nonEmpty) {
-          normalizedData(destField) = metadata.data(existingSrcFields.head)
-        }
-      }
-    }
-
-    // copy over the raw fields in
-    Metadata(normalizedData.toMap)
   }
 
   def detectAssetType(data: Array[Byte]): AssetType = {
