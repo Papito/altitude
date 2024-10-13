@@ -4,9 +4,9 @@
       <entry path="$PROJECT_DIR$/lib" />
     </classpathModifications>
     <envs>
-      <env name="OUTPUT" value="$USER_HOME$/output" />
-      <env name="SOURCE.TESSA" value="$USER_HOME$/dropbox/media/_catalog/Tessa/" />
+      <env name="OUTPUT" value="$USER_HOME$/Desktop/output" />
       <env name="SOURCE" value="$PROJECT_DIR$/src/test/resources/import/people" />
+      <env name="SOURCE.TESSA" value="$USER_HOME$/dropbox/media/_catalog/Tessa/" />
     </envs>
     <option name="INCLUDE_PROVIDED_SCOPE" value="true" />
     <option name="MAIN_CLASS_NAME" value="research.FaceRecognition" />
