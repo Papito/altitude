@@ -11,11 +11,11 @@
 
 ```sh
 # Bring up the Postgres database (dev and test at once)
-make up
+make db
 # Run the tests
 make test
 # With hot reload
-make watch 
+make watch
 ```
 
 See the Makefile for all the available commands.

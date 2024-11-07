@@ -11,31 +11,35 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
 import software.altitude.core.models.AssetType
-import software.altitude.core.models.Metadata
-import scala.jdk.CollectionConverters._
+import software.altitude.core.models.UserMetadata
 
-import java.io.{ByteArrayInputStream, InputStream}
+import java.io.ByteArrayInputStream
+import java.io.InputStream
+import scala.jdk.CollectionConverters._
 
 class MetadataExtractionService(app: Altitude) {
   protected final val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  def extract(data: Array[Byte]): Metadata = {
-    val rawMetadata: com.drew.metadata.Metadata = ImageMetadataReader.readMetadata(new ByteArrayInputStream(data))
-    println(rawMetadata)
+  def extract(data: Array[Byte]): UserMetadata = {
+    try {
+      val rawMetadata: com.drew.metadata.Metadata = ImageMetadataReader.readMetadata(new ByteArrayInputStream(data))
 
-    for (directory: Directory <- rawMetadata.getDirectories.asScala) {
-      for (tag <- directory.getTags.asScala) {
-        println(tag.getTagName + " = " + tag.getDescription)
+      for (directory: Directory <- rawMetadata.getDirectories.asScala) {
+        for (tag <- directory.getTags.asScala) {
+          // println(tag.getTagName + " = " + tag.getDescription)
+        }
       }
+      UserMetadata()
+    } catch {
+      case e: Exception =>
+        logger.error("Error extracting metadata", e)
+        UserMetadata()
     }
-
-    Metadata()
-    // rawToMetadata(raw)
   }
 
-  private def rawToMetadata(raw: Option[TikaMetadata]): Metadata = {
+  private def rawToMetadata(raw: Option[TikaMetadata]): UserMetadata = {
     if (raw.isEmpty) {
-      Metadata()
+      UserMetadata()
     }
 
     val data = scala.collection.mutable.Map[String, Set[String]]()
@@ -44,7 +48,7 @@ class MetadataExtractionService(app: Altitude) {
       data(name) = Set(raw.get.get(name).trim)
     }
 
-    Metadata(data.toMap)
+    UserMetadata(data.toMap)
   }
 
   def detectAssetType(data: Array[Byte]): AssetType = {

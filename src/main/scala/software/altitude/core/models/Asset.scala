@@ -20,8 +20,8 @@ object Asset {
       folderId = (json \ Field.Asset.FOLDER_ID).as[String],
       checksum = (json \ Field.Asset.CHECKSUM).as[Int],
       sizeBytes = (json \ Field.Asset.SIZE_BYTES).as[Long],
-      metadata = Metadata.fromJson((json \ Field.Asset.METADATA).as[JsObject]),
-      extractedMetadata = Metadata.fromJson((json \ Field.Asset.EXTRACTED_METADATA).as[JsObject]),
+      metadata = UserMetadata.fromJson((json \ Field.Asset.METADATA).as[JsObject]),
+      extractedMetadata = UserMetadata.fromJson((json \ Field.Asset.EXTRACTED_METADATA).as[JsObject]),
       isTriaged = (json \ Field.Asset.IS_TRIAGED).as[Boolean],
       isRecycled = (json \ Field.Asset.IS_RECYCLED).as[Boolean]
     ).withCoreAttr(json)
@@ -34,10 +34,10 @@ case class Asset(id: Option[String] = None,
                  checksum: Int,
                  sizeBytes: Long,
                  folderId: String,
-                 metadata: Metadata = Metadata(),
+                 metadata: UserMetadata = UserMetadata(),
                  isTriaged: Boolean = false,
                  isRecycled: Boolean = false,
-                 extractedMetadata: Metadata = Metadata()) extends BaseModel {
+                 extractedMetadata: UserMetadata = UserMetadata()) extends BaseModel {
 
   override def toJson: JsObject = Json.obj(
     Field.USER_ID -> userId,

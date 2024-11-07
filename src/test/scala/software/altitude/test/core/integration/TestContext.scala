@@ -8,7 +8,7 @@ import software.altitude.core.models.AssetType
 import software.altitude.core.models.AssetWithData
 import software.altitude.core.models.Face
 import software.altitude.core.models.Folder
-import software.altitude.core.models.Metadata
+import software.altitude.core.models.UserMetadata
 import software.altitude.core.models.Person
 import software.altitude.core.models.Repository
 import software.altitude.core.models.User
@@ -86,7 +86,7 @@ class TestContext(val testApp: Altitude) {
                 resourcePath: Option[String] = None,
                 user: Option[User] = None,
                 folder: Option[Folder] = None,
-                metadata: Metadata = Metadata()): Asset ={
+                metadata: UserMetadata = UserMetadata()): Asset ={
     if (repository.isEmpty && repositories.isEmpty) {
       throw new RuntimeException("Cannot make an asset without a repository previously created")
     }
@@ -123,7 +123,7 @@ class TestContext(val testApp: Altitude) {
                         resourcePath: Option[String] = None,
                         user: Option[User] = None,
                         folder: Option[Folder] = None,
-                        metadata: Metadata = Metadata()): AssetWithData = {
+                        metadata: UserMetadata = UserMetadata()): AssetWithData = {
 
     val asset = makeAsset(repository, filename, resourcePath, user, folder, metadata)
     val data = Random.nextBytes(100)
@@ -135,7 +135,7 @@ class TestContext(val testApp: Altitude) {
                    resourcePath: Option[String] = None,
                    user: Option[User] = None,
                    folder: Option[Folder] = None,
-                   metadata: Metadata = Metadata()): Asset = {
+                   metadata: UserMetadata = UserMetadata()): Asset = {
 
     if (repository.isEmpty && repositories.length > 1) {
       throw new RuntimeException(

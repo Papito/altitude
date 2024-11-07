@@ -1,12 +1,11 @@
 package software.altitude.test.core.integration
 
-import com.drew.imaging.ImageMetadataReader
 import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
 import software.altitude.core.models.AssetType
-import software.altitude.core.models.Metadata
+import software.altitude.core.models.UserMetadata
 import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.IntegrationTestCore
 
@@ -30,7 +29,7 @@ import software.altitude.test.core.IntegrationTestCore
 
   test("Extract metadata", Focused) {
     val importAsset =IntegrationTestUtil.getImportAsset("images/cactus.jpg")
-    val metadata: Metadata = testApp.service.metadataExtractor.extract(importAsset.data)
+    val metadata: UserMetadata = testApp.service.metadataExtractor.extract(importAsset.data)
     println(metadata)
   }
 }

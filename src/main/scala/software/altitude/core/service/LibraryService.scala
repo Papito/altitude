@@ -415,7 +415,7 @@ class LibraryService(val app: Altitude) {
   def addMetadataValue(assetId: String, fieldId: String, newValue: Any): Unit = {
     txManager.withTransaction {
       app.service.metadata.addFieldValue(assetId, fieldId, newValue.toString)
-      val field: MetadataField = app.service.metadata.getFieldById(fieldId)
+      val field: UserMetadataField = app.service.metadata.getFieldById(fieldId)
       val asset: Asset = getById(assetId)
       app.service.search.addMetadataValue(asset, field, newValue.toString)
     }

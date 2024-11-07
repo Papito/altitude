@@ -8,7 +8,7 @@ import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.models.Asset
 import software.altitude.core.models.AssetType
 import software.altitude.core.models.Field
-import software.altitude.core.models.Metadata
+import software.altitude.core.models.UserMetadata
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 
@@ -37,8 +37,8 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
       checksum = rec(Field.Asset.CHECKSUM).asInstanceOf[Int],
       assetType = assetType,
       sizeBytes = rec(Field.Asset.SIZE_BYTES).asInstanceOf[Int],
-      metadata = metadataJson: Metadata,
-      extractedMetadata = extractedMetadataJson: Metadata,
+      metadata = metadataJson: UserMetadata,
+      extractedMetadata = extractedMetadataJson: UserMetadata,
       folderId = rec(Field.Asset.FOLDER_ID).asInstanceOf[String],
       isRecycled = getBooleanField(rec(Field.Asset.IS_RECYCLED)),
       isTriaged = getBooleanField(rec(Field.Asset.IS_TRIAGED)),
@@ -59,7 +59,7 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
     this.query(q.withRepository(), sqlQueryBuilder)
   }
 
-  override def getMetadata(assetId: String): Option[Metadata] = {
+  override def getMetadata(assetId: String): Option[UserMetadata] = {
     val sql = s"""
       SELECT ${Field.Asset.METADATA}
          FROM $tableName
@@ -68,14 +68,14 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
 
     val rec = executeAndGetOne(sql, List(assetId))
     val metadataJson = getJsonFromColumn(rec(Field.Asset.METADATA))
-    val metadata = Metadata.fromJson(metadataJson)
+    val metadata = UserMetadata.fromJson(metadataJson)
     Some(metadata)
   }
 
   override def add(jsonIn: JsObject): JsObject = {
     val asset = jsonIn: Asset
 
-    val metadataWithIds = Metadata.withIds(asset.metadata)
+    val metadataWithIds = UserMetadata.withIds(asset.metadata)
 
     val metadata: String = metadataWithIds.toString().replaceAll("\\\\u0000", "")
     val extractedMetadata: String = asset.extractedMetadata.toString().replaceAll("\\\\u0000", "")
@@ -113,10 +113,10 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
     jsonIn ++ Json.obj(Field.ID -> id)
   }
 
-  override def setMetadata(assetId: String, metadata: Metadata): Unit = {
+  override def setMetadata(assetId: String, metadata: UserMetadata): Unit = {
     BaseDao.incrWriteQueryCount()
 
-    val metadataWithIds = Metadata.withIds(metadata)
+    val metadataWithIds = UserMetadata.withIds(metadata)
 
     val sql = s"""
       UPDATE $tableName
