@@ -47,15 +47,16 @@ class LibraryService(val app: Altitude) {
       }
 
       /**
-        * Create the version of the asset with ID and metadata (we don't have that yet)
+        * Create the version of the asset with ID and metadata
         */
-      val metadata = app.service.metadata.cleanAndValidate(dataAssetIn.asset.metadata)
       val assetId = BaseDao.genId
+      val userMetadata = app.service.metadata.cleanAndValidate(dataAssetIn.asset.metadata)
+      val extractedMetadata = app.service.metadataExtractor.extract(dataAssetIn.data)
 
       val asset: Asset = dataAssetIn.asset.copy(
         id = Some(assetId),
-        metadata = metadata,
-        extractedMetadata = dataAssetIn.asset.extractedMetadata
+        metadata = userMetadata,
+        extractedMetadata = extractedMetadata
       )
 
       /**
@@ -69,7 +70,6 @@ class LibraryService(val app: Altitude) {
       logger.info(s"Adding asset: $dataAsset")
 
       app.service.asset.add(asset)
-      extractAndSaveMetadata(dataAsset)
       app.service.faceRecognition.processAsset(dataAsset)
       app.service.search.indexAsset(asset)
       app.service.stats.addAsset(asset)
@@ -78,10 +78,6 @@ class LibraryService(val app: Altitude) {
 
       asset
     }
-  }
-
-  private def extractAndSaveMetadata(dataAsset: AssetWithData): Unit = {
-      app.service.metadataExtractor.extract(dataAsset.data)
   }
 
   def deleteById(id: String): Unit = {

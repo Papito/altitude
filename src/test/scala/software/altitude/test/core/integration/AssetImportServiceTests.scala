@@ -11,6 +11,7 @@ import software.altitude.core.models.Asset
 import software.altitude.core.models.MimedPreviewData
 import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.IntegrationTestCore
+import org.scalatest.matchers.must.Matchers.empty
 
 @DoNotDiscover class AssetImportServiceTests(override val testApp: Altitude) extends IntegrationTestCore {
 
@@ -23,20 +24,7 @@ import software.altitude.test.core.IntegrationTestCore
     }
   }
 
-  test("Imported image WITHOUT metadata should successfully import") {
-    val importAsset = IntegrationTestUtil.getImportAsset("images/1.jpg")
-    val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
-
-    importedAsset.assetType should equal(importedAsset.assetType)
-    importedAsset.checksum should not be 0
-
-    val asset = testApp.service.library.getById(importedAsset.persistedId): Asset
-    asset.assetType should equal(importedAsset.assetType)
-    asset.checksum should not be 0
-    asset.sizeBytes should not be 0
-  }
-
-  test("Imported image WITH metadata should successfully import") {
+  test("Imported image with extracted metadata should successfully import") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/bullock.jpg")
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
 
@@ -47,6 +35,8 @@ import software.altitude.test.core.IntegrationTestCore
     asset.assetType should equal(importedAsset.assetType)
     asset.checksum should not be 0
     asset.sizeBytes should not be 0
+
+    asset.extractedMetadata.getFieldValues("JPEG").get("Image Height") should not be empty
   }
 
   test("Imported image should have a preview") {

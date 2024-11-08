@@ -5,10 +5,7 @@ import org.apache.commons.dbutils.QueryRunner
 import play.api.libs.json._
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
-import software.altitude.core.models.Asset
-import software.altitude.core.models.AssetType
-import software.altitude.core.models.Field
-import software.altitude.core.models.UserMetadata
+import software.altitude.core.models.{Asset, AssetType, ExtractedMetadata, Field, UserMetadata}
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 
@@ -38,7 +35,7 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
       assetType = assetType,
       sizeBytes = rec(Field.Asset.SIZE_BYTES).asInstanceOf[Int],
       metadata = metadataJson: UserMetadata,
-      extractedMetadata = extractedMetadataJson: UserMetadata,
+      extractedMetadata = extractedMetadataJson: ExtractedMetadata,
       folderId = rec(Field.Asset.FOLDER_ID).asInstanceOf[String],
       isRecycled = getBooleanField(rec(Field.Asset.IS_RECYCLED)),
       isTriaged = getBooleanField(rec(Field.Asset.IS_TRIAGED)),

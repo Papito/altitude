@@ -10,8 +10,7 @@ import org.apache.tika.mime.{MediaType => TikaMediaType}
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
-import software.altitude.core.models.AssetType
-import software.altitude.core.models.UserMetadata
+import software.altitude.core.models.{AssetType, ExtractedMetadata, UserMetadata}
 
 import java.io.ByteArrayInputStream
 import java.io.InputStream
@@ -20,20 +19,23 @@ import scala.jdk.CollectionConverters._
 class MetadataExtractionService(app: Altitude) {
   protected final val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  def extract(data: Array[Byte]): UserMetadata = {
+  def extract(data: Array[Byte]): ExtractedMetadata = {
+    val extractedMetadata = ExtractedMetadata()
+
     try {
       val rawMetadata: com.drew.metadata.Metadata = ImageMetadataReader.readMetadata(new ByteArrayInputStream(data))
 
       for (directory: Directory <- rawMetadata.getDirectories.asScala) {
         for (tag <- directory.getTags.asScala) {
-          // println(tag.getTagName + " = " + tag.getDescription)
+          extractedMetadata.addValue(directory.getName, tag.getTagName, tag.getDescription)
         }
       }
-      UserMetadata()
+
+      extractedMetadata
     } catch {
       case e: Exception =>
         logger.error("Error extracting metadata", e)
-        UserMetadata()
+        ExtractedMetadata()
     }
   }
 

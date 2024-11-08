@@ -4,8 +4,7 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
-import software.altitude.core.models.AssetType
-import software.altitude.core.models.UserMetadata
+import software.altitude.core.models.{AssetType, ExtractedMetadata, UserMetadata}
 import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.IntegrationTestCore
 
@@ -27,9 +26,10 @@ import software.altitude.test.core.IntegrationTestCore
     assetType.mime should be("image/png")
   }
 
-  test("Extract metadata", Focused) {
-    val importAsset =IntegrationTestUtil.getImportAsset("images/cactus.jpg")
-    val metadata: UserMetadata = testApp.service.metadataExtractor.extract(importAsset.data)
-    println(metadata)
+  test("Extract metadata") {
+    val importAsset = IntegrationTestUtil.getImportAsset("images/cactus.jpg")
+    val metadata: ExtractedMetadata = testApp.service.metadataExtractor.extract(importAsset.data)
+    metadata.getFieldValues("JFIF").get("Resolution Units") should be(Some("inch"))
+    metadata.getFieldValues("Exif IFD0").get("Make") should be(Some("NIKON CORPORATION"))
   }
 }
