@@ -37,16 +37,14 @@ abstract class SearchDao(override val config: Config)
   protected def replaceSearchDocument(asset: Asset): Unit =
     throw new NotImplementedError
 
-  override def indexAsset(asset: Asset, metadataFields: Map[String, UserMetadataField])
-                         : Unit = {
-    logger.debug(s"Indexing asset $asset with metadata [${asset.metadata}]")
+  override def indexAsset(asset: Asset, metadataFields: Map[String, UserMetadataField]) : Unit = {
+    logger.debug(s"Indexing asset ${asset.persistedId} for search")
     indexMetadata(asset, metadataFields)
     addSearchDocument(asset)
   }
 
   def reindexAsset(asset: Asset, metadataFields: Map[String, UserMetadataField])
                   : Unit = {
-    logger.debug(s"Reindexing asset $asset with metadata [${asset.metadata}]")
 
     clearMetadata(asset.persistedId)
     indexMetadata(asset, metadataFields)
@@ -75,9 +73,9 @@ abstract class SearchDao(override val config: Config)
 
   private def indexMetadata(asset: Asset, metadataFields: Map[String, UserMetadataField])
                              : Unit = {
-    logger.debug(s"Indexing metadata for asset $asset: [${asset.metadata}]")
+    logger.debug(s"Indexing metadata for asset ${asset.persistedId}")
 
-    asset.metadata.data.foreach { m =>
+    asset.userMetadata.data.foreach { m =>
       val fieldId = m._1
 
       if (!metadataFields.contains(fieldId)) {

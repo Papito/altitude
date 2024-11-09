@@ -4,7 +4,8 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
-import software.altitude.core.models.{AssetType, ExtractedMetadata, UserMetadata}
+import software.altitude.core.models.AssetType
+import software.altitude.core.models.ExtractedMetadata
 import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.IntegrationTestCore
 

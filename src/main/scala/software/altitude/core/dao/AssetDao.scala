@@ -6,9 +6,9 @@ import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 
 trait AssetDao extends BaseDao {
-  def getMetadata(assetId: String): Option[UserMetadata]
+  def getUserMetadata(assetId: String): Option[UserMetadata]
 
-  def setMetadata(assetId: String, metadata: UserMetadata): Unit
+  def setUserMetadata(assetId: String, metadata: UserMetadata): Unit
 
   def queryNotRecycled(q: Query): QueryResult
 
@@ -25,7 +25,7 @@ trait AssetDao extends BaseDao {
      * A better implementation - for advanced engines - updates only the metadata fields of interest.
      */
     // OPTIMIZE
-    val existingMetadata = getMetadata(assetId) match {
+    val existingMetadata = getUserMetadata(assetId) match {
       case Some(m) => m
       case None => UserMetadata()
     }
@@ -35,6 +35,6 @@ trait AssetDao extends BaseDao {
     val newMetadata = new UserMetadata(newData)
     logger.debug(s"New metadata -> $newMetadata")
 
-    setMetadata(assetId, newMetadata)
+    setUserMetadata(assetId, newMetadata)
   }
 }

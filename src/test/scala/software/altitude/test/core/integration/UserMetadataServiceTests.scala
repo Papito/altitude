@@ -262,7 +262,7 @@ import software.altitude.test.core.IntegrationTestCore
 
     val storedAsset: Asset = testApp.service.library.getById(asset.persistedId)
 
-    storedAsset.metadata.isEmpty shouldBe false
+    storedAsset.userMetadata.isEmpty shouldBe false
   }
 
   test("Not defined user metadata values should not return") {
@@ -289,8 +289,8 @@ import software.altitude.test.core.IntegrationTestCore
 
     val storedAsset: Asset = testApp.service.library.getById(asset.persistedId)
 
-    storedAsset.metadata.isEmpty shouldBe false
-    storedAsset.metadata.data.size shouldBe 1
+    storedAsset.userMetadata.isEmpty shouldBe false
+    storedAsset.userMetadata.data.size shouldBe 1
   }
 
   test("Delete metadata value") {

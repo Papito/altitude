@@ -50,12 +50,12 @@ class LibraryService(val app: Altitude) {
         * Create the version of the asset with ID and metadata
         */
       val assetId = BaseDao.genId
-      val userMetadata = app.service.metadata.cleanAndValidate(dataAssetIn.asset.metadata)
+      val userMetadata = app.service.metadata.cleanAndValidate(dataAssetIn.asset.userMetadata)
       val extractedMetadata = app.service.metadataExtractor.extract(dataAssetIn.data)
 
       val asset: Asset = dataAssetIn.asset.copy(
         id = Some(assetId),
-        metadata = userMetadata,
+        userMetadata = userMetadata,
         extractedMetadata = extractedMetadata
       )
 

@@ -8,8 +8,7 @@ import scala.language.implicitConversions
  * All asset-related metadata.
  *
  * Since we do not store actual data in DB, the data itself is only passed via AssetWithData.
- *
- * This makes the purpose clear and avoids the confusion of an asset having zero byte data.
+ * This makes the purpose clear and avoids the confusion of an asset having zero bytes for data.
  */
 object Asset {
   implicit def fromJson(json: JsValue): Asset = Asset(
@@ -20,7 +19,7 @@ object Asset {
       folderId = (json \ Field.Asset.FOLDER_ID).as[String],
       checksum = (json \ Field.Asset.CHECKSUM).as[Int],
       sizeBytes = (json \ Field.Asset.SIZE_BYTES).as[Long],
-      metadata = UserMetadata.fromJson((json \ Field.Asset.METADATA).as[JsObject]),
+      userMetadata = UserMetadata.fromJson((json \ Field.Asset.USER_METADATA).as[JsObject]),
       extractedMetadata = ExtractedMetadata.fromJson((json \ Field.Asset.EXTRACTED_METADATA).as[JsObject]),
       isTriaged = (json \ Field.Asset.IS_TRIAGED).as[Boolean],
       isRecycled = (json \ Field.Asset.IS_RECYCLED).as[Boolean]
@@ -34,7 +33,7 @@ case class Asset(id: Option[String] = None,
                  checksum: Int,
                  sizeBytes: Long,
                  folderId: String,
-                 metadata: UserMetadata = UserMetadata(),
+                 userMetadata: UserMetadata = UserMetadata(),
                  extractedMetadata: ExtractedMetadata = ExtractedMetadata(),
                  isTriaged: Boolean = false,
                  isRecycled: Boolean = false) extends BaseModel {
@@ -46,7 +45,7 @@ case class Asset(id: Option[String] = None,
     Field.Asset.FILENAME -> fileName,
     Field.Asset.SIZE_BYTES -> sizeBytes,
     Field.Asset.ASSET_TYPE -> (assetType: JsValue),
-    Field.Asset.METADATA -> metadata.toJson,
+    Field.Asset.USER_METADATA -> userMetadata.toJson,
     Field.Asset.EXTRACTED_METADATA -> extractedMetadata.toJson,
     Field.Asset.IS_TRIAGED -> isTriaged,
     Field.Asset.IS_RECYCLED -> isRecycled

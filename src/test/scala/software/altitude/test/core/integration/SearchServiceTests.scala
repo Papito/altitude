@@ -365,29 +365,29 @@ import software.altitude.test.core.IntegrationTestCore
     // sort by string field
     var sort = SearchSort(field = kwField, direction = SortDirection.ASC)
     var results = testApp.service.library.search(new SearchQuery(searchSort = List(sort)))
-    (results.records.head: Asset).metadata.get(kwField.persistedId).value.head.value shouldBe "a"
+    (results.records.head: Asset).userMetadata.get(kwField.persistedId).value.head.value shouldBe "a"
 
     sort = SearchSort(field = kwField, direction = SortDirection.DESC)
     results = testApp.service.library.search(new SearchQuery(searchSort = List(sort)))
-    (results.records.head: Asset).metadata.get(kwField.persistedId).value.head.value shouldBe "c"
+    (results.records.head: Asset).userMetadata.get(kwField.persistedId).value.head.value shouldBe "c"
 
     // sort by number field
     sort = SearchSort(field = numField, direction = SortDirection.ASC)
     results = testApp.service.library.search(new SearchQuery(searchSort = List(sort)))
-    (results.records.head: Asset).metadata.get(numField.persistedId).value.head.value shouldBe "50"
+    (results.records.head: Asset).userMetadata.get(numField.persistedId).value.head.value shouldBe "50"
 
     sort = SearchSort(field = numField, direction = SortDirection.DESC)
     results = testApp.service.library.search(new SearchQuery(searchSort = List(sort)))
-    (results.records.head: Asset).metadata.get(numField.persistedId).value.head.value shouldBe "300"
+    (results.records.head: Asset).userMetadata.get(numField.persistedId).value.head.value shouldBe "300"
 
     // sort by number field
     sort = SearchSort(field = boolField, direction = SortDirection.ASC)
     results = testApp.service.library.search(new SearchQuery(searchSort = List(sort)))
-    (results.records.head: Asset).metadata.get(boolField.persistedId).value.head.value shouldBe "false"
+    (results.records.head: Asset).userMetadata.get(boolField.persistedId).value.head.value shouldBe "false"
 
     sort = SearchSort(field = boolField, direction = SortDirection.DESC)
     results = testApp.service.library.search(new SearchQuery(searchSort = List(sort)))
-    (results.records.head: Asset).metadata.get(boolField.persistedId).value.head.value shouldBe "true"
+    (results.records.head: Asset).userMetadata.get(boolField.persistedId).value.head.value shouldBe "true"
   }
 
   test("Sort info should be returned with query results") {

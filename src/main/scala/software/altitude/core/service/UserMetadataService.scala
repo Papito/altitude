@@ -68,7 +68,7 @@ class UserMetadataService(val app: Altitude) {
   def getMetadata(assetId: String)
                  : UserMetadata =
     // return the metadata or a new empty one if blank
-    assetDao.getMetadata(assetId) match {
+    assetDao.getUserMetadata(assetId) match {
       case Some(metadata) => metadata
       case None => UserMetadata()
     }
@@ -80,7 +80,7 @@ class UserMetadataService(val app: Altitude) {
     txManager.withTransaction {
       val cleanMetadata = cleanAndValidate(metadata)
 
-      assetDao.setMetadata(assetId = assetId, metadata = cleanMetadata)
+      assetDao.setUserMetadata(assetId = assetId, metadata = cleanMetadata)
     }
   }
 

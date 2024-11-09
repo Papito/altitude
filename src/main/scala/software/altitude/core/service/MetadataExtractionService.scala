@@ -10,7 +10,9 @@ import org.apache.tika.mime.{MediaType => TikaMediaType}
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
-import software.altitude.core.models.{AssetType, ExtractedMetadata, UserMetadata}
+import software.altitude.core.models.AssetType
+import software.altitude.core.models.ExtractedMetadata
+import software.altitude.core.models.UserMetadata
 
 import java.io.ByteArrayInputStream
 import java.io.InputStream

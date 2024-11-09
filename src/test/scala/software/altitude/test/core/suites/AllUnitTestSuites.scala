@@ -2,9 +2,9 @@ package software.altitude.test.core.suites
 
 import org.scalatest.Suites
 import software.altitude.test.core.unit.ApiValidatorTests
+import software.altitude.test.core.unit.CoreModelTests
 import software.altitude.test.core.unit.DataScrubberTests
 import software.altitude.test.core.unit.FolderModelTests
-import software.altitude.test.core.unit.CoreModelTests
 import software.altitude.test.core.unit.SearchSqlQueryTests
 import software.altitude.test.core.unit.SqlQueryTests
 

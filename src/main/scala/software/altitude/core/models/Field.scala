@@ -73,7 +73,7 @@ object Field {
     val FOLDER_ID = "folder_id"
     val SIZE_BYTES = "size_bytes"
     val FILENAME = "filename"
-    val METADATA = "metadata"
+    val USER_METADATA = "user_metadata"
     val EXTRACTED_METADATA = "extracted_metadata"
     val IS_RECYCLED = "is_recycled"
     val IS_TRIAGED = "is_triaged"
