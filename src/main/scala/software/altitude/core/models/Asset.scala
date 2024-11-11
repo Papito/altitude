@@ -20,10 +20,22 @@ object Asset {
       checksum = (json \ Field.Asset.CHECKSUM).as[Int],
       sizeBytes = (json \ Field.Asset.SIZE_BYTES).as[Long],
       userMetadata = UserMetadata.fromJson((json \ Field.Asset.USER_METADATA).as[JsObject]),
+      publicMetadata = PublicMetadata.fromJson((json \ Field.Asset.PUBLIC_METADATA).as[JsObject]),
       extractedMetadata = ExtractedMetadata.fromJson((json \ Field.Asset.EXTRACTED_METADATA).as[JsObject]),
       isTriaged = (json \ Field.Asset.IS_TRIAGED).as[Boolean],
       isRecycled = (json \ Field.Asset.IS_RECYCLED).as[Boolean]
     ).withCoreAttr(json)
+
+  def getPublicMetadata(extractedMetadata: ExtractedMetadata): PublicMetadata = {
+    PublicMetadata(
+      deviceModel = extractedMetadata.getFieldValues("Exif IFD0").get("Model"),
+      fNumber = extractedMetadata.getFieldValues("Exif SubIFD").get("F-Number"),
+      focalLength = extractedMetadata.getFieldValues("Exif SubIFD").get("Focal Length"),
+      iso = extractedMetadata.getFieldValues("Exif SubIFD").get("ISO Speed Ratings"),
+      exposureTime = extractedMetadata.getFieldValues("Exif SubIFD").get("Exposure Time"),
+      dateTimeOriginal = extractedMetadata.getFieldValues("Exif SubIFD").get("Date/Time Original")
+    )
+  }
 }
 
 case class Asset(id: Option[String] = None,
@@ -34,6 +46,7 @@ case class Asset(id: Option[String] = None,
                  sizeBytes: Long,
                  folderId: String,
                  userMetadata: UserMetadata = UserMetadata(),
+                 publicMetadata: PublicMetadata = PublicMetadata(),
                  extractedMetadata: ExtractedMetadata = ExtractedMetadata(),
                  isTriaged: Boolean = false,
                  isRecycled: Boolean = false) extends BaseModel {
@@ -46,6 +59,7 @@ case class Asset(id: Option[String] = None,
     Field.Asset.SIZE_BYTES -> sizeBytes,
     Field.Asset.ASSET_TYPE -> (assetType: JsValue),
     Field.Asset.USER_METADATA -> userMetadata.toJson,
+    Field.Asset.PUBLIC_METADATA -> publicMetadata.toJson,
     Field.Asset.EXTRACTED_METADATA -> extractedMetadata.toJson,
     Field.Asset.IS_TRIAGED -> isTriaged,
     Field.Asset.IS_RECYCLED -> isRecycled

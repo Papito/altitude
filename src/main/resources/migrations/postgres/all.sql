@@ -56,6 +56,7 @@ CREATE TABLE asset (
   media_subtype VARCHAR(64) NOT NULL,
   mime_type VARCHAR(64) NOT NULL,
   user_metadata jsonb,
+  public_metadata jsonb,
   extracted_metadata jsonb,
   folder_id CHAR(36),
   filename TEXT NOT NULL,

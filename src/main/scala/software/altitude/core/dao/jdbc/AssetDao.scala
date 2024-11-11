@@ -9,6 +9,7 @@ import software.altitude.core.models.Asset
 import software.altitude.core.models.AssetType
 import software.altitude.core.models.ExtractedMetadata
 import software.altitude.core.models.Field
+import software.altitude.core.models.PublicMetadata
 import software.altitude.core.models.UserMetadata
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
@@ -25,12 +26,6 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
       mediaSubtype = rec(Field.AssetType.MEDIA_SUBTYPE).asInstanceOf[String],
       mime = rec(Field.AssetType.MIME_TYPE).asInstanceOf[String])
 
-    val userMetadataJson = getJsonFromColumn(rec(Field.Asset.USER_METADATA))
-
-    val extractedMetadataCol = rec(Field.Asset.EXTRACTED_METADATA)
-    val extractedMetadataJsonStr: String = if (extractedMetadataCol == null) "{}" else extractedMetadataCol.asInstanceOf[String]
-    val extractedMetadataJson = Json.parse(extractedMetadataJsonStr).as[JsObject]
-
     val model = new Asset(
       id = Option(rec(Field.ID).asInstanceOf[String]),
       userId = rec(Field.USER_ID).asInstanceOf[String],
@@ -38,8 +33,9 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
       checksum = rec(Field.Asset.CHECKSUM).asInstanceOf[Int],
       assetType = assetType,
       sizeBytes = rec(Field.Asset.SIZE_BYTES).asInstanceOf[Int],
-      userMetadata = userMetadataJson: UserMetadata,
-      extractedMetadata = extractedMetadataJson: ExtractedMetadata,
+      extractedMetadata = getJsonFromColumn(rec(Field.Asset.EXTRACTED_METADATA)): ExtractedMetadata,
+      publicMetadata = getJsonFromColumn(rec(Field.Asset.PUBLIC_METADATA)): PublicMetadata,
+      userMetadata =getJsonFromColumn(rec(Field.Asset.USER_METADATA)): UserMetadata,
       folderId = rec(Field.Asset.FOLDER_ID).asInstanceOf[String],
       isRecycled = getBooleanField(rec(Field.Asset.IS_RECYCLED)),
       isTriaged = getBooleanField(rec(Field.Asset.IS_TRIAGED)),
@@ -81,8 +77,9 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
              ${Field.ID}, ${Field.REPO_ID}, ${Field.USER_ID}, ${Field.Asset.CHECKSUM},
              ${Field.Asset.FILENAME}, ${Field.Asset.SIZE_BYTES},
              ${Field.AssetType.MEDIA_TYPE}, ${Field.AssetType.MEDIA_SUBTYPE}, ${Field.AssetType.MIME_TYPE},
-             ${Field.Asset.FOLDER_ID}, ${Field.Asset.IS_TRIAGED}, ${Field.Asset.USER_METADATA}, ${Field.Asset.EXTRACTED_METADATA})
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, $jsonFunc, $jsonFunc)
+             ${Field.Asset.FOLDER_ID}, ${Field.Asset.IS_TRIAGED}, ${Field.Asset.USER_METADATA},
+             ${Field.Asset.EXTRACTED_METADATA}, ${Field.Asset.PUBLIC_METADATA})
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, $jsonFunc, $jsonFunc, $jsonFunc)
     """
 
     val id = asset.id match {
@@ -103,7 +100,8 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
       asset.folderId,
       asset.isTriaged,
       UserMetadata.withIds(asset.userMetadata).toString,
-      asset.extractedMetadata.toString
+      asset.extractedMetadata.toString,
+      asset.publicMetadata.toString
     )
 
     addRecord(jsonIn, sql, sqlVals)

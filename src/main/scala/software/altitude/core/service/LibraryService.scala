@@ -52,11 +52,13 @@ class LibraryService(val app: Altitude) {
       val assetId = BaseDao.genId
       val userMetadata = app.service.metadata.cleanAndValidate(dataAssetIn.asset.userMetadata)
       val extractedMetadata = app.service.metadataExtractor.extract(dataAssetIn.data)
+      val publicMetadata = Asset.getPublicMetadata(extractedMetadata)
 
       val asset: Asset = dataAssetIn.asset.copy(
         id = Some(assetId),
         userMetadata = userMetadata,
-        extractedMetadata = extractedMetadata
+        extractedMetadata = extractedMetadata,
+        publicMetadata = publicMetadata
       )
 
       /**

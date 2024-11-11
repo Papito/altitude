@@ -37,6 +37,13 @@ import software.altitude.test.core.IntegrationTestCore
     asset.sizeBytes should not be 0
 
     asset.extractedMetadata.getFieldValues("JPEG").get("Image Height") should not be empty
+
+    asset.publicMetadata.deviceModel should not be empty
+    asset.publicMetadata.fNumber should not be empty
+    asset.publicMetadata.focalLength should not be empty
+    asset.publicMetadata.iso should not be empty
+    asset.publicMetadata.exposureTime should not be empty
+    asset.publicMetadata.dateTimeOriginal should not be empty
   }
 
   test("Imported image should have a preview") {

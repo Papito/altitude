@@ -9,16 +9,14 @@ import org.apache.tika.metadata.{Metadata => TikaMetadata}
 import org.apache.tika.mime.{MediaType => TikaMediaType}
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import software.altitude.core.Altitude
 import software.altitude.core.models.AssetType
 import software.altitude.core.models.ExtractedMetadata
-import software.altitude.core.models.UserMetadata
 
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import scala.jdk.CollectionConverters._
 
-class MetadataExtractionService(app: Altitude) {
+class MetadataExtractionService {
   protected final val logger: Logger = LoggerFactory.getLogger(getClass)
 
   def extract(data: Array[Byte]): ExtractedMetadata = {
@@ -28,7 +26,9 @@ class MetadataExtractionService(app: Altitude) {
       val rawMetadata: com.drew.metadata.Metadata = ImageMetadataReader.readMetadata(new ByteArrayInputStream(data))
 
       for (directory: Directory <- rawMetadata.getDirectories.asScala) {
+         // println(directory.getName)
         for (tag <- directory.getTags.asScala) {
+          // println(s"\t${tag.getTagName} : ${tag.getTagType} -> ${tag.getDescription}")
           extractedMetadata.addValue(directory.getName, tag.getTagName, tag.getDescription)
         }
       }
@@ -39,20 +39,6 @@ class MetadataExtractionService(app: Altitude) {
         logger.error("Error extracting metadata", e)
         ExtractedMetadata()
     }
-  }
-
-  private def rawToMetadata(raw: Option[TikaMetadata]): UserMetadata = {
-    if (raw.isEmpty) {
-      UserMetadata()
-    }
-
-    val data = scala.collection.mutable.Map[String, Set[String]]()
-
-    for (name <- raw.get.names()) {
-      data(name) = Set(raw.get.get(name).trim)
-    }
-
-    UserMetadata(data.toMap)
   }
 
   def detectAssetType(data: Array[Byte]): AssetType = {
