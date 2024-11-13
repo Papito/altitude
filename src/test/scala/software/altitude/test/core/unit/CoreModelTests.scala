@@ -46,7 +46,8 @@ import scala.language.implicitConversions
       boolProp = true,
       intProp = 2)
 
-    // println(obj.toJson)
+//    println(obj)
+//    println(obj.toJson)
 
     val jsonObj = Json.toJson(obj)
     jsonObj.toString() should include("\"string_prop\":\"stringPropValue\"")

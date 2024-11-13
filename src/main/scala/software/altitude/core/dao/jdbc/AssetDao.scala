@@ -99,9 +99,9 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
       asset.assetType.mime,
       asset.folderId,
       asset.isTriaged,
-      UserMetadata.withIds(asset.userMetadata).toString,
-      asset.extractedMetadata.toString,
-      asset.publicMetadata.toString
+      UserMetadata.withIds(asset.userMetadata).toJson.toString,
+      asset.extractedMetadata.toJson.toString,
+      asset.publicMetadata.toJson.toString
     )
 
     addRecord(jsonIn, sql, sqlVals)
@@ -119,7 +119,9 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
        WHERE ${FieldConst.REPO_ID} = ? AND ${FieldConst.ID} = ?
       """
 
-    val updateValues = List(metadataWithIds.toString, RequestContext.getRepository.persistedId, assetId)
+    val updateValues = List(
+      metadataWithIds.toJson.toString,
+      RequestContext.getRepository.persistedId, assetId)
     logger.debug(s"Update SQL: [$sql] with values: $updateValues")
     val runner: QueryRunner = new QueryRunner()
 
