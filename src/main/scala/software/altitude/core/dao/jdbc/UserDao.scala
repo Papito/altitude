@@ -4,8 +4,7 @@ import com.typesafe.config.Config
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
 import software.altitude.core.models.AccountType.AccountType
-import software.altitude.core.models.Field
-import software.altitude.core.models.User
+import software.altitude.core.models.{AccountType, Field, User}
 
 abstract class UserDao(override val config: Config) extends BaseDao with software.altitude.core.dao.UserDao {
   override final val tableName = "account"
@@ -15,7 +14,7 @@ abstract class UserDao(override val config: Config) extends BaseDao with softwar
       id = Option(rec(Field.ID).asInstanceOf[String]),
       email = rec(Field.User.EMAIL).asInstanceOf[String],
       name = rec(Field.User.NAME).asInstanceOf[String],
-      accountType = rec(Field.User.ACCOUNT_TYPE).asInstanceOf[AccountType],
+      accountType = AccountType.withName(rec(Field.User.ACCOUNT_TYPE).asInstanceOf[String]),
       lastActiveRepoId = Option(rec(Field.User.LAST_ACTIVE_REPO_ID).asInstanceOf[String])
     )
   }
