@@ -27,7 +27,6 @@ class UserMetadataService(val app: Altitude) {
   def addField(metadataField: UserMetadataField): UserMetadataField = {
 
     txManager.withTransaction[UserMetadataField] {
-
       val existing = metadataFieldDao.query(new Query(params = Map(
         Field.MetadataField.NAME_LC -> metadataField.nameLowercase
       )).withRepository())
@@ -104,7 +103,7 @@ class UserMetadataService(val app: Altitude) {
     logger.info(s"Adding value [$newValue] for field [$fieldId] on asset [$assetId] ")
 
     txManager.withTransaction {
-      val metadata = UserMetadata(Map(fieldId -> Set(UserMetadataValue(newValue))))
+      val metadata = UserMetadata(Map(fieldId -> Set(UserMetadataValue(value = newValue))))
       val cleanMetadata = cleanAndValidate(metadata)
 
       // if after cleaning the value is not there - it's empty
@@ -184,7 +183,7 @@ class UserMetadataService(val app: Altitude) {
 
       val (fieldId, currentMdVals) = search.head
 
-      val metadata = UserMetadata(Map(fieldId -> Set(UserMetadataValue(newValue))))
+      val metadata = UserMetadata(Map(fieldId -> Set(UserMetadataValue(value = newValue))))
       val cleanMetadata = cleanAndValidate(metadata)
 
       // if after cleaning the value is not there - it's empty
@@ -259,7 +258,7 @@ class UserMetadataService(val app: Altitude) {
       val mdVals: Set[UserMetadataValue] = m._2
 
       val trimmed: Set[UserMetadataValue] = field.fieldType match {
-        case FieldType.KEYWORD => {
+        case FieldType.KEYWORD =>
           mdVals
           // trim leading/trailing
           .map{ mdVal => UserMetadataValue(mdVal.id, mdVal.value.trim) }
@@ -269,23 +268,20 @@ class UserMetadataService(val app: Altitude) {
           .map{ mdVal => UserMetadataValue(mdVal.id, mdVal.value.replaceAll("\\s", " ")) }
           // and lose the blanks
           .filter(_.nonEmpty)
-        }
 
-        case FieldType.TEXT => {
+        case FieldType.TEXT =>
           mdVals
           // trim leading/trailing
           .map{ mdVal => UserMetadataValue(mdVal.id, mdVal.value.trim) }
           // and lose the blanks
           .filter(_.nonEmpty)
-        }
 
-        case FieldType.NUMBER | FieldType.BOOL => {
+        case FieldType.NUMBER | FieldType.BOOL =>
           mdVals
           // trim leading/trailing
           .map{ mdVal => UserMetadataValue(mdVal.id, mdVal.value.trim) }
           // and lose the blanks
           .filter(_.nonEmpty)
-        }
       }
 
       if (trimmed.nonEmpty) res + (fieldId -> trimmed) else res

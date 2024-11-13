@@ -21,16 +21,16 @@ abstract class RepositoryDao(override val config: Config) extends BaseDao
 
     val fileStoreConfigJson = Json.parse(fileStoreConfigJsonStr).as[JsObject]
 
-    val model = Repository(
+    Repository(
       id = Option(rec(Field.ID).asInstanceOf[String]),
       name = rec(Field.Repository.NAME).asInstanceOf[String],
       ownerAccountId = rec(Field.Repository.OWNER_ACCOUNT_ID).asInstanceOf[String],
       rootFolderId = rec(Field.Repository.ROOT_FOLDER_ID).asInstanceOf[String],
       fileStoreType = rec(Field.Repository.FILE_STORE_TYPE).asInstanceOf[String],
-      fileStoreConfig = fileStoreConfigJson.as[Map[String, String]]
+      fileStoreConfig = fileStoreConfigJson.as[Map[String, String]],
+      createdAt = getDateTimeField(rec.get(Field.CREATED_AT)),
+      updatedAt = getDateTimeField(rec.get(Field.UPDATED_AT))
     )
-
-    addCoreAttrs(model, rec)
   }
 
   override def add(jsonIn: JsObject): JsObject = {

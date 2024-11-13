@@ -3,24 +3,27 @@ package software.altitude.core.models
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
+import play.api.libs.json.JsonConfiguration
+import play.api.libs.json.JsonNaming.SnakeCase
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
 
 import scala.language.implicitConversions
 
 object AssetType {
-  implicit def fromJson(json: JsValue): AssetType = new AssetType(
-      mediaType = (json \ Field.AssetType.MEDIA_TYPE).as[String],
-      mediaSubtype = (json \ Field.AssetType.MEDIA_SUBTYPE).as[String],
-      mime = (json \ Field.AssetType.MIME_TYPE).as[String])
+  implicit val config: JsonConfiguration = JsonConfiguration(SnakeCase)
+  implicit val writes: OWrites[AssetType] = Json.writes[AssetType]
+  implicit val reads: Reads[AssetType] = Json.reads[AssetType]
+
+  implicit def fromJson(json: JsValue): AssetType = Json.fromJson[AssetType](json).get
 }
 
-case class AssetType(mediaType: String, mediaSubtype: String, mime: String) extends BaseModel with NoId {
-  override def toString: String = List(mediaType, mediaSubtype, mime).mkString(":")
+case class AssetType(mediaType: String,
+                     mediaSubtype: String,
+                     mime: String
+                    ) extends BaseModel with NoId with NoDates {
 
-  override val toJson: JsObject = Json.obj(
-    Field.AssetType.MIME_TYPE -> mime,
-    Field.AssetType.MEDIA_TYPE ->  mediaType,
-    Field.AssetType.MEDIA_SUBTYPE -> mediaSubtype
-  )
+  val toJson: JsObject = Json.toJson(this).as[JsObject]
 
   override def equals(other: Any): Boolean = other match {
     case that: AssetType =>
@@ -29,6 +32,8 @@ case class AssetType(mediaType: String, mediaSubtype: String, mime: String) exte
       that.mediaSubtype == this.mediaSubtype
     case _ => false
   }
+
+  override def toString: String = List(mediaType, mediaSubtype, mime).mkString(":")
 
   override def hashCode: Int = (mediaType + mediaSubtype + mime).hashCode
 }

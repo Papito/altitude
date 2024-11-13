@@ -1,5 +1,4 @@
 package software.altitude.core.models
-import play.api.libs.json.JsonNaming.SnakeCase
 import play.api.libs.json._
 import software.altitude.core.util.Util
 
@@ -13,6 +12,8 @@ object BaseModel {
 
 abstract class BaseModel {
   val id: Option[String]
+  val createdAt: Option[LocalDateTime]
+  val updatedAt: Option[LocalDateTime]
 
   // Should be always used to get the ID of an object, unless we are positive that the object has not been persisted yet
   def persistedId: String = {
@@ -24,30 +25,6 @@ abstract class BaseModel {
 
   // implicit converter to go from JSON to model
   implicit def toJson: JsObject
-
-  // created at - mutable, but can only be set once
-  private var _createdAt: Option[LocalDateTime] = None
-
-  def createdAt: Option[LocalDateTime] = _createdAt
-
-  def createdAt_= (arg: LocalDateTime): Unit = {
-    if (_createdAt.isDefined) {
-      throw new RuntimeException("Cannot set 'created at' twice")
-    }
-    _createdAt = Some(arg)
-  }
-
-  // updated at - mutable, but can only be set once
-  private var _updatedAt: Option[LocalDateTime] = None
-
-  def updatedAt: Option[LocalDateTime] = _updatedAt
-
-  def updatedAt_= (arg: LocalDateTime): Unit = {
-    if (_updatedAt.isDefined) {
-      throw new RuntimeException("Cannot set 'updated at' twice")
-    }
-    _updatedAt = Some(arg)
-  }
 
   /**
    * Returns core JSON attributes that all models should have
@@ -68,24 +45,6 @@ abstract class BaseModel {
       case _ => JsString(Util.localDateTimeToString(updatedAt))
     }}
   ).toSeq)
-
-  /**
-    * Return this type of object, but with core attributes
-    * present, parsed from the passed in JSON object (if the values are present)
-    */
-  protected def withCoreAttr(json: JsValue): this.type = {
-    val isoCreatedAt = (json \ Field.CREATED_AT).asOpt[String]
-    if (isoCreatedAt.isDefined) {
-      createdAt = Util.stringToLocalDateTime(isoCreatedAt.get).get
-    }
-
-    val isoUpdatedAt = (json \ Field.UPDATED_AT).asOpt[String]
-    if (isoUpdatedAt.isDefined) {
-      updatedAt = Util.stringToLocalDateTime(isoUpdatedAt.get).get
-    }
-
-    this
-  }
 
   override def toString: String = toJson.toString()
 }

@@ -26,7 +26,7 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
       mediaSubtype = rec(Field.AssetType.MEDIA_SUBTYPE).asInstanceOf[String],
       mime = rec(Field.AssetType.MIME_TYPE).asInstanceOf[String])
 
-    val model = new Asset(
+    Asset(
       id = Option(rec(Field.ID).asInstanceOf[String]),
       userId = rec(Field.USER_ID).asInstanceOf[String],
       fileName = rec(Field.Asset.FILENAME).asInstanceOf[String],
@@ -39,9 +39,9 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
       folderId = rec(Field.Asset.FOLDER_ID).asInstanceOf[String],
       isRecycled = getBooleanField(rec(Field.Asset.IS_RECYCLED)),
       isTriaged = getBooleanField(rec(Field.Asset.IS_TRIAGED)),
+      createdAt = getDateTimeField(rec.get(Field.CREATED_AT)),
+      updatedAt = getDateTimeField(rec.get(Field.UPDATED_AT))
     )
-
-    addCoreAttrs(model, rec)
   }
 
   override def queryNotRecycled(q: Query): QueryResult = {

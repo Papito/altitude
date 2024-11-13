@@ -14,13 +14,12 @@ abstract class MetadataFieldDao(override val config: Config)
   override final val tableName = "metadata_field"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
-    val model = UserMetadataField(
+    UserMetadataField(
       id = Option(rec(Field.ID).asInstanceOf[String]),
       name = rec(Field.MetadataField.NAME).asInstanceOf[String],
       fieldType = FieldType.withName(
         rec(Field.MetadataField.FIELD_TYPE).asInstanceOf[String])
     )
-    addCoreAttrs(model, rec)
   }
 
   override def add(jsonIn: JsObject): JsObject = {

@@ -2,13 +2,15 @@ package software.altitude.test.core.unit
 
 import org.scalatest.DoNotDiscover
 import org.scalatest.funsuite
-import org.scalatest.matchers.must.Matchers.{be, include}
+import org.scalatest.matchers.must.Matchers.be
+import org.scalatest.matchers.must.Matchers.include
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import play.api.libs.json.JsonNaming.SnakeCase
 import play.api.libs.json._
 import software.altitude.core.models.BaseModel
 import software.altitude.test.core.TestFocus
 
+import java.time.LocalDateTime
 import scala.language.implicitConversions
 
 
@@ -23,6 +25,8 @@ import scala.language.implicitConversions
   }
 
   case class TestModel(id: Option[String] = None,
+                       createdAt: Option[LocalDateTime] = None,
+                       updatedAt: Option[LocalDateTime] = None,
                        stringProp: String,
                        boolProp: Boolean,
                        intProp: Int) extends BaseModel {
@@ -34,11 +38,19 @@ import scala.language.implicitConversions
     TestModel(stringProp = "stringPropValue", boolProp = true, intProp = 2)
   }
 
-  test("Model JSON conversion", Focused) {
-    val obj = TestModel(stringProp = "stringPropValue", boolProp = true, intProp = 2)
+  test("Model JSON conversion") {
+    val obj = TestModel(
+      id = Some("idValue"),
+      createdAt = Some(LocalDateTime.now()),
+      stringProp = "stringPropValue",
+      boolProp = true,
+      intProp = 2)
+
+    // println(obj.toJson)
 
     val jsonObj = Json.toJson(obj)
-    jsonObj.toString() should include("string_prop\":\"stringPropValue\"")
+    jsonObj.toString() should include("\"string_prop\":\"stringPropValue\"")
+    jsonObj.toString() should include("\"created_at\":\"20")
 
     val objFromJson =  TestModel.fromJson(jsonObj)
     objFromJson.intProp should be(obj.intProp)

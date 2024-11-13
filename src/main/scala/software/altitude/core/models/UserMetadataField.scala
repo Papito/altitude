@@ -18,15 +18,15 @@ object UserMetadataField {
       id = (json \ Field.ID).asOpt[String],
       name = (json \ Field.MetadataField.NAME).as[String],
       fieldType = FieldType.withName((json \ Field.MetadataField.FIELD_TYPE).as[String])
-    ).withCoreAttr(json)
+    )
 }
 
 case class UserMetadataField(id: Option[String] = None,
                              name: String,
-                             fieldType: FieldType.Value) extends BaseModel {
+                             fieldType: FieldType.Value) extends BaseModel with NoDates {
   val nameLowercase: String = name.toLowerCase
 
-  override def toJson: JsObject = Json.obj(
+  val toJson: JsObject = Json.obj(
       Field.MetadataField.NAME -> name,
       Field.MetadataField.NAME_LC -> nameLowercase,
       Field.MetadataField.FIELD_TYPE -> fieldType.toString

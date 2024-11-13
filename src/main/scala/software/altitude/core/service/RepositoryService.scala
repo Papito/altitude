@@ -26,7 +26,7 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
       name = name,
       ownerAccountId = owner.persistedId,
       rootFolderId = BaseDao.genId,
-      fileStoreType = fileStoreType
+      fileStoreType = fileStoreType,
     )
 
     txManager.withTransaction[JsObject] {
@@ -35,7 +35,7 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
       // we must force the context to the new repository because following operations depend on this
       switchContextToRepository(repo)
 
-      logger.info(s"Creating repository [${repo}] system folders")
+      logger.info(s"Creating repository [$repo] system folders")
 
       val rootFolder = Folder(
         id = Some(contextRepo.rootFolderId),
@@ -66,9 +66,11 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
     }
 
     val repo = super.getById(id)
+
     AltitudeServletContext.repositoriesById += (id -> repo)
     repo
   }
+
   def switchContextToRepository(repo: Repository): Unit = {
     RequestContext.repository.value = Some(repo)
   }

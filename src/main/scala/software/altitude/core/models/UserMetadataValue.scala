@@ -1,23 +1,20 @@
 package software.altitude.core.models
 
+import play.api.libs.json.JsonNaming.SnakeCase
 import play.api.libs.json._
 
 import java.util.Base64
 import scala.language.implicitConversions
 
 object UserMetadataValue {
-  implicit def fromJson(json: JsValue): UserMetadataValue = {
-    UserMetadataValue(
-      id = (json \ Field.ID).asOpt[String],
-      value = (json \ Field.VALUE).as[String]
-    )
-  }
-
-  def apply(value: String): UserMetadataValue = UserMetadataValue(id = None, value = value)
+  implicit val config: JsonConfiguration = JsonConfiguration(SnakeCase)
+  implicit val writes: OWrites[UserMetadataValue] = Json.writes[UserMetadataValue]
+  implicit val reads: Reads[UserMetadataValue] = Json.reads[UserMetadataValue]
+  implicit def fromJson(json: JsValue): UserMetadataValue = Json.fromJson[UserMetadataValue](json).get
 }
 
 case class UserMetadataValue(id: Option[String] = None,
-                             value: String) extends BaseModel {
+                             value: String) extends BaseModel with NoDates {
   private val md = java.security.MessageDigest.getInstance("SHA-1")
   val checksum: String = Base64.getEncoder.encodeToString(
     md.digest(
@@ -35,13 +32,7 @@ case class UserMetadataValue(id: Option[String] = None,
     case _ => false
   }
 
-  override def toJson: JsObject = Json.obj(
-    Field.VALUE -> value,
-    Field.ID -> {id match {
-      case None => JsNull
-      case _ => JsString(id.get)
-    }}
-  )
+  val toJson: JsObject = Json.toJson(this).as[JsObject]
 
   override def hashCode: Int = super.hashCode
 }

@@ -15,7 +15,7 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val mergedIntoLabel = rec(Field.Person.MERGED_INTO_LABEL)
 
-    val model = Person(
+    Person(
       id = Option(rec(Field.ID).asInstanceOf[String]),
       // To placate Postgres Sequences, which return Longs
       label = rec(Field.Person.LABEL).getClass match {
@@ -38,8 +38,6 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
       numOfFaces = rec(Field.Person.NUM_OF_FACES).asInstanceOf[Int],
       isHidden = getBooleanField(rec(Field.Person.IS_HIDDEN))
     )
-
-    addCoreAttrs(model, rec)
   }
 
   override def updateMergedWithIds(person: Person, newId: String): Person = {

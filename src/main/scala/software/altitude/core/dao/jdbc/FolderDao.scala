@@ -11,7 +11,7 @@ abstract class FolderDao(override val config: Config) extends BaseDao with softw
   override final val tableName = "folder"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
-    val model = Folder(
+    Folder(
       id = Option(rec(Field.ID).asInstanceOf[String]),
       name = rec(Field.Folder.NAME).asInstanceOf[String],
       parentId = rec(Field.Folder.PARENT_ID).asInstanceOf[String],
@@ -19,7 +19,6 @@ abstract class FolderDao(override val config: Config) extends BaseDao with softw
       numOfAssets = rec(Field.Folder.NUM_OF_ASSETS).asInstanceOf[Int],
       numOfChildren = rec(Field.Folder.NUM_OF_CHILDREN).asInstanceOf[Int]
     )
-    addCoreAttrs(model, rec)
   }
 
   override def add(jsonIn: JsObject): JsObject = {

@@ -12,12 +12,12 @@ import software.altitude.core.NotFoundException
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.querybuilder.SqlQuery
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
-import software.altitude.core.models.BaseModel
 import software.altitude.core.models.Field
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 
+import java.time.LocalDateTime
 import java.util.UUID
 import scala.jdk.CollectionConverters._
 import scala.reflect.ClassTag
@@ -252,8 +252,5 @@ abstract class BaseDao {
    */
   protected def makeModel(rec: Map[String, AnyRef]): JsObject
 
-  /**
-   *  Given a model and an SQL record, calculate and set properties common to most models
-   */
-  protected def addCoreAttrs(model: BaseModel, rec: Map[String, AnyRef]): model.type
+  protected def getDateTimeField(value: Option[AnyRef]): Option[LocalDateTime]
 }

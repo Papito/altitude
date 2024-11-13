@@ -2,32 +2,38 @@ package software.altitude.core.models
 
 import org.apache.commons.codec.binary.Base64
 import play.api.libs.json.JsObject
+import play.api.libs.json.JsSuccess
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
 
 import scala.language.implicitConversions
 
 object MimedAssetData {
-  implicit def fromJson(json: JsValue): MimedAssetData = {
+  implicit val reads: Reads[MimedAssetData] = (json: JsValue) => {
     val data: String = (json \ Field.MimedData.DATA).as[String]
-
-    MimedAssetData(
+    JsSuccess(MimedAssetData(
       assetId = (json \ Field.MimedData.ASSET_ID).as[String],
       mimeType = (json \ Field.MimedData.MIME_TYPE).as[String],
       data = Base64.decodeBase64(data)
+    ))
+  }
+
+  implicit val writes: OWrites[MimedAssetData] = (mimedAssetData: MimedAssetData) => {
+    Json.obj(
+      Field.MimedData.ASSET_ID -> mimedAssetData.assetId,
+      Field.MimedData.MIME_TYPE -> mimedAssetData.mimeType,
+      Field.MimedData.DATA -> Base64.encodeBase64String(mimedAssetData.data)
     )
   }
+
+  implicit def fromJson(json: JsValue): MimedAssetData = Json.fromJson[MimedAssetData](json).get
 }
 
 case class MimedAssetData(assetId: String,
                           mimeType: String,
-                          data: Array[Byte]) extends BaseModel with NoId {
+                          data: Array[Byte]) extends BaseModel with NoId with NoDates {
 
-  override def toJson: JsObject = {
-    Json.obj(
-      Field.MimedData.ASSET_ID -> assetId,
-      Field.MimedData.MIME_TYPE -> mimeType,
-      Field.MimedData.DATA -> Base64.encodeBase64String(data)
-    )
-  }
+  val toJson: JsObject = Json.toJson(this).as[JsObject]
 }
