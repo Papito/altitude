@@ -46,7 +46,7 @@ case class Face(id: Option[String] = None,
     floatMat
   }
 
-  val toJson: JsObject = Json.toJson(this).as[JsObject]
+  lazy val toJson: JsObject = Json.toJson(this).as[JsObject]
 
   override def toString: String =
     s"FACE $id. Label: $personLabel. Score: $detectionScore, ${width}x$height at ($x1, $y1)"

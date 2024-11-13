@@ -22,8 +22,7 @@ abstract class BaseModel {
     }
   }
 
-  // implicit converter to go from JSON to model
-  implicit def toJson: JsObject
+  def toJson: JsObject
 
   override def toString: String = toJson.toString()
 }

@@ -7,6 +7,7 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import software.altitude.core.FieldConst
 
 import scala.language.implicitConversions
 
@@ -15,7 +16,7 @@ object MimedFaceData {
   final val FILE_EXTENSION = "png"
 
   implicit val reads: Reads[MimedFaceData] = (json: JsValue) => {
-    val data: String = (json \ Field.MimedData.DATA).as[String]
+    val data: String = (json \ FieldConst.MimedData.DATA).as[String]
     JsSuccess(MimedFaceData(
       data = Base64.decodeBase64(data)
     ))
@@ -23,8 +24,8 @@ object MimedFaceData {
 
   implicit val writes: OWrites[MimedFaceData] = (mimedFaceData: MimedFaceData) => {
     Json.obj(
-      Field.MimedData.MIME_TYPE -> mimedFaceData.mimeType,
-      Field.MimedData.DATA -> Base64.encodeBase64String(mimedFaceData.data)
+      FieldConst.MimedData.MIME_TYPE -> mimedFaceData.mimeType,
+      FieldConst.MimedData.DATA -> Base64.encodeBase64String(mimedFaceData.data)
     )
   }
 
@@ -34,5 +35,5 @@ object MimedFaceData {
 case class MimedFaceData(data: Array[Byte]) extends BaseModel with NoId with NoDates {
   val mimeType: String = MimedFaceData.MIME_TYPE
 
-  val toJson: JsObject = Json.toJson(this).as[JsObject]
+  lazy val toJson: JsObject = Json.toJson(this).as[JsObject]
 }

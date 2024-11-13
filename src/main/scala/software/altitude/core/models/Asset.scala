@@ -45,7 +45,7 @@ case class Asset(id: Option[String] = None,
                  updatedAt: Option[LocalDateTime] = None,
                 ) extends BaseModel {
 
-  val toJson: JsObject = Json.toJson(this).as[JsObject]
+  lazy val toJson: JsObject = Json.toJson(this).as[JsObject]
 
   override def toString: String =
     s"Asset: [$id] Recycled: [$isRecycled] Triaged: [$isTriaged] Type: [${assetType.mediaType}:${assetType.mediaSubtype}]"

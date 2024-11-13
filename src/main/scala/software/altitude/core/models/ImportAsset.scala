@@ -8,7 +8,7 @@ class ImportAsset(val fileName: String,
                   val metadata: UserMetadata)
   extends BaseModel with NoId with NoDates {
 
-  override val toJson: JsObject = Json.obj(
+  lazy val toJson: JsObject = Json.obj(
     "fileName" -> fileName,
   )
 }

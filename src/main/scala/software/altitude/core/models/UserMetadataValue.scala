@@ -31,7 +31,7 @@ case class UserMetadataValue(id: Option[String] = None,
     case _ => false
   }
 
-  val toJson: JsObject = Json.toJson(this).as[JsObject]
+  lazy val toJson: JsObject = Json.toJson(this).as[JsObject]
 
   override def hashCode: Int = super.hashCode
 }

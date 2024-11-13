@@ -22,7 +22,7 @@ case class User(id: Option[String] = None,
                 accountType: AccountType,
                 lastActiveRepoId: Option[String] = None) extends BaseModel with NoDates {
 
-  val toJson: JsObject = Json.toJson(this).as[JsObject]
+  lazy val toJson: JsObject = Json.toJson(this).as[JsObject]
 
   override def toString: String = s"<user> ${id.getOrElse("NO ID")}, email: $email, accountType: $accountType"
 

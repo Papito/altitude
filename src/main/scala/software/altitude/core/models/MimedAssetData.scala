@@ -7,24 +7,25 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import software.altitude.core.FieldConst
 
 import scala.language.implicitConversions
 
 object MimedAssetData {
   implicit val reads: Reads[MimedAssetData] = (json: JsValue) => {
-    val data: String = (json \ Field.MimedData.DATA).as[String]
+    val data: String = (json \ FieldConst.MimedData.DATA).as[String]
     JsSuccess(MimedAssetData(
-      assetId = (json \ Field.MimedData.ASSET_ID).as[String],
-      mimeType = (json \ Field.MimedData.MIME_TYPE).as[String],
+      assetId = (json \ FieldConst.MimedData.ASSET_ID).as[String],
+      mimeType = (json \ FieldConst.MimedData.MIME_TYPE).as[String],
       data = Base64.decodeBase64(data)
     ))
   }
 
   implicit val writes: OWrites[MimedAssetData] = (mimedAssetData: MimedAssetData) => {
     Json.obj(
-      Field.MimedData.ASSET_ID -> mimedAssetData.assetId,
-      Field.MimedData.MIME_TYPE -> mimedAssetData.mimeType,
-      Field.MimedData.DATA -> Base64.encodeBase64String(mimedAssetData.data)
+      FieldConst.MimedData.ASSET_ID -> mimedAssetData.assetId,
+      FieldConst.MimedData.MIME_TYPE -> mimedAssetData.mimeType,
+      FieldConst.MimedData.DATA -> Base64.encodeBase64String(mimedAssetData.data)
     )
   }
 
@@ -35,5 +36,5 @@ case class MimedAssetData(assetId: String,
                           mimeType: String,
                           data: Array[Byte]) extends BaseModel with NoId with NoDates {
 
-  val toJson: JsObject = Json.toJson(this).as[JsObject]
+  lazy val toJson: JsObject = Json.toJson(this).as[JsObject]
 }

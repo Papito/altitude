@@ -22,7 +22,7 @@ case class Person(id: Option[String] = None,
                   numOfFaces: Int = 0,
                   isHidden: Boolean = false) extends BaseModel with NoDates {
 
-  val toJson: JsObject = Json.toJson(this).as[JsObject]
+  lazy val toJson: JsObject = Json.toJson(this).as[JsObject]
 
   private val _faces: mutable.TreeSet[Face] = mutable.TreeSet[Face]()
 

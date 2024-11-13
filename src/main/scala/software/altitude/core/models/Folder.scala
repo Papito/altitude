@@ -27,7 +27,7 @@ case class Folder(id: Option[String] = None,
 
   val nameLowercase: String = name.toLowerCase
 
-  val toJson: JsObject = Json.toJson(this).as[JsObject]
+  lazy val toJson: JsObject = Json.toJson(this).as[JsObject]
 
   override def canEqual(other: Any): Boolean = other.isInstanceOf[Folder]
 

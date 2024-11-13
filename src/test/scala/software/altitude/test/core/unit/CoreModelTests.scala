@@ -31,7 +31,7 @@ import scala.language.implicitConversions
                        boolProp: Boolean,
                        intProp: Int) extends BaseModel {
 
-    val toJson: JsObject = Json.toJson(this).as[JsObject]
+    lazy val toJson: JsObject = Json.toJson(this).as[JsObject]
   }
 
   test("Create a model") {

@@ -14,5 +14,5 @@ object Stat {
 }
 
 case class Stat(dimension: String, dimVal: Int) {
-  val toJson: JsObject = Json.toJson(this).as[JsObject]
+  lazy val toJson: JsObject = Json.toJson(this).as[JsObject]
 }

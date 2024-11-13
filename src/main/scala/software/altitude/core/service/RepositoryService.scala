@@ -3,10 +3,10 @@ package software.altitude.core.service
 import play.api.libs.json.JsObject
 import software.altitude.core.Altitude
 import software.altitude.core.AltitudeServletContext
+import software.altitude.core.FieldConst
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.RepositoryDao
 import software.altitude.core.dao.jdbc.BaseDao
-import software.altitude.core.models.Field
 import software.altitude.core.models.Folder
 import software.altitude.core.models.Repository
 import software.altitude.core.models.Stats
@@ -40,7 +40,7 @@ class RepositoryService(val app: Altitude) extends BaseService[Repository] {
       val rootFolder = Folder(
         id = Some(contextRepo.rootFolderId),
         parentId = contextRepo.rootFolderId,
-        name = Field.Folder.Name.ROOT,
+        name = FieldConst.Folder.Name.ROOT,
       )
 
       app.service.folder.add(rootFolder)

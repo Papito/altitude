@@ -27,5 +27,5 @@ case class UserMetadataField(id: Option[String] = None,
                              fieldType: FieldType.Value) extends BaseModel with NoDates {
   val nameLowercase: String = name.toLowerCase
 
-  val toJson: JsObject = Json.toJson(this).as[JsObject]
+  lazy val toJson: JsObject = Json.toJson(this).as[JsObject]
 }

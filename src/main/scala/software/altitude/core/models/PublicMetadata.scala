@@ -19,5 +19,5 @@ case class PublicMetadata(deviceModel: Option[String] = None,
                           dateTimeOriginal: Option[String] = None)
   extends BaseModel with NoId with NoDates {
 
-  val toJson: JsObject = Json.toJson(this).as[JsObject]
+  lazy val toJson: JsObject = Json.toJson(this).as[JsObject]
 }

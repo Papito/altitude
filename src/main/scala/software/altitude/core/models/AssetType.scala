@@ -20,7 +20,7 @@ case class AssetType(mediaType: String,
                      mime: String
                     ) extends BaseModel with NoId with NoDates {
 
-  val toJson: JsObject = Json.toJson(this).as[JsObject]
+  lazy val toJson: JsObject = Json.toJson(this).as[JsObject]
 
   override def equals(other: Any): Boolean = other match {
     case that: AssetType =>

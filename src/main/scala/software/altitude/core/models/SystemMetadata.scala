@@ -17,7 +17,7 @@ object SystemMetadata {
 }
 
 case class SystemMetadata(version: Int, isInitialized: Boolean) {
-  val toJson: JsObject = Json.toJson(this).as[JsObject]
+  lazy val toJson: JsObject = Json.toJson(this).as[JsObject]
 
   override def toString: String = s"<system> version=$version, initialized=$isInitialized"
 }

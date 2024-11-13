@@ -4,7 +4,6 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json._
 import software.altitude.core.dao.AssetDao
 import software.altitude.core.dao.UserMetadataFieldDao
-import software.altitude.core.models.Field
 import software.altitude.core.models._
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.Query
@@ -28,7 +27,7 @@ class UserMetadataService(val app: Altitude) {
 
     txManager.withTransaction[UserMetadataField] {
       val existing = metadataFieldDao.query(new Query(params = Map(
-        Field.MetadataField.NAME_LC -> metadataField.nameLowercase
+        FieldConst.MetadataField.NAME_LC -> metadataField.nameLowercase
       )).withRepository())
 
       if (existing.nonEmpty) {
@@ -371,11 +370,11 @@ class UserMetadataService(val app: Altitude) {
 
       def toJson(field: UserMetadataField, mdVals: Set[UserMetadataValue]): JsObject = {
         Json.obj(
-          Field.MetadataField.FIELD -> (field.toJson -
-            Field.UPDATED_AT -
-            Field.CREATED_AT -
-            Field.MetadataField.NAME_LC),
-          Field.VALUES -> JsArray(mdVals.toSeq.map(_.toJson))
+          FieldConst.MetadataField.FIELD -> (field.toJson -
+            FieldConst.UPDATED_AT -
+            FieldConst.CREATED_AT -
+            FieldConst.MetadataField.NAME_LC),
+          FieldConst.VALUES -> JsArray(mdVals.toSeq.map(_.toJson))
         )
       }
 
@@ -394,8 +393,8 @@ class UserMetadataService(val app: Altitude) {
       }
 
       val sorted = (res ++ emptyFields).sortWith{ (left, right) =>
-        val leftFieldName: String = (left \ Field.MetadataField.FIELD \ Field.MetadataField.NAME).as[String]
-        val rightFieldName: String = (right \ Field.MetadataField.FIELD \ Field.MetadataField.NAME).as[String]
+        val leftFieldName: String = (left \ FieldConst.MetadataField.FIELD \ FieldConst.MetadataField.NAME).as[String]
+        val rightFieldName: String = (right \ FieldConst.MetadataField.FIELD \ FieldConst.MetadataField.NAME).as[String]
         leftFieldName.compareToIgnoreCase(rightFieldName) < 1
       }
 
