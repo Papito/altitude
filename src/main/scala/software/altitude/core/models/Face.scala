@@ -11,9 +11,7 @@ import scala.language.implicitConversions
 
 object Face {
   implicit val config: JsonConfiguration = JsonConfiguration(SnakeCase)
-  implicit val writes: OWrites[Face] = Json.writes[Face]
-  implicit val reads: Reads[Face] = Json.reads[Face]
-
+  implicit val format: OFormat[Face] = Json.format[Face]
   implicit def fromJson(json: JsValue): Face = Json.fromJson[Face](json).get
 
   // For sorting faces by detection score automatically, highest score first

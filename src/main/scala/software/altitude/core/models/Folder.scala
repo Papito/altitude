@@ -8,8 +8,7 @@ import scala.language.implicitConversions
 
 object Folder {
   implicit val config: JsonConfiguration = JsonConfiguration(SnakeCase)
-  implicit val writes: OWrites[Folder] = Json.writes[Folder]
-  implicit val reads: Reads[Folder] = Json.reads[Folder]
+  implicit val format: OFormat[Folder] = Json.format[Folder]
   implicit def fromJson(json: JsValue): Folder = Json.fromJson[Folder](json).get
 }
 

@@ -8,9 +8,7 @@ import scala.language.implicitConversions
 
 object Repository {
   implicit val config: JsonConfiguration = JsonConfiguration(SnakeCase)
-  implicit val writes: OWrites[Repository] = Json.writes[Repository]
-  implicit val reads: Reads[Repository] = Json.reads[Repository]
-
+  implicit val format: OFormat[Repository] = Json.format[Repository]
   implicit def fromJson(json: JsValue): Repository = Json.fromJson[Repository](json).get
 }
 

@@ -8,9 +8,7 @@ import scala.language.implicitConversions
 
 object Person {
   implicit val config: JsonConfiguration = JsonConfiguration(SnakeCase)
-  implicit val writes: OWrites[Person] = Json.writes[Person]
-  implicit val reads: Reads[Person] = Json.reads[Person]
-
+  implicit val format: OFormat[Person] = Json.format[Person]
   implicit def fromJson(json: JsValue): Person = Json.fromJson[Person](json).get
 }
 

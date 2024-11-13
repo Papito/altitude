@@ -8,9 +8,8 @@ import scala.language.implicitConversions
 
 object UserMetadataValue {
   implicit val config: JsonConfiguration = JsonConfiguration(SnakeCase)
-  implicit val writes: OWrites[UserMetadataValue] = Json.writes[UserMetadataValue]
-  implicit val reads: Reads[UserMetadataValue] = Json.reads[UserMetadataValue]
-  implicit def fromJson(json: JsValue): UserMetadataValue = Json.fromJson[UserMetadataValue](json).get
+  implicit val format: OFormat[UserMetadataValue] = Json.format[UserMetadataValue]
+  implicit def fromJson(json: JsValue): UserMetadataField = Json.fromJson[UserMetadataField](json).get
 }
 
 case class UserMetadataValue(id: Option[String] = None,

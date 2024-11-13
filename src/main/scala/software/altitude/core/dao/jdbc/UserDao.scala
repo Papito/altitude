@@ -36,7 +36,7 @@ abstract class UserDao(override val config: Config) extends BaseDao with softwar
       id,
       user.email,
       user.name,
-      user.accountType,
+      user.accountType.toString,
       passwordHash,
       user.lastActiveRepoId.orNull
     )

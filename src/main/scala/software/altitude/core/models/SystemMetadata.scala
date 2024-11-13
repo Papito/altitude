@@ -1,19 +1,13 @@
 package software.altitude.core.models
 
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsValue
-import play.api.libs.json.Json
-import play.api.libs.json.JsonConfiguration
+import play.api.libs.json.{JsObject, JsValue, Json, JsonConfiguration, OFormat, OWrites, Reads}
 import play.api.libs.json.JsonNaming.SnakeCase
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
 
 import scala.language.implicitConversions
 
 object SystemMetadata {
   implicit val config: JsonConfiguration = JsonConfiguration(SnakeCase)
-  implicit val writes: OWrites[SystemMetadata] = Json.writes[SystemMetadata]
-  implicit val reads: Reads[SystemMetadata] = Json.reads[SystemMetadata]
+  implicit val format: OFormat[SystemMetadata] = Json.format[SystemMetadata]
 
   implicit def fromJson(json: JsValue): SystemMetadata = Json.fromJson[SystemMetadata](json).get
 }

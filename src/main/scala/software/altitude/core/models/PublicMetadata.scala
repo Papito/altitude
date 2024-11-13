@@ -7,8 +7,7 @@ import scala.language.implicitConversions
 
 object PublicMetadata {
   implicit val config: JsonConfiguration = JsonConfiguration(SnakeCase)
-  implicit val writes: OWrites[PublicMetadata] = Json.writes[PublicMetadata]
-  implicit val reads: Reads[PublicMetadata] = Json.reads[PublicMetadata]
+  implicit val format: OFormat[PublicMetadata] = Json.format[PublicMetadata]
   implicit def fromJson(json: JsValue): PublicMetadata = Json.fromJson[PublicMetadata](json).get
 }
 

@@ -18,9 +18,7 @@ object FieldType extends Enumeration {
 
 object UserMetadataField {
   implicit val config: JsonConfiguration = JsonConfiguration(SnakeCase)
-  implicit val writes: OWrites[UserMetadataField] = Json.writes[UserMetadataField]
-  implicit val reads: Reads[UserMetadataField] = Json.reads[UserMetadataField]
-
+  implicit val format: OFormat[UserMetadataField] = Json.format[UserMetadataField]
   implicit def fromJson(json: JsValue): UserMetadataField = Json.fromJson[UserMetadataField](json).get
 }
 
