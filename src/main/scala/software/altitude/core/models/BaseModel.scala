@@ -1,6 +1,5 @@
 package software.altitude.core.models
 import play.api.libs.json._
-import software.altitude.core.util.Util
 
 import java.time.LocalDateTime
 import scala.language.implicitConversions
@@ -25,26 +24,6 @@ abstract class BaseModel {
 
   // implicit converter to go from JSON to model
   implicit def toJson: JsObject
-
-  /**
-   * Returns core JSON attributes that all models should have
-    */
-  protected def coreJsonAttrs: JsObject = JsObject(Map(
-    Field.ID -> {id match {
-      case None => JsNull
-      case _ => JsString(id.get)
-    }},
-
-    Field.CREATED_AT -> {createdAt match {
-      case None => JsNull
-      case _ => JsString(Util.localDateTimeToString(createdAt))
-    }},
-
-    Field.UPDATED_AT -> {updatedAt match {
-      case None => JsNull
-      case _ => JsString(Util.localDateTimeToString(updatedAt))
-    }}
-  ).toSeq)
 
   override def toString: String = toJson.toString()
 }

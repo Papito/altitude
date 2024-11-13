@@ -22,7 +22,7 @@ case class Repository(id: Option[String] = None,
                       updatedAt: Option[LocalDateTime] = None,
                      ) extends BaseModel {
 
-  val toJson: JsObject = Json.toJson(this).as[JsObject] ++ coreJsonAttrs
+  val toJson: JsObject = Json.toJson(this).as[JsObject]
 
   override def toString: String = s"<repo> ${id.getOrElse("NO ID")}: $name"
 }

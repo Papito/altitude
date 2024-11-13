@@ -1,6 +1,7 @@
 package software.altitude.core.models
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.Format
+import play.api.libs.json.Json
 
 object AccountType extends Enumeration {
   type AccountType = Value

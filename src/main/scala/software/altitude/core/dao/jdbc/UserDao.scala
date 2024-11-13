@@ -3,8 +3,9 @@ package software.altitude.core.dao.jdbc
 import com.typesafe.config.Config
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import software.altitude.core.models.AccountType.AccountType
-import software.altitude.core.models.{AccountType, Field, User}
+import software.altitude.core.models.AccountType
+import software.altitude.core.models.Field
+import software.altitude.core.models.User
 
 abstract class UserDao(override val config: Config) extends BaseDao with software.altitude.core.dao.UserDao {
   override final val tableName = "account"
