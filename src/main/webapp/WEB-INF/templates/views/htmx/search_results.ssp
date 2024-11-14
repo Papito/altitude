@@ -109,7 +109,7 @@
     </script>
 
     <div class="grid">
-        ${include("results_grid.ssp")}
+        <% include("results_grid.ssp") %>
     </div>
 
     <script lang="javascript">
