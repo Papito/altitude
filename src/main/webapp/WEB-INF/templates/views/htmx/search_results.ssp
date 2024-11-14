@@ -13,6 +13,7 @@
 
     #assets .cell img {
         display: block;
+        cursor: pointer;
     }
 
     #assets .grid {
