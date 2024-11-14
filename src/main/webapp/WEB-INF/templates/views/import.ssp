@@ -38,7 +38,7 @@
 
 </head>
 
-#import(software.altitude.core.RequestContext)
+<% import software.altitude.core.RequestContext %>
 
 <body>
 

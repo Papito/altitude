@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-#import(software.altitude.core.Api)
-#import(software.altitude.core.AltitudeServletContext)
-#import(software.altitude.core.RequestContext)
+<% import software.altitude.core.Api %>
+<% import software.altitude.core.AltitudeServletContext %>
+<% import software.altitude.core.RequestContext %>
 
 <html lang="en">
 <head>

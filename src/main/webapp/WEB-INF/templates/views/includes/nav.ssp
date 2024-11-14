@@ -1,5 +1,5 @@
-#import(software.altitude.core.Api)
-#import(software.altitude.core.RequestContext)
+<% import software.altitude.core.Api %>
+<% import software.altitude.core.RequestContext %>
 
 <style>
     nav {
