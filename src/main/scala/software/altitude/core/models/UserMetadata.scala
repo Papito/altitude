@@ -1,3 +1,28 @@
+/*
+_
+_._ _..._ .-',     _.._(`))
+'-. `     '  /-._.-'    ',/
+)         \            '.
+/ _    _    |             \
+|  a    a    /              |
+\   .-.                     ;
+'-('' ).-'       ,'       ;
+'-;           |      .'
+\           \    /
+| 7  .__  _.-\   \
+  | |  |  ``/  /`  /
+/,_|  |   /,_/   /
+/,_/      '`-'
+
+SAFETY PIG HAS ARRIVED
+
+THIS FILE is the first draft of user-defined metadata system. It may be overengineered and
+unnecessarily complex, but since this is only implemented against tests, the only
+way to flesh it out is to actually build the user-facing feature.
+
+Regard this code as for reference use only in the meantime.
+
+*/
 package software.altitude.core.models
 
 import play.api.libs.json._
