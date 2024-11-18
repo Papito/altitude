@@ -107,7 +107,7 @@
         const mergeSourceId = event.detail["${ Api.Field.Person.MERGE_SOURCE_ID}"]
         const mergeDestId = event.detail["${ Api.Field.Person.MERGE_DEST_ID}"]
 
-        console.log("Person " + mergeSourceId + " dragon dropped into " + mergeDestId)
+        console.debug("Person " + mergeSourceId + " dragon dropped into " + mergeDestId)
 
         if (mergeSourceId === mergeDestId) {
             return
@@ -126,7 +126,7 @@
         const mergeSourceId = event.detail["${ Api.Field.Person.MERGE_SOURCE_ID}"]
         const mergeDestId = event.detail["${ Api.Field.Person.MERGE_DEST_ID}"]
 
-        console.log("Person " + mergeSourceId + " MERGED into " + mergeDestId)
+        console.debug("Person " + mergeSourceId + " MERGED into " + mergeDestId)
 
         // remove the source person from the DOM
         htmx.find("#person-" + mergeSourceId).remove()

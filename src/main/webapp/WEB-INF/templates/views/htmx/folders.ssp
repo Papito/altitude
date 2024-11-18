@@ -2,6 +2,7 @@
 <% import software.altitude.core.Const %>
 <% import software.altitude.core.models.Folder %>
 <% import software.altitude.core.Api %>
+
 <%@ val rootFolder: Folder %>
 
 <style>
@@ -143,18 +144,20 @@
     selectTab("explorer", "foldersTab")
 </script>
 
-<!-- Before/after HTMX request listeners -->
 <script type="module">
-    import {Const} from "/js/constants.js";
-    import {Folder} from "/js/models.js";
-
     /**
+     * Before/after HTMX request listeners
+     * ===============
+     *
      * This handles multiple "before request" scenarios, short-circuiting the request
      * if necessary.
      *
      * Some actions require a network call (show menu, expand folders)
-     * but other do not (close menu, collapse folders).
+     * but others do not (close menu, collapse folders).
      */
+    import {Const} from "/js/constants.js";
+    import {Folder} from "/js/models.js";
+
     htmx.find("#rootFolderList").addEventListener('htmx:beforeRequest', function(evt) {
         console.debug(evt.detail.pathInfo.requestPath)
         /**
@@ -267,7 +270,7 @@
             const status = response['htmx-internal-data'].xhr.status
 
             if (status === 200) {
-                // IRREGARDLESS of the target folder state, we should declutter the visual state of the moved folder
+                // Regardless of the target folder state, we should de-clutter the visual state of the moved folder
                 movedFolder.closeContextMenu()
                 movedFolder.clearChildren()
 
@@ -334,13 +337,16 @@
 
         showSuccessSnackBar("Folder \"" + folder.name() + "\" deleted")
 
-        // Elegantly, without major commotion, pluck the folder from the DOM
+        // Without major commotion, pluck the folder from the DOM
         folder.remove()
     })
 </script>
 
-<!-- DRAGON DROP -->
 <script type="module">
+    /**
+     * DRAGON DROP
+     * ===============
+     */
     import {Const} from "/js/constants.js"
     import interact from "https://cdn.interactjs.io/v1.9.20/interactjs/index.js"
 
