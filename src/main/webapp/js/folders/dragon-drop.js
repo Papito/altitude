@@ -24,7 +24,7 @@ function dragged(e) {
     e.target.removeAttribute("data-y")
 }
 
-interact('#explorer .draggable')
+interact('#rootFolderList .draggable')
     .draggable({
         // enable inertial throwing
         inertia: true,
@@ -72,7 +72,7 @@ function dragMoveListener (event) {
 // enable a draggable to be dropped into this
 interact('#rootFolderList .dropzone').dropzone({
     // only accept elements matching this CSS selector
-    accept: '#explorer .draggable',
+    accept: '#rootFolderList .draggable',
     // going above seems to break the dropzone
     overlap: 0.50,
 
@@ -124,7 +124,7 @@ interact('#rootFolderList .dropzone').dropzone({
     }
 })
 
-interact('#explorer .drag-drop')
+interact('#rootFolderList .drag-drop')
     .draggable({
         inertia: true,
         modifiers: [
