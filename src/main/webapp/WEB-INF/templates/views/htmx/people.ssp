@@ -10,6 +10,12 @@
         margin: 3px;
         border: var(--result-border);
         border-radius: 5px;
+        display: grid;
+        width:<%= software.altitude.core.service.FaceDetectionService.faceDetectionBoxPx + 60 %>px;
+        height: <%= software.altitude.core.service.FaceDetectionService.faceDetectionBoxPx + 40 %>px;
+        place-items: center;
+        touch-action: none;
+        row-gap: var(--control-vertical-space);
     }
 
     #people .cell img {
@@ -23,15 +29,6 @@
         flex-wrap: wrap;
         flex-direction: row;
         justify-content: center;
-    }
-
-    #people .cell {
-        display: grid;
-        width:<%= software.altitude.core.service.FaceDetectionService.faceDetectionBoxPx + 60 %>px;
-        height: <%= software.altitude.core.service.FaceDetectionService.faceDetectionBoxPx + 40 %>px;
-        place-items: center;
-        touch-action: none;
-        row-gap: var(--control-vertical-space);
     }
 
     #people .cell a {
@@ -62,7 +59,7 @@
         <div class="grid">
             #for (person <- people)
             <div id="person-${person.persistedId}"
-                 class="cell draggable drag-drop dropzone"
+                 class="cell drag-drop dropzone"
                  person-id="${person.persistedId}">
                 <div>
                     <a href="#"

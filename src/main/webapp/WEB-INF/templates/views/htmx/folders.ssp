@@ -142,12 +142,12 @@
     import {selectTab} from "/js/common/navigation.js";
     import {context} from "/js/context.js"
 
+    selectTab("explorer", "foldersTab")
+
     /**
      * Set the necessary context for script includes
      */
     context.repoId = "${ RequestContext.getRepository.persistedId }"
-
-    selectTab("explorer", "foldersTab")
 </script>
 
 <script type="module" src="/js/folders/htmx.js"></script>

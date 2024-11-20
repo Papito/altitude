@@ -9,6 +9,7 @@
     #assets .cell {
         margin: 3px;
         border: var(--result-border);
+        touch-action: none;
     }
 
     #assets .cell img {
@@ -37,18 +38,30 @@
         <% include("../htmx/results_grid.ssp") %>
     </div>
 
-    <script type="module">
-        import {observer} from "/js/search-results/infinite-scroll.js";
-
-        /**
-         * Observe every new cell element in the grid for lazy loading/unloading
-         */
-        document.querySelector('#assets .grid').addEventListener('htmx:load', function(evt) {
-            const imgEl = evt.target.querySelector("img")
-            if (imgEl !== null) {
-                observer.observe(imgEl)
-            }
-        })
-
-    </script>
 </div>
+
+<!-- On load -->
+<script type="module">
+    import {selectTab} from "/js/common/navigation.js";
+    import {context} from "/js/context.js"
+    import {observer} from "/js/search-results/infinite-scroll.js";
+
+    selectTab("explorer", "foldersTab")
+
+    /**
+     * Observe every new cell element in the grid for lazy loading/unloading
+     */
+    document.querySelector('#assets .grid').addEventListener('htmx:load', function(evt) {
+        const imgEl = evt.target.querySelector("img")
+        if (imgEl !== null) {
+            observer.observe(imgEl)
+        }
+    })
+
+    /**
+     * Set the necessary context for script includes (below)
+     */
+    context.repoId = "${ RequestContext.getRepository.persistedId }"
+</script>
+
+<script type="module" src="/js/search-results/dragon-drop.js"></script>
