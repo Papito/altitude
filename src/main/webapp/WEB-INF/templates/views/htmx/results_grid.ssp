@@ -13,8 +13,6 @@
 
 <%--
 
-SEE: results_grid.ssp for the plumbing comments of infinite scroll and lazy-loading.
-
 NOTE: The FIRST set of results is server-loaded, this is what "isServerSideLoad" is here for.
       Those images do not have a "data-src" attribute and are NOT watched by the intersection observer
       (first batch is not lazy loaded or unloaded, they are static).

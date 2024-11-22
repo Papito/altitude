@@ -10,21 +10,12 @@
     <% include("includes/header_common.ssp") %>
 
     <style>
-        html, body {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        body {
-            flex: 1;
-        }
-
         #explorer {
             border-right: 1px solid var(--panel-border-color);
             box-shadow: var(--box-shadow);
             text-shadow: rgba(0,0,0,0.75) 0 1px;
             padding-top: var(--panel-padding);
+            height: 100%;
         }
 
         #explorerPanels {
@@ -43,22 +34,18 @@
             box-shadow: var(--box-shadow);
             text-shadow: rgba(0,0,0,0.75) 0 1px;
             overflow-y: scroll;
+            max-height: 100%;
             max-width: 100%;
         }
 
         #explorerPanelContent {
             overflow-y: auto;
-            max-height: 100%;
         }
 
         /* Resizable grid */
         .panes {
             touch-action: none;
             display: grid;
-        }
-
-        .panes-v {
-            height: 100%;
         }
 
         .pane {
@@ -154,11 +141,11 @@
     els(".panes").forEach(resizableGrid);
 </script>
 
-<main class="panes panes-v">
+<% include("includes/nav.ssp") %>
+
+<main>
     <!-- Modals, snackbars, etc-->
     <% include("includes/html_common.ssp") %>
-
-    <% include("includes/nav.ssp") %>
 
     <div id="explorer" class="pane panes panes-h">
         <div id="explorerPanels" class="pane panes panes-v">
@@ -194,6 +181,7 @@
                     </div>
 
                     <div id="explorerPanelContent" role="tabpanel" class="tab-content">
+                        <% include("includes/search_results.ssp") %>
                     </div>
 
                 </tab-container>
@@ -205,12 +193,11 @@
         </div>
     </div>
 
-    <footer>
-        <%= RequestContext.account.value.getOrElse("None") %>
-    </footer>
-
 </main>
 
+<footer>
+    <%= RequestContext.account.value.getOrElse("None") %>
+</footer>
 
 </body>
 </html>

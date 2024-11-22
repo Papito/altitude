@@ -6,28 +6,6 @@
     <% include("includes/header_common.ssp") %>
 
     <style>
-        body {
-            display: grid;
-            grid-template-rows: [header]  auto
-                        [content] 1fr
-                        [footer]  auto;
-            min-height: 100vh;
-        }
-
-        footer {
-            padding: 5px;
-            background: var(--background-secondary-color);
-            color: #fff;
-            bottom: 0;
-            display: grid;
-            font-size: .9em;
-            align-items: center;
-        }
-
-        #content {
-            height: 100%;
-        }
-
         #importOptions {
             padding-top: calc(var(--section-vertical-space) * 2);
             display: grid;
