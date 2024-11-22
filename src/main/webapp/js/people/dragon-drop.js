@@ -13,7 +13,7 @@ interact('#people .drag-drop')
                 endOnly: true,
             })
         ],
-        autoScroll: {container: document.getElementById('explorerPanelContent')},
+        autoScroll: {container: document.getElementById('contentNavigationPanel')},
         listeners: {
             move: dragMoveListener,
             end: dragged,

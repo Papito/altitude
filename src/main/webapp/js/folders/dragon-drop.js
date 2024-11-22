@@ -12,7 +12,7 @@ interact('#rootFolderList .drag-drop').draggable({
             endOnly: true,
         })
     ],
-    autoScroll: {container: document.getElementById('explorerPanelContent')},
+    autoScroll: {container: document.getElementById('contentNavigationPanel')},
 
     listeners: {
         move: dragMoveListener,
