@@ -37,10 +37,6 @@
 
     }
 
-    #people .draggable {
-        cursor: move;
-    }
-
     #people .drop-target {
         border-radius: 6px;
         background-color: var(--dnd-drop-target-color);

@@ -6,11 +6,26 @@
     <% include("includes/header_common.ssp") %>
 
     <style>
-
-        main {
+        body {
             display: grid;
-            grid-template-rows: max-content auto;
-            row-gap: var(--section-vertical-space);
+            grid-template-rows: [header]  auto
+                        [content] 1fr
+                        [footer]  auto;
+            min-height: 100vh;
+        }
+
+        footer {
+            padding: 5px;
+            background: var(--background-secondary-color);
+            color: #fff;
+            bottom: 0;
+            display: grid;
+            font-size: .9em;
+            align-items: center;
+        }
+
+        #content {
+            height: 100%;
         }
 
         #importOptions {
@@ -42,27 +57,31 @@
 
 <body>
 
-<div>
-    <% include("includes/nav.ssp") %>
-</div>
+<% include("includes/nav.ssp") %>
 
 <main>
-    <div id="importOptions">
-        <div id="browseForFiles">
-            <% include("htmx/upload_form.ssp") %>
-        </div>
-    </div>
-    <div id="importLog">
-        <div hx-ext="ws" ws-connect="/import/status?userId=${ RequestContext.getAccount.id.get }">
-            <div id="statusText"></div>
-        </div>
-    </div>
-</main>
+    <!-- Modals, snackbars, etc-->
+    <% include("includes/html_common.ssp") %>
 
+    <div id="content">
+        <div id="importOptions">
+            <div id="browseForFiles">
+                <% include("htmx/upload_form.ssp") %>
+            </div>
+        </div>
+        <div id="importLog">
+            <div hx-ext="ws" ws-connect="/import/status?userId=${ RequestContext.getAccount.id.get }">
+                <div id="statusText"></div>
+            </div>
+        </div>
+    </div>
+
+</main>
 
 <footer>
     <%= RequestContext.account.value.getOrElse("None") %>
 </footer>
+
 
 <script lang="js" type="module">
     import {highlightNav} from "/js/common/navigation.js";

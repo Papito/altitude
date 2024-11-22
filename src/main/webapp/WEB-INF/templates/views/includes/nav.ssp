@@ -18,7 +18,6 @@
         text-decoration: none;
         font-size: .9em;
         font-weight: bold;
-        font-family: var(--font);
         text-transform: uppercase;
     }
     nav .brand a {

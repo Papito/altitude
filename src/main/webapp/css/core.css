@@ -42,43 +42,28 @@
 
     /* For messages such as form validation and server response status */
     --message-background-color: #2f2e2e;
-    --font: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"
 }
 
 * {
+    margin: 0;
     box-sizing: border-box;
 }
 
-/*              */
-/* DEFAULT CORE */
-/*              */
+html, body {
+    height: 100vh;
+}
+
 body {
     font-size: 14px;
-    margin: 0;
     background-color: var(--background-color);
     color: #FFFFFF;
-    font-family: var(--font);
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    margin: 0;
 }
 
 footer {
     padding: 5px;
-    background: var(--background-secondary-color);
-    color: #fff;
-    bottom: 0;
-    display: grid;
     font-size: .9em;
-    align-items: center;
-}
-
-body {
-    display: grid;
-    grid-template-rows: [header]  auto
-                        [content] 1fr
-                        [footer]  40px;
-    min-height: 100vh;
-}
-
-footer {
     background: var(--background-secondary-color);
     color: #fff;
     bottom: 0;

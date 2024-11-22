@@ -10,16 +10,14 @@
     <% include("includes/header_common.ssp") %>
 
     <style>
-        body {
-            display: grid;
-            grid-template-rows: auto 1fr 40px;
+        html, body {
             height: 100vh;
-            margin: 0;
+            display: flex;
+            flex-direction: column;
         }
 
-        main {
-            height: 100%;
-            overflow: hidden;
+        body {
+            flex: 1;
         }
 
         #explorer {
@@ -29,7 +27,7 @@
             padding-top: var(--panel-padding);
         }
 
-        #explorerViews {
+        #explorerPanels {
             box-shadow: var(--box-shadow);
             text-shadow: rgba(0,0,0,0.75) 0 1px;
         }
@@ -48,132 +46,171 @@
             max-width: 100%;
         }
 
-        /* SPLIT */
-        .split.split-horizontal,
-        .gutter.gutter-horizontal {
-            height: 100%;
-            float: left;
-        }
-
-        .gutter {
-            background-color: transparent;
-            background-repeat: no-repeat;
-            background-position: 50%;
-        }
-
-        .gutter.gutter-vertical {
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
-            cursor: ns-resize;
-        }
-
-        .gutter.gutter-horizontal {
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
-            cursor: ew-resize;
-        }
-
-        .split {
+        #explorerPanelContent {
             overflow-y: auto;
-            overflow-x: hidden;
+            max-height: 100%;
         }
 
+        /* Resizable grid */
+        .panes {
+            touch-action: none;
+            display: grid;
+        }
+
+        .panes-v {
+            height: 100%;
+        }
+
+        .pane {
+            position: relative;
+            overflow-y: hidden;
+        }
+        .gutter {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            z-index: 3;
+            background: transparent;
+        }
+
+        .panes-h > .pane > .gutter {
+            cursor: col-resize;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+        }
+
+        .panes-v > .pane > .gutter {
+            cursor: row-resize;
+            left: 0;
+            height: 8px;
+        }
     </style>
 </head>
 
 <body>
 
-<div>
-    <% include("includes/nav.ssp") %>
-</div>
+<script type="module">
+    const els = (sel, par = document) => document.querySelectorAll(sel);
+    const elNew = (tag, prop = {}) => Object.assign(document.createElement(tag), prop);
 
-<main>
+    let isResizing = false;
+    let frNext = 0;
+
+    const resizableGrid = (elParent, idx) => {
+        const isVert = elParent.classList.contains("panes-v");
+        const elsPanes = elParent.querySelectorAll(":scope > .pane");
+
+        let fr = [...elsPanes].map(() => 1 / elsPanes.length);
+        let elPaneCurr = null;
+        let paneIndex = -1;
+        let frStart = 0;
+        const frToCSS = () => {
+            elParent.style[isVert ? "grid-template-rows" : "grid-template-columns"] = fr.join("fr ") + "fr";
+        };
+
+        const pointerDown = (evt) => {
+            if (isResizing || !evt.target.closest(".gutter")) return;
+            isResizing = true;
+            elPaneCurr = evt.currentTarget;
+            fr = [...elsPanes].map((elPane) => isVert ? elPane.clientHeight / elParent.clientHeight : elPane.clientWidth / elParent.clientWidth);
+            paneIndex = [...elsPanes].indexOf(elPaneCurr);
+            frStart = fr[paneIndex];
+            frNext = fr[paneIndex + 1];
+            addEventListener("pointermove", pointerMove);
+            addEventListener("pointerup", pointerUp);
+        };
+
+        const pointerMove = (evt) => {
+            evt.preventDefault();
+            const paneBCR = elPaneCurr.getBoundingClientRect();
+            const parentSize = isVert ? elParent.clientHeight : elParent.clientWidth;
+            const pointer = {
+                x: Math.max(0, Math.min(evt.clientX - paneBCR.left, elParent.clientWidth)),
+                y: Math.max(0, Math.min(evt.clientY - paneBCR.top, elParent.clientHeight))
+            };
+            const frRel = pointer[isVert ? "y" : "x"] / parentSize;
+            const frDiff = frStart - frRel;
+            fr[paneIndex] = Math.max(0.05, frRel);
+            fr[paneIndex + 1] = Math.max(0.05, frNext + frDiff);
+            frToCSS();
+        };
+
+        const pointerUp = (evt) => {
+            removeEventListener("pointermove", pointerMove);
+            removeEventListener("pointerup", pointerUp);
+            isResizing = false;
+        };
+
+        [...elsPanes].slice(0, -1).forEach((elPane, i) => {
+            elPane.append(elNew("div", {
+                className: "gutter"
+            }));
+            elPane.addEventListener("pointerdown", pointerDown);
+        });
+        frToCSS();
+    };
+
+    els(".panes").forEach(resizableGrid);
+</script>
+
+<main class="panes panes-v">
+    <!-- Modals, snackbars, etc-->
     <% include("includes/html_common.ssp") %>
 
-    <div id="explorer" class="split content split-horizontal">
-        <div id="explorerViews" class="split content">
-            <tab-container>
-                <div role="tablist">
-                    <button type="button" id="foldersTab" role="tab"
-                            data-tab-container-no-tabstop>
-                        <a href="#"
-                           hx-target="#explorerPanelContent"
-                           hx-swap="innerHTML"
-                           hx-trigger="load, click"
-                           hx-get='${ url(showFoldersTab, Api.Field.REPO_ID -> RequestContext.getRepository.persistedId) }'>Folders</a>
-                    </button>
+    <% include("includes/nav.ssp") %>
 
-                    <button type="button" id="albumsTab" role="tab"
-                            data-tab-container-no-tabstop>
-                        <a href="#"
-                           hx-target="#explorerPanelContent"
-                           hx-trigger="click"
-                           hx-swap="innerHTML"
-                           hx-get='${ url(showAlbumsTab, Api.Field.REPO_ID -> RequestContext.getRepository.persistedId) }'>Albums</a>
-                    </button>
+    <div id="explorer" class="pane panes panes-h">
+        <div id="explorerPanels" class="pane panes panes-v">
+            <div class="pane">
+                <tab-container>
+                    <div role="tablist">
+                        <button type="button" id="foldersTab" role="tab"
+                                data-tab-container-no-tabstop>
+                            <a href="#"
+                               hx-target="#explorerPanelContent"
+                               hx-swap="innerHTML"
+                               hx-trigger="load, click"
+                               hx-get='${ url(showFoldersTab, Api.Field.REPO_ID -> RequestContext.getRepository.persistedId) }'>Folders</a>
+                        </button>
 
-                    <button type="button" id="peopleTab" role="tab"
-                            data-tab-container-no-tabstop>
-                        <a href="#"
-                           hx-target="#explorerPanelContent"
-                           hx-trigger="click"
-                           hx-swap="innerHTML"
-                           hx-get='${ url(showPeopleTab, Api.Field.REPO_ID -> RequestContext.getRepository.persistedId) }'>People</a>
-                    </button>
-                </div>
+                        <button type="button" id="albumsTab" role="tab"
+                                data-tab-container-no-tabstop>
+                            <a href="#"
+                               hx-target="#explorerPanelContent"
+                               hx-trigger="click"
+                               hx-swap="innerHTML"
+                               hx-get='${ url(showAlbumsTab, Api.Field.REPO_ID -> RequestContext.getRepository.persistedId) }'>Albums</a>
+                        </button>
 
-                <div id="explorerPanelContent" role="tabpanel" class="tab-content">
-                </div>
+                        <button type="button" id="peopleTab" role="tab"
+                                data-tab-container-no-tabstop>
+                            <a href="#"
+                               hx-target="#explorerPanelContent"
+                               hx-trigger="click"
+                               hx-swap="innerHTML"
+                               hx-get='${ url(showPeopleTab, Api.Field.REPO_ID -> RequestContext.getRepository.persistedId) }'>People</a>
+                        </button>
+                    </div>
 
-            </tab-container>
+                    <div id="explorerPanelContent" role="tabpanel" class="tab-content">
+                    </div>
+
+                </tab-container>
+            </div>
+            <div id="infoPanel" class="pane"></div>
         </div>
-
-        <div id="infoPanel" class="split content">
+        <div id="content" class="pane">
+            <% include("includes/search_results.ssp") %>
         </div>
     </div>
 
-    <div id="content" class="split content split-horizontal">
-        <% include("includes/search_results.ssp") %>
-    </div>
+    <footer>
+        <%= RequestContext.account.value.getOrElse("None") %>
+    </footer>
+
 </main>
 
-<footer>
-    <%= RequestContext.account.value.get.name %>
-</footer>
 
-<script type="module">
-    /**
-     * Split.js plumbing
-     *
-     * @see: https://github.com/nathancahill/split/tree/master/packages/splitjs
-     */
-    const savedHorizontalSplitSizes = localStorage.getItem("horizontalSplitSizes")
-    let horizontalSplitSizes = [25, 75]
-
-    if (savedHorizontalSplitSizes) {
-        horizontalSplitSizes = JSON.parse(savedHorizontalSplitSizes)
-    }
-
-    Split(["#explorer", "#content"], {
-        sizes: horizontalSplitSizes,
-        minSize: [100, 300],
-        onDragEnd: function (horizontalSplitSizes) {
-            localStorage.setItem("horizontalSplitSizes", JSON.stringify(horizontalSplitSizes))
-        },
-    })
-
-    const savedVerticalSplitSizes = localStorage.getItem("verticalSplitSizes")
-    let verticalSplitSizes = [65, 35]
-
-    if (savedVerticalSplitSizes) {
-        verticalSplitSizes = JSON.parse(savedVerticalSplitSizes)
-    }
-
-    Split(["#explorerViews", "#infoPanel"], {
-        sizes: verticalSplitSizes,
-        direction: 'vertical',
-        onDragEnd: function (verticalSplitSizes) {
-            localStorage.setItem("verticalSplitSizes", JSON.stringify(verticalSplitSizes))
-        },
-    })
-</script>
 </body>
 </html>
