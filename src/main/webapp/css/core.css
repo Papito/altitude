@@ -268,3 +268,37 @@ form input.error, form input.error:focus {
 #imageDetailModalContainer .modal-box {
     border: none;
 }
+
+* {
+    user-select: none;
+}
+
+html,
+body {
+    padding: 0;
+    margin: 0;
+}
+
+.ds-selected {
+    outline: 3px solid black;
+    outline-offset: 3px;
+}
+
+.ds-droppable {
+    color: red;
+}
+.ds-dropped-target {
+    background: gold;
+    color: black;
+}
+.ds-dropped-target::before {
+    position: absolute;
+    bottom: 0;
+}
+.ds-dropped-inside::after {
+    position: absolute;
+    top: 0;
+}
+.ds-dropzone-target {
+    background: gold;
+}
