@@ -1,6 +1,10 @@
+import DragSelect from "/js/ds.esm.min.js";
+
 import {Const} from "/js/constants.js"
-import interact from "https://cdn.interactjs.io/v1.9.20/interactjs/index.js"
 import {dragged, dragMoveListener} from "/js/common/dragon-drop.js";
+
+/*
+import interact from "https://cdn.interactjs.io/v1.9.20/interactjs/index.js"
 
 interact('#rootFolderList .drag-drop').draggable({
     // enable inertial throwing
@@ -75,3 +79,4 @@ interact('#rootFolderList .dropzone').dropzone({
         event.target.classList.remove('drop-target')
     }
 })
+*/
