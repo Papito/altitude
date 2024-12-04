@@ -58,6 +58,11 @@ body {
     background-color: var(--background-color);
     color: #FFFFFF;
     font-family: var(--font);
+    display: grid;
+    grid-template-rows: [header]  auto
+                        [content] 1fr
+                        [footer]  40px;
+    min-height: 100vh;
 }
 
 footer {
@@ -68,22 +73,7 @@ footer {
     display: grid;
     font-size: .9em;
     align-items: center;
-}
-
-body {
-    display: grid;
-    grid-template-rows: [header]  auto
-                        [content] 1fr
-                        [footer]  40px;
-    min-height: 100vh;
-}
-
-footer {
     background: var(--background-secondary-color);
-    color: #fff;
-    bottom: 0;
-    display: grid;
-    align-items: center;
 }
 
 /*       */
@@ -267,38 +257,4 @@ form input.error, form input.error:focus {
 
 #imageDetailModalContainer .modal-box {
     border: none;
-}
-
-* {
-    user-select: none;
-}
-
-html,
-body {
-    padding: 0;
-    margin: 0;
-}
-
-.ds-selected {
-    outline: 3px solid black;
-    outline-offset: 3px;
-}
-
-.ds-droppable {
-    color: red;
-}
-.ds-dropped-target {
-    background: gold;
-    color: black;
-}
-.ds-dropped-target::before {
-    position: absolute;
-    bottom: 0;
-}
-.ds-dropped-inside::after {
-    position: absolute;
-    top: 0;
-}
-.ds-dropzone-target {
-    background: gold;
 }
