@@ -3,9 +3,7 @@ import {dragged, dragMoveListener} from "/js/common/dragon-drop.js";
 import interact from "https://cdn.interactjs.io/v1.9.20/interactjs/index.js"
 
 interact('#assets .drag-drop').draggable({
-    // enable inertial throwing
     inertia: true,
-    // keep the element within the area of it's parent
     autoScroll: true,
 
     listeners: {
