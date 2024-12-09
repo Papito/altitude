@@ -14,20 +14,50 @@ import software.altitude.test.core.TestFocus
 
 @DoNotDiscover class ApiValidatorTests extends funsuite.AnyFunSuite with TestFocus {
 
-  test("Test multiple failed required fields") {
+  test("Test multiple invalid email addresses") {
     val validator: ApiRequestValidator = ApiRequestValidator(
-      required=List(Api.Field.ID, Api.Field.Folder.NAME)
+      email=List(Api.Field.Setup.ADMIN_EMAIL)
+    )
+
+    val invalidEmails = List(
+      "invalid-email",
+      "invalid@",
+      "@domain.com",
+      "invalid@domain,com",
+      "invalid@domain..com"
+    )
+
+    invalidEmails.foreach { email =>
+      val jsonIn = Json.obj(
+        Api.Field.Setup.ADMIN_EMAIL -> email
+      )
+
+      val validationException = intercept[ValidationException] {
+        validator.validate(jsonIn)
+      }
+
+      validationException.errors.size should be(1)
+      validationException.errors.head._2 should be(C.Msg.Err.VALUE_NOT_AN_EMAIL)
+    }
+  }
+
+  test("Test multiple failed required fields", Focused) {
+    val validator: ApiRequestValidator = ApiRequestValidator(
+      required=List(Api.Field.ID, Api.Field.Folder.NAME, Api.Field.Setup.ADMIN_EMAIL),
+      email=List(Api.Field.Setup.ADMIN_EMAIL)
     )
 
     val jsonIn = Json.obj(
-      Api.Field.Folder.PATH -> "Bright Future Path"
+      Api.Field.Folder.PATH -> "Bright Future Path",
+      Api.Field.Setup.ADMIN_EMAIL -> "invalid-email"
     )
 
     val validationException = intercept[ValidationException] {
       validator.validate(jsonIn)
     }
 
-    validationException.errors.size should be(validator.required.size)
+    validationException.errors.size should be(3)
+    validationException.errors(Api.Field.Setup.ADMIN_EMAIL) should be(C.Msg.Err.VALUE_NOT_AN_EMAIL)
   }
 
   test("Test failed max length") {
@@ -80,7 +110,7 @@ import software.altitude.test.core.TestFocus
     }
 
     validationException.errors.size should be(1)
-    validationException.errors.head._2 should be(C.Msg.Err.REQUIRED)
+    validationException.errors.head._2 should be(C.Msg.Err.VALUE_REQUIRED)
   }
 
   test("Test multiple failed length checks") {
@@ -132,7 +162,7 @@ import software.altitude.test.core.TestFocus
     }
 
     validationException.errors(Api.Field.Folder.PATH) should be(C.Msg.Err.VALUE_TOO_LONG.format(maxFieldLength))
-    validationException.errors(Api.Field.Folder.NAME) should be(C.Msg.Err.REQUIRED)
+    validationException.errors(Api.Field.Folder.NAME) should be(C.Msg.Err.VALUE_REQUIRED)
 
   }
 
