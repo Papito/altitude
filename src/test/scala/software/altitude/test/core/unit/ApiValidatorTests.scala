@@ -2,7 +2,7 @@ package software.altitude.test.core.unit
 
 import org.scalatest.DoNotDiscover
 import org.scalatest.funsuite
-import org.scalatest.matchers.must.Matchers.be
+import org.scalatest.matchers.must.Matchers.{be, noException}
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import play.api.libs.json.Json
 import software.altitude.core.Api
@@ -41,7 +41,29 @@ import software.altitude.test.core.TestFocus
     }
   }
 
-  test("Test multiple failed required fields", Focused) {
+  test("Test valid email addresses") {
+    val validator: ApiRequestValidator = ApiRequestValidator(
+      email=List(Api.Field.Setup.ADMIN_EMAIL)
+    )
+
+    val validEmails = List(
+      "valid.email@example.com",
+      "user+mailbox/department=shipping@example.com",
+      "customer/department=shipping@example.com",
+      "user@localserver",
+      "user@subdomain.example.com"
+    )
+
+    validEmails.foreach { email =>
+      val jsonIn = Json.obj(
+        Api.Field.Setup.ADMIN_EMAIL -> email
+      )
+
+      noException should be thrownBy validator.validate(jsonIn)
+    }
+  }
+
+  test("Test multiple failed required fields") {
     val validator: ApiRequestValidator = ApiRequestValidator(
       required=List(Api.Field.ID, Api.Field.Folder.NAME, Api.Field.Setup.ADMIN_EMAIL),
       email=List(Api.Field.Setup.ADMIN_EMAIL)
@@ -180,5 +202,46 @@ import software.altitude.test.core.TestFocus
     }
 
     validationException.errors.size should be(validator.required.size)
+  }
+
+
+  test("Test multiple invalid UUIDs") {
+    val validator: ApiRequestValidator = ApiRequestValidator(
+      uuid=List(Api.Field.ID)
+    )
+
+    val invalidUUIDs = List(
+      "invalid-uuid",
+      "12345678-1234-1234-1234-1234567890abz",
+      "12345678-1234-1234-1234-1234567890",
+      "12345678-1234-1234-1234-1234567890ab-1234"
+    )
+
+    invalidUUIDs.foreach { uuid =>
+      val jsonIn = Json.obj(
+        Api.Field.ID -> uuid
+      )
+
+      val validationException = intercept[ValidationException] {
+        validator.validate(jsonIn)
+      }
+
+      validationException.errors.size should be(1)
+      validationException.errors.head._2 should be(C.Msg.Err.VALUE_NOT_A_UUID)
+    }
+  }
+
+  test("Test valid UUID") {
+    val validator: ApiRequestValidator = ApiRequestValidator(
+      uuid=List(Api.Field.ID)
+    )
+
+    val validUUID = "12345678-1234-1234-1234-1234567890ab"
+
+    val jsonIn = Json.obj(
+      Api.Field.ID -> validUUID
+    )
+
+    noException should be thrownBy validator.validate(jsonIn)
   }
 }
