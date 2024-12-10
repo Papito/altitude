@@ -17,3 +17,9 @@ export function showAssetDetailModal({ title }) {
     htmx.find("#imageDetailModalContainer .modal-title").innerText = title
     htmx.find("#imageDetailModalContainer").style.display = "grid"
 }
+
+document.querySelectorAll(".close-modal").forEach((element) => {
+    element.addEventListener("click", () => {
+        closeModal()
+    })
+})
