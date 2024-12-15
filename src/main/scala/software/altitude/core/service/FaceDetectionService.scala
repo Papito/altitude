@@ -1,7 +1,9 @@
 package software.altitude.core.service
 
-import org.apache.commons.io.FileUtils
+import java.io.File
+import java.nio.file.Paths
 import org.apache.commons.io.FilenameUtils
+import org.apache.commons.io.FileUtils
 import org.bytedeco.javacpp.Loader
 import org.bytedeco.opencv.opencv_java
 import org.opencv.core.CvType
@@ -21,14 +23,12 @@ import org.opencv.objdetect.FaceDetectorYN
 import org.opencv.objdetect.FaceRecognizerSF
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
 import software.altitude.core.Environment
 import software.altitude.core.models.Face
 import software.altitude.core.util.ImageUtil.determineImageScale
 import software.altitude.core.util.ImageUtil.makeImageThumbnail
 import software.altitude.core.util.ImageUtil.matFromBytes
-
-import java.io.File
-import java.nio.file.Paths
 
 object FaceDetectionService {
   private val dnnInWidth = 300
@@ -76,10 +76,10 @@ object FaceDetectionService {
 }
 
 class FaceDetectionService {
+
   /**
-   * As if the fact that OpenCV for Java has two competing APIs wasn't confusing enough (org.opencv, org.bytedeco),
-   * every example under the sun directs to do this in order to have native lib linking errors go away:
-   * System.loadLibrary(Core.NATIVE_LIBRARY_NAME)
+   * As if the fact that OpenCV for Java has two competing APIs wasn't confusing enough (org.opencv, org.bytedeco), every example under the sun directs to do
+   * this in order to have native lib linking errors go away: System.loadLibrary(Core.NATIVE_LIBRARY_NAME)
    *
    * But it doesn't work. While we use the org.opencv API, the native lib is loaded by the org.bytedeco API.
    *
@@ -89,7 +89,7 @@ class FaceDetectionService {
    */
   Loader.load(classOf[opencv_java])
 
-  protected final val logger: Logger = LoggerFactory.getLogger(getClass)
+  final protected val logger: Logger = LoggerFactory.getLogger(getClass)
 
   private val RESOURCE_FILE_NAMES: Map[String, String] = {
     Map(
@@ -104,16 +104,15 @@ class FaceDetectionService {
   checkAndCreateResourceFiles()
 
   private val SF_ONNX_MODEL_PATH = new File(Environment.OPENCV_RESOURCE_PATH, RESOURCE_FILE_NAMES("SF_ONNX_MODEL")).getAbsolutePath
-  private val DNN_NET_PROTO_CONF_PATH = new File(Environment.OPENCV_RESOURCE_PATH, RESOURCE_FILE_NAMES("DNN_NET_PROTO_CONF")).getAbsolutePath
+  private val DNN_NET_PROTO_CONF_PATH =
+    new File(Environment.OPENCV_RESOURCE_PATH, RESOURCE_FILE_NAMES("DNN_NET_PROTO_CONF")).getAbsolutePath
   private val DNN_NET_MODEL_PATH = new File(Environment.OPENCV_RESOURCE_PATH, RESOURCE_FILE_NAMES("DNN_NET_MODEL")).getAbsolutePath
   private val YUNET_MODEL_PATH = new File(Environment.OPENCV_RESOURCE_PATH, RESOURCE_FILE_NAMES("YUNET_MODEL")).getAbsolutePath
   private val EMBEDDING_NET_PATH = new File(Environment.OPENCV_RESOURCE_PATH, RESOURCE_FILE_NAMES("EMBEDDING_NET_MODEL")).getAbsolutePath
 
   private val sfaceRecognizer = FaceRecognizerSF.create(SF_ONNX_MODEL_PATH, "")
 
-  private val dnnNet: Net = readNetFromCaffe(
-    DNN_NET_PROTO_CONF_PATH,
-    DNN_NET_MODEL_PATH)
+  private val dnnNet: Net = readNetFromCaffe(DNN_NET_PROTO_CONF_PATH, DNN_NET_MODEL_PATH)
 
   private val embedder = readNetFromTorch(EMBEDDING_NET_PATH, true)
 
@@ -121,10 +120,7 @@ class FaceDetectionService {
   yuNet.setScoreThreshold(FaceDetectionService.yunetConfidenceThreshold)
   yuNet.setNMSThreshold(0.2f)
 
-
-  /**
-   * Create the required OPENCV resource files if they do not exist outside of the JAR itself.
-   */
+  /** Create the required OPENCV resource files if they do not exist outside of the JAR itself. */
   private def checkAndCreateResourceFiles(): Unit = {
     val openCvResourcesDir = new File(Environment.OPENCV_RESOURCE_PATH)
 
@@ -133,19 +129,20 @@ class FaceDetectionService {
       FileUtils.forceMkdir(openCvResourcesDir)
     }
 
-    RESOURCE_FILE_NAMES.values.foreach { fileName =>
-      val filePath = Paths.get(openCvResourcesDir.getAbsolutePath, fileName).toFile
+    RESOURCE_FILE_NAMES.values.foreach {
+      fileName =>
+        val filePath = Paths.get(openCvResourcesDir.getAbsolutePath, fileName).toFile
 
-      if (!filePath.exists() || !filePath.isFile) {
-        logger.info(s"Resource file $fileName not found, creating it from source")
+        if (!filePath.exists() || !filePath.isFile) {
+          logger.info(s"Resource file $fileName not found, creating it from source")
 
-        val resourceFilePath = s"/opencv/$fileName"
+          val resourceFilePath = s"/opencv/$fileName"
 
-        logger.info("Resource path: " + resourceFilePath)
-        val resourceUrl = getClass.getResource(resourceFilePath)
-        logger.info("Copying resource file from " + resourceUrl + " to " + filePath)
-        FileUtils.copyURLToFile(resourceUrl, filePath)
-      }
+          logger.info("Resource path: " + resourceFilePath)
+          val resourceUrl = getClass.getResource(resourceFilePath)
+          logger.info("Copying resource file from " + resourceUrl + " to " + filePath)
+          FileUtils.copyURLToFile(resourceUrl, filePath)
+        }
     }
   }
 
@@ -154,7 +151,11 @@ class FaceDetectionService {
       image,
       FaceDetectionService.dnnInScaleFactor,
       new Size(FaceDetectionService.dnnInWidth, FaceDetectionService.dnnInHeight),
-      FaceDetectionService.dnnMeanVal, false, false, CvType.CV_32F)
+      FaceDetectionService.dnnMeanVal,
+      false,
+      false,
+      CvType.CV_32F
+    )
 
     dnnNet.setInput(inputBlob)
 
@@ -248,42 +249,43 @@ class FaceDetectionService {
     val imageMat: Mat = matFromBytes(data)
     val results: List[Mat] = detectFacesWithYunet(imageMat)
 
-    val faces: List[Face] = results.map { res =>
-      val alignedFaceImage = alignCropFaceFromDetection(imageMat, res)
-      // LBPHFaceRecognizer requires grayscale images
-      val alignedFaceImageGs = getHistEqualizedGrayScImage(alignedFaceImage)
-      val features = getFacialFeatures(alignedFaceImage)
+    val faces: List[Face] = results.map {
+      res =>
+        val alignedFaceImage = alignCropFaceFromDetection(imageMat, res)
+        // LBPHFaceRecognizer requires grayscale images
+        val alignedFaceImageGs = getHistEqualizedGrayScImage(alignedFaceImage)
+        val features = getFacialFeatures(alignedFaceImage)
 
-      val featuresArray = (0 to 127).map(col => features.get(0, col)(0).asInstanceOf[Float]).toArray
-      val embedding = getEmbeddings(alignedFaceImage)
+        val featuresArray = (0 to 127).map(col => features.get(0, col)(0).asInstanceOf[Float]).toArray
+        val embedding = getEmbeddings(alignedFaceImage)
 
-      val rect = FaceDetectionService.faceDetectToRect(res)
-      val faceImage: Mat = imageMat.submat(rect)
+        val rect = FaceDetectionService.faceDetectToRect(res)
+        val faceImage: Mat = imageMat.submat(rect)
 
-      val imageBytes = new MatOfByte
-      Imgcodecs.imencode(".png", faceImage, imageBytes)
+        val imageBytes = new MatOfByte
+        Imgcodecs.imencode(".png", faceImage, imageBytes)
 
-      val alignedImageBytes = new MatOfByte
-      Imgcodecs.imencode(".png", alignedFaceImage, alignedImageBytes)
+        val alignedImageBytes = new MatOfByte
+        Imgcodecs.imencode(".png", alignedFaceImage, alignedImageBytes)
 
-      val alignedFaceImageGsBytes = new MatOfByte
-      Imgcodecs.imencode(".png", alignedFaceImageGs, alignedFaceImageGsBytes)
+        val alignedFaceImageGsBytes = new MatOfByte
+        Imgcodecs.imencode(".png", alignedFaceImageGs, alignedFaceImageGsBytes)
 
-      val displayImage = makeImageThumbnail(imageBytes.toArray, FaceDetectionService.faceDetectionBoxPx)
+        val displayImage = makeImageThumbnail(imageBytes.toArray, FaceDetectionService.faceDetectionBoxPx)
 
-      Face(
-        x1 = rect.x,
-        y1 = rect.y,
-        width = rect.width,
-        height = rect.height,
-        detectionScore = res.get(0, 14)(0).asInstanceOf[Float],
-        embeddings = embedding,
-        features = featuresArray,
-        displayImage = displayImage,
-        image = imageBytes.toArray,
-        alignedImage = alignedImageBytes.toArray,
-        alignedImageGs = alignedFaceImageGsBytes.toArray
-      )
+        Face(
+          x1 = rect.x,
+          y1 = rect.y,
+          width = rect.width,
+          height = rect.height,
+          detectionScore = res.get(0, 14)(0).asInstanceOf[Float],
+          embeddings = embedding,
+          features = featuresArray,
+          displayImage = displayImage,
+          image = imageBytes.toArray,
+          alignedImage = alignedImageBytes.toArray,
+          alignedImageGs = alignedFaceImageGsBytes.toArray
+        )
     }
 
     faces

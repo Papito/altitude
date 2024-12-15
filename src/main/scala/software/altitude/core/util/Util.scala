@@ -1,16 +1,15 @@
 package software.altitude.core.util
 
-import org.mindrot.jbcrypt.BCrypt
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import org.mindrot.jbcrypt.BCrypt
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 object Util {
-  protected final val logger: Logger = LoggerFactory.getLogger(getClass)
+  final protected val logger: Logger = LoggerFactory.getLogger(getClass)
 
   def logStacktrace(e: Exception): String = {
     e.printStackTrace()

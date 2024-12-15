@@ -1,6 +1,7 @@
 package software.altitude.core.service
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
 import software.altitude.core.Altitude
 import software.altitude.core.dao.SearchDao
 import software.altitude.core.models.Asset
@@ -15,7 +16,7 @@ object SearchService {
 }
 
 class SearchService(val app: Altitude) {
-  protected final val logger: Logger = LoggerFactory.getLogger(getClass)
+  final protected val logger: Logger = LoggerFactory.getLogger(getClass)
   private val searchDao: SearchDao = app.DAO.search
 
   def indexAsset(asset: Asset): Unit = {

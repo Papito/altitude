@@ -2,39 +2,39 @@ package software.altitude.core.service
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
+
+import software.altitude.core.{Const => C, _}
 import software.altitude.core.Altitude
 import software.altitude.core.FieldConst
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.BaseDao
-import software.altitude.core.models.Folder
 import software.altitude.core.models._
+import software.altitude.core.models.Folder
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.ImageUtil.makeImageThumbnail
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchResult
-import software.altitude.core.{Const => C, _}
 
 /**
-  * The class that stitches it all together
-  * TOC:
-  * - ASSETS
-  * - DATA/PREVIEW
-  * - DISCOVERY
-  * - FOLDERS
-  * - RECYCLING
-  * - METADATA
-  */
+ * The class that stitches it all together TOC:
+ *   - ASSETS
+ *   - DATA/PREVIEW
+ *   - DISCOVERY
+ *   - FOLDERS
+ *   - RECYCLING
+ *   - METADATA
+ */
 class LibraryService(val app: Altitude) {
-  protected final val logger: Logger = LoggerFactory.getLogger(getClass)
+  final protected val logger: Logger = LoggerFactory.getLogger(getClass)
   protected val txManager: TransactionManager = app.txManager
 
   private val previewBoxSize: Int = app.config.getInt(C.Conf.PREVIEW_BOX_PIXELS)
 
-  /** **************************************************************************
-    * ASSETS
-    * *********************************************************************** */
+  /**
+   * ************************************************************************** ASSETS ***********************************************************************
+   */
 
   def add(dataAssetIn: AssetWithData): JsObject = {
     logger.info(s"Preparing to add asset [$dataAssetIn]")
@@ -47,9 +47,7 @@ class LibraryService(val app: Altitude) {
         throw DuplicateException()
       }
 
-      /**
-        * Create the version of the asset with ID and metadata
-        */
+      /** Create the version of the asset with ID and metadata */
       val assetId = BaseDao.genId
       val userMetadata = app.service.metadata.cleanAndValidate(dataAssetIn.asset.userMetadata)
       val extractedMetadata = app.service.metadataExtractor.extract(dataAssetIn.data)
@@ -64,9 +62,9 @@ class LibraryService(val app: Altitude) {
 
       /**
        * This data asset has:
-       *    - Asset with ID
-       *    - Asset with metadata
-       *    - The actual data (which we normally do not pass around for performance reasons)
+       *   - Asset with ID
+       *   - Asset with metadata
+       *   - The actual data (which we normally do not pass around for performance reasons)
        */
       val dataAsset = AssetWithData(asset, dataAssetIn.data)
 
@@ -101,8 +99,7 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  def moveAssetToFolder(assetId: String, folderId: String)
-                       : Asset = {
+  def moveAssetToFolder(assetId: String, folderId: String): Asset = {
     txManager.withTransaction[Asset] {
       moveAssetsToFolder(Set(assetId), folderId)
       getById(assetId)
@@ -123,7 +120,7 @@ class LibraryService(val app: Altitude) {
       /* Point the asset to the new folder.
          It may or may not be recycled or triaged, so we update it as neither unconditionally
          (saves us a separate update query)
-      */
+       */
       val data = Map(
         FieldConst.Asset.FOLDER_ID -> destFolderId,
         FieldConst.Asset.IS_RECYCLED -> false,
@@ -138,10 +135,11 @@ class LibraryService(val app: Altitude) {
       // ensure the folder exists
       app.service.folder.getById(destFolderId)
 
-      assetIds.foreach { assetId =>
-        val asset: Asset = getById(assetId)
+      assetIds.foreach {
+        assetId =>
+          val asset: Asset = getById(assetId)
 
-        move(asset)
+          move(asset)
       }
     }
   }
@@ -164,9 +162,10 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  /** **************************************************************************
-    * DATA/PREVIEW
-    * *********************************************************************** */
+  /**
+   * ************************************************************************** DATA/PREVIEW
+   * ***********************************************************************
+   */
 
   private def genPreviewData(dataAsset: AssetWithData): Array[Byte] = {
     dataAsset.asset.assetType.mediaType match {
@@ -181,10 +180,7 @@ class LibraryService(val app: Altitude) {
 
     previewData.length match {
       case size if size > 0 =>
-
-        val preview: MimedPreviewData = MimedPreviewData(
-          assetId = dataAsset.asset.persistedId,
-          data = previewData)
+        val preview: MimedPreviewData = MimedPreviewData(assetId = dataAsset.asset.persistedId, data = previewData)
 
         app.service.fileStore.addPreview(preview)
 
@@ -197,9 +193,10 @@ class LibraryService(val app: Altitude) {
     app.service.fileStore.getPreviewById(assetId)
   }
 
-  /** **************************************************************************
-    * DISCOVERY
-    * *********************************************************************** */
+  /**
+   * ************************************************************************** DISCOVERY
+   * ***********************************************************************
+   */
 
   def query(query: Query): QueryResult = {
     txManager.asReadOnly[QueryResult] {
@@ -207,9 +204,8 @@ class LibraryService(val app: Altitude) {
 
       val _query: Query = if (folderId.isDefined) {
         val allFolderIds = app.service.folder.flatChildrenIds(parentIds = Set(folderId.get))
-        query.add(FieldConst.Asset.FOLDER_ID ->  Query.IN(allFolderIds.asInstanceOf[Set[Any]]))
-      }
-      else {
+        query.add(FieldConst.Asset.FOLDER_ID -> Query.IN(allFolderIds.asInstanceOf[Set[Any]]))
+      } else {
         query
       }
 
@@ -223,13 +219,8 @@ class LibraryService(val app: Altitude) {
         // create a new query, with the new folder set
         val allFolderIds = app.service.folder.flatChildrenIds(parentIds = query.folderIds)
 
-        new SearchQuery(text = query.text,
-          folderIds = allFolderIds,
-          params = query.params,
-          rpp = query.rpp,
-          page = query.page)
-      }
-      else {
+        new SearchQuery(text = query.text, folderIds = allFolderIds, params = query.params, rpp = query.rpp, page = query.page)
+      } else {
         query
       }
 
@@ -245,10 +236,9 @@ class LibraryService(val app: Altitude) {
     app.service.asset.queryAll(query)
   }
 
-
-  /** **************************************************************************
-    * FOLDERS
-    * *********************************************************************** */
+  /**
+   * ************************************************************************** FOLDERS ***********************************************************************
+   */
 
   def addFolder(name: String, parentId: Option[String] = None): Folder = {
     txManager.withTransaction[JsObject] {
@@ -263,11 +253,10 @@ class LibraryService(val app: Altitude) {
   }
 
   /**
-    * Delete a folder by ID, including its children. Does not allow deleting the root folder,
-    * or any system folders.
-    *
-    * Recycle all the assets in the tree.
-    */
+   * Delete a folder by ID, including its children. Does not allow deleting the root folder, or any system folders.
+   *
+   * Recycle all the assets in the tree.
+   */
   def deleteFolderById(id: String): Unit = {
     if (app.service.folder.isRootFolder(id)) {
       throw IllegalOperationException("Cannot delete the root folder")
@@ -280,53 +269,52 @@ class LibraryService(val app: Altitude) {
 
       // get the list of tuples - (depth, id), with most-deep first
       val childrenAndDepths: List[(Int, String)] =
-        app.service.folder.flatChildrenIdsWithDepths(
-          id, app.service.folder.repositoryFolders()).sortBy(_._1).reverse
+        app.service.folder.flatChildrenIdsWithDepths(id, app.service.folder.repositoryFolders()).sortBy(_._1).reverse
       /* ^^^ sort by depth */
-
 
       logger.trace(s"Folder children, deepest first: $childrenAndDepths")
 
-      childrenAndDepths.foldLeft(0) { (assetCount: Int, f: (Int, String)) =>
-        val folderId = f._2
-        val childFolder: Folder = app.service.folder.getById(folderId)
+      childrenAndDepths.foldLeft(0) {
+        (assetCount: Int, f: (Int, String)) =>
+          val folderId = f._2
+          val childFolder: Folder = app.service.folder.getById(folderId)
 
-        logger.trace(s"Deleting or recycling folder $f")
+          logger.trace(s"Deleting or recycling folder $f")
 
-        // set all the assets as recycled
-        val folderAssetsQuery = new Query(Map(FieldConst.Asset.FOLDER_ID -> folderId))
+          // set all the assets as recycled
+          val folderAssetsQuery = new Query(Map(FieldConst.Asset.FOLDER_ID -> folderId))
 
-        val results: QueryResult = app.service.library.queryAll(folderAssetsQuery)
+          val results: QueryResult = app.service.library.queryAll(folderAssetsQuery)
 
-        logger.trace(s"Folder $folderId has ${results.total} assets")
+          logger.trace(s"Folder $folderId has ${results.total} assets")
 
-        // OPTIMIZE: bulk deletions.
-        results.records.foreach { record =>
-          val asset: Asset = record
+          // OPTIMIZE: bulk deletions.
+          results.records.foreach {
+            record =>
+              val asset: Asset = record
 
-          /* We only want to recycle assets that are not recycled,
+              /* We only want to recycle assets that are not recycled,
              however the query is for all assets, as we need to know if the folder
              has any asset references in the repository. This spares us a second
              query.
-           */
-          if (!asset.isRecycled) this.recycleAsset(asset.persistedId)
-        }
+               */
+              if (!asset.isRecycled) this.recycleAsset(asset.persistedId)
+          }
 
-        val treeAssetCount = assetCount + results.total
+          val treeAssetCount = assetCount + results.total
 
-        logger.trace(s"Total assets in the tree of folder ${folder.persistedId}: $treeAssetCount")
+          logger.trace(s"Total assets in the tree of folder ${folder.persistedId}: $treeAssetCount")
 
-        // delete folder if it has no assets, otherwise - recycle it
-        if (treeAssetCount == 0) {
-          logger.trace(s"DELETING (PURGING) folder $f")
-          app.service.folder.deleteById(folderId)
-        }
-        else {
-          logger.trace(s"RECYCLING folder $folderId")
-          app.service.folder.setRecycledProp(childFolder, isRecycled = true)
-        }
+          // delete folder if it has no assets, otherwise - recycle it
+          if (treeAssetCount == 0) {
+            logger.trace(s"DELETING (PURGING) folder $f")
+            app.service.folder.deleteById(folderId)
+          } else {
+            logger.trace(s"RECYCLING folder $folderId")
+            app.service.folder.setRecycledProp(childFolder, isRecycled = true)
+          }
 
-        treeAssetCount // accumulates total asset count for the next step in the fold
+          treeAssetCount // accumulates total asset count for the next step in the fold
       }
 
       app.service.folder.decrChildCount(folder.parentId)
@@ -347,10 +335,10 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-
-  /** **************************************************************************
-    * RECYCLING
-    * *********************************************************************** */
+  /**
+   * ************************************************************************** RECYCLING
+   * ***********************************************************************
+   */
 
   def restoreRecycledAsset(assetId: String): Asset = {
     txManager.withTransaction[Asset] {
@@ -362,30 +350,31 @@ class LibraryService(val app: Altitude) {
   def restoreRecycledAssets(assetIds: Set[String]): Unit = {
     logger.info(s"Restoring recycled assets [${assetIds.mkString(",")}]")
 
-    assetIds.foreach { assetId =>
-      logger.info(s"Restoring recycled asset [$assetId]")
+    assetIds.foreach {
+      assetId =>
+        logger.info(s"Restoring recycled asset [$assetId]")
 
-      val asset: Asset = getById(assetId)
-      val existing = getByChecksum(asset.checksum)
+        val asset: Asset = getById(assetId)
+        val existing = getByChecksum(asset.checksum)
 
-      if (existing.isDefined) {
-        throw DuplicateException()
-      }
-
-      txManager.withTransaction {
-        if (asset.isRecycled) {
-          app.service.asset.setRecycledProp(asset, isRecycled = false)
-          // OPTIMIZE: create a lookup cache for folders, to avoid querying for each asset
-          val folder: Folder = app.service.folder.getById(asset.folderId)
-
-          if (folder.isRecycled) {
-            app.service.folder.setRecycledProp(folder = folder, isRecycled = false)
-          }
-
-          val restoredAsset: Asset = getById(assetId)
-          app.service.stats.restoreAsset(restoredAsset)
+        if (existing.isDefined) {
+          throw DuplicateException()
         }
-      }
+
+        txManager.withTransaction {
+          if (asset.isRecycled) {
+            app.service.asset.setRecycledProp(asset, isRecycled = false)
+            // OPTIMIZE: create a lookup cache for folders, to avoid querying for each asset
+            val folder: Folder = app.service.folder.getById(asset.folderId)
+
+            if (folder.isRecycled) {
+              app.service.folder.setRecycledProp(folder = folder, isRecycled = false)
+            }
+
+            val restoredAsset: Asset = getById(assetId)
+            app.service.stats.restoreAsset(restoredAsset)
+          }
+        }
     }
   }
 
@@ -398,18 +387,19 @@ class LibraryService(val app: Altitude) {
 
   def recycleAssets(assetIds: Set[String]): Unit = {
 
-    assetIds.foreach { assetId =>
-      txManager.withTransaction {
-        val asset: Asset = getById(assetId)
-        app.service.asset.setRecycledProp(asset, isRecycled = true)
-        app.service.stats.recycleAsset(asset.copy(isRecycled = true))
-      }
+    assetIds.foreach {
+      assetId =>
+        txManager.withTransaction {
+          val asset: Asset = getById(assetId)
+          app.service.asset.setRecycledProp(asset, isRecycled = true)
+          app.service.stats.recycleAsset(asset.copy(isRecycled = true))
+        }
     }
   }
 
-  /** **************************************************************************
-    * METADATA
-    * *********************************************************************** */
+  /**
+   * ************************************************************************** METADATA ***********************************************************************
+   */
 
   def addMetadataValue(assetId: String, fieldId: String, newValue: Any): Unit = {
     txManager.withTransaction {

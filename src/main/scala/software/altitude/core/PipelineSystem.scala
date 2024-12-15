@@ -2,6 +2,7 @@ package software.altitude.core
 
 import org.apache.pekko.actor.typed.Behavior
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
+
 import software.altitude.core.models.AssetWithData
 
 object PipelineSystem {
@@ -13,9 +14,9 @@ object PipelineSystem {
       context =>
         context.log.info("Starting the Pipeline actor system....")
         Behaviors.receiveMessage {
-            case ProcessAssetCommand(assetWithData) =>
-                context.log.info("Processing asset: {}", assetWithData.asset.id)
-                Behaviors.same
+          case ProcessAssetCommand(assetWithData) =>
+            context.log.info("Processing asset: {}", assetWithData.asset.id)
+            Behaviors.same
         }
     }
 }

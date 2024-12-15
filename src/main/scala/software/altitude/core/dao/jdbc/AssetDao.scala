@@ -3,6 +3,7 @@ package software.altitude.core.dao.jdbc
 import com.typesafe.config.Config
 import org.apache.commons.dbutils.QueryRunner
 import play.api.libs.json._
+
 import software.altitude.core.FieldConst
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
@@ -14,9 +15,8 @@ import software.altitude.core.models.UserMetadata
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 
-
 abstract class AssetDao(val config: Config) extends BaseDao with software.altitude.core.dao.AssetDao {
-  override final val tableName = "asset"
+  final override val tableName = "asset"
 
   override val sqlQueryBuilder = new SqlQueryBuilder[Query](columnsForSelect, tableName)
 
@@ -35,7 +35,7 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
       sizeBytes = rec(FieldConst.Asset.SIZE_BYTES).asInstanceOf[Int],
       extractedMetadata = getJsonFromColumn(rec(FieldConst.Asset.EXTRACTED_METADATA)): ExtractedMetadata,
       publicMetadata = getJsonFromColumn(rec(FieldConst.Asset.PUBLIC_METADATA)): PublicMetadata,
-      userMetadata =getJsonFromColumn(rec(FieldConst.Asset.USER_METADATA)): UserMetadata,
+      userMetadata = getJsonFromColumn(rec(FieldConst.Asset.USER_METADATA)): UserMetadata,
       folderId = rec(FieldConst.Asset.FOLDER_ID).asInstanceOf[String],
       isRecycled = getBooleanField(rec(FieldConst.Asset.IS_RECYCLED)),
       isTriaged = getBooleanField(rec(FieldConst.Asset.IS_TRIAGED)),
@@ -119,9 +119,7 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
        WHERE ${FieldConst.REPO_ID} = ? AND ${FieldConst.ID} = ?
       """
 
-    val updateValues = List(
-      metadataWithIds.toJson.toString,
-      RequestContext.getRepository.persistedId, assetId)
+    val updateValues = List(metadataWithIds.toJson.toString, RequestContext.getRepository.persistedId, assetId)
     logger.debug(s"Update SQL: [$sql] with values: $updateValues")
     val runner: QueryRunner = new QueryRunner()
 

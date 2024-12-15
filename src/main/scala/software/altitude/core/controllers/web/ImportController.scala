@@ -1,5 +1,8 @@
 package software.altitude.core.controllers.web
 
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import org.apache.commons.fileupload.servlet.ServletFileUpload
 import org.apache.commons.io.IOUtils
 import org.json4s.DefaultFormats
@@ -15,9 +18,13 @@ import org.scalatra.atmosphere.Disconnected
 import org.scalatra.atmosphere.Error
 import org.scalatra.atmosphere.JsonMessage
 import org.scalatra.atmosphere.TextMessage
-import org.scalatra.json.JValueResult
 import org.scalatra.json.JacksonJsonSupport
+import org.scalatra.json.JValueResult
 import org.scalatra.servlet.SizeConstraintExceededException
+
+import scala.collection.concurrent.TrieMap
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import software.altitude.core.Api
 import software.altitude.core.DuplicateException
 import software.altitude.core.RequestContext
@@ -25,12 +32,6 @@ import software.altitude.core.controllers.BaseWebController
 import software.altitude.core.controllers.web.ImportController.isCancelled
 import software.altitude.core.models.ImportAsset
 import software.altitude.core.models.UserMetadata
-
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
-import scala.collection.concurrent.TrieMap
-import scala.concurrent.ExecutionContext.Implicits.global
 
 object ImportController {
   private val uploadCancelRequest = TrieMap[String, Boolean]()
@@ -40,12 +41,7 @@ object ImportController {
   }
 }
 
-class ImportController
-  extends BaseWebController
-    with AtmosphereSupport
-    with JValueResult
-    with JacksonJsonSupport
-    with SessionSupport {
+class ImportController extends BaseWebController with AtmosphereSupport with JValueResult with JacksonJsonSupport with SessionSupport {
   private val fileSizeLimitGB = 10
 
   private class ImportCounters {
@@ -99,7 +95,7 @@ class ImportController
           userToWsClientLookup(userId) = clients.filterNot(_ == this)
 
         case Error(Some(error)) =>
-            logger.error(s"WS Error: $error")
+          logger.error(s"WS Error: $error")
 
         case TextMessage(text) =>
         case JsonMessage(json) =>
@@ -128,7 +124,7 @@ class ImportController
       halt(200, layoutTemplate("/WEB-INF/templates/views/htmx/upload_form.ssp"))
     }
 
-    val importStatus = importAssetCountPerRepo.computeIfAbsent(uploadId, _ => new ImportCounters )
+    val importStatus = importAssetCountPerRepo.computeIfAbsent(uploadId, _ => new ImportCounters)
 
     val iter = servletFileUpload.getItemIterator(request)
     while (iter.hasNext && !isCancelled(uploadId)) {
@@ -140,10 +136,7 @@ class ImportController
       val bytes = IOUtils.toByteArray(fStream)
       logger.info(s"Received file: ${fileItemStream.getName}]")
 
-      val importAsset = new ImportAsset(
-        fileName = fileItemStream.getName,
-        data = bytes,
-        metadata = UserMetadata())
+      val importAsset = new ImportAsset(fileName = fileItemStream.getName, data = bytes, metadata = UserMetadata())
 
       app.executorService.submit(new Runnable {
         override def run(): Unit = {
@@ -170,21 +163,21 @@ class ImportController
               sendWsStatusToUserClients(errorStatusTickerTemplate.format(errorStatusText))
 
           } finally {
-            val isFinishedUploading =  importStatus.isFinishedUploading.get()
+            val isFinishedUploading = importStatus.isFinishedUploading.get()
             val inProgress = importStatus.inProgress.decrementAndGet()
             val processedSoFar = importStatus.processedSoFar.get()
             val total = importStatus.total.get()
             val _isCancelled = isCancelled(uploadId)
 
-            logger.info(s"Is cancelled: ${_isCancelled}, is finished uploading: $isFinishedUploading, total: $total, in progress: $inProgress, processed so far: $processedSoFar")
+            logger.info(
+              s"Is cancelled: ${_isCancelled}, is finished uploading: $isFinishedUploading, total: $total, in progress: $inProgress, processed so far: $processedSoFar")
             val isDone = isFinishedUploading && (processedSoFar == total) && inProgress == 0
 
             if (isDone || _isCancelled) {
               // save the model after all files have been processed
               app.service.faceRecognition.saveModel()
 
-              sendWsStatusToUserClients(
-                successStatusTickerTemplate.format("All files processed"))
+              sendWsStatusToUserClients(successStatusTickerTemplate.format("All files processed"))
             }
           }
         }
@@ -200,10 +193,7 @@ class ImportController
   }
 
   private def sendWsStatusToUserClients(message: String): Unit = {
-    userToWsClientLookup.get(RequestContext.getAccount.persistedId).foreach { clients =>
-      clients.foreach { client =>client.send(message)
-      }
-    }
+    userToWsClientLookup.get(RequestContext.getAccount.persistedId).foreach(clients => clients.foreach(client => client.send(message)))
   }
 
   error {

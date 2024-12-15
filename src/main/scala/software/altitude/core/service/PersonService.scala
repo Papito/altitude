@@ -1,6 +1,7 @@
 package software.altitude.core.service
 
 import play.api.libs.json.JsObject
+
 import software.altitude.core.Altitude
 import software.altitude.core.FieldConst
 import software.altitude.core.dao.FaceDao
@@ -18,7 +19,7 @@ object PersonService {
   val UNKNOWN_NAME_PREFIX = "Unknown"
 }
 
-class PersonService (val app: Altitude) extends BaseService[Person] {
+class PersonService(val app: Altitude) extends BaseService[Person] {
   protected val dao: PersonDao = app.DAO.person
   private val faceDao: FaceDao = app.DAO.face
 
@@ -77,7 +78,7 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
 
       // Without a face given, numOfFaces is 0, with a face given, it's 1
       val personForUpdate = person.copy(
-        numOfFaces = person.getFaces.size,
+        numOfFaces = person.getFaces.size
       )
 
       dao.add(personForUpdate): Person
@@ -86,7 +87,7 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
 
   def merge(dest: Person, source: Person): Person = {
     if (source == dest) {
-        throw new IllegalArgumentException("Cannot merge a person with itself. That's perverse!")
+      throw new IllegalArgumentException("Cannot merge a person with itself. That's perverse!")
     }
 
     if (source.mergedIntoId.nonEmpty) {
@@ -102,27 +103,22 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
     txManager.withTransaction[Person] {
 
       if (source.mergedWithIds.nonEmpty) {
+
         /**
-         * If the source person was merged with other people before, follow that relation and update THAT source with
-         * current destination info.
-         * This way, when of of the old merge sources is pulled by label from cache, it will point directly to this new
-         * composite person.
+         * If the source person was merged with other people before, follow that relation and update THAT source with current destination info. This way, when
+         * of of the old merge sources is pulled by label from cache, it will point directly to this new composite person.
          */
         logger.info(s"Source person ${source.name} was merged with other people before. IDs: ${source.mergedWithIds}")
         logger.info("Updating the old merge sources with the new destination info")
-        val oldMergeSourcesQ = new Query().add(
-          FieldConst.ID -> Query.IN(source.mergedWithIds.toSet))
+        val oldMergeSourcesQ = new Query().add(FieldConst.ID -> Query.IN(source.mergedWithIds.toSet))
 
-        updateByQuery(
-          oldMergeSourcesQ,
-          Map(
-            FieldConst.Person.MERGED_INTO_ID -> dest.persistedId,
-            FieldConst.Person.MERGED_INTO_LABEL -> dest.label))
+        updateByQuery(oldMergeSourcesQ, Map(FieldConst.Person.MERGED_INTO_ID -> dest.persistedId, FieldConst.Person.MERGED_INTO_LABEL -> dest.label))
 
         // update the cache with the new destination info
-        source.mergedWithIds.foreach { oldMergeSourceId =>
-          val oldMergeSource = getPersonById(oldMergeSourceId)
-          app.service.faceCache.putPerson(oldMergeSource)
+        source.mergedWithIds.foreach {
+          oldMergeSourceId =>
+            val oldMergeSource = getPersonById(oldMergeSourceId)
+            app.service.faceCache.putPerson(oldMergeSource)
         }
       }
 
@@ -134,9 +130,7 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
       val updatedDest = mergedDest.copy(numOfFaces = persistedDest.numOfFaces + persistedSource.numOfFaces)
 
       // update new destination count
-      updateById(
-        dest.persistedId,
-        Map(FieldConst.Person.NUM_OF_FACES -> updatedDest.numOfFaces))
+      updateById(dest.persistedId, Map(FieldConst.Person.NUM_OF_FACES -> updatedDest.numOfFaces))
 
       // move all faces from source to destination
       logger.debug(s"Moving faces from ${source.name.get} to ${dest.name.get}")
@@ -151,9 +145,7 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
       faceDao.updateByQuery(q, Map(FieldConst.Face.PERSON_ID -> dest.persistedId))
 
       // specify ID/label of where the source person was merged into
-      val updatedSource: Person = persistedSource.copy(
-        mergedIntoId = Some(dest.persistedId),
-        mergedIntoLabel = Some(dest.label))
+      val updatedSource: Person = persistedSource.copy(mergedIntoId = Some(dest.persistedId), mergedIntoLabel = Some(dest.label))
 
       updatedSource.clearFaces()
 
@@ -163,7 +155,8 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
           FieldConst.Person.MERGED_INTO_ID -> updatedSource.mergedIntoId.get,
           FieldConst.Person.MERGED_INTO_LABEL -> updatedSource.mergedIntoLabel.get,
           FieldConst.Person.NUM_OF_FACES -> 0
-        ))
+        )
+      )
 
       // get the top face after merge
       val destFaces = getPersonFaces(dest.persistedId, FaceRecognitionService.MAX_COMPARISONS_PER_PERSON)
@@ -180,9 +173,7 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
     txManager.asReadOnly[List[Face]] {
       val sort: Sort = Sort(FieldConst.Face.DETECTION_SCORE, SortDirection.DESC)
 
-      val q = new Query(
-        params=Map(FieldConst.Face.PERSON_ID -> personId),
-        sort=List(sort))
+      val q = new Query(params = Map(FieldConst.Face.PERSON_ID -> personId), sort = List(sort))
 
       val qRes: QueryResult = faceDao.query(q)
       qRes.records.take(limit).map(Face.fromJson(_))
@@ -191,8 +182,7 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
 
   def getAssetFaces(assetId: String): List[Face] = {
     txManager.asReadOnly[List[Face]] {
-      val q = new Query(
-        params=Map(FieldConst.Face.ASSET_ID -> assetId))
+      val q = new Query(params = Map(FieldConst.Face.ASSET_ID -> assetId))
 
       val qRes: QueryResult = faceDao.query(q)
       qRes.records.map(Face.fromJson(_))
@@ -204,8 +194,7 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
       val faces = getAssetFaces(assetId)
       val personIds = faces.map(_.personId.get)
 
-      val q = new Query(
-        params=Map(FieldConst.ID -> Query.IN(personIds.toSet)))
+      val q = new Query(params = Map(FieldConst.ID -> Query.IN(personIds.toSet)))
 
       val qRes: QueryResult = dao.query(q)
       qRes.records.map(Person.fromJson(_))
@@ -216,9 +205,7 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
     txManager.withTransaction {
       val personForUpdate = person.copy(coverFaceId = Some(face.persistedId))
 
-      updateById(
-        person.persistedId,
-        Map(FieldConst.Person.COVER_FACE_ID -> face.persistedId))
+      updateById(person.persistedId, Map(FieldConst.Person.COVER_FACE_ID -> face.persistedId))
 
       personForUpdate
     }
@@ -227,9 +214,7 @@ class PersonService (val app: Altitude) extends BaseService[Person] {
   def updateName(person: Person, newName: String): Person = {
     txManager.withTransaction {
 
-      updateById(
-        person.persistedId,
-        Map(FieldConst.Person.NAME -> newName))
+      updateById(person.persistedId, Map(FieldConst.Person.NAME -> newName))
 
       person.copy(name = Some(newName))
     }

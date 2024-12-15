@@ -43,6 +43,7 @@ lint:
 	npm run format
 	npm run lint:fix
 	sbt scalafixAll
+	sbt scalafmt
 
 clean:
 	rm -rf data/*

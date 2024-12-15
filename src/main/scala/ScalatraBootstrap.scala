@@ -1,8 +1,8 @@
+import javax.servlet.ServletContext
 import org.scalatra._
+
 import software.altitude.core.AltitudeServletContext
 import software.altitude.core.Environment
-
-import javax.servlet.ServletContext
 
 class ScalatraBootstrap extends LifeCycle with AltitudeServletContext {
 

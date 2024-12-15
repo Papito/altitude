@@ -1,8 +1,10 @@
 package software.altitude.core.dao.jdbc
 
 import com.typesafe.config.Config
+import java.sql.PreparedStatement
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
+
 import software.altitude.core.FieldConst
 import software.altitude.core.RequestContext
 import software.altitude.core.models.Asset
@@ -11,11 +13,9 @@ import software.altitude.core.models.Person
 import software.altitude.core.service.FaceRecognitionService
 import software.altitude.core.util.MurmurHash
 
-import java.sql.PreparedStatement
-
 abstract class FaceDao(override val config: Config) extends BaseDao with software.altitude.core.dao.FaceDao {
 
-  override final val tableName = "face"
+  final override val tableName = "face"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
     val liteModel = makeLiteModel(rec)
@@ -76,19 +76,18 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
     val conn = RequestContext.getConn
 
     /**
-     * Embeddings and Features are an array of floats, and even though Postgres supports float array natively,
-     * there is really no value in creating a separate DAO hierarchy just for that.
-     * Both DBs store this data as JSON in a TEXT field - faces are preloaded into memory anyway.
+     * Embeddings and Features are an array of floats, and even though Postgres supports float array natively, there is really no value in creating a separate
+     * DAO hierarchy just for that. Both DBs store this data as JSON in a TEXT field - faces are preloaded into memory anyway.
      *
-     * Why not as a CSV? Casting floats into Strings and back is a pain, and JSON is more pliable for this, without
-     * worrying about messing with precision. This just works.
+     * Why not as a CSV? Casting floats into Strings and back is a pain, and JSON is more pliable for this, without worrying about messing with precision. This
+     * just works.
      */
     val embeddingsArrayJson = Json.obj(
-      FieldConst.Face.EMBEDDINGS -> Json.toJson(face.embeddings),
+      FieldConst.Face.EMBEDDINGS -> Json.toJson(face.embeddings)
     )
 
     val featuresArrayJson = Json.obj(
-      FieldConst.Face.FEATURES -> Json.toJson(face.features),
+      FieldConst.Face.FEATURES -> Json.toJson(face.features)
     )
 
     val checksum = MurmurHash.hash32(face.image)
@@ -117,19 +116,29 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
       FieldConst.ID -> id,
       FieldConst.Face.ASSET_ID -> asset.id.get,
       FieldConst.Face.PERSON_ID -> person.id.get,
-      FieldConst.Face.PERSON_LABEL -> person.label,
+      FieldConst.Face.PERSON_LABEL -> person.label
     )
   }
 
   /**
-   * Get faces for all people in this repo, but only the top X faces per person.
-   * We use those to brute-force compare a new face, if there is no machine-learned hit,
-   * and to verify ML hits as well.
+   * Get faces for all people in this repo, but only the top X faces per person. We use those to brute-force compare a new face, if there is no machine-learned
+   * hit, and to verify ML hits as well.
    */
   def getAllForCache: List[Face] = {
-    val selectColumns = List(FieldConst.ID, FieldConst.REPO_ID, FieldConst.Face.X1, FieldConst.Face.Y1, FieldConst.Face.WIDTH, FieldConst.Face.HEIGHT,
-      FieldConst.Face.ASSET_ID, FieldConst.Face.PERSON_ID, FieldConst.Face.PERSON_LABEL, FieldConst.Face.DETECTION_SCORE, FieldConst.Face.EMBEDDINGS,
-      FieldConst.Face.FEATURES)
+    val selectColumns = List(
+      FieldConst.ID,
+      FieldConst.REPO_ID,
+      FieldConst.Face.X1,
+      FieldConst.Face.Y1,
+      FieldConst.Face.WIDTH,
+      FieldConst.Face.HEIGHT,
+      FieldConst.Face.ASSET_ID,
+      FieldConst.Face.PERSON_ID,
+      FieldConst.Face.PERSON_LABEL,
+      FieldConst.Face.DETECTION_SCORE,
+      FieldConst.Face.EMBEDDINGS,
+      FieldConst.Face.FEATURES
+    )
 
     val sql = s"""
        SELECT ${selectColumns.mkString(", ")}
@@ -144,10 +153,8 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
         """
 
     val recs: List[Map[String, AnyRef]] = manyBySqlQuery(
-      sql, List(
-        RequestContext.getRepository.persistedId,
-        RequestContext.getRepository.persistedId,
-        FaceRecognitionService.MAX_COMPARISONS_PER_PERSON))
+      sql,
+      List(RequestContext.getRepository.persistedId, RequestContext.getRepository.persistedId, FaceRecognitionService.MAX_COMPARISONS_PER_PERSON))
 
     recs.map(makeLiteModel)
   }
