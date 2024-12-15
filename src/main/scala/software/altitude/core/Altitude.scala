@@ -5,6 +5,7 @@ import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
+import org.apache.pekko.actor.typed.ActorSystem
 import org.scalatra.auth.ScentryStrategy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -258,6 +259,8 @@ class Altitude(val dbEngineOverride: Option[String] = None)  {
     val faceDetection = new FaceDetectionService()
     val faceRecognition = new FaceRecognitionService(app)
     val faceCache = new FaceCacheService(app)
+    val pipelineSystem: ActorSystem[PipelineSystem.ProcessAssetCommand] = ActorSystem(
+      PipelineSystem(), "PipelineActorSystem")
 
     val fileStore: FileStoreService = fileStoreType match {
       case C.StorageEngineName.FS => new FileSystemStoreService(app)
@@ -290,6 +293,14 @@ class Altitude(val dbEngineOverride: Option[String] = None)  {
        logger.warn("Migration is required!")
       service.migrationService.migrate()
     }
+  }
+
+  def cleanup(): Unit = {
+    logger.info("Cleaning up resources")
+    executorService.shutdown()
+    logger.info("Executor service terminated")
+    service.pipelineSystem.terminate()
+    logger.info("Pipeline system terminated")
   }
 
   logger.info("Altitude Server instance initialized")

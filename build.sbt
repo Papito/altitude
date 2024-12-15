@@ -5,6 +5,7 @@ scalaVersion := "2.13.14"
 
 val json4sVersion = "4.0.7"
 val scalatraVersion = "2.8.4"
+val pekkoVersion = "1.1.2"
 val jettyVersion = "9.4.20.v20190813"
 val opencvVersion = "1.5.10"
 
@@ -46,6 +47,9 @@ libraryDependencies ++= Seq(
   "org.apache.tika"              % "tika-parser-image-module" % "2.9.2",
   "ch.qos.logback"               % "logback-classic"          % "1.5.9" % "runtime",
   "org.slf4j"                    % "slf4j-api"                % "2.0.12" % "runtime",
+
+  "org.apache.pekko"             %% "pekko-actor-typed"         % pekkoVersion,
+  "org.apache.pekko"             %% "pekko-testkit"           % pekkoVersion % Test,
 
   "org.scalatra"                %% "scalatra-scalatest"       % scalatraVersion % Test,
   "org.mockito"                  % "mockito-core"             % "5.11.0" % Test,
