@@ -84,7 +84,7 @@ import software.altitude.test.core.IntegrationTestCore
 
   }
 
-  test("Load face cache", Focused) {
+  test("Load face cache") {
     val personA: Person = testApp.service.person.addPerson(Person(name=Some(Util.randomStr(size = 6))))
     testContext.addTestFaces(personA, 15)
 

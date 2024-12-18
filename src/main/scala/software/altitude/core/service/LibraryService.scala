@@ -1,21 +1,24 @@
 package software.altitude.core.service
+import org.apache.pekko.stream.scaladsl.Source
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
-
-import software.altitude.core.{Const => C, _}
 import software.altitude.core.Altitude
 import software.altitude.core.FieldConst
 import software.altitude.core.RequestContext
-import software.altitude.core.dao.jdbc.BaseDao
-import software.altitude.core.models._
 import software.altitude.core.models.Folder
+import software.altitude.core.models._
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.ImageUtil.makeImageThumbnail
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchResult
+import software.altitude.core.{Const => C, _}
+
+import scala.concurrent.Await
+import scala.concurrent.Future
+import scala.concurrent.duration.Duration
 
 /**
  * The class that stitches it all together TOC:
@@ -48,36 +51,29 @@ class LibraryService(val app: Altitude) {
       }
 
       /** Create the version of the asset with ID and metadata */
-      val assetId = BaseDao.genId
-      val userMetadata = app.service.metadata.cleanAndValidate(dataAssetIn.asset.userMetadata)
-      val extractedMetadata = app.service.metadataExtractor.extract(dataAssetIn.data)
-      val publicMetadata = Asset.getPublicMetadata(extractedMetadata)
+      val source = Source.single(dataAssetIn)
+      val pipelineResFuture: Future[AssetWithData] = app.service.pipelineSystem.importPipeline(source)
 
-      val asset: Asset = dataAssetIn.asset.copy(
-        id = Some(assetId),
-        userMetadata = userMetadata,
-        extractedMetadata = extractedMetadata,
-        publicMetadata = publicMetadata
-      )
+      val dataAsset = Await.result(pipelineResFuture, Duration.Inf)
 
-      /**
-       * This data asset has:
-       *   - Asset with ID
-       *   - Asset with metadata
-       *   - The actual data (which we normally do not pass around for performance reasons)
-       */
-      val dataAsset = AssetWithData(asset, dataAssetIn.data)
+      //      /**
+      //       * This data asset has:
+      //       *    - Asset with ID
+      //       *    - Asset with metadata
+      //       *    - The actual data (which we normally do not pass around for performance reasons)
+      //       */
+      //      val dataAsset = AssetWithData(asset, dataAssetIn.data)
+      //
+      //      logger.info(s"Adding asset: $dataAsset")
+      //
+      //      app.service.asset.add(asset)
+      //      app.service.faceRecognition.processAsset(dataAsset)
+      //      app.service.search.indexAsset(asset)
+      //      app.service.stats.addAsset(asset)
+      //      app.service.fileStore.addAsset(dataAsset)
+      //      addPreview(dataAsset)
 
-      logger.info(s"Adding asset: $dataAsset")
-
-      app.service.asset.add(asset)
-      app.service.faceRecognition.processAsset(dataAsset)
-      app.service.search.indexAsset(asset)
-      app.service.stats.addAsset(asset)
-      app.service.fileStore.addAsset(dataAsset)
-      addPreview(dataAsset)
-
-      asset
+      dataAsset.asset
     }
   }
 

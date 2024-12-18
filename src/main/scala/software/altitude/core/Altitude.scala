@@ -3,17 +3,11 @@ package software.altitude.core
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
-import java.io.File
-import java.util.concurrent.Executors
-import java.util.concurrent.ExecutorService
-import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.FileUtils
-import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.commons.io.FilenameUtils
 import org.scalatra.auth.ScentryStrategy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
-import software.altitude.core.{Const => C}
 import software.altitude.core.auth.strategies.LocalDevRememberMeStrategy
 import software.altitude.core.auth.strategies.RememberMeStrategy
 import software.altitude.core.auth.strategies.TestRememberMeStrategy
@@ -24,6 +18,11 @@ import software.altitude.core.service._
 import software.altitude.core.service.filestore.FileStoreService
 import software.altitude.core.service.filestore.FileSystemStoreService
 import software.altitude.core.transactions._
+import software.altitude.core.{Const => C}
+
+import java.io.File
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class Altitude(val dbEngineOverride: Option[String] = None) {
   final protected val logger: Logger = LoggerFactory.getLogger(getClass)
@@ -256,7 +255,7 @@ class Altitude(val dbEngineOverride: Option[String] = None) {
     val faceDetection = new FaceDetectionService()
     val faceRecognition = new FaceRecognitionService(app)
     val faceCache = new FaceCacheService(app)
-    val pipelineSystem: ActorSystem[PipelineSystem.ProcessAssetCommand] = ActorSystem(PipelineSystem(), "PipelineActorSystem")
+    val pipelineSystem = new PipelineSystem(app)
 
     val fileStore: FileStoreService = fileStoreType match {
       case C.StorageEngineName.FS => new FileSystemStoreService(app)
@@ -295,7 +294,7 @@ class Altitude(val dbEngineOverride: Option[String] = None) {
     logger.info("Cleaning up resources")
     executorService.shutdown()
     logger.info("Executor service terminated")
-    service.pipelineSystem.terminate()
+    service.pipelineSystem.shutdown()
     logger.info("Pipeline system terminated")
   }
 

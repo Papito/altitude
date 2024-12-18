@@ -43,12 +43,13 @@ libraryDependencies ++= Seq(
 
   "com.drewnoakes"               % "metadata-extractor"       % "2.19.0",
   "org.apache.tika"              % "tika-core"                % "2.9.2",
-  "org.apache.tika"              % "tika-parsers" % "2.9.2",
+  "org.apache.tika"              % "tika-parsers"             % "2.9.2",
   "org.apache.tika"              % "tika-parser-image-module" % "2.9.2",
   "ch.qos.logback"               % "logback-classic"          % "1.5.9" % "runtime",
   "org.slf4j"                    % "slf4j-api"                % "2.0.12" % "runtime",
 
-  "org.apache.pekko"             %% "pekko-actor-typed"         % pekkoVersion,
+  "org.apache.pekko"             %% "pekko-actor-typed"       % pekkoVersion,
+  "org.apache.pekko"             %% "pekko-stream-typed"      % pekkoVersion,
   "org.apache.pekko"             %% "pekko-testkit"           % pekkoVersion % Test,
 
   "org.scalatra"                %% "scalatra-scalatest"       % scalatraVersion % Test,

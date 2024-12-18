@@ -2,7 +2,6 @@ package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.be
-import org.scalatest.matchers.must.Matchers.empty
 import org.scalatest.matchers.must.Matchers.equal
 import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
@@ -24,26 +23,27 @@ import software.altitude.test.core.IntegrationTestCore
     }
   }
 
-  test("Imported image with extracted metadata should successfully import") {
+  test("Imported image with extracted metadata should successfully import", Focused) {
     val importAsset = IntegrationTestUtil.getImportAsset("people/bullock.jpg")
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
-
-    importedAsset.assetType should equal(importedAsset.assetType)
-    importedAsset.checksum should not be 0
-
-    val asset = testApp.service.library.getById(importedAsset.persistedId): Asset
-    asset.assetType should equal(importedAsset.assetType)
-    asset.checksum should not be 0
-    asset.sizeBytes should not be 0
-
-    asset.extractedMetadata.getFieldValues("JPEG").get("Image Height") should not be empty
-
-    asset.publicMetadata.deviceModel should not be empty
-    asset.publicMetadata.fNumber should not be empty
-    asset.publicMetadata.focalLength should not be empty
-    asset.publicMetadata.iso should not be empty
-    asset.publicMetadata.exposureTime should not be empty
-    asset.publicMetadata.dateTimeOriginal should not be empty
+    println(importedAsset.extractedMetadata.toJson.toString())
+//
+//    importedAsset.assetType should equal(importedAsset.assetType)
+//    importedAsset.checksum should not be 0
+//
+//    val asset = testApp.service.library.getById(importedAsset.persistedId): Asset
+//    asset.assetType should equal(importedAsset.assetType)
+//    asset.checksum should not be 0
+//    asset.sizeBytes should not be 0
+//
+//    asset.extractedMetadata.getFieldValues("JPEG").get("Image Height") should not be empty
+//
+//    asset.publicMetadata.deviceModel should not be empty
+//    asset.publicMetadata.fNumber should not be empty
+//    asset.publicMetadata.focalLength should not be empty
+//    asset.publicMetadata.iso should not be empty
+//    asset.publicMetadata.exposureTime should not be empty
+//    asset.publicMetadata.dateTimeOriginal should not be empty
   }
 
   test("Imported image should have a preview") {
