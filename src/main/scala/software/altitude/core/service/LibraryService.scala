@@ -53,10 +53,10 @@ class LibraryService(val app: Altitude) {
 
       val pipelineContext = PipelineContext(RequestContext.getRepository, RequestContext.getAccount)
       val source: Source[(AssetWithData, PipelineContext), NotUsed] = Source.single((dataAssetIn, pipelineContext))
-      val pipelineResFuture: Future[(AssetWithData, PipelineContext)] = app.service.pipelineSystem.importPipeline(source)
+      val pipelineResFuture: Future[Seq[AssetWithData]] = app.service.importPipeline.run(source)
 
       val result = Await.result(pipelineResFuture, Duration.Inf)
-      val dataAsset = result._1
+      val dataAsset = result.head
 
       //      /**
       //       * This data asset has:

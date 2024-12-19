@@ -255,7 +255,7 @@ class Altitude(val dbEngineOverride: Option[String] = None) {
     val faceDetection = new FaceDetectionService()
     val faceRecognition = new FaceRecognitionService(app)
     val faceCache = new FaceCacheService(app)
-    val pipelineSystem = new PipelineSystem(app)
+    val importPipeline = new ImportPipelineService(app)
 
     val fileStore: FileStoreService = fileStoreType match {
       case C.StorageEngineName.FS => new FileSystemStoreService(app)
@@ -294,7 +294,7 @@ class Altitude(val dbEngineOverride: Option[String] = None) {
     logger.info("Cleaning up resources")
     executorService.shutdown()
     logger.info("Executor service terminated")
-    service.pipelineSystem.shutdown()
+    service.importPipeline.shutdown()
     logger.info("Pipeline system terminated")
   }
 
