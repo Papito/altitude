@@ -32,8 +32,8 @@ import scala.concurrent.duration.Duration
     }
   }
 
-  test("Pipeline") {
-    val dataAssetsIn = (1 to 3).map(_ => {
+  test("Pipeline", Focused) {
+    val dataAssetsIn = (1 to 20).map(_ => {
       val importAsset = IntegrationTestUtil.getImportAsset("people/bullock.jpg")
       val asset: Asset = Asset(
         userId = testContext.user.persistedId,
@@ -55,7 +55,7 @@ import scala.concurrent.duration.Duration
     println(result)
   }
 
-  test("Imported image with extracted metadata should successfully import", Focused) {
+  test("Imported image with extracted metadata should successfully import") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/bullock.jpg")
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
     println(importedAsset.extractedMetadata.toJson.toString())

@@ -23,7 +23,7 @@ class ImportPipelineService(app: Altitude) {
   private val parallelism = Runtime.getRuntime.availableProcessors
 
   private val extractMetadataFlow: Flow[(AssetWithData, PipelineContext), (AssetWithData, PipelineContext), NotUsed] =
-    Flow[(AssetWithData, PipelineContext)].map {
+    Flow[(AssetWithData, PipelineContext)].mapAsync(parallelism) {
       case (dataAsset, ctx) =>
         val assetId = BaseDao.genId
         val extractedMetadata = app.service.metadataExtractor.extract(dataAsset.data)
@@ -36,22 +36,24 @@ class ImportPipelineService(app: Altitude) {
         )
 
         println(s"(Thread: ${Thread.currentThread().getName})")
-        (AssetWithData(asset, dataAsset.data), ctx)
+        Future.successful(AssetWithData(asset, dataAsset.data), ctx)
     }
 
-  private val fileStoreFlow: Flow[(AssetWithData, PipelineContext), (AssetWithData, PipelineContext), NotUsed] = Flow[(AssetWithData, PipelineContext)].map {
-    case (dataAsset, ctx) =>
-      RequestContext.repository.value = Some(ctx.repository)
-      RequestContext.account.value = Some(ctx.account)
-      println(s"(Thread: ${Thread.currentThread().getName})")
-      println(s"Storing asset ${dataAsset.asset.id.get} in file store")
-      app.service.fileStore.addAsset(dataAsset)
-      (dataAsset, ctx)
-  }
+  private val fileStoreFlow: Flow[(AssetWithData, PipelineContext), (AssetWithData, PipelineContext), NotUsed] =
+    Flow[(AssetWithData, PipelineContext)].mapAsync(parallelism) {
+      case (dataAsset, ctx) =>
+        RequestContext.repository.value = Some(ctx.repository)
+        RequestContext.account.value = Some(ctx.account)
+        println(s"(Thread: ${Thread.currentThread().getName})")
+        println(s"Storing asset ${dataAsset.asset.id.get} in file store")
+        app.service.fileStore.addAsset(dataAsset)
+        Future.successful(dataAsset, ctx)
+    }
 
   def run(source: Source[(AssetWithData, PipelineContext), NotUsed]): Future[Seq[AssetWithData]] = {
     source
       .via(extractMetadataFlow)
+      .async
       .via(fileStoreFlow)
       .map { case (dataAsset, _) => dataAsset }
       .runWith(Sink.seq)
