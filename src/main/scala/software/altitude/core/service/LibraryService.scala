@@ -1,4 +1,5 @@
 package software.altitude.core.service
+import org.apache.pekko.NotUsed
 import org.apache.pekko.stream.scaladsl.Source
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -50,11 +51,12 @@ class LibraryService(val app: Altitude) {
         throw DuplicateException()
       }
 
-      /** Create the version of the asset with ID and metadata */
-      val source = Source.single(dataAssetIn)
-      val pipelineResFuture: Future[AssetWithData] = app.service.pipelineSystem.importPipeline(source)
+      val pipelineContext = PipelineContext(RequestContext.getRepository, RequestContext.getAccount)
+      val source: Source[(AssetWithData, PipelineContext), NotUsed] = Source.single((dataAssetIn, pipelineContext))
+      val pipelineResFuture: Future[(AssetWithData, PipelineContext)] = app.service.pipelineSystem.importPipeline(source)
 
-      val dataAsset = Await.result(pipelineResFuture, Duration.Inf)
+      val result = Await.result(pipelineResFuture, Duration.Inf)
+      val dataAsset = result._1
 
       //      /**
       //       * This data asset has:
