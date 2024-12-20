@@ -23,7 +23,6 @@ object PostgresSuiteBundle {
 
     testApp.service.migrationService.migrate()
   }
-
 }
 
 class PostgresSuiteBundle
