@@ -21,4 +21,5 @@ abstract class AllIntegrationTestSuites(val testApp: Altitude) extends Suites (
   new FaceDetectionTests(testApp),
   new PersonServiceTests(testApp),
   new FaceRecognitionServiceTests(testApp),
+  new ImportPipelineServiceTests(testApp),
 )

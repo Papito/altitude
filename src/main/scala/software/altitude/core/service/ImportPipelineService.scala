@@ -10,10 +10,10 @@ import org.apache.pekko.stream.scaladsl.Flow
 import org.apache.pekko.stream.scaladsl.GraphDSL
 import org.apache.pekko.stream.scaladsl.Sink
 import org.apache.pekko.stream.scaladsl.Source
+import org.apache.pekko.stream.scaladsl.Source.actorRefWithAck
 import org.apache.pekko.stream.scaladsl.ZipWith
 
 import scala.concurrent.Future
-
 import software.altitude.core.Altitude
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.BaseDao
@@ -31,13 +31,37 @@ object ImportPipelineService {
    *
    * Useful for understanding the flow of the pipeline and the use of threads.
    */
-  private val DEBUG = true
+  private val DEBUG = false
 }
 
+case class Valid[T](payload: T)
+
+case class Invalid[T](payload: T, cause: Option[Throwable])
+
 /**
- * Source \| v Assign UUID \| \|--------------------------------------------------- \| | | | v v v v Extract Metadata File Store Update Stats Add Preview \| v
- * Persist Asset \| v Index Asset \| v Facial Recognition \| v Sink
+     Source
+       |
+       v
+  Assign UUID
+       |
+       |---------------------------------------------------
+       |                   |               |              |
+       v                   v               v              v
+ Extract Metadata     File Store     Update Stats     Add Preview
+       |
+       v
+  Persist Asset
+       |
+       v
+    Index Asset
+       |
+       v
+ Facial Recognition
+       |
+       v
+     Sink
  */
+
 class ImportPipelineService(app: Altitude) {
   implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "pipeline-system")
   private val parallelism = Runtime.getRuntime.availableProcessors
@@ -95,13 +119,17 @@ class ImportPipelineService(app: Altitude) {
         Future.successful(dataAsset, ctx)
     }
 
-  private val persistAssetFlow: Flow[(AssetWithData, PipelineContext), (AssetWithData, PipelineContext), NotUsed] =
+  private val persistAndIndexAssetFlow: Flow[(AssetWithData, PipelineContext), (AssetWithData, PipelineContext), NotUsed] =
     Flow[(AssetWithData, PipelineContext)].mapAsync(parallelism) {
       case (dataAsset, ctx) =>
         setThreadLocalRequestContext(ctx)
 
-        threadInfo(s"\tPersisting asset ${dataAsset.asset.persistedId}")
-        app.service.asset.add(dataAsset.asset)
+        app.txManager.withTransaction {
+          threadInfo(s"\tPersisting asset ${dataAsset.asset.persistedId}")
+          app.service.asset.add(dataAsset.asset)
+          threadInfo(s"\tIndexing asset ${dataAsset.asset.persistedId}")
+          app.service.search.indexAsset(dataAsset.asset)
+        }
         Future.successful(dataAsset, ctx)
     }
 
@@ -181,9 +209,8 @@ class ImportPipelineService(app: Altitude) {
       .via(assignIdFlow)
       .async
       .via(parallelGraph)
+      .via(persistAndIndexAssetFlow)
       .async
-      .via(persistAssetFlow)
-      .via(indexAssetFlow)
       .via(facialRecognitionFlow)
       .map { case (dataAsset, _) => dataAsset }
       .runWith(Sink.seq)

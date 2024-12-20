@@ -25,39 +25,6 @@ import software.altitude.test.core.IntegrationTestCore
     }
   }
 
-/*
-  test("Pipeline", Focused) {
-  import software.altitude.core.models.AssetWithData
-  import software.altitude.core.service.PipelineContext
-  import scala.concurrent.Await
-  import scala.concurrent.Future
-  import scala.concurrent.duration.Duration
-  import org.apache.pekko.NotUsed
-  import org.apache.pekko.stream.scaladsl.Source
-
-    val dataAssetsIn = (1 to 30).map(_ => {
-      val importAsset = IntegrationTestUtil.getImportAsset("people/bullock.jpg")
-      val asset: Asset = Asset(
-        userId = testContext.user.persistedId,
-        fileName = importAsset.fileName,
-        checksum = scala.util.Random.nextInt(1000000) + 1,
-        assetType = testApp.service.metadataExtractor.detectAssetType(importAsset.data),
-        sizeBytes = importAsset.data.length,
-        isTriaged = true,
-        folderId = testContext.repository.rootFolderId
-      )
-
-      AssetWithData(asset, importAsset.data)
-    })
-
-    val pipelineContext = PipelineContext(testContext.repository, testContext.user)
-    val source: Source[(AssetWithData, PipelineContext), NotUsed] = Source.fromIterator(() => dataAssetsIn.iterator).map((_, pipelineContext))
-    val pipelineResFuture: Future[Seq[AssetWithData]] = testApp.service.importPipeline.run(source)
-    val result = Await.result(pipelineResFuture, Duration.Inf)
-    println(result)
-  }
-*/
-
   test("Imported image with extracted metadata should successfully import") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/bullock.jpg")
 

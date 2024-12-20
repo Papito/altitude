@@ -23,7 +23,7 @@ class AssetImportService(app: Altitude) {
   def importAsset(importAsset: ImportAsset): Option[Asset] = {
     logger.info(s"Importing file asset '$importAsset'")
 
-    val assetWithData = makeAssetWithDataFromImportAsset(importAsset)
+    val assetWithData = convertFromImportAssetToAssetWithData(importAsset)
 
     if (assetWithData.isEmpty) {
       return None
@@ -40,7 +40,7 @@ class AssetImportService(app: Altitude) {
     storedAsset
   }
 
-  def makeAssetWithDataFromImportAsset(importAsset: ImportAsset): Option[AssetWithData] = {
+  def convertFromImportAssetToAssetWithData(importAsset: ImportAsset): Option[AssetWithData] = {
     val assetType = detectAssetType(importAsset)
 
     if (!AssetImportService.SUPPORTED_MEDIA_TYPES.contains(assetType.mediaType)) {

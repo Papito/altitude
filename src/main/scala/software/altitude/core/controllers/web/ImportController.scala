@@ -151,7 +151,7 @@ class ImportController extends BaseWebController with AtmosphereSupport with JVa
             fStream.close()
 
             val importAsset = new ImportAsset(fileName = fileItemStream.getName, data = bytes, metadata = UserMetadata())
-            val assetWithDataOpt = app.service.assetImport.makeAssetWithDataFromImportAsset(importAsset)
+            val assetWithDataOpt = app.service.assetImport.convertFromImportAssetToAssetWithData(importAsset)
 
             (assetWithDataOpt.get, pipelineContext)
         }
