@@ -60,23 +60,6 @@ class LibraryService(val app: Altitude) {
     val result = Await.result(pipelineResFuture, Duration.Inf)
     val dataAsset = result.head
 
-    //      /**
-    //       * This data asset has:
-    //       *    - Asset with ID
-    //       *    - Asset with metadata
-    //       *    - The actual data (which we normally do not pass around for performance reasons)
-    //       */
-    //      val dataAsset = AssetWithData(asset, dataAssetIn.data)
-    //
-    //      logger.info(s"Adding asset: $dataAsset")
-    //
-    //      app.service.asset.add(asset)
-    //      app.service.faceRecognition.processAsset(dataAsset)
-    //      app.service.search.indexAsset(asset)
-    //      app.service.stats.addAsset(asset)
-    //      app.service.fileStore.addAsset(dataAsset)
-    //      addPreview(dataAsset)
-
     dataAsset.asset
   }
 

@@ -2,6 +2,7 @@ package software.altitude.test.core.integration
 
 import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.be
+import org.scalatest.matchers.must.Matchers.empty
 import org.scalatest.matchers.must.Matchers.equal
 import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
@@ -24,7 +25,8 @@ import software.altitude.test.core.IntegrationTestCore
     }
   }
 
-  test("Pipeline") {
+/*
+  test("Pipeline", Focused) {
   import software.altitude.core.models.AssetWithData
   import software.altitude.core.service.PipelineContext
   import scala.concurrent.Await
@@ -33,7 +35,7 @@ import software.altitude.test.core.IntegrationTestCore
   import org.apache.pekko.NotUsed
   import org.apache.pekko.stream.scaladsl.Source
 
-    val dataAssetsIn = (1 to 10).map(_ => {
+    val dataAssetsIn = (1 to 30).map(_ => {
       val importAsset = IntegrationTestUtil.getImportAsset("people/bullock.jpg")
       val asset: Asset = Asset(
         userId = testContext.user.persistedId,
@@ -54,30 +56,29 @@ import software.altitude.test.core.IntegrationTestCore
     val result = Await.result(pipelineResFuture, Duration.Inf)
     println(result)
   }
+*/
 
-  test("Imported image with extracted metadata should successfully import", Focused) {
+  test("Imported image with extracted metadata should successfully import") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/bullock.jpg")
 
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
-    println(importedAsset.extractedMetadata.toJson.toString())
-
 
     importedAsset.assetType should equal(importedAsset.assetType)
     importedAsset.checksum should not be 0
 
     val asset = testApp.service.library.getById(importedAsset.persistedId): Asset
-//    asset.assetType should equal(importedAsset.assetType)
-//    asset.checksum should not be 0
-//    asset.sizeBytes should not be 0
-//
-//    asset.extractedMetadata.getFieldValues("JPEG").get("Image Height") should not be empty
-//
-//    asset.publicMetadata.deviceModel should not be empty
-//    asset.publicMetadata.fNumber should not be empty
-//    asset.publicMetadata.focalLength should not be empty
-//    asset.publicMetadata.iso should not be empty
-//    asset.publicMetadata.exposureTime should not be empty
-//    asset.publicMetadata.dateTimeOriginal should not be empty
+    asset.assetType should equal(importedAsset.assetType)
+    asset.checksum should not be 0
+    asset.sizeBytes should not be 0
+
+    asset.extractedMetadata.getFieldValues("JPEG").get("Image Height") should not be empty
+
+    asset.publicMetadata.deviceModel should not be empty
+    asset.publicMetadata.fNumber should not be empty
+    asset.publicMetadata.focalLength should not be empty
+    asset.publicMetadata.iso should not be empty
+    asset.publicMetadata.exposureTime should not be empty
+    asset.publicMetadata.dateTimeOriginal should not be empty
   }
 
   test("Imported image should have a preview") {

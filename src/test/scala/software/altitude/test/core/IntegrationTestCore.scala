@@ -39,17 +39,6 @@ abstract class IntegrationTestCore
 
     // nuke the data dir tree
     IntegrationTestUtil.createFileStoreDir(testApp)
-
-    testApp.txManager.commit()
-  }
-
-  override def afterEach(): Unit = {
-    // We COULD rollback here, but we don't need to, and committing is better for checking repo/user isolation
-    testApp.txManager.commit()
-  }
-
-  def savepoint(): Unit = {
-    testApp.txManager.savepoint()
   }
 
   def switchContextUser(user: User): Unit = {
@@ -58,19 +47,6 @@ abstract class IntegrationTestCore
 
   def switchContextRepo(repository: Repository): Unit = {
     testApp.service.repository.switchContextToRepository(repository)
-  }
-
-  def commit(): Unit = {
-    testApp.txManager.commit()
-  }
-
-  def rollback(): Unit = {
-    testApp.txManager.rollback()
-  }
-
-  def reset(): Unit = {
-    testApp.txManager.rollback()
-    RequestContext.clear()
   }
 
   /**

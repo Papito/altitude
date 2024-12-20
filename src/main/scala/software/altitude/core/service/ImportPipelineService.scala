@@ -11,6 +11,9 @@ import org.apache.pekko.stream.scaladsl.GraphDSL
 import org.apache.pekko.stream.scaladsl.Sink
 import org.apache.pekko.stream.scaladsl.Source
 import org.apache.pekko.stream.scaladsl.ZipWith
+
+import scala.concurrent.Future
+
 import software.altitude.core.Altitude
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.BaseDao
@@ -19,10 +22,22 @@ import software.altitude.core.models.AssetWithData
 import software.altitude.core.models.Repository
 import software.altitude.core.models.User
 
-import scala.concurrent.Future
-
 case class PipelineContext(repository: Repository, account: User)
 
+object ImportPipelineService {
+
+  /**
+   * Set to "true" to enable debugging output to console.
+   *
+   * Useful for understanding the flow of the pipeline and the use of threads.
+   */
+  private val DEBUG = false
+}
+
+/**
+ * Source \| v Assign UUID \| \|--------------------------------------------------- \| | | | v v v v Extract Metadata File Store Update Stats Add Preview \| v
+ * Persist Asset \| v Index Asset \| v Facial Recognition \| v Sink
+ */
 class ImportPipelineService(app: Altitude) {
   implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "pipeline-system")
   private val parallelism = Runtime.getRuntime.availableProcessors
@@ -32,7 +47,13 @@ class ImportPipelineService(app: Altitude) {
     RequestContext.account.value = Some(ctx.account)
   }
 
-  private def threadInfo = s"(${Thread.currentThread().getName})"
+  private def threadInfo(msg: String) = {
+    if (ImportPipelineService.DEBUG) {
+      println(s"(${Thread.currentThread().getName}) $msg")
+    } else {
+      ""
+    }
+  }
 
   private val assignIdFlow: Flow[(AssetWithData, PipelineContext), (AssetWithData, PipelineContext), NotUsed] =
     Flow[(AssetWithData, PipelineContext)].map {
@@ -40,7 +61,7 @@ class ImportPipelineService(app: Altitude) {
         val asset: Asset = dataAsset.asset.copy(
           id = Some(BaseDao.genId)
         )
-        println(s"$threadInfo Assigning ID to asset: ${asset.id.get}")
+        threadInfo(s"Assigning ID to asset: ${asset.id.get}")
 
         (AssetWithData(asset, dataAsset.data), ctx)
     }
@@ -48,13 +69,17 @@ class ImportPipelineService(app: Altitude) {
   private val extractMetadataFlow: Flow[(AssetWithData, PipelineContext), (AssetWithData, PipelineContext), NotUsed] =
     Flow[(AssetWithData, PipelineContext)].mapAsync(parallelism) {
       case (dataAsset, ctx) =>
-        println(s"$threadInfo Extracting metadata for asset ${dataAsset.asset.persistedId}")
+        setThreadLocalRequestContext(ctx)
+
+        threadInfo(s"\tExtracting metadata for asset: ${dataAsset.asset.persistedId}")
+        val userMetadata = app.service.metadata.cleanAndValidate(dataAsset.asset.userMetadata)
         val extractedMetadata = app.service.metadataExtractor.extract(dataAsset.data)
         val publicMetadata = Asset.getPublicMetadata(extractedMetadata)
 
         val asset: Asset = dataAsset.asset.copy(
           extractedMetadata = extractedMetadata,
-          publicMetadata = publicMetadata
+          publicMetadata = publicMetadata,
+          userMetadata = userMetadata
         )
 
         Future.successful(AssetWithData(asset, dataAsset.data), ctx)
@@ -65,7 +90,7 @@ class ImportPipelineService(app: Altitude) {
       case (dataAsset, ctx) =>
         setThreadLocalRequestContext(ctx)
 
-        println(s"$threadInfo Storing asset ${dataAsset.asset.persistedId} in file store")
+        threadInfo(s"\tStoring asset ${dataAsset.asset.persistedId} in file store")
         app.service.fileStore.addAsset(dataAsset)
         Future.successful(dataAsset, ctx)
     }
@@ -75,7 +100,7 @@ class ImportPipelineService(app: Altitude) {
       case (dataAsset, ctx) =>
         setThreadLocalRequestContext(ctx)
 
-        println(s"$threadInfo Persisting asset ${dataAsset.asset.persistedId}")
+        threadInfo(s"\tPersisting asset ${dataAsset.asset.persistedId}")
         app.service.asset.add(dataAsset.asset)
         Future.successful(dataAsset, ctx)
     }
@@ -85,7 +110,7 @@ class ImportPipelineService(app: Altitude) {
       case (dataAsset, ctx) =>
         setThreadLocalRequestContext(ctx)
 
-        println(s"$threadInfo Indexing asset  ${dataAsset.asset.persistedId}")
+        threadInfo(s"\tIndexing asset ${dataAsset.asset.persistedId}")
         app.service.search.indexAsset(dataAsset.asset)
         (dataAsset, ctx)
     }
@@ -95,7 +120,7 @@ class ImportPipelineService(app: Altitude) {
       case (dataAsset, ctx) =>
         setThreadLocalRequestContext(ctx)
 
-        println(s"$threadInfo Running facial recognition ${dataAsset.asset.persistedId}")
+        threadInfo(s"\tRunning facial recognition ${dataAsset.asset.persistedId}")
         app.service.faceRecognition.processAsset(dataAsset)
         (dataAsset, ctx)
     }
@@ -105,7 +130,7 @@ class ImportPipelineService(app: Altitude) {
       case (dataAsset, ctx) =>
         setThreadLocalRequestContext(ctx)
 
-        println(s"$threadInfo Updating stats for ${dataAsset.asset.persistedId}")
+        threadInfo(s"\tUpdating stats for ${dataAsset.asset.persistedId}")
         app.service.stats.addAsset(dataAsset.asset)
         Future.successful(dataAsset, ctx)
     }
@@ -115,7 +140,7 @@ class ImportPipelineService(app: Altitude) {
       case (dataAsset, ctx) =>
         setThreadLocalRequestContext(ctx)
 
-        println(s"$threadInfo Generating preview ${dataAsset.asset.id.get}")
+        threadInfo(s"\tGenerating preview ${dataAsset.asset.persistedId}")
         app.service.library.addPreview(dataAsset)
         Future.successful(dataAsset, ctx)
     }
@@ -158,8 +183,8 @@ class ImportPipelineService(app: Altitude) {
       .via(parallelGraph)
       .async
       .via(persistAssetFlow)
-      // .via(facialRecognitionFlow)
       .via(indexAssetFlow)
+      .via(facialRecognitionFlow)
       .map { case (dataAsset, _) => dataAsset }
       .runWith(Sink.seq)
   }

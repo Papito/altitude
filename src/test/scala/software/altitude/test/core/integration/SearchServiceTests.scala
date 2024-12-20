@@ -169,7 +169,7 @@ import software.altitude.test.core.IntegrationTestCore
     results6.totalPages shouldBe 1
   }
 
-  test("Create assets and search by metadata") {
+  test("Create assets and search by metadata", Focused) {
     val field1 = testApp.service.metadata.addField(
       UserMetadataField(
         name = "field 1",

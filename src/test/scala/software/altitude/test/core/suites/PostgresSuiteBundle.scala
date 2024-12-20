@@ -2,7 +2,6 @@ package software.altitude.test.core.suites
 
 import org.scalatest.BeforeAndAfterAll
 import software.altitude.core.Altitude
-import software.altitude.core.RequestContext
 import software.altitude.core.{Const => C}
 import software.altitude.test.core.testAltitudeApp
 
@@ -37,12 +36,5 @@ class PostgresSuiteBundle
     println("@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
 
     PostgresSuiteBundle.setup(this.testApp)
-
-    // See: https://github.com/papito/altitude/wiki/How-the-tests-work#why-do-tests-create-a-top-level-database-connection
-    RequestContext.conn.value = Some(testApp.txManager.connection(readOnly = false))
-  }
-
-  override def afterAll(): Unit = {
-    testApp.txManager.close()
   }
 }

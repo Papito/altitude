@@ -151,7 +151,8 @@ class TestContext(val testApp: Altitude) {
         repository=Some(persistedRepository),
         folder=folder,
         resourcePath=resourcePath,
-        userMetadata=metadata, user=user))
+        userMetadata=metadata,
+        user=user))
 
     val dataAsset = AssetWithData(
       asset = assetModel,

@@ -101,27 +101,29 @@ class FaceCacheService(app: Altitude) {
 
     RequestContext.repository.value = Some(repository)
 
-    val allTopFaces: List[Face] = faceDao.getAllForCache
-    val allPeople: Map[String, Person] = personDao.getAll
+    txManager.asReadOnly {
+      val allTopFaces: List[Face] = faceDao.getAllForCache
+      val allPeople: Map[String, Person] = personDao.getAll
 
-    var faceCount = 0
-    allTopFaces.foreach {
-      face: Face =>
-        val person: Person = allPeople(face.personId.get)
+      var faceCount = 0
+      allTopFaces.foreach {
+        face: Face =>
+          val person: Person = allPeople(face.personId.get)
 
-        val alignedGreyscaleData = app.service.fileStore.getAlignedGreyscaleFaceById(face.persistedId)
-        val faceWithImageData = face.copy(alignedImageGs = alignedGreyscaleData.data)
-        person.addFace(faceWithImageData)
-        faceCount += 1
+          val alignedGreyscaleData = app.service.fileStore.getAlignedGreyscaleFaceById(face.persistedId)
+          val faceWithImageData = face.copy(alignedImageGs = alignedGreyscaleData.data)
+          person.addFace(faceWithImageData)
+          faceCount += 1
+      }
+
+      // faces added, now cache the peeps whole
+      allPeople.foreach {
+        case (_, person) =>
+          putPerson(person)
+      }
+
+      logger.info(s"Loaded ${allPeople.size} people into the cache, $faceCount faces.")
     }
-
-    // faces added, now cache the peeps whole
-    allPeople.foreach {
-      case (_, person) =>
-        putPerson(person)
-    }
-
-    logger.info(s"Loaded ${allPeople.size} people into the cache, $faceCount faces.")
 
     RequestContext.repository.value = None
   }

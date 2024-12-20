@@ -27,8 +27,8 @@ class SearchService(val app: Altitude) {
 
     txManager.withTransaction {
       // we are not doing user metadata fields yet
-      // val metadataFields: Map[String, UserMetadataField] = app.service.metadata.getAllFields
-      searchDao.indexAsset(asset, Map())
+      val metadataFields: Map[String, UserMetadataField] = app.service.metadata.getAllFields
+      searchDao.indexAsset(asset, metadataFields)
     }
   }
 

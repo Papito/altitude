@@ -64,12 +64,15 @@ class UserMetadataService(val app: Altitude) {
       metadataFieldDao.deleteById(id)
     }
 
-  def getMetadata(assetId: String): UserMetadata =
-    // return the metadata or a new empty one if blank
-    assetDao.getUserMetadata(assetId) match {
-      case Some(metadata) => metadata
-      case None => UserMetadata()
+  def getMetadata(assetId: String): UserMetadata = {
+    txManager.asReadOnly[UserMetadata] {
+      // return the metadata or a new empty one if blank
+      assetDao.getUserMetadata(assetId) match {
+        case Some(metadata) => metadata
+        case None => UserMetadata()
+      }
     }
+  }
 
   def setMetadata(assetId: String, metadata: UserMetadata): Unit = {
     logger.info(s"Setting metadata for asset [$assetId]: $metadata")
