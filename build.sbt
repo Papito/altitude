@@ -29,31 +29,31 @@ libraryDependencies ++= Seq(
   "org.scalatra.scalate"        %% "scalate-core"             % "1.10.1",
 
   "com.typesafe"                 % "config"                   % "1.4.3",
-  "com.typesafe.play"           %% "play-json"                % "2.10.5",
+  "com.typesafe.play"           %% "play-json"                % "2.10.6",
 
-  "commons-io"                   % "commons-io"               % "2.16.1",
-  "commons-codec"                % "commons-codec"            % "1.17.0",
+  "commons-io"                   % "commons-io"               % "2.18.0",
+  "commons-codec"                % "commons-codec"            % "1.17.1",
   "commons-dbutils"              % "commons-dbutils"          % "1.8.1",
-  "commons-logging"              % "commons-logging"          % "1.3.3",
+  "commons-logging"              % "commons-logging"          % "1.3.4",
   "commons-fileupload"           % "commons-fileupload"       % "1.5",
   "org.mindrot"                  % "jbcrypt"                  % "0.4",
 
-  "org.postgresql"               % "postgresql"               % "42.7.3",
-  "org.xerial"                   % "sqlite-jdbc"              % "3.46.0.0",
+  "org.postgresql"               % "postgresql"               % "42.7.4",
+  "org.xerial"                   % "sqlite-jdbc"              % "3.47.1.0",
 
   "com.drewnoakes"               % "metadata-extractor"       % "2.19.0",
-  "org.apache.tika"              % "tika-core"                % "2.9.2",
-  "org.apache.tika"              % "tika-parsers"             % "2.9.2",
-  "org.apache.tika"              % "tika-parser-image-module" % "2.9.2",
-  "ch.qos.logback"               % "logback-classic"          % "1.5.9" % "runtime",
-  "org.slf4j"                    % "slf4j-api"                % "2.0.12" % "runtime",
+  "org.apache.tika"              % "tika-core"                % "3.0.0",
+  "org.apache.tika"              % "tika-parsers"             % "3.0.0",
+  "org.apache.tika"              % "tika-parser-image-module" % "3.0.0",
+  "ch.qos.logback"               % "logback-classic"          % "1.5.14" % "runtime",
+  "org.slf4j"                    % "slf4j-api"                % "2.0.16" % "runtime",
 
   "org.apache.pekko"             %% "pekko-actor-typed"       % pekkoVersion,
   "org.apache.pekko"             %% "pekko-stream-typed"      % pekkoVersion,
   "org.apache.pekko"             %% "pekko-testkit"           % pekkoVersion % Test,
 
   "org.scalatra"                %% "scalatra-scalatest"       % scalatraVersion % Test,
-  "org.mockito"                  % "mockito-core"             % "5.11.0" % Test,
+  "org.mockito"                  % "mockito-core"             % "5.14.2" % Test,
 
   //
   // ATTN: The old versions are required - we don't need to update them until Scalatra 3.x/Scala 3.x upgrade
