@@ -52,9 +52,11 @@ class UserService(val app: Altitude) extends BaseService[User] {
     throw new NotImplementedError("Use the alternate add() method with password")
 
   def add(objIn: User, password: String): JsObject = {
-    // password and hash are not stored in the model and are not passed around outside of login flow
-    val passwordHash = Util.hashPassword(password)
-    dao.add(objIn.toJson ++ Json.obj(FieldConst.User.PASSWORD_HASH -> passwordHash))
+    txManager.withTransaction {
+      // password and hash are not stored in the model and are not passed around outside of login flow
+      val passwordHash = Util.hashPassword(password)
+      dao.add(objIn.toJson ++ Json.obj(FieldConst.User.PASSWORD_HASH -> passwordHash))
+    }
   }
 
   private def getPasswordHashByEmail(email: String): String = {
@@ -77,11 +79,12 @@ class UserService(val app: Altitude) extends BaseService[User] {
   }
 
   def getByToken(token: String): Option[User] = {
-    if (AltitudeServletContext.usersByToken.contains(token)) {
-      return Some(AltitudeServletContext.usersByToken(token))
+    txManager.asReadOnly[Option[User]] {
+      if (AltitudeServletContext.usersByToken.contains(token)) {
+        return Some(AltitudeServletContext.usersByToken(token))
+      }
+      None
     }
-
-    None
   }
 
   def deleteToken(token: String): Unit = {

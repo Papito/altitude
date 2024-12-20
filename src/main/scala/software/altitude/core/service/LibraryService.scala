@@ -44,40 +44,40 @@ class LibraryService(val app: Altitude) {
   def add(dataAssetIn: AssetWithData): JsObject = {
     logger.info(s"Preparing to add asset [$dataAssetIn]")
 
-    txManager.withTransaction[JsObject] {
+    txManager.asReadOnly {
       val existing: Option[Asset] = getByChecksum(dataAssetIn.asset.checksum)
 
       if (existing.nonEmpty) {
         logger.debug(s"Duplicate found for [$dataAssetIn] and checksum: ${dataAssetIn.asset.checksum}")
         throw DuplicateException()
       }
-
-      val pipelineContext = PipelineContext(RequestContext.getRepository, RequestContext.getAccount)
-      val source: Source[(AssetWithData, PipelineContext), NotUsed] = Source.single((dataAssetIn, pipelineContext))
-      val pipelineResFuture: Future[Seq[AssetWithData]] = app.service.importPipeline.run(source)
-
-      val result = Await.result(pipelineResFuture, Duration.Inf)
-      val dataAsset = result.head
-
-      //      /**
-      //       * This data asset has:
-      //       *    - Asset with ID
-      //       *    - Asset with metadata
-      //       *    - The actual data (which we normally do not pass around for performance reasons)
-      //       */
-      //      val dataAsset = AssetWithData(asset, dataAssetIn.data)
-      //
-      //      logger.info(s"Adding asset: $dataAsset")
-      //
-      //      app.service.asset.add(asset)
-      //      app.service.faceRecognition.processAsset(dataAsset)
-      //      app.service.search.indexAsset(asset)
-      //      app.service.stats.addAsset(asset)
-      //      app.service.fileStore.addAsset(dataAsset)
-      //      addPreview(dataAsset)
-
-      dataAsset.asset
     }
+
+    val pipelineContext = PipelineContext(RequestContext.getRepository, RequestContext.getAccount)
+    val source: Source[(AssetWithData, PipelineContext), NotUsed] = Source.single((dataAssetIn, pipelineContext))
+    val pipelineResFuture: Future[Seq[AssetWithData]] = app.service.importPipeline.run(source)
+
+    val result = Await.result(pipelineResFuture, Duration.Inf)
+    val dataAsset = result.head
+
+    //      /**
+    //       * This data asset has:
+    //       *    - Asset with ID
+    //       *    - Asset with metadata
+    //       *    - The actual data (which we normally do not pass around for performance reasons)
+    //       */
+    //      val dataAsset = AssetWithData(asset, dataAssetIn.data)
+    //
+    //      logger.info(s"Adding asset: $dataAsset")
+    //
+    //      app.service.asset.add(asset)
+    //      app.service.faceRecognition.processAsset(dataAsset)
+    //      app.service.search.indexAsset(asset)
+    //      app.service.stats.addAsset(asset)
+    //      app.service.fileStore.addAsset(dataAsset)
+    //      addPreview(dataAsset)
+
+    dataAsset.asset
   }
 
   def deleteById(id: String): Unit = {
@@ -174,7 +174,7 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  private def addPreview(dataAsset: AssetWithData): Option[MimedPreviewData] = {
+  def addPreview(dataAsset: AssetWithData): Option[MimedPreviewData] = {
     val previewData: Array[Byte] = genPreviewData(dataAsset)
 
     previewData.length match {

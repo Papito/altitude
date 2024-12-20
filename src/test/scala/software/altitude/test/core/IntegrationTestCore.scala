@@ -39,6 +39,8 @@ abstract class IntegrationTestCore
 
     // nuke the data dir tree
     IntegrationTestUtil.createFileStoreDir(testApp)
+
+    testApp.txManager.commit()
   }
 
   override def afterEach(): Unit = {

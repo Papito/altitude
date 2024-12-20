@@ -7,6 +7,7 @@ import software.altitude.core.dao.SearchDao
 import software.altitude.core.models.Asset
 import software.altitude.core.models.FieldType
 import software.altitude.core.models.UserMetadataField
+import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchResult
 
@@ -18,12 +19,17 @@ object SearchService {
 class SearchService(val app: Altitude) {
   final protected val logger: Logger = LoggerFactory.getLogger(getClass)
   private val searchDao: SearchDao = app.DAO.search
+  protected val txManager: TransactionManager = app.txManager
 
   def indexAsset(asset: Asset): Unit = {
     require(asset.id.isDefined, "Asset ID cannot be empty")
     logger.info(s"Indexing asset $asset")
-    val metadataFields: Map[String, UserMetadataField] = app.service.metadata.getAllFields
-    searchDao.indexAsset(asset, metadataFields)
+
+    txManager.withTransaction {
+      // we are not doing user metadata fields yet
+      // val metadataFields: Map[String, UserMetadataField] = app.service.metadata.getAllFields
+      searchDao.indexAsset(asset, Map())
+    }
   }
 
   def reindexAsset(asset: Asset): Unit = {

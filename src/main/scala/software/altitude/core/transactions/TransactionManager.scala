@@ -38,32 +38,34 @@ class TransactionManager(val config: Config) {
           conn.setAutoCommit(false)
         }
 
-        // println(s"NEW PSQL CONN ${System.identityHashCode(conn)}")
         conn
 
       case C.DbEngineName.SQLITE =>
-        /**
-         * At some point the prod jar stopped working without this line. This is commonly needed for JDBC drivers to register themselves, but also to show an
-         * error if the driver is not found.
-         *
-         * In this case, it just fixed the problem.
-         */
         Class.forName("org.sqlite.JDBC")
 
         val url: String = config.getString(C.Conf.SQLITE_URL)
 
         val sqliteConfig: SQLiteConfig = new SQLiteConfig()
 
-        if (readOnly) {
+        val conn = if (readOnly) {
           sqliteConfig.setReadOnly(true)
           DriverManager.getConnection(url, sqliteConfig.toProperties)
         } else {
           val writeConnection = DriverManager.getConnection(url, sqliteConfig.toProperties)
+
+          // enable write-ahead logging and set synchronous to NORMAL for concurrent operations
+          val statement = writeConnection.createStatement()
+          statement.execute("PRAGMA journal_mode=WAL;")
+          statement.execute("PRAGMA synchronous=NORMAL;")
+          statement.execute("PRAGMA busy_timeout=10000;") // 10s BUSY_TIMEOUT
+          statement.close()
+
           writeConnection.setAutoCommit(false)
 
-          // println(s"NEW SQLITE CONN ${System.identityHashCode(writeConnection)}")
           writeConnection
         }
+
+        conn
     }
   }
 
@@ -145,7 +147,7 @@ class TransactionManager(val config: Config) {
   }
 
   def commit(): Unit = {
-    // println(s"COMMIT ${System.identityHashCode(RequestContext.conn.value.get)}")
+//     println(s"COMMIT ${System.identityHashCode(RequestContext.conn.value.get)}")
     RequestContext.conn.value.get.commit()
     RequestContext.savepoints.value.clear()
   }

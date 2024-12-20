@@ -1,7 +1,5 @@
 package software.altitude.test.core.integration
 
-import org.apache.pekko.NotUsed
-import org.apache.pekko.stream.scaladsl.Source
 import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.must.Matchers.equal
@@ -10,16 +8,10 @@ import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
 import software.altitude.core.DuplicateException
 import software.altitude.core.models.Asset
-import software.altitude.core.models.AssetWithData
 import software.altitude.core.models.MimedPreviewData
-import software.altitude.core.service.PipelineContext
-import software.altitude.core.util.MurmurHash
 import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.IntegrationTestCore
 
-import scala.concurrent.Await
-import scala.concurrent.Future
-import scala.concurrent.duration.Duration
 
 @DoNotDiscover class AssetImportServiceTests(override val testApp: Altitude) extends IntegrationTestCore {
 
@@ -32,13 +24,21 @@ import scala.concurrent.duration.Duration
     }
   }
 
-  test("Pipeline", Focused) {
-    val dataAssetsIn = (1 to 20).map(_ => {
+  test("Pipeline") {
+  import software.altitude.core.models.AssetWithData
+  import software.altitude.core.service.PipelineContext
+  import scala.concurrent.Await
+  import scala.concurrent.Future
+  import scala.concurrent.duration.Duration
+  import org.apache.pekko.NotUsed
+  import org.apache.pekko.stream.scaladsl.Source
+
+    val dataAssetsIn = (1 to 10).map(_ => {
       val importAsset = IntegrationTestUtil.getImportAsset("people/bullock.jpg")
       val asset: Asset = Asset(
         userId = testContext.user.persistedId,
         fileName = importAsset.fileName,
-        checksum = MurmurHash.hash32(importAsset.data),
+        checksum = scala.util.Random.nextInt(1000000) + 1,
         assetType = testApp.service.metadataExtractor.detectAssetType(importAsset.data),
         sizeBytes = importAsset.data.length,
         isTriaged = true,
@@ -55,15 +55,17 @@ import scala.concurrent.duration.Duration
     println(result)
   }
 
-  test("Imported image with extracted metadata should successfully import") {
+  test("Imported image with extracted metadata should successfully import", Focused) {
     val importAsset = IntegrationTestUtil.getImportAsset("people/bullock.jpg")
+
     val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
     println(importedAsset.extractedMetadata.toJson.toString())
-//
-//    importedAsset.assetType should equal(importedAsset.assetType)
-//    importedAsset.checksum should not be 0
-//
-//    val asset = testApp.service.library.getById(importedAsset.persistedId): Asset
+
+
+    importedAsset.assetType should equal(importedAsset.assetType)
+    importedAsset.checksum should not be 0
+
+    val asset = testApp.service.library.getById(importedAsset.persistedId): Asset
 //    asset.assetType should equal(importedAsset.assetType)
 //    asset.checksum should not be 0
 //    asset.sizeBytes should not be 0
