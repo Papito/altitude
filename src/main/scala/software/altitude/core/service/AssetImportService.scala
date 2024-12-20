@@ -22,6 +22,25 @@ class AssetImportService(app: Altitude) {
 
   def importAsset(importAsset: ImportAsset): Option[Asset] = {
     logger.info(s"Importing file asset '$importAsset'")
+
+    val assetWithData = makeAssetWithDataFromImportAsset(importAsset)
+
+    if (assetWithData.isEmpty) {
+      return None
+    }
+
+    val storedAsset: Option[Asset] =
+      try {
+        Some(app.service.library.add(assetWithData.get))
+      } catch {
+        case _: FormatException =>
+          return None
+      }
+
+    storedAsset
+  }
+
+  def makeAssetWithDataFromImportAsset(importAsset: ImportAsset): Option[AssetWithData] = {
     val assetType = detectAssetType(importAsset)
 
     if (!AssetImportService.SUPPORTED_MEDIA_TYPES.contains(assetType.mediaType)) {
@@ -29,7 +48,7 @@ class AssetImportService(app: Altitude) {
       return None
     }
 
-    val asset: Asset = Asset(
+    val asset = Asset(
       userId = RequestContext.account.value.get.persistedId,
       fileName = importAsset.fileName,
       checksum = MurmurHash.hash32(importAsset.data),
@@ -39,16 +58,6 @@ class AssetImportService(app: Altitude) {
       folderId = RequestContext.getRepository.rootFolderId
     )
 
-    val assetWithData = AssetWithData(asset, importAsset.data)
-
-    val storedAsset: Option[Asset] =
-      try {
-        Some(app.service.library.add(assetWithData))
-      } catch {
-        case _: FormatException =>
-          return None
-      }
-
-    storedAsset
+    Some(AssetWithData(asset, importAsset.data))
   }
 }

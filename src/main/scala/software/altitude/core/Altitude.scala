@@ -125,10 +125,7 @@ class Altitude(val dbEngineOverride: Option[String] = None) {
   logger.info(s"File store type: $fileStoreType")
 
   /** App thread pool, whatever it is needed for */
-  private val maxThreads: Int = dataSourceType match {
-    case C.DbEngineName.POSTGRES => 1 // Runtime.getRuntime.availableProcessors()
-    case C.DbEngineName.SQLITE => 1 // SQLite is single-threaded
-  }
+  private val maxThreads: Int = Runtime.getRuntime.availableProcessors()
   logger.info(s"Available processors: $maxThreads")
 
   val executorService: ExecutorService = Executors.newFixedThreadPool(maxThreads)

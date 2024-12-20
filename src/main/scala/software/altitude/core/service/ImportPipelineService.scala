@@ -31,7 +31,7 @@ object ImportPipelineService {
    *
    * Useful for understanding the flow of the pipeline and the use of threads.
    */
-  private val DEBUG = false
+  private val DEBUG = true
 }
 
 /**

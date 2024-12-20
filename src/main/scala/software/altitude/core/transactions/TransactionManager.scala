@@ -56,7 +56,7 @@ class TransactionManager(val config: Config) {
           // enable write-ahead logging and set synchronous to NORMAL for concurrent operations
           val statement = writeConnection.createStatement()
           statement.execute("PRAGMA journal_mode=WAL;")
-          statement.execute("PRAGMA synchronous=NORMAL;")
+          statement.execute("PRAGMA synchronous=OFF;")
           statement.execute("PRAGMA busy_timeout=10000;") // 10s BUSY_TIMEOUT
           statement.close()
 
