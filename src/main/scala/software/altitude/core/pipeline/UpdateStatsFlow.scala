@@ -6,7 +6,7 @@ import software.altitude.core.Altitude
 import software.altitude.core.pipeline.PipelineConstants.parallelism
 import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
 import software.altitude.core.pipeline.PipelineUtils.setThreadLocalRequestContext
-import software.altitude.core.pipeline.PipelineUtils.threadInfo
+import software.altitude.core.pipeline.PipelineUtils.debugInfo
 
 import scala.concurrent.Future
 
@@ -16,7 +16,7 @@ object UpdateStatsFlow {
       case (Left(dataAsset), ctx) =>
         setThreadLocalRequestContext(ctx)
 
-        threadInfo(s"\tUpdating stats for ${dataAsset.asset.persistedId}")
+        debugInfo(s"\tUpdating stats for ${dataAsset.asset.persistedId}")
         app.service.stats.addAsset(dataAsset.asset)
         Future.successful((Left(dataAsset), ctx))
       case (Right(invalid), ctx) => Future.successful((Right(invalid), ctx))

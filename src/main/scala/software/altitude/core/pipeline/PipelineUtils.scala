@@ -10,7 +10,7 @@ object PipelineUtils {
     RequestContext.account.value = Some(ctx.account)
   }
 
-  def threadInfo(msg: String): Unit = {
+  def debugInfo(msg: String): Unit = {
     if (DEBUG) {
       println(s"(${Thread.currentThread().getName}) $msg")
     }

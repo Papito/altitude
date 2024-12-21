@@ -7,7 +7,7 @@ import software.altitude.core.models.Asset
 import software.altitude.core.pipeline.PipelineConstants.parallelism
 import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
 import software.altitude.core.pipeline.PipelineUtils.setThreadLocalRequestContext
-import software.altitude.core.pipeline.PipelineUtils.threadInfo
+import software.altitude.core.pipeline.PipelineUtils.debugInfo
 
 import scala.concurrent.Future
 
@@ -17,7 +17,7 @@ object ExtractMetadataFlow {
       case (Left(dataAsset), ctx) =>
         setThreadLocalRequestContext(ctx)
 
-        threadInfo(s"\tExtracting metadata for asset: ${dataAsset.asset.persistedId}")
+        debugInfo(s"\tExtracting metadata for asset: ${dataAsset.asset.persistedId}")
         val userMetadata = app.service.metadata.cleanAndValidate(dataAsset.asset.userMetadata)
         val extractedMetadata = app.service.metadataExtractor.extract(dataAsset.data)
         val publicMetadata = Asset.getPublicMetadata(extractedMetadata)

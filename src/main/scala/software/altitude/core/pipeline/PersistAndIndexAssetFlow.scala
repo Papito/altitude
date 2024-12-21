@@ -8,7 +8,7 @@ import software.altitude.core.pipeline.PipelineConstants.parallelism
 import software.altitude.core.pipeline.PipelineTypes.Invalid
 import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
 import software.altitude.core.pipeline.PipelineUtils.setThreadLocalRequestContext
-import software.altitude.core.pipeline.PipelineUtils.threadInfo
+import software.altitude.core.pipeline.PipelineUtils.debugInfo
 
 import scala.concurrent.Future
 
@@ -20,9 +20,9 @@ object PersistAndIndexAssetFlow {
 
         app.txManager.withTransaction {
           try {
-            threadInfo(s"\tPersisting asset ${dataAsset.asset.persistedId}")
+            debugInfo(s"\tPersisting asset ${dataAsset.asset.persistedId}")
             app.service.asset.add(dataAsset.asset)
-            threadInfo(s"\tIndexing asset ${dataAsset.asset.persistedId}")
+            debugInfo(s"\tIndexing asset ${dataAsset.asset.persistedId}")
             app.service.search.indexAsset(dataAsset.asset)
             Future.successful((Left(dataAsset), ctx))
           } catch {

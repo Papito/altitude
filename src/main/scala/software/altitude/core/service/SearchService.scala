@@ -12,8 +12,7 @@ import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchResult
 
 object SearchService {
-  // TODO: sound weird. Non-indexable? It's indexable, but can't be a facet
-  private val NON_INDEXABLE_FIELD_TYPES: Set[FieldType.Value] = Set(FieldType.TEXT)
+  private val NON_FACETED_FIELD_TYPES: Set[FieldType.Value] = Set(FieldType.TEXT)
 }
 
 class SearchService(val app: Altitude) {
@@ -26,7 +25,6 @@ class SearchService(val app: Altitude) {
     logger.info(s"Indexing asset $asset")
 
     txManager.withTransaction {
-      // we are not doing user metadata fields yet
       val metadataFields: Map[String, UserMetadataField] = app.service.metadata.getAllFields
       searchDao.indexAsset(asset, metadataFields)
     }
@@ -44,14 +42,14 @@ class SearchService(val app: Altitude) {
 
   def addMetadataValue(asset: Asset, field: UserMetadataField, value: String): Unit = {
     // some fields are not eligible for parameterized search
-    if (SearchService.NON_INDEXABLE_FIELD_TYPES.contains(field.fieldType)) return
+    if (SearchService.NON_FACETED_FIELD_TYPES.contains(field.fieldType)) return
 
     searchDao.addMetadataValue(asset, field, value)
   }
 
   def addMetadataValues(asset: Asset, field: UserMetadataField, values: Set[String]): Unit = {
     // some fields are not eligible for parameterized search
-    if (SearchService.NON_INDEXABLE_FIELD_TYPES.contains(field.fieldType)) return
+    if (SearchService.NON_FACETED_FIELD_TYPES.contains(field.fieldType)) return
 
     searchDao.addMetadataValues(asset, field, values)
   }
