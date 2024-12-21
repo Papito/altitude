@@ -109,9 +109,9 @@ class TestContext(val testApp: Altitude) {
       userId = currentUser.persistedId,
       folderId = folderId,
       assetType = new AssetType(
-        mediaType = "mediaType",
-        mediaSubtype = "mediaSubtype",
-        mime = "mime"),
+        mediaType = "x-none",
+        mediaSubtype = "unknown",
+        mime = "x-none/unknown"),
       fileName = filename,
       checksum = Random.nextInt(500000),
       userMetadata = userMetadata,

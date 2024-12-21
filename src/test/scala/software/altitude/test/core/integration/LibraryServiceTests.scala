@@ -132,8 +132,6 @@ import software.altitude.test.core.IntegrationTestCore
     val folder1_2: Folder = testApp.service.library.addFolder(
       name = "folder1_2", parentId = folder1.id)
 
-    val mediaType = new AssetType(mediaType = "mediaType", mediaSubtype = "mediaSubtype", mime = "mime")
-
     testContext.persistAsset(folder = Some(folder1_1))
     testContext.persistAsset(folder = Some(folder1_2))
     testContext.persistAsset(folder = Some(folder1))

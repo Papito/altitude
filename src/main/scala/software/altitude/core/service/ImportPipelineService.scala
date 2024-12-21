@@ -22,7 +22,8 @@ import software.altitude.core.models.AssetWithData
 import software.altitude.core.models.Repository
 import software.altitude.core.models.User
 
-case class PipelineContext(repository: Repository, account: User)
+case class PipelineContext(repository: Repository,
+                           account: User)
 
 object ImportPipelineService {
 
@@ -34,9 +35,9 @@ object ImportPipelineService {
   private val DEBUG = false
 }
 
-case class Valid[T](payload: T)
+case class Valid(asset: AssetWithData)
 
-case class Invalid[T](payload: T, cause: Option[Throwable])
+case class Invalid(payload: AssetWithData, cause: Option[Throwable])
 
 class ImportPipelineService(app: Altitude) {
   implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "pipeline-system")
@@ -54,6 +55,14 @@ class ImportPipelineService(app: Altitude) {
       ""
     }
   }
+
+  private val checkMediaTypeFlow: Flow[(AssetWithData, PipelineContext), (AssetWithData, PipelineContext), NotUsed] =
+    Flow[(AssetWithData, PipelineContext)].map {
+      case (dataAsset, ctx) =>
+        threadInfo(s"Checking media type: ${dataAsset.asset.fileName}: ${dataAsset.asset.assetType.toJson}")
+        app.service.library.checkMediaType(dataAsset.asset)
+        (dataAsset, ctx)
+    }
 
   private val assignIdFlow: Flow[(AssetWithData, PipelineContext), (AssetWithData, PipelineContext), NotUsed] =
     Flow[(AssetWithData, PipelineContext)].map {
@@ -182,6 +191,7 @@ class ImportPipelineService(app: Altitude) {
     }
 
     source
+      .via(checkMediaTypeFlow)
       .via(assignIdFlow)
       .async
       .via(parallelGraph)

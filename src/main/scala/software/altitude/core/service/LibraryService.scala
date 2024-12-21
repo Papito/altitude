@@ -24,8 +24,10 @@ import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchResult
 
 object LibraryService {
-  private val SUPPORTED_MEDIA_TYPES: Set[String] = Set("image")
-
+  private val SUPPORTED_MEDIA_TYPES: Set[String] = Set(
+    "image",
+    "x-none" // in test, this is used to force zero-length preview data
+  )
 }
 
 class LibraryService(val app: Altitude) {
@@ -33,6 +35,12 @@ class LibraryService(val app: Altitude) {
   protected val txManager: TransactionManager = app.txManager
 
   private val previewBoxSize: Int = app.config.getInt(C.Conf.PREVIEW_BOX_PIXELS)
+
+  def checkMediaType(asset: Asset): Unit = {
+    if (!LibraryService.SUPPORTED_MEDIA_TYPES.contains(asset.assetType.mediaType)) {
+      throw UnsupportedMediaTypeException(asset)
+    }
+  }
 
   def convImportAsset2dataAsset(importAsset: ImportAsset): AssetWithData = {
     val assetType = app.service.metadataExtractor.detectAssetType(importAsset.data)

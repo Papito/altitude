@@ -17,14 +17,14 @@ case class ValidationException(message: String = "") extends Exception {
   }
 }
 
-// All-purpose event to get out of loops with user interrupts or conditionals
+// All-purpose event to get out of loops and sticky situations
 case class AllDone(success: Boolean) extends Exception
 
 case class DuplicateException(message: Option[String] = None) extends Exception
 
 case class ConstraintException(msg: String) extends Exception(msg)
 
-case class FormatException(asset: Asset) extends RuntimeException()
+case class UnsupportedMediaTypeException(asset: Asset) extends Exception()
 
 case class IllegalOperationException(msg: String) extends IllegalArgumentException(msg)
 
