@@ -8,7 +8,7 @@ import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
 import software.altitude.core.models.AssetType
 import software.altitude.core.models.AssetWithData
-import software.altitude.core.service.PipelineContext
+import software.altitude.core.pipeline.PipelineTypes.PipelineContext
 import software.altitude.test.core.IntegrationTestCore
 
 import scala.concurrent.Await

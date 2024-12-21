@@ -1,8 +1,5 @@
 package software.altitude.core.controllers.web
 
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
 import org.apache.commons.fileupload.servlet.ServletFileUpload
 import org.apache.commons.io.IOUtils
 import org.json4s.DefaultFormats
@@ -18,13 +15,9 @@ import org.scalatra.atmosphere.Disconnected
 import org.scalatra.atmosphere.Error
 import org.scalatra.atmosphere.JsonMessage
 import org.scalatra.atmosphere.TextMessage
-import org.scalatra.json.JacksonJsonSupport
 import org.scalatra.json.JValueResult
+import org.scalatra.json.JacksonJsonSupport
 import org.scalatra.servlet.SizeConstraintExceededException
-
-import scala.collection.concurrent.TrieMap
-import scala.concurrent.ExecutionContext.Implicits.global
-
 import software.altitude.core.Api
 import software.altitude.core.DuplicateException
 import software.altitude.core.RequestContext
@@ -32,7 +25,12 @@ import software.altitude.core.controllers.BaseWebController
 import software.altitude.core.controllers.web.ImportController.isCancelled
 import software.altitude.core.models.ImportAsset
 import software.altitude.core.models.UserMetadata
-import software.altitude.core.service.PipelineContext
+
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
+import scala.collection.concurrent.TrieMap
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object ImportController {
   private val uploadCancelRequest = TrieMap[String, Boolean]()
@@ -129,9 +127,8 @@ class ImportController extends BaseWebController with AtmosphereSupport with JVa
 
     val iter = servletFileUpload.getItemIterator(request)
 
-    val pipelineContext = PipelineContext(repository = RequestContext.getRepository, account = RequestContext.getAccount)
-
     /*
+        val pipelineContext = PipelineContext(repository = RequestContext.getRepository, account = RequestContext.getAccount)
         val source = Source.fromIterator[(AssetWithData, PipelineContext)](() => new Iterator[(AssetWithData, PipelineContext)] {
             override def hasNext: Boolean = iter.hasNext
             override def next(): (AssetWithData, PipelineContext) = {

@@ -9,6 +9,7 @@ import software.altitude.core.FieldConst
 import software.altitude.core.RequestContext
 import software.altitude.core.models.Folder
 import software.altitude.core.models._
+import software.altitude.core.pipeline.PipelineTypes.PipelineContext
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.ImageUtil.makeImageThumbnail
 import software.altitude.core.util.MurmurHash
