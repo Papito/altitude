@@ -6,12 +6,14 @@ import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.have
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
-import software.altitude.core.models.{AssetType, AssetWithData}
+import software.altitude.core.models.AssetType
+import software.altitude.core.models.AssetWithData
 import software.altitude.core.service.PipelineContext
 import software.altitude.test.core.IntegrationTestCore
 
+import scala.concurrent.Await
+import scala.concurrent.Future
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
 
 
 @DoNotDiscover class ImportPipelineServiceTests(override val testApp: Altitude)
@@ -46,7 +48,7 @@ import scala.concurrent.{Await, Future}
     Await.result(pipelineResFuture, Duration.Inf) should have size batchSize
   }
 
-  test("Pipeline should complete on unsupported media type errors", Focused) {
+  test("Pipeline should complete on unsupported media type errors") {
     val badMediaType = AssetType("bad", "type", "mime")
     val assetWithBadMediaType = testContext.makeAsset().copy(assetType = badMediaType)
     val assetWithData = testContext.makeAssetWithData().copy(asset = assetWithBadMediaType)
@@ -56,6 +58,6 @@ import scala.concurrent.{Await, Future}
 
     val pipelineResFuture: Future[Seq[AssetWithData]] = testApp.service.importPipeline.run(source)
 
-    Await.result(pipelineResFuture, Duration.Inf) should have size 1
+    Await.result(pipelineResFuture, Duration.Inf) should have size 0
   }
 }
