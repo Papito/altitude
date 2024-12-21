@@ -240,7 +240,6 @@ class Altitude(val dbEngineOverride: Option[String] = None) {
     val system = new SystemService(app)
     val user = new UserService(app)
     val repository = new RepositoryService(app)
-    val assetImport = new AssetImportService(app)
     val metadataExtractor = new MetadataExtractionService
     val metadata = new UserMetadataService(app)
     val library = new LibraryService(app)

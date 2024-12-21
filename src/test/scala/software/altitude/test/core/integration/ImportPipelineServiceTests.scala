@@ -1,26 +1,20 @@
 package software.altitude.test.core.integration
 
-import software.altitude.core.models.AssetWithData
-import software.altitude.core.service.PipelineContext
-
-import scala.concurrent.Await
-import scala.concurrent.Future
-import scala.concurrent.duration.Duration
 import org.apache.pekko.NotUsed
 import org.apache.pekko.stream.scaladsl.Source
 import org.scalatest.DoNotDiscover
 import org.scalatest.concurrent.Eventually
-import org.scalatest.concurrent.Futures.PatienceConfig
 import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
-import org.scalatest.matchers.must.Matchers.{be, empty, equal, have, not}
+import org.scalatest.matchers.must.Matchers.have
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import org.scalatest.time.{Seconds, Span}
+import org.scalatest.time.Seconds
+import org.scalatest.time.Span
 import software.altitude.core.Altitude
-import software.altitude.core.DuplicateException
-import software.altitude.core.models.Asset
-import software.altitude.core.models.MimedPreviewData
-import software.altitude.test.IntegrationTestUtil
+import software.altitude.core.models.AssetWithData
+import software.altitude.core.service.PipelineContext
 import software.altitude.test.core.IntegrationTestCore
+
+import scala.concurrent.Future
 
 
 @DoNotDiscover class ImportPipelineServiceTests(override val testApp: Altitude) extends IntegrationTestCore with Eventually {

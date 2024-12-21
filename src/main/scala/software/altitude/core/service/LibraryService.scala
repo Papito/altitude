@@ -17,50 +17,52 @@ import software.altitude.core.models._
 import software.altitude.core.models.Folder
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.ImageUtil.makeImageThumbnail
+import software.altitude.core.util.MurmurHash
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchResult
 
-/**
- * The class that stitches it all together TOC:
- *   - ASSETS
- *   - DATA/PREVIEW
- *   - DISCOVERY
- *   - FOLDERS
- *   - RECYCLING
- *   - METADATA
- */
+object LibraryService {
+  private val SUPPORTED_MEDIA_TYPES: Set[String] = Set("image")
+
+}
+
 class LibraryService(val app: Altitude) {
   final protected val logger: Logger = LoggerFactory.getLogger(getClass)
   protected val txManager: TransactionManager = app.txManager
 
   private val previewBoxSize: Int = app.config.getInt(C.Conf.PREVIEW_BOX_PIXELS)
 
-  /**
-   * ************************************************************************** ASSETS ***********************************************************************
-   */
+  def convImportAsset2dataAsset(importAsset: ImportAsset): AssetWithData = {
+    val assetType = app.service.metadataExtractor.detectAssetType(importAsset.data)
 
-  def add(dataAssetIn: AssetWithData): JsObject = {
-    logger.info(s"Preparing to add asset [$dataAssetIn]")
+    val asset = Asset(
+      userId = RequestContext.account.value.get.persistedId,
+      fileName = importAsset.fileName,
+      checksum = MurmurHash.hash32(importAsset.data),
+      assetType = assetType,
+      sizeBytes = importAsset.data.length,
+      isTriaged = true,
+      folderId = RequestContext.getRepository.rootFolderId
+    )
+    AssetWithData(asset, importAsset.data)
+  }
 
-    txManager.asReadOnly {
-      val existing: Option[Asset] = getByChecksum(dataAssetIn.asset.checksum)
+  def addImportAsset(importAsset: ImportAsset): Asset = {
+    logger.info(s"Importing asset '$importAsset'")
+    val dataAssetIn = convImportAsset2dataAsset(importAsset)
+    addAsset(dataAssetIn)
+  }
 
-      if (existing.nonEmpty) {
-        logger.debug(s"Duplicate found for [$dataAssetIn] and checksum: ${dataAssetIn.asset.checksum}")
-        throw DuplicateException()
-      }
-    }
-
+  def addAsset(dataAsset: AssetWithData): Asset = {
     val pipelineContext = PipelineContext(RequestContext.getRepository, RequestContext.getAccount)
-    val source: Source[(AssetWithData, PipelineContext), NotUsed] = Source.single((dataAssetIn, pipelineContext))
+    val source: Source[(AssetWithData, PipelineContext), NotUsed] = Source.single((dataAsset, pipelineContext))
     val pipelineResFuture: Future[Seq[AssetWithData]] = app.service.importPipeline.run(source)
 
     val result = Await.result(pipelineResFuture, Duration.Inf)
-    val dataAsset = result.head
 
-    dataAsset.asset
+    result.head.asset
   }
 
   def deleteById(id: String): Unit = {
@@ -144,11 +146,6 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  /**
-   * ************************************************************************** DATA/PREVIEW
-   * ***********************************************************************
-   */
-
   private def genPreviewData(dataAsset: AssetWithData): Array[Byte] = {
     dataAsset.asset.assetType.mediaType match {
       case "image" =>
@@ -174,11 +171,6 @@ class LibraryService(val app: Altitude) {
   def getPreview(assetId: String): MimedPreviewData = {
     app.service.fileStore.getPreviewById(assetId)
   }
-
-  /**
-   * ************************************************************************** DISCOVERY
-   * ***********************************************************************
-   */
 
   def query(query: Query): QueryResult = {
     txManager.asReadOnly[QueryResult] {
@@ -217,10 +209,6 @@ class LibraryService(val app: Altitude) {
   def queryAll(query: Query): QueryResult = {
     app.service.asset.queryAll(query)
   }
-
-  /**
-   * ************************************************************************** FOLDERS ***********************************************************************
-   */
 
   def addFolder(name: String, parentId: Option[String] = None): Folder = {
     txManager.withTransaction[JsObject] {
@@ -317,11 +305,6 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  /**
-   * ************************************************************************** RECYCLING
-   * ***********************************************************************
-   */
-
   def restoreRecycledAsset(assetId: String): Asset = {
     txManager.withTransaction[Asset] {
       restoreRecycledAssets(Set(assetId))
@@ -378,10 +361,6 @@ class LibraryService(val app: Altitude) {
         }
     }
   }
-
-  /**
-   * ************************************************************************** METADATA ***********************************************************************
-   */
 
   def addMetadataValue(assetId: String, fieldId: String, newValue: Any): Unit = {
     txManager.withTransaction {

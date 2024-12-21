@@ -10,10 +10,10 @@ import org.apache.pekko.stream.scaladsl.Flow
 import org.apache.pekko.stream.scaladsl.GraphDSL
 import org.apache.pekko.stream.scaladsl.Sink
 import org.apache.pekko.stream.scaladsl.Source
-import org.apache.pekko.stream.scaladsl.Source.actorRefWithAck
 import org.apache.pekko.stream.scaladsl.ZipWith
 
 import scala.concurrent.Future
+
 import software.altitude.core.Altitude
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.BaseDao
@@ -29,7 +29,7 @@ object ImportPipelineService {
   /**
    * Set to "true" to enable debugging output to console.
    *
-   * Useful for understanding the flow of the pipeline and the use of threads.
+   * Useful for understanding the flow of the pipeline and its use of threads.
    */
   private val DEBUG = false
 }
@@ -37,30 +37,6 @@ object ImportPipelineService {
 case class Valid[T](payload: T)
 
 case class Invalid[T](payload: T, cause: Option[Throwable])
-
-/**
-     Source
-       |
-       v
-  Assign UUID
-       |
-       |---------------------------------------------------
-       |                   |               |              |
-       v                   v               v              v
- Extract Metadata     File Store     Update Stats     Add Preview
-       |
-       v
-  Persist Asset
-       |
-       v
-    Index Asset
-       |
-       v
- Facial Recognition
-       |
-       v
-     Sink
- */
 
 class ImportPipelineService(app: Altitude) {
   implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "pipeline-system")

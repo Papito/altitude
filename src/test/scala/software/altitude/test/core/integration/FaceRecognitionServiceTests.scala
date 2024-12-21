@@ -19,7 +19,7 @@ import software.altitude.test.core.IntegrationTestCore
 
   test("Recognize a person twice") {
     val importAsset1 = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
-    val importedAsset1: Asset = testApp.service.assetImport.importAsset(importAsset1).get
+    val importedAsset1: Asset = testApp.service.library.addImportAsset(importAsset1)
     val faces1 = testApp.service.faceDetection.extractFaces(importAsset1.data)
     val face1: Face = faces1.head
     val recognizedPerson: Person = testApp.service.faceRecognition.recognizeFace(face1, importedAsset1)
@@ -36,7 +36,7 @@ import software.altitude.test.core.IntegrationTestCore
 
     // Recognize again
     val importAsset2 = IntegrationTestUtil.getImportAsset("people/meme-ben2.png")
-    val importedAsset2: Asset = testApp.service.assetImport.importAsset(importAsset2).get
+    val importedAsset2: Asset = testApp.service.library.addImportAsset(importAsset2)
     val faces2 = testApp.service.faceDetection.extractFaces(importAsset2.data)
     val face2: Face = faces2.head
 
@@ -49,7 +49,7 @@ import software.altitude.test.core.IntegrationTestCore
 
     // Recognize a second time
     val importAsset3 = IntegrationTestUtil.getImportAsset("people/meme-ben3.png")
-    val importedAsset3: Asset = testApp.service.assetImport.importAsset(importAsset3).get
+    val importedAsset3: Asset = testApp.service.library.addImportAsset(importAsset3)
     val faces3 = testApp.service.faceDetection.extractFaces(importAsset3.data)
     val face3: Face = faces3.head
 
@@ -70,7 +70,7 @@ import software.altitude.test.core.IntegrationTestCore
 
   test("Recognize two new people") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/movies-speed.png")
-    val importedAsset: Asset = testApp.service.assetImport.importAsset(importAsset).get
+    val importedAsset: Asset = testApp.service.library.addImportAsset(importAsset)
 
     val people = testApp.service.person.getPeople(importedAsset.persistedId)
     people.size should be(2)

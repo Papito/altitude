@@ -320,13 +320,13 @@ import software.altitude.test.core.IntegrationTestCore
     val folder1: Folder = testApp.service.library.addFolder("folder1")
 
     val dataAsset = testContext.makeAssetWithData(folder=Some(folder1))
-    val persistedAsset: Asset = testApp.service.library.add(dataAsset)
+    val persistedAsset: Asset = testApp.service.library.addAsset(dataAsset)
 
     // recycle the asset
     testApp.service.library.recycleAsset(persistedAsset.persistedId)
 
     // import a new copy of it (should be allowed)
-    testApp.service.library.add(dataAsset)
+    testApp.service.library.addAsset(dataAsset)
 
     // now restore the previously deleted copy into itself
     intercept[DuplicateException] {

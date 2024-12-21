@@ -158,7 +158,7 @@ class TestContext(val testApp: Altitude) {
       asset = assetModel,
       data = Random.nextBytes(100))
 
-    val persistedAsset: Asset = testApp.service.library.add(dataAsset)
+    val persistedAsset: Asset = testApp.service.library.addAsset(dataAsset)
 
     assets = assets ::: persistedAsset :: Nil
 
