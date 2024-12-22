@@ -7,6 +7,7 @@ import org.scalatest.matchers.must.Matchers.equal
 import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
+import software.altitude.core.DuplicateException
 import software.altitude.core.models.Asset
 import software.altitude.core.models.MimedPreviewData
 import software.altitude.test.IntegrationTestUtil
@@ -18,13 +19,13 @@ import software.altitude.test.core.IntegrationTestCore
   test("Import duplicate") {
     val importAsset = IntegrationTestUtil.getImportAsset("images/2.jpg")
     testApp.service.library.addImportAsset(importAsset)
-    // FIXME
-//    intercept[DuplicateException] {
-//      testApp.service.library.addImportAsset(importAsset)
-//    }
+
+    intercept[DuplicateException] {
+      testApp.service.library.addImportAsset(importAsset)
+    }
   }
 
-  test("Imported image with extracted metadata should successfully import", Focused) {
+  test("Imported image with extracted metadata should successfully import") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/bullock.jpg")
 
     val importedAsset: Asset = testApp.service.library.addImportAsset(importAsset)

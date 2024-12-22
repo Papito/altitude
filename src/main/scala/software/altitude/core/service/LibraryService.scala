@@ -10,6 +10,8 @@ import software.altitude.core.RequestContext
 import software.altitude.core.models.Folder
 import software.altitude.core.models._
 import software.altitude.core.pipeline.PipelineTypes.PipelineContext
+import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalid
+import software.altitude.core.pipeline.Sinks.seqOutputSink
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.ImageUtil.makeImageThumbnail
 import software.altitude.core.util.MurmurHash
@@ -66,11 +68,14 @@ class LibraryService(val app: Altitude) {
   def addAsset(dataAsset: AssetWithData): Asset = {
     val pipelineContext = PipelineContext(RequestContext.getRepository, RequestContext.getAccount)
     val source: Source[(AssetWithData, PipelineContext), NotUsed] = Source.single((dataAsset, pipelineContext))
-    val pipelineResFuture: Future[Seq[AssetWithData]] = app.service.importPipeline.run(source)
+    val pipelineResFuture: Future[Seq[TAssetOrInvalid]] = app.service.importPipeline.run(source, seqOutputSink)
 
-    val result = Await.result(pipelineResFuture, Duration.Inf)
+    val result: Seq[TAssetOrInvalid] = Await.result(pipelineResFuture, Duration.Inf)
 
-    result.head.asset
+    result.head match {
+      case Left(assetOut) => assetOut
+      case Right(invalid) => throw invalid.cause.getOrElse(new Exception("Unknown error"))
+    }
   }
 
   def deleteById(id: String): Unit = {

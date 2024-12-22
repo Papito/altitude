@@ -22,7 +22,7 @@ object CheckMetadataFlow {
           (Left(dataAsset), ctx)
         } catch {
           case e: UnsupportedMediaTypeException =>
-            (Right(Invalid(dataAsset, Some(e))), ctx)
+            (Right(Invalid(dataAsset.asset, Some(e))), ctx)
         }
     }
 }
