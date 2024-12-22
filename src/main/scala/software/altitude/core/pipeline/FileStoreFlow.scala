@@ -16,7 +16,7 @@ object FileStoreFlow {
       case (Left(dataAsset), ctx) =>
         setThreadLocalRequestContext(ctx)
 
-        debugInfo(s"\tStoring asset ${dataAsset.asset.persistedId} in file store")
+        debugInfo(s"\tStoring asset ${dataAsset.asset.persistedId}")
         app.service.fileStore.addAsset(dataAsset)
         Future.successful((Left(dataAsset), ctx))
       case (Right(invalid), ctx) => Future.successful((Right(invalid), ctx))

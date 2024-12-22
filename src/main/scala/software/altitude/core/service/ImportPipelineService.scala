@@ -33,14 +33,13 @@ class ImportPipelineService(app: Altitude) {
     source
       .via(checkMediaTypeFlow)
       .via(assignIdFlow)
-      .async
       .via(extractMetadataFlow)
       .async
       .via(persistAndIndexAssetFlow)
       .async
-      .via(parallelFlowsGraph)
-      .async
       .via(facialRecognitionFlow)
+      .async
+      .via(parallelFlowsGraph)
       .alsoTo(Sink.foreach {
         case (Right(invalid), _) => errorSink.runWith(Source.single(invalid))
         case _ =>

@@ -12,32 +12,28 @@ import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
 object ParallelFlowsGraph {
   def apply(app: Altitude): Graph[FlowShape[TAssetOrInvalidWithContext, TAssetOrInvalidWithContext], NotUsed] = GraphDSL.create() {
     val fileStoreFlow = FileStoreFlow(app)
-    val updateStatsFlow = UpdateStatsFlow(app)
     val addPreviewFlow = AddPreviewFlow(app)
 
     implicit builder =>
       import GraphDSL.Implicits._
 
-      val broadcast = builder.add(Broadcast[TAssetOrInvalidWithContext](3))
+      val broadcast = builder.add(Broadcast[TAssetOrInvalidWithContext](2))
 
       val zip = builder.add(
         ZipWith[
           TAssetOrInvalidWithContext,
           TAssetOrInvalidWithContext,
-          TAssetOrInvalidWithContext,
           TAssetOrInvalidWithContext](
-          (extractMetadataSubstream, _, _) => extractMetadataSubstream)
+          (extractMetadataSubstream, _) => extractMetadataSubstream)
       )
 
       // Define the flows
-      val fileStoreFlowShape = builder.add(fileStoreFlow)
-      val updateStatsFlowShape = builder.add(updateStatsFlow)
-      val addPreviewFlowShape = builder.add(addPreviewFlow)
+      val fileStoreFlowShape = builder.add(fileStoreFlow.async)
+      val addPreviewFlowShape = builder.add(addPreviewFlow.async)
 
       // Connect the flows
       broadcast ~> fileStoreFlowShape ~> zip.in0
-      broadcast ~> updateStatsFlowShape ~> zip.in1
-      broadcast ~> addPreviewFlowShape ~> zip.in2
+      broadcast ~> addPreviewFlowShape ~> zip.in1
 
       FlowShape(broadcast.in, zip.out)
   }

@@ -15,7 +15,7 @@ object CheckMetadataFlow {
   def apply(app: Altitude): Flow[TAssetWithContext, TAssetOrInvalidWithContext, NotUsed] =
     Flow[(AssetWithData, PipelineContext)].map {
       case (dataAsset, ctx) =>
-        debugInfo(s"Checking media type: ${dataAsset.asset.fileName}: ${dataAsset.asset.assetType.toJson}")
+        debugInfo(s"\tChecking media type: ${dataAsset.asset.fileName}: ${dataAsset.asset.assetType.toJson}")
 
         try {
           app.service.library.checkMediaType(dataAsset.asset)

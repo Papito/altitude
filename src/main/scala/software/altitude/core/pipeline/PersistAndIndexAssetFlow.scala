@@ -24,6 +24,8 @@ object PersistAndIndexAssetFlow {
             app.service.asset.add(dataAsset.asset)
             debugInfo(s"\tIndexing asset ${dataAsset.asset.persistedId}")
             app.service.search.indexAsset(dataAsset.asset)
+            debugInfo(s"\tUpdating stats for asset ${dataAsset.asset.persistedId}")
+            app.service.stats.addAsset(dataAsset.asset)
             Future.successful((Left(dataAsset), ctx))
           } catch {
             case e: DuplicateException =>
