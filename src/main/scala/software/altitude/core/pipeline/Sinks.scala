@@ -15,5 +15,5 @@ object Sinks {
 
   val seqOutputSink: Sink[TAssetOrInvalid, Future[Seq[TAssetOrInvalid]]] = Sink.seq[TAssetOrInvalid]
 
-  val voidOutputSink: Sink[TAssetOrInvalid, Future[Done]] = Sink.ignore
+  val voidOutputSink: Sink[TAssetOrInvalid, Future[Seq[TAssetOrInvalid]]] = Sink.fold(Seq.empty[TAssetOrInvalid])((acc, _) => acc)
 }

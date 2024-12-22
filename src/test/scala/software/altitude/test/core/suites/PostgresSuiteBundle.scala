@@ -36,4 +36,8 @@ class PostgresSuiteBundle
 
     PostgresSuiteBundle.setup(this.testApp)
   }
+
+  override def afterAll(): Unit = {
+    testApp.cleanup()
+  }
 }

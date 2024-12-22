@@ -47,4 +47,8 @@ class SqliteSuiteBundle
     testApp.service.migrationService.migrate()
 
   }
+
+  override def afterAll(): Unit = {
+    testApp.cleanup()
+  }
 }

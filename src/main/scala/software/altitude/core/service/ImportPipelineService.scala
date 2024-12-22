@@ -7,7 +7,7 @@ import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.apache.pekko.stream.scaladsl.Sink
 import org.apache.pekko.stream.scaladsl.Source
 import software.altitude.core.Altitude
-import software.altitude.core.pipeline.{AssignIdFlow, CheckMetadataFlow, ExtractMetadataFlow, FacialRecognitionFlow, ParallelFlowsGraph, PersistAndIndexAssetFlow}
+import software.altitude.core.pipeline.{AddPreviewFlow, AssignIdFlow, CheckMetadataFlow, ExtractMetadataFlow, FacialRecognitionFlow, FileStoreFlow, PersistAndIndexAssetFlow}
 import software.altitude.core.pipeline.PipelineTypes.Invalid
 import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalid
 import software.altitude.core.pipeline.PipelineTypes.TAssetWithContext
@@ -22,24 +22,27 @@ class ImportPipelineService(app: Altitude) {
   private val assignIdFlow = AssignIdFlow(app)
   private val persistAndIndexAssetFlow = PersistAndIndexAssetFlow(app)
   private val facialRecognitionFlow = FacialRecognitionFlow(app)
-  private val parallelFlowsGraph = ParallelFlowsGraph(app)
   private val extractMetadataFlow = ExtractMetadataFlow(app)
+  private val fileStoreFlow = FileStoreFlow(app)
+  private val addPreviewFlow = AddPreviewFlow(app)
 
 
   def run(
       source: Source[TAssetWithContext, NotUsed],
       outputSink: Sink[TAssetOrInvalid, Future[Seq[TAssetOrInvalid]]],
       errorSink: Sink[Invalid, Future[Done]] = voidErrorSink): Future[Seq[TAssetOrInvalid]] = {
+
     source
       .via(checkMediaTypeFlow)
       .via(assignIdFlow)
       .via(extractMetadataFlow)
-      .async
       .via(persistAndIndexAssetFlow)
       .async
       .via(facialRecognitionFlow)
       .async
-      .via(parallelFlowsGraph)
+      .via(fileStoreFlow)
+      .async
+      .via(addPreviewFlow)
       .alsoTo(Sink.foreach {
         case (Right(invalid), _) => errorSink.runWith(Source.single(invalid))
         case _ =>
