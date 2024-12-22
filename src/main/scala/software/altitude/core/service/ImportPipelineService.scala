@@ -7,11 +7,7 @@ import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.apache.pekko.stream.scaladsl.Sink
 import org.apache.pekko.stream.scaladsl.Source
 import software.altitude.core.Altitude
-import software.altitude.core.pipeline.AssignIdFlow
-import software.altitude.core.pipeline.CheckMetadataFlow
-import software.altitude.core.pipeline.FacialRecognitionFlow
-import software.altitude.core.pipeline.ParallelFlowsGraph
-import software.altitude.core.pipeline.PersistAndIndexAssetFlow
+import software.altitude.core.pipeline.{AssignIdFlow, CheckMetadataFlow, ExtractMetadataFlow, FacialRecognitionFlow, ParallelFlowsGraph, PersistAndIndexAssetFlow}
 import software.altitude.core.pipeline.PipelineTypes.Invalid
 import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalid
 import software.altitude.core.pipeline.PipelineTypes.TAssetWithContext
@@ -27,6 +23,8 @@ class ImportPipelineService(app: Altitude) {
   private val persistAndIndexAssetFlow = PersistAndIndexAssetFlow(app)
   private val facialRecognitionFlow = FacialRecognitionFlow(app)
   private val parallelFlowsGraph = ParallelFlowsGraph(app)
+  private val extractMetadataFlow = ExtractMetadataFlow(app)
+
 
   def run(
       source: Source[TAssetWithContext, NotUsed],
@@ -36,8 +34,11 @@ class ImportPipelineService(app: Altitude) {
       .via(checkMediaTypeFlow)
       .via(assignIdFlow)
       .async
-      .via(parallelFlowsGraph)
+      .via(extractMetadataFlow)
+      .async
       .via(persistAndIndexAssetFlow)
+      .async
+      .via(parallelFlowsGraph)
       .async
       .via(facialRecognitionFlow)
       .alsoTo(Sink.foreach {

@@ -25,7 +25,7 @@ import scala.concurrent.duration.Duration
 @DoNotDiscover class ImportPipelineServiceTests(override val testApp: Altitude)
   extends IntegrationTestCore {
 
-  test("Pipeline should import multiple assets") {
+  test("Pipeline should import multiple assets", Focused) {
     val batchSize = 10
     val dataAssets = (1 to batchSize).map(_ => testContext.makeAssetWithData())
 
@@ -77,7 +77,7 @@ import scala.concurrent.duration.Duration
     }
   }
 
-  test("Pipeline should complete on unsupported media type errors", Focused) {
+  test("Pipeline should complete on unsupported media type errors") {
     val badMediaType = AssetType("bad", "type", "mime")
     val assetWithBadMediaType = testContext.makeAsset().copy(assetType = badMediaType)
     val assetWithData = testContext.makeAssetWithData().copy(asset = assetWithBadMediaType)
