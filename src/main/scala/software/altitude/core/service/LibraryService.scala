@@ -88,7 +88,7 @@ class LibraryService(val app: Altitude) {
     }
   }
 
-  private def getByChecksum(checksum: Int): Option[Asset] = {
+  def getByChecksum(checksum: Int): Option[Asset] = {
     txManager.asReadOnly[Option[Asset]] {
       val query = new Query(params = Map(FieldConst.Asset.CHECKSUM -> checksum)).withRepository()
       val existing = app.service.asset.query(query)

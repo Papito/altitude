@@ -16,7 +16,7 @@ import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class AssetImportServiceTests(override val testApp: Altitude) extends IntegrationTestCore {
 
-  test("Import duplicate") {
+  test("Import duplicate", Focused) {
     val importAsset = IntegrationTestUtil.getImportAsset("images/2.jpg")
     testApp.service.library.addImportAsset(importAsset)
 

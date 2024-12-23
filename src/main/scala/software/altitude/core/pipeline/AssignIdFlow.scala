@@ -15,7 +15,7 @@ object AssignIdFlow {
         val asset: Asset = dataAsset.asset.copy(
           id = Some(BaseDao.genId)
         )
-        debugInfo(s"Assigning ID to asset: ${asset.id.get}")
+        debugInfo(s"\tAssigning ID to asset: ${asset.id.get}")
 
         (Left(dataAsset.copy(asset = asset)), ctx)
       case (Right(invalid), ctx) => (Right(invalid), ctx)

@@ -14,7 +14,8 @@ import software.altitude.core.models.AssetType
 import software.altitude.core.models.AssetWithData
 import software.altitude.core.pipeline.PipelineTypes.PipelineContext
 import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalid
-import software.altitude.core.pipeline.Sinks.{seqOutputSink, voidOutputSink}
+import software.altitude.core.pipeline.Sinks.seqOutputSink
+import software.altitude.core.pipeline.Sinks.voidOutputSink
 import software.altitude.test.core.IntegrationTestCore
 
 import scala.concurrent.Await

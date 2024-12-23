@@ -7,7 +7,14 @@ import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.apache.pekko.stream.scaladsl.Sink
 import org.apache.pekko.stream.scaladsl.Source
 import software.altitude.core.Altitude
-import software.altitude.core.pipeline.{AddPreviewFlow, AssignIdFlow, CheckMetadataFlow, ExtractMetadataFlow, FacialRecognitionFlow, FileStoreFlow, PersistAndIndexAssetFlow}
+import software.altitude.core.pipeline.AddPreviewFlow
+import software.altitude.core.pipeline.AssignIdFlow
+import software.altitude.core.pipeline.CheckDuplicateFlow
+import software.altitude.core.pipeline.CheckMetadataFlow
+import software.altitude.core.pipeline.ExtractMetadataFlow
+import software.altitude.core.pipeline.FacialRecognitionFlow
+import software.altitude.core.pipeline.FileStoreFlow
+import software.altitude.core.pipeline.PersistAndIndexAssetFlow
 import software.altitude.core.pipeline.PipelineTypes.Invalid
 import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalid
 import software.altitude.core.pipeline.PipelineTypes.TAssetWithContext
@@ -25,7 +32,7 @@ class ImportPipelineService(app: Altitude) {
   private val extractMetadataFlow = ExtractMetadataFlow(app)
   private val fileStoreFlow = FileStoreFlow(app)
   private val addPreviewFlow = AddPreviewFlow(app)
-
+  private val checkDuplicateFlow = CheckDuplicateFlow(app)
 
   def run(
       source: Source[TAssetWithContext, NotUsed],
@@ -34,6 +41,7 @@ class ImportPipelineService(app: Altitude) {
 
     source
       .via(checkMediaTypeFlow)
+      .via(checkDuplicateFlow)
       .via(assignIdFlow)
       .via(extractMetadataFlow)
       .via(persistAndIndexAssetFlow)

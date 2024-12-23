@@ -7,15 +7,17 @@ import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
 import software.altitude.core.pipeline.PipelineUtils.debugInfo
 import software.altitude.core.pipeline.PipelineUtils.setThreadLocalRequestContext
 
+import scala.concurrent.Future
+
 object FacialRecognitionFlow {
   def apply(app: Altitude): Flow[TAssetOrInvalidWithContext, TAssetOrInvalidWithContext, NotUsed] =
-    Flow[TAssetOrInvalidWithContext].map {
+    Flow[TAssetOrInvalidWithContext].mapAsync(1) {
       case (Left(dataAsset), ctx) =>
         setThreadLocalRequestContext(ctx)
 
         debugInfo(s"\tRunning facial recognition ${dataAsset.asset.persistedId}")
         app.service.faceRecognition.processAsset(dataAsset)
-        (Left(dataAsset), ctx)
-      case (Right(invalid), ctx) => (Right(invalid), ctx)
+        Future.successful(Left(dataAsset), ctx)
+      case (Right(invalid), ctx) => Future.successful(Right(invalid), ctx)
     }
 }

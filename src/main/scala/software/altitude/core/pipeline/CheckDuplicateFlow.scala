@@ -2,24 +2,35 @@ package software.altitude.core.pipeline
 
 import org.apache.pekko.NotUsed
 import org.apache.pekko.stream.scaladsl.Flow
-
-import scala.concurrent.Future
-
 import software.altitude.core.Altitude
+import software.altitude.core.DuplicateException
+import software.altitude.core.models.Asset
 import software.altitude.core.pipeline.PipelineConstants.parallelism
+import software.altitude.core.pipeline.PipelineTypes.Invalid
 import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
 import software.altitude.core.pipeline.PipelineUtils.debugInfo
 import software.altitude.core.pipeline.PipelineUtils.setThreadLocalRequestContext
 
-object AddPreviewFlow {
+import scala.concurrent.Future
+
+object CheckDuplicateFlow {
   def apply(app: Altitude): Flow[TAssetOrInvalidWithContext, TAssetOrInvalidWithContext, NotUsed] =
     Flow[TAssetOrInvalidWithContext].mapAsync(parallelism) {
       case (Left(dataAsset), ctx) =>
         setThreadLocalRequestContext(ctx)
 
-        debugInfo(s"\tGenerating preview ${dataAsset.asset.persistedId}")
-        app.service.library.addPreview(dataAsset)
-        Future.successful((Left(dataAsset), ctx))
-      case (Right(invalid), ctx) => Future.successful((Right(invalid), ctx))
+        debugInfo(s"\tChecking for duplicate for ${dataAsset.asset.fileName}")
+
+        val existing: Option[Asset] = app.service.library.getByChecksum(dataAsset.asset.checksum)
+
+        if (existing.nonEmpty) {
+          Future.successful(Right(Invalid(dataAsset.asset, Some(new DuplicateException))), ctx)
+        } else {
+          Future.successful((Left(dataAsset), ctx))
+        }
+
+      case (Right(invalid), ctx) =>
+        Future.successful((Right(invalid), ctx))
     }
+
 }
