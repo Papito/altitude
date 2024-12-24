@@ -4,9 +4,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload
 import org.apache.commons.io.IOUtils
 import org.json4s.DefaultFormats
 import org.json4s.Formats
-import org.scalatra.RequestEntityTooLarge
-import org.scalatra.Route
-import org.scalatra.SessionSupport
+import org.scalatra.{FutureSupport, RequestEntityTooLarge, Route, SessionSupport}
 import org.scalatra.atmosphere.AtmoReceive
 import org.scalatra.atmosphere.AtmosphereClient
 import org.scalatra.atmosphere.AtmosphereSupport
@@ -42,7 +40,12 @@ object ImportController {
   }
 }
 
-class ImportController extends BaseWebController with AtmosphereSupport with JValueResult with JacksonJsonSupport with SessionSupport {
+class ImportController
+  extends BaseWebController
+  with AtmosphereSupport
+    with JValueResult
+    with JacksonJsonSupport
+    with SessionSupport {
   private val fileSizeLimitGB = 10
 
   private class ImportCounters {
@@ -126,11 +129,9 @@ class ImportController extends BaseWebController with AtmosphereSupport with JVa
     }
 
     val importStatus = importAssetCountPerRepo.computeIfAbsent(uploadId, _ => new ImportCounters)
+    val pipelineContext = PipelineContext(repository = RequestContext.getRepository, account = RequestContext.getAccount)
 
     val iter = servletFileUpload.getItemIterator(request)
-
-    val pipelineContext = PipelineContext(repository = RequestContext.getRepository, account = RequestContext.getAccount)
-    val (importQueuePipeline, completionFuture) = app.service.importPipeline.runAsQueue()
 
     while (iter.hasNext && !isCancelled(uploadId)) {
       logger.debug("Next file")
@@ -143,65 +144,13 @@ class ImportController extends BaseWebController with AtmosphereSupport with JVa
       logger.info(s"Received file: ${fileItemStream.getName}]")
 
       val importAsset = new ImportAsset(fileName = fileItemStream.getName, data = bytes, metadata = UserMetadata())
-
       val assetWithData = app.service.library.convImportAsset2dataAsset(importAsset)
-      val offeredFut = importQueuePipeline.offer(assetWithData, pipelineContext)
+      val offeredFut = app.service.importPipeline.addToQueue(assetWithData, pipelineContext)
+
       Await.result(offeredFut, Duration.Inf)
-
-//          app.executorService.submit(new Runnable {
-//            override def run(): Unit = {
-//              logger.debug(s"Processing file ${importAsset.fileName} in thread")
-//              try {
-//                val processedSoFar = importStatus.processedSoFar.addAndGet(1)
-//                importStatus.inProgress.addAndGet(1)
-//
-//                app.service.library.addImportAsset(importAsset)
-//
-//                val importedStatusText = s"Imported $processedSoFar: <span>${importAsset.fileName}</span>"
-//
-//                sendWsStatusToUserClients(successStatusTickerTemplate.format(importedStatusText))
-//              } catch {
-//                case _: DuplicateException =>
-//                  logger.warn(s"Duplicate asset: ${importAsset.fileName}")
-//                  val duplicateStatusText = s"Ignoring duplicate: <span>${importAsset.fileName}</span>"
-//                  sendWsStatusToUserClients(warningStatusTickerTemplate.format(duplicateStatusText))
-//
-//                case e: Exception =>
-//                  logger.error("Error importing asset:", e)
-//
-//                  val errorStatusText = s"Error: <span>${importAsset.fileName}</span>"
-//                  sendWsStatusToUserClients(errorStatusTickerTemplate.format(errorStatusText))
-//
-//              } finally {
-//                val isFinishedUploading = importStatus.isFinishedUploading.get()
-//                val inProgress = importStatus.inProgress.decrementAndGet()
-//                val processedSoFar = importStatus.processedSoFar.get()
-//                val total = importStatus.total.get()
-//                val _isCancelled = isCancelled(uploadId)
-//
-//                logger.info(
-//                  s"Is cancelled: ${_isCancelled}, is finished uploading: $isFinishedUploading, total: $total, in progress: $inProgress, processed so far: $processedSoFar")
-//                val isDone = isFinishedUploading && (processedSoFar == total) && inProgress == 0
-//
-//                if (isDone || _isCancelled) {
-//                  // save the model after all files have been processed
-//                  app.service.faceRecognition.saveModel()
-//
-//                  sendWsStatusToUserClients(successStatusTickerTemplate.format("All files processed"))
-//                }
-//              }
-//            }
-//          })
-
     }
 
     logger.info("All files sent to queue")
-    importQueuePipeline.complete()
-
-    logger.info("Waiting for completion")
-    Await.result(completionFuture, Duration.Inf)
-    logger.info("Pipeline completed")
-
     layoutTemplate("/WEB-INF/templates/views/htmx/upload_form.ssp")
   }
 
