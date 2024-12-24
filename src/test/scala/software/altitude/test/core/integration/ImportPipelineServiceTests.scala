@@ -14,8 +14,8 @@ import software.altitude.core.models.AssetType
 import software.altitude.core.models.AssetWithData
 import software.altitude.core.pipeline.PipelineTypes.PipelineContext
 import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
-import software.altitude.core.pipeline.Sinks.seqOutputSink
-import software.altitude.core.pipeline.Sinks.voidOutputSink
+import software.altitude.core.pipeline.sinks.SeqOutputSink
+import software.altitude.core.pipeline.sinks.VoidOutputSink
 import software.altitude.test.core.IntegrationTestCore
 
 import scala.concurrent.Await
@@ -26,27 +26,27 @@ import scala.concurrent.duration.Duration
 @DoNotDiscover class ImportPipelineServiceTests(override val testApp: Altitude)
   extends IntegrationTestCore {
 
-  test("Void pipeline sink should produce no results", Focused) {
+  test("Void pipeline sink should produce no results") {
     val batchSize = 5
     val dataAssets = (1 to batchSize).map(_ => testContext.makeAssetWithData())
 
     val pipelineContext = PipelineContext(testContext.repository, testContext.user)
     val source = Source.fromIterator(() => dataAssets.iterator).map((_, pipelineContext))
 
-    val pipelineResFuture: Future[Seq[TAssetOrInvalidWithContext]] = testApp.service.importPipeline.run(source, voidOutputSink)
+    val pipelineResFuture: Future[Seq[TAssetOrInvalidWithContext]] = testApp.service.importPipeline.run(source, VoidOutputSink())
 
     val pipelineRes = Await.result(pipelineResFuture, Duration.Inf)
     pipelineRes should have size 0
   }
 
-  test("Pipeline should import multiple assets") {
+  test("Pipeline should import multiple assets", Focused) {
     val batchSize = 10
     val dataAssets = (1 to batchSize).map(_ => testContext.makeAssetWithData())
 
     val pipelineContext = PipelineContext(testContext.repository, testContext.user)
     val source = Source.fromIterator(() => dataAssets.iterator).map((_, pipelineContext))
 
-    val pipelineResFuture: Future[Seq[TAssetOrInvalidWithContext]] = testApp.service.importPipeline.run(source, seqOutputSink)
+    val pipelineResFuture: Future[Seq[TAssetOrInvalidWithContext]] = testApp.service.importPipeline.run(source, SeqOutputSink())
 
     val pipelineRes = Await.result(pipelineResFuture, Duration.Inf)
     pipelineRes should have size batchSize
@@ -67,7 +67,7 @@ import scala.concurrent.duration.Duration
     val pipelineContext = PipelineContext(testContext.repository, testContext.user)
     val source = Source.fromIterator(() => dataAssetsWithDuplicate.iterator).map((_, pipelineContext))
 
-    val pipelineResFuture: Future[Seq[TAssetOrInvalidWithContext]] = testApp.service.importPipeline.run(source, seqOutputSink)
+    val pipelineResFuture: Future[Seq[TAssetOrInvalidWithContext]] = testApp.service.importPipeline.run(source, SeqOutputSink())
 
     val pipelineRes = Await.result(pipelineResFuture, Duration.Inf)
     pipelineRes should have size batchSize + 1
@@ -99,7 +99,7 @@ import scala.concurrent.duration.Duration
     val pipelineContext = PipelineContext(testContext.repository, testContext.user)
     val source: Source[(AssetWithData, PipelineContext), NotUsed] = Source.single(assetWithData, pipelineContext)
 
-    val pipelineResFuture: Future[Seq[TAssetOrInvalidWithContext]] = testApp.service.importPipeline.run(source, seqOutputSink)
+    val pipelineResFuture: Future[Seq[TAssetOrInvalidWithContext]] = testApp.service.importPipeline.run(source, SeqOutputSink())
 
     val pipelineRes = Await.result(pipelineResFuture, Duration.Inf)
     pipelineRes should have size 1

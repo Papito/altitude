@@ -23,11 +23,10 @@ import software.altitude.core.pipeline.FacialRecognitionFlow
 import software.altitude.core.pipeline.FileStoreFlow
 import software.altitude.core.pipeline.PersistAndIndexAssetFlow
 import software.altitude.core.pipeline.PipelineConstants.parallelism
-import software.altitude.core.pipeline.PipelineTypes.Invalid
 import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
 import software.altitude.core.pipeline.PipelineTypes.TDataAssetWithContext
-import software.altitude.core.pipeline.Sinks.voidErrorSink
-import software.altitude.core.pipeline.actors.ImportStatusWsActor
+import software.altitude.core.pipeline.actors.StripBinaryDataFlow
+import software.altitude.core.pipeline.sinks.WsNotificationSink
 
 import scala.concurrent.Await
 import scala.concurrent.Future
@@ -46,6 +45,8 @@ class ImportPipelineService(app: Altitude) {
   private val fileStoreFlow = FileStoreFlow(app)
   private val addPreviewFlow = AddPreviewFlow(app)
   private val checkDuplicateFlow = CheckDuplicateFlow(app)
+  private val stripBinaryDataFlow = StripBinaryDataFlow(app)
+  private val wsNotificationSink = WsNotificationSink(app)
 
   private val combinedFlow: Flow[TDataAssetWithContext, TAssetOrInvalidWithContext, NotUsed] =
     Flow[TDataAssetWithContext]
@@ -60,38 +61,17 @@ class ImportPipelineService(app: Altitude) {
       .via(fileStoreFlow)
       .async
       .via(addPreviewFlow)
-      .map {
-        // strip binary data from the asset, leaving just the Asset metadata and pipeline context
-        case (assetWithDataOrInvalid, ctx) =>
-          val assetOrInvalid = assetWithDataOrInvalid match {
-            case Left(assetWithData) => Left(assetWithData.asset)
-            case Right(invalid) => Right(invalid)
-          }
-
-          (assetOrInvalid, ctx)
-      }
-      .map {
-        case (assetOrInvalid, ctx) =>
-          app.actorSystem ! ImportStatusWsActor.UserWideImportStatus(ctx.account.persistedId, assetOrInvalid)
-          (assetOrInvalid, ctx)
-      }
+      .via(stripBinaryDataFlow)
+      .alsoTo(wsNotificationSink)
 
   private val (queueImportPipeline, queuePipelineCompletedFut) = runAsQueue()
 
   def run(
       source: Source[TDataAssetWithContext, NotUsed],
-      outputSink: Sink[TAssetOrInvalidWithContext, Future[Seq[TAssetOrInvalidWithContext]]],
-      errorSink: Sink[Invalid, Future[Done]] = voidErrorSink): Future[Seq[TAssetOrInvalidWithContext]] = {
+      outputSink: Sink[TAssetOrInvalidWithContext, Future[Seq[TAssetOrInvalidWithContext]]]): Future[Seq[TAssetOrInvalidWithContext]] = {
 
     source
       .via(combinedFlow)
-      .alsoTo(Sink.foreach {
-        case (assetOrInvalid, ctx) =>
-          assetOrInvalid match {
-            case Left(asset) => (Left(asset), ctx)
-            case Right(invalid) => errorSink.runWith(Source.single(invalid))
-          }
-      })
       .runWith(outputSink)
   }
 
