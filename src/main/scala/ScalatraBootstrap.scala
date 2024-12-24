@@ -7,7 +7,6 @@ import software.altitude.core.Environment
 class ScalatraBootstrap extends LifeCycle with AltitudeServletContext {
   val logger: Logger = LoggerFactory.getLogger(getClass)
 
-
   override def init(context: javax.servlet.ServletContext): Unit = {
     super.init(context)
 

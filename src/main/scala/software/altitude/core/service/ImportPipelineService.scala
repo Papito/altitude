@@ -11,7 +11,7 @@ import org.apache.pekko.stream.scaladsl.Sink
 import org.apache.pekko.stream.scaladsl.Source
 import org.apache.pekko.stream.scaladsl.SourceQueueWithComplete
 import org.slf4j.{Logger, LoggerFactory}
-import software.altitude.core.Altitude
+import software.altitude.core.{Altitude, AltitudeActorSystem}
 import software.altitude.core.pipeline.AddPreviewFlow
 import software.altitude.core.pipeline.AssignIdFlow
 import software.altitude.core.pipeline.CheckDuplicateFlow
@@ -32,7 +32,7 @@ import scala.concurrent.{Await, Future}
 class ImportPipelineService(app: Altitude) {
   val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "pipeline-system")
+  implicit val system: ActorSystem[AltitudeActorSystem.Command] = app.actorSystem
 
   private val checkMediaTypeFlow = CheckMetadataFlow(app)
   private val assignIdFlow = AssignIdFlow(app)

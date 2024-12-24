@@ -3,15 +3,15 @@ package software.altitude.core
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
+
 import java.io.File
-import java.util.concurrent.Executors
-import java.util.concurrent.ExecutorService
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.FileUtils
+import org.apache.pekko.actor.typed.{ActorSystem, Behavior}
+import org.apache.pekko.actor.typed.scaladsl.{ActorContext, Behaviors}
 import org.scalatra.auth.ScentryStrategy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 import software.altitude.core.{Const => C}
 import software.altitude.core.auth.strategies.LocalDevRememberMeStrategy
 import software.altitude.core.auth.strategies.RememberMeStrategy
@@ -19,6 +19,7 @@ import software.altitude.core.auth.strategies.TestRememberMeStrategy
 import software.altitude.core.auth.strategies.UserPasswordStrategy
 import software.altitude.core.dao._
 import software.altitude.core.models.User
+import software.altitude.core.pipeline.actors.WebsocketImportStatusManagerActor
 import software.altitude.core.service._
 import software.altitude.core.service.filestore.FileStoreService
 import software.altitude.core.service.filestore.FileSystemStoreService
@@ -124,13 +125,6 @@ class Altitude(val dbEngineOverride: Option[String] = None) {
   final val fileStoreType: String = config.getString(C.Conf.DEFAULT_STORAGE_ENGINE)
   logger.info(s"File store type: $fileStoreType")
 
-  /** App thread pool, whatever it is needed for */
-  private val maxThreads: Int = Runtime.getRuntime.availableProcessors()
-  logger.info(s"Available processors: $maxThreads")
-
-  val executorService: ExecutorService = Executors.newFixedThreadPool(maxThreads)
-  logger.info("Executor service initialized")
-
   final val txManager: TransactionManager = new software.altitude.core.transactions.TransactionManager(app.config)
 
   /**
@@ -223,6 +217,8 @@ class Altitude(val dbEngineOverride: Option[String] = None) {
     }
   }
 
+  val actorSystem: ActorSystem[AltitudeActorSystem.Command] = ActorSystem[AltitudeActorSystem.Command](AltitudeActorSystem(), "altitude-actor-system")
+
   object service {
     val migrationService: MigrationService = dataSourceType match {
       case C.DbEngineName.SQLITE =>
@@ -288,8 +284,6 @@ class Altitude(val dbEngineOverride: Option[String] = None) {
 
   def cleanup(): Unit = {
     logger.info("Cleaning up resources")
-    executorService.shutdown()
-    logger.info("Executor service terminated")
     service.importPipeline.shutdown()
     logger.info("Pipeline system terminated")
   }

@@ -4,7 +4,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload
 import org.apache.commons.io.IOUtils
 import org.json4s.DefaultFormats
 import org.json4s.Formats
-import org.scalatra.{FutureSupport, RequestEntityTooLarge, Route, SessionSupport}
+import org.scalatra.{RequestEntityTooLarge, Route, SessionSupport}
 import org.scalatra.atmosphere.AtmoReceive
 import org.scalatra.atmosphere.AtmosphereClient
 import org.scalatra.atmosphere.AtmosphereSupport
@@ -23,6 +23,7 @@ import software.altitude.core.controllers.web.ImportController.isCancelled
 import software.altitude.core.models.ImportAsset
 import software.altitude.core.models.UserMetadata
 import software.altitude.core.pipeline.PipelineTypes.PipelineContext
+import software.altitude.core.pipeline.actors.WebsocketImportStatusManagerActor
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
@@ -57,6 +58,7 @@ class ImportController
 
   private val importAssetCountPerRepo = new ConcurrentHashMap[String, ImportCounters]()
 
+
   implicit protected val jsonFormats: Formats = DefaultFormats
 
   private val userToWsClientLookup = collection.mutable.Map[String, List[AtmosphereClient]]()
@@ -77,7 +79,6 @@ class ImportController
     contentType = "text/html"
     layoutTemplate("/WEB-INF/templates/views/import.ssp")
   }
-
   atmosphere("/status") {
     val userId = params("userId")
 
@@ -86,23 +87,18 @@ class ImportController
         case Connected =>
           logger.info("Client connected ...")
           logger.info(s"Associating user $userId with client $uuid")
+          app.actorSystem ! WebsocketImportStatusManagerActor.AddClient(userId, this)
+          app.actorSystem ! WebsocketImportStatusManagerActor.UserWideImportStatus(userId, "Connected")
 
-          if (!userToWsClientLookup.contains(userId)) {
-            userToWsClientLookup += userId -> List(this)
-          } else {
-            userToWsClientLookup(userId) = this :: userToWsClientLookup(userId)
-          }
-
-        case Disconnected(disconnector, Some(error)) =>
+        case Disconnected(_, Some(_)) =>
           logger.info(s"Disassociating user $userId with client $uuid")
-          val clients = userToWsClientLookup(userId)
-          userToWsClientLookup(userId) = clients.filterNot(_ == this)
+          app.actorSystem ! WebsocketImportStatusManagerActor.RemoveClient(userId, this)
 
         case Error(Some(error)) =>
           logger.error(s"WS Error: $error")
 
-        case TextMessage(text) =>
-        case JsonMessage(json) =>
+        case TextMessage(_) =>
+        case JsonMessage(_) =>
       }
     }
 
@@ -155,7 +151,8 @@ class ImportController
   }
 
   private def sendWsStatusToUserClients(message: String): Unit = {
-    userToWsClientLookup.get(RequestContext.getAccount.persistedId).foreach(clients => clients.foreach(client => client.send(message)))
+    userToWsClientLookup.get(RequestContext.getAccount.persistedId).foreach(
+      clients => clients.foreach(client => client.send(message)))
   }
 
   error {
