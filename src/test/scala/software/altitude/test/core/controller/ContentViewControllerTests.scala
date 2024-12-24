@@ -11,7 +11,7 @@ import software.altitude.test.core.ControllerTestCore
 
 @DoNotDiscover class ContentViewControllerTests(override val testApp: Altitude) extends ControllerTestCore {
 
-  // FIXME: This works alone but fails within the context of the suite - what state is being shared?
+  // FIXME: This works alone but fails within the context of the suite - what state is being shared across these tests?
   test("Access to thumbnail image denied for not logged in users") {
     // no need to persist the repository or import an asset - should never get to that point
 //    get(s"/content/preview/lol") {

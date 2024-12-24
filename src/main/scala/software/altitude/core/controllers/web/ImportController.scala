@@ -4,7 +4,9 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload
 import org.apache.commons.io.IOUtils
 import org.json4s.DefaultFormats
 import org.json4s.Formats
-import org.scalatra.{RequestEntityTooLarge, Route, SessionSupport}
+import org.scalatra.RequestEntityTooLarge
+import org.scalatra.Route
+import org.scalatra.SessionSupport
 import org.scalatra.atmosphere.AtmoReceive
 import org.scalatra.atmosphere.AtmosphereClient
 import org.scalatra.atmosphere.AtmosphereSupport
@@ -23,7 +25,7 @@ import software.altitude.core.controllers.web.ImportController.isCancelled
 import software.altitude.core.models.ImportAsset
 import software.altitude.core.models.UserMetadata
 import software.altitude.core.pipeline.PipelineTypes.PipelineContext
-import software.altitude.core.pipeline.actors.WebsocketImportStatusManagerActor
+import software.altitude.core.pipeline.actors.ImportStatusWsActor
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
@@ -41,12 +43,7 @@ object ImportController {
   }
 }
 
-class ImportController
-  extends BaseWebController
-  with AtmosphereSupport
-    with JValueResult
-    with JacksonJsonSupport
-    with SessionSupport {
+class ImportController extends BaseWebController with AtmosphereSupport with JValueResult with JacksonJsonSupport with SessionSupport {
   private val fileSizeLimitGB = 10
 
   private class ImportCounters {
@@ -58,17 +55,9 @@ class ImportController
 
   private val importAssetCountPerRepo = new ConcurrentHashMap[String, ImportCounters]()
 
-
   implicit protected val jsonFormats: Formats = DefaultFormats
-
   private val userToWsClientLookup = collection.mutable.Map[String, List[AtmosphereClient]]()
 
-  // HTMX WS client expects a div with id "status" to update the status ticker
-  private val successStatusTickerTemplate = "<div id=\"statusText\">%s</div>"
-  private val warningStatusTickerTemplate = "<div id=\"statusText\" class=\"warning\">%s</div>"
-  private val errorStatusTickerTemplate = "<div id=\"statusText\" class=\"error\">%s</div>"
-
-  // I don't feel strongly about this
   // configureMultipartHandling(MultipartConfig(maxFileSize = Some(fileSizeLimitGB*1024*1024)))
 
   before() {
@@ -87,12 +76,11 @@ class ImportController
         case Connected =>
           logger.info("Client connected ...")
           logger.info(s"Associating user $userId with client $uuid")
-          app.actorSystem ! WebsocketImportStatusManagerActor.AddClient(userId, this)
-          app.actorSystem ! WebsocketImportStatusManagerActor.UserWideImportStatus(userId, "Connected")
+          app.actorSystem ! ImportStatusWsActor.AddClient(userId, this)
 
         case Disconnected(_, Some(_)) =>
           logger.info(s"Disassociating user $userId with client $uuid")
-          app.actorSystem ! WebsocketImportStatusManagerActor.RemoveClient(userId, this)
+          app.actorSystem ! ImportStatusWsActor.RemoveClient(userId, this)
 
         case Error(Some(error)) =>
           logger.error(s"WS Error: $error")
@@ -151,8 +139,7 @@ class ImportController
   }
 
   private def sendWsStatusToUserClients(message: String): Unit = {
-    userToWsClientLookup.get(RequestContext.getAccount.persistedId).foreach(
-      clients => clients.foreach(client => client.send(message)))
+    userToWsClientLookup.get(RequestContext.getAccount.persistedId).foreach(clients => clients.foreach(client => client.send(message)))
   }
 
   error {

@@ -3,15 +3,17 @@ package software.altitude.core.service
 import org.apache.pekko.Done
 import org.apache.pekko.NotUsed
 import org.apache.pekko.actor.typed.ActorSystem
-import org.apache.pekko.actor.typed.scaladsl.Behaviors
-import org.apache.pekko.stream.{OverflowStrategy, QueueOfferResult}
+import org.apache.pekko.stream.OverflowStrategy
+import org.apache.pekko.stream.QueueOfferResult
 import org.apache.pekko.stream.scaladsl.Flow
 import org.apache.pekko.stream.scaladsl.Keep
 import org.apache.pekko.stream.scaladsl.Sink
 import org.apache.pekko.stream.scaladsl.Source
 import org.apache.pekko.stream.scaladsl.SourceQueueWithComplete
-import org.slf4j.{Logger, LoggerFactory}
-import software.altitude.core.{Altitude, AltitudeActorSystem}
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import software.altitude.core.Altitude
+import software.altitude.core.AltitudeActorSystem
 import software.altitude.core.pipeline.AddPreviewFlow
 import software.altitude.core.pipeline.AssignIdFlow
 import software.altitude.core.pipeline.CheckDuplicateFlow
@@ -25,9 +27,11 @@ import software.altitude.core.pipeline.PipelineTypes.Invalid
 import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalid
 import software.altitude.core.pipeline.PipelineTypes.TAssetWithContext
 import software.altitude.core.pipeline.Sinks.voidErrorSink
+import software.altitude.core.pipeline.actors.ImportStatusWsActor
 
-import scala.concurrent.duration.{Duration, DurationInt}
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
+import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
 
 class ImportPipelineService(app: Altitude) {
   val logger: Logger = LoggerFactory.getLogger(getClass)
@@ -57,8 +61,11 @@ class ImportPipelineService(app: Altitude) {
       .async
       .via(addPreviewFlow)
       .map {
-        // strip pipeline context
-        case (assetWithDataOrInvalid, _) => assetWithDataOrInvalid
+        case (assetWithDataOrInvalid, ctx) =>
+          app.actorSystem ! ImportStatusWsActor.UserWideImportStatus(ctx.account.persistedId, assetWithDataOrInvalid)
+
+          // strip pipeline context downstream TODO: don't, as now it's a "mixed" repo flow
+          assetWithDataOrInvalid
       }
       .map {
         // strip binary data from the asset, leaving just the Asset (metadata)
@@ -95,7 +102,7 @@ class ImportPipelineService(app: Altitude) {
   }
 
   def addToQueue(asset: TAssetWithContext): Future[QueueOfferResult] = {
-      queueImportPipeline.offer(asset)
+    queueImportPipeline.offer(asset)
   }
 
   def shutdown(): Unit = {

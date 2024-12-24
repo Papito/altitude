@@ -1,8 +1,12 @@
 package software.altitude.core
 
-import org.apache.pekko.actor.typed.{ActorSystem, Behavior, PostStop, Signal}
-import org.apache.pekko.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
-import software.altitude.core.pipeline.actors.WebsocketImportStatusManagerActor
+import org.apache.pekko.actor.typed.Behavior
+import org.apache.pekko.actor.typed.PostStop
+import org.apache.pekko.actor.typed.Signal
+import org.apache.pekko.actor.typed.scaladsl.AbstractBehavior
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import software.altitude.core.pipeline.actors.ImportStatusWsActor
 
 object AltitudeActorSystem {
   trait Command
@@ -10,14 +14,13 @@ object AltitudeActorSystem {
   def apply(): Behavior[Command] = Behaviors.setup(context => new AltitudeActorSystem(context))
 }
 
-private class AltitudeActorSystem(context: ActorContext[AltitudeActorSystem.Command])
-  extends AbstractBehavior[AltitudeActorSystem.Command](context) {
+private class AltitudeActorSystem(context: ActorContext[AltitudeActorSystem.Command]) extends AbstractBehavior[AltitudeActorSystem.Command](context) {
 
-  private val websocketImportStatusManagerActor = context.spawn(WebsocketImportStatusManagerActor(), "websocketImportStatusManagerActor")
+  private val websocketImportStatusManagerActor = context.spawn(ImportStatusWsActor(), "importStatusWsActor")
 
   override def onMessage(msg: AltitudeActorSystem.Command): Behavior[AltitudeActorSystem.Command] = {
     msg match {
-      case command: WebsocketImportStatusManagerActor.Command =>
+      case command: ImportStatusWsActor.Command =>
         websocketImportStatusManagerActor ! command
         Behaviors.same
       case _ =>
@@ -26,7 +29,7 @@ private class AltitudeActorSystem(context: ActorContext[AltitudeActorSystem.Comm
   }
   override def onSignal: PartialFunction[Signal, Behavior[AltitudeActorSystem.Command]] = {
     case PostStop =>
-        context.log.info("Actor system stopped")
+      context.log.info("Actor system stopped")
       this
   }
 
