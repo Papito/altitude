@@ -10,14 +10,14 @@ import software.altitude.core.AltitudeActorSystem
 import software.altitude.core.DuplicateException
 import software.altitude.core.StorageException
 import software.altitude.core.UnsupportedMediaTypeException
-import software.altitude.core.pipeline.PipelineTypes.TAssetWithDataOrInvalid
+import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalid
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object ImportStatusWsActor {
   sealed trait Command
   final case class AddClient(userId: String, client: AtmosphereClient) extends AltitudeActorSystem.Command with Command
-  final case class UserWideImportStatus(userId: String, assetWithDataOrInvalid: TAssetWithDataOrInvalid) extends AltitudeActorSystem.Command with Command
+  final case class UserWideImportStatus(userId: String, assetOrInvalid: TAssetOrInvalid) extends AltitudeActorSystem.Command with Command
   final case class RemoveClient(userId: String, client: AtmosphereClient) extends AltitudeActorSystem.Command with Command
 
   private val successStatusTickerTemplate = "<div id=\"statusText\">%s</div>"
@@ -41,7 +41,7 @@ class ImportStatusWsActor(context: ActorContext[ImportStatusWsActor.Command]) ex
         userToWsClientLookup.update(userId, client :: clients)
         Behaviors.same
 
-      case UserWideImportStatus(userId, assetWithDataOrInvalid) =>
+      case UserWideImportStatus(userId, assetOrInvalid) =>
         context.log.info(s"Sending message to WS clients for user $userId")
         userToWsClientLookup.get(userId).foreach {
           clients =>
@@ -49,9 +49,9 @@ class ImportStatusWsActor(context: ActorContext[ImportStatusWsActor.Command]) ex
               client =>
                 context.log.info(s"Sending message to client $client")
 
-                val wsContent = assetWithDataOrInvalid match {
-                  case Left(assetWithData) =>
-                    successStatusTickerTemplate.format(s"Imported ${assetWithData.asset.fileName}")
+                val wsContent = assetOrInvalid match {
+                  case Left(asset) =>
+                    successStatusTickerTemplate.format(s"Imported ${asset.fileName}")
 
                   case Right(invalid) =>
                     val errorMessage = invalid.cause.get match {

@@ -97,10 +97,7 @@
             elAbortButton.removeAttribute("hidden")
             elProgressBarCtrl.removeAttribute("hidden")
             elStayOnPage.removeAttribute("hidden")
-            elProgressBar.setAttribute(
-                "value",
-                percentLoaded,
-            )
+            elProgressBar.setAttribute("value", percentLoaded)
             elStartUploadButton.setAttribute("hidden", "true")
             elFiles.setAttribute("disabled", "true")
 

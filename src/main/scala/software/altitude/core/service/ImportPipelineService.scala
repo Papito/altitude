@@ -24,8 +24,8 @@ import software.altitude.core.pipeline.FileStoreFlow
 import software.altitude.core.pipeline.PersistAndIndexAssetFlow
 import software.altitude.core.pipeline.PipelineConstants.parallelism
 import software.altitude.core.pipeline.PipelineTypes.Invalid
-import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalid
-import software.altitude.core.pipeline.PipelineTypes.TAssetWithContext
+import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
+import software.altitude.core.pipeline.PipelineTypes.TDataAssetWithContext
 import software.altitude.core.pipeline.Sinks.voidErrorSink
 import software.altitude.core.pipeline.actors.ImportStatusWsActor
 
@@ -47,8 +47,8 @@ class ImportPipelineService(app: Altitude) {
   private val addPreviewFlow = AddPreviewFlow(app)
   private val checkDuplicateFlow = CheckDuplicateFlow(app)
 
-  private val combinedFlow: Flow[TAssetWithContext, TAssetOrInvalid, NotUsed] =
-    Flow[TAssetWithContext]
+  private val combinedFlow: Flow[TDataAssetWithContext, TAssetOrInvalidWithContext, NotUsed] =
+    Flow[TDataAssetWithContext]
       .via(checkMediaTypeFlow)
       .via(checkDuplicateFlow)
       .via(assignIdFlow)
@@ -61,37 +61,44 @@ class ImportPipelineService(app: Altitude) {
       .async
       .via(addPreviewFlow)
       .map {
+        // strip binary data from the asset, leaving just the Asset metadata and pipeline context
         case (assetWithDataOrInvalid, ctx) =>
-          app.actorSystem ! ImportStatusWsActor.UserWideImportStatus(ctx.account.persistedId, assetWithDataOrInvalid)
+          val assetOrInvalid = assetWithDataOrInvalid match {
+            case Left(assetWithData) => Left(assetWithData.asset)
+            case Right(invalid) => Right(invalid)
+          }
 
-          // strip pipeline context downstream TODO: don't, as now it's a "mixed" repo flow
-          assetWithDataOrInvalid
+          (assetOrInvalid, ctx)
       }
       .map {
-        // strip binary data from the asset, leaving just the Asset (metadata)
-        case Left(assetWithData) => Left(assetWithData.asset)
-        case Right(invalid) => Right(invalid)
+        case (assetOrInvalid, ctx) =>
+          app.actorSystem ! ImportStatusWsActor.UserWideImportStatus(ctx.account.persistedId, assetOrInvalid)
+          (assetOrInvalid, ctx)
       }
 
   private val (queueImportPipeline, queuePipelineCompletedFut) = runAsQueue()
 
   def run(
-      source: Source[TAssetWithContext, NotUsed],
-      outputSink: Sink[TAssetOrInvalid, Future[Seq[TAssetOrInvalid]]],
-      errorSink: Sink[Invalid, Future[Done]] = voidErrorSink): Future[Seq[TAssetOrInvalid]] = {
+      source: Source[TDataAssetWithContext, NotUsed],
+      outputSink: Sink[TAssetOrInvalidWithContext, Future[Seq[TAssetOrInvalidWithContext]]],
+      errorSink: Sink[Invalid, Future[Done]] = voidErrorSink): Future[Seq[TAssetOrInvalidWithContext]] = {
 
     source
       .via(combinedFlow)
       .alsoTo(Sink.foreach {
-        case Right(invalid) => errorSink.runWith(Source.single(invalid))
-        case _ =>
+        case (assetOrInvalid, ctx) =>
+          assetOrInvalid match {
+            case Left(asset) => (Left(asset), ctx)
+            case Right(invalid) => errorSink.runWith(Source.single(invalid))
+          }
       })
       .runWith(outputSink)
   }
 
-  private def runAsQueue(): (SourceQueueWithComplete[TAssetWithContext], Future[Done]) = {
-    logger.info("Starting the import pipeline")
-    val queueSource = Source.queue[TAssetWithContext](parallelism * 3, OverflowStrategy.backpressure)
+  private def runAsQueue(): (SourceQueueWithComplete[TDataAssetWithContext], Future[Done]) = {
+    logger.info("Starting the import queue pipeline")
+    val bufferSize = parallelism * 4 // Reckless guess on my part of what should be a good buffer size
+    val queueSource = Source.queue[TDataAssetWithContext](bufferSize, OverflowStrategy.backpressure)
 
     val (queue, completedFut) = queueSource
       .via(combinedFlow)
@@ -101,7 +108,7 @@ class ImportPipelineService(app: Altitude) {
     (queue, completedFut)
   }
 
-  def addToQueue(asset: TAssetWithContext): Future[QueueOfferResult] = {
+  def addToQueue(asset: TDataAssetWithContext): Future[QueueOfferResult] = {
     queueImportPipeline.offer(asset)
   }
 

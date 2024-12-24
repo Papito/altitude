@@ -27,12 +27,8 @@ import software.altitude.core.models.UserMetadata
 import software.altitude.core.pipeline.PipelineTypes.PipelineContext
 import software.altitude.core.pipeline.actors.ImportStatusWsActor
 
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 
 object ImportController {
@@ -46,11 +42,7 @@ object ImportController {
 class ImportController extends BaseWebController with AtmosphereSupport with JValueResult with JacksonJsonSupport with SessionSupport {
   private val fileSizeLimitGB = 10
 
-  private val importAssetCountPerRepo = new ConcurrentHashMap[String, ImportCounters]()
-
   implicit protected val jsonFormats: Formats = DefaultFormats
-  private val userToWsClientLookup = collection.mutable.Map[String, List[AtmosphereClient]]()
-
   // configureMultipartHandling(MultipartConfig(maxFileSize = Some(fileSizeLimitGB*1024*1024)))
 
   before() {

@@ -13,7 +13,7 @@ import software.altitude.core.models.Asset
 import software.altitude.core.models.AssetType
 import software.altitude.core.models.AssetWithData
 import software.altitude.core.pipeline.PipelineTypes.PipelineContext
-import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalid
+import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
 import software.altitude.core.pipeline.Sinks.seqOutputSink
 import software.altitude.core.pipeline.Sinks.voidOutputSink
 import software.altitude.test.core.IntegrationTestCore
@@ -26,14 +26,14 @@ import scala.concurrent.duration.Duration
 @DoNotDiscover class ImportPipelineServiceTests(override val testApp: Altitude)
   extends IntegrationTestCore {
 
-  test("Void pipeline sink should produce no results") {
+  test("Void pipeline sink should produce no results", Focused) {
     val batchSize = 5
     val dataAssets = (1 to batchSize).map(_ => testContext.makeAssetWithData())
 
     val pipelineContext = PipelineContext(testContext.repository, testContext.user)
     val source = Source.fromIterator(() => dataAssets.iterator).map((_, pipelineContext))
 
-    val pipelineResFuture: Future[Seq[TAssetOrInvalid]] = testApp.service.importPipeline.run(source, voidOutputSink)
+    val pipelineResFuture: Future[Seq[TAssetOrInvalidWithContext]] = testApp.service.importPipeline.run(source, voidOutputSink)
 
     val pipelineRes = Await.result(pipelineResFuture, Duration.Inf)
     pipelineRes should have size 0
@@ -46,14 +46,14 @@ import scala.concurrent.duration.Duration
     val pipelineContext = PipelineContext(testContext.repository, testContext.user)
     val source = Source.fromIterator(() => dataAssets.iterator).map((_, pipelineContext))
 
-    val pipelineResFuture: Future[Seq[TAssetOrInvalid]] = testApp.service.importPipeline.run(source, seqOutputSink)
+    val pipelineResFuture: Future[Seq[TAssetOrInvalidWithContext]] = testApp.service.importPipeline.run(source, seqOutputSink)
 
     val pipelineRes = Await.result(pipelineResFuture, Duration.Inf)
     pipelineRes should have size batchSize
 
     pipelineRes.foreach {
-      case Left(asset) => asset shouldBe a[Asset]
-      case Right(_) => fail("Expected all elements to be of type AssetWithData")
+      case (Left(asset), _) => asset shouldBe a[Asset]
+      case (Right(_), _) => fail("Expected all elements to be of type AssetWithData")
     }
   }
 
@@ -67,26 +67,26 @@ import scala.concurrent.duration.Duration
     val pipelineContext = PipelineContext(testContext.repository, testContext.user)
     val source = Source.fromIterator(() => dataAssetsWithDuplicate.iterator).map((_, pipelineContext))
 
-    val pipelineResFuture: Future[Seq[TAssetOrInvalid]] = testApp.service.importPipeline.run(source, seqOutputSink)
+    val pipelineResFuture: Future[Seq[TAssetOrInvalidWithContext]] = testApp.service.importPipeline.run(source, seqOutputSink)
 
     val pipelineRes = Await.result(pipelineResFuture, Duration.Inf)
     pipelineRes should have size batchSize + 1
 
     val validAssetsCount = pipelineRes.count {
-      case Left(asset) => asset.isInstanceOf[Asset]
-      case Right(_) => false
+      case (Left(asset), _)  => asset.isInstanceOf[Asset]
+      case (Right(_), _) => false
     }
     validAssetsCount shouldBe batchSize
 
     val invalidAssetsCount = pipelineRes.count {
-      case Right(_) => true
+      case (Right(_), _) => true
       case _ => false
     }
     invalidAssetsCount shouldBe 1
 
     // the second element is a duplicate
     pipelineRes(1) match {
-      case Right(invalid) => invalid.cause.get shouldBe a[DuplicateException]
+      case (Right(invalid), _) => invalid.cause.get shouldBe a[DuplicateException]
       case _ => fail("Expected the second element to be of type DuplicateException")
     }
   }
@@ -99,13 +99,13 @@ import scala.concurrent.duration.Duration
     val pipelineContext = PipelineContext(testContext.repository, testContext.user)
     val source: Source[(AssetWithData, PipelineContext), NotUsed] = Source.single(assetWithData, pipelineContext)
 
-    val pipelineResFuture: Future[Seq[TAssetOrInvalid]] = testApp.service.importPipeline.run(source, seqOutputSink)
+    val pipelineResFuture: Future[Seq[TAssetOrInvalidWithContext]] = testApp.service.importPipeline.run(source, seqOutputSink)
 
     val pipelineRes = Await.result(pipelineResFuture, Duration.Inf)
     pipelineRes should have size 1
 
     pipelineRes.head match {
-      case Right(invalid) => invalid.cause.get shouldBe a[UnsupportedMediaTypeException]
+      case (Right(invalid), _) => invalid.cause.get shouldBe a[UnsupportedMediaTypeException]
       case _ => fail("Expected the first element to be of type DuplicateException")
     }
   }

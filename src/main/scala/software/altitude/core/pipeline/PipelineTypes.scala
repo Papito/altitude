@@ -10,7 +10,8 @@ object PipelineTypes {
   case class Invalid(payload: Asset, cause: Option[Throwable])
 
   type TAssetOrInvalid = Either[Asset, Invalid]
-  type TAssetWithDataOrInvalid = Either[AssetWithData, Invalid]
-  type TAssetOrInvalidWithContext = (TAssetWithDataOrInvalid, PipelineContext)
-  type TAssetWithContext = (AssetWithData, PipelineContext)
+  type TDataAssetOrInvalid = Either[AssetWithData, Invalid]
+  type TDataAssetOrInvalidWithContext = (TDataAssetOrInvalid, PipelineContext)
+  type TDataAssetWithContext = (AssetWithData, PipelineContext)
+  type TAssetOrInvalidWithContext = (TAssetOrInvalid, PipelineContext)
 }
