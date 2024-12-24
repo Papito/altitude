@@ -46,13 +46,6 @@ object ImportController {
 class ImportController extends BaseWebController with AtmosphereSupport with JValueResult with JacksonJsonSupport with SessionSupport {
   private val fileSizeLimitGB = 10
 
-  private class ImportCounters {
-    val processedSoFar = new AtomicInteger(0)
-    val inProgress = new AtomicInteger(0)
-    val total = new AtomicInteger(0)
-    val isFinishedUploading = new AtomicBoolean(false)
-  }
-
   private val importAssetCountPerRepo = new ConcurrentHashMap[String, ImportCounters]()
 
   implicit protected val jsonFormats: Formats = DefaultFormats
@@ -68,6 +61,7 @@ class ImportController extends BaseWebController with AtmosphereSupport with JVa
     contentType = "text/html"
     layoutTemplate("/WEB-INF/templates/views/import.ssp")
   }
+
   atmosphere("/status") {
     val userId = params("userId")
 
@@ -75,11 +69,9 @@ class ImportController extends BaseWebController with AtmosphereSupport with JVa
       def receive: AtmoReceive = {
         case Connected =>
           logger.info("Client connected ...")
-          logger.info(s"Associating user $userId with client $uuid")
           app.actorSystem ! ImportStatusWsActor.AddClient(userId, this)
 
         case Disconnected(_, Some(_)) =>
-          logger.info(s"Disassociating user $userId with client $uuid")
           app.actorSystem ! ImportStatusWsActor.RemoveClient(userId, this)
 
         case Error(Some(error)) =>
@@ -91,12 +83,6 @@ class ImportController extends BaseWebController with AtmosphereSupport with JVa
     }
 
     client
-  }
-
-  val cancelUpload: Route = delete(s"/r/:repoId/upload/:${Api.Field.Upload.UPLOAD_ID}/cancel") {
-    val uploadId = params(Api.Field.Upload.UPLOAD_ID)
-    logger.info(s"CANCELLING upload ID: $uploadId")
-    ImportController.uploadCancelRequest(uploadId) = true
   }
 
   val uploadFilesForm: Route = post(s"/r/:repoId/upload/:${Api.Field.Upload.UPLOAD_ID}") {
@@ -112,14 +98,12 @@ class ImportController extends BaseWebController with AtmosphereSupport with JVa
       halt(200, layoutTemplate("/WEB-INF/templates/views/htmx/upload_form.ssp"))
     }
 
-    val importStatus = importAssetCountPerRepo.computeIfAbsent(uploadId, _ => new ImportCounters)
     val pipelineContext = PipelineContext(repository = RequestContext.getRepository, account = RequestContext.getAccount)
 
     val iter = servletFileUpload.getItemIterator(request)
 
     while (iter.hasNext && !isCancelled(uploadId)) {
       logger.debug("Next file")
-      importStatus.total.addAndGet(1)
 
       val fileItemStream = iter.next()
       val fStream = fileItemStream.openStream()
@@ -136,10 +120,6 @@ class ImportController extends BaseWebController with AtmosphereSupport with JVa
 
     logger.info("All files sent to queue")
     layoutTemplate("/WEB-INF/templates/views/htmx/upload_form.ssp")
-  }
-
-  private def sendWsStatusToUserClients(message: String): Unit = {
-    userToWsClientLookup.get(RequestContext.getAccount.persistedId).foreach(clients => clients.foreach(client => client.send(message)))
   }
 
   error {
