@@ -5,11 +5,7 @@ import org.apache.pekko.NotUsed
 import org.apache.pekko.actor.typed.ActorSystem
 import org.apache.pekko.stream.OverflowStrategy
 import org.apache.pekko.stream.QueueOfferResult
-import org.apache.pekko.stream.scaladsl.Flow
-import org.apache.pekko.stream.scaladsl.Keep
-import org.apache.pekko.stream.scaladsl.Sink
-import org.apache.pekko.stream.scaladsl.Source
-import org.apache.pekko.stream.scaladsl.SourceQueueWithComplete
+import org.apache.pekko.stream.scaladsl.{Flow, Keep, Sink, Source, SourceQueueWithComplete}
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
@@ -26,12 +22,11 @@ import software.altitude.core.pipeline.PipelineConstants.parallelism
 import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
 import software.altitude.core.pipeline.PipelineTypes.TDataAssetWithContext
 import software.altitude.core.pipeline.actors.StripBinaryDataFlow
-import software.altitude.core.pipeline.sinks.WsNotificationSink
+import software.altitude.core.pipeline.sinks.{ErrorLoggingSink, WsNotificationSink}
 
-import scala.concurrent.Await
-import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
-import scala.util.{Success, Failure}
+import scala.concurrent.{Await, Future}
+import scala.util.{Failure, Success}
 
 class ImportPipelineService(app: Altitude) {
   val logger: Logger = LoggerFactory.getLogger(getClass)
@@ -48,6 +43,7 @@ class ImportPipelineService(app: Altitude) {
   private val checkDuplicateFlow = CheckDuplicateFlow(app)
   private val stripBinaryDataFlow = StripBinaryDataFlow(app)
   private val wsNotificationSink = WsNotificationSink(app)
+  private val errorLoggingSink = ErrorLoggingSink()
 
   private val combinedFlow: Flow[TDataAssetWithContext, TAssetOrInvalidWithContext, NotUsed] =
     Flow[TDataAssetWithContext]
@@ -64,8 +60,9 @@ class ImportPipelineService(app: Altitude) {
       .via(addPreviewFlow)
       .via(stripBinaryDataFlow)
       .alsoTo(wsNotificationSink)
+      .alsoTo(errorLoggingSink)
 
-  private val (queueImportPipeline, queuePipelineCompletedFut) = runAsQueue()
+  private val queueImportPipeline = runAsQueue()
 
   def run(
            source: Source[TDataAssetWithContext, NotUsed],
@@ -76,15 +73,15 @@ class ImportPipelineService(app: Altitude) {
       .runWith(outputSink)
   }
 
-  private def runAsQueue(): (SourceQueueWithComplete[TDataAssetWithContext], Future[Done]) = {
+  private def runAsQueue(): SourceQueueWithComplete[TDataAssetWithContext] = {
     logger.info("Starting the import queue pipeline")
     val bufferSize = parallelism * 2
     val queueSource = Source.queue[TDataAssetWithContext](bufferSize, OverflowStrategy.backpressure)
-    val neverEndingSink = Sink.ignore.mapMaterializedValue(_ => Source.maybe[Nothing].toMat(Sink.ignore)(Keep.right).run())
 
-    val (queue, completedFut) = queueSource
+    val queue = queueSource
+      .merge(Source.never)
       .via(combinedFlow)
-      .toMat(neverEndingSink)(Keep.both)
+      .toMat(Sink.foreach(n => println(s"Completed processing: $n")))(Keep.left)
       .run()
 
     queue.watchCompletion().onComplete {
@@ -94,7 +91,7 @@ class ImportPipelineService(app: Altitude) {
         logger.warn(s"Import queue pipeline failed with exception: $exception")
     }(system.executionContext)
 
-    (queue, completedFut)
+    queue
   }
 
   def addToQueue(asset: TDataAssetWithContext): Future[QueueOfferResult] = {
@@ -103,9 +100,8 @@ class ImportPipelineService(app: Altitude) {
 
   def shutdown(): Unit = {
     queueImportPipeline.complete()
-    logger.warn("Waiting for the import pipeline to complete")
-    Await.result(queuePipelineCompletedFut, 15.seconds)
-    logger.warn("Import pipeline completed")
+    val queueCompletedFut = queueImportPipeline.watchCompletion()
+    Await.result(queueCompletedFut, 10.seconds)
     system.terminate()
     logger.warn("Actor system terminated")
   }
