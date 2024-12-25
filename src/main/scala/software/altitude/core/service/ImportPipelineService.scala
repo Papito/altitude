@@ -31,6 +31,7 @@ import software.altitude.core.pipeline.sinks.WsNotificationSink
 import scala.concurrent.Await
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
+import scala.util.{Success, Failure}
 
 class ImportPipelineService(app: Altitude) {
   val logger: Logger = LoggerFactory.getLogger(getClass)
@@ -67,8 +68,8 @@ class ImportPipelineService(app: Altitude) {
   private val (queueImportPipeline, queuePipelineCompletedFut) = runAsQueue()
 
   def run(
-      source: Source[TDataAssetWithContext, NotUsed],
-      outputSink: Sink[TAssetOrInvalidWithContext, Future[Seq[TAssetOrInvalidWithContext]]]): Future[Seq[TAssetOrInvalidWithContext]] = {
+           source: Source[TDataAssetWithContext, NotUsed],
+           outputSink: Sink[TAssetOrInvalidWithContext, Future[Seq[TAssetOrInvalidWithContext]]]): Future[Seq[TAssetOrInvalidWithContext]] = {
 
     source
       .via(combinedFlow)
@@ -77,13 +78,21 @@ class ImportPipelineService(app: Altitude) {
 
   private def runAsQueue(): (SourceQueueWithComplete[TDataAssetWithContext], Future[Done]) = {
     logger.info("Starting the import queue pipeline")
-    val bufferSize = parallelism * 4 // Reckless guess on my part of what should be a good buffer size
+    val bufferSize = parallelism * 2
     val queueSource = Source.queue[TDataAssetWithContext](bufferSize, OverflowStrategy.backpressure)
+    val neverEndingSink = Sink.ignore.mapMaterializedValue(_ => Source.maybe[Nothing].toMat(Sink.ignore)(Keep.right).run())
 
     val (queue, completedFut) = queueSource
       .via(combinedFlow)
-      .toMat(Sink.ignore)(Keep.both)
+      .toMat(neverEndingSink)(Keep.both)
       .run()
+
+    queue.watchCompletion().onComplete {
+      case Success(_) =>
+        logger.warn("Import queue pipeline completed successfully")
+      case Failure(exception) =>
+        logger.warn(s"Import queue pipeline failed with exception: $exception")
+    }(system.executionContext)
 
     (queue, completedFut)
   }
