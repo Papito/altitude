@@ -1,0 +1,25 @@
+// src/main/scala/software/altitude/core/pipeline/sinks/ErrorLoggingSink.scala
+package software.altitude.core.pipeline.sinks
+
+import org.apache.pekko.{Done, NotUsed}
+import org.apache.pekko.stream.scaladsl.Sink
+import org.slf4j.{Logger, LoggerFactory}
+import software.altitude.core.pipeline.PipelineTypes
+import software.altitude.core.pipeline.PipelineTypes.{Invalid, TAssetOrInvalid, TAssetOrInvalidWithContext}
+import software.altitude.core.pipeline.actors.ImportStatusWsActor
+
+import scala.concurrent.Future
+
+object ErrorLoggingSink {
+  final protected val logger: Logger = LoggerFactory.getLogger(getClass)
+
+  def apply(): Sink[(TAssetOrInvalid, PipelineTypes.PipelineContext), Future[Done]] = Sink.foreach[TAssetOrInvalidWithContext] {
+    assetOrInvalidWithContext =>
+      val (assetOrInvalid, ctx) = assetOrInvalidWithContext
+        assetOrInvalid match {
+            case Right(invalid) =>
+            logger.error(s"Error processing asset [repo: ${ctx.repository.persistedId}] ${invalid.cause.getOrElse("Unknown cause")}")
+            case Left(_) =>
+        }
+  }
+}

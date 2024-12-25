@@ -49,6 +49,7 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
   }
 
   override def addPreview(preview: MimedPreviewData): Unit = {
+    println("1 !!!!!!!!!!!!!")
     logger.info(s"Adding preview for asset ${preview.assetId}")
 
     // get the full path to our preview file
@@ -59,10 +60,16 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
 //    FileUtils.forceMkdir(new File(dirPath))
 
     try {
+      println("2 !!!!!!!!!!!!!")
       FileUtils.writeByteArrayToFile(new File(destFilePath), preview.data)
     } catch {
-      case _: IOException => logger.error(s"Could not save preview data to [$destFilePath]")
+
+      case _: IOException => {
+        println("3 !!!!!!!!!!!!!")
+        logger.error(s"Could not save preview data to [$destFilePath]")
+      }
     }
+    println("4 !!!!!!!!!!!!!")
   }
 
   override def getPreviewById(assetId: String): MimedPreviewData = {
