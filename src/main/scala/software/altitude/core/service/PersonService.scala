@@ -1,9 +1,7 @@
 package software.altitude.core.service
 
 import play.api.libs.json.JsObject
-
-import software.altitude.core.Altitude
-import software.altitude.core.FieldConst
+import software.altitude.core.{Altitude, DuplicateException, FieldConst}
 import software.altitude.core.dao.FaceDao
 import software.altitude.core.dao.PersonDao
 import software.altitude.core.models.Asset
@@ -14,6 +12,9 @@ import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 import software.altitude.core.util.Sort
 import software.altitude.core.util.SortDirection
+import software.altitude.core.util.Util.{getDuplicateExceptionOrSame}
+
+import java.sql.SQLException
 
 object PersonService {
   val UNKNOWN_NAME_PREFIX = "Unknown"
@@ -46,29 +47,57 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
     require(asset.persistedId.nonEmpty, "Cannot add a face to an unsaved asset object")
 
     txManager.withTransaction[Face] {
-      val persistedFace: Face = faceDao.add(face, asset, person)
 
-      app.service.fileStore.addFace(persistedFace)
+      /**
+       * An image can have multiple faces, but can same person have multiple faces in the same image?
+       *
+       * Yep.
+       *
+       * In isolation, an image is very likely to not have such absurdity, but in the context
+       * of a larger data set, a previously detected person may be detected again in the same image,
+       * given lax face detection/similarity thresholds.
+       *
+       * This is obviously wrong, but we can't really do anything about it. The user is responsible
+       * for properly maintaining people and faces, and all we can do is silently fail and chug
+       * along.
+       *
+       * This is not ideal, and in the future we should mark the asset as "needs attention",
+       * or something.
+       *
+       * We shouldn't be ignoring the image as there is nothing really wrong with it.
+       *
+       */
+      var persistedFace: Option[Face] = None
+      try {
+        persistedFace = Some(faceDao.add(face, asset, person))
+      } catch {
+        case e: SQLException => throw getDuplicateExceptionOrSame(
+          e, Some(s"Face already exists for person ${person.label} in asset ${asset.persistedId}"))
+        case ex: Exception =>
+          throw ex
+      }
+
+      app.service.fileStore.addFace(persistedFace.get)
 
       // First time? Add the face to the person as the cover
       if (person.numOfFaces == 0) {
-        setFaceAsCover(person, persistedFace)
+        setFaceAsCover(person, persistedFace.get)
       }
 
       // face number + 1
       increment(person.persistedId, FieldConst.Person.NUM_OF_FACES)
 
-      val cachedPerson = app.service.faceCache.getPersonByLabel(persistedFace.personLabel.get)
+      val cachedPerson = app.service.faceCache.getPersonByLabel(persistedFace.get.personLabel.get)
 
       if (cachedPerson.isEmpty) {
         val personWithFace = person.copy(numOfFaces = 1)
-        personWithFace.addFace(persistedFace)
+        personWithFace.addFace(persistedFace.get)
         app.service.faceCache.putPerson(personWithFace)
       } else {
-        app.service.faceCache.addFace(persistedFace)
+        app.service.faceCache.addFace(persistedFace.get)
       }
 
-      persistedFace
+      persistedFace.get
     }
   }
 

@@ -33,3 +33,5 @@ case class MetadataExtractorException(asset: Asset, ex: Throwable) extends Excep
 case class NotFoundException(msg: String) extends Exception(msg)
 
 case class StorageException(msg: String) extends Exception(msg)
+
+case class SamePersonDetectedTwiceException(msg: String) extends Exception(msg)

@@ -17,11 +17,11 @@ object PersistAndIndexAssetFlow {
 
         app.txManager.withTransaction {
           try {
-            debugInfo(s"\tPersisting asset ${dataAsset.asset.persistedId}")
+            debugInfo(s"\tPersisting asset ${dataAsset.asset.fileName}")
             app.service.asset.add(dataAsset.asset)
-            debugInfo(s"\tIndexing asset ${dataAsset.asset.persistedId}")
+            debugInfo(s"\tIndexing asset ${dataAsset.asset.fileName}")
             app.service.search.indexAsset(dataAsset.asset)
-            debugInfo(s"\tUpdating stats for asset ${dataAsset.asset.persistedId}")
+            debugInfo(s"\tUpdating stats for asset ${dataAsset.asset.fileName}")
             app.service.stats.addAsset(dataAsset.asset)
             Future.successful((Left(dataAsset), ctx))
           } catch {

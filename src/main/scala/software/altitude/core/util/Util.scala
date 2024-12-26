@@ -7,6 +7,9 @@ import java.time.format.DateTimeFormatter
 import org.mindrot.jbcrypt.BCrypt
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import software.altitude.core.DuplicateException
+
+import java.sql.SQLException
 
 object Util {
   final protected val logger: Logger = LoggerFactory.getLogger(getClass)
@@ -47,5 +50,13 @@ object Util {
 
   def checkPassword(password: String, hashedPassword: String): Boolean = {
     BCrypt.checkpw(password, hashedPassword)
+  }
+
+  def getDuplicateExceptionOrSame(e: SQLException, message: Option[String] = None): Exception = {
+    if (e.getErrorCode == /* SQLITE */ 19 || e.getSQLState == /* POSTGRES */ "23505") {
+       DuplicateException(message = message)
+    } else {
+      e
+    }
   }
 }

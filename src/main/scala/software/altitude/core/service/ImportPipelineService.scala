@@ -41,6 +41,7 @@ class ImportPipelineService(app: Altitude) {
 
   private val combinedFlow: Flow[TDataAssetWithContext, TAssetOrInvalidWithContext, NotUsed] =
     Flow[TDataAssetWithContext]
+      // .groupBy(Int.MaxValue, _._2.repository.id)
       .via(checkMediaTypeFlow)
       .via(checkDuplicateFlow)
       .via(assignIdFlow)
@@ -55,6 +56,7 @@ class ImportPipelineService(app: Altitude) {
       .via(stripBinaryDataFlow)
       .alsoTo(wsNotificationSink)
       .alsoTo(errorLoggingSink)
+      // .mergeSubstreams
 
   private val queueSink = runAsQueue()
 
@@ -76,9 +78,9 @@ class ImportPipelineService(app: Altitude) {
       .preMaterialize()
 
     val res = source
+      .merge(Source.never)
       .via(combinedFlow)
-      .toMat(Sink.foreach(item =>
-        println(s"[${java.time.LocalDateTime.now} UTC] Processed: $item"))
+      .toMat(Sink.foreach(_ => ())
       )(Keep.right)
       .run()
 

@@ -18,7 +18,7 @@ object ExtractMetadataFlow {
       case (Left(dataAsset), ctx) =>
         setThreadLocalRequestContext(ctx)
 
-        debugInfo(s"\tExtracting metadata for asset: ${dataAsset.asset.persistedId}")
+        debugInfo(s"\tExtracting metadata for asset: ${dataAsset.asset.fileName}")
         val userMetadata = app.service.metadata.cleanAndValidate(dataAsset.asset.userMetadata)
         val extractedMetadata = app.service.metadataExtractor.extract(dataAsset.data)
         val publicMetadata = Asset.getPublicMetadata(extractedMetadata)

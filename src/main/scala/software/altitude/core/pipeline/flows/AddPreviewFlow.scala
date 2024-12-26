@@ -15,7 +15,7 @@ object AddPreviewFlow {
       case (Left(dataAsset), ctx) =>
         setThreadLocalRequestContext(ctx)
 
-        debugInfo(s"\tGenerating preview ${dataAsset.asset.persistedId}")
+        debugInfo(s"\tGenerating preview ${dataAsset.asset.fileName}")
         app.service.library.addPreview(dataAsset)
         Future.successful((Left(dataAsset), ctx))
       case (Right(invalid), ctx) => Future.successful((Right(invalid), ctx))

@@ -5,9 +5,7 @@ import java.sql.SQLException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
-
 import software.altitude.core.Altitude
-import software.altitude.core.DuplicateException
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.BaseDao
 import software.altitude.core.models.BaseModel
@@ -15,6 +13,7 @@ import software.altitude.core.models.Repository
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
+import software.altitude.core.util.Util.{getDuplicateExceptionOrSame}
 
 abstract class BaseService[Model <: BaseModel] {
   protected val app: Altitude
@@ -39,12 +38,7 @@ abstract class BaseService[Model <: BaseModel] {
         dao.add(objIn)
       } catch {
         // NOTE: duplicate logic in add() and updateById()
-        case e: SQLException =>
-          if (e.getErrorCode == /* SQLITE */ 19 || e.getSQLState == /* POSTGRES */ "23505") {
-            throw DuplicateException()
-          } else {
-            throw e
-          }
+        case e: SQLException => throw getDuplicateExceptionOrSame(e)
         case ex: Exception =>
           throw ex
       }
@@ -57,13 +51,7 @@ abstract class BaseService[Model <: BaseModel] {
       try {
         dao.updateById(id, data)
       } catch {
-        case e: SQLException =>
-          // NOTE: duplicate logic in add() and updateById()
-          if (e.getErrorCode == /* SQLITE */ 19 || e.getSQLState == /* POSTGRES */ "23505") {
-            throw DuplicateException()
-          } else {
-            throw e
-          }
+        case e: SQLException => throw getDuplicateExceptionOrSame(e)
         case ex: Exception =>
           println(ex.toString)
           throw ex
