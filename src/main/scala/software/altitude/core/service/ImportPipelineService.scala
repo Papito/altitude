@@ -1,11 +1,11 @@
 package software.altitude.core.service
 
+import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.pekko.Done
 import org.apache.pekko.NotUsed
 import org.apache.pekko.actor.{Actor, Props}
 import org.apache.pekko.actor.typed.ActorSystem
-import org.apache.pekko.stream.OverflowStrategy
-import org.apache.pekko.stream.QueueOfferResult
+import org.apache.pekko.stream.{ActorAttributes, OverflowStrategy, QueueOfferResult}
 import org.apache.pekko.stream.scaladsl.{Flow, Keep, MergeHub, Sink, Source, SourceQueueWithComplete}
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -27,6 +27,10 @@ class ImportPipelineService(app: Altitude) {
 
   implicit val system: ActorSystem[AltitudeActorSystem.Command] = app.actorSystem
 
+  private val singleThreadExecutor = scala.concurrent.ExecutionContext.fromExecutor(
+    java.util.concurrent.Executors.newSingleThreadExecutor()
+  )
+
   private val checkMediaTypeFlow = CheckMetadataFlow(app)
   private val assignIdFlow = AssignIdFlow(app)
   private val persistAndIndexFlow = PersistAndIndexAssetFlow(app)
@@ -41,22 +45,22 @@ class ImportPipelineService(app: Altitude) {
 
   private val combinedFlow: Flow[TDataAssetWithContext, TAssetOrInvalidWithContext, NotUsed] =
     Flow[TDataAssetWithContext]
-      // .groupBy(Int.MaxValue, _._2.repository.id)
+      .groupBy(Int.MaxValue, _._2.repository.id)
       .via(checkMediaTypeFlow)
       .via(checkDuplicateFlow)
       .via(assignIdFlow)
       .via(extractMetadataFlow)
       .via(persistAndIndexFlow)
       .async
-      .via(facialRecognitionFlow)
+      .via(facialRecognitionFlow).withAttributes(ActorAttributes.dispatcher("single-thread-dispatcher"))
       .async
       .via(fileStoreFlow)
       .async
       .via(addPreviewFlow)
+      .mergeSubstreams
       .via(stripBinaryDataFlow)
       .alsoTo(wsNotificationSink)
       .alsoTo(errorLoggingSink)
-      // .mergeSubstreams
 
   private val queueSink = runAsQueue()
 
