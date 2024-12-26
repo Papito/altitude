@@ -106,9 +106,9 @@ class ImportController extends BaseWebController with AtmosphereSupport with JVa
 
       val importAsset = new ImportAsset(fileName = fileItemStream.getName, data = bytes, metadata = UserMetadata())
       val assetWithData = app.service.library.convImportAsset2dataAsset(importAsset)
-      val offeredFut = app.service.importPipeline.addToQueue(assetWithData, pipelineContext)
 
-      Await.result(offeredFut, Duration.Inf)
+      val fut = app.service.importPipeline.addToQueue(assetWithData, pipelineContext)
+      Await.result(fut, Duration.Inf)
     }
 
     logger.info("All files sent to queue")

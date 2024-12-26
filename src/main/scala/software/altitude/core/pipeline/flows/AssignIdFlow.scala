@@ -1,4 +1,4 @@
-package software.altitude.core.pipeline
+package software.altitude.core.pipeline.flows
 
 import org.apache.pekko.NotUsed
 import org.apache.pekko.stream.scaladsl.Flow

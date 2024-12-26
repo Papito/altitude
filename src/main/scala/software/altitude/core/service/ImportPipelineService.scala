@@ -2,7 +2,8 @@ package software.altitude.core.service
 
 import org.apache.pekko.Done
 import org.apache.pekko.NotUsed
-import org.apache.pekko.actor.typed.ActorSystem
+import org.apache.pekko.actor.{Actor, Props}
+import org.apache.pekko.actor.typed.{ActorRef, ActorSystem}
 import org.apache.pekko.stream.OverflowStrategy
 import org.apache.pekko.stream.QueueOfferResult
 import org.apache.pekko.stream.scaladsl.{Flow, Keep, Sink, Source, SourceQueueWithComplete}
@@ -10,14 +11,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
 import software.altitude.core.AltitudeActorSystem
-import software.altitude.core.pipeline.AddPreviewFlow
-import software.altitude.core.pipeline.AssignIdFlow
-import software.altitude.core.pipeline.CheckDuplicateFlow
-import software.altitude.core.pipeline.CheckMetadataFlow
-import software.altitude.core.pipeline.ExtractMetadataFlow
-import software.altitude.core.pipeline.FacialRecognitionFlow
-import software.altitude.core.pipeline.FileStoreFlow
-import software.altitude.core.pipeline.PersistAndIndexAssetFlow
+import software.altitude.core.pipeline.flows.{AddPreviewFlow, AssignIdFlow, CheckDuplicateFlow, CheckMetadataFlow, ExtractMetadataFlow, FacialRecognitionFlow, FileStoreFlow, PersistAndIndexAssetFlow}
 import software.altitude.core.pipeline.PipelineConstants.parallelism
 import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
 import software.altitude.core.pipeline.PipelineTypes.TDataAssetWithContext
@@ -28,6 +22,7 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success}
 
+
 class ImportPipelineService(app: Altitude) {
   val logger: Logger = LoggerFactory.getLogger(getClass)
 
@@ -35,7 +30,7 @@ class ImportPipelineService(app: Altitude) {
 
   private val checkMediaTypeFlow = CheckMetadataFlow(app)
   private val assignIdFlow = AssignIdFlow(app)
-  private val persistAndIndexAssetFlow = PersistAndIndexAssetFlow(app)
+  private val persistAndIndexFlow = PersistAndIndexAssetFlow(app)
   private val facialRecognitionFlow = FacialRecognitionFlow(app)
   private val extractMetadataFlow = ExtractMetadataFlow(app)
   private val fileStoreFlow = FileStoreFlow(app)
@@ -51,7 +46,7 @@ class ImportPipelineService(app: Altitude) {
       .via(checkDuplicateFlow)
       .via(assignIdFlow)
       .via(extractMetadataFlow)
-      .via(persistAndIndexAssetFlow)
+      .via(persistAndIndexFlow)
       .async
       .via(facialRecognitionFlow)
       .async
@@ -73,35 +68,31 @@ class ImportPipelineService(app: Altitude) {
       .runWith(outputSink)
   }
 
-  private def runAsQueue(): SourceQueueWithComplete[TDataAssetWithContext] = {
+  private def runAsQueue() = {
     logger.info("Starting the import queue pipeline")
     val bufferSize = parallelism * 2
-    val queueSource = Source.queue[TDataAssetWithContext](bufferSize, OverflowStrategy.backpressure)
 
-    val queue = queueSource
-      .merge(Source.never)
+    val (actorRef, source) = Source.actorRef[TDataAssetWithContext](
+      completionMatcher = PartialFunction.empty,
+      failureMatcher = PartialFunction.empty,
+      bufferSize = parallelism * 1000,
+      overflowStrategy = OverflowStrategy.fail
+    ).preMaterialize()
+
+    source
       .via(combinedFlow)
-      .toMat(Sink.foreach(n => println(s"Completed processing: $n")))(Keep.left)
+      .toMat(Sink.ignore)(Keep.left)
       .run()
 
-    queue.watchCompletion().onComplete {
-      case Success(_) =>
-        logger.warn("Import queue pipeline completed successfully")
-      case Failure(exception) =>
-        logger.warn(s"Import queue pipeline failed with exception: $exception")
+    actorRef
+  }
+
+  def addToQueue(asset: TDataAssetWithContext): Future[Unit] = {
+    Future {
+      queueImportPipeline ! asset
     }(system.executionContext)
-
-    queue
   }
-
-  def addToQueue(asset: TDataAssetWithContext): Future[QueueOfferResult] = {
-    queueImportPipeline.offer(asset)
-  }
-
   def shutdown(): Unit = {
-    queueImportPipeline.complete()
-    val queueCompletedFut = queueImportPipeline.watchCompletion()
-    Await.result(queueCompletedFut, 10.seconds)
     system.terminate()
     logger.warn("Actor system terminated")
   }

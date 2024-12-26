@@ -1,4 +1,4 @@
-package software.altitude.core.pipeline
+package software.altitude.core.pipeline.flows
 
 import org.apache.pekko.NotUsed
 import org.apache.pekko.stream.scaladsl.Flow
@@ -6,32 +6,30 @@ import org.apache.pekko.stream.scaladsl.Flow
 import scala.concurrent.Future
 
 import software.altitude.core.Altitude
-import software.altitude.core.DuplicateException
 import software.altitude.core.models.Asset
 import software.altitude.core.pipeline.PipelineConstants.parallelism
-import software.altitude.core.pipeline.PipelineTypes.Invalid
 import software.altitude.core.pipeline.PipelineTypes.TDataAssetOrInvalidWithContext
 import software.altitude.core.pipeline.PipelineUtils.debugInfo
 import software.altitude.core.pipeline.PipelineUtils.setThreadLocalRequestContext
 
-object CheckDuplicateFlow {
+object ExtractMetadataFlow {
   def apply(app: Altitude): Flow[TDataAssetOrInvalidWithContext, TDataAssetOrInvalidWithContext, NotUsed] =
     Flow[TDataAssetOrInvalidWithContext].mapAsync(parallelism) {
       case (Left(dataAsset), ctx) =>
         setThreadLocalRequestContext(ctx)
 
-        debugInfo(s"\tChecking for duplicate for ${dataAsset.asset.fileName}")
+        debugInfo(s"\tExtracting metadata for asset: ${dataAsset.asset.persistedId}")
+        val userMetadata = app.service.metadata.cleanAndValidate(dataAsset.asset.userMetadata)
+        val extractedMetadata = app.service.metadataExtractor.extract(dataAsset.data)
+        val publicMetadata = Asset.getPublicMetadata(extractedMetadata)
 
-        val existing: Option[Asset] = app.service.library.getByChecksum(dataAsset.asset.checksum)
+        val asset: Asset = dataAsset.asset.copy(
+          extractedMetadata = extractedMetadata,
+          publicMetadata = publicMetadata,
+          userMetadata = userMetadata
+        )
 
-        if (existing.nonEmpty) {
-          Future.successful(Right(Invalid(dataAsset.asset, Some(new DuplicateException))), ctx)
-        } else {
-          Future.successful((Left(dataAsset), ctx))
-        }
-
-      case (Right(invalid), ctx) =>
-        Future.successful((Right(invalid), ctx))
+        Future.successful((Left(dataAsset.copy(asset = asset)), ctx))
+      case (Right(invalid), ctx) => Future.successful((Right(invalid), ctx))
     }
-
 }
