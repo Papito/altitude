@@ -11,7 +11,7 @@
     <appender-ref ref="STDOUT" />
   </root>
 
-  <logger name="software.altitude.core" level="ERROR" />
+  <logger name="software.altitude.core" level="INFO" />
   <logger name="org.scalatra" level="INFO" />
   <logger name="org.eclipse.jetty" level="ERROR" />
   <logger name="org.fusesource.scalate" level="ERROR" />

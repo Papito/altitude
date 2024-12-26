@@ -226,8 +226,8 @@ class Altitude(val dbEngineOverride: Option[String] = None) {
     }
   """)
 
-  val actorSystem: ActorSystem[AltitudeActorSystem.Command] = ActorSystem[AltitudeActorSystem.Command](
-    AltitudeActorSystem(), "altitude-actor-system", actorSystemConfig)
+  val actorSystem: ActorSystem[AltitudeActorSystem.Command] =
+    ActorSystem[AltitudeActorSystem.Command](AltitudeActorSystem(), "altitude-actor-system", actorSystemConfig)
 
   object service {
     val migrationService: MigrationService = dataSourceType match {

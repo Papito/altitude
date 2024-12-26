@@ -76,13 +76,13 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
     val conn = RequestContext.getConn
 
     /**
-     * Embeddings and Features are an array of floats, and even though Postgres supports float array natively,
-     * there is really no value in creating a separate DAO hierarchy just for that.
+     * Embeddings and Features are an array of floats, and even though Postgres supports float array natively, there is really no value in creating a separate
+     * DAO hierarchy just for that.
      *
      * Both DBs store this data as JSON in a TEXT field - faces are preloaded into memory anyway.
      *
-     * Why not as a CSV? Casting floats into Strings and back is a pain, and JSON is more pliable for this,
-     * without worrying about messing with precision. This just works.
+     * Why not as a CSV? Casting floats into Strings and back is a pain, and JSON is more pliable for this, without worrying about messing with precision. This
+     * just works.
      */
     val embeddingsArrayJson = Json.obj(
       FieldConst.Face.EMBEDDINGS -> Json.toJson(face.embeddings)

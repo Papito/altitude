@@ -127,6 +127,7 @@ unmanagedResourceDirectories in Compile += {
 assemblyMergeStrategy in assembly := {
   case PathList("META-INF", xs @ _*) if xs.contains("MANIFEST.MF") => MergeStrategy.discard
   case "reference.conf" => MergeStrategy.concat
+  case "version.conf" => MergeStrategy.concat
   case PathList(ps @ _*) if ps.last endsWith ".class" => MergeStrategy.first
   case _ => MergeStrategy.first
 }

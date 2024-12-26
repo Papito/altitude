@@ -1,7 +1,8 @@
 package software.altitude.core.service
 
 import play.api.libs.json.JsObject
-import software.altitude.core.{Altitude, DuplicateException, FieldConst}
+import software.altitude.core.Altitude
+import software.altitude.core.FieldConst
 import software.altitude.core.dao.FaceDao
 import software.altitude.core.dao.PersonDao
 import software.altitude.core.models.Asset
@@ -12,7 +13,7 @@ import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 import software.altitude.core.util.Sort
 import software.altitude.core.util.SortDirection
-import software.altitude.core.util.Util.{getDuplicateExceptionOrSame}
+import software.altitude.core.util.Util.getDuplicateExceptionOrSame
 
 import java.sql.SQLException
 
@@ -53,26 +54,21 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
        *
        * Yep.
        *
-       * In isolation, an image is very likely to not have such absurdity, but in the context
-       * of a larger data set, a previously detected person may be detected again in the same image,
-       * given lax face detection/similarity thresholds.
+       * In isolation, an image is very likely to not have such absurdity, but in the context of a larger data set, a previously detected person may be detected
+       * again in the same image, given lax face detection/similarity thresholds.
        *
-       * This is obviously wrong, but we can't really do anything about it. The user is responsible
-       * for properly maintaining people and faces, and all we can do is silently fail and chug
-       * along.
+       * This is obviously wrong, but we can't really do anything about it. The user is responsible for properly maintaining people and faces, and all we can do
+       * is silently fail and chug along.
        *
-       * This is not ideal, and in the future we should mark the asset as "needs attention",
-       * or something.
+       * This is not ideal, and in the future we should mark the asset as "needs attention", or something.
        *
        * We shouldn't be ignoring the image as there is nothing really wrong with it.
-       *
        */
       var persistedFace: Option[Face] = None
       try {
         persistedFace = Some(faceDao.add(face, asset, person))
       } catch {
-        case e: SQLException => throw getDuplicateExceptionOrSame(
-          e, Some(s"Face already exists for person ${person.label} in asset ${asset.persistedId}"))
+        case e: SQLException => throw getDuplicateExceptionOrSame(e, Some(s"Face already exists for person ${person.label} in asset ${asset.persistedId}"))
         case ex: Exception =>
           throw ex
       }
