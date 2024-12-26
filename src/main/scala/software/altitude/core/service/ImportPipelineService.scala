@@ -3,10 +3,10 @@ package software.altitude.core.service
 import org.apache.pekko.Done
 import org.apache.pekko.NotUsed
 import org.apache.pekko.actor.{Actor, Props}
-import org.apache.pekko.actor.typed.{ActorRef, ActorSystem}
+import org.apache.pekko.actor.typed.ActorSystem
 import org.apache.pekko.stream.OverflowStrategy
 import org.apache.pekko.stream.QueueOfferResult
-import org.apache.pekko.stream.scaladsl.{Flow, Keep, Sink, Source, SourceQueueWithComplete}
+import org.apache.pekko.stream.scaladsl.{Flow, Keep, MergeHub, Sink, Source, SourceQueueWithComplete}
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
@@ -19,9 +19,8 @@ import software.altitude.core.pipeline.actors.StripBinaryDataFlow
 import software.altitude.core.pipeline.sinks.{ErrorLoggingSink, WsNotificationSink}
 
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
-
 
 class ImportPipelineService(app: Altitude) {
   val logger: Logger = LoggerFactory.getLogger(getClass)
@@ -57,11 +56,10 @@ class ImportPipelineService(app: Altitude) {
       .alsoTo(wsNotificationSink)
       .alsoTo(errorLoggingSink)
 
-  private val queueImportPipeline = runAsQueue()
+  private val queueSink = runAsQueue()
 
-  def run(
-           source: Source[TDataAssetWithContext, NotUsed],
-           outputSink: Sink[TAssetOrInvalidWithContext, Future[Seq[TAssetOrInvalidWithContext]]]): Future[Seq[TAssetOrInvalidWithContext]] = {
+  def run(source: Source[TDataAssetWithContext, NotUsed],
+          outputSink: Sink[TAssetOrInvalidWithContext, Future[Seq[TAssetOrInvalidWithContext]]]): Future[Seq[TAssetOrInvalidWithContext]] = {
 
     source
       .via(combinedFlow)
@@ -70,28 +68,47 @@ class ImportPipelineService(app: Altitude) {
 
   private def runAsQueue() = {
     logger.info("Starting the import queue pipeline")
-    val bufferSize = parallelism * 2
 
-    val (actorRef, source) = Source.actorRef[TDataAssetWithContext](
-      completionMatcher = PartialFunction.empty,
-      failureMatcher = PartialFunction.empty,
-      bufferSize = parallelism * 1000,
-      overflowStrategy = OverflowStrategy.fail
-    ).preMaterialize()
+    val (queue, source) = Source.queue[TDataAssetWithContext](
+        parallelism * 2,
+        OverflowStrategy.backpressure,
+        maxConcurrentOffers = parallelism)
+      .preMaterialize()
 
-    source
+    val res = source
       .via(combinedFlow)
-      .toMat(Sink.ignore)(Keep.left)
+      .toMat(Sink.foreach(item =>
+        println(s"[${java.time.LocalDateTime.now} UTC] Processed: $item"))
+      )(Keep.right)
       .run()
 
-    actorRef
+    res.onComplete {
+      case Success(_) =>
+        logger.error("Import queue pipeline completed")
+      case Failure(e) =>
+        logger.error("Import queue pipeline failed", e)
+    }(ExecutionContext.global)
+
+    queue
   }
 
   def addToQueue(asset: TDataAssetWithContext): Future[Unit] = {
-    Future {
-      queueImportPipeline ! asset
-    }(system.executionContext)
+    queueSink.offer(asset).map {
+      case QueueOfferResult.Enqueued =>
+        logger.debug(s"Added asset to the import queue: ${asset._1.asset.fileName}")
+        println(s"===> Added asset to the import queue: ${asset._1.asset.fileName}")
+      case QueueOfferResult.Dropped =>
+        println(s"!!!! Asset dropped from the import queue: ${asset._1.asset.fileName}")
+        logger.warn(s"Asset dropped from the import queue: ${asset._1.asset.fileName}}")
+      case QueueOfferResult.Failure(ex) =>
+        println(s"!!!! Failed to add asset to the import queue: ${asset._1.asset.fileName}")
+        logger.error(s"Failed to add asset to the import queue: ${asset._1.asset.fileName}", ex)
+      case QueueOfferResult.QueueClosed =>
+        println(s"!!!! Import queue closed, asset dropped: ${asset._1.asset.fileName}")
+        logger.warn(s"Import queue closed, asset dropped: ${asset._1.asset.fileName}")
+    }(ExecutionContext.global)
   }
+
   def shutdown(): Unit = {
     system.terminate()
     logger.warn("Actor system terminated")
