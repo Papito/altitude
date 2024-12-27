@@ -22,8 +22,6 @@ import software.altitude.core.transactions._
 import software.altitude.core.{Const => C}
 
 import java.io.File
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
 
 class Altitude(val dbEngineOverride: Option[String] = None) {
   final protected val logger: Logger = LoggerFactory.getLogger(getClass)

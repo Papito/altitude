@@ -6,16 +6,10 @@ import software.altitude.core.models.Asset
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 
-/**
- * This is a "dumb" DAO service for the "asset" table.
- *
- * All the actual asset management logic is handled by the LibraryService exclusively.
- */
 class AssetService(val app: Altitude) extends BaseService[Asset] {
   override protected val dao: AssetDao = app.DAO.asset
 
   def setRecycledProp(asset: Asset, isRecycled: Boolean): Unit = {
-
     if (asset.isRecycled == isRecycled) {
       return
     }
@@ -47,7 +41,10 @@ class AssetService(val app: Altitude) extends BaseService[Asset] {
 
   def pruneDanglingAssets(): Unit = {
     logger.info("Pruning dangling assets")
-    dao.deleteByQuery(new Query(Map(FieldConst.Asset.IS_PIPELINE_PROCESSED -> false)))
+
+    txManager.withTransaction {
+      dao.deleteByQuery(new Query(Map(FieldConst.Asset.IS_PIPELINE_PROCESSED -> false)))
+    }
   }
 
   def getDanglingAssets: List[Asset] = {
@@ -58,11 +55,31 @@ class AssetService(val app: Altitude) extends BaseService[Asset] {
   }
 
   def markAsCompleted(asset: Asset): Asset = {
-    val updateData = Map(
-      FieldConst.Asset.IS_PIPELINE_PROCESSED -> true
-    )
+    txManager.withTransaction {
+      val updateData = Map(
+        FieldConst.Asset.IS_PIPELINE_PROCESSED -> true
+      )
 
-    updateById(asset.persistedId, updateData)
-    asset.copy(isPipelineProcessed = true)
+      updateById(asset.persistedId, updateData)
+      asset.copy(isPipelineProcessed = true)
+    }
+  }
+
+  def markAllAsPersistedInFaceRecModel: Int = {
+    txManager.withTransaction {
+      val updateData = Map(
+        FieldConst.Asset.IS_IN_FACE_REC_MODEL -> true
+      )
+      val assetQuery = new Query(Map(FieldConst.Asset.IS_IN_FACE_REC_MODEL -> false))
+
+      updateByQuery(assetQuery, updateData)
+    }
+  }
+
+  def getAllNotPersistedInFaceRecModel: List[Asset] = {
+    txManager.asReadOnly {
+      val assetQuery = new Query(Map(FieldConst.Asset.IS_IN_FACE_REC_MODEL -> false))
+      dao.queryAll(assetQuery).records.map(Asset.fromJson(_))
+    }
   }
 }

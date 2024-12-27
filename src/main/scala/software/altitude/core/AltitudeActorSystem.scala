@@ -6,8 +6,7 @@ import org.apache.pekko.actor.typed.Signal
 import org.apache.pekko.actor.typed.scaladsl.AbstractBehavior
 import org.apache.pekko.actor.typed.scaladsl.ActorContext
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
-
-import software.altitude.core.pipeline.actors.ImportStatusWsActor
+import software.altitude.core.actors.ImportStatusWsActor
 
 object AltitudeActorSystem {
   trait Command

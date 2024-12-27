@@ -2,9 +2,6 @@ package software.altitude.core.service
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
-import scala.collection.concurrent.TrieMap
-
 import software.altitude.core.Altitude
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.FaceDao
@@ -13,6 +10,8 @@ import software.altitude.core.models.Face
 import software.altitude.core.models.Person
 import software.altitude.core.models.Repository
 import software.altitude.core.transactions.TransactionManager
+
+import scala.collection.concurrent.TrieMap
 
 class FaceCacheService(app: Altitude) {
   final protected val logger: Logger = LoggerFactory.getLogger(getClass)
@@ -97,18 +96,16 @@ class FaceCacheService(app: Altitude) {
   def clear(): Unit = getRepositoryPersonCache.clear()
 
   def loadCache(repository: Repository): Unit = {
-    logger.info(s"Loading faces for repository ${repository.name}")
-
-    RequestContext.repository.value = Some(repository)
-
     txManager.asReadOnly {
+      logger.info(s"Loading faces for repository ${repository.name}")
+
       val allTopFaces: List[Face] = faceDao.getAllForCache
-      val allPeople: Map[String, Person] = personDao.getAll
+      val personLookup: Map[String, Person] = personDao.getAll
 
       var faceCount = 0
       allTopFaces.foreach {
         face: Face =>
-          val person: Person = allPeople(face.personId.get)
+          val person: Person = personLookup(face.personId.get)
 
           val alignedGreyscaleData = app.service.fileStore.getAlignedGreyscaleFaceById(face.persistedId)
           val faceWithImageData = face.copy(alignedImageGs = alignedGreyscaleData.data)
@@ -117,23 +114,18 @@ class FaceCacheService(app: Altitude) {
       }
 
       // faces added, now cache the peeps whole
-      allPeople.foreach {
+      personLookup.foreach {
         case (_, person) =>
           putPerson(person)
       }
 
-      logger.info(s"Loaded ${allPeople.size} people into the cache, $faceCount faces.")
+      logger.info(s"Loaded ${personLookup.size} people into the cache, $faceCount faces.")
     }
 
-    RequestContext.repository.value = None
   }
 
   def loadCacheForAll(): Unit = {
-    txManager.asReadOnly {
-      logger.info("Loading face cache from the database")
-      val repositories = app.DAO.repository.getAll
-      repositories.foreach(loadCache)
-    }
+    app.service.library.forEachRepository(repository => loadCache(repository))
   }
 
   def dump(): Unit = {

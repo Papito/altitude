@@ -13,7 +13,7 @@ import scala.concurrent.duration._
 object SaveFaceRecModelFlow {
   def apply(app: Altitude): Flow[TAssetOrInvalidWithContext, TAssetOrInvalidWithContext, NotUsed] = {
     Flow[TAssetOrInvalidWithContext]
-      .groupedWithin(100, 15.minutes)
+      .groupedWithin(30, 30.seconds)
       .mapAsync(1) {
         batch =>
           val (_, contexts) = batch.unzip
@@ -22,6 +22,10 @@ object SaveFaceRecModelFlow {
 
           debugInfo(s"\tSaving facial recognition model for repo: ${ctx.repository.name}")
           app.service.faceRecognition.saveModel()
+
+          debugInfo(s"\tMarking all assets as saved in face rec model for repo: ${ctx.repository.name}")
+          app.service.asset.markAllAsPersistedInFaceRecModel
+
           Future.successful(batch)
       }
       .mapConcat(identity)

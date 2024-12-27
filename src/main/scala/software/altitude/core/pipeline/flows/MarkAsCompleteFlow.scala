@@ -19,6 +19,7 @@ object MarkAsCompleteFlow {
         app.txManager.withTransaction {
           debugInfo(s"\tMarking asset as pipeline-complete ${asset.fileName}")
           val updatedAsset = app.service.asset.markAsCompleted(asset)
+
           Future.successful((Left(updatedAsset), ctx))
         }
       case (Right(invalid), ctx) =>

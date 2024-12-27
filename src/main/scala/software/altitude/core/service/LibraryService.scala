@@ -4,17 +4,11 @@ import org.apache.pekko.stream.scaladsl.Source
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
-
-import scala.concurrent.Await
-import scala.concurrent.Future
-import scala.concurrent.duration.Duration
-
-import software.altitude.core.{Const => C, _}
 import software.altitude.core.Altitude
 import software.altitude.core.FieldConst
 import software.altitude.core.RequestContext
-import software.altitude.core.models._
 import software.altitude.core.models.Folder
+import software.altitude.core.models._
 import software.altitude.core.pipeline.PipelineTypes.PipelineContext
 import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
 import software.altitude.core.pipeline.sinks.SeqOutputSink
@@ -25,6 +19,11 @@ import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchResult
+import software.altitude.core.{Const => C, _}
+
+import scala.concurrent.Await
+import scala.concurrent.Future
+import scala.concurrent.duration.Duration
 
 object LibraryService {
   private val SUPPORTED_MEDIA_TYPES: Set[String] = Set(
@@ -403,24 +402,55 @@ class LibraryService(val app: Altitude) {
   }
 
   def pruneDanglingAssets(): Unit = {
+    forEachRepository {
+      repository =>
+        logger.info(s"Pruning dangling assets. Repo: ${repository.name}")
+        val danglingAssets = app.service.asset.getDanglingAssets
+
+        if (danglingAssets.nonEmpty) {
+          logger.warn(s"Found ${danglingAssets.size} dangling assets")
+          danglingAssets.foreach(asset => logger.warn(s"Will prune: ${asset.persistedId} - ${asset.fileName}"))
+        }
+        app.service.asset.pruneDanglingAssets()
+    }
+  }
+
+  def persistNotSavedFacesInFaceRecModel(): Unit = {
+    forEachRepository {
+      repository =>
+        logger.info(s"Persisting not saved faces to face recognition model. Repo: ${repository.name}")
+        val notPersistedAssets = app.service.asset.getAllNotPersistedInFaceRecModel
+
+        notPersistedAssets.foreach {
+          asset =>
+            val faces = app.service.person.getAssetFaces(asset.persistedId)
+            logger.debug(s"Found ${faces.size} faces for asset ${asset.persistedId}")
+            faces.foreach {
+              face =>
+                logger.debug(s"Persisting face ${face.persistedId} in face recognition model")
+                app.service.faceRecognition.indexFace(face, face.personLabel.get)
+            }
+        }
+
+        app.service.asset.markAllAsPersistedInFaceRecModel
+    }
+
+    // FIXME: MUST BE PER REPO
+    app.service.faceRecognition.saveModel()
+  }
+
+  def forEachRepository(operation: Repository => Unit): Unit = {
     txManager.withTransaction {
       val repositories = app.DAO.repository.getAll
 
       repositories.foreach {
         repository =>
-          RequestContext.repository.value = Some(repository)
-
-          val danglingAssets = app.service.asset.getDanglingAssets
-
-          if (danglingAssets.nonEmpty) {
-            logger.warn(s"Found ${danglingAssets.size} dangling assets")
-            danglingAssets.foreach(asset => logger.warn(s"Will prune: ${asset.persistedId} - ${asset.fileName}"))
+          {
+            RequestContext.repository.value = Some(repository)
+            operation(repository)
+            RequestContext.repository.value = None
           }
-          logger.info("Pruning dangling assets")
-          app.service.asset.pruneDanglingAssets()
       }
-
-      RequestContext.repository.value = None
     }
   }
 }

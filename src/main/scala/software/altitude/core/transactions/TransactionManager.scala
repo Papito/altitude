@@ -1,15 +1,15 @@
 package software.altitude.core.transactions
 
 import com.typesafe.config.Config
-import java.sql.Connection
-import java.sql.DriverManager
-import java.util.Properties
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.sqlite.SQLiteConfig
-
-import software.altitude.core.{Const => C}
 import software.altitude.core.RequestContext
+import software.altitude.core.{Const => C}
+
+import java.sql.Connection
+import java.sql.DriverManager
+import java.util.Properties
 
 object TransactionManager {
   def apply(config: Config): TransactionManager = new TransactionManager(config)
@@ -57,7 +57,12 @@ class TransactionManager(val config: Config) {
           val statement = writeConnection.createStatement()
           statement.execute("PRAGMA journal_mode=WAL;")
           statement.execute("PRAGMA synchronous=NORMAL;")
+          statement.execute("PRAGMA isolation_level=IMMEDIATE;")
           statement.execute("PRAGMA busy_timeout=10000;") // 10s BUSY_TIMEOUT
+          statement.execute("PRAGMA foreign_keys=ON;")
+          statement.execute("PRAGMA temp_store=MEMORY;")
+          statement.execute("PRAGMA wal_autocheckpoint=500;")
+          statement.execute("PRAGMA wal_checkpoint(TRUNCATE);")
           statement.close()
 
           writeConnection.setAutoCommit(false)

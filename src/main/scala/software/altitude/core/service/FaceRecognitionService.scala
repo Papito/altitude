@@ -1,15 +1,12 @@
 package software.altitude.core.service
 
-import java.io.File
-import java.util
-import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.FileUtils
+import org.apache.commons.io.FilenameUtils
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.face.LBPHFaceRecognizer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 import software.altitude.core.Altitude
 import software.altitude.core.Const
 import software.altitude.core.Environment
@@ -18,6 +15,9 @@ import software.altitude.core.models.AssetWithData
 import software.altitude.core.models.Face
 import software.altitude.core.models.Person
 import software.altitude.core.util.ImageUtil.matFromBytes
+
+import java.io.File
+import java.util
 
 object FaceRecognitionService {
   // Number of labels reserved for special cases, and not used for actual people instances
@@ -80,10 +80,10 @@ class FaceRecognitionService(val app: Altitude) {
   def saveModel(): Unit = {
 
     /**
-     * Unorthodox, but this whole file-writing thing is messy and we can't really mock this method as it can be invoked during deep app init, before we can use
-     * Mockito.
+     * Unorthodox, but this whole file-writing thing is messy, and we can't really mock this method as it can be invoked during early app init, before we can
+     * use Mockito.
      *
-     * In test, the model is ephemeral.
+     * In test, the model is ephemeral and does not persist to file store
      */
     if (Environment.CURRENT == Environment.Name.TEST) {
       return
@@ -103,7 +103,7 @@ class FaceRecognitionService(val app: Altitude) {
         val existingOrNewPerson = recognizeFace(detectedFace, dataAsset.asset)
         val persistedFace = app.service.person.addFace(detectedFace, dataAsset.asset, existingOrNewPerson)
         logger.info(s"Saving face ${persistedFace.persistedId} for person ${existingOrNewPerson.name.get}")
-        indexFace(persistedFace, existingOrNewPerson)
+        indexFace(persistedFace, existingOrNewPerson.label)
       })
   }
 
@@ -200,11 +200,11 @@ class FaceRecognitionService(val app: Altitude) {
     }
   }
 
-  private def indexFace(face: Face, person: Person): Unit = {
-    logger.info(s"Updating model for person ${person.label}")
+  def indexFace(face: Face, personLabel: Int): Unit = {
+    logger.info(s"Updating model for person $personLabel")
     val labels = new Mat(1, 1, CvType.CV_32SC1)
     val images = new util.ArrayList[Mat]()
-    labels.put(0, 0, person.label)
+    labels.put(0, 0, personLabel)
     images.add(face.alignedImageGsMat)
     recognizer.update(images, labels)
   }
@@ -213,7 +213,7 @@ class FaceRecognitionService(val app: Altitude) {
     faces.foreach(
       face => {
         person.addFace(face)
-        indexFace(face, person)
+        indexFace(face, person.label)
       })
   }
 }

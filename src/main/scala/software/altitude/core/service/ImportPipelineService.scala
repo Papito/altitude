@@ -24,7 +24,6 @@ import software.altitude.core.pipeline.flows.FacialRecognitionFlow
 import software.altitude.core.pipeline.flows.FileStoreFlow
 import software.altitude.core.pipeline.flows.MarkAsCompleteFlow
 import software.altitude.core.pipeline.flows.PersistAndIndexAssetFlow
-import software.altitude.core.pipeline.flows.SaveFaceRecModelFlow
 import software.altitude.core.pipeline.flows.StripBinaryDataFlow
 import software.altitude.core.pipeline.sinks.ErrorLoggingSink
 import software.altitude.core.pipeline.sinks.WsNotificationSink
@@ -50,7 +49,6 @@ class ImportPipelineService(app: Altitude) {
   private val addPreviewFlow = AddPreviewFlow(app)
   private val checkDuplicateFlow = CheckDuplicateFlow(app)
   private val stripBinaryDataFlow = StripBinaryDataFlow(app)
-  private val saveFaceRecModelSink = SaveFaceRecModelFlow(app).to(Sink.ignore)
   private val markAsCompleteFlow = MarkAsCompleteFlow(app)
   private val wsNotificationSink = WsNotificationSink(app)
   private val errorLoggingSink = ErrorLoggingSink()
@@ -78,8 +76,6 @@ class ImportPipelineService(app: Altitude) {
       .via(markAsCompleteFlow)
       // Will save the model for this substream (a repo) every X minutes or Y elements
       // whichever comes first
-      .alsoTo(saveFaceRecModelSink)
-      .withAttributes(ActorAttributes.dispatcher("single-thread-dispatcher"))
       .mergeSubstreams
       .alsoTo(wsNotificationSink)
       .alsoTo(errorLoggingSink)
