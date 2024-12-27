@@ -299,9 +299,8 @@ class Altitude(val dbEngineOverride: Option[String] = None) {
     service.importPipeline.shutdown()
     logger.info("Pipeline system terminated")
 
-    actorSystem.terminate()
-    Await.result(actorSystem.whenTerminated, Duration.Inf)
-    logger.warn("Actor system terminated")
+    // This is already done by default and will cause a warning
+    // actorSystem.terminate()
   }
 
   logger.info("Altitude Server instance initialized")

@@ -19,6 +19,9 @@ abstract class SearchQueryBuilder(selColumnNames: List[String]) extends SqlQuery
   private val notRecycledFilter: ClauseComponents =
     ClauseComponents(elements = List(s"${FieldConst.Asset.IS_RECYCLED} = ?"), bindVals = List(false))
 
+  private val isPipelineProcessedFilter: ClauseComponents =
+    ClauseComponents(elements = List(s"${FieldConst.Asset.IS_PIPELINE_PROCESSED} = ?"), bindVals = List(true))
+
   protected def textSearch(searchQuery: SearchQuery): ClauseComponents
 
   override protected def from(searchQuery: SearchQuery): ClauseComponents = {
@@ -82,6 +85,7 @@ abstract class SearchQueryBuilder(selColumnNames: List[String]) extends SqlQuery
     ClauseComponents(repoIdElements, repoIdBindVals) +
       textSearch(searchQuery) +
       notRecycledFilter +
+      isPipelineProcessedFilter +
       folderFilter(searchQuery) +
       fieldFilter(searchQuery) +
       searchDocumentJoin(searchQuery) +

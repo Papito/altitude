@@ -5,8 +5,6 @@ import software.altitude.core.AltitudeServletContext
 import software.altitude.core.Environment
 
 import javax.servlet.ServletContext
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
 
 class ScalatraBootstrap extends LifeCycle with AltitudeServletContext {
   val logger: Logger = LoggerFactory.getLogger(getClass)

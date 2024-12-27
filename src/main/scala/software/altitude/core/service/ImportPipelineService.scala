@@ -32,7 +32,7 @@ import software.altitude.core.pipeline.sinks.WsNotificationSink
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-import scala.concurrent.duration.{Duration, DurationInt}
+import scala.concurrent.duration.Duration
 import scala.util.Failure
 import scala.util.Success
 
