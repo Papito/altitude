@@ -4,17 +4,11 @@ import org.apache.pekko.stream.scaladsl.Source
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import play.api.libs.json.JsObject
-
-import scala.concurrent.Await
-import scala.concurrent.Future
-import scala.concurrent.duration.Duration
-
-import software.altitude.core.{Const => C, _}
 import software.altitude.core.Altitude
 import software.altitude.core.FieldConst
 import software.altitude.core.RequestContext
-import software.altitude.core.models._
 import software.altitude.core.models.Folder
+import software.altitude.core.models._
 import software.altitude.core.pipeline.PipelineTypes.PipelineContext
 import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
 import software.altitude.core.pipeline.sinks.SeqOutputSink
@@ -25,6 +19,11 @@ import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchResult
+import software.altitude.core.{Const => C, _}
+
+import scala.concurrent.Await
+import scala.concurrent.Future
+import scala.concurrent.duration.Duration
 
 object LibraryService {
   private val SUPPORTED_MEDIA_TYPES: Set[String] = Set(
@@ -126,7 +125,6 @@ class LibraryService(val app: Altitude) {
       )
 
       app.service.asset.updateById(asset.persistedId, data)
-
     }
 
     txManager.withTransaction {
@@ -365,7 +363,6 @@ class LibraryService(val app: Altitude) {
   }
 
   def recycleAssets(assetIds: Set[String]): Unit = {
-
     assetIds.foreach {
       assetId =>
         txManager.withTransaction {
@@ -399,8 +396,30 @@ class LibraryService(val app: Altitude) {
     txManager.withTransaction {
       app.service.metadata.updateFieldValue(assetId, valueId, newValue.toString)
       val asset: Asset = getById(assetId)
-      // OPTIMIZE: store value ID with search to update in a targeted way
+      // OPTIMIZE: store value ID with search to update in a more efficient way
       app.service.search.reindexAsset(asset)
+    }
+  }
+
+  def pruneDanglingAssets(): Unit = {
+    txManager.withTransaction {
+      val repositories = app.DAO.repository.getAll
+
+      repositories.foreach {
+        repository =>
+          RequestContext.repository.value = Some(repository)
+
+          val danglingAssets = app.service.asset.getDanglingAssets
+
+          if (danglingAssets.nonEmpty) {
+            logger.warn(s"Found ${danglingAssets.size} dangling assets")
+            danglingAssets.foreach(asset => logger.warn(s"Will prune: ${asset.persistedId} - ${asset.fileName}"))
+          }
+          logger.info("Pruning dangling assets")
+          app.service.asset.pruneDanglingAssets()
+      }
+
+      RequestContext.repository.value = None
     }
   }
 }

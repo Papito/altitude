@@ -62,9 +62,14 @@ CREATE TABLE asset (
   filename TEXT NOT NULL,
   size_bytes INT NOT NULL,
   is_triaged BOOLEAN NOT NULL DEFAULT FALSE,
-  is_recycled BOOLEAN NOT NULL DEFAULT FALSE
+  is_recycled BOOLEAN NOT NULL DEFAULT FALSE,
+  is_pipeline_processed BOOLEAN NOT NULL DEFAULT FALSE,
+  is_in_face_rec_model BOOLEAN NOT NULL DEFAULT FALSE
+
 ) INHERITS (_core);
 CREATE UNIQUE INDEX asset_01 ON asset(repository_id, checksum, is_recycled);
+CREATE INDEX asset_02 on asset(is_pipeline_processed);
+CREATE INDEX asset_03 on asset(is_in_face_rec_model);
 
 
 CREATE SEQUENCE person_label;

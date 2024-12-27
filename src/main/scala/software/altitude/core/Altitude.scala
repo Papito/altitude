@@ -3,15 +3,12 @@ package software.altitude.core
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
-import java.io.File
-import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.FileUtils
+import org.apache.commons.io.FilenameUtils
 import org.apache.pekko.actor.typed.ActorSystem
 import org.scalatra.auth.ScentryStrategy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
-import software.altitude.core.{Const => C}
 import software.altitude.core.auth.strategies.LocalDevRememberMeStrategy
 import software.altitude.core.auth.strategies.RememberMeStrategy
 import software.altitude.core.auth.strategies.TestRememberMeStrategy
@@ -22,6 +19,11 @@ import software.altitude.core.service._
 import software.altitude.core.service.filestore.FileStoreService
 import software.altitude.core.service.filestore.FileSystemStoreService
 import software.altitude.core.transactions._
+import software.altitude.core.{Const => C}
+
+import java.io.File
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 class Altitude(val dbEngineOverride: Option[String] = None) {
   final protected val logger: Logger = LoggerFactory.getLogger(getClass)
@@ -47,7 +49,7 @@ class Altitude(val dbEngineOverride: Option[String] = None) {
    * For DEV and PROD, application*.conf files have the final say - and are in the root of the project (and along the live JAR in release)
    */
 
-  // the config before final actual config as we need to dynamically figure out some values later
+  // the config before final actual config as we need to dynamically figure out some values
   private val preConfig: Config = Environment.CURRENT match {
     case Environment.Name.DEV =>
       ConfigFactory
@@ -296,6 +298,10 @@ class Altitude(val dbEngineOverride: Option[String] = None) {
     logger.info("Cleaning up resources")
     service.importPipeline.shutdown()
     logger.info("Pipeline system terminated")
+
+    actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, Duration.Inf)
+    logger.warn("Actor system terminated")
   }
 
   logger.info("Altitude Server instance initialized")

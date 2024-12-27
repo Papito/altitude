@@ -62,6 +62,8 @@ CREATE TABLE asset  (
   size_bytes INT NOT NULL,
   is_recycled TINYINT NOT NULL DEFAULT 0,
   is_triaged TINYINT NOT NULL DEFAULT 0,
+  is_pipeline_processed TINYINT NOT NULL DEFAULT 0,
+  is_in_face_rec_model TINYINT NOT NULL DEFAULT 0,
   created_at DATETIME DEFAULT (datetime('now', 'utc')),
   updated_at DATETIME DEFAULT NULL,
   FOREIGN KEY(repository_id) REFERENCES repository(id) ON DELETE CASCADE

@@ -39,7 +39,7 @@ import scala.concurrent.duration.Duration
     pipelineRes should have size 0
   }
 
-  test("Pipeline should import multiple assets", Focused) {
+  test("Pipeline should import multiple assets") {
     val batchSize = 10
     val dataAssets = (1 to batchSize).map(_ => testContext.makeAssetWithData())
 
@@ -52,7 +52,12 @@ import scala.concurrent.duration.Duration
     pipelineRes should have size batchSize
 
     pipelineRes.foreach {
-      case (Left(asset), _) => asset shouldBe a[Asset]
+      case (Left(asset), _) =>
+        asset shouldBe a[Asset]
+        val assetId = asset.persistedId
+        val persistedAsset: Asset = testApp.service.asset.getById(assetId)
+        persistedAsset.isPipelineProcessed shouldBe true
+
       case (Right(_), _) => fail("Expected all elements to be of type AssetWithData")
     }
   }

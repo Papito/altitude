@@ -45,8 +45,24 @@ class AssetService(val app: Altitude) extends BaseService[Asset] {
     }
   }
 
-  //
-  // NO
-  //
-  // Read the class description before adding new methods
+  def pruneDanglingAssets(): Unit = {
+    logger.info("Pruning dangling assets")
+    dao.deleteByQuery(new Query(Map(FieldConst.Asset.IS_PIPELINE_PROCESSED -> false)))
+  }
+
+  def getDanglingAssets: List[Asset] = {
+    txManager.asReadOnly {
+      val danglingAssets = dao.queryAll(new Query(Map(FieldConst.Asset.IS_PIPELINE_PROCESSED -> false)))
+      danglingAssets.records.map(Asset.fromJson(_))
+    }
+  }
+
+  def markAsCompleted(asset: Asset): Asset = {
+    val updateData = Map(
+      FieldConst.Asset.IS_PIPELINE_PROCESSED -> true
+    )
+
+    updateById(asset.persistedId, updateData)
+    asset.copy(isPipelineProcessed = true)
+  }
 }

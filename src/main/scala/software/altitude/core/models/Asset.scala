@@ -1,9 +1,9 @@
 package software.altitude.core.models
 
-import java.time.LocalDateTime
-import play.api.libs.json._
 import play.api.libs.json.JsonNaming.SnakeCase
+import play.api.libs.json._
 
+import java.time.LocalDateTime
 import scala.language.implicitConversions
 
 /**
@@ -42,6 +42,8 @@ case class Asset(
     extractedMetadata: ExtractedMetadata = ExtractedMetadata(),
     isTriaged: Boolean = false,
     isRecycled: Boolean = false,
+    isPipelineProcessed: Boolean = false,
+    isInFaceRecModel: Boolean = false,
     createdAt: Option[LocalDateTime] = None,
     updatedAt: Option[LocalDateTime] = None)
   extends BaseModel {
@@ -49,5 +51,5 @@ case class Asset(
   lazy val toJson: JsObject = Json.toJson(this).as[JsObject]
 
   override def toString: String =
-    s"Asset: [$id] Recycled: [$isRecycled] Triaged: [$isTriaged] Type: [${assetType.mediaType}:${assetType.mediaSubtype}]"
+    s"Asset: [$id] [$fileName] Recycled: [$isRecycled] Triaged: [$isTriaged] Type: [${assetType.mediaType}:${assetType.mediaSubtype}]"
 }

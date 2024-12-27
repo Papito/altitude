@@ -15,12 +15,24 @@ import software.altitude.core.AltitudeActorSystem
 import software.altitude.core.pipeline.PipelineConstants.parallelism
 import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
 import software.altitude.core.pipeline.PipelineTypes.TDataAssetWithContext
-import software.altitude.core.pipeline.flows.{AddPreviewFlow, AssignIdFlow, CheckDuplicateFlow, CheckMetadataFlow, ExtractMetadataFlow, FacialRecognitionFlow, FileStoreFlow, PersistAndIndexAssetFlow, SaveFaceRecModelFlow, StripBinaryDataFlow}
+import software.altitude.core.pipeline.flows.AddPreviewFlow
+import software.altitude.core.pipeline.flows.AssignIdFlow
+import software.altitude.core.pipeline.flows.CheckDuplicateFlow
+import software.altitude.core.pipeline.flows.CheckMetadataFlow
+import software.altitude.core.pipeline.flows.ExtractMetadataFlow
+import software.altitude.core.pipeline.flows.FacialRecognitionFlow
+import software.altitude.core.pipeline.flows.FileStoreFlow
+import software.altitude.core.pipeline.flows.MarkAsCompleteFlow
+import software.altitude.core.pipeline.flows.PersistAndIndexAssetFlow
+import software.altitude.core.pipeline.flows.SaveFaceRecModelFlow
+import software.altitude.core.pipeline.flows.StripBinaryDataFlow
 import software.altitude.core.pipeline.sinks.ErrorLoggingSink
 import software.altitude.core.pipeline.sinks.WsNotificationSink
 
-import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.Await
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
+import scala.concurrent.duration.{Duration, DurationInt}
 import scala.util.Failure
 import scala.util.Success
 
@@ -39,6 +51,7 @@ class ImportPipelineService(app: Altitude) {
   private val checkDuplicateFlow = CheckDuplicateFlow(app)
   private val stripBinaryDataFlow = StripBinaryDataFlow(app)
   private val saveFaceRecModelSink = SaveFaceRecModelFlow(app).to(Sink.ignore)
+  private val markAsCompleteFlow = MarkAsCompleteFlow(app)
   private val wsNotificationSink = WsNotificationSink(app)
   private val errorLoggingSink = ErrorLoggingSink()
 
@@ -62,9 +75,11 @@ class ImportPipelineService(app: Altitude) {
       .async
       .via(addPreviewFlow)
       .via(stripBinaryDataFlow)
+      .via(markAsCompleteFlow)
       // Will save the model for this substream (a repo) every X minutes or Y elements
       // whichever comes first
-      .alsoTo(saveFaceRecModelSink).withAttributes(ActorAttributes.dispatcher("single-thread-dispatcher"))
+      .alsoTo(saveFaceRecModelSink)
+      .withAttributes(ActorAttributes.dispatcher("single-thread-dispatcher"))
       .mergeSubstreams
       .alsoTo(wsNotificationSink)
       .alsoTo(errorLoggingSink)
@@ -120,9 +135,6 @@ class ImportPipelineService(app: Altitude) {
 
   def shutdown(): Unit = {
     queueImportPipeline.complete()
-    val queueCompletedFut = queueImportPipeline.watchCompletion()
-    Await.result(queueCompletedFut, 30.seconds)
-    system.terminate()
-    logger.warn("Actor system terminated")
+    Await.result(queueImportPipeline.watchCompletion(), Duration.Inf)
   }
 }
