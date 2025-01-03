@@ -17,6 +17,14 @@ import software.altitude.test.core.IntegrationTestCore
 
 @DoNotDiscover class FaceRecognitionServiceTests(override val testApp: Altitude) extends IntegrationTestCore {
 
+  test("Initialize face recognition", Focused) {
+    val repo2 = testContext.persistRepository()
+    val repo3 = testContext.persistRepository()
+
+    testApp.service.faceRecognition.initialize(repo2.persistedId)
+    testApp.service.faceRecognition.initialize(repo3.persistedId)
+  }
+
   test("Recognize a person twice") {
     val importAsset1 = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val importedAsset1: Asset = testApp.service.library.addImportAsset(importAsset1)

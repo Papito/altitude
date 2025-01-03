@@ -261,7 +261,7 @@ class Altitude(val dbEngineOverride: Option[String] = None) {
 
     val fileStore: FileStoreService = fileStoreType match {
       case C.StorageEngineName.FS => new FileSystemStoreService(app)
-      // S3-based file store bigly wants to be here
+      // S3-based wants to play as well
       case _ => throw new NotImplementedError
     }
 

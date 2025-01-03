@@ -2,14 +2,16 @@ package software.altitude.core.service
 
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
+import org.apache.pekko.actor.typed.Scheduler
+import org.apache.pekko.actor.typed.scaladsl.AskPattern.Askable
+import org.apache.pekko.util.Timeout
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.face.LBPHFaceRecognizer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import software.altitude.core.Altitude
-import software.altitude.core.Const
-import software.altitude.core.Environment
+import software.altitude.core.actors.FaceRecManagerActor
+import software.altitude.core.{Altitude, AltitudeActorSystem, Const, Environment}
 import software.altitude.core.models.Asset
 import software.altitude.core.models.AssetWithData
 import software.altitude.core.models.Face
@@ -18,6 +20,7 @@ import software.altitude.core.util.ImageUtil.matFromBytes
 
 import java.io.File
 import java.util
+import scala.concurrent.duration.DurationInt
 
 object FaceRecognitionService {
   // Number of labels reserved for special cases, and not used for actual people instances
@@ -52,29 +55,17 @@ class FaceRecognitionService(val app: Altitude) {
   recognizer.setGridY(10)
   recognizer.setRadius(2)
 
-  def initialize(): Unit = {
-    if (modelFile.exists()) {
-      logger.info("Found facial recognition model, loading...")
-      recognizer.read(FACE_RECOGNITION_MODEL_PATH)
-      return
-    }
+  implicit val timeout: Timeout = 3.seconds
+  implicit val scheduler: Scheduler = app.actorSystem.scheduler
 
-    logger.warn("No facial recognition model found, training with initial data...")
+  def initialize(repositoryId: String): Unit = {
+    app.actorSystem.ask[AltitudeActorSystem.EmptyResponse](replyTo => FaceRecManagerActor.Initialize(repositoryId, replyTo))
+  }
 
-    /** Initial data is two random images, as we need the minimum of two. Can't just add the first user image without an error. */
-    val initialLabels = new Mat(2, 1, CvType.CV_32SC1)
-    val InitialImages = new java.util.ArrayList[Mat]()
-
-    for (idx <- 0 to 1) {
-      val bytes = getClass.getResourceAsStream(s"/train/$idx.png").readAllBytes()
-      val image: Mat = matFromBytes(bytes)
-      initialLabels.put(idx, 0, idx)
-      InitialImages.add(image)
-    }
-
-    recognizer.clear()
-    recognizer.train(InitialImages, initialLabels)
-    saveModel()
+  def initializeAll(): Unit = {
+    app.service.library.forEachRepository(repo => {
+        initialize(repo.persistedId)
+      })
   }
 
   def saveModel(): Unit = {
@@ -131,7 +122,8 @@ class FaceRecognitionService(val app: Altitude) {
      *
      * This is called a "verified" match.
      *
-     * We do NOT trust the ML model confidence score, as its meaning is relative
+     * We do NOT trust the ML model confidence score, as it will always return the closest "match",
+     * and the meaning of the score is relative.
      */
     if (personMlMatch.isDefined) {
       logger.debug(f"Comparing ML match ${personMlMatch.get.persistedId})")
@@ -162,7 +154,6 @@ class FaceRecognitionService(val app: Altitude) {
   }
 
   private def matchFaceBruteForce(face: Face): Option[Face] = {
-    logger.debug("Brute-force matching face")
     val bestFaceMatch: Option[Face] = getBestFaceMatch(face)
     logger.debug("Best match: " + bestFaceMatch)
 
