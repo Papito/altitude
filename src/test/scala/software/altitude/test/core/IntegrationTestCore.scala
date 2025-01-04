@@ -9,13 +9,15 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core._
 import software.altitude.core.actors.FaceRecManagerActor
-import software.altitude.core.actors.FaceRecModelActor.{ModelLabels, ModelSize}
+import software.altitude.core.actors.FaceRecModelActor.ModelLabels
+import software.altitude.core.actors.FaceRecModelActor.ModelSize
 import software.altitude.core.models._
 import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.integration.TestContext
 
+import scala.concurrent.Await
+import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, Future}
 import scala.language.implicitConversions
 
 abstract class IntegrationTestCore
@@ -87,13 +89,13 @@ abstract class IntegrationTestCore
    */
   def getNumberOfModelLabels: Int = {
     val repositoryId = RequestContext.getRepository.persistedId
-    val futureResp: Future[ModelSize] = testApp.actorSystem ? (replyTo => FaceRecManagerActor.GetModelSize(repositoryId, replyTo))
+    val futureResp: Future[ModelSize] = testApp.actorSystem ? (ref => FaceRecManagerActor.GetModelSize(repositoryId, ref))
     Await.result(futureResp, timeout.duration).size
   }
 
   def getLabels: Seq[Int] = {
     val repositoryId = RequestContext.getRepository.persistedId
-    val futureResp: Future[ModelLabels] = testApp.actorSystem ? (replyTo => FaceRecManagerActor.GetModelLabels(repositoryId, replyTo))
+    val futureResp: Future[ModelLabels] = testApp.actorSystem ? (ref => FaceRecManagerActor.GetModelLabels(repositoryId, ref))
     Await.result(futureResp, timeout.duration).labels
   }
 }

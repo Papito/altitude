@@ -1,7 +1,10 @@
 package software.altitude.core.actors
 
-import org.apache.pekko.actor.typed.{ActorRef, Behavior}
-import org.apache.pekko.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
+import org.apache.pekko.actor.typed.ActorRef
+import org.apache.pekko.actor.typed.Behavior
+import org.apache.pekko.actor.typed.scaladsl.AbstractBehavior
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.face.LBPHFaceRecognizer
@@ -56,18 +59,15 @@ class FaceRecModelActor(context: ActorContext[FaceRecModelActor.Command]) extend
   override def onMessage(msg: Command): Behavior[Command] = {
     msg match {
       case AddFace(face, personLabel, replyTo) =>
-        println("Adding face to model " + personLabel)
         val labels = new Mat(1, 1, CvType.CV_32SC1)
         val images = new util.ArrayList[Mat]()
         labels.put(0, 0, personLabel)
         images.add(face.alignedImageGsMat)
         recognizer.update(images, labels)
-        println("Model now has " + recognizer.getLabels.size() + " labels")
         replyTo ! AltitudeActorSystem.EmptyResponse()
         Behaviors.same
 
       case Initialize(replyTo) =>
-        println("Asking 3")
         initialize()
         replyTo ! AltitudeActorSystem.EmptyResponse()
         Behaviors.same
@@ -83,15 +83,15 @@ class FaceRecModelActor(context: ActorContext[FaceRecModelActor.Command]) extend
         replyTo ! FacePrediction(predLabel, confidence)
         Behaviors.same
 
-        case GetModelSize(replyTo) =>
-          replyTo ! ModelSize(recognizer.getLabels.size().height.toInt - 2)
-          Behaviors.same
+      case GetModelSize(replyTo) =>
+        replyTo ! ModelSize(recognizer.getLabels.size().height.toInt - 2)
+        Behaviors.same
 
-        case GetModelLabels(replyTo) =>
-            val labels = recognizer.getLabels
-            val labelSeq = (0 until labels.height()).map(labels.get(_, 0)(0).toInt)
-            replyTo ! ModelLabels(labelSeq)
-            Behaviors.same
+      case GetModelLabels(replyTo) =>
+        val labels = recognizer.getLabels
+        val labelSeq = (0 until labels.height()).map(labels.get(_, 0)(0).toInt)
+        replyTo ! ModelLabels(labelSeq)
+        Behaviors.same
     }
   }
 }

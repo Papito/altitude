@@ -1,27 +1,25 @@
 package software.altitude.core.service
 
-import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import org.apache.pekko.actor.typed.Scheduler
 import org.apache.pekko.actor.typed.scaladsl.AskPattern.Askable
 import org.apache.pekko.util.Timeout
-import org.opencv.core.CvType
-import org.opencv.core.Mat
-import org.opencv.face.LBPHFaceRecognizer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import software.altitude.core.Altitude
+import software.altitude.core.AltitudeActorSystem
+import software.altitude.core.Const
+import software.altitude.core.RequestContext
 import software.altitude.core.actors.FaceRecManagerActor
 import software.altitude.core.actors.FaceRecModelActor.FacePrediction
-import software.altitude.core.{Altitude, AltitudeActorSystem, Const, Environment, RequestContext}
 import software.altitude.core.models.Asset
 import software.altitude.core.models.AssetWithData
 import software.altitude.core.models.Face
 import software.altitude.core.models.Person
-import software.altitude.core.util.ImageUtil.matFromBytes
 
 import java.io.File
-import java.util
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
+import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
 object FaceRecognitionService {
@@ -61,7 +59,8 @@ class FaceRecognitionService(val app: Altitude) {
   }
 
   def initializeAll(): Unit = {
-    app.service.library.forEachRepository(repo => {
+    app.service.library.forEachRepository(
+      repo => {
         initialize(repo.persistedId)
       })
   }
@@ -89,19 +88,17 @@ class FaceRecognitionService(val app: Altitude) {
     require(detectedFace.id.isEmpty, "Face object must not be persisted yet")
     require(detectedFace.personId.isEmpty, "Face object must not be associated with a person yet")
 
-    val predictionFut: Future[FacePrediction] = app.actorSystem ? (replyTo => FaceRecManagerActor.Predict(RequestContext.getRepository.persistedId, detectedFace, replyTo))
-    val predLabel = Await.result(predictionFut, timeout.duration)
-    println("Prediction label: " + predLabel)
+    val result: Future[FacePrediction] = app.actorSystem.ask(ref => FaceRecManagerActor.Predict(RequestContext.getRepository.persistedId, detectedFace, ref))
+    val predLabel = Await.result(result, timeout.duration).label
 
-    val personMlMatch: Option[Person] = app.service.faceCache.getPersonByLabel(predLabel.label)
+    val personMlMatch: Option[Person] = app.service.faceCache.getPersonByLabel(predLabel)
 
     /**
      * If we have a match, we compare the match to the person's "best" face - the faces are sorted by detection score.
      *
      * This is called a "verified" match.
      *
-     * We do NOT trust the ML model confidence score, as it will always return the closest "match",
-     * and the meaning of the score is relative.
+     * We do NOT trust the ML model confidence score, as it will always return the closest "match", and the meaning of the score is relative.
      */
     if (personMlMatch.isDefined) {
       logger.debug(f"Comparing ML match ${personMlMatch.get.persistedId})")
@@ -170,7 +167,7 @@ class FaceRecognitionService(val app: Altitude) {
   }
 
   private def indexFace(face: Face, personLabel: Int, repositoryId: String = RequestContext.getRepository.persistedId): Unit = {
-    val fut: Future[AltitudeActorSystem.EmptyResponse] = app.actorSystem ? (replyTo => FaceRecManagerActor.AddFace(repositoryId, face, personLabel, replyTo))
+    val fut: Future[AltitudeActorSystem.EmptyResponse] = app.actorSystem ? (ref => FaceRecManagerActor.AddFace(repositoryId, face, personLabel, ref))
     Await.result(fut, timeout.duration)
   }
 

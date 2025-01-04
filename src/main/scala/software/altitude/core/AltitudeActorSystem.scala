@@ -1,17 +1,22 @@
 package software.altitude.core
 
-import org.apache.pekko.actor.typed.{ActorRef, Behavior, PostStop, Scheduler, Signal}
+import org.apache.pekko.actor.typed.Behavior
+import org.apache.pekko.actor.typed.PostStop
+import org.apache.pekko.actor.typed.Scheduler
+import org.apache.pekko.actor.typed.Signal
 import org.apache.pekko.actor.typed.scaladsl.AbstractBehavior
 import org.apache.pekko.actor.typed.scaladsl.ActorContext
 import org.apache.pekko.actor.typed.scaladsl.AskPattern.Askable
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.apache.pekko.util.Timeout
+import software.altitude.core.actors.FaceRecManagerActor
 import software.altitude.core.actors.FaceRecManagerActor.Initialize
-import software.altitude.core.actors.{FaceRecManagerActor, FaceRecModelActor, ImportStatusWsActor}
+import software.altitude.core.actors.ImportStatusWsActor
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
-import scala.util.{Failure, Success}
+import scala.util.Failure
+import scala.util.Success
 
 object AltitudeActorSystem {
   trait Command
@@ -35,29 +40,51 @@ private class AltitudeActorSystem(context: ActorContext[AltitudeActorSystem.Comm
         websocketImportStatusManagerActor ! command
         Behaviors.same
 
-      case Initialize(repositoryId, replyTo) =>
-        println("Asking 1")
-        faceRecManagerActor.ask(FaceRecManagerActor.Initialize(repositoryId, _)).onComplete {
-          case Success(response) => {
-            println("Responded 1")
-            replyTo ! response
-          }
-          case Failure(exception) => {
-            context.log.error("Failed to initialize model actor", exception)
-          }
-        }(ec)
+      case command: Initialize =>
+        faceRecManagerActor
+          .ask(FaceRecManagerActor.Initialize(command.repositoryId, _))
+          .onComplete {
+            case Success(response) => command.replyTo ! response
+            case Failure(exception) => context.log.error("Failed to initialize face rec model actor", exception)
+          }(ec)
         Behaviors.same
 
       case command: FaceRecManagerActor.AddFace =>
-        faceRecManagerActor.ask(FaceRecManagerActor.AddFace(command.repositoryId, command.face, command.personLabel, _))
+        faceRecManagerActor
+          .ask(FaceRecManagerActor.AddFace(command.repositoryId, command.face, command.personLabel, _))
+          .onComplete {
+            case Success(response) => command.replyTo ! response
+            case Failure(exception) => context.log.error("Failed to add a face", exception)
+          }(ec)
         Behaviors.same
 
       case command: FaceRecManagerActor.Predict =>
-        faceRecManagerActor.ask(FaceRecManagerActor.Predict(command.repositoryId, command.face, _))
+        faceRecManagerActor
+          .ask(FaceRecManagerActor.Predict(command.repositoryId, command.face, _))
+          .onComplete {
+            case Success(response) => command.replyTo ! response
+            case Failure(exception) => context.log.error("Failed to run face ec", exception)
+          }(ec)
         Behaviors.same
+
       case command: FaceRecManagerActor.GetModelSize =>
-        faceRecManagerActor.ask(FaceRecManagerActor.GetModelSize(command.repositoryId, _))
+        faceRecManagerActor
+          .ask(FaceRecManagerActor.GetModelSize(command.repositoryId, _))
+          .onComplete {
+            case Success(response) => command.replyTo ! response
+            case Failure(exception) => context.log.error("Failed to get model size", exception)
+          }(ec)
         Behaviors.same
+
+      case command: FaceRecManagerActor.GetModelLabels =>
+        faceRecManagerActor
+          .ask(FaceRecManagerActor.GetModelLabels(command.repositoryId, _))
+          .onComplete {
+            case Success(response) => command.replyTo ! response
+            case Failure(exception) => context.log.error("Failed to get model labels", exception)
+          }(ec)
+        Behaviors.same
+
       case _ =>
         Behaviors.unhandled
     }
