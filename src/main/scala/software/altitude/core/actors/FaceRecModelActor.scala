@@ -12,9 +12,17 @@ import software.altitude.core.util.ImageUtil.matFromBytes
 import java.util
 
 object FaceRecModelActor {
+  sealed trait Response
+  final case class FacePrediction(label: Int, confidence: Double) extends Response
+  final case class ModelSize(size: Int) extends Response
+  final case class ModelLabels(labels: Seq[Int])
+
   sealed trait Command
   final case class AddFace(face: Face, personLabel: Int, replyTo: ActorRef[AltitudeActorSystem.EmptyResponse]) extends Command
   final case class Initialize(replyTo: ActorRef[AltitudeActorSystem.EmptyResponse]) extends Command
+  final case class Predict(face: Face, replyTo: ActorRef[FacePrediction]) extends Command
+  final case class GetModelSize(replyTo: ActorRef[ModelSize]) extends Command
+  final case class GetModelLabels(replyTo: ActorRef[ModelLabels]) extends Command
 
   def apply(): Behavior[Command] = Behaviors.setup(context => new FaceRecModelActor(context))
 }
@@ -48,18 +56,42 @@ class FaceRecModelActor(context: ActorContext[FaceRecModelActor.Command]) extend
   override def onMessage(msg: Command): Behavior[Command] = {
     msg match {
       case AddFace(face, personLabel, replyTo) =>
+        println("Adding face to model " + personLabel)
         val labels = new Mat(1, 1, CvType.CV_32SC1)
         val images = new util.ArrayList[Mat]()
         labels.put(0, 0, personLabel)
         images.add(face.alignedImageGsMat)
         recognizer.update(images, labels)
+        println("Model now has " + recognizer.getLabels.size() + " labels")
         replyTo ! AltitudeActorSystem.EmptyResponse()
         Behaviors.same
 
       case Initialize(replyTo) =>
+        println("Asking 3")
         initialize()
         replyTo ! AltitudeActorSystem.EmptyResponse()
         Behaviors.same
+
+      case Predict(face, replyTo) =>
+        val predLabelArr = new Array[Int](1)
+        val confidenceArr = new Array[Double](1)
+        recognizer.predict(face.alignedImageGsMat, predLabelArr, confidenceArr)
+
+        val predLabel = predLabelArr.head
+        val confidence = confidenceArr.head
+
+        replyTo ! FacePrediction(predLabel, confidence)
+        Behaviors.same
+
+        case GetModelSize(replyTo) =>
+          replyTo ! ModelSize(recognizer.getLabels.size().height.toInt - 2)
+          Behaviors.same
+
+        case GetModelLabels(replyTo) =>
+            val labels = recognizer.getLabels
+            val labelSeq = (0 until labels.height()).map(labels.get(_, 0)(0).toInt)
+            replyTo ! ModelLabels(labelSeq)
+            Behaviors.same
     }
   }
 }

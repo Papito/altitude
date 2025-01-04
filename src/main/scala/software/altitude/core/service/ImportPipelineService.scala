@@ -55,8 +55,7 @@ class ImportPipelineService(app: Altitude) {
 
   private val combinedFlow: Flow[TDataAssetWithContext, TAssetOrInvalidWithContext, NotUsed] =
     Flow[TDataAssetWithContext]
-      // Each repo has its own substream. Unlimited, plus minus a few.
-      // https://en.wikipedia.org/wiki/Zero_one_infinity_rule
+      // Each repo has its own substream. We group by repo id and run the pipeline for each repo in parallel
       .groupBy(Int.MaxValue, _._2.repository.id)
       .via(checkMediaTypeFlow)
       .via(checkDuplicateFlow)

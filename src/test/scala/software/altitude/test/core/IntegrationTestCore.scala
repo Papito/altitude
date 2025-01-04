@@ -1,14 +1,21 @@
 package software.altitude.test.core
+import org.apache.pekko.actor.typed.Scheduler
+import org.apache.pekko.actor.typed.scaladsl.AskPattern.Askable
+import org.apache.pekko.util.Timeout
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest._
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core._
+import software.altitude.core.actors.FaceRecManagerActor
+import software.altitude.core.actors.FaceRecModelActor.{ModelLabels, ModelSize}
 import software.altitude.core.models._
 import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.integration.TestContext
 
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.{Await, Future}
 import scala.language.implicitConversions
 
 abstract class IntegrationTestCore
@@ -21,6 +28,9 @@ abstract class IntegrationTestCore
   protected final val log: Logger = LoggerFactory.getLogger(getClass)
 
   var testContext: TestContext = new TestContext(testApp)
+
+  implicit val scheduler: Scheduler = testApp.actorSystem.scheduler
+  implicit val timeout: Timeout = 3.seconds
 
   override def beforeEach(): Unit = {
     AltitudeServletContext.clearState()
@@ -75,10 +85,15 @@ abstract class IntegrationTestCore
    * The number of labels in the model, minus the reserved labels.
    * That is, this reflects purely our trained labels for easier reasoning about the counts.
    */
-  def getNumberOfModelLabels: Int = testApp.service.faceRecognition.recognizer.getLabels.size().height.toInt - 2
+  def getNumberOfModelLabels: Int = {
+    val repositoryId = RequestContext.getRepository.persistedId
+    val futureResp: Future[ModelSize] = testApp.actorSystem ? (replyTo => FaceRecManagerActor.GetModelSize(repositoryId, replyTo))
+    Await.result(futureResp, timeout.duration).size
+  }
 
   def getLabels: Seq[Int] = {
-    val labels = testApp.service.faceRecognition.recognizer.getLabels
-    (0 until labels.height()).map(labels.get(_, 0)(0).toInt)
+    val repositoryId = RequestContext.getRepository.persistedId
+    val futureResp: Future[ModelLabels] = testApp.actorSystem ? (replyTo => FaceRecManagerActor.GetModelLabels(repositoryId, replyTo))
+    Await.result(futureResp, timeout.duration).labels
   }
 }

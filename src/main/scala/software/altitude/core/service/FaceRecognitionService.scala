@@ -11,7 +11,8 @@ import org.opencv.face.LBPHFaceRecognizer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.actors.FaceRecManagerActor
-import software.altitude.core.{Altitude, AltitudeActorSystem, Const, Environment}
+import software.altitude.core.actors.FaceRecModelActor.FacePrediction
+import software.altitude.core.{Altitude, AltitudeActorSystem, Const, Environment, RequestContext}
 import software.altitude.core.models.Asset
 import software.altitude.core.models.AssetWithData
 import software.altitude.core.models.Face
@@ -20,6 +21,7 @@ import software.altitude.core.util.ImageUtil.matFromBytes
 
 import java.io.File
 import java.util
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.DurationInt
 
 object FaceRecognitionService {
@@ -50,16 +52,12 @@ class FaceRecognitionService(val app: Altitude) {
 
   private val modelFile = new File(FACE_RECOGNITION_MODEL_PATH)
 
-  val recognizer: LBPHFaceRecognizer = LBPHFaceRecognizer.create()
-  recognizer.setGridX(10)
-  recognizer.setGridY(10)
-  recognizer.setRadius(2)
-
   implicit val timeout: Timeout = 3.seconds
   implicit val scheduler: Scheduler = app.actorSystem.scheduler
 
   def initialize(repositoryId: String): Unit = {
-    app.actorSystem.ask[AltitudeActorSystem.EmptyResponse](replyTo => FaceRecManagerActor.Initialize(repositoryId, replyTo))
+    val result: Future[AltitudeActorSystem.EmptyResponse] = app.actorSystem.ask(ref => FaceRecManagerActor.Initialize(repositoryId, ref))
+    Await.result(result, timeout.duration)
   }
 
   def initializeAll(): Unit = {
@@ -68,27 +66,11 @@ class FaceRecognitionService(val app: Altitude) {
       })
   }
 
-  def saveModel(): Unit = {
-
-    /**
-     * Unorthodox, but this whole file-writing thing is messy, and we can't really mock this method as it can be invoked during early app init, before we can
-     * use Mockito.
-     *
-     * In test, the model is ephemeral and does not persist to file store
-     */
-    if (Environment.CURRENT == Environment.Name.TEST) {
-      return
-    }
-
-    logger.info("--> Saving model")
-    FileUtils.forceMkdirParent(modelFile)
-    recognizer.save(FACE_RECOGNITION_MODEL_PATH)
-  }
-
   def processAsset(dataAsset: AssetWithData): Unit = {
     val detectedFaces = app.service.faceDetection.extractFaces(dataAsset.data)
     logger.info(s"Detected ${detectedFaces.size} faces")
 
+    // FIXME: index all faces at once as the ML model supports it
     detectedFaces.foreach(
       detectedFace => {
         val existingOrNewPerson = recognizeFace(detectedFace, dataAsset.asset)
@@ -107,15 +89,11 @@ class FaceRecognitionService(val app: Altitude) {
     require(detectedFace.id.isEmpty, "Face object must not be persisted yet")
     require(detectedFace.personId.isEmpty, "Face object must not be associated with a person yet")
 
-    val predLabelArr = new Array[Int](1)
-    val confidenceArr = new Array[Double](1)
-    recognizer.predict(detectedFace.alignedImageGsMat, predLabelArr, confidenceArr)
+    val predictionFut: Future[FacePrediction] = app.actorSystem ? (replyTo => FaceRecManagerActor.Predict(RequestContext.getRepository.persistedId, detectedFace, replyTo))
+    val predLabel = Await.result(predictionFut, timeout.duration)
+    println("Prediction label: " + predLabel)
 
-    val predLabel = predLabelArr.head
-    val confidence = confidenceArr.head
-
-    logger.debug("Predicted label: " + predLabel + " with confidence: " + confidence)
-    val personMlMatch: Option[Person] = app.service.faceCache.getPersonByLabel(predLabel)
+    val personMlMatch: Option[Person] = app.service.faceCache.getPersonByLabel(predLabel.label)
 
     /**
      * If we have a match, we compare the match to the person's "best" face - the faces are sorted by detection score.
@@ -191,13 +169,9 @@ class FaceRecognitionService(val app: Altitude) {
     }
   }
 
-  def indexFace(face: Face, personLabel: Int): Unit = {
-    logger.info(s"Updating model for person $personLabel")
-    val labels = new Mat(1, 1, CvType.CV_32SC1)
-    val images = new util.ArrayList[Mat]()
-    labels.put(0, 0, personLabel)
-    images.add(face.alignedImageGsMat)
-    recognizer.update(images, labels)
+  private def indexFace(face: Face, personLabel: Int, repositoryId: String = RequestContext.getRepository.persistedId): Unit = {
+    val fut: Future[AltitudeActorSystem.EmptyResponse] = app.actorSystem ? (replyTo => FaceRecManagerActor.AddFace(repositoryId, face, personLabel, replyTo))
+    Await.result(fut, timeout.duration)
   }
 
   def addFacesToPerson(faces: List[Face], person: Person): Unit = {
