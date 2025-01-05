@@ -29,6 +29,9 @@ object FaceRecManagerActor {
   final case class AddFace(repositoryId: String, face: Face, personLabel: Int, replyTo: ActorRef[AltitudeActorSystem.EmptyResponse])
     extends AltitudeActorSystem.Command
     with Command
+  final case class AddFaceAsync(repositoryId: String, face: Face, personLabel: Int)
+    extends AltitudeActorSystem.Command
+      with Command
   final case class Initialize(repositoryId: String, replyTo: ActorRef[AltitudeActorSystem.EmptyResponse]) extends AltitudeActorSystem.Command with Command
   final case class Predict(repositoryId: String, face: Face, replyTo: ActorRef[FacePrediction]) extends AltitudeActorSystem.Command with Command
   final case class GetModelSize(repositoryId: String, replyTo: ActorRef[ModelSize]) extends AltitudeActorSystem.Command with Command

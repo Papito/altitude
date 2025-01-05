@@ -27,7 +27,7 @@ import software.altitude.test.core.IntegrationTestCore
     this.getNumberOfModelLabels shouldBe 0
   }
 
-  test("Recognize a person twice") {
+  test("Recognize a person twice", Focused) {
     val importAsset1 = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val importedAsset1: Asset = testApp.service.library.addImportAsset(importAsset1)
     val faces1 = testApp.service.faceDetection.extractFaces(importAsset1.data)

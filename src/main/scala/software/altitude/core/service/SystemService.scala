@@ -64,6 +64,9 @@ class SystemService(val app: Altitude) {
         fileStoreType = C.StorageEngineName.FS, // hard default for now
         owner = admin)
 
+      // normally done on startup but on the first run, that train has sailed.
+      app.service.faceRecognition.initialize(repo.persistedId)
+
       app.service.user.setLastActiveRepoId(admin, repo.persistedId)
 
       systemMetadataDao.setInitialized()

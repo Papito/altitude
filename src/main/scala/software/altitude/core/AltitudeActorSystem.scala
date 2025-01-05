@@ -58,6 +58,10 @@ private class AltitudeActorSystem(context: ActorContext[AltitudeActorSystem.Comm
           }(ec)
         Behaviors.same
 
+      case command: FaceRecManagerActor.AddFaceAsync =>
+        faceRecManagerActor.ask(FaceRecManagerActor.AddFace(command.repositoryId, command.face, command.personLabel, _))
+        Behaviors.same
+
       case command: FaceRecManagerActor.Predict =>
         faceRecManagerActor
           .ask(FaceRecManagerActor.Predict(command.repositoryId, command.face, _))

@@ -40,8 +40,6 @@ class AssetService(val app: Altitude) extends BaseService[Asset] {
   }
 
   def pruneDanglingAssets(): Unit = {
-    logger.info("Pruning dangling assets")
-
     txManager.withTransaction {
       dao.deleteByQuery(new Query(Map(FieldConst.Asset.IS_PIPELINE_PROCESSED -> false)))
     }
