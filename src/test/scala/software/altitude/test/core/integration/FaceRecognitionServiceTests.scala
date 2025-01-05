@@ -7,7 +7,6 @@ import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
 import software.altitude.core.models.Asset
-import software.altitude.core.models.Face
 import software.altitude.core.models.Person
 import software.altitude.core.service.FaceRecognitionService
 import software.altitude.core.util.Util
@@ -23,15 +22,18 @@ import software.altitude.test.core.IntegrationTestCore
     testApp.service.faceRecognition.initialize(repo2.persistedId)
     testApp.service.faceRecognition.initialize(repo3.persistedId)
 
-    // only the first (current repo)
+    // check only the first (current repo)
     this.getNumberOfModelLabels shouldBe 0
   }
 
-  test("Recognize a person twice", Focused) {
+  test("Recognize a person twice") {
     val importAsset1 = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val importedAsset1: Asset = testApp.service.library.addImportAsset(importAsset1)
-    val faces1 = testApp.service.faceDetection.extractFaces(importAsset1.data)
-    val face1: Face = faces1.head
+    val (face1, faceImages) = testApp.service.faceDetection.extractFaces(importAsset1.data).head
+    faceImages.image should not be empty
+    faceImages.displayImage should not be empty
+    faceImages.alignedImage should not be empty
+    faceImages.alignedImageGs should not be empty
     val recognizedPerson: Person = testApp.service.faceRecognition.recognizeFace(face1, importedAsset1)
 
     // the person should be in the cache
@@ -47,8 +49,7 @@ import software.altitude.test.core.IntegrationTestCore
     // Recognize again
     val importAsset2 = IntegrationTestUtil.getImportAsset("people/meme-ben2.png")
     val importedAsset2: Asset = testApp.service.library.addImportAsset(importAsset2)
-    val faces2 = testApp.service.faceDetection.extractFaces(importAsset2.data)
-    val face2: Face = faces2.head
+    val (face2, _) = testApp.service.faceDetection.extractFaces(importAsset2.data).head
 
     val samePerson: Person = testApp.service.faceRecognition.recognizeFace(face2, importedAsset2)
     samePerson.persistedId shouldBe recognizedPerson.persistedId
@@ -60,8 +61,7 @@ import software.altitude.test.core.IntegrationTestCore
     // Recognize a second time
     val importAsset3 = IntegrationTestUtil.getImportAsset("people/meme-ben3.png")
     val importedAsset3: Asset = testApp.service.library.addImportAsset(importAsset3)
-    val faces3 = testApp.service.faceDetection.extractFaces(importAsset3.data)
-    val face3: Face = faces3.head
+    val (face3, _) = testApp.service.faceDetection.extractFaces(importAsset3.data).head
 
     val samePersonAgain: Person = testApp.service.faceRecognition.recognizeFace(face3, importedAsset3)
     samePersonAgain.persistedId shouldBe recognizedPerson.persistedId

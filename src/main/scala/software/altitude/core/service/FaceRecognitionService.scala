@@ -1,6 +1,4 @@
 package software.altitude.core.service
-
-import org.apache.commons.io.FilenameUtils
 import org.apache.pekko.actor.typed.Scheduler
 import org.apache.pekko.actor.typed.scaladsl.AskPattern.Askable
 import org.apache.pekko.util.Timeout
@@ -8,16 +6,15 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
 import software.altitude.core.AltitudeActorSystem
-import software.altitude.core.Const
 import software.altitude.core.RequestContext
 import software.altitude.core.actors.FaceRecManagerActor
 import software.altitude.core.actors.FaceRecModelActor.FacePrediction
 import software.altitude.core.models.Asset
 import software.altitude.core.models.AssetWithData
 import software.altitude.core.models.Face
+import software.altitude.core.models.FaceImages
 import software.altitude.core.models.Person
 
-import java.io.File
 import scala.concurrent.Await
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
@@ -45,16 +42,10 @@ object FaceRecognitionService {
 class FaceRecognitionService(val app: Altitude) {
   final val logger: Logger = LoggerFactory.getLogger(getClass)
 
-  private val MODELS_PATH = FilenameUtils.concat(app.dataPath, Const.DataStore.MODELS)
-  private val FACE_RECOGNITION_MODEL_PATH = FilenameUtils.concat(MODELS_PATH, "lbphf_face_rec_model.xml")
-
-  private val modelFile = new File(FACE_RECOGNITION_MODEL_PATH)
-
   implicit val timeout: Timeout = 3.seconds
   implicit val scheduler: Scheduler = app.actorSystem.scheduler
 
   def initialize(repositoryId: String): Unit = {
-    logger.info("Initializing face recognition model for repository " + repositoryId)
     val result: Future[AltitudeActorSystem.EmptyResponse] = app.actorSystem.ask(ref => FaceRecManagerActor.Initialize(repositoryId, ref))
     Await.result(result, timeout.duration)
   }
@@ -67,17 +58,16 @@ class FaceRecognitionService(val app: Altitude) {
   }
 
   def processAsset(dataAsset: AssetWithData): Unit = {
-    val detectedFaces = app.service.faceDetection.extractFaces(dataAsset.data)
-    logger.info(s"Detected ${detectedFaces.size} faces")
+    val faceWithImages = app.service.faceDetection.extractFaces(dataAsset.data)
+    logger.info(s"Detected ${faceWithImages.size} faces")
 
-    // FIXME: index all faces at once as the ML model supports it
-    detectedFaces.foreach(
-      detectedFace => {
+    faceWithImages.foreach {
+      case (detectedFace: Face, faceImages: FaceImages) =>
         val existingOrNewPerson = recognizeFace(detectedFace, dataAsset.asset)
         val persistedFace = app.service.person.addFace(detectedFace, dataAsset.asset, existingOrNewPerson)
-        logger.info(s"Saving face ${persistedFace.persistedId} for person ${existingOrNewPerson.name.get}")
+        app.service.fileStore.addFace(persistedFace, faceImages)
         indexFace(persistedFace, existingOrNewPerson.label)
-      })
+    }
   }
 
   /**

@@ -1,9 +1,7 @@
 package software.altitude.core.service
 
-import java.io.File
-import java.nio.file.Paths
-import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.FileUtils
+import org.apache.commons.io.FilenameUtils
 import org.bytedeco.javacpp.Loader
 import org.bytedeco.opencv.opencv_java
 import org.opencv.core.CvType
@@ -23,12 +21,17 @@ import org.opencv.objdetect.FaceDetectorYN
 import org.opencv.objdetect.FaceRecognizerSF
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
+import software.altitude.core.Altitude
 import software.altitude.core.Environment
 import software.altitude.core.models.Face
+import software.altitude.core.models.FaceImages
 import software.altitude.core.util.ImageUtil.determineImageScale
 import software.altitude.core.util.ImageUtil.makeImageThumbnail
 import software.altitude.core.util.ImageUtil.matFromBytes
+import software.altitude.core.util.MurmurHash
+
+import java.io.File
+import java.nio.file.Paths
 
 object FaceDetectionService {
   private val dnnInWidth = 300
@@ -75,7 +78,7 @@ object FaceDetectionService {
   }
 }
 
-class FaceDetectionService {
+class FaceDetectionService(app: Altitude) {
 
   /**
    * As if the fact that OpenCV for Java has two competing APIs wasn't confusing enough (org.opencv, org.bytedeco), every example under the sun directs to do
@@ -245,11 +248,11 @@ class FaceDetectionService {
     ret.flatten
   }
 
-  def extractFaces(data: Array[Byte]): List[Face] = {
+  def extractFaces(data: Array[Byte]): List[(Face, FaceImages)] = {
     val imageMat: Mat = matFromBytes(data)
     val results: List[Mat] = detectFacesWithYunet(imageMat)
 
-    val faces: List[Face] = results.map {
+    val facesAndImages: List[(Face, FaceImages)] = results.map {
       res =>
         val alignedFaceImage = alignCropFaceFromDetection(imageMat, res)
         // LBPHFaceRecognizer requires grayscale images
@@ -273,7 +276,7 @@ class FaceDetectionService {
 
         val displayImage = makeImageThumbnail(imageBytes.toArray, FaceDetectionService.faceDetectionBoxPx)
 
-        Face(
+        val face = Face(
           x1 = rect.x,
           y1 = rect.y,
           width = rect.width,
@@ -281,14 +284,21 @@ class FaceDetectionService {
           detectionScore = res.get(0, 14)(0).asInstanceOf[Float],
           embeddings = embedding,
           features = featuresArray,
-          displayImage = displayImage,
+          alignedImageGs = alignedFaceImageGsBytes.toArray,
+          checksum = MurmurHash.hash32(imageBytes.toArray)
+        )
+
+        val faceImages = FaceImages(
           image = imageBytes.toArray,
-          alignedImage = alignedImageBytes.toArray,
+          displayImage = displayImage,
+          alignedImage = alignedFaceImageGsBytes.toArray,
           alignedImageGs = alignedFaceImageGsBytes.toArray
         )
+
+        (face, faceImages)
     }
 
-    faces
+    facesAndImages
   }
 
   def alignCropFaceFromDetection(image: Mat, detection: Mat): Mat = {

@@ -8,6 +8,7 @@ import org.apache.pekko.actor.typed.scaladsl.ActorContext
 import org.apache.pekko.actor.typed.scaladsl.AskPattern.Askable
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.apache.pekko.util.Timeout
+import org.slf4j.Logger
 import software.altitude.core.AltitudeActorSystem
 import software.altitude.core.actors.FaceRecModelActor.FacePrediction
 import software.altitude.core.actors.FaceRecModelActor.ModelLabels
@@ -29,9 +30,7 @@ object FaceRecManagerActor {
   final case class AddFace(repositoryId: String, face: Face, personLabel: Int, replyTo: ActorRef[AltitudeActorSystem.EmptyResponse])
     extends AltitudeActorSystem.Command
     with Command
-  final case class AddFaceAsync(repositoryId: String, face: Face, personLabel: Int)
-    extends AltitudeActorSystem.Command
-      with Command
+  final case class AddFaceAsync(repositoryId: String, face: Face, personLabel: Int) extends AltitudeActorSystem.Command with Command
   final case class Initialize(repositoryId: String, replyTo: ActorRef[AltitudeActorSystem.EmptyResponse]) extends AltitudeActorSystem.Command with Command
   final case class Predict(repositoryId: String, face: Face, replyTo: ActorRef[FacePrediction]) extends AltitudeActorSystem.Command with Command
   final case class GetModelSize(repositoryId: String, replyTo: ActorRef[ModelSize]) extends AltitudeActorSystem.Command with Command
@@ -48,6 +47,7 @@ class FaceRecManagerActor(context: ActorContext[FaceRecManagerActor.Command]) ex
   implicit val timeout: Timeout = 3.seconds
   implicit val scheduler: Scheduler = context.system.scheduler
   implicit val ec: ExecutionContext = context.executionContext
+  val logger: Logger = context.log
 
   override def onMessage(msg: Command): Behavior[Command] = {
     msg match {
@@ -59,7 +59,7 @@ class FaceRecManagerActor(context: ActorContext[FaceRecManagerActor.Command]) ex
           .ask(FaceRecModelActor.Initialize(_))
           .onComplete {
             case Success(response) => replyTo ! response
-            case Failure(exception) => context.log.error("Failed to initialize face rec model actor", exception)
+            case Failure(exception) => logger.error("Failed to initialize face rec model actor", exception)
           }(ec)
         Behaviors.same
 
@@ -71,12 +71,16 @@ class FaceRecManagerActor(context: ActorContext[FaceRecManagerActor.Command]) ex
               .mapTo[AltitudeActorSystem.EmptyResponse]
               .onComplete {
                 case Success(response) => replyTo ! response
-                case Failure(exception) => context.log.error("Failed to add face", exception)
+                case Failure(exception) => logger.error("Failed to add face", exception)
               }(ec)
             Behaviors.same
           case None =>
             throw new RuntimeException(s"No model actor found for repositoryId: $repositoryId")
         }
+
+      case _: AddFaceAsync =>
+        logger.warn("AddFaceAsync should not be used in the context of this actor class")
+        Behaviors.same
 
       case Predict(repositoryId, face, replyTo) =>
         modelActors.get(repositoryId) match {
@@ -86,7 +90,7 @@ class FaceRecManagerActor(context: ActorContext[FaceRecManagerActor.Command]) ex
               .mapTo[FacePrediction]
               .onComplete {
                 case Success(response) => replyTo ! response
-                case Failure(exception) => context.log.error("Failed to predict face", exception)
+                case Failure(exception) => logger.error("Failed to predict face", exception)
               }(ec)
             Behaviors.same
           case None =>
@@ -101,7 +105,7 @@ class FaceRecManagerActor(context: ActorContext[FaceRecManagerActor.Command]) ex
               .mapTo[ModelSize]
               .onComplete {
                 case Success(response) => replyTo ! response
-                case Failure(exception) => context.log.error("Failed to get model size", exception)
+                case Failure(exception) => logger.error("Failed to get model size", exception)
               }(ec)
             Behaviors.same
           case None =>
@@ -116,7 +120,7 @@ class FaceRecManagerActor(context: ActorContext[FaceRecManagerActor.Command]) ex
               .mapTo[ModelLabels]
               .onComplete {
                 case Success(response) => replyTo ! response
-                case Failure(exception) => context.log.error("Failed to get model labels", exception)
+                case Failure(exception) => logger.error("Failed to get model labels", exception)
               }(ec)
             Behaviors.same
           case None =>

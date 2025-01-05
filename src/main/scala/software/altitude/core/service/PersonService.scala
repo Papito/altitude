@@ -1,8 +1,6 @@
 package software.altitude.core.service
 
-import java.sql.SQLException
 import play.api.libs.json.JsObject
-
 import software.altitude.core.Altitude
 import software.altitude.core.FieldConst
 import software.altitude.core.dao.FaceDao
@@ -16,6 +14,8 @@ import software.altitude.core.util.QueryResult
 import software.altitude.core.util.Sort
 import software.altitude.core.util.SortDirection
 import software.altitude.core.util.Util.getDuplicateExceptionOrSame
+
+import java.sql.SQLException
 
 object PersonService {
   val UNKNOWN_NAME_PREFIX = "Unknown"
@@ -73,8 +73,6 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
           throw ex
       }
 
-      app.service.fileStore.addFace(persistedFace.get)
-
       // First time? Add the face to the person as the cover
       if (person.numOfFaces == 0) {
         setFaceAsCover(person, persistedFace.get)
@@ -126,12 +124,11 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
     logger.info(s"Merging person ${source.name} into ${dest.name}")
 
     txManager.withTransaction[Person] {
-
       if (source.mergedWithIds.nonEmpty) {
 
         /**
          * If the source person was merged with other people before, follow that relation and update THAT source with current destination info. This way, when
-         * of of the old merge sources is pulled by label from cache, it will point directly to this new composite person.
+         * of the old merge sources is pulled by label from cache, it will point directly to this new composite person.
          */
         logger.info(s"Source person ${source.name} was merged with other people before. IDs: ${source.mergedWithIds}")
         logger.info("Updating the old merge sources with the new destination info")
@@ -147,7 +144,7 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
         }
       }
 
-      // update the destination with the source person's id (it's a list of ids at the destination)
+      // update the destination with the source person's id (it's a list of IDs at the destination)
       val persistedDest: Person = dao.getById(dest.persistedId)
       val persistedSource: Person = dao.getById(source.persistedId)
 
@@ -164,8 +161,17 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
       val allSourceFaces: List[Face] = faceDao.query(q).records.map(Face.fromJson(_))
       logger.info(s"Training the ${allSourceFaces.size} faces on the destination label ${dest.label}")
 
-      // train the faces on the destination label
-      app.service.faceRecognition.addFacesToPerson(allSourceFaces, persistedDest)
+      /**
+       * Train the faces on the destination label. We, however, do NOT have the training images stored in the database. We must pull the binary data from the
+       * file store and create a copy of the face objects.
+       */
+      val allSourceFacesWithImageData = allSourceFaces.map {
+        face =>
+          val alignedGreyscaleData = app.service.fileStore.getAlignedGreyscaleFaceById(face.persistedId)
+          face.copy(alignedImageGs = alignedGreyscaleData.data)
+      }
+
+      app.service.faceRecognition.addFacesToPerson(allSourceFacesWithImageData, persistedDest)
 
       faceDao.updateByQuery(q, Map(FieldConst.Face.PERSON_ID -> dest.persistedId))
 

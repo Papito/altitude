@@ -19,7 +19,7 @@ import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
 import software.altitude.core.util.SearchQuery
 import software.altitude.core.util.SearchResult
-import software.altitude.core.{Const => C, _}
+import software.altitude.core.{ Const => C, _ }
 
 import scala.concurrent.Await
 import scala.concurrent.Future

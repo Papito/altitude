@@ -2,9 +2,6 @@ package software.altitude.core.service
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
-import scala.collection.concurrent.TrieMap
-
 import software.altitude.core.Altitude
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.FaceDao
@@ -13,6 +10,8 @@ import software.altitude.core.models.Face
 import software.altitude.core.models.Person
 import software.altitude.core.models.Repository
 import software.altitude.core.transactions.TransactionManager
+
+import scala.collection.concurrent.TrieMap
 
 class FaceCacheService(app: Altitude) {
   final protected val logger: Logger = LoggerFactory.getLogger(getClass)
@@ -68,18 +67,15 @@ class FaceCacheService(app: Altitude) {
     val person = getRepositoryPersonCache(face.personLabel.get)
 
     /**
-     * Add the face and trim the number to top X faces - we don't need all of them. Note that we are not getting cute here with checking the list size or
-     * anything - the list is sorted by detection score, so it must be pruned AFTER the sort settles.
+     * Add the face and trim the number to top X faces - we don't need all of them. The faces are sorted by detection score automatically, so we can just take
+     * the top X.
      */
     val faces = person.getFaces
 
-    // Strip the binary data we don't need. We are just interested in the aligned greyscale image
-    val liteFace = face.copy(image = Array[Byte](0), alignedImage = Array[Byte](0), displayImage = Array[Byte](0))
-
-    faces.add(liteFace)
+    faces.add(face)
     person.setFaces(faces.take(FaceRecognitionService.MAX_COMPARISONS_PER_PERSON).toSeq)
 
-    // keep true to the actual number of faces
+    // record the latest number of faces for this person
     val updatedPerson = person.copy(numOfFaces = person.numOfFaces + 1)
     updatedPerson.setFaces(person.getFaces.toSeq)
     putPerson(updatedPerson)

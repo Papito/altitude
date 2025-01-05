@@ -1,37 +1,22 @@
 package software.altitude.core.dao.jdbc
 
 import com.typesafe.config.Config
-import java.sql.PreparedStatement
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-
 import software.altitude.core.FieldConst
 import software.altitude.core.RequestContext
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Face
 import software.altitude.core.models.Person
 import software.altitude.core.service.FaceRecognitionService
-import software.altitude.core.util.MurmurHash
+
+import java.sql.PreparedStatement
 
 abstract class FaceDao(override val config: Config) extends BaseDao with software.altitude.core.dao.FaceDao {
 
   final override val tableName = "face"
 
   override protected def makeModel(rec: Map[String, AnyRef]): JsObject = {
-    val liteModel = makeLiteModel(rec)
-
-    // the lite model, used for caching in memory, does not have image data by default
-    val model = liteModel ++ Json.obj(
-      FieldConst.Face.IMAGE -> rec(FieldConst.Face.IMAGE).asInstanceOf[Array[Byte]],
-      FieldConst.Face.DISPLAY_IMAGE -> rec(FieldConst.Face.DISPLAY_IMAGE).asInstanceOf[Array[Byte]],
-      FieldConst.Face.ALIGNED_IMAGE -> rec(FieldConst.Face.ALIGNED_IMAGE).asInstanceOf[Array[Byte]],
-      FieldConst.Face.ALIGNED_IMAGE_GS -> rec(FieldConst.Face.ALIGNED_IMAGE_GS).asInstanceOf[Array[Byte]]
-    )
-
-    model
-  }
-
-  private def makeLiteModel(rec: Map[String, AnyRef]): JsObject = {
     val embeddingsArray = getFloatListByJsonKey(rec(FieldConst.Face.EMBEDDINGS).asInstanceOf[String], FieldConst.Face.EMBEDDINGS)
     val featuresArray = getFloatListByJsonKey(rec(FieldConst.Face.FEATURES).asInstanceOf[String], FieldConst.Face.FEATURES)
 
@@ -50,10 +35,7 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
       detectionScore = rec(FieldConst.Face.DETECTION_SCORE).asInstanceOf[Double],
       embeddings = embeddingsArray.toArray,
       features = featuresArray.toArray,
-      image = new Array[Byte](0),
-      displayImage = new Array[Byte](0),
-      alignedImage = new Array[Byte](0),
-      alignedImageGs = new Array[Byte](0)
+      checksum = rec(FieldConst.Face.CHECKSUM).asInstanceOf[Int]
     )
 
     model
@@ -68,9 +50,8 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
       s"""
         INSERT INTO $tableName (${FieldConst.ID}, ${FieldConst.REPO_ID}, ${FieldConst.Face.X1}, ${FieldConst.Face.Y1}, ${FieldConst.Face.WIDTH}, ${FieldConst.Face.HEIGHT},
                                 ${FieldConst.Face.ASSET_ID}, ${FieldConst.Face.PERSON_ID}, ${FieldConst.Face.PERSON_LABEL}, ${FieldConst.Face.DETECTION_SCORE},
-                                ${FieldConst.Face.EMBEDDINGS}, ${FieldConst.Face.FEATURES}, ${FieldConst.Face.IMAGE}, ${FieldConst.Face.DISPLAY_IMAGE},
-                                ${FieldConst.Face.ALIGNED_IMAGE}, ${FieldConst.Face.ALIGNED_IMAGE_GS}, ${FieldConst.Face.CHECKSUM})
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                ${FieldConst.Face.EMBEDDINGS}, ${FieldConst.Face.FEATURES}, ${FieldConst.Face.CHECKSUM})
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
 
     val conn = RequestContext.getConn
@@ -92,8 +73,6 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
       FieldConst.Face.FEATURES -> Json.toJson(face.features)
     )
 
-    val checksum = MurmurHash.hash32(face.image)
-
     val preparedStatement: PreparedStatement = conn.prepareStatement(sql)
     preparedStatement.setString(1, id)
     preparedStatement.setString(2, RequestContext.getRepository.persistedId)
@@ -107,11 +86,7 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
     preparedStatement.setDouble(10, face.detectionScore)
     preparedStatement.setString(11, embeddingsArrayJson.toString())
     preparedStatement.setString(12, featuresArrayJson.toString())
-    preparedStatement.setBytes(13, face.image)
-    preparedStatement.setBytes(14, face.displayImage)
-    preparedStatement.setBytes(15, face.alignedImage)
-    preparedStatement.setBytes(16, face.alignedImageGs)
-    preparedStatement.setInt(17, checksum)
+    preparedStatement.setInt(13, face.checksum)
     preparedStatement.execute()
 
     jsonIn ++ Json.obj(
@@ -139,7 +114,8 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
       FieldConst.Face.PERSON_LABEL,
       FieldConst.Face.DETECTION_SCORE,
       FieldConst.Face.EMBEDDINGS,
-      FieldConst.Face.FEATURES
+      FieldConst.Face.FEATURES,
+      FieldConst.Face.CHECKSUM
     )
 
     val sql = s"""
@@ -158,6 +134,6 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
       sql,
       List(RequestContext.getRepository.persistedId, RequestContext.getRepository.persistedId, FaceRecognitionService.MAX_COMPARISONS_PER_PERSON))
 
-    recs.map(makeLiteModel)
+    recs.map(makeModel)
   }
 }

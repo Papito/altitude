@@ -9,6 +9,7 @@ import org.apache.pekko.actor.typed.scaladsl.ActorContext
 import org.apache.pekko.actor.typed.scaladsl.AskPattern.Askable
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.apache.pekko.util.Timeout
+import org.slf4j.Logger
 import software.altitude.core.actors.FaceRecManagerActor
 import software.altitude.core.actors.FaceRecManagerActor.Initialize
 import software.altitude.core.actors.ImportStatusWsActor
@@ -32,6 +33,7 @@ private class AltitudeActorSystem(context: ActorContext[AltitudeActorSystem.Comm
   implicit val timeout: Timeout = 3.seconds
   implicit val scheduler: Scheduler = context.system.scheduler
   implicit val ec: ExecutionContext = context.executionContext
+  val logger: Logger = context.log
 
   /** Route messages to the appropriate actors and actor managers */
   override def onMessage(msg: AltitudeActorSystem.Command): Behavior[AltitudeActorSystem.Command] = {
@@ -45,7 +47,7 @@ private class AltitudeActorSystem(context: ActorContext[AltitudeActorSystem.Comm
           .ask(FaceRecManagerActor.Initialize(command.repositoryId, _))
           .onComplete {
             case Success(response) => command.replyTo ! response
-            case Failure(exception) => context.log.error("Failed to initialize face rec model actor", exception)
+            case Failure(exception) => logger.error("Failed to initialize face rec model actor", exception)
           }(ec)
         Behaviors.same
 
@@ -54,12 +56,18 @@ private class AltitudeActorSystem(context: ActorContext[AltitudeActorSystem.Comm
           .ask(FaceRecManagerActor.AddFace(command.repositoryId, command.face, command.personLabel, _))
           .onComplete {
             case Success(response) => command.replyTo ! response
-            case Failure(exception) => context.log.error("Failed to add a face", exception)
+            case Failure(exception) => logger.error("Failed to add a face", exception)
           }(ec)
         Behaviors.same
 
       case command: FaceRecManagerActor.AddFaceAsync =>
-        faceRecManagerActor.ask(FaceRecManagerActor.AddFace(command.repositoryId, command.face, command.personLabel, _))
+        faceRecManagerActor
+          .ask(FaceRecManagerActor.AddFace(command.repositoryId, command.face, command.personLabel, _))
+          .onComplete {
+            case Success(_) => logger.info(s"Added face ${command.face.persistedId}")
+            case Failure(exception) => logger.error("Failed to add a face", exception)
+          }(ec)
+
         Behaviors.same
 
       case command: FaceRecManagerActor.Predict =>
@@ -67,7 +75,7 @@ private class AltitudeActorSystem(context: ActorContext[AltitudeActorSystem.Comm
           .ask(FaceRecManagerActor.Predict(command.repositoryId, command.face, _))
           .onComplete {
             case Success(response) => command.replyTo ! response
-            case Failure(exception) => context.log.error("Failed to run face ec", exception)
+            case Failure(exception) => logger.error("Failed to run face ec", exception)
           }(ec)
         Behaviors.same
 
@@ -76,7 +84,7 @@ private class AltitudeActorSystem(context: ActorContext[AltitudeActorSystem.Comm
           .ask(FaceRecManagerActor.GetModelSize(command.repositoryId, _))
           .onComplete {
             case Success(response) => command.replyTo ! response
-            case Failure(exception) => context.log.error("Failed to get model size", exception)
+            case Failure(exception) => logger.error("Failed to get model size", exception)
           }(ec)
         Behaviors.same
 
@@ -85,7 +93,7 @@ private class AltitudeActorSystem(context: ActorContext[AltitudeActorSystem.Comm
           .ask(FaceRecManagerActor.GetModelLabels(command.repositoryId, _))
           .onComplete {
             case Success(response) => command.replyTo ! response
-            case Failure(exception) => context.log.error("Failed to get model labels", exception)
+            case Failure(exception) => logger.error("Failed to get model labels", exception)
           }(ec)
         Behaviors.same
 
@@ -96,9 +104,9 @@ private class AltitudeActorSystem(context: ActorContext[AltitudeActorSystem.Comm
 
   override def onSignal: PartialFunction[Signal, Behavior[AltitudeActorSystem.Command]] = {
     case PostStop =>
-      context.log.info("Actor system stopped")
+      logger.info("Actor system stopped")
       this
   }
 
-  context.log.info("Actor system started")
+  logger.info("Actor system started")
 }

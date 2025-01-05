@@ -7,6 +7,7 @@ import software.altitude.core.models.Asset
 import software.altitude.core.models.AssetType
 import software.altitude.core.models.AssetWithData
 import software.altitude.core.models.Face
+import software.altitude.core.models.FaceImages
 import software.altitude.core.models.Folder
 import software.altitude.core.models.Person
 import software.altitude.core.models.Repository
@@ -168,6 +169,8 @@ class TestContext(val testApp: Altitude) {
   def addTestFaces(person: Person, count: Int = 1): Unit = {
     require(person.id.nonEmpty, "Person must have an ID for a mock face to be added")
 
+    val randomGrImage = generateRandomImagBytesGray()
+
     for (idx <- 1 to count) {
       val asset: Asset = persistAsset()
       val face = Face(id=Some(Util.randomStr(32)),
@@ -177,16 +180,22 @@ class TestContext(val testApp: Altitude) {
         height = Random.nextInt(100) + 1,
         assetId = Some(asset.persistedId),
         personId = Some(person.persistedId),
-        personLabel=Some(idx),
+        personLabel = Some(idx),
         detectionScore = Random.nextDouble(),
         embeddings = Array.fill(128) { Random.nextFloat() },
         features = Array.fill(128) { Random.nextFloat() },
-        image = generateRandomImagBytesBgr(),
-        displayImage = generateRandomImagBytesBgr(),
-        alignedImage = generateRandomImagBytesBgr(),
-        alignedImageGs = generateRandomImagBytesGray())
+        checksum = Random.nextInt(),
+        alignedImageGs = randomGrImage)
 
-      testApp.service.person.addFace(face, asset, person)
+      val persistedFace = testApp.service.person.addFace(face, asset, person)
+
+      val faceImages = FaceImages(
+        image = generateRandomImagBytesBgr(),
+        alignedImageGs = randomGrImage,
+        alignedImage = generateRandomImagBytesBgr(),
+        displayImage = generateRandomImagBytesBgr()
+      )
+      testApp.service.fileStore.addFace(persistedFace, faceImages)
     }
   }
 

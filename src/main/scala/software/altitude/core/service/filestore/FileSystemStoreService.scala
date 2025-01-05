@@ -1,21 +1,22 @@
 package software.altitude.core.service.filestore
 
-import java.io._
-import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.FileUtils
+import org.apache.commons.io.FilenameUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
-import software.altitude.core.{Const => C}
 import software.altitude.core.Altitude
 import software.altitude.core.NotFoundException
 import software.altitude.core.RequestContext
 import software.altitude.core.StorageException
 import software.altitude.core.models.AssetWithData
 import software.altitude.core.models.Face
+import software.altitude.core.models.FaceImages
 import software.altitude.core.models.MimedAssetData
 import software.altitude.core.models.MimedFaceData
 import software.altitude.core.models.MimedPreviewData
+import software.altitude.core.{ Const => C }
+
+import java.io._
 
 class FileSystemStoreService(app: Altitude) extends FileStoreService {
   final protected val logger: Logger = LoggerFactory.getLogger(getClass)
@@ -114,23 +115,31 @@ class FileSystemStoreService(app: Altitude) extends FileStoreService {
     FilenameUtils.concat(partitionedFacesPath, s"$faceId-detected.png")
   }
 
+  private def alignedFacePath(faceId: String): String = {
+    val facesPath = FilenameUtils.concat(repositoryDataPath, C.DataStore.FACES)
+    val partitionedFacesPath = FilenameUtils.concat(facesPath, faceId.substring(0, 2))
+    FilenameUtils.concat(partitionedFacesPath, s"$faceId-aligned.png")
+  }
+
   private def alignedGreyscaleFacePath(faceId: String): String = {
     val facesPath = FilenameUtils.concat(repositoryDataPath, C.DataStore.FACES)
     val partitionedFacesPath = FilenameUtils.concat(facesPath, faceId.substring(0, 2))
     FilenameUtils.concat(partitionedFacesPath, s"$faceId-aligned-gs.png")
   }
 
-  override def addFace(face: Face): Unit = {
+  override def addFace(face: Face, faceImages: FaceImages): Unit = {
     logger.debug(s"Creating face [${face.persistedId}] on file system")
 
     val destDisplayFile = new File(displayFacePath(face.persistedId))
     val detectedFaceFile = new File(detectedFacePath(face.persistedId))
     val alignedGreyscaleFile = new File(alignedGreyscaleFacePath(face.persistedId))
+    val alignedFile = new File(alignedFacePath(face.persistedId))
 
     try {
-      FileUtils.writeByteArrayToFile(destDisplayFile, face.displayImage)
-      FileUtils.writeByteArrayToFile(detectedFaceFile, face.image)
-      FileUtils.writeByteArrayToFile(alignedGreyscaleFile, face.alignedImageGs)
+      FileUtils.writeByteArrayToFile(destDisplayFile, faceImages.displayImage)
+      FileUtils.writeByteArrayToFile(detectedFaceFile, faceImages.image)
+      FileUtils.writeByteArrayToFile(alignedFile, faceImages.alignedImage)
+      FileUtils.writeByteArrayToFile(alignedGreyscaleFile, faceImages.alignedImageGs)
     } catch {
       case ex: IOException =>
         throw StorageException(s"Error creating [$face] @ [$destDisplayFile]: $ex]")
