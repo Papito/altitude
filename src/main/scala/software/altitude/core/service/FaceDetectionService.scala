@@ -81,13 +81,11 @@ object FaceDetectionService {
 class FaceDetectionService(app: Altitude) {
 
   /**
-   * As if the fact that OpenCV for Java has two competing APIs wasn't confusing enough (org.opencv, org.bytedeco), every example
+   * OpenCV for Java has two competing APIs, which is confusing enough (org.opencv, org.bytedeco), every example
    * under the sun directs to do this in order to have native lib linking errors go away:
    * System.loadLibrary(Core.NATIVE_LIBRARY_NAME)
    *
-   * But it doesn't work. While we use the org.opencv API, the native lib is loaded by the org.bytedeco API.
-   *
-   * If it works, it works. I give up.
+   * But it doesn't work here. While we are using the org.opencv API, the native lib is loaded by the org.bytedeco API.
    *
    * https://stackoverflow.com/a/58064096/53687
    */
@@ -327,10 +325,10 @@ class FaceDetectionService(app: Altitude) {
   }
 
   def getHistEqualizedGrayScImage(cropAlignedFace: Mat): Mat = {
-    val greyAlignedImage = new Mat()
-    Imgproc.cvtColor(cropAlignedFace, greyAlignedImage, Imgproc.COLOR_BGR2GRAY)
-    Imgproc.equalizeHist(greyAlignedImage, greyAlignedImage)
-    greyAlignedImage
+    val grayAlignedImage = new Mat()
+    Imgproc.cvtColor(cropAlignedFace, grayAlignedImage, Imgproc.COLOR_BGR2GRAY)
+    Imgproc.equalizeHist(grayAlignedImage, grayAlignedImage)
+    grayAlignedImage
   }
 
   private def getAlignedFaceBlob(image: Mat): Mat = {
@@ -341,6 +339,7 @@ class FaceDetectionService(app: Altitude) {
   }
 
   def isFaceSimilar(image1: Mat, image2: Mat, detectMat1: Mat, detectMat2: Mat): Boolean = {
+    // DEBUGGING:
     // val face1Rect = faceDetectToRect(detectMat1)
     // val face2Rect = faceDetectToRect(detectMat2)
     // writeDebugOpenCvMat(image1.submat(face1Rect), "face1-1.jpg")
@@ -349,6 +348,7 @@ class FaceDetectionService(app: Altitude) {
     val alignedFace1 = alignCropFaceFromDetection(image1, detectMat1)
     val alignedFace2 = alignCropFaceFromDetection(image2, detectMat2)
 
+    // DEBUGGING:
     // writeDebugOpenCvMat(alignedFace1, "face1-2.jpg")
     // writeDebugOpenCvMat(alignedFace2, "face2-2.jpg")
 
