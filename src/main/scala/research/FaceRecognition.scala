@@ -1,21 +1,20 @@
 package research
 
-import java.io.File
-import java.util
-import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.FileUtils
+import org.apache.commons.io.FilenameUtils
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.face.LBPHFaceRecognizer
 import org.opencv.imgcodecs.Imgcodecs
-
-import scala.collection.mutable
-import scala.util.control.Breaks.break
-import scala.util.control.Breaks.breakable
-
 import software.altitude.core.service.FaceDetectionService
 import software.altitude.core.service.FaceRecognitionService
 import software.altitude.core.util.ImageUtil.matFromBytes
+
+import java.io.File
+import java.util
+import scala.collection.mutable
+import scala.util.control.Breaks.break
+import scala.util.control.Breaks.breakable
 
 class Face(
     val path: String,
@@ -36,8 +35,8 @@ class Face(
 object PersonFace {
 
   /**
-   * Automatically sort a person's faces by detection score, best score on top, so when we compare people, we compare the "best" faces first, hopefully knowing
-   * one way or the other quickly.
+   * Automatically sort a person's faces by detection score, best score on top, so when we compare people, we compare the "best"
+   * faces first, hopefully knowing one way or the other quickly.
    */
   implicit val faceOrdering: Ordering[PersonFace] = Ordering.by(-_.face.detectionScore)
 }
@@ -181,7 +180,8 @@ object FaceRecognition extends SandboxApp {
 
         if (personMlMatch.isDefined) {
           val simScore =
-            altitude.service.faceDetection.getFeatureSimilarityScore(thisFace.features, personMlMatch.get.allFaces().head.face.features)
+            altitude.service.faceDetection
+              .getFeatureSimilarityScore(thisFace.features, personMlMatch.get.allFaces().head.face.features)
           println("Similarity score: " + simScore)
 
           if (simScore >= FaceRecognitionService.PESSIMISTIC_COSINE_DISTANCE_THRESHOLD) {
@@ -247,8 +247,10 @@ object FaceRecognition extends SandboxApp {
         val faceScores: List[(Double, PersonFace)] = bestFaces.map {
           bestFace =>
             comparisonOpCount += 1
-            println(s"Comparing ${thisFace.name} Q:${thisFace.detectionScore} with ${bestFace.face.name} Q:${bestFace.face.detectionScore}")
-            val similarityScore = altitude.service.faceDetection.getFeatureSimilarityScore(thisFace.features, bestFace.face.features)
+            println(
+              s"Comparing ${thisFace.name} Q:${thisFace.detectionScore} with ${bestFace.face.name} Q:${bestFace.face.detectionScore}")
+            val similarityScore =
+              altitude.service.faceDetection.getFeatureSimilarityScore(thisFace.features, bestFace.face.features)
             println(" -> " + similarityScore)
             (similarityScore, bestFace)
         }

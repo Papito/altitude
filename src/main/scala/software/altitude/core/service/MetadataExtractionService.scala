@@ -52,7 +52,10 @@ class MetadataExtractionService {
       val tikaMediaType: TikaMediaType = detector.detect(inputStream.get, metadata)
 
       val assetType =
-        AssetType(mediaType = tikaMediaType.getType, mediaSubtype = tikaMediaType.getSubtype, mime = tikaMediaType.getBaseType.toString)
+        AssetType(
+          mediaType = tikaMediaType.getType,
+          mediaSubtype = tikaMediaType.getSubtype,
+          mime = tikaMediaType.getBaseType.toString)
 
       assetType
     } finally {

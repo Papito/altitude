@@ -25,13 +25,13 @@ object FaceRecognitionService {
   val RESERVED_LABEL_COUNT = 10
 
   /**
-   * If there is no machine learning model verified hit, we cycle through all people in the database, but only doing the matching on THIS many best face
-   * detections that we have (1 to X)
+   * If there is no machine learning model verified hit, we cycle through all people in the database, but only doing the matching
+   * on THIS many best face detections that we have (1 to X)
    *
    * Higher number means more matches will be found, at the cost of performance.
    *
-   * Lower number means faster matching but the same person may be detected as new. Technically, just 1 "top" face will work, and the accuracy benefits get
-   * diminished the higher we go
+   * Lower number means faster matching but the same person may be detected as new. Technically, just 1 "top" face will work, and
+   * the accuracy benefits get diminished the higher we go
    */
   val MAX_COMPARISONS_PER_PERSON = 12
 
@@ -46,7 +46,8 @@ class FaceRecognitionService(val app: Altitude) {
   implicit val scheduler: Scheduler = app.actorSystem.scheduler
 
   def initialize(repositoryId: String): Unit = {
-    val result: Future[AltitudeActorSystem.EmptyResponse] = app.actorSystem.ask(ref => FaceRecManagerActor.Initialize(repositoryId, ref))
+    val result: Future[AltitudeActorSystem.EmptyResponse] =
+      app.actorSystem.ask(ref => FaceRecManagerActor.Initialize(repositoryId, ref))
     Await.result(result, timeout.duration)
   }
 
@@ -73,13 +74,15 @@ class FaceRecognitionService(val app: Altitude) {
   /**
    * Returns an existing OR a new person, already persisted in the database.
    *
-   * The person/faces are also added to the cache for this repository, as we may need to brute-force search for the person's face in the future.
+   * The person/faces are also added to the cache for this repository, as we may need to brute-force search for the person's face
+   * in the future.
    */
   def recognizeFace(detectedFace: Face, asset: Asset): Person = {
     require(detectedFace.id.isEmpty, "Face object must not be persisted yet")
     require(detectedFace.personId.isEmpty, "Face object must not be associated with a person yet")
 
-    val result: Future[FacePrediction] = app.actorSystem.ask(ref => FaceRecManagerActor.Predict(RequestContext.getRepository.persistedId, detectedFace, ref))
+    val result: Future[FacePrediction] =
+      app.actorSystem.ask(ref => FaceRecManagerActor.Predict(RequestContext.getRepository.persistedId, detectedFace, ref))
     val predLabel = Await.result(result, timeout.duration).label
 
     val personMlMatch: Option[Person] = app.service.faceCache.getPersonByLabel(predLabel)
@@ -89,7 +92,8 @@ class FaceRecognitionService(val app: Altitude) {
      *
      * This is called a "verified" match.
      *
-     * We do NOT trust the ML model confidence score, as it will always return the closest "match", and the meaning of the score is relative.
+     * We do NOT trust the ML model confidence score, as it will always return the closest "match", and the meaning of the score
+     * is relative.
      */
     if (personMlMatch.isDefined) {
       logger.debug(f"Comparing ML match ${personMlMatch.get.persistedId})")
@@ -131,14 +135,15 @@ class FaceRecognitionService(val app: Altitude) {
 
   private def getBestFaceMatch(thisFace: Face): Option[Face] = {
     logger.debug(s"Comparing $thisFace: ")
-    val faceSimilarityScores: List[(Double, Face)] = app.service.faceCache.getAll.flatMap {
+    val faceSimilarityScores: List[(Double, Face)] = app.service.faceCache.getAllMatchable.flatMap {
       person =>
         logger.debug(s"Comparing faces for person ${person.name.get}")
         // these are already sorted by detection score, best first
         val bestFaces = person.getFaces.toList.take(FaceRecognitionService.MAX_COMPARISONS_PER_PERSON)
         val faceScores: List[(Double, Face)] = bestFaces.map {
           personFace =>
-            val similarityScore = app.service.faceDetection.getFeatureSimilarityScore(thisFace.featuresMat, personFace.featuresMat)
+            val similarityScore =
+              app.service.faceDetection.getFeatureSimilarityScore(thisFace.featuresMat, personFace.featuresMat)
             logger.debug(s"Comparing with $personFace -> " + similarityScore)
             (similarityScore, personFace)
         }

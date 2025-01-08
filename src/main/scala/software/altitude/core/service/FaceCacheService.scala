@@ -67,8 +67,8 @@ class FaceCacheService(app: Altitude) {
     val person = getRepositoryPersonCache(face.personLabel.get)
 
     /**
-     * Add the face and trim the number to top X faces - we don't need all of them. The faces are sorted by detection score automatically, so we can just take
-     * the top X.
+     * Add the face and trim the number to top X faces - we don't need all of them. The faces are sorted by detection score
+     * automatically, so we can just take the top X.
      */
     val faces = person.getFaces
 
@@ -88,7 +88,16 @@ class FaceCacheService(app: Altitude) {
 
   def size(): Int = getRepositoryPersonCache.keys.size
 
+  /** This should only be used for debugging and testing */
   def getAll: List[Person] = getRepositoryPersonCache.values.toList
+
+  /**
+   * In "dirty" (post-startup-load) cache state, we need to filter out the people that have been merged from. These will be gone
+   * on the next cache load as the model will be retrained and the old labels purged.
+   *
+   * This is the method that should always be used for face rec.
+   */
+  def getAllMatchable: List[Person] = getRepositoryPersonCache.values.toList.filterNot(_.wasMergedFrom)
 
   def clear(): Unit = getRepositoryPersonCache.clear()
 

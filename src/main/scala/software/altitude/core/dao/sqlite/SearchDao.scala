@@ -2,7 +2,6 @@ package software.altitude.core.dao.sqlite
 
 import com.typesafe.config.Config
 import org.apache.commons.dbutils.QueryRunner
-
 import software.altitude.core.FieldConst
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.jdbc.BaseDao
@@ -71,6 +70,11 @@ class SearchDao(override val config: Config) extends software.altitude.core.dao.
       logger.debug(recs.map(_.toString()).mkString("\n"))
     }
 
-    SearchResult(records = recs.map(makeModel), total = total, rpp = searchQuery.rpp, page = searchQuery.page, sort = searchQuery.searchSort)
+    SearchResult(
+      records = recs.map(makeModel),
+      total = total,
+      rpp = searchQuery.rpp,
+      page = searchQuery.page,
+      sort = searchQuery.searchSort)
   }
 }

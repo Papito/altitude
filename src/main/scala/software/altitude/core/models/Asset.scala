@@ -1,16 +1,16 @@
 package software.altitude.core.models
 
-import java.time.LocalDateTime
-import play.api.libs.json._
 import play.api.libs.json.JsonNaming.SnakeCase
+import play.api.libs.json._
 
+import java.time.LocalDateTime
 import scala.language.implicitConversions
 
 /**
  * All asset-related metadata.
  *
- * Since we do not store actual binary data in a DB, the data itself is only passed via AssetWithData. This [underlying] class is for passing around asset
- * metadata.
+ * Since we do not store actual binary data in a DB, the data itself is only passed via AssetWithData. This [underlying] class is
+ * for passing around asset metadata.
  */
 object Asset {
   implicit val config: JsonConfiguration = JsonConfiguration(SnakeCase)

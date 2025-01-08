@@ -2,7 +2,6 @@ package software.altitude.core.util
 
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-
 import software.altitude.core.Api
 import software.altitude.core.models.UserMetadataField
 
@@ -35,5 +34,11 @@ class SearchQuery(
   override val isSorted: Boolean = searchSort.nonEmpty
 
   override def add(_params: (String, Any)*): SearchQuery =
-    new SearchQuery(text = text, folderIds = folderIds, params = params ++ _params, rpp = rpp, page = page, searchSort = searchSort)
+    new SearchQuery(
+      text = text,
+      folderIds = folderIds,
+      params = params ++ _params,
+      rpp = rpp,
+      page = page,
+      searchSort = searchSort)
 }

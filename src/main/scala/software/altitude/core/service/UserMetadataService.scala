@@ -324,7 +324,8 @@ class UserMetadataService(val app: Altitude) {
   }
 
   /**
-   * Makes sure the metadata fields are configured in this system after common-sense data hygiene. Validates correct type for anything
+   * Makes sure the metadata fields are configured in this system after common-sense data hygiene. Validates correct type for
+   * anything
    *
    * @return
    *   clean, de-duplicated copy of the metadata
@@ -336,8 +337,8 @@ class UserMetadataService(val app: Altitude) {
   }
 
   /**
-   * Presentation-level JSON transformer for metadata. This augments the limiting metadata JSON object to supply the names of fields, pulled from field
-   * configuration that the Metadata domain object is not aware of.
+   * Presentation-level JSON transformer for metadata. This augments the limiting metadata JSON object to supply the names of
+   * fields, pulled from field configuration that the Metadata domain object is not aware of.
    *
    * On the way in we get: { field id -> values field id -> values }
    *

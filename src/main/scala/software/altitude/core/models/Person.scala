@@ -1,7 +1,7 @@
 package software.altitude.core.models
 
-import play.api.libs.json._
 import play.api.libs.json.JsonNaming.SnakeCase
+import play.api.libs.json._
 
 import scala.collection.mutable
 import scala.language.implicitConversions
@@ -48,7 +48,7 @@ case class Person(
   def getFaces: mutable.TreeSet[Face] = {
     // we do not get faces for a person automatically, but "numOfFaces" reflects the actual number in DB
     if (numOfFaces > 0 && _faces.isEmpty) {
-      throw new IllegalStateException("Faces have not been loaded for this person.")
+      throw new IllegalStateException(s"Faces have not been loaded for person $this")
     }
 
     _faces

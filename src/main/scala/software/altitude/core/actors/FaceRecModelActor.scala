@@ -30,7 +30,8 @@ object FaceRecModelActor {
   def apply(): Behavior[Command] = Behaviors.setup(context => new FaceRecModelActor(context))
 }
 
-class FaceRecModelActor(context: ActorContext[FaceRecModelActor.Command]) extends AbstractBehavior[FaceRecModelActor.Command](context) {
+class FaceRecModelActor(context: ActorContext[FaceRecModelActor.Command])
+  extends AbstractBehavior[FaceRecModelActor.Command](context) {
   import FaceRecModelActor._
 
   val recognizer: LBPHFaceRecognizer = LBPHFaceRecognizer.create()

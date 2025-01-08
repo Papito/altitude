@@ -26,10 +26,9 @@ Regard this code as for reference use only in the meantime.
 package software.altitude.core.models
 
 import play.api.libs.json._
+import software.altitude.core.dao.jdbc.BaseDao
 
 import scala.language.implicitConversions
-
-import software.altitude.core.dao.jdbc.BaseDao
 
 object UserMetadata {
   implicit val reads: Reads[UserMetadata] = (json: JsValue) => {
@@ -53,8 +52,8 @@ object UserMetadata {
   implicit def fromJson(json: JsValue): UserMetadata = Json.fromJson[UserMetadata](json).get
 
   /**
-   * Adapter to easily set metadata from a set of plain strings. Note: dummy implicit is added to prevent compiler from complaining about double definition due
-   * to type erasure
+   * Adapter to easily set metadata from a set of plain strings. Note: dummy implicit is added to prevent compiler from
+   * complaining about double definition due to type erasure
    */
   def apply(data: Map[String, Set[String]])(implicit d: DummyImplicit): UserMetadata = {
     val convertedData: Map[String, Set[UserMetadataValue]] = data.foldLeft(Map[String, Set[UserMetadataValue]]()) {

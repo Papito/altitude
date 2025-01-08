@@ -38,13 +38,15 @@ class Altitude(val dbEngineOverride: Option[String] = None) {
    *
    * Production JAR defaults to SQLITE and can be overridden by application.conf.
    *
-   * ENV var overrides are a Typesafe Config feature: https://github.com/lightbend/config?tab=readme-ov-file#optional-system-or-env-variable-overrides
+   * ENV var overrides are a Typesafe Config feature:
+   * https://github.com/lightbend/config?tab=readme-ov-file#optional-system-or-env-variable-overrides
    *
    * In short: FORCE_CONFIG_db_engine=mongo will override db.engine=mysql in the config. This is only for tests,
    *
    * Default reference configs are in src/main/resources/reference.conf and src/test/resources/reference.conf
    *
-   * For DEV and PROD, application*.conf files have the final say - and are in the root of the project (and along the live JAR in release)
+   * For DEV and PROD, application*.conf files have the final say - and are in the root of the project (and along the live JAR in
+   * release)
    */
 
   // the config before final actual config as we need to dynamically figure out some values
@@ -106,8 +108,8 @@ class Altitude(val dbEngineOverride: Option[String] = None) {
   }
 
   /**
-   * Has the first admin user been created? This flag is loaded from the system metadata table upon start and then cached for the lifetime of the application
-   * instance.
+   * Has the first admin user been created? This flag is loaded from the system metadata table upon start and then cached for the
+   * lifetime of the application instance.
    *
    * This is to avoid getting the value from the database every time we need it.
    *
@@ -126,8 +128,8 @@ class Altitude(val dbEngineOverride: Option[String] = None) {
   final val txManager: TransactionManager = new software.altitude.core.transactions.TransactionManager(app.config)
 
   /**
-   * Scentry strategies differ from environment to environment. Production strategy is different from development and test. In dev, since the cookie store is
-   * cleared on every hot reload, logging in every time is a pain.
+   * Scentry strategies differ from environment to environment. Production strategy is different from development and test. In
+   * dev, since the cookie store is cleared on every hot reload, logging in every time is a pain.
    */
   val scentryStrategies: List[(String, Class[_ <: ScentryStrategy[User]])] = Environment.CURRENT match {
     case Environment.Name.PROD =>

@@ -1,18 +1,12 @@
 package software.altitude.core.dao.jdbc
 
 import com.typesafe.config.Config
-import java.time.LocalDateTime
-import java.util.UUID
 import org.apache.commons.dbutils.QueryRunner
 import org.apache.commons.dbutils.handlers.MapListHandler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import play.api.libs.json._
 import play.api.libs.json.JsValue.jsValueToJsLookup
-
-import scala.jdk.CollectionConverters._
-import scala.reflect.ClassTag
-
+import play.api.libs.json._
 import software.altitude.core.ConstraintException
 import software.altitude.core.FieldConst
 import software.altitude.core.NotFoundException
@@ -22,6 +16,11 @@ import software.altitude.core.dao.jdbc.querybuilder.SqlQueryBuilder
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.Query
 import software.altitude.core.util.QueryResult
+
+import java.time.LocalDateTime
+import java.util.UUID
+import scala.jdk.CollectionConverters._
+import scala.reflect.ClassTag
 
 object BaseDao {
   final def genId: String = UUID.randomUUID.toString
@@ -153,7 +152,8 @@ abstract class BaseDao {
 
     logger.debug(s"SELECT SQL: $sql with values: $values")
 
-    val res = queryRunner.query(RequestContext.getConn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]): _*).asScala.toList
+    val res =
+      queryRunner.query(RequestContext.getConn, sql, new MapListHandler(), values.map(_.asInstanceOf[Object]): _*).asScala.toList
 
     res.map(_.asScala.toMap[String, AnyRef])
   }
@@ -176,7 +176,8 @@ abstract class BaseDao {
 
     val runner: QueryRunner = new QueryRunner()
 
-    val res = runner.query(RequestContext.getConn, sqlQuery.sqlAsString, new MapListHandler(), sqlQuery.bindValues: _*).asScala.toList
+    val res =
+      runner.query(RequestContext.getConn, sqlQuery.sqlAsString, new MapListHandler(), sqlQuery.bindValues: _*).asScala.toList
 
     logger.debug(s"Found ${res.length} records")
     val recs = res.map(_.asScala.toMap[String, AnyRef])
@@ -238,8 +239,9 @@ abstract class BaseDao {
   }
 
   /**
-   * Implementations should define this method, which returns an optional JSON object which is guaranteed to serialize into a valid model backing this class.
-   * JSON can be constructed directly, but best to create a model instance first and return it, triggering implicit conversion.
+   * Implementations should define this method, which returns an optional JSON object which is guaranteed to serialize into a
+   * valid model backing this class. JSON can be constructed directly, but best to create a model instance first and return it,
+   * triggering implicit conversion.
    */
   protected def makeModel(rec: Map[String, AnyRef]): JsObject
 

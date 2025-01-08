@@ -21,25 +21,42 @@ import scala.util.Failure
 import scala.util.Success
 
 /**
- * This manager maintains references to all face recognition model actors. Each actor is responsible for a single face recognition model (per repository).
+ * This manager maintains references to all face recognition model actors. Each actor is responsible for a single face recognition
+ * model (per repository).
  *
- * The manager routes messages to the appropriate model actor, thus serializing access to the otherwise non-thread-safe OpenCV models.
+ * The manager routes messages to the appropriate model actor, thus serializing access to the otherwise non-thread-safe OpenCV
+ * models.
  */
 object FaceRecManagerActor {
   sealed trait Command
-  final case class AddFace(repositoryId: String, face: Face, personLabel: Int, replyTo: ActorRef[AltitudeActorSystem.EmptyResponse])
+  final case class AddFace(
+      repositoryId: String,
+      face: Face,
+      personLabel: Int,
+      replyTo: ActorRef[AltitudeActorSystem.EmptyResponse])
     extends AltitudeActorSystem.Command
     with Command
-  final case class AddFaceAsync(repositoryId: String, face: Face, personLabel: Int) extends AltitudeActorSystem.Command with Command
-  final case class Initialize(repositoryId: String, replyTo: ActorRef[AltitudeActorSystem.EmptyResponse]) extends AltitudeActorSystem.Command with Command
-  final case class Predict(repositoryId: String, face: Face, replyTo: ActorRef[FacePrediction]) extends AltitudeActorSystem.Command with Command
-  final case class GetModelSize(repositoryId: String, replyTo: ActorRef[ModelSize]) extends AltitudeActorSystem.Command with Command
-  final case class GetModelLabels(repositoryId: String, replyTo: ActorRef[ModelLabels]) extends AltitudeActorSystem.Command with Command
+  final case class AddFaceAsync(repositoryId: String, face: Face, personLabel: Int)
+    extends AltitudeActorSystem.Command
+    with Command
+  final case class Initialize(repositoryId: String, replyTo: ActorRef[AltitudeActorSystem.EmptyResponse])
+    extends AltitudeActorSystem.Command
+    with Command
+  final case class Predict(repositoryId: String, face: Face, replyTo: ActorRef[FacePrediction])
+    extends AltitudeActorSystem.Command
+    with Command
+  final case class GetModelSize(repositoryId: String, replyTo: ActorRef[ModelSize])
+    extends AltitudeActorSystem.Command
+    with Command
+  final case class GetModelLabels(repositoryId: String, replyTo: ActorRef[ModelLabels])
+    extends AltitudeActorSystem.Command
+    with Command
 
   def apply(): Behavior[Command] = Behaviors.setup(context => new FaceRecManagerActor(context))
 }
 
-class FaceRecManagerActor(context: ActorContext[FaceRecManagerActor.Command]) extends AbstractBehavior[FaceRecManagerActor.Command](context) {
+class FaceRecManagerActor(context: ActorContext[FaceRecManagerActor.Command])
+  extends AbstractBehavior[FaceRecManagerActor.Command](context) {
   import FaceRecManagerActor._
 
   private var modelActors = Map.empty[String, ActorRef[FaceRecModelActor.Command]]
@@ -52,7 +69,8 @@ class FaceRecManagerActor(context: ActorContext[FaceRecManagerActor.Command]) ex
   override def onMessage(msg: Command): Behavior[Command] = {
     msg match {
       case Initialize(repositoryId, replyTo) =>
-        val modelActor = modelActors.getOrElse(repositoryId, context.spawn(FaceRecModelActor(), s"faceRecModelActor-$repositoryId"))
+        val modelActor =
+          modelActors.getOrElse(repositoryId, context.spawn(FaceRecModelActor(), s"faceRecModelActor-$repositoryId"))
         modelActors += (repositoryId -> modelActor)
 
         modelActor

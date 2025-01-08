@@ -81,6 +81,8 @@ class BaseApiController extends BaseController {
       val strStacktrace = Util.logStacktrace(ex)
 
       InternalServerError(
-        Json.obj(Api.Field.ERROR -> (if (ex.getMessage != null) ex.getMessage else ex.getClass.getName), Api.Field.STACKTRACE -> strStacktrace))
+        Json.obj(
+          Api.Field.ERROR -> (if (ex.getMessage != null) ex.getMessage else ex.getClass.getName),
+          Api.Field.STACKTRACE -> strStacktrace))
   }
 }

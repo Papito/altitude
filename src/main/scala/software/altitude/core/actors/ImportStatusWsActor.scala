@@ -6,19 +6,20 @@ import org.apache.pekko.actor.typed.scaladsl.ActorContext
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.scalatra.atmosphere.AtmosphereClient
 import org.scalatra.atmosphere.TextMessage
-
-import scala.concurrent.ExecutionContext.Implicits.global
-
 import software.altitude.core.AltitudeActorSystem
 import software.altitude.core.DuplicateException
 import software.altitude.core.StorageException
 import software.altitude.core.UnsupportedMediaTypeException
 import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalid
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 object ImportStatusWsActor {
   sealed trait Command
   final case class AddClient(userId: String, client: AtmosphereClient) extends AltitudeActorSystem.Command with Command
-  final case class UserWideImportStatus(userId: String, assetOrInvalid: TAssetOrInvalid) extends AltitudeActorSystem.Command with Command
+  final case class UserWideImportStatus(userId: String, assetOrInvalid: TAssetOrInvalid)
+    extends AltitudeActorSystem.Command
+    with Command
   final case class RemoveClient(userId: String, client: AtmosphereClient) extends AltitudeActorSystem.Command with Command
 
   private val successStatusTickerTemplate = "<div id=\"statusText\">%s</div>"
@@ -28,7 +29,8 @@ object ImportStatusWsActor {
   def apply(): Behavior[Command] = Behaviors.setup(context => new ImportStatusWsActor(context))
 }
 
-class ImportStatusWsActor(context: ActorContext[ImportStatusWsActor.Command]) extends AbstractBehavior[ImportStatusWsActor.Command](context) {
+class ImportStatusWsActor(context: ActorContext[ImportStatusWsActor.Command])
+  extends AbstractBehavior[ImportStatusWsActor.Command](context) {
 
   import ImportStatusWsActor._
 

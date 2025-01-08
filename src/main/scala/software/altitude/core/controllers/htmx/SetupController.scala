@@ -13,13 +13,22 @@ import software.altitude.core.{ Const => C }
 class SetupController extends BaseHtmxController {
 
   private val dataScrubber = DataScrubber(
-    trim = List(Api.Field.Setup.REPOSITORY_NAME, Api.Field.Setup.ADMIN_EMAIL, Api.Field.Setup.ADMIN_NAME, Api.Field.Setup.PASSWORD, Api.Field.Setup.PASSWORD2),
+    trim = List(
+      Api.Field.Setup.REPOSITORY_NAME,
+      Api.Field.Setup.ADMIN_EMAIL,
+      Api.Field.Setup.ADMIN_NAME,
+      Api.Field.Setup.PASSWORD,
+      Api.Field.Setup.PASSWORD2),
     lower = List(Api.Field.Setup.ADMIN_EMAIL)
   )
 
   private val apiRequestValidator = ApiRequestValidator(
-    required =
-      List(Api.Field.Setup.REPOSITORY_NAME, Api.Field.Setup.ADMIN_EMAIL, Api.Field.Setup.ADMIN_NAME, Api.Field.Setup.PASSWORD, Api.Field.Setup.PASSWORD2),
+    required = List(
+      Api.Field.Setup.REPOSITORY_NAME,
+      Api.Field.Setup.ADMIN_EMAIL,
+      Api.Field.Setup.ADMIN_NAME,
+      Api.Field.Setup.PASSWORD,
+      Api.Field.Setup.PASSWORD2),
     maxLengths = Map(
       Api.Field.Setup.REPOSITORY_NAME -> Api.Constraints.MAX_REPOSITORY_NAME_LENGTH,
       Api.Field.Setup.ADMIN_EMAIL -> Api.Constraints.MAX_EMAIL_LENGTH,

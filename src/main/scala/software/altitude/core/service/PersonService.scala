@@ -54,11 +54,11 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
        *
        * Yep.
        *
-       * In isolation, an image is very likely to not have such absurdity, but in the context of a larger data set, a previously detected person may be detected
-       * again in the same image, given lax face detection/similarity thresholds.
+       * In isolation, an image is very likely to not have such absurdity, but in the context of a larger data set, a previously
+       * detected person may be detected again in the same image, given lax face detection/similarity thresholds.
        *
-       * This is obviously wrong, but we can't really do anything about it. The user is responsible for properly maintaining people and faces, and all we can do
-       * is silently fail and chug along.
+       * This is obviously wrong, but we can't really do anything about it. The user is responsible for properly maintaining
+       * people and faces, and all we can do is silently fail and chug along.
        *
        * This is not ideal, and in the future we should mark the asset as "needs attention", or something.
        *
@@ -68,7 +68,10 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
       try {
         persistedFace = Some(faceDao.add(face, asset, person))
       } catch {
-        case e: SQLException => throw getDuplicateExceptionOrSame(e, Some(s"Face already exists for person ${person.label} in asset ${asset.persistedId}"))
+        case e: SQLException =>
+          throw getDuplicateExceptionOrSame(
+            e,
+            Some(s"Face already exists for person ${person.label} in asset ${asset.persistedId}"))
         case ex: Exception =>
           throw ex
       }
@@ -127,14 +130,17 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
       if (source.mergedWithIds.nonEmpty) {
 
         /**
-         * If the source person was merged with other people before, follow that relation and update THAT source with current destination info. This way, when
-         * of the old merge sources is pulled by label from cache, it will point directly to this new composite person.
+         * If the source person was merged with other people before, follow that relation and update THAT source with current
+         * destination info. This way, when of the old merge sources is pulled by label from cache, it will point directly to this
+         * new composite person.
          */
         logger.info(s"Source person ${source.name} was merged with other people before. IDs: ${source.mergedWithIds}")
         logger.info("Updating the old merge sources with the new destination info")
         val oldMergeSourcesQ = new Query().add(FieldConst.ID -> Query.IN(source.mergedWithIds.toSet))
 
-        updateByQuery(oldMergeSourcesQ, Map(FieldConst.Person.MERGED_INTO_ID -> dest.persistedId, FieldConst.Person.MERGED_INTO_LABEL -> dest.label))
+        updateByQuery(
+          oldMergeSourcesQ,
+          Map(FieldConst.Person.MERGED_INTO_ID -> dest.persistedId, FieldConst.Person.MERGED_INTO_LABEL -> dest.label))
 
         // update the cache with the new destination info
         source.mergedWithIds.foreach {
@@ -162,8 +168,8 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
       logger.info(s"Training the ${allSourceFaces.size} faces on the destination label ${dest.label}")
 
       /**
-       * Train the faces on the destination label. We, however, do NOT have the training images stored in the database. We must pull the binary data from the
-       * file store and create a copy of the face objects.
+       * Train the faces on the destination label. We, however, do NOT have the training images stored in the database. We must
+       * pull the binary data from the file store and create a copy of the face objects.
        */
       val allSourceFacesWithImageData = allSourceFaces.map {
         face =>
@@ -193,6 +199,7 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
       val destFaces = getPersonFaces(dest.persistedId, FaceRecognitionService.MAX_COMPARISONS_PER_PERSON)
       updatedDest.setFaces(destFaces)
 
+      // the source person is now empty but still has to be there to serve as a redirect to the new destination
       app.service.faceCache.putPerson(updatedSource)
       app.service.faceCache.putPerson(updatedDest)
 

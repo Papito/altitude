@@ -25,7 +25,8 @@ object AltitudeActorSystem {
   def apply(): Behavior[Command] = Behaviors.setup(context => new AltitudeActorSystem(context))
 }
 
-private class AltitudeActorSystem(context: ActorContext[AltitudeActorSystem.Command]) extends AbstractBehavior[AltitudeActorSystem.Command](context) {
+private class AltitudeActorSystem(context: ActorContext[AltitudeActorSystem.Command])
+  extends AbstractBehavior[AltitudeActorSystem.Command](context) {
 
   private val websocketImportStatusManagerActor = context.spawn(ImportStatusWsActor(), "importStatusWsActor")
   private val faceRecManagerActor = context.spawn(FaceRecManagerActor(), "faceRecManagerActor")

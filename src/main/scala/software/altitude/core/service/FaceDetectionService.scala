@@ -81,8 +81,9 @@ object FaceDetectionService {
 class FaceDetectionService(app: Altitude) {
 
   /**
-   * As if the fact that OpenCV for Java has two competing APIs wasn't confusing enough (org.opencv, org.bytedeco), every example under the sun directs to do
-   * this in order to have native lib linking errors go away: System.loadLibrary(Core.NATIVE_LIBRARY_NAME)
+   * As if the fact that OpenCV for Java has two competing APIs wasn't confusing enough (org.opencv, org.bytedeco), every example
+   * under the sun directs to do this in order to have native lib linking errors go away:
+   * System.loadLibrary(Core.NATIVE_LIBRARY_NAME)
    *
    * But it doesn't work. While we use the org.opencv API, the native lib is loaded by the org.bytedeco API.
    *
@@ -106,12 +107,15 @@ class FaceDetectionService(app: Altitude) {
 
   checkAndCreateResourceFiles()
 
-  private val SF_ONNX_MODEL_PATH = new File(Environment.OPENCV_RESOURCE_PATH, RESOURCE_FILE_NAMES("SF_ONNX_MODEL")).getAbsolutePath
+  private val SF_ONNX_MODEL_PATH =
+    new File(Environment.OPENCV_RESOURCE_PATH, RESOURCE_FILE_NAMES("SF_ONNX_MODEL")).getAbsolutePath
   private val DNN_NET_PROTO_CONF_PATH =
     new File(Environment.OPENCV_RESOURCE_PATH, RESOURCE_FILE_NAMES("DNN_NET_PROTO_CONF")).getAbsolutePath
-  private val DNN_NET_MODEL_PATH = new File(Environment.OPENCV_RESOURCE_PATH, RESOURCE_FILE_NAMES("DNN_NET_MODEL")).getAbsolutePath
+  private val DNN_NET_MODEL_PATH =
+    new File(Environment.OPENCV_RESOURCE_PATH, RESOURCE_FILE_NAMES("DNN_NET_MODEL")).getAbsolutePath
   private val YUNET_MODEL_PATH = new File(Environment.OPENCV_RESOURCE_PATH, RESOURCE_FILE_NAMES("YUNET_MODEL")).getAbsolutePath
-  private val EMBEDDING_NET_PATH = new File(Environment.OPENCV_RESOURCE_PATH, RESOURCE_FILE_NAMES("EMBEDDING_NET_MODEL")).getAbsolutePath
+  private val EMBEDDING_NET_PATH =
+    new File(Environment.OPENCV_RESOURCE_PATH, RESOURCE_FILE_NAMES("EMBEDDING_NET_MODEL")).getAbsolutePath
 
   private val sfaceRecognizer = FaceRecognizerSF.create(SF_ONNX_MODEL_PATH, "")
 

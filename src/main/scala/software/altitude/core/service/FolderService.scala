@@ -1,6 +1,5 @@
 package software.altitude.core.service
 import play.api.libs.json._
-
 import software.altitude.core.Altitude
 import software.altitude.core.DuplicateException
 import software.altitude.core.FieldConst
@@ -129,7 +128,10 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
     throw new NotImplementedError("Cannot delete folders by query")
   }
 
-  /** Returns a nested list of children for a given folder. Not a flat list! Subsequent children are in each folders' "children" element. */
+  /**
+   * Returns a nested list of children for a given folder. Not a flat list! Subsequent children are in each folders' "children"
+   * element.
+   */
   private def children(parentId: String, allRepoFolders: List[JsObject]): List[Folder] = {
     val repoFolders = repositoryFolders(allRepoFolders)
     val immediateChildren = this.immediateChildren(parentId, repoFolders)
@@ -179,10 +181,13 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   }
 
   /**
-   * Return all folders, with their depths, as a flat list, for a given parent folder. Specifically, returns a flat list of tuples, where the first element is
-   * the depth, relative to parent folder, and the second element is the folder ID.
+   * Return all folders, with their depths, as a flat list, for a given parent folder. Specifically, returns a flat list of
+   * tuples, where the first element is the depth, relative to parent folder, and the second element is the folder ID.
    */
-  def flatChildrenIdsWithDepths(parentId: String, allRepoFolders: List[JsObject] = List(), depth: Int = 0): List[(Int, String)] = {
+  def flatChildrenIdsWithDepths(
+      parentId: String,
+      allRepoFolders: List[JsObject] = List(),
+      depth: Int = 0): List[(Int, String)] = {
     val repoFolders = repositoryFolders(allRepoFolders)
 
     val childElements = repoFolders.filter(j => (j \ FieldConst.Folder.PARENT_ID).asOpt[String].contains(parentId))
@@ -196,8 +201,8 @@ class FolderService(val app: Altitude) extends BaseService[Folder] {
   }
 
   /**
-   * Returns a unique set of folder IDs for one OR more folder ids. The difference between the other method is that folder depths are not returned. It's a "raw"
-   * list of folder ids.
+   * Returns a unique set of folder IDs for one OR more folder ids. The difference between the other method is that folder depths
+   * are not returned. It's a "raw" list of folder ids.
    */
   def flatChildrenIds(parentIds: Set[String], allRepoFolders: List[JsObject] = List()): Set[String] =
     parentIds.foldLeft(Set[String]()) {

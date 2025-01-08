@@ -22,8 +22,8 @@ trait AssetDao extends BaseDao {
   def updateMetadata(assetId: String, metadata: UserMetadata, deletedFields: Set[String]): Unit = {
 
     /**
-     * Pedestrian version of this just overwrites fields for old metadata and re-sets it on the asset. A better implementation - for advanced engines - updates
-     * only the metadata fields of interest.
+     * Pedestrian version of this just overwrites fields for old metadata and re-sets it on the asset. A better implementation -
+     * for advanced engines - updates only the metadata fields of interest.
      */
     // OPTIMIZE
     val existingMetadata = getUserMetadata(assetId) match {

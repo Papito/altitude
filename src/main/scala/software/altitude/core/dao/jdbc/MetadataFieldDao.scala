@@ -3,13 +3,14 @@ package software.altitude.core.dao.jdbc
 import com.typesafe.config.Config
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-
 import software.altitude.core.FieldConst
 import software.altitude.core.RequestContext
 import software.altitude.core.models.FieldType
 import software.altitude.core.models.UserMetadataField
 
-abstract class MetadataFieldDao(override val config: Config) extends BaseDao with software.altitude.core.dao.UserMetadataFieldDao {
+abstract class MetadataFieldDao(override val config: Config)
+  extends BaseDao
+  with software.altitude.core.dao.UserMetadataFieldDao {
 
   final override val tableName = "metadata_field"
 
@@ -37,7 +38,12 @@ abstract class MetadataFieldDao(override val config: Config) extends BaseDao wit
     val id = BaseDao.genId
 
     val sqlVals: List[Any] =
-      List(id, RequestContext.getRepository.persistedId, metadataField.name, metadataField.nameLowercase, metadataField.fieldType.toString)
+      List(
+        id,
+        RequestContext.getRepository.persistedId,
+        metadataField.name,
+        metadataField.nameLowercase,
+        metadataField.fieldType.toString)
 
     addRecord(jsonIn, sql, sqlVals)
 

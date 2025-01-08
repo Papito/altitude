@@ -11,7 +11,8 @@ object SearchQueryBuilder {
 }
 
 /** Common code for JDBC search query builders */
-abstract class SearchQueryBuilder(selColumnNames: List[String]) extends SqlQueryBuilder[SearchQuery](selColumnNames, SearchQueryBuilder.ASSET_TABLE_NAME) {
+abstract class SearchQueryBuilder(selColumnNames: List[String])
+  extends SqlQueryBuilder[SearchQuery](selColumnNames, SearchQueryBuilder.ASSET_TABLE_NAME) {
 
   private val searchParamTable = "search_parameter"
   protected val searchDocumentTable = "search_document"

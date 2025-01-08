@@ -1,5 +1,4 @@
 package software.altitude.test.core.integration
-
 import org.scalatest.DoNotDiscover
 import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.must.Matchers.empty
@@ -117,5 +116,30 @@ import software.altitude.test.core.IntegrationTestCore
     }
 
     // should also pull ALL person A faces and make sure the top X ones are in the cache
+  }
+
+  test("Face cache should ignore labels that have been merged from") {
+    val importAsset1 = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
+    val persistedAsset1 = testApp.service.library.addImportAsset(importAsset1)
+
+    val importAsset2 = IntegrationTestUtil.getImportAsset("people/damon.jpg")
+    val persistedAsset2 = testApp.service.library.addImportAsset(importAsset2)
+
+    val person1 = testApp.service.person.getPeople(persistedAsset1.persistedId).head
+    val person2 = testApp.service.person.getPeople(persistedAsset2.persistedId).head
+
+    // Matt and Ben are the same person now
+    testApp.service.person.merge(dest=person2, source=person1)
+
+    testApp.service.faceCache.getAll.size should be(2)
+    testApp.service.faceCache.getAllMatchable.size should be(1)
+
+    // This Ben will match the first Ben, but that Ben is no longer home, having been merged into Matt
+    val importAsset3 = IntegrationTestUtil.getImportAsset("people/meme-ben2.png")
+    val persistedAsset3 = testApp.service.library.addImportAsset(importAsset3)
+
+    testApp.service.person.getPeople(persistedAsset3.persistedId).head
+    testApp.service.faceCache.getAllMatchable.size should be(1)
+    testApp.service.faceCache.getAllMatchable.head.numOfFaces should be(3)
   }
 }
