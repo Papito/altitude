@@ -61,6 +61,15 @@ private class AltitudeActorSystem(context: ActorContext[AltitudeActorSystem.Comm
           }(ec)
         Behaviors.same
 
+      case command: FaceRecManagerActor.AddFaces =>
+        faceRecManagerActor
+          .ask(FaceRecManagerActor.AddFaces(command.repositoryId, command.faces, _))
+          .onComplete {
+            case Success(response) => command.replyTo ! response
+            case Failure(exception) => logger.error(s"Failed to add ${command.faces.length} in bulk", exception)
+          }(ec)
+        Behaviors.same
+
       case command: FaceRecManagerActor.AddFaceAsync =>
         faceRecManagerActor
           .ask(FaceRecManagerActor.AddFace(command.repositoryId, command.face, command.personLabel, _))

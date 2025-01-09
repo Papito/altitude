@@ -8,6 +8,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
 import software.altitude.core.AltitudeActorSystem
+import software.altitude.core.AltitudeActorSystem.EmptyResponse
 import software.altitude.core.RequestContext
 import software.altitude.core.actors.FaceRecManagerActor
 import software.altitude.core.actors.FaceRecModelActor.FacePrediction
@@ -16,8 +17,8 @@ import software.altitude.core.dao.FaceDao
 import software.altitude.core.models.Asset
 import software.altitude.core.models.AssetWithData
 import software.altitude.core.models.Face
-import software.altitude.core.models.FaceForTraining
-import software.altitude.core.models.FaceForTrainingWithData
+import software.altitude.core.models.FaceForBulkTraining
+import software.altitude.core.models.FaceForBulkTrainingWithData
 import software.altitude.core.models.FaceImages
 import software.altitude.core.models.Person
 import software.altitude.core.transactions.TransactionManager
@@ -70,14 +71,35 @@ class FaceRecognitionService(val app: Altitude) {
 
   def trainModelFromDb(): Unit = {
     txManager.asReadOnly {
-      val facesForTraining: List[FaceForTraining] = faceDao.getAllForTraining
-      val source = Source.fromIterator(() => facesForTraining.iterator)
-      val pipelineResFuture: Future[Done] = app.service.faceRecLoadPipelineService.run(source)
-      Await.result(pipelineResFuture, Duration.Inf)
-
       val repositoryId = RequestContext.getRepository.persistedId
-      val futureResp: Future[ModelSize] = app.actorSystem ? (ref => FaceRecManagerActor.GetModelSize(repositoryId, ref))
-      val labelCount = Await.result(futureResp, timeout.duration).size
+      val facesForTraining: List[FaceForBulkTraining] = faceDao.getAllForTraining
+
+      // TBD which method is faster at scale - a Pekko pipeline or serial bulk load
+       val source = Source.fromIterator(() => facesForTraining.iterator)
+       val pipelineResFuture: Future[Done] = app.service.faceRecLoadPipelineService.run(source)
+       Await.result(pipelineResFuture, Duration.Inf)
+
+//      val faces: Seq[Face] = facesForTraining.map( faceForTraining => {
+//        val alignedImageGs = app.service.fileStore.getAlignedGreyscaleFaceById(faceForTraining.id)
+//        Face(
+//          id = Some(faceForTraining.id),
+//          personLabel = Some(faceForTraining.personLabel),
+//          alignedImageGs = alignedImageGs.data,
+//          checksum = 0,
+//          detectionScore = 0,
+//          embeddings = Array.emptyFloatArray,
+//          features = Array.emptyFloatArray,
+//          x1 = 0,
+//          y1 = 0,
+//          width = 0,
+//          height = 0)
+//      })
+//
+//      val addFacesFut: Future[EmptyResponse] = app.actorSystem ? (ref => FaceRecManagerActor.AddFaces(repositoryId, faces, ref))
+//      Await.result(addFacesFut, timeout.duration)
+
+      val labelSizeFut: Future[ModelSize] = app.actorSystem ? (ref => FaceRecManagerActor.GetModelSize(repositoryId, ref))
+      val labelCount = Await.result(labelSizeFut, timeout.duration).size
 
       logger.info(s"Trained model from DB for repo ${RequestContext.getRepository.name}. Labels: $labelCount")
     }
@@ -196,27 +218,6 @@ class FaceRecognitionService(val app: Altitude) {
 
   def indexFace(face: Face, personLabel: Int, repositoryId: String = RequestContext.getRepository.persistedId): Unit = {
     app.actorSystem ! FaceRecManagerActor.AddFaceAsync(repositoryId, face, personLabel)
-  }
-
-  def indexFace(faceForTrainingWithData: FaceForTrainingWithData): Unit = {
-    // we only need core data for training
-    val face = Face(
-      id = Some(faceForTrainingWithData.id),
-      personLabel = Some(faceForTrainingWithData.personLabel),
-      alignedImageGs = faceForTrainingWithData.alignedImageGs,
-      checksum = 0,
-      detectionScore = 0,
-      embeddings = Array.emptyFloatArray,
-      features = Array.emptyFloatArray,
-      x1 = 0,
-      y1 = 0,
-      width = 0,
-      height = 0
-    )
-    app.actorSystem ! FaceRecManagerActor.AddFaceAsync(
-      faceForTrainingWithData.repositoryId,
-      face,
-      faceForTrainingWithData.personLabel)
   }
 
   def addFacesToPerson(faces: List[Face], person: Person): Unit = {

@@ -7,7 +7,7 @@ import software.altitude.core.FieldConst
 import software.altitude.core.RequestContext
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Face
-import software.altitude.core.models.FaceForTraining
+import software.altitude.core.models.FaceForBulkTraining
 import software.altitude.core.models.Person
 import software.altitude.core.service.FaceRecognitionService
 
@@ -141,7 +141,7 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
     recs.map(makeModel)
   }
 
-  def getAllForTraining: List[FaceForTraining] = {
+  def getAllForTraining: List[FaceForBulkTraining] = {
     val sql = s"""
         SELECT ${FieldConst.ID}, ${FieldConst.Face.PERSON_LABEL}, ${FieldConst.REPO_ID}
           FROM $tableName
@@ -152,7 +152,7 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
 
     recs.map(
       rec => {
-        FaceForTraining(
+        FaceForBulkTraining(
           id = rec(FieldConst.ID).asInstanceOf[String],
           repositoryId = rec(FieldConst.REPO_ID).asInstanceOf[String],
           personLabel = rec(FieldConst.Face.PERSON_LABEL).getClass match {

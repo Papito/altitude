@@ -22,6 +22,7 @@ object FaceRecModelActor {
 
   sealed trait Command
   final case class AddFace(face: Face, personLabel: Int, replyTo: ActorRef[AltitudeActorSystem.EmptyResponse]) extends Command
+  final case class AddFaces(face: Seq[Face], replyTo: ActorRef[AltitudeActorSystem.EmptyResponse]) extends Command
   final case class Initialize(replyTo: ActorRef[AltitudeActorSystem.EmptyResponse]) extends Command
   final case class Predict(face: Face, replyTo: ActorRef[FacePrediction]) extends Command
   final case class GetModelSize(replyTo: ActorRef[ModelSize]) extends Command
@@ -67,6 +68,19 @@ class FaceRecModelActor(context: ActorContext[FaceRecModelActor.Command])
         recognizer.update(images, labels)
         replyTo ! AltitudeActorSystem.EmptyResponse()
         Behaviors.same
+
+      case AddFaces(faces, replyTo) =>
+        val labels = new Mat(faces.size, 1, CvType.CV_32SC1)
+        val images = new util.ArrayList[Mat]()
+
+        faces.zipWithIndex.foreach { case (face, idx) =>
+          labels.put(idx, 0, face.personLabel.getOrElse(-1))
+          images.add(face.alignedImageGsMat)
+        }
+        recognizer.update(images, labels)
+        replyTo ! AltitudeActorSystem.EmptyResponse()
+        Behaviors.same
+
 
       case Initialize(replyTo) =>
         initialize()

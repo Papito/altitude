@@ -9,7 +9,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import software.altitude.core.Altitude
 import software.altitude.core.AltitudeActorSystem
-import software.altitude.core.models.FaceForTraining
+import software.altitude.core.models.FaceForBulkTraining
 import software.altitude.core.pipeline.flows._
 
 import scala.concurrent.Future
@@ -20,10 +20,12 @@ class FaceRecLoadPipelineService(app: Altitude) {
   implicit val system: ActorSystem[AltitudeActorSystem.Command] = app.actorSystem
 
   private val readFaceDataFlow = ReadFaceDataFlow(app)
+  private val indexFaceDataFlow = AddFaceDataToModelFlow(app)
 
-  def run(source: Source[FaceForTraining, NotUsed]): Future[Done] = {
+  def run(source: Source[FaceForBulkTraining, NotUsed]): Future[Done] = {
     source
       .via(readFaceDataFlow)
+      .via(indexFaceDataFlow)
       .runWith(Sink.ignore)
   }
 
