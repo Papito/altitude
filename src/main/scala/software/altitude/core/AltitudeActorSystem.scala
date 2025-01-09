@@ -65,7 +65,7 @@ private class AltitudeActorSystem(context: ActorContext[AltitudeActorSystem.Comm
         faceRecManagerActor
           .ask(FaceRecManagerActor.AddFace(command.repositoryId, command.face, command.personLabel, _))
           .onComplete {
-            case Success(_) => logger.info(s"Added face ${command.face.persistedId}")
+            case Success(_) =>
             case Failure(exception) => logger.error("Failed to add a face", exception)
           }(ec)
 

@@ -1,7 +1,6 @@
 package software.altitude.core.controllers.web
 
 import org.scalatra.Route
-
 import software.altitude.core.Api
 import software.altitude.core.Const
 import software.altitude.core.RequestContext

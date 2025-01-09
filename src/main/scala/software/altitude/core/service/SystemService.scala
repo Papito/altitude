@@ -1,10 +1,7 @@
 package software.altitude.core.service
 
-import java.sql.SQLException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
-import software.altitude.core.{ Const => C }
 import software.altitude.core.Altitude
 import software.altitude.core.RequestContext
 import software.altitude.core.dao.SystemMetadataDao
@@ -12,6 +9,9 @@ import software.altitude.core.models.Repository
 import software.altitude.core.models.SystemMetadata
 import software.altitude.core.models.User
 import software.altitude.core.transactions.TransactionManager
+import software.altitude.core.{ Const => C }
+
+import java.sql.SQLException
 
 class SystemService(val app: Altitude) {
   final protected val logger: Logger = LoggerFactory.getLogger(getClass)
@@ -65,7 +65,8 @@ class SystemService(val app: Altitude) {
         owner = admin)
 
       // normally done on startup but on the first run, that train has sailed.
-      app.service.faceRecognition.initialize(repo.persistedId)
+      RequestContext.repository.value = Some(repo)
+      app.service.faceRecognition.initialize()
 
       app.service.user.setLastActiveRepoId(admin, repo.persistedId)
 

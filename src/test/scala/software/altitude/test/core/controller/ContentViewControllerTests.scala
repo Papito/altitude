@@ -47,7 +47,7 @@ import software.altitude.test.core.ControllerTestCore
 
   test("View a person's cover image") {
     testContext.persistRepository()
-    testApp.service.faceRecognition.initialize(testContext.repository.persistedId)
+    testApp.service.faceRecognition.initialize()
     val repoId = testContext.repository.persistedId
 
     val importAsset = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")

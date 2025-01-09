@@ -7,6 +7,7 @@ import software.altitude.core.FieldConst
 import software.altitude.core.RequestContext
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Face
+import software.altitude.core.models.FaceForTraining
 import software.altitude.core.models.Person
 import software.altitude.core.service.FaceRecognitionService
 
@@ -138,5 +139,27 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
         FaceRecognitionService.MAX_COMPARISONS_PER_PERSON))
 
     recs.map(makeModel)
+  }
+
+  def getAllForTraining: List[FaceForTraining] = {
+    val sql = s"""
+        SELECT ${FieldConst.ID}, ${FieldConst.Face.PERSON_LABEL}, ${FieldConst.REPO_ID}
+          FROM $tableName
+         WHERE repository_id = ?
+      """
+
+    val recs: List[Map[String, AnyRef]] = manyBySqlQuery(sql, List(RequestContext.getRepository.persistedId))
+
+    recs.map(
+      rec => {
+        FaceForTraining(
+          id = rec(FieldConst.ID).asInstanceOf[String],
+          repositoryId = rec(FieldConst.REPO_ID).asInstanceOf[String],
+          personLabel = rec(FieldConst.Face.PERSON_LABEL).getClass match {
+            case c if c == classOf[java.lang.Integer] => rec(FieldConst.Face.PERSON_LABEL).asInstanceOf[Int]
+            case c if c == classOf[java.lang.Long] => rec(FieldConst.Face.PERSON_LABEL).asInstanceOf[Long].toInt
+          }
+        )
+      })
   }
 }

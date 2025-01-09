@@ -5,6 +5,7 @@ import org.scalatest.matchers.must.Matchers.empty
 import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
+import software.altitude.core.RequestContext
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Person
 import software.altitude.core.service.FaceRecognitionService
@@ -18,11 +19,14 @@ import software.altitude.test.core.IntegrationTestCore
     val repo2 = testContext.persistRepository()
     val repo3 = testContext.persistRepository()
 
-    testApp.service.faceRecognition.initialize(repo2.persistedId)
-    testApp.service.faceRecognition.initialize(repo3.persistedId)
+    RequestContext.repository.value = Some(repo2)
+    testApp.service.faceRecognition.initialize()
+    RequestContext.repository.value = Some(repo3)
+    testApp.service.faceRecognition.initialize()
 
     // check only the first (current repo)
     this.getNumberOfModelLabels shouldBe 0
+    RequestContext.repository.value = Some(testContext.repositories.head)
   }
 
   test("Recognize a person twice") {
@@ -142,4 +146,21 @@ import software.altitude.test.core.IntegrationTestCore
     testApp.service.faceCache.getAllMatchable.size should be(1)
     testApp.service.faceCache.getAllMatchable.head.numOfFaces should be(3)
   }
+
+  test("Should be able to pre-train the model on existing data", Focused) {
+    val assets = Seq("people/meme-ben.jpg", "people/meme-ben2.png", "people/damon.jpg")
+    assets
+      .map(IntegrationTestUtil.getImportAsset)
+      .map(testApp.service.library.addImportAsset)
+
+    getNumberOfModelLabels shouldBe assets.length
+
+    // wipe the model
+    testApp.service.faceRecognition.initialize()
+
+    getNumberOfModelLabels shouldBe 0
+    testApp.service.faceRecognition.trainModelFromDb()
+    getNumberOfModelLabels shouldBe assets.length
+  }
+
 }

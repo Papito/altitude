@@ -45,10 +45,10 @@ class FaceCacheService(app: Altitude) {
     }
 
     if (personOpt.isEmpty) {
-      logger.warn(s"Person with label $label not found in cache")
+      logger.info(s"Person with label $label not found in cache")
       None
     } else {
-      logger.info(s"Returning label $label from cache: ${personOpt.get.name}")
+      logger.debug(s"Returning label $label from cache: ${personOpt.get.name}")
       personOpt
     }
   }

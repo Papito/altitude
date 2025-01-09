@@ -1,6 +1,8 @@
 package software.altitude.core.service
+import org.apache.pekko.Done
 import org.apache.pekko.actor.typed.Scheduler
 import org.apache.pekko.actor.typed.scaladsl.AskPattern.Askable
+import org.apache.pekko.stream.scaladsl.Source
 import org.apache.pekko.util.Timeout
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -9,14 +11,20 @@ import software.altitude.core.AltitudeActorSystem
 import software.altitude.core.RequestContext
 import software.altitude.core.actors.FaceRecManagerActor
 import software.altitude.core.actors.FaceRecModelActor.FacePrediction
+import software.altitude.core.actors.FaceRecModelActor.ModelSize
+import software.altitude.core.dao.FaceDao
 import software.altitude.core.models.Asset
 import software.altitude.core.models.AssetWithData
 import software.altitude.core.models.Face
+import software.altitude.core.models.FaceForTraining
+import software.altitude.core.models.FaceForTrainingWithData
 import software.altitude.core.models.FaceImages
 import software.altitude.core.models.Person
+import software.altitude.core.transactions.TransactionManager
 
 import scala.concurrent.Await
 import scala.concurrent.Future
+import scala.concurrent.duration.Duration
 import scala.concurrent.duration.DurationInt
 
 object FaceRecognitionService {
@@ -42,19 +50,43 @@ object FaceRecognitionService {
 class FaceRecognitionService(val app: Altitude) {
   final val logger: Logger = LoggerFactory.getLogger(getClass)
 
+  protected val txManager: TransactionManager = app.txManager
+  private val faceDao: FaceDao = app.DAO.face
+
   implicit val timeout: Timeout = 3.seconds
   implicit val scheduler: Scheduler = app.actorSystem.scheduler
 
-  def initialize(repositoryId: String): Unit = {
+  def initialize(): Unit = {
     val result: Future[AltitudeActorSystem.EmptyResponse] =
-      app.actorSystem.ask(ref => FaceRecManagerActor.Initialize(repositoryId, ref))
+      app.actorSystem.ask(ref => FaceRecManagerActor.Initialize(RequestContext.getRepository.persistedId, ref))
     Await.result(result, timeout.duration)
   }
 
-  def initializeAll(): Unit = {
+  def initializeAll(): Unit =
     app.service.library.forEachRepository(
-      repo => {
-        initialize(repo.persistedId)
+      _ => {
+        initialize()
+      })
+
+  def trainModelFromDb(): Unit = {
+    txManager.asReadOnly {
+      val facesForTraining: List[FaceForTraining] = faceDao.getAllForTraining
+      val source = Source.fromIterator(() => facesForTraining.iterator)
+      val pipelineResFuture: Future[Done] = app.service.faceRecLoadPipelineService.run(source)
+      Await.result(pipelineResFuture, Duration.Inf)
+
+      val repositoryId = RequestContext.getRepository.persistedId
+      val futureResp: Future[ModelSize] = app.actorSystem ? (ref => FaceRecManagerActor.GetModelSize(repositoryId, ref))
+      val labelCount = Await.result(futureResp, timeout.duration).size
+
+      logger.info(s"Trained model from DB for repo ${RequestContext.getRepository.name}. Labels: $labelCount")
+    }
+  }
+
+  def trainModelsFromDbForAll(): Unit = {
+    app.service.library.forEachRepository(
+      _ => {
+        trainModelFromDb()
       })
   }
 
@@ -162,8 +194,29 @@ class FaceRecognitionService(val app: Altitude) {
     }
   }
 
-  private def indexFace(face: Face, personLabel: Int, repositoryId: String = RequestContext.getRepository.persistedId): Unit = {
+  def indexFace(face: Face, personLabel: Int, repositoryId: String = RequestContext.getRepository.persistedId): Unit = {
     app.actorSystem ! FaceRecManagerActor.AddFaceAsync(repositoryId, face, personLabel)
+  }
+
+  def indexFace(faceForTrainingWithData: FaceForTrainingWithData): Unit = {
+    // we only need core data for training
+    val face = Face(
+      id = Some(faceForTrainingWithData.id),
+      personLabel = Some(faceForTrainingWithData.personLabel),
+      alignedImageGs = faceForTrainingWithData.alignedImageGs,
+      checksum = 0,
+      detectionScore = 0,
+      embeddings = Array.emptyFloatArray,
+      features = Array.emptyFloatArray,
+      x1 = 0,
+      y1 = 0,
+      width = 0,
+      height = 0
+    )
+    app.actorSystem ! FaceRecManagerActor.AddFaceAsync(
+      faceForTrainingWithData.repositoryId,
+      face,
+      faceForTrainingWithData.personLabel)
   }
 
   def addFacesToPerson(faces: List[Face], person: Person): Unit = {

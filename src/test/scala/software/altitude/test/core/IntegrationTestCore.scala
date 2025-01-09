@@ -44,7 +44,7 @@ abstract class IntegrationTestCore
     testContext.persistRepository()
 
     // Clear the face recognition model before each test
-    testApp.service.faceRecognition.initialize(testContext.repository.persistedId)
+    testApp.service.faceRecognition.initialize()
 
     // Clear face recognition cache
     testApp.service.faceCache.clear()
