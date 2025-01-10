@@ -9,7 +9,7 @@ import software.altitude.core.pipeline.PipelineConstants.parallelism
 import scala.concurrent.Future
 
 /**
- * This scoops up aligned grayscale face images from the file store, and then indexes them into the face recognition system.
+ * This scoops up aligned grayscale face images from the file store
  */
 object AddFaceDataToModelFlow {
   def apply(app: Altitude): Flow[FaceForBulkTrainingWithData, Face, NotUsed] = {

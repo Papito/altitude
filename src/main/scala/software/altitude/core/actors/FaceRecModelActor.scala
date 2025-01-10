@@ -21,8 +21,8 @@ object FaceRecModelActor {
   final case class ModelLabels(labels: Seq[Int])
 
   sealed trait Command
-  final case class AddFace(face: Face, personLabel: Int, replyTo: ActorRef[AltitudeActorSystem.EmptyResponse]) extends Command
-  final case class AddFaces(face: Seq[Face], replyTo: ActorRef[AltitudeActorSystem.EmptyResponse]) extends Command
+  final case class AddFace(face: Face, personLabel: Int) extends Command
+  final case class AddFaces(face: Seq[Face]) extends Command
   final case class Initialize(replyTo: ActorRef[AltitudeActorSystem.EmptyResponse]) extends Command
   final case class Predict(face: Face, replyTo: ActorRef[FacePrediction]) extends Command
   final case class GetModelSize(replyTo: ActorRef[ModelSize]) extends Command
@@ -60,16 +60,15 @@ class FaceRecModelActor(context: ActorContext[FaceRecModelActor.Command])
 
   override def onMessage(msg: Command): Behavior[Command] = {
     msg match {
-      case AddFace(face, personLabel, replyTo) =>
+      case AddFace(face, personLabel) =>
         val labels = new Mat(1, 1, CvType.CV_32SC1)
         val images = new util.ArrayList[Mat]()
         labels.put(0, 0, personLabel)
         images.add(face.alignedImageGsMat)
         recognizer.update(images, labels)
-        replyTo ! AltitudeActorSystem.EmptyResponse()
         Behaviors.same
 
-      case AddFaces(faces, replyTo) =>
+      case AddFaces(faces) =>
         val labels = new Mat(faces.size, 1, CvType.CV_32SC1)
         val images = new util.ArrayList[Mat]()
 
@@ -77,8 +76,8 @@ class FaceRecModelActor(context: ActorContext[FaceRecModelActor.Command])
           labels.put(idx, 0, face.personLabel.getOrElse(-1))
           images.add(face.alignedImageGsMat)
         }
+
         recognizer.update(images, labels)
-        replyTo ! AltitudeActorSystem.EmptyResponse()
         Behaviors.same
 
 

@@ -199,7 +199,7 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
       val destFaces = getPersonFaces(dest.persistedId, FaceRecognitionService.MAX_COMPARISONS_PER_PERSON)
       updatedDest.setFaces(destFaces)
 
-      // the source person is now empty but still has to be there to serve as a redirect to the new destination
+      // The source person is now empty but still has to be there to serve as a redirect to the new destination
       app.service.faceCache.putPerson(updatedSource)
       app.service.faceCache.putPerson(updatedDest)
 

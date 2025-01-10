@@ -32,18 +32,14 @@ object FaceRecManagerActor {
   final case class AddFace(
       repositoryId: String,
       face: Face,
-      personLabel: Int,
-      replyTo: ActorRef[AltitudeActorSystem.EmptyResponse])
+      personLabel: Int)
     extends AltitudeActorSystem.Command
     with Command
+
   final case class AddFaces(repositoryId: String,
-                            faces: Seq[Face],
-                            replyTo: ActorRef[AltitudeActorSystem.EmptyResponse])
+                            faces: Seq[Face])
     extends AltitudeActorSystem.Command
       with Command
-  final case class AddFaceAsync(repositoryId: String, face: Face, personLabel: Int)
-    extends AltitudeActorSystem.Command
-    with Command
   final case class Initialize(repositoryId: String, replyTo: ActorRef[AltitudeActorSystem.EmptyResponse])
     extends AltitudeActorSystem.Command
     with Command
@@ -86,39 +82,23 @@ class FaceRecManagerActor(context: ActorContext[FaceRecManagerActor.Command])
           }(ec)
         Behaviors.same
 
-      case AddFace(repositoryId, face, personLabel, replyTo) =>
+      case AddFace(repositoryId, face, personLabel) =>
         modelActors.get(repositoryId) match {
           case Some(modelActor) =>
-            modelActor
-              .ask(FaceRecModelActor.AddFace(face, personLabel, _))
-              .mapTo[AltitudeActorSystem.EmptyResponse]
-              .onComplete {
-                case Success(response) => replyTo ! response
-                case Failure(exception) => logger.error("Failed to add face", exception)
-              }(ec)
+            modelActor ! FaceRecModelActor.AddFace(face, personLabel)
             Behaviors.same
           case None =>
             throw new RuntimeException(s"No model actor found for repositoryId: $repositoryId")
         }
 
-      case AddFaces(repositoryId, faces, replyTo) =>
+      case AddFaces(repositoryId, faces) =>
         modelActors.get(repositoryId) match {
           case Some(modelActor) =>
-            modelActor
-              .ask(FaceRecModelActor.AddFaces(faces, _))
-              .mapTo[AltitudeActorSystem.EmptyResponse]
-              .onComplete {
-                case Success(response) => replyTo ! response
-                case Failure(exception) => logger.error(s"Failed to add ${faces.length} in bulk", exception)
-              }(ec)
+            modelActor ! FaceRecModelActor.AddFaces(faces)
             Behaviors.same
           case None =>
             throw new RuntimeException(s"No model actor found for repositoryId: $repositoryId")
         }
-
-      case _: AddFaceAsync =>
-        logger.warn("AddFaceAsync should not be used in the context of this actor class")
-        Behaviors.same
 
       case Predict(repositoryId, face, replyTo) =>
         modelActors.get(repositoryId) match {

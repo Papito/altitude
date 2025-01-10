@@ -217,7 +217,11 @@ class FaceRecognitionService(val app: Altitude) {
   }
 
   def indexFace(face: Face, personLabel: Int, repositoryId: String = RequestContext.getRepository.persistedId): Unit = {
-    app.actorSystem ! FaceRecManagerActor.AddFaceAsync(repositoryId, face, personLabel)
+    app.actorSystem ! FaceRecManagerActor.AddFace(repositoryId, face, personLabel)
+  }
+
+  def indexFaces(faces: Seq[Face], repositoryId: String = RequestContext.getRepository.persistedId): Unit = {
+    app.actorSystem ! FaceRecManagerActor.AddFaces(repositoryId, faces)
   }
 
   def addFacesToPerson(faces: List[Face], person: Person): Unit = {

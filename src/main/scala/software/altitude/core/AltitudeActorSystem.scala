@@ -52,32 +52,12 @@ private class AltitudeActorSystem(context: ActorContext[AltitudeActorSystem.Comm
           }(ec)
         Behaviors.same
 
-      case command: FaceRecManagerActor.AddFace =>
-        faceRecManagerActor
-          .ask(FaceRecManagerActor.AddFace(command.repositoryId, command.face, command.personLabel, _))
-          .onComplete {
-            case Success(response) => command.replyTo ! response
-            case Failure(exception) => logger.error("Failed to add a face", exception)
-          }(ec)
-        Behaviors.same
-
       case command: FaceRecManagerActor.AddFaces =>
-        faceRecManagerActor
-          .ask(FaceRecManagerActor.AddFaces(command.repositoryId, command.faces, _))
-          .onComplete {
-            case Success(response) => command.replyTo ! response
-            case Failure(exception) => logger.error(s"Failed to add ${command.faces.length} in bulk", exception)
-          }(ec)
+        faceRecManagerActor ! FaceRecManagerActor.AddFaces(command.repositoryId, command.faces)
         Behaviors.same
 
-      case command: FaceRecManagerActor.AddFaceAsync =>
-        faceRecManagerActor
-          .ask(FaceRecManagerActor.AddFace(command.repositoryId, command.face, command.personLabel, _))
-          .onComplete {
-            case Success(_) =>
-            case Failure(exception) => logger.error("Failed to add a face", exception)
-          }(ec)
-
+      case command: FaceRecManagerActor.AddFace =>
+        faceRecManagerActor ! FaceRecManagerActor.AddFace(command.repositoryId, command.face, command.personLabel)
         Behaviors.same
 
       case command: FaceRecManagerActor.Predict =>
