@@ -5,7 +5,6 @@ import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
 
 import scala.concurrent.Future
 
-object VoidOutputSink {
-  def apply(): Sink[TAssetOrInvalidWithContext, Future[Seq[TAssetOrInvalidWithContext]]] =
-    Sink.fold(Seq.empty[TAssetOrInvalidWithContext])((acc, _) => acc)
+object AssetSeqOutputSink {
+  def apply(): Sink[TAssetOrInvalidWithContext, Future[Seq[TAssetOrInvalidWithContext]]] = Sink.seq[TAssetOrInvalidWithContext]
 }

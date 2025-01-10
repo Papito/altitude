@@ -6,7 +6,7 @@ import software.altitude.core.Altitude
 import software.altitude.core.DuplicateException
 import software.altitude.core.models.Asset
 import software.altitude.core.pipeline.PipelineConstants.parallelism
-import software.altitude.core.pipeline.PipelineTypes.Invalid
+import software.altitude.core.pipeline.PipelineTypes.InvalidAsset
 import software.altitude.core.pipeline.PipelineTypes.TDataAssetOrInvalidWithContext
 import software.altitude.core.pipeline.PipelineUtils.debugInfo
 import software.altitude.core.pipeline.PipelineUtils.setThreadLocalRequestContext
@@ -24,7 +24,7 @@ object CheckDuplicateFlow {
         val existing: Option[Asset] = app.service.library.getByChecksum(dataAsset.asset.checksum)
 
         if (existing.nonEmpty) {
-          Future.successful(Right(Invalid(dataAsset.asset, Some(new DuplicateException))), ctx)
+          Future.successful(Right(InvalidAsset(dataAsset.asset, Some(new DuplicateException))), ctx)
         } else {
           Future.successful((Left(dataAsset), ctx))
         }

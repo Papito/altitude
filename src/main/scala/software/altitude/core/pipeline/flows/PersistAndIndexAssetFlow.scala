@@ -5,7 +5,7 @@ import org.apache.pekko.stream.scaladsl.Flow
 import software.altitude.core.Altitude
 import software.altitude.core.DuplicateException
 import software.altitude.core.pipeline.PipelineConstants.parallelism
-import software.altitude.core.pipeline.PipelineTypes.Invalid
+import software.altitude.core.pipeline.PipelineTypes.InvalidAsset
 import software.altitude.core.pipeline.PipelineTypes.TDataAssetOrInvalidWithContext
 import software.altitude.core.pipeline.PipelineUtils.debugInfo
 import software.altitude.core.pipeline.PipelineUtils.setThreadLocalRequestContext
@@ -29,7 +29,7 @@ object PersistAndIndexAssetFlow {
             Future.successful((Left(dataAsset), ctx))
           } catch {
             case e: DuplicateException =>
-              Future.successful(Right(Invalid(dataAsset.asset, Some(e))), ctx)
+              Future.successful(Right(InvalidAsset(dataAsset.asset, Some(e))), ctx)
           }
         }
       case (Right(invalid), ctx) =>

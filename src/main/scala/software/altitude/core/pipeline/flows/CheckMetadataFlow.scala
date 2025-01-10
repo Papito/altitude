@@ -5,7 +5,7 @@ import org.apache.pekko.stream.scaladsl.Flow
 import software.altitude.core.Altitude
 import software.altitude.core.UnsupportedMediaTypeException
 import software.altitude.core.models.AssetWithData
-import software.altitude.core.pipeline.PipelineTypes.Invalid
+import software.altitude.core.pipeline.PipelineTypes.InvalidAsset
 import software.altitude.core.pipeline.PipelineTypes.PipelineContext
 import software.altitude.core.pipeline.PipelineTypes.TDataAssetOrInvalidWithContext
 import software.altitude.core.pipeline.PipelineTypes.TDataAssetWithContext
@@ -22,7 +22,7 @@ object CheckMetadataFlow {
           (Left(dataAsset), ctx)
         } catch {
           case e: UnsupportedMediaTypeException =>
-            (Right(Invalid(dataAsset.asset, Some(e))), ctx)
+            (Right(InvalidAsset(dataAsset.asset, Some(e))), ctx)
         }
     }
 }

@@ -11,7 +11,7 @@ import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
 
 import scala.concurrent.Future
 
-object ErrorLoggingSink {
+object AssetErrorLoggingSink {
   final protected val logger: Logger = LoggerFactory.getLogger(getClass)
 
   def apply(): Sink[(TAssetOrInvalid, PipelineTypes.PipelineContext), Future[Done]] = Sink.foreach[TAssetOrInvalidWithContext] {

@@ -10,7 +10,7 @@ import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
 
 import scala.concurrent.Future
 
-object WsNotificationSink {
+object WsAssetProcessedNotificationSink {
   def apply(app: Altitude): Sink[(TAssetOrInvalid, PipelineTypes.PipelineContext), Future[Done]] =
     Sink.foreach[TAssetOrInvalidWithContext] {
       assetOrInvalidWithContext =>

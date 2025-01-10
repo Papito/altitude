@@ -11,7 +11,7 @@ import software.altitude.core.models.Folder
 import software.altitude.core.models._
 import software.altitude.core.pipeline.PipelineTypes.PipelineContext
 import software.altitude.core.pipeline.PipelineTypes.TAssetOrInvalidWithContext
-import software.altitude.core.pipeline.sinks.SeqOutputSink
+import software.altitude.core.pipeline.sinks.AssetSeqOutputSink
 import software.altitude.core.transactions.TransactionManager
 import software.altitude.core.util.ImageUtil.makeImageThumbnail
 import software.altitude.core.util.MurmurHash
@@ -68,7 +68,7 @@ class LibraryService(val app: Altitude) {
   def addAsset(dataAsset: AssetWithData): Asset = {
     val pipelineContext = PipelineContext(RequestContext.getRepository, RequestContext.getAccount)
     val source: Source[(AssetWithData, PipelineContext), NotUsed] = Source.single((dataAsset, pipelineContext))
-    val pipelineResFuture: Future[Seq[TAssetOrInvalidWithContext]] = app.service.importPipeline.run(source, SeqOutputSink())
+    val pipelineResFuture: Future[Seq[TAssetOrInvalidWithContext]] = app.service.importPipeline.run(source, AssetSeqOutputSink())
 
     val result: Seq[TAssetOrInvalidWithContext] = Await.result(pipelineResFuture, Duration.Inf)
 

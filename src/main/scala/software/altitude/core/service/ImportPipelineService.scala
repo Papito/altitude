@@ -25,8 +25,8 @@ import software.altitude.core.pipeline.flows.FileStoreFlow
 import software.altitude.core.pipeline.flows.MarkAsCompleteFlow
 import software.altitude.core.pipeline.flows.PersistAndIndexAssetFlow
 import software.altitude.core.pipeline.flows.StripBinaryDataFlow
-import software.altitude.core.pipeline.sinks.ErrorLoggingSink
-import software.altitude.core.pipeline.sinks.WsNotificationSink
+import software.altitude.core.pipeline.sinks.AssetErrorLoggingSink
+import software.altitude.core.pipeline.sinks.WsAssetProcessedNotificationSink
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext
@@ -50,8 +50,8 @@ class ImportPipelineService(app: Altitude) {
   private val checkDuplicateFlow = CheckDuplicateFlow(app)
   private val stripBinaryDataFlow = StripBinaryDataFlow(app)
   private val markAsCompleteFlow = MarkAsCompleteFlow(app)
-  private val wsNotificationSink = WsNotificationSink(app)
-  private val errorLoggingSink = ErrorLoggingSink()
+  private val wsNotificationSink = WsAssetProcessedNotificationSink(app)
+  private val errorLoggingSink = AssetErrorLoggingSink()
 
   private val combinedFlow: Flow[TDataAssetWithContext, TAssetOrInvalidWithContext, NotUsed] =
     Flow[TDataAssetWithContext]
