@@ -9,16 +9,17 @@ import org.apache.pekko.actor.typed.scaladsl.AskPattern.Askable
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.apache.pekko.util.Timeout
 import org.slf4j.Logger
-import software.altitude.core.AltitudeActorSystem
-import software.altitude.core.actors.FaceRecModelActor.FacePrediction
-import software.altitude.core.actors.FaceRecModelActor.ModelLabels
-import software.altitude.core.actors.FaceRecModelActor.ModelSize
-import software.altitude.core.models.Face
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
 import scala.util.Failure
 import scala.util.Success
+
+import software.altitude.core.AltitudeActorSystem
+import software.altitude.core.actors.FaceRecModelActor.FacePrediction
+import software.altitude.core.actors.FaceRecModelActor.ModelLabels
+import software.altitude.core.actors.FaceRecModelActor.ModelSize
+import software.altitude.core.models.Face
 
 /**
  * This manager maintains references to all face recognition model actors. Each actor is responsible for a single face recognition
@@ -29,17 +30,9 @@ import scala.util.Success
  */
 object FaceRecManagerActor {
   sealed trait Command
-  final case class AddFace(
-      repositoryId: String,
-      face: Face,
-      personLabel: Int)
-    extends AltitudeActorSystem.Command
-    with Command
+  final case class AddFace(repositoryId: String, face: Face, personLabel: Int) extends AltitudeActorSystem.Command with Command
 
-  final case class AddFaces(repositoryId: String,
-                            faces: Seq[Face])
-    extends AltitudeActorSystem.Command
-      with Command
+  final case class AddFaces(repositoryId: String, faces: Seq[Face]) extends AltitudeActorSystem.Command with Command
   final case class Initialize(repositoryId: String, replyTo: ActorRef[AltitudeActorSystem.EmptyResponse])
     extends AltitudeActorSystem.Command
     with Command

@@ -1,6 +1,8 @@
 package software.altitude.core.service
 
+import java.sql.SQLException
 import play.api.libs.json.JsObject
+
 import software.altitude.core.Altitude
 import software.altitude.core.FieldConst
 import software.altitude.core.dao.FaceDao
@@ -14,8 +16,6 @@ import software.altitude.core.util.QueryResult
 import software.altitude.core.util.Sort
 import software.altitude.core.util.SortDirection
 import software.altitude.core.util.Util.getDuplicateExceptionOrSame
-
-import java.sql.SQLException
 
 object PersonService {
   val UNKNOWN_NAME_PREFIX = "Unknown"

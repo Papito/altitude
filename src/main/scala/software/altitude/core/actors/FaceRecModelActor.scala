@@ -1,5 +1,6 @@
 package software.altitude.core.actors
 
+import java.util
 import org.apache.pekko.actor.typed.ActorRef
 import org.apache.pekko.actor.typed.Behavior
 import org.apache.pekko.actor.typed.scaladsl.AbstractBehavior
@@ -8,11 +9,10 @@ import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.face.LBPHFaceRecognizer
+
 import software.altitude.core.AltitudeActorSystem
 import software.altitude.core.models.Face
 import software.altitude.core.util.ImageUtil.matFromBytes
-
-import java.util
 
 object FaceRecModelActor {
   sealed trait Response
@@ -72,14 +72,14 @@ class FaceRecModelActor(context: ActorContext[FaceRecModelActor.Command])
         val labels = new Mat(faces.size, 1, CvType.CV_32SC1)
         val images = new util.ArrayList[Mat]()
 
-        faces.zipWithIndex.foreach { case (face, idx) =>
-          labels.put(idx, 0, face.personLabel.getOrElse(-1))
-          images.add(face.alignedImageGsMat)
+        faces.zipWithIndex.foreach {
+          case (face, idx) =>
+            labels.put(idx, 0, face.personLabel.getOrElse(-1))
+            images.add(face.alignedImageGsMat)
         }
 
         recognizer.update(images, labels)
         Behaviors.same
-
 
       case Initialize(replyTo) =>
         initialize()

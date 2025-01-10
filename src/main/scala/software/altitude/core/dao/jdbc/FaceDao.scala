@@ -7,7 +7,6 @@ import software.altitude.core.FieldConst
 import software.altitude.core.RequestContext
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Face
-import software.altitude.core.models.FaceForBulkTraining
 import software.altitude.core.models.Person
 import software.altitude.core.service.FaceRecognitionService
 
@@ -141,7 +140,7 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
     recs.map(makeModel)
   }
 
-  def getAllForTraining: List[FaceForBulkTraining] = {
+  def getAllForTraining: List[Face] = {
     val sql = s"""
         SELECT ${FieldConst.ID}, ${FieldConst.Face.PERSON_LABEL}, ${FieldConst.REPO_ID}
           FROM $tableName
@@ -152,13 +151,20 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
 
     recs.map(
       rec => {
-        FaceForBulkTraining(
-          id = rec(FieldConst.ID).asInstanceOf[String],
-          repositoryId = rec(FieldConst.REPO_ID).asInstanceOf[String],
+        Face(
+          id = Some(rec(FieldConst.ID).asInstanceOf[String]),
           personLabel = rec(FieldConst.Face.PERSON_LABEL).getClass match {
-            case c if c == classOf[java.lang.Integer] => rec(FieldConst.Face.PERSON_LABEL).asInstanceOf[Int]
-            case c if c == classOf[java.lang.Long] => rec(FieldConst.Face.PERSON_LABEL).asInstanceOf[Long].toInt
-          }
+            case c if c == classOf[java.lang.Integer] => Some(rec(FieldConst.Face.PERSON_LABEL).asInstanceOf[Int])
+            case c if c == classOf[java.lang.Long] => Some(rec(FieldConst.Face.PERSON_LABEL).asInstanceOf[Long].toInt)
+          },
+          checksum = 0,
+          detectionScore = 0,
+          embeddings = Array.emptyFloatArray,
+          features = Array.emptyFloatArray,
+          x1 = 0,
+          y1 = 0,
+          width = 0,
+          height = 0
         )
       })
   }
