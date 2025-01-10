@@ -6,6 +6,12 @@ import org.apache.pekko.stream.scaladsl.Source
 import org.apache.pekko.util.Timeout
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
+import scala.concurrent.Await
+import scala.concurrent.Future
+import scala.concurrent.duration.Duration
+import scala.concurrent.duration.DurationInt
+
 import software.altitude.core.Altitude
 import software.altitude.core.AltitudeActorSystem
 import software.altitude.core.RequestContext
@@ -20,11 +26,6 @@ import software.altitude.core.models.FaceImages
 import software.altitude.core.models.Person
 import software.altitude.core.pipeline.PipelineTypes.PipelineContext
 import software.altitude.core.transactions.TransactionManager
-
-import scala.concurrent.Await
-import scala.concurrent.Future
-import scala.concurrent.duration.Duration
-import scala.concurrent.duration.DurationInt
 
 object FaceRecognitionService {
   // Number of labels reserved for special cases, and not used for actual people instances
@@ -69,6 +70,8 @@ class FaceRecognitionService(val app: Altitude) {
 
   def trainModelFromDb(): Unit = {
     txManager.asReadOnly {
+      logger.info(s"Training model from DB for repo ${RequestContext.getRepository.name}")
+
       val facesForTraining: List[Face] = faceDao.getAllForTraining
 
       val pipelineContext = PipelineContext(RequestContext.getRepository, null)
@@ -80,7 +83,7 @@ class FaceRecognitionService(val app: Altitude) {
         app.actorSystem ? (ref => FaceRecManagerActor.GetModelSize(RequestContext.getRepository.persistedId, ref))
 
       val labelCount = Await.result(labelSizeFut, timeout.duration).size
-      logger.info(s"Trained model from DB for repo ${RequestContext.getRepository.name}. Labels: $labelCount")
+      logger.info(s"Trained model from DB. Labels: $labelCount")
     }
   }
 
@@ -116,9 +119,12 @@ class FaceRecognitionService(val app: Altitude) {
 
     val result: Future[FacePrediction] =
       app.actorSystem.ask(ref => FaceRecManagerActor.Predict(RequestContext.getRepository.persistedId, detectedFace, ref))
-    val predLabel = Await.result(result, timeout.duration).label
+    val prediction = Await.result(result, timeout.duration)
 
-    val personMlMatch: Option[Person] = app.service.faceCache.getPersonByLabel(predLabel)
+    val personMlMatch: Option[Person] = app.service.faceCache.getPersonByLabel(prediction.label)
+    if (personMlMatch.isDefined) {
+      logger.info(s"ML face match: ${personMlMatch.get.label}, confidence: ${prediction.confidence}")
+    }
 
     /**
      * If we have a match, we compare the match to the person's "best" face - the faces are sorted by detection score.
@@ -135,7 +141,7 @@ class FaceRecognitionService(val app: Altitude) {
       logger.debug("Similarity score: " + simScore)
 
       if (simScore >= FaceRecognitionService.PESSIMISTIC_COSINE_DISTANCE_THRESHOLD) {
-        logger.debug("MATCHED. Persisting face")
+        logger.debug("Valid face match")
         return personMlMatch.get
       }
     }
