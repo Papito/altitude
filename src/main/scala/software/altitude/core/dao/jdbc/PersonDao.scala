@@ -2,12 +2,12 @@ package software.altitude.core.dao.jdbc
 
 import com.typesafe.config.Config
 import play.api.libs.json.JsObject
-
-import scala.collection.mutable
-
+import software.altitude.core.Const.FaceRecognition
 import software.altitude.core.FieldConst
 import software.altitude.core.RequestContext
 import software.altitude.core.models.Person
+
+import scala.collection.mutable
 
 abstract class PersonDao(override val config: Config) extends BaseDao with software.altitude.core.dao.PersonDao {
 
@@ -23,6 +23,7 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
         case c if c == classOf[java.lang.Integer] => rec(FieldConst.Person.LABEL).asInstanceOf[Int]
         case c if c == classOf[java.lang.Long] => rec(FieldConst.Person.LABEL).asInstanceOf[Long].toInt
       },
+      isHidden = getBooleanField(rec(FieldConst.Face.IS_HIDDEN)),
       name = Option(rec(FieldConst.Person.NAME).asInstanceOf[String]),
       coverFaceId = Option(rec(FieldConst.Person.COVER_FACE_ID).asInstanceOf[String]),
       mergedWithIds = loadCsv[String](rec(FieldConst.Person.MERGED_WITH_IDS).asInstanceOf[String]),
@@ -36,8 +37,7 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
       } else {
         None
       },
-      numOfFaces = rec(FieldConst.Person.NUM_OF_FACES).asInstanceOf[Int],
-      isHidden = getBooleanField(rec(FieldConst.Person.IS_HIDDEN))
+      numOfFaces = rec(FieldConst.Person.NUM_OF_FACES).asInstanceOf[Int]
     )
   }
 
@@ -63,8 +63,12 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
   }
 
   def getAll: Map[String, Person] = {
-    val sql = s"SELECT * from $tableName WHERE repository_id = ? AND num_of_faces > 0"
-    val recs: List[Map[String, AnyRef]] = manyBySqlQuery(sql, List(RequestContext.getRepository.persistedId))
+    val sql = s"""SELECT * FROM $tableName
+                   WHERE repository_id = ?
+                     AND num_of_faces > ?
+                     """
+    val recs: List[Map[String, AnyRef]] =
+      manyBySqlQuery(sql, List(RequestContext.getRepository.persistedId, FaceRecognition.MIN_FACES_THRESHOLD))
 
     val lookup: mutable.Map[String, Person] = mutable.Map()
 

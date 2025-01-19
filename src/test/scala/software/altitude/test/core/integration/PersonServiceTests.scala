@@ -47,6 +47,25 @@ import software.altitude.test.core.IntegrationTestCore
     people.head.numOfFaces should be(2)
   }
 
+  test("Person becomes valid after adding enough faces") {
+    val importAsset1 = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
+    testApp.service.library.addImportAsset(importAsset1)
+
+    val importAsset2 = IntegrationTestUtil.getImportAsset("people/meme-ben2.png")
+    val importedAsset2: Asset = testApp.service.library.addImportAsset(importAsset2)
+
+    var people = testApp.service.person.getPeople(importedAsset2.persistedId)
+    people.head.numOfFaces should be(2)
+    people.head.isAboveThreshold should be(false)
+
+    val importAsset3 = IntegrationTestUtil.getImportAsset("people/meme-ben3.png")
+    val importedAsset3: Asset = testApp.service.library.addImportAsset(importAsset3)
+
+    people = testApp.service.person.getPeople(importedAsset3.persistedId)
+    people.head.numOfFaces should be(3)
+    people.head.isAboveThreshold should be(true)
+  }
+
   test("Person has cover face assigned") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val importedAsset: Asset = testApp.service.library.addImportAsset(importAsset)
@@ -71,6 +90,20 @@ import software.altitude.test.core.IntegrationTestCore
     val retrievedPerson2: Person = testApp.service.person.getById(person2.persistedId)
 
     retrievedPerson2.label - retrievedPerson1.label should be(1)
+  }
+
+  test("Merging people updates the number of faces correctly") {
+    val personA: Person = testApp.service.person.addPerson(Person())
+    testContext.addTestFaces(personA, 3)
+
+    val personB: Person = testApp.service.person.addPerson(Person())
+    testContext.addTestFaces(personB, 4)
+
+    val mergedB: Person = testApp.service.person.merge(dest=personB, source=personA)
+    mergedB.numOfFaces should be(7)
+
+    val mergedBPersisted: Person = testApp.service.person.getById(mergedB.persistedId)
+    mergedBPersisted.numOfFaces should be(7)
   }
 
   test("Person merge B -> A") {
@@ -147,7 +180,7 @@ import software.altitude.test.core.IntegrationTestCore
     bFacesInDb shouldBe empty
   }
 
-  test("Person merge C -> B, B -> A") {
+  test("Person merge C -> B, B -> A", Focused) {
     val personC: Person = testApp.service.person.addPerson(Person(name=Some("C")))
     testContext.addTestFaces(personC, NUM_OF_FACES)
 
@@ -163,6 +196,8 @@ import software.altitude.test.core.IntegrationTestCore
     val mergedB: Person = testApp.service.person.merge(dest=personB, source=personC)
     // B is trained on C faces
     getLabels.count(_ == personB.label) should be(NUM_OF_FACES)
+    mergedB.numOfFaces should be(NUM_OF_FACES * 2)
+    mergedB.isAboveThreshold should be(true)
 
     val bOrigFaceScores = mergedB.getFaces.map(_.detectionScore)
 
@@ -193,6 +228,7 @@ import software.altitude.test.core.IntegrationTestCore
     val persistedA: Person = testApp.service.person.getById(personA.persistedId)
 
     val mergedA: Person = testApp.service.person.merge(dest=persistedA, source=cachedB)
+    mergedA.isAboveThreshold should be(true)
 
     // A is trained on B faces (which now has B + C faces)
     getLabels.count(_ == personA.label) should be(NUM_OF_FACES * 2)

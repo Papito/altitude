@@ -38,6 +38,7 @@ object FieldConst {
   }
 
   object Face {
+    val IS_HIDDEN = "is_hidden"
     val X1 = "x1"
     val Y1 = "y1"
     val WIDTH = "width"
@@ -48,10 +49,6 @@ object FieldConst {
     val DETECTION_SCORE = "detection_score"
     val EMBEDDINGS = "embeddings"
     val FEATURES = "features"
-    val IMAGE = "image"
-    val DISPLAY_IMAGE = "display_image"
-    val ALIGNED_IMAGE = "aligned_image"
-    val ALIGNED_IMAGE_GS = "aligned_image_gs"
     val CHECKSUM = "checksum"
   }
 

@@ -147,7 +147,7 @@ import software.altitude.test.core.IntegrationTestCore
     testApp.service.faceCache.getAllMatchable.head.numOfFaces should be(3)
   }
 
-  test("Should be able to pre-train the model on existing data", Focused) {
+  test("Should be able to pre-train the model on existing data") {
     val assets = Seq("people/meme-ben.jpg", "people/meme-ben2.png", "people/damon.jpg")
     assets
       .map(IntegrationTestUtil.getImportAsset)
