@@ -6,6 +6,7 @@ import org.scalatest.matchers.must.Matchers.empty
 import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import software.altitude.core.Altitude
+import software.altitude.core.Const.FaceRecognition
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Face
 import software.altitude.core.models.Person
@@ -48,22 +49,13 @@ import software.altitude.test.core.IntegrationTestCore
   }
 
   test("Person becomes valid after adding enough faces") {
-    val importAsset1 = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
-    testApp.service.library.addImportAsset(importAsset1)
+    val person: Person = testApp.service.person.addPerson(Person())
+    person.isAboveThreshold should be(false)
 
-    val importAsset2 = IntegrationTestUtil.getImportAsset("people/meme-ben2.png")
-    val importedAsset2: Asset = testApp.service.library.addImportAsset(importAsset2)
+    testContext.addTestFaces(person, FaceRecognition.MIN_FACES_THRESHOLD)
 
-    var people = testApp.service.person.getPeople(importedAsset2.persistedId)
-    people.head.numOfFaces should be(2)
-    people.head.isAboveThreshold should be(false)
-
-    val importAsset3 = IntegrationTestUtil.getImportAsset("people/meme-ben3.png")
-    val importedAsset3: Asset = testApp.service.library.addImportAsset(importAsset3)
-
-    people = testApp.service.person.getPeople(importedAsset3.persistedId)
-    people.head.numOfFaces should be(3)
-    people.head.isAboveThreshold should be(true)
+    val updatedPerson: Person = testApp.service.person.getById(person.persistedId)
+    updatedPerson.isAboveThreshold should be(true)
   }
 
   test("Person has cover face assigned") {
@@ -180,7 +172,7 @@ import software.altitude.test.core.IntegrationTestCore
     bFacesInDb shouldBe empty
   }
 
-  test("Person merge C -> B, B -> A", Focused) {
+  test("Person merge C -> B, B -> A") {
     val personC: Person = testApp.service.person.addPerson(Person(name=Some("C")))
     testContext.addTestFaces(personC, NUM_OF_FACES)
 

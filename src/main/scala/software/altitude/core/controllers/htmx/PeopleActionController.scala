@@ -20,7 +20,7 @@ class PeopleActionController extends BaseHtmxController {
   }
 
   val showPeopleTab: Route = get("/r/:repoId/tab") {
-    val people: List[Person] = app.service.person.getAll
+    val people: List[Person] = app.service.person.getAllAboveThreshold
 
     ssp("htmx/people", Api.Field.Person.PEOPLE -> people)
   }

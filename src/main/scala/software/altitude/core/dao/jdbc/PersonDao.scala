@@ -6,6 +6,7 @@ import software.altitude.core.Const.FaceRecognition
 import software.altitude.core.FieldConst
 import software.altitude.core.RequestContext
 import software.altitude.core.models.Person
+import software.altitude.core.service.PersonService
 
 import scala.collection.mutable
 
@@ -41,6 +42,29 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
     )
   }
 
+  protected def getPersonName(person: Person, sequenceNum: Long): String = {
+    val name = if (person.name.nonEmpty) {
+      person.name.get
+    }
+    else {
+      s"${PersonService.UNKNOWN_NAME_PREFIX} $sequenceNum"
+    }
+
+    name
+  }
+
+  // lowercase name or "unknown_0001" etc
+  protected def getPersonSortName(person: Person, sequenceNum: Long): String = {
+    val sortName = if (person.name.nonEmpty) {
+      person.name.get.toLowerCase()
+    }
+    else {
+      f"${PersonService.UNKNOWN_NAME_PREFIX.toLowerCase()} $sequenceNum%04d"
+    }
+
+    sortName
+  }
+
   override def updateMergedWithIds(person: Person, newId: String): Person = {
     val updatedIdList = person.mergedWithIds :+ newId
 
@@ -65,10 +89,9 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
   def getAll: Map[String, Person] = {
     val sql = s"""SELECT * FROM $tableName
                    WHERE repository_id = ?
-                     AND num_of_faces > ?
-                     """
+               """
     val recs: List[Map[String, AnyRef]] =
-      manyBySqlQuery(sql, List(RequestContext.getRepository.persistedId, FaceRecognition.MIN_FACES_THRESHOLD))
+      manyBySqlQuery(sql, List(RequestContext.getRepository.persistedId))
 
     val lookup: mutable.Map[String, Person] = mutable.Map()
 
@@ -81,4 +104,15 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
     lookup.toMap
   }
 
+  def getAllAboveThreshold: List[Person] = {
+    val sql = s"""SELECT * FROM $tableName
+                   WHERE repository_id = ?
+                     AND num_of_faces >= ?
+                ORDER BY name_for_sort
+               """
+    val recs: List[Map[String, AnyRef]] =
+      manyBySqlQuery(sql, List(RequestContext.getRepository.persistedId, FaceRecognition.MIN_FACES_THRESHOLD))
+
+    recs.map(makeModel)
+  }
 }

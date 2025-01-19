@@ -120,7 +120,7 @@ class FaceCacheService(app: Altitude) {
           faceCount += 1
       }
 
-      // faces added, now cache the peeps whole
+      // faces added, now cache the people
       personLookup.foreach {
         case (_, person) =>
           putPerson(person)

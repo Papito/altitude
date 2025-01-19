@@ -55,6 +55,7 @@ object FieldConst {
   object Person {
     val LABEL = "label"
     val NAME = "name"
+    val NAME_FOR_SORT = "name_for_sort"
     val COVER_FACE_ID = "cover_face_id"
     val MERGED_WITH_IDS = "merged_with_ids"
     val NUM_OF_FACES = "num_of_faces"

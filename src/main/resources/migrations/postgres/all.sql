@@ -93,6 +93,7 @@ CREATE TABLE person (
   -- this is taken from the person_label table, where its primary key is a sequence
   label BIGINT NOT NULL,
   name TEXT NOT NULL,
+  name_for_sort TEXT NOT NULL,
   cover_face_id CHAR(36),
   merged_with_ids TEXT,
   merged_into_id CHAR(36) DEFAULT NULL REFERENCES person(id) ON DELETE CASCADE,

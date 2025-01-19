@@ -393,7 +393,6 @@ class LibraryService(val app: Altitude) {
   }
 
   def updateMetadataValue(assetId: String, valueId: String, newValue: Any): Unit = {
-
     txManager.withTransaction {
       app.service.metadata.updateFieldValue(assetId, valueId, newValue.toString)
       val asset: Asset = getById(assetId)
