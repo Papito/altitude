@@ -31,9 +31,8 @@
         font-size: 1.2em;
     }
 
-    #statusTicker {
-    }
 
+    /* These elements are served by the server via websocket */
     #statusText {
         display: none;
         color: var(--success-font-color);
