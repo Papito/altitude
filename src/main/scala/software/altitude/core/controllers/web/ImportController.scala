@@ -83,6 +83,13 @@ class ImportController
     client
   }
 
+  val cancelUpload: Route = post(s"/r/:repoId/upload/:${Api.Field.Upload.UPLOAD_ID}/cancel") {
+    val uploadId = params(Api.Field.Upload.UPLOAD_ID)
+    logger.warn(s"CANCELLING upload ID: $uploadId")
+    ImportController.uploadCancelRequest(uploadId) = true
+  }
+
+
   val uploadFilesForm: Route = post(s"/r/:repoId/upload/:${Api.Field.Upload.UPLOAD_ID}") {
     contentType = "text/html"
     val uploadId = params(Api.Field.Upload.UPLOAD_ID)
