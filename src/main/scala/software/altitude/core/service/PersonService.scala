@@ -157,7 +157,11 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
       val pipelineResFuture: Future[Done] = app.service.bulkFaceRecTrainingPipelineService.run(trainingPipelineSource)
       Await.result(pipelineResFuture, Duration.Inf)
 
-      faceDao.updateByQuery(query, Map(FieldConst.Face.PERSON_ID -> dest.persistedId))
+      // faces from source are moved to the new person and ML model label
+      faceDao.updateByQuery(query, Map(
+        FieldConst.Face.PERSON_ID -> dest.persistedId,
+        FieldConst.Face.PERSON_LABEL -> dest.label)
+      )
 
       val updatedSource: Person = persistedSource.copy(mergedIntoId = Some(dest.persistedId), mergedIntoLabel = Some(dest.label))
 

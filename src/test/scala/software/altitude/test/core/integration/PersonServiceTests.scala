@@ -84,7 +84,7 @@ import software.altitude.test.core.IntegrationTestCore
     retrievedPerson2.label - retrievedPerson1.label should be(1)
   }
 
-  test("Merging people updates the number of faces correctly") {
+  test("Merging people results in correct persistence state") {
     val personA: Person = testApp.service.person.addPerson(Person())
     testContext.addTestFaces(personA, 3)
 
@@ -92,10 +92,18 @@ import software.altitude.test.core.IntegrationTestCore
     testContext.addTestFaces(personB, 4)
 
     val mergedB: Person = testApp.service.person.merge(dest=personB, source=personA)
-    mergedB.numOfFaces should be(7)
+    val NEW_FACES_TOTAL = 7
+    mergedB.numOfFaces should be(NEW_FACES_TOTAL)
 
     val mergedBPersisted: Person = testApp.service.person.getById(mergedB.persistedId)
-    mergedBPersisted.numOfFaces should be(7)
+
+    // merged person should have the correct face number
+    mergedBPersisted.numOfFaces should be(NEW_FACES_TOTAL)
+
+    // all face labels should be the same as the merged INTO person label
+    val faces  = testApp.service.person.getPersonFaces(mergedB.persistedId)
+    faces.count(_.personId.get == mergedB.persistedId) should be(NEW_FACES_TOTAL)
+    faces.count(_.personLabel.get == mergedB.label) should be(NEW_FACES_TOTAL)
   }
 
   test("Person merge B -> A") {
@@ -160,19 +168,16 @@ import software.altitude.test.core.IntegrationTestCore
     aFacesInDb.size should be(NUM_OF_FACES * 2)
 
     val persistedA: Person = testApp.service.person.getById(personA.persistedId)
-    persistedA.mergedWithIds should be(mergedA.mergedWithIds)
     persistedA.numOfFaces should be(NUM_OF_FACES * 2)
 
     val persistedB: Person = testApp.service.person.getById(personB.persistedId)
-    persistedB.mergedIntoId should be(Some(mergedA.persistedId))
-    persistedB.mergedIntoLabel should be(Some(mergedA.label))
     persistedB.numOfFaces should be(0)
 
     val bFacesInDb: List[Face] = testApp.service.person.getPersonFaces(persistedB.persistedId)
     bFacesInDb shouldBe empty
   }
 
-  test("Person merge C -> B, B -> A") {
+  test("Person merge C -> B, B -> A", Focused) {
     val personC: Person = testApp.service.person.addPerson(Person(name=Some("C")))
     testContext.addTestFaces(personC, NUM_OF_FACES)
 

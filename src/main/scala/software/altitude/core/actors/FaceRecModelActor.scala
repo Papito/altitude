@@ -103,7 +103,7 @@ class FaceRecModelActor(context: ActorContext[FaceRecModelActor.Command])
 
       case GetModelLabels(replyTo) =>
         val labels = recognizer.getLabels
-        val labelSeq = (0 until labels.height()).map(labels.get(_, 0)(0).toInt)
+        val labelSeq = (2 until labels.height()).map(labels.get(_, 0)(0).toInt)
         replyTo ! ModelLabels(labelSeq)
         Behaviors.same
     }

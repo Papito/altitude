@@ -27,6 +27,7 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
       isHidden = getBooleanField(rec(FieldConst.Face.IS_HIDDEN)),
       name = Option(rec(FieldConst.Person.NAME).asInstanceOf[String]),
       coverFaceId = Option(rec(FieldConst.Person.COVER_FACE_ID).asInstanceOf[String]),
+      numOfFaces = rec(FieldConst.Person.NUM_OF_FACES).asInstanceOf[Int],
       mergedWithIds = loadCsv[String](rec(FieldConst.Person.MERGED_WITH_IDS).asInstanceOf[String]),
       mergedIntoId = Option(rec(FieldConst.Person.MERGED_INTO_ID).asInstanceOf[String]),
       // If mergedIntoLabel is there, it's an Int or a Long, depending on DB
@@ -38,7 +39,6 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
       } else {
         None
       },
-      numOfFaces = rec(FieldConst.Person.NUM_OF_FACES).asInstanceOf[Int]
     )
   }
 
@@ -86,7 +86,8 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
 
   def getAll: Map[String, Person] = {
     val sql = s"""SELECT * FROM $tableName
-                   WHERE repository_id = ?
+                   WHERE merged_into_id is NULL
+                     AND repository_id = ?
                """
     val recs: List[Map[String, AnyRef]] =
       manyBySqlQuery(sql, List(RequestContext.getRepository.persistedId))
