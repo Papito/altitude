@@ -37,29 +37,21 @@
 </form>
 
 <script type="module">
-    htmx.find("#field-<%= Api.Field.Person.NAME %>").focus()
-    htmx.find("#field-<%= Api.Field.Person.NAME %>").select()
-
     import { Const } from "../../../../js/constants.js"
-    import { showErrorSnackBar } from "../../../../js/common/snackbar.js"
+
+    const elPersonNameInputCtrl = htmx.find("#field-<%= Api.Field.Person.NAME %>")
+    elPersonNameInputCtrl.focus()
+    elPersonNameInputCtrl.select()
 
     htmx.find("#editPersonName").addEventListener(
         "htmx:afterRequest",
         function (evt) {
-            const requestPath = evt.detail.pathInfo.requestPath
-            const status = evt.detail.xhr.status
-
             if (evt.detail.successful === false) {
-                console.debug(evt)
-                showErrorSnackBar(
-                    "Error for request to " + requestPath + ". HTTP " + status,
-                )
                 return
             }
 
-            const elPerson = htmx.find("#person")
-            const personId = elPerson.getAttribute(Const.attributes.personId)
-            const personName = htmx.find("#person .name").innerText.trim()
+            const personId = htmx.find("#person").getAttribute(Const.attributes.personId)
+            const personName = htmx.find("#person .name span").innerText.trim()
 
             const personNameEditedEvent = new CustomEvent(
                 Const.events.personNameEdited,
