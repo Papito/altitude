@@ -112,7 +112,6 @@
         }
 
         htmx.on("#uploadForm", "htmx:xhr:progress", function (evt) {
-            console.log("!!", evt)
             const percentLoaded = parseInt((evt.detail.loaded / evt.detail.total) * 100)
             setBusy(percentLoaded)
 

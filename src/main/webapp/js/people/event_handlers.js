@@ -35,3 +35,12 @@ document.body.addEventListener(Const.events.personMerged, (event) => {
 
     showSuccessSnackBar("Person merged successfully")
 })
+
+document.body.addEventListener(Const.events.personNameEdited, (event) => {
+    const personId = event.detail["personId"]
+    const newPersonName = event.detail["newPersonName"]
+
+    console.debug(`Person ${personId} name changed to ${newPersonName}`)
+
+    htmx.find("#person-" + personId + " .name a").textContent = newPersonName
+})

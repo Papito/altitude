@@ -47,8 +47,8 @@ interact("#people .dropzone").dropzone({
 
         draggableElement.classList.remove("can-drop")
 
-        const mergeSrcId = draggableElement.getAttribute("person-id")
-        const mergeDestId = dropzoneElement.getAttribute("person-id")
+        const mergeSrcId = draggableElement.getAttribute(Const.attributes.personId)
+        const mergeDestId = dropzoneElement.getAttribute(Const.attributes.personId)
 
         console.debug("Merging " + mergeSrcId + " into " + mergeDestId)
         const confirmPersonMergeEvent = new CustomEvent(

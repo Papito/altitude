@@ -7,6 +7,7 @@ export const Const = {
         folderCollapsed: "FOLDER_COLLAPSED_EVENT",
         personMerged: "PERSON_MERGED_EVENT",
         confirmPersonMerge: "CONFIRM_PERSON_MERGE_EVENT",
+        personNameEdited: "PERSON_NAME_EDITED_EVENT",
     },
 
     /**
@@ -25,6 +26,7 @@ export const Const = {
         assetId: "alt-asset-id",
         originalWidth: "alt-og-width",
         dataSrc: "alt-data-src",
+        personId: "alt-person-id",
     },
 
     context: {

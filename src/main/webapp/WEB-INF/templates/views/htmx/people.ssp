@@ -60,8 +60,8 @@
             #for (person <- people)
             <div id="person-${person.persistedId}"
                  class="cell drag-drop dropzone"
-                 person-id="${person.persistedId}">
-                <div>
+                 alt-person-id="${person.persistedId}">
+                <div class="image">
                     <a href="#"
                        hx-target="#content"
                        hx-trigger="click"
@@ -70,7 +70,7 @@
                     <img src="/content/r/${RequestContext.getRepository.persistedId}/${Const.DataStore.FACE}/${person.coverFaceId}">
                     </a>
                 </div>
-                <div>
+                <div class="name">
                     <a href="#"
                        hx-target="#content"
                        hx-trigger="click"
