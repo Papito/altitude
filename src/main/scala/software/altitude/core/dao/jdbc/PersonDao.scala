@@ -45,8 +45,7 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
   protected def getPersonName(person: Person, sequenceNum: Long): String = {
     val name = if (person.name.nonEmpty) {
       person.name.get
-    }
-    else {
+    } else {
       s"${PersonService.UNKNOWN_NAME_PREFIX} $sequenceNum"
     }
 
@@ -57,8 +56,7 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
   protected def getPersonSortName(person: Person, sequenceNum: Long): String = {
     val sortName = if (person.name.nonEmpty) {
       person.name.get.toLowerCase()
-    }
-    else {
+    } else {
       f"${PersonService.UNKNOWN_NAME_PREFIX.toLowerCase()} $sequenceNum%04d"
     }
 

@@ -250,10 +250,13 @@ import software.altitude.test.core.IntegrationTestCore
     // testApp.service.faceCache.dump()
   }
 
-  def isSortedDescending(seq: Seq[Double]): Boolean = {
-    seq.sliding(2).forall {
-      case Seq(x, y) => x >= y
-      case _ => true
-    }
+
+  test("Same person can appear in the same image more than once") {
+    val importAsset = IntegrationTestUtil.getImportAsset("people/twins.png")
+    val importedAsset: Asset = testApp.service.library.addImportAsset(importAsset)
+    val people = testApp.service.person.getPeople(importedAsset.persistedId)
+
+    people.length should be(1)
+    people.head.numOfFaces should be(2)
   }
 }

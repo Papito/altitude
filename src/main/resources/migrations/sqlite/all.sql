@@ -127,8 +127,7 @@ CREATE TABLE face (
   FOREIGN KEY(asset_id) REFERENCES asset(id) ON DELETE CASCADE,
   FOREIGN KEY(repository_id) REFERENCES repository(id) ON DELETE CASCADE
 );
-CREATE UNIQUE INDEX face_01 ON face(person_id, asset_id);
-CREATE UNIQUE INDEX face_02 ON face(repository_id, checksum);
+CREATE UNIQUE INDEX face_01 ON face(repository_id, checksum);
 
 CREATE TABLE metadata_field (
   id CHAR(36) PRIMARY KEY,

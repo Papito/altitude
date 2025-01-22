@@ -6,12 +6,6 @@ import org.apache.pekko.stream.scaladsl.Source
 import org.apache.pekko.util.Timeout
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
-import scala.concurrent.Await
-import scala.concurrent.Future
-import scala.concurrent.duration.Duration
-import scala.concurrent.duration.DurationInt
-
 import software.altitude.core.Altitude
 import software.altitude.core.AltitudeActorSystem
 import software.altitude.core.RequestContext
@@ -26,6 +20,11 @@ import software.altitude.core.models.FaceImages
 import software.altitude.core.models.Person
 import software.altitude.core.pipeline.PipelineTypes.PipelineContext
 import software.altitude.core.transactions.TransactionManager
+
+import scala.concurrent.Await
+import scala.concurrent.Future
+import scala.concurrent.duration.Duration
+import scala.concurrent.duration.DurationInt
 
 object FaceRecognitionService {
   // Number of labels reserved for special cases, and not used for actual people instances
@@ -207,13 +206,5 @@ class FaceRecognitionService(val app: Altitude) {
 
   def indexFaces(faces: Seq[Face], repositoryId: String = RequestContext.getRepository.persistedId): Unit = {
     app.actorSystem ! FaceRecManagerActor.AddFaces(repositoryId, faces)
-  }
-
-  def addFacesToPerson(faces: List[Face], person: Person): Unit = {
-    faces.foreach(
-      face => {
-        person.addFace(face)
-        indexFace(face, person.label)
-      })
   }
 }
