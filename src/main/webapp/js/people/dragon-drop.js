@@ -2,15 +2,11 @@ import interact from "https://cdn.interactjs.io/v1.9.20/interactjs/index.js"
 
 import { Const } from "../constants.js"
 import { dragged, dragMoveListener } from "../common/dragon-drop.js"
+
 interact("#people .drag-drop").draggable({
     inertia: true,
-    modifiers: [
-        interact.modifiers.restrict({
-            restriction: "parent",
-            endOnly: true,
-        }),
-    ],
-    autoScroll: { container: document.getElementById("explorerViews") },
+    autoScroll: true,
+
     listeners: {
         move: dragMoveListener,
         end: dragged,
@@ -18,7 +14,7 @@ interact("#people .drag-drop").draggable({
 })
 
 interact("#people .dropzone").dropzone({
-    accept: "#people .drag-drop",
+    accept: "#person .drag-drop, #people .drag-drop",
     overlap: 0.5,
 
     ondropactivate: function (event) {

@@ -59,12 +59,21 @@
     #person .name span i {
         padding-left: 10px;
     }
+
+    #person .visual  > .cover.can-drop {
+        padding-left: 4px;
+        border: var(--dnd-draggable-border);
+        border-radius: 4px;
+        background-color: var(--dnd-can-drop-color);
+    }
+
 </style>
 
 <div id="person" alt-person-id="${person.persistedId}">
     <div class="visual">
-        <div class="cover">
-            <img src="/content/r/${RequestContext.getRepository.persistedId}/${Const.DataStore.FACE}/${person.coverFaceId}">
+        <div class="cover person drag-drop" alt-person-id="${person.persistedId}">
+            <img src="/content/r/${RequestContext.getRepository.persistedId}/${Const.DataStore.FACE}/${person.coverFaceId}"
+                 draggable="false">
         </div>
         <div class="edit-cover">
             <a href="#">Choose cover</a>
@@ -79,3 +88,5 @@
         </div>
     </div>
 </div>
+
+<script type="module" src="/js/person/dragon-drop.js"></script>
