@@ -14,9 +14,9 @@ interact("#people .drag-drop").draggable({
     },
 })
 
-interact("#people .dropzone, #person .dropzone").dropzone({
+interact("#people .dropzone, #person.dropzone").dropzone({
     accept: "#person .drag-drop, #people .drag-drop",
-    overlap: 0.5,
+    overlap: 0.75,
 
     ondropactivate: function (event) {
         event.target.classList.add("drop-active")

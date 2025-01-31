@@ -67,7 +67,7 @@
         background-color: var(--dnd-can-drop-color);
     }
 
-    #person .drop-target {
+    #person.drop-target {
         border-radius: 6px;
         background-color: var(--dnd-drop-target-color);
     }
@@ -75,9 +75,9 @@
 
 </style>
 
-<div id="person" alt-person-id="${person.persistedId}">
-    <div class="visual dropzone" alt-person-id="${person.persistedId}">
-        <div class="cover person drag-drop" alt-person-id="${person.persistedId}">
+<div id="person" class="dropzone" alt-person-id="${person.persistedId}">
+    <div class="visual " alt-person-id="${person.persistedId}">
+        <div class="cover drag-drop" alt-person-id="${person.persistedId}">
             <img src="/content/r/${RequestContext.getRepository.persistedId}/${Const.DataStore.FACE}/${person.coverFaceId}"
                  draggable="false">
         </div>
