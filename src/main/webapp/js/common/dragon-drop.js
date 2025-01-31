@@ -5,18 +5,18 @@ const dragState = {
     y: 0,
 }
 
-export function dragged(e) {
+export function dragged(event) {
     dragState.x = 0
     dragState.y = 0
 
-    let target = e.target
+    let target = event.target
     target.style.position = "relative"
     target.style.top = "auto"
-    e.target.style.transform = "translate(0px, 0px)"
+    event.target.style.transform = "translate(0px, 0px)"
 
     // reset the position attributes for draggables (on failed drag, it will resume from the last position)
-    e.target.removeAttribute("data-x")
-    e.target.removeAttribute("data-y")
+    event.target.removeAttribute("data-x")
+    event.target.removeAttribute("data-y")
 
     let imgElement = target.querySelector("img")
     if (imgElement) {
@@ -43,4 +43,14 @@ export function dragMoveListener(event) {
     // update the position attributes
     target.setAttribute("data-x", x)
     target.setAttribute("data-y", y)
+}
+
+// Setting element as "fixed" will let us drag it outside the parent container boundaries (between panels)
+export function setFixedPositionWhileDragging(event) {
+    console.debug("Setting fixed position while dragging")
+    let target = event.target
+    let position = target.getBoundingClientRect()
+
+    target.style.position = "fixed"
+    target.style.top = position.top + "px"
 }
