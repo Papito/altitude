@@ -11,6 +11,13 @@ export function dragged(event) {
     event.target.removeAttribute("data-x")
     event.target.removeAttribute("data-y")
 
+
+    // Remove the placeholder element
+    const placeholder = document.querySelector(".drag-placeholder")
+    if (placeholder) {
+        placeholder.remove()
+    }
+
     let imgElement = target.querySelector("img")
     if (imgElement) {
         imgElement.style.width =
@@ -39,4 +46,12 @@ export function setFixedPositionWhileDragging(event) {
     target.style.position = "fixed"
     target.style.top = position.top + "px"
     target.style.left = position.left + "px"
+
+    const placeholder = document.createElement("div")
+    placeholder.classList.add("drag-placeholder")
+    placeholder.style.width = position.width + "px"
+    placeholder.style.height = position.height + "px"
+    placeholder.style.margin = window.getComputedStyle(target).margin
+
+    target.parentNode.insertBefore(placeholder, target)
 }
