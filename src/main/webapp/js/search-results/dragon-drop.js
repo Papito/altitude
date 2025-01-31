@@ -8,7 +8,6 @@ interact("#assets .drag-drop").draggable({
 
     listeners: {
         move: dragMoveListener,
-        end: dragged,
         /**
          * This a custom function that, in addition to setting the display as "fixed",
          * makes the image smaller while dragging, for better UX.
@@ -31,5 +30,6 @@ interact("#assets .drag-drop").draggable({
                 target.style.top = position.top + yOffset + "px"
             }
         },
+        end: dragged,
     },
 })

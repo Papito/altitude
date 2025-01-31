@@ -4,7 +4,7 @@ import { dragged, dragMoveListener, setFixedPositionWhileDragging } from "../com
 interact(".person.drag-drop").draggable({
     listeners: {
         move: dragMoveListener,
-        end: dragged,
         start: setFixedPositionWhileDragging,
+        end: dragged,
     },
 })

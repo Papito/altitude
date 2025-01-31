@@ -1,7 +1,7 @@
 import interact from "https://cdn.interactjs.io/v1.9.20/interactjs/index.js"
 
 import { Const } from "../constants.js"
-import { dragged, dragMoveListener } from "../common/dragon-drop.js"
+import { dragged, dragMoveListener, setFixedPositionWhileDragging } from "../common/dragon-drop.js"
 
 interact("#people .drag-drop").draggable({
     inertia: true,
@@ -10,10 +10,11 @@ interact("#people .drag-drop").draggable({
     listeners: {
         move: dragMoveListener,
         end: dragged,
+        start: setFixedPositionWhileDragging,
     },
 })
 
-interact("#people .dropzone").dropzone({
+interact("#people .dropzone, #person .dropzone").dropzone({
     accept: "#person .drag-drop, #people .drag-drop",
     overlap: 0.5,
 
