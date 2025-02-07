@@ -231,7 +231,10 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
   def updateName(person: Person, newName: String): Person = {
     txManager.withTransaction {
 
-      updateById(person.persistedId, Map(FieldConst.Person.NAME -> newName))
+      updateById(person.persistedId, Map(
+        FieldConst.Person.NAME -> newName,
+        FieldConst.Person.NAME_FOR_SORT -> newName.toLowerCase()
+      ))
 
       person.copy(name = Some(newName))
     }

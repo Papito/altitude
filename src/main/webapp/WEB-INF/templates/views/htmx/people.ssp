@@ -36,22 +36,6 @@
         text-decoration: none;
 
     }
-
-    #people .draggable {
-        cursor: move;
-    }
-
-    #people .drop-target {
-        border-radius: 6px;
-        background-color: var(--dnd-drop-target-color);
-    }
-
-    #people .can-drop {
-        padding-left: 4px;
-        border: var(--dnd-draggable-border);
-        border-radius: 4px;
-        background-color: var(--dnd-can-drop-color);
-    }
 </style>
 
 <div id="peopleList">

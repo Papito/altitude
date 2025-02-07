@@ -60,19 +60,6 @@
         padding-left: 10px;
     }
 
-    #person .can-drop {
-        padding-left: 4px;
-        border: var(--dnd-draggable-border);
-        border-radius: 4px;
-        background-color: var(--dnd-can-drop-color);
-    }
-
-    #person.drop-target {
-        border-radius: 6px;
-        background-color: var(--dnd-drop-target-color);
-    }
-
-
 </style>
 
 <div id="person" class="dropzone" alt-person-id="${person.persistedId}">

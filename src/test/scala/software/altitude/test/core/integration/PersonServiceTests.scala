@@ -5,7 +5,7 @@ import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.must.Matchers.empty
 import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import software.altitude.core.Altitude
+import software.altitude.core.{Altitude, RequestContext}
 import software.altitude.core.Const.FaceRecognition
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Face
@@ -33,6 +33,29 @@ import software.altitude.test.core.IntegrationTestCore
     people.size should be(2)
     people.head.numOfFaces should be(1)
     people.last.numOfFaces should be(1)
+  }
+
+  test("Update person's name", Focused) {
+    val name = "Ben"
+    val person = testApp.service.person.addPerson(Person(name=Some(name)))
+
+    val personQuery = "select * from person where id = ?"
+
+    testApp.txManager.asReadOnly {
+      val row = this.query(personQuery, person.persistedId).head
+      row("name") should be(name)
+      row("name_for_sort") should be(name.toLowerCase)
+    }
+
+    val newName = "Jerry"
+    testApp.service.person.updateName(person, newName)
+
+    testApp.txManager.asReadOnly {
+      val row = this.query(personQuery, person.persistedId).head
+      row("name") should be(newName)
+      row("name_for_sort") should be(newName.toLowerCase)
+    }
+
   }
 
   test("Faces are added to a person") {
@@ -177,7 +200,7 @@ import software.altitude.test.core.IntegrationTestCore
     bFacesInDb shouldBe empty
   }
 
-  test("Person merge C -> B, B -> A", Focused) {
+  test("Person merge C -> B, B -> A") {
     val personC: Person = testApp.service.person.addPerson(Person(name=Some("C")))
     testContext.addTestFaces(personC, NUM_OF_FACES)
 
