@@ -9,7 +9,7 @@
         margin: 5px;
         padding: 5px;
         border-bottom: 2px solid var(--background-tertiary-color);
-        grid-template-columns: 100px 300px auto;
+        grid-template-columns: 100px 300px 1fr;
         column-gap: var(--control-horizontal-space);
     }
 
@@ -40,7 +40,7 @@
     }
 
     #person .edit-cover a {
-        font-size: .9em;
+        text-decoration: none;
     }
 
     #person .name, #person .num-of-instances{
@@ -60,6 +60,25 @@
         padding-left: 10px;
     }
 
+    #person .visibility-controls {
+        display: grid;
+        grid-template-rows: 1fr 1fr;
+        place-items: center;
+    }
+
+    #person .mark-hidden a, #person .mark-hidden i {
+        color: var(--warning-font-color);
+        text-decoration: none;
+    }
+
+    #person .mark-invalid a, #person .mark-invalid i {
+        color: var(--error-font-color);
+        text-decoration: none;
+    }
+
+    #person .visibility-controls i {
+        padding-right: 5px;
+    }
 </style>
 
 <div id="person" class="dropzone" alt-person-id="${person.persistedId}">
@@ -78,6 +97,14 @@
         </div>
         <div class="num-of-instances">
             (${person.numOfFaces} occurrences)
+        </div>
+    </div>
+    <div class="visibility-controls">
+        <div class="mark-hidden">
+            <a href="#"><i class="fas fa-eye-slash"></i>Hide</a>
+        </div>
+        <div class="mark-invalid">
+            <a href="#"><i class="fas fa-exclamation-circle"></i>Not a person</a>
         </div>
     </div>
 </div>
