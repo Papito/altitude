@@ -249,6 +249,7 @@ class Altitude(val dbEngineOverride: Option[String] = None) {
     val faceCache = new FaceCacheService(app)
     val importPipeline = new ImportPipelineService(app)
     val bulkFaceRecTrainingPipelineService = new BulkFaceRecTrainingPipelineService(app)
+    val urlService = new UrlService()
 
     val fileStore: FileStoreService = fileStoreType match {
       case C.StorageEngineName.FS => new FileSystemStoreService(app)

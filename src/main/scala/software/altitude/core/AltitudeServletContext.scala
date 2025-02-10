@@ -55,10 +55,6 @@ object AltitudeServletContext {
     (new PeopleActionController, "/htmx/people/*"),
     (new SearchResultsController, "/htmx/search/*"),
     (new SetupController, "/htmx/admin/setup/*")
-
-    // (new admin.MetadataController, "/api/v1/admin/metadata/*"),
-    // (new FileSystemBrowserController, "/navigate/*"),
-    // (new ImportController(actorSystem), "/import/*")
   )
 
   def mountEndpoints(context: ServletContext): Unit = {

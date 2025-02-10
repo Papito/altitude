@@ -59,10 +59,7 @@
           }
       })
 
-  /**
-   * Set the necessary context for script includes (below)
-   */
-  context.repoId = "${ RequestContext.getRepository.persistedId }"
+  context.setRepoId("<%= RequestContext.getRepository.persistedId %>")
 </script>
 
 <script type="module" src="/js/search-results/dragon-drop.js"></script>

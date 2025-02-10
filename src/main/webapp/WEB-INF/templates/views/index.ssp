@@ -142,16 +142,34 @@
 </footer>
 
 <script type="module">
-  function loadTabFromFragment() {
+  import { context } from "../../../js/context.js"
+
+  function loadView() {
+    // if there is no fragment, we default to folder views
     const fragment = window.location.hash || "#folders"
 
     const tabLink = document.querySelector("a[href=\"" + fragment + "\"]")
     if (tabLink) {
       tabLink.click()
     }
+
+    context.setRepoId("<%= RequestContext.getRepository.persistedId %>")
+    const urlParams = new URLSearchParams(window.location.search)
+    const view = urlParams.get("view")
+    if (view === "person") {
+      const personId = urlParams.get("personId")
+      if (personId) {
+        const personViewUrl = "/htmx/people/r/" + context.getRepoId() + "/p/" + personId + "/search"
+
+        htmx.ajax("get", personViewUrl, {
+          swap: "innerHTML",
+          target: "#content"
+        })
+      }
+    }
   }
 
-  document.addEventListener("DOMContentLoaded", loadTabFromFragment)
+  document.addEventListener("DOMContentLoaded", loadView)
 </script>
 
 </body>

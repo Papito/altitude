@@ -2,14 +2,10 @@ package software.altitude.core.controllers.htmx
 
 import org.scalatra.Route
 import play.api.libs.json.JsObject
-import software.altitude.core.Api
-import software.altitude.core.DataScrubber
-import software.altitude.core.DuplicateException
-import software.altitude.core.ValidationException
+import software.altitude.core.{Api, DataScrubber, DuplicateException, RequestContext, ValidationException, Const => C}
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.BaseHtmxController
 import software.altitude.core.models.Person
-import software.altitude.core.{ Const => C }
 
 /** @ /htmx/people/ */
 class PeopleActionController extends BaseHtmxController {
@@ -26,7 +22,7 @@ class PeopleActionController extends BaseHtmxController {
 
   val searchPerson: Route = get("/r/:repoId/p/:personId/search") {
     val personId: String = params.get("personId").get
-    searchPerson(personId = personId)
+    viewPerson(personId = personId)
   }
 
   val showEditPersonName: Route = get("/r/:repoId/p/:personId/name/edit") {
@@ -122,12 +118,13 @@ class PeopleActionController extends BaseHtmxController {
     logger.info(s"MERGING: {${srcPerson.name} into ${destPerson.name}")
 
     app.service.person.merge(dest = destPerson, source = srcPerson)
-    searchPerson(personId = destPersonId)
+    viewPerson(personId = destPersonId)
   }
 
-  private def searchPerson(personId: String): String = {
+  private def viewPerson(personId: String): String = {
     val person: Person = app.service.person.getById(personId)
-
+    val personViewUrl = app.service.urlService.getUrlForPersonView(request, person.persistedId)
+    response.addHeader("HX-Replace-Url", personViewUrl)
     ssp("htmx/person", Api.Field.Person.PERSON -> person)
   }
 }
