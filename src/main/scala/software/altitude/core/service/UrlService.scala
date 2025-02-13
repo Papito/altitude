@@ -1,8 +1,8 @@
 package software.altitude.core.service
 
-import software.altitude.core.RequestContext
-
 import javax.servlet.http.HttpServletRequest
+
+import software.altitude.core.RequestContext
 
 class UrlService {
   def getUrlForPersonView(request: HttpServletRequest, personId: String): String = {
@@ -12,6 +12,6 @@ class UrlService {
   private def gerFragment(request: HttpServletRequest): String = {
     val currentUrl = request.getHeader("HX-Current-URL")
     val urlFragment = currentUrl.split("#").lastOption.getOrElse("")
-    if (urlFragment.isEmpty) "" else s"#${urlFragment}"
+    if (urlFragment.isEmpty) "" else s"#$urlFragment"
   }
 }

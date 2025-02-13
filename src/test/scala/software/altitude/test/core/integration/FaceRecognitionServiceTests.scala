@@ -99,13 +99,13 @@ import software.altitude.test.core.IntegrationTestCore
 
   test("Load face cache") {
     val personA: Person = testApp.service.person.addPerson(Person(name=Some(Util.randomStr(size = 6))))
-    testContext.addTestFaces(personA, 15)
+    testContext.addTestFacesAndAssets(personA, 15)
 
     val personB: Person = testApp.service.person.addPerson(Person(name=Some(Util.randomStr(size = 6))))
-    testContext.addTestFaces(personB, 15)
+    testContext.addTestFacesAndAssets(personB, 15)
 
     val personC: Person = testApp.service.person.addPerson(Person(name=Some(Util.randomStr(size = 6))))
-    testContext.addTestFaces(personC, 15)
+    testContext.addTestFacesAndAssets(personC, 15)
 
     testApp.service.faceCache.clear()
 

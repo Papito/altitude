@@ -1,5 +1,9 @@
 import interact from "https://cdn.interactjs.io/v1.9.20/interactjs/index.js"
-import { dragged, dragMoveListener, setFixedPositionWhileDragging } from "../common/dragon-drop.js"
+import {
+    dragged,
+    dragMoveListener,
+    setFixedPositionWhileDragging,
+} from "../common/dragon-drop.js"
 import { Const } from "../constants.js"
 
 interact("#assets .drag-drop").draggable({

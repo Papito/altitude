@@ -2,10 +2,14 @@ package software.altitude.core.controllers.htmx
 
 import org.scalatra.Route
 import play.api.libs.json.JsObject
-import software.altitude.core.{Api, DataScrubber, DuplicateException, RequestContext, ValidationException, Const => C}
+import software.altitude.core.Api
+import software.altitude.core.DataScrubber
+import software.altitude.core.DuplicateException
+import software.altitude.core.ValidationException
 import software.altitude.core.Validators.ApiRequestValidator
 import software.altitude.core.controllers.BaseHtmxController
 import software.altitude.core.models.Person
+import software.altitude.core.{ Const => C }
 
 /** @ /htmx/people/ */
 class PeopleActionController extends BaseHtmxController {

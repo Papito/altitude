@@ -5,7 +5,7 @@ import org.scalatest.matchers.must.Matchers.be
 import org.scalatest.matchers.must.Matchers.empty
 import org.scalatest.matchers.must.Matchers.not
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import software.altitude.core.{Altitude, RequestContext}
+import software.altitude.core.Altitude
 import software.altitude.core.Const.FaceRecognition
 import software.altitude.core.models.Asset
 import software.altitude.core.models.Face
@@ -35,7 +35,7 @@ import software.altitude.test.core.IntegrationTestCore
     people.last.numOfFaces should be(1)
   }
 
-  test("Update person's name", Focused) {
+  test("Update person's name") {
     val name = "Ben"
     val person = testApp.service.person.addPerson(Person(name=Some(name)))
 
@@ -75,7 +75,7 @@ import software.altitude.test.core.IntegrationTestCore
     val person: Person = testApp.service.person.addPerson(Person())
     person.isAboveThreshold should be(false)
 
-    testContext.addTestFaces(person, FaceRecognition.MIN_FACES_THRESHOLD)
+    testContext.addTestFacesAndAssets(person, FaceRecognition.MIN_FACES_THRESHOLD)
 
     val updatedPerson: Person = testApp.service.person.getById(person.persistedId)
     updatedPerson.isAboveThreshold should be(true)
@@ -109,10 +109,10 @@ import software.altitude.test.core.IntegrationTestCore
 
   test("Merging people results in correct persistence state") {
     val personA: Person = testApp.service.person.addPerson(Person())
-    testContext.addTestFaces(personA, 3)
+    testContext.addTestFacesAndAssets(personA, 3)
 
     val personB: Person = testApp.service.person.addPerson(Person())
-    testContext.addTestFaces(personB, 4)
+    testContext.addTestFacesAndAssets(personB, 4)
 
     val mergedB: Person = testApp.service.person.merge(dest=personB, source=personA)
     val NEW_FACES_TOTAL = 7
@@ -131,7 +131,7 @@ import software.altitude.test.core.IntegrationTestCore
 
   test("Person merge B -> A") {
     val personA: Person = testApp.service.person.addPerson(Person())
-    testContext.addTestFaces(personA, NUM_OF_FACES)
+    testContext.addTestFacesAndAssets(personA, NUM_OF_FACES)
 
     //
     // *** Person in cache should have only the required top faces, sorted by detection score
@@ -147,7 +147,7 @@ import software.altitude.test.core.IntegrationTestCore
       faces.head.detectionScore >= faces.last.detectionScore) should be(true)
 
     val personB: Person = testApp.service.person.addPerson(Person())
-    testContext.addTestFaces(personB, NUM_OF_FACES)
+    testContext.addTestFacesAndAssets(personB, NUM_OF_FACES)
 
     var cachedB = testApp.service.faceCache.getPersonByLabel(personB.label).get
     cachedB.getFaces.size should be(FaceRecognitionService.MAX_COMPARISONS_PER_PERSON)
@@ -202,10 +202,10 @@ import software.altitude.test.core.IntegrationTestCore
 
   test("Person merge C -> B, B -> A") {
     val personC: Person = testApp.service.person.addPerson(Person(name=Some("C")))
-    testContext.addTestFaces(personC, NUM_OF_FACES)
+    testContext.addTestFacesAndAssets(personC, NUM_OF_FACES)
 
     val personB: Person = testApp.service.person.addPerson(Person(name=Some("B")))
-    testContext.addTestFaces(personB, NUM_OF_FACES)
+    testContext.addTestFacesAndAssets(personB, NUM_OF_FACES)
 
     // no faces, to keep it simple
     val personA: Person = testApp.service.person.addPerson(Person(name=Some("A")))

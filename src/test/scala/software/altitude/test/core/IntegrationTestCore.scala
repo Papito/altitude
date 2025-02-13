@@ -16,11 +16,11 @@ import software.altitude.core.actors.FaceRecModelActor.ModelSize
 import software.altitude.core.models._
 import software.altitude.test.IntegrationTestUtil
 import software.altitude.test.core.integration.TestContext
-import scala.jdk.CollectionConverters._
 
 import scala.concurrent.Await
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
+import scala.jdk.CollectionConverters._
 import scala.language.implicitConversions
 
 abstract class IntegrationTestCore

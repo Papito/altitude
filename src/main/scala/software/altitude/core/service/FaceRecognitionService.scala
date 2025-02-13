@@ -156,7 +156,7 @@ class FaceRecognitionService(val app: Altitude) {
     } else {
       logger.info("Mo match. Adding new person")
       val personModel = Person()
-      val newPerson: Person = app.service.person.addPerson(personModel, Some(asset))
+      val newPerson: Person = app.service.person.addPerson(personModel)
       newPerson
     }
   }

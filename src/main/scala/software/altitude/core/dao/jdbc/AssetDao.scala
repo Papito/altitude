@@ -40,7 +40,6 @@ abstract class AssetDao(val config: Config) extends BaseDao with software.altitu
       isRecycled = getBooleanField(rec(FieldConst.Asset.IS_RECYCLED)),
       isTriaged = getBooleanField(rec(FieldConst.Asset.IS_TRIAGED)),
       isPipelineProcessed = getBooleanField(rec(FieldConst.Asset.IS_PIPELINE_PROCESSED)),
-      isInFaceRecModel = getBooleanField(rec(FieldConst.Asset.IS_IN_FACE_REC_MODEL)),
       createdAt = getDateTimeField(rec.get(FieldConst.CREATED_AT)),
       updatedAt = getDateTimeField(rec.get(FieldConst.UPDATED_AT))
     )

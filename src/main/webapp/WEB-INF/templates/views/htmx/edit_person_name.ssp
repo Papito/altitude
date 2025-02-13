@@ -50,7 +50,9 @@
                 return
             }
 
-            const personId = htmx.find("#person").getAttribute(Const.attributes.personId)
+            const personId = htmx
+                .find("#person")
+                .getAttribute(Const.attributes.personId)
             const personName = htmx.find("#person .name span").innerText.trim()
 
             const personNameEditedEvent = new CustomEvent(
@@ -58,12 +60,11 @@
                 {
                     detail: {
                         personId: personId,
-                        newPersonName: personName
+                        newPersonName: personName,
                     },
                 },
             )
             document.body.dispatchEvent(personNameEditedEvent)
         },
     )
-
 </script>

@@ -63,12 +63,12 @@ CREATE TABLE asset  (
   is_recycled TINYINT NOT NULL DEFAULT 0,
   is_triaged TINYINT NOT NULL DEFAULT 0,
   is_pipeline_processed TINYINT NOT NULL DEFAULT 0,
-  is_in_face_rec_model TINYINT NOT NULL DEFAULT 0,
   created_at DATETIME DEFAULT (datetime('now', 'utc')),
   updated_at DATETIME DEFAULT NULL,
   FOREIGN KEY(repository_id) REFERENCES repository(id) ON DELETE CASCADE
 );
 CREATE UNIQUE INDEX asset_01 ON asset(repository_id, checksum, is_recycled);
+CREATE INDEX asset_02 ON asset(repository_id, is_recycled, is_pipeline_processed);
 
 CREATE TABLE person_label (
   id INTEGER PRIMARY KEY AUTOINCREMENT
@@ -128,6 +128,8 @@ CREATE TABLE face (
   FOREIGN KEY(repository_id) REFERENCES repository(id) ON DELETE CASCADE
 );
 CREATE UNIQUE INDEX face_01 ON face(repository_id, checksum);
+CREATE INDEX face_02 ON face (person_id);
+
 
 CREATE TABLE metadata_field (
   id CHAR(36) PRIMARY KEY,

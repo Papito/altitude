@@ -88,7 +88,7 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
     }
   }
 
-  def addPerson(person: Person, asset: Option[Asset] = None): Person = {
+  def addPerson(person: Person): Person = {
     txManager.withTransaction[Person] {
       require(person.getFaces.size < 2, "Adding a new person with more than one face is currently not supported")
 
@@ -149,19 +149,14 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
 
       val sourceFacesWithNewDestLabel: List[Face] = allSourceFaces.map(face => face.copy(personLabel = Some(dest.label)))
 
-      /**
-       * Take source faces, update them with destination ML label, and push via stream to the training pipeline
-       */
+      /** Take source faces, update them with destination ML label, and push via stream to the training pipeline */
       val pipelineContext = PipelineContext(RequestContext.getRepository, null)
       val trainingPipelineSource = Source.fromIterator(() => sourceFacesWithNewDestLabel.iterator).map((_, pipelineContext))
       val pipelineResFuture: Future[Done] = app.service.bulkFaceRecTrainingPipelineService.run(trainingPipelineSource)
       Await.result(pipelineResFuture, Duration.Inf)
 
       // faces from source are moved to the new person and ML model label
-      faceDao.updateByQuery(query, Map(
-        FieldConst.Face.PERSON_ID -> dest.persistedId,
-        FieldConst.Face.PERSON_LABEL -> dest.label)
-      )
+      faceDao.updateByQuery(query, Map(FieldConst.Face.PERSON_ID -> dest.persistedId, FieldConst.Face.PERSON_LABEL -> dest.label))
 
       val updatedSource: Person = persistedSource.copy(mergedIntoId = Some(dest.persistedId), mergedIntoLabel = Some(dest.label))
 
@@ -231,10 +226,12 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
   def updateName(person: Person, newName: String): Person = {
     txManager.withTransaction {
 
-      updateById(person.persistedId, Map(
-        FieldConst.Person.NAME -> newName,
-        FieldConst.Person.NAME_FOR_SORT -> newName.toLowerCase()
-      ))
+      updateById(
+        person.persistedId,
+        Map(
+          FieldConst.Person.NAME -> newName,
+          FieldConst.Person.NAME_FOR_SORT -> newName.toLowerCase()
+        ))
 
       person.copy(name = Some(newName))
     }

@@ -11,7 +11,6 @@ export function dragged(event) {
     event.target.removeAttribute("data-x")
     event.target.removeAttribute("data-y")
 
-
     // Remove the placeholder element
     const placeholder = document.querySelector(".drag-placeholder")
     if (placeholder) {
