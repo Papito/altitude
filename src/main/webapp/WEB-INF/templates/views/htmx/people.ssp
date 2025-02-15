@@ -50,7 +50,7 @@
                        hx-target="#content"
                        hx-trigger="click"
                        hx-swap="innerHTML"
-                       hx-get='${ url(searchPerson, Api.Field.REPO_ID -> RequestContext.getRepository.persistedId, Api.Field.PERSON_ID -> person.persistedId) }'>
+                       hx-get='${ url(htmxSearchResults, Api.Field.REPO_ID -> RequestContext.getRepository.persistedId) }?${Api.Field.Search.PEOPLE_IDS}=${person.persistedId}'>
                     <img src="/content/r/${RequestContext.getRepository.persistedId}/${Const.DataStore.FACE}/${person.coverFaceId}">
                     </a>
                 </div>
@@ -59,7 +59,7 @@
                        hx-target="#content"
                        hx-trigger="click"
                        hx-swap="innerHTML"
-                       hx-get='${ url(searchPerson, Api.Field.REPO_ID -> RequestContext.getRepository.persistedId, Api.Field.PERSON_ID -> person.persistedId) }'>
+                       hx-get='${ url(htmxSearchResults, Api.Field.REPO_ID -> RequestContext.getRepository.persistedId) }?${Api.Field.Search.PEOPLE_IDS}=${person.persistedId}'>
                         ${person.name.get}
                     </a>
                 </div>

@@ -160,11 +160,7 @@
           const personId = urlParams.get("personId")
           if (personId) {
               const personViewUrl =
-                  "/htmx/people/r/" +
-                  context.getRepoId() +
-                  "/p/" +
-                  personId +
-                  "/search"
+                  "/htmx/search/r/" + context.getRepoId() + "?personIds=" + personId
 
               htmx.ajax("get", personViewUrl, {
                   swap: "innerHTML",

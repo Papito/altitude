@@ -107,11 +107,13 @@ object Api {
 
     object Search {
       val ASSETS = "assets"
+      val PERSON = "person"
       val QUERY_TEXT = "q"
       val RESULTS_PER_PAGE = "rpp"
       val RESULTS = "results"
       val PAGE = "p"
-      val FOLDERS = "folders"
+      val FOLDER_IDS = "folderIds"
+      val PEOPLE_IDS = "personIds"
       val SORT = "sort"
     }
 
