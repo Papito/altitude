@@ -43,15 +43,6 @@
         text-decoration: none;
     }
 
-    #person .name, #person .num-of-instances{
-        display: grid;
-        align-items: center;
-    }
-
-    #person .num-of-instances {
-        color: var(--font-color-dim);
-    }
-
     #person .name span  {
         cursor: pointer;
     }
@@ -95,17 +86,16 @@
         <div class="name">
             ${ include("view_person_name.ssp") }
         </div>
-        <div class="num-of-instances">
-            (${person.numOfFaces} occurrences)
-        </div>
     </div>
     <div class="visibility-controls">
         <div class="mark-hidden">
             <a href="#"><i class="fas fa-eye-slash"></i>Hide</a>
         </div>
+        #if (person.numOfFaces < 10)
         <div class="mark-invalid">
             <a href="#"><i class="fas fa-exclamation-circle"></i>Not a person</a>
         </div>
+        #end
     </div>
 </div>
 
