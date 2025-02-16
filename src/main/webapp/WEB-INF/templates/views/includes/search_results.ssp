@@ -1,9 +1,6 @@
 <% import software.altitude.core.Const %>
 <% import software.altitude.core.AltitudeServletContext %>
 <% import software.altitude.core.RequestContext %>
-<% import software.altitude.core.models.Asset %>
-<% import software.altitude.core.util.SearchResult %>
-<%@ val results: SearchResult %>
 
 <style>
   #assets .cell {
@@ -17,7 +14,7 @@
     cursor: pointer;
   }
 
-  #assets .grid {
+  #assets {
     margin: 10px;
     display: flex;
     flex-wrap: wrap;
@@ -34,10 +31,6 @@
 </style>
 
 <div id="assets">
-  <div class="grid">
-    <% include("../htmx/results_grid.ssp") %>
-  </div>
-
 </div>
 
 <script type="module">
@@ -51,7 +44,7 @@
    * Observe every new cell element in the grid for lazy loading/unloading
    */
   document
-      .querySelector("#assets .grid")
+      .querySelector("#assets")
       .addEventListener("htmx:load", function (evt) {
           const imgEl = evt.target.querySelector("img")
           if (imgEl !== null) {

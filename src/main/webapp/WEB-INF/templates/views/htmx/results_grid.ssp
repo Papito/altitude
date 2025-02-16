@@ -9,16 +9,6 @@
 <%@ val page: Int = 1 %>
 <%@ val nextPage: Int = page + 1 %>
 <%@ val results: SearchResult %>
-<%@ val isServerSideLoad: Boolean = false %>
-
-<%--
-
-SEE: results_grid.ssp for the plumbing comments of infinite scroll and lazy-loading.
-
-NOTE: The FIRST set of results is server-loaded, this is what "isServerSideLoad" is here for.
-      Those images do not have a "data-src" attribute and are NOT watched by the intersection observer
-      (first batch is not lazy loaded or unloaded, they are static).
---%>
 
 #for (idx <- 0 to results.records.length - 1)
 
@@ -44,13 +34,7 @@ NOTE: The FIRST set of results is server-loaded, this is what "isServerSideLoad"
                  hx-trigger="click"
                  hx-target="#imageDetailModalContent"
                  hx-get="${ url(showAssetDetailModal, Api.Field.ASSET_ID -> asset.persistedId, Api.Field.REPO_ID -> RequestContext.getRepository.persistedId) }"
-
-                 #if (isServerSideLoad) <%-- First page is rendered by server not via infinite scroll --%>
-                 src="${imgUrl}"
-                 #else
                  alt-data-src="${imgUrl}"
-                 #end
-
                  alt="${ asset.fileName }"
                  class="responsive-image">
 

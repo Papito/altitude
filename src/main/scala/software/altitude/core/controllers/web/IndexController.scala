@@ -16,16 +16,8 @@ class IndexController extends BaseWebController {
     requireLogin()
     contentType = "text/html"
 
-    val q = new SearchQuery(
-      rpp = Const.Search.DEFAULT_RPP
-    )
-
-    val results: SearchResult = app.service.library.search(q)
-
     layoutTemplate(
-      "/WEB-INF/templates/views/index.ssp",
-      "results" -> results,
-      "isServerSideLoad" -> true
+      "/WEB-INF/templates/views/index.ssp"
     )
   }
 
