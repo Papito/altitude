@@ -115,6 +115,7 @@ object Api {
       val FOLDER_IDS = "folderIds"
       val PEOPLE_IDS = "personIds"
       val SORT = "sort"
+      val IS_CONTINUOUS_SCROLL = "isContinuousScroll"
     }
 
     object SearchSort {

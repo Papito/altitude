@@ -65,15 +65,21 @@ export const observer = new IntersectionObserver(function (entries, self) {
                 // console.debug("Already loaded: %s", entry.target.getAttribute(Const.attributes.dataSrc))
                 return
             }
-            entry.target.src = entry.target.getAttribute(
-                Const.attributes.dataSrc,
-            )
+
+            if (entry.target.hasAttribute(Const.attributes.dataSrc)) {
+                // console.debug("Loading: %s", entry.target.src)
+                entry.target.src = entry.target.getAttribute(Const.attributes.dataSrc)
+            }
+
         } else {
             if (entry.target.getAttribute("src") === placeholderImageData) {
                 return
             }
-            // console.debug("Unloading %s", entry.target.getAttribute(Const.attributes.dataSrc))
-            entry.target.src = placeholderImageData
+
+            if (entry.target.hasAttribute(Const.attributes.dataSrc)) {
+                // console.debug("Unloading %s", entry.target.getAttribute(Const.attributes.dataSrc))
+                entry.target.src = placeholderImageData
+            }
         }
     })
 }, observerOptions)

@@ -133,7 +133,6 @@
   </div>
 
   <div id="content" class="split content split-horizontal">
-    <% include("includes/search_results.ssp") %>
   </div>
 </main>
 
@@ -171,7 +170,7 @@
 
     htmx.ajax("get", searchUrl, {
       swap: "innerHTML",
-      target: "#assets",
+      target: "#content",
     })
 
   }

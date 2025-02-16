@@ -11,6 +11,9 @@ class UrlService {
 
   private def gerFragment(request: HttpServletRequest): String = {
     val currentUrl = request.getHeader("HX-Current-URL")
+
+    if (currentUrl == null) return ""
+
     val urlFragment = currentUrl.split("#").lastOption.getOrElse("")
     if (urlFragment.isEmpty) "" else s"#$urlFragment"
   }

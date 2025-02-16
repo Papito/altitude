@@ -27,7 +27,7 @@ class SearchResultsController extends BaseHtmxController {
     val page = params.getOrElse(Api.Field.Search.PAGE, "1").toInt
     val queryText = params.get(Api.Field.Search.QUERY_TEXT)
     val sortArg = params.get(Api.Field.Search.SORT)
-
+    val isContinuousScroll = params.getOrElse(Api.Field.Search.IS_CONTINUOUS_SCROLL, "false").toBoolean
     val folderIdsCsv = params.get(Api.Field.Search.FOLDER_IDS)
     val personIdsCsv = params.get(Api.Field.Search.PEOPLE_IDS)
 
@@ -68,19 +68,36 @@ class SearchResultsController extends BaseHtmxController {
       halt(204)
     }
 
-    var personOpt: Option[Person] = None
-    if (personIds.size == 1) {
-      personOpt = Some(app.service.person.getById(personIds.head))
-      val personViewUrl = app.service.urlService.getUrlForPersonView(request, personOpt.get.persistedId)
-      response.addHeader("HX-Replace-Url", personViewUrl)
+    /**
+     * If this is not a continuous scroll request and a person view,
+     * render the larger results template with auxiliary person view.
+     */
+    if (!isContinuousScroll) {
+      var personOpt: Option[Person] =  None
+
+      if (personIds.size == 1) {
+        personOpt = Some(app.service.person.getById(personIds.head))
+        val personViewUrl = app.service.urlService.getUrlForPersonView(request, personOpt.get.persistedId)
+        response.addHeader("HX-Replace-Url", personViewUrl)
+      }
+
+      ssp(
+        "/includes/search_results.ssp",
+        Api.Field.Search.RESULTS -> results,
+        Api.Field.Search.PAGE -> page,
+        Api.Field.Search.PERSON -> personOpt.orNull,
+        Api.Field.Search.IS_CONTINUOUS_SCROLL -> false
+      )
+    } else {
+      ssp(
+        "/htmx/results_grid.ssp",
+        Api.Field.Search.RESULTS -> results,
+        Api.Field.Search.PAGE -> page,
+        Api.Field.Search.IS_CONTINUOUS_SCROLL -> true
+      )
+
     }
 
-    ssp(
-      "/htmx/results_grid.ssp",
-      Api.Field.Search.RESULTS -> results,
-      Api.Field.Search.PAGE -> page,
-      Api.Field.Search.PERSON -> personOpt.orNull
-    )
   }
 
 }

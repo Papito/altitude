@@ -47,7 +47,7 @@
                  alt-person-id="${person.persistedId}">
                 <div class="image">
                     <a href="#"
-                       hx-target="#assets"
+                       hx-target="#content"
                        hx-trigger="click"
                        hx-swap="innerHTML"
                        hx-get='${ url(htmxSearchResults, Api.Field.REPO_ID -> RequestContext.getRepository.persistedId) }?${Api.Field.Search.PEOPLE_IDS}=${person.persistedId}'>
@@ -56,7 +56,7 @@
                 </div>
                 <div class="name">
                     <a href="#"
-                       hx-target="#assets"
+                       hx-target="#content"
                        hx-trigger="click"
                        hx-swap="innerHTML"
                        hx-get='${ url(htmxSearchResults, Api.Field.REPO_ID -> RequestContext.getRepository.persistedId) }?${Api.Field.Search.PEOPLE_IDS}=${person.persistedId}'>

@@ -1,6 +1,8 @@
 <% import software.altitude.core.Const %>
 <% import software.altitude.core.AltitudeServletContext %>
 <% import software.altitude.core.RequestContext %>
+<% import software.altitude.core.models.Person %>
+<%@ val person: Person = null %>
 
 <style>
   #assets .cell {
@@ -30,7 +32,12 @@
   }
 </style>
 
+#if (person != null)
+<% include("../htmx/person.ssp") %>
+#end
+
 <div id="assets">
+  <% include("../htmx/results_grid.ssp") %>
 </div>
 
 <script type="module">
