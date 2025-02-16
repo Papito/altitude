@@ -118,7 +118,7 @@ import scala.language.reflectiveCalls
 
   }
 
-  def fixtureForPersonFilter: Object {val peopleCount: Int; val assetsPerPersonCount: Int; val people: Seq[Person]} = new {
+  def fixtureForPersonFilter: Object {val assetsPerPersonCount: Int; val people: Seq[Person]} = new {
     val peopleCount =  3
     val assetsPerPersonCount = 3
 
@@ -139,11 +139,11 @@ import scala.language.reflectiveCalls
     results.total shouldBe f.assetsPerPersonCount
   }
 
-  test("Filter by more than one person", Focused) {
+  test("Filter by more than one person") {
     val f = fixtureForPersonFilter
     val q = new SearchQuery(personIds = f.people.map(_.persistedId).toSet)
     val results = testApp.service.library.search(q)
-    results.total shouldBe f.assetsPerPersonCount * f.peopleCount
+    results.total shouldBe f.assetsPerPersonCount * f.people.length
   }
 
   test("Recycled assets should not be in the search index") {

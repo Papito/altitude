@@ -82,7 +82,7 @@ class SearchResultsController extends BaseHtmxController {
       }
 
       ssp(
-        "/includes/search_results.ssp",
+        "/includes/search_results",
         Api.Field.Search.RESULTS -> results,
         Api.Field.Search.PAGE -> page,
         Api.Field.Search.PERSON -> personOpt.orNull,
@@ -90,7 +90,7 @@ class SearchResultsController extends BaseHtmxController {
       )
     } else {
       ssp(
-        "/htmx/results_grid.ssp",
+        "/htmx/results_grid",
         Api.Field.Search.RESULTS -> results,
         Api.Field.Search.PAGE -> page,
         Api.Field.Search.IS_CONTINUOUS_SCROLL -> true

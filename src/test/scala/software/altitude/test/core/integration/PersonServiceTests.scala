@@ -29,7 +29,7 @@ import software.altitude.test.core.IntegrationTestCore
     val persistedFaces = testApp.service.person.getAssetFaces(importedAsset.persistedId)
     persistedFaces.size should be(faces.size)
 
-    val people = testApp.service.person.getPeople(importedAsset.persistedId)
+    val people = testApp.service.person.getPeopleForAsset(importedAsset.persistedId)
     people.size should be(2)
     people.head.numOfFaces should be(1)
     people.last.numOfFaces should be(1)
@@ -66,7 +66,7 @@ import software.altitude.test.core.IntegrationTestCore
     val importAsset2 = IntegrationTestUtil.getImportAsset("people/meme-ben2.png")
     val importedAsset2: Asset = testApp.service.library.addImportAsset(importAsset2)
 
-    val people = testApp.service.person.getPeople(importedAsset2.persistedId)
+    val people = testApp.service.person.getPeopleForAsset(importedAsset2.persistedId)
     people.size should be(1)
     people.head.numOfFaces should be(2)
   }
@@ -81,10 +81,10 @@ import software.altitude.test.core.IntegrationTestCore
     updatedPerson.isAboveThreshold should be(true)
   }
 
-  test("Person has cover face assigned") {
+  test("Person has cover face assigned", Focused) {
     val importAsset = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
     val importedAsset: Asset = testApp.service.library.addImportAsset(importAsset)
-    val people = testApp.service.person.getPeople(importedAsset.persistedId)
+    val people = testApp.service.person.getPeopleForAsset(importedAsset.persistedId)
     val faces = testApp.service.person.getAssetFaces(importedAsset.persistedId)
 
     people.size should be(1)
@@ -282,9 +282,34 @@ import software.altitude.test.core.IntegrationTestCore
   test("Same person can appear in the same image more than once") {
     val importAsset = IntegrationTestUtil.getImportAsset("people/twins.png")
     val importedAsset: Asset = testApp.service.library.addImportAsset(importAsset)
-    val people = testApp.service.person.getPeople(importedAsset.persistedId)
+    val people = testApp.service.person.getPeopleForAsset(importedAsset.persistedId)
 
     people.length should be(1)
     people.head.numOfFaces should be(2)
   }
+
+  test("Hidden person should not be returned with bulk retrieval") {
+    val person: Person = testApp.service.person.addPerson(Person())
+    testContext.addTestFacesAndAssets(person, 6)
+
+    val hiddenPerson: Person = testApp.service.person.addPerson(Person())
+    testContext.addTestFacesAndAssets(hiddenPerson, 6)
+
+    testApp.service.person.getAllAboveThreshold.size should be(2)
+    testApp.service.person.setVisibility(hiddenPerson, isHidden = true)
+    testApp.service.person.getAllAboveThreshold.size should be(1)
+  }
+
+  test("Hidden person is not returned for an asset") {
+    val importAsset1 = IntegrationTestUtil.getImportAsset("people/meme-ben.jpg")
+    val asset = testApp.service.library.addImportAsset(importAsset1)
+
+    var people = testApp.service.person.getPeopleForAsset(asset.persistedId)
+    people.size should be(1)
+
+    testApp.service.person.setVisibility(people.head, isHidden = true)
+    people = testApp.service.person.getPeopleForAsset(asset.persistedId)
+    people.size should be(0)
+  }
+
 }

@@ -115,4 +115,30 @@ class PeopleActionController extends BaseHtmxController {
     app.service.person.merge(dest = destPerson, source = srcPerson)
     redirect(s"/htmx/search/r/${RequestContext.getRepository.persistedId}?${Api.Field.Search.PEOPLE_IDS}=${destPersonId}")
   }
+
+  val hidePerson: Route = put("/r/:repoId/p/:personId/hide") {
+    val personId: String = params.get("personId").get
+    val person: Person = app.service.person.getById(personId)
+    logger.info(s"Hiding person: $personId")
+
+    val updatedPerson = app.service.person.setVisibility(person, isHidden = true)
+
+    ssp(
+      "htmx/person_inner",
+      Api.Field.Search.PERSON  -> updatedPerson,
+    )
+  }
+
+  val showPerson: Route = put("/r/:repoId/p/:personId/show") {
+    val personId: String = params.get("personId").get
+    logger.info(s"Showing person: $personId")
+    val person: Person = app.service.person.getById(personId)
+
+    val updatedPerson = app.service.person.setVisibility(person, isHidden = false)
+
+    ssp(
+      "htmx/person_inner",
+      Api.Field.Search.PERSON  -> updatedPerson,
+    )
+  }
 }

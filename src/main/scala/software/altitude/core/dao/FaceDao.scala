@@ -11,4 +11,5 @@ trait FaceDao extends BaseDao {
   def add(jsonIn: JsObject, asset: Asset, person: Person): JsObject
   def getAllForCache: List[Face]
   def getAllForTraining: List[Face]
+  def getAssetFaces(assetId: String): List[Face]
 }

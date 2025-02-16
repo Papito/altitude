@@ -45,7 +45,7 @@ import software.altitude.test.core.IntegrationTestCore
     cachedPerson.get.getFaces.size should be(1)
 
     // person is trained on one face (model has one label reference)
-    val people = testApp.service.person.getPeople(importedAsset1.persistedId)
+    val people = testApp.service.person.getPeopleForAsset(importedAsset1.persistedId)
     val person = people.head
     getLabels.count(_ == person.label) should be(1)
 
@@ -85,7 +85,7 @@ import software.altitude.test.core.IntegrationTestCore
     val importAsset = IntegrationTestUtil.getImportAsset("people/movies-speed.png")
     val importedAsset: Asset = testApp.service.library.addImportAsset(importAsset)
 
-    val people = testApp.service.person.getPeople(importedAsset.persistedId)
+    val people = testApp.service.person.getPeopleForAsset(importedAsset.persistedId)
     people.size should be(2)
 
     // model has two label references, one for each person
@@ -129,8 +129,8 @@ import software.altitude.test.core.IntegrationTestCore
     val importAsset2 = IntegrationTestUtil.getImportAsset("people/damon.jpg")
     val persistedAsset2 = testApp.service.library.addImportAsset(importAsset2)
 
-    val ben = testApp.service.person.getPeople(persistedAsset1.persistedId).head
-    val matt = testApp.service.person.getPeople(persistedAsset2.persistedId).head
+    val ben = testApp.service.person.getPeopleForAsset(persistedAsset1.persistedId).head
+    val matt = testApp.service.person.getPeopleForAsset(persistedAsset2.persistedId).head
 
     // Matt and Ben are the same person now
     testApp.service.person.merge(dest=matt, source=ben)
@@ -170,8 +170,8 @@ import software.altitude.test.core.IntegrationTestCore
     val importAsset2 = IntegrationTestUtil.getImportAsset("people/damon.jpg")
     val persistedAsset2 = testApp.service.library.addImportAsset(importAsset2)
 
-    val person1 = testApp.service.person.getPeople(persistedAsset1.persistedId).head
-    val person2 = testApp.service.person.getPeople(persistedAsset2.persistedId).head
+    val person1 = testApp.service.person.getPeopleForAsset(persistedAsset1.persistedId).head
+    val person2 = testApp.service.person.getPeopleForAsset(persistedAsset2.persistedId).head
 
     getNumberOfModelLabels shouldBe 2
     getLabels.count(_ == person1.label) shouldBe 1

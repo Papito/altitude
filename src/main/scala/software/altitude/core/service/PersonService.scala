@@ -194,17 +194,18 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
 
   def getAssetFaces(assetId: String): List[Face] = {
     txManager.asReadOnly[List[Face]] {
-      val q = new Query(params = Map(FieldConst.Face.ASSET_ID -> assetId))
-
-      val qRes: QueryResult = faceDao.query(q)
-      qRes.records.map(Face.fromJson(_))
+      faceDao.getAssetFaces(assetId)
     }
   }
 
-  def getPeople(assetId: String): List[Person] = {
+  def getPeopleForAsset(assetId: String): List[Person] = {
     txManager.asReadOnly[List[Person]] {
       val faces = getAssetFaces(assetId)
       val personIds = faces.map(_.personId.get)
+
+      if (personIds.isEmpty) {
+        return List()
+      }
 
       val q = new Query(params = Map(FieldConst.ID -> Query.IN(personIds.toSet)))
 
@@ -213,7 +214,7 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
     }
   }
 
-  def setFaceAsCover(person: Person, face: Face): Person = {
+  private def setFaceAsCover(person: Person, face: Face): Person = {
     txManager.withTransaction {
       val personForUpdate = person.copy(coverFaceId = Some(face.persistedId))
 
@@ -234,6 +235,13 @@ class PersonService(val app: Altitude) extends BaseService[Person] {
         ))
 
       person.copy(name = Some(newName))
+    }
+  }
+
+  def setVisibility(person: Person, isHidden: Boolean): Person = {
+    txManager.withTransaction {
+      updateById(person.persistedId, Map(FieldConst.Person.IS_HIDDEN -> isHidden))
+      person.copy(isHidden = isHidden)
     }
   }
 

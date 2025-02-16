@@ -38,7 +38,6 @@ object FieldConst {
   }
 
   object Face {
-    val IS_HIDDEN = "is_hidden"
     val X1 = "x1"
     val Y1 = "y1"
     val WIDTH = "width"

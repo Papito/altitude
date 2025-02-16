@@ -97,6 +97,22 @@ abstract class FaceDao(override val config: Config) extends BaseDao with softwar
     )
   }
 
+  def getAssetFaces(assetId: String): List[Face] = {
+    val sql = s"""
+        SELECT face.*
+          FROM face, person
+         WHERE face.repository_id = ?
+           AND face.asset_id = ?
+           AND face.person_id = person.id
+           AND person.is_hidden = FALSE
+      """
+
+    val recs: List[Map[String, AnyRef]] = manyBySqlQuery(
+      sql, List(RequestContext.getRepository.persistedId, assetId))
+
+    recs.map(makeModel)
+  }
+
   /**
    * Get faces for all people in this repo, but only the top X faces per person. We use those to brute-force compare a new face,
    * if there is no machine-learned hit, and to verify ML hits as well.

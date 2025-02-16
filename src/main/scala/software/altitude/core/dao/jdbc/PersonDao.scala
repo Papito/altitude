@@ -25,7 +25,7 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
         case c if c == classOf[java.lang.Integer] => rec(FieldConst.Person.LABEL).asInstanceOf[Int]
         case c if c == classOf[java.lang.Long] => rec(FieldConst.Person.LABEL).asInstanceOf[Long].toInt
       },
-      isHidden = getBooleanField(rec(FieldConst.Face.IS_HIDDEN)),
+      isHidden = getBooleanField(rec(FieldConst.Person.IS_HIDDEN)),
       name = Option(rec(FieldConst.Person.NAME).asInstanceOf[String]),
       coverFaceId = Option(rec(FieldConst.Person.COVER_FACE_ID).asInstanceOf[String]),
       numOfFaces = rec(FieldConst.Person.NUM_OF_FACES).asInstanceOf[Int],
@@ -108,6 +108,7 @@ abstract class PersonDao(override val config: Config) extends BaseDao with softw
     val sql = s"""SELECT * FROM $tableName
                    WHERE repository_id = ?
                      AND num_of_faces >= ?
+                     AND is_hidden = FALSE
                 ORDER BY name_for_sort
                """
     val recs: List[Map[String, AnyRef]] =

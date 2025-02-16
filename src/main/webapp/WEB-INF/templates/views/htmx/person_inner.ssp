@@ -1,0 +1,42 @@
+<% import software.altitude.core.Const %>
+<% import software.altitude.core.Api %>
+<% import software.altitude.core.RequestContext %>
+<% import software.altitude.core.models.Person %>
+<%@ val person: Person %>
+
+<div class="visual " alt-person-id="${person.persistedId}">
+    <div class="cover drag-drop" alt-person-id="${person.persistedId}">
+        <img src="/content/r/${RequestContext.getRepository.persistedId}/${Const.DataStore.FACE}/${person.coverFaceId}"
+             draggable="false">
+    </div>
+    <div class="edit-cover">
+        <a href="#">Choose cover</a>
+    </div>
+</div>
+<div class="meta">
+    <div class="name">
+        ${ include("view_person_name.ssp") }
+    </div>
+</div>
+
+<div class="visibility-controls">
+    #if (person.isHidden)
+        <div class="mark-visible">
+            <a href="#"
+               hx-trigger="click"
+               hx-put="${ url(showPerson, Api.Field.REPO_ID -> RequestContext.getRepository.persistedId, Api.Field.PERSON_ID -> person.persistedId) }"
+               hx-swap="innerHTML"
+               hx-target="#person"
+            ><i class="fas fa-eye"></i>Show</a>
+        </div>
+    #else
+        <div class="mark-hidden">
+            <a href="#"
+               hx-trigger="click"
+               hx-put="${ url(hidePerson, Api.Field.REPO_ID -> RequestContext.getRepository.persistedId, Api.Field.PERSON_ID -> person.persistedId) }"
+               hx-swap="innerHTML"
+               hx-target="#person"
+            ><i class="fas fa-eye-slash"></i>Hide</a>
+        </div>
+    #end
+</div>
