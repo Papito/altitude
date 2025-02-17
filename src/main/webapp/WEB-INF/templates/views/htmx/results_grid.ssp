@@ -6,8 +6,8 @@
 <% import software.altitude.core.Api %>
 <%@ val isContinuousScroll: Boolean = false %>
 
-<%@ val page: Int = 1 %>
-<%@ val nextPage: Int = page + 1 %>
+<%@ val p: Int %>
+<%@ val nextPage: Int = p + 1 %>
 <%@ val results: SearchResult %>
 
 #for (idx <- 0 to results.records.length - 1)

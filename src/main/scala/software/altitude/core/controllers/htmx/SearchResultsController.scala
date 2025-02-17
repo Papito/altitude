@@ -72,7 +72,14 @@ class SearchResultsController extends BaseHtmxController {
      * If this is not a continuous scroll request and a person view,
      * render the larger results template with auxiliary person view.
      */
-    if (!isContinuousScroll) {
+    if (isContinuousScroll) {
+      ssp(
+        "/htmx/results_grid",
+        Api.Field.Search.RESULTS -> results,
+        Api.Field.Search.PAGE -> page,
+        Api.Field.Search.IS_CONTINUOUS_SCROLL -> true
+      )
+    } else {
       var personOpt: Option[Person] =  None
 
       if (personIds.size == 1) {
@@ -88,14 +95,6 @@ class SearchResultsController extends BaseHtmxController {
         Api.Field.Search.PERSON -> personOpt.orNull,
         Api.Field.Search.IS_CONTINUOUS_SCROLL -> false
       )
-    } else {
-      ssp(
-        "/htmx/results_grid",
-        Api.Field.Search.RESULTS -> results,
-        Api.Field.Search.PAGE -> page,
-        Api.Field.Search.IS_CONTINUOUS_SCROLL -> true
-      )
-
     }
 
   }
